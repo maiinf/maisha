@@ -625,6 +625,42 @@
 			]
 		},
 		{
+			"id": "lago_espejo",
+			"tipo": "historia",
+			"titulo": "El Lago Espejo",
+			"quien": "mbuzi",
+			"texto": "Al oeste de la Cañada del Eco hay un lago que, dicen, se acuerda de todo lo que ha visto. Pero su agua está turbia, y algo grande se mueve en el fondo.",
+			"aparece": [
+				"eco/canada_eco"
+			],
+			"hecha": [
+				"kambare_vencido"
+			],
+			"premio": "El lago vuelve a ser un espejo",
+			"pasos": [
+				{
+					"texto": "Ve al Lago Espejo, al oeste de la Cañada del Eco",
+					"hecho": [
+						"visto/lago_espejo"
+					],
+					"ir": {
+						"escena": "canada_eco",
+						"buscar": "puerta:lago_espejo"
+					}
+				},
+				{
+					"texto": "Encuentra lo que enturbia el agua",
+					"hecho": [
+						"kambare_vencido"
+					],
+					"ir": {
+						"escena": "lago_espejo",
+						"buscar": "grupo:arena_jefe"
+					}
+				}
+			]
+		},
+		{
 			"id": "cocina_juncia",
 			"tipo": "encargo",
 			"titulo": "La cocina de Juncia",

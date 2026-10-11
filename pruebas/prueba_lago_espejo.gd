@@ -1,9 +1,11 @@
 extends Node
-## Prueba automática del Lago Espejo: el agua turbia mientras vive Kambare, la quietud que vuelve el lago espejo,
+## Prueba automática del Lago Espejo: el agua turbia mientras vive Kambare, la pelea contra Kambare (el siluro de
+## cieno), la quietud que vuelve el lago espejo,
 ## los puentes del reflejo (que se encienden, se cruzan y se apagan si el agua tiembla) y la vuelta a la Cañada.
 ## Se ejecuta sin abrir el editor:  godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_lago_espejo
 
 const R := preload("res://scripts/combate/reglas_combate.gd")
+const SEMILLA := preload("res://scripts/combate/semilla.gd")
 var _fallos := 0
 
 
@@ -121,9 +123,82 @@ func _ready() -> void:
 	await _empujar("mover_arriba", 1.2)
 	_comprobar(maisha.global_position.y > 47 * 16, "y el puente no se puede pisar (%.0f)" % maisha.global_position.y)
 
+	print("Kambare, el siluro de cieno:")
+	var arena: Node2D = get_tree().get_first_node_in_group("arena_jefe")
+	_comprobar(arena != null and arena.jefe == "kambare", "en la orilla sur, la arena de Kambare")
+	arena.set("activa", true)
+	maisha.vida = maisha.vida_maxima()
+	maisha.global_position = arena.global_position + Vector2(-arena.radios_umbral.x - 40, 0)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	maisha.global_position = arena.global_position + Vector2(-arena.radios_umbral.x * 0.7, 0)
+	await _esperar(0.4)
+	var kam: Node2D = arena.get("_nucleo")
+	_comprobar(arena.estado == arena.Estado.CERRADA and kam.fase != kam.Fase.DORMIDO, "al entrar, las raíces encierran a Maisha y Kambare asoma del cieno")
+	_comprobar(Sonido.musica_actual == "jefe_kambare", "con su música (%s)" % Sonido.musica_actual)
+	await _esperar(2.0)
+	_comprobar(kam.fase == kam.Fase.NADA and not kam.recibir_golpe(1, Vector2.RIGHT), "nadando en su charca, el cetro no le da")
+	maisha.global_position = kam.get("_charca").call() + Vector2(0, 4)
+	await _esperar(0.3)
+	_comprobar(float(maisha.get("pegajoso")) > 0.0, "y el cieno de la charca frena a Maisha")
+	maisha.global_position = arena.global_position + Vector2(-90, 10)
+	kam.set("_espera", 0.0)
+	var aviso := false
+	for i in 60:
+		await _esperar(0.05)
+		maisha.vida = maisha.vida_maxima()
+		if kam.fase == kam.Fase.APUNTA:
+			aviso = true
+			break
+	_comprobar(aviso and kam.get("_hasta").distance_to(maisha.global_position) < 30.0, "una sombra marca dónde va a caer, junto a Maisha")
+	maisha.set("_invulnerable", 0.0)
+	var varado := false
+	for i in 60:
+		await _esperar(0.05)
+		if kam.fase == kam.Fase.VARADO:
+			varado = true
+			break
+	_comprobar(varado, "salta y cae varado en la orilla")
+	await _esperar(0.3)
+	_comprobar(maisha.vida < maisha.vida_maxima(), "la ola de barro le hace daño a Maisha, que estaba debajo")
+	_comprobar(kam.recibir_golpe(1, Vector2.RIGHT) and kam.vida == R.KAMBARE_VIDA - 1, "varado, el cetro le quita 1")
+	kam.recibir_danio(1, kam.global_position, "explosion")
+	_comprobar(kam.vida == R.KAMBARE_VIDA - 1 - R.KAMBARE_DANIO_SEMILLA, "y una semilla que le estalla al lado, 2")
+	var vuelve := false
+	for i in 80:
+		await _esperar(0.05)
+		maisha.vida = maisha.vida_maxima()
+		if kam.fase == kam.Fase.NADA:
+			vuelve = true
+			break
+	_comprobar(vuelve, "luego se arrastra de vuelta a la charca")
+	kam._herir(1)
+	_comprobar(kam._en_fase_2(), "con la mitad de vida, pasa a la segunda fase")
+	kam._cambiar(kam.Fase.ESCUPE)
+	await _esperar(0.8)
+	_comprobar(get_tree().get_nodes_in_group("bolas_oxido").size() >= R.KAMBARE_CHORROS, "escupe chorros de cieno en abanico")
+	await _esperar(1.2)
+	_comprobar(kam.get("_charcos").size() >= 1, "que dejan charcos de barro")
+	while kam.vida > 0:
+		kam._cambiar(kam.Fase.VARADO)
+		kam.recibir_golpe(1, Vector2.RIGHT)
+		await get_tree().process_frame
+	_comprobar(Estado.tiene("kambare_vencido"), "vencido, se le cae el barro")
+	for i in 30:
+		maisha.vida = maisha.vida_maxima()
+		await _esperar(0.5)
+		if arena.estado == arena.Estado.PURGADA:
+			break
+	_comprobar(arena.estado == arena.Estado.PURGADA and Estado.tiene("zona/lago_espejo/1"), "Kambare se va nadando y la arena queda purgada")
+	_comprobar(Misiones.hechas().any(func(m: Dictionary) -> bool: return m["id"] == "lago_espejo"), "misión del lago cumplida")
+	for i in 20:
+		await _esperar(0.5)
+		if get_tree().get_first_node_in_group("dialogo").hablando:
+			break
+	await _leer_dialogo()
+
 	print("Sin Kambare, la quietud:")
-	Estado.marcar("kambare_vencido")
-	await _esperar(3.3)
+	await _esperar(1.0)
 	_comprobar(not espejo.turbio(), "al vencer a Kambare, el agua se aclara")
 	maisha.global_position = pie
 	await _esperar(0.5)

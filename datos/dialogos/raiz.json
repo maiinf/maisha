@@ -1713,5 +1713,17 @@
 				]
 			}
 		]
+	},
+	"lago_kambare_libre": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Kambare se hunde en el lago, limpio y tranquilo. Era él quien removía el barro: Giza no le dejaba estarse quieto.",
+					"El agua se está aclarando... Si ahora me quedo quieta en la orilla, quizá el lago me enseñe lo que guarda."
+				]
+			}
+		]
 	}
 }

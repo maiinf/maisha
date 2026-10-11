@@ -129,6 +129,15 @@ const CUERVO_APUNTA := 0.75            # segundos apuntando (la raya del suelo a
 const CUERVO_PICADO := 230.0           # velocidad del picado (píxeles por segundo)
 const CUERVO_POSADO := 1.4             # posado picoteando tras el picado: el cetro le quita 2
 const CUERVO_ESPERA := 1.3             # dando vueltas antes de volver a apuntar
+## Kambare, el siluro de cieno (minijefe del Lago Espejo): nada en su charca, salta hacia Maisha y queda varado
+const KAMBARE_VIDA := 8
+const KAMBARE_AVISO := 0.85             # la sombra marca dónde caerá antes de saltar
+const KAMBARE_SALTO := 0.6              # segundos en el aire
+const KAMBARE_OLA := 42.0               # hasta dónde llega la ola de barro al caer
+const KAMBARE_VARADO := 2.2             # coleteando en la orilla: el cetro le quita 1 (una semilla, 2)
+const KAMBARE_DANIO_SEMILLA := 2
+const KAMBARE_ESPERA := 2.0             # nadando en la charca antes de volver a saltar
+const KAMBARE_CHORROS := 3              # fase 2: chorros de cieno en abanico
 ## Lago Espejo: segundos que Maisha tiene que estar quieta junto al agua para que el lago se vuelva espejo
 const QUIETUD_SEGUNDOS := 3.0
 ## Murciélago de eco (Cañada del Eco): revolotea, avisa y grita una onda que va y vuelve; al tragársela, cae aturdido

@@ -1552,6 +1552,78 @@ def escala_tramo():
     return reverb(p.entera(), 0.8, 0.2)
 
 
+# =============================================================================
+# KAMBARE, EL SILURO DE CIENO
+# =============================================================================
+
+def _chapoteo(d, f0=300, f1=2400, fuerza=1.0):
+    """Un chapoteo de barro: ruido que se abre y se apaga deprisa, con borboteo."""
+    n = _n(d)
+    x = paso_banda(ruido_rosa(d), f0, f1) * caida(n, d * 0.3)
+    burbujas = seno(_desliz(180, 90, d), d) * (np.sin(np.arange(n) / SR * 2 * np.pi * 22) > 0.4) * caida(n, d * 0.4) * 0.3
+    return (x + burbujas) * fuerza
+
+
+def kambare_ruge():
+    """Kambare asoma del cieno: un gruñido grave y húmedo, con burbujas que revientan."""
+    p = Pista(1.6)
+    d = 1.0
+    n = _n(d)
+    f = _desliz(70, 52, d)
+    voz = (sierra(f, d) * 0.5 + seno(f * 2, d) * 0.3) * adsr(n, 0.08, 0.2, 0.7, 0.4)
+    p.poner(paso_bajo(voz, 600) * 0.8, 0.0)
+    for k in range(5):
+        p.poner(_chapoteo(0.12, 500, 2500, 0.4), 0.2 + k * 0.17)
+    return reverb(p.entera(), 1.2, 0.25)
+
+
+def kambare_salta():
+    """El salto: el cieno se abre de golpe y un chorro de barro sube."""
+    p = Pista(0.8)
+    p.poner(_chapoteo(0.35, 300, 3000, 1.0), 0.0)
+    p.poner(paso_banda(ruido(0.3), 1500, 5000) * np.linspace(1, 0, _n(0.3)) * 0.3, 0.05)
+    return reverb(p.entera(), 0.6, 0.2)
+
+
+def kambare_cae():
+    """Cae en la orilla: un golpe sordo y pesado, y la ola de barro que se abre."""
+    p = Pista(1.2)
+    golpe = seno(_desliz(90, 40, 0.3), 0.3) * caida(_n(0.3), 0.1)
+    p.poner(golpe * 1.0, 0.0)
+    p.poner(paso_bajo(ruido_rosa(0.15), 500) * caida(_n(0.15), 0.05) * 0.9, 0.0)
+    p.poner(_chapoteo(0.6, 250, 2000, 0.8), 0.04)
+    return reverb(p.entera(), 0.9, 0.25)
+
+
+def kambare_escupe():
+    """Escupe chorros de cieno: tres «ploc» húmedos seguidos."""
+    p = Pista(1.0)
+    for k in range(3):
+        d = 0.14
+        p.poner(seno(_desliz(260, 520, d), d) * caida(_n(d), 0.05) * 0.5, k * 0.12)
+        p.poner(_chapoteo(0.15, 600, 3000, 0.5), k * 0.12)
+    return reverb(p.entera(), 0.6, 0.2)
+
+
+def kambare_dolor():
+    """Le duele: un gruñido que sube, ahogado en barro."""
+    d = 0.5
+    n = _n(d)
+    f = _desliz(80, 150, d)
+    x = (sierra(f, d) * 0.5 + seno(f * 3, d) * 0.2) * adsr(n, 0.01, 0.1, 0.6, 0.2)
+    return reverb(paso_bajo(x, 900) * 0.9 + _chapoteo(d, 400, 2000, 0.3), 0.7, 0.2)
+
+
+def kambare_vencido():
+    """Vencido: el barro se le cae a trozos (chapoteos que se apagan) y queda un borboteo tranquilo y limpio."""
+    p = Pista(3.0)
+    for k in range(7):
+        p.poner(_chapoteo(0.2, 300 + k * 60, 2500, 0.7 - k * 0.08), k * 0.18)
+    for k, nota in enumerate(("E5", "G#5", "B5", "E6")):
+        p.poner(campanita(nota, 1.4, 0.35), 1.5 + k * 0.15)
+    return reverb(p.entera(), 1.8, 0.35)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -1595,6 +1667,8 @@ EFECTOS = {
     "murcielago_chillido": (murcielago_chillido, 0.55), "murcielago_grito": (murcielago_grito, 0.7),
     "onda_rebota": (onda_rebota, 0.6), "murcielago_mareo": (murcielago_mareo, 0.6),
     "murcielago_aleteo": (murcielago_aleteo, 0.5), "cencerro": (cencerro, 0.6), "escala_tramo": (escala_tramo, 0.6),
+    "kambare_ruge": (kambare_ruge, 0.85), "kambare_salta": (kambare_salta, 0.7), "kambare_cae": (kambare_cae, 0.9),
+    "kambare_escupe": (kambare_escupe, 0.65), "kambare_dolor": (kambare_dolor, 0.8), "kambare_vencido": (kambare_vencido, 0.85),
 }
 
 AMBIENTES = {

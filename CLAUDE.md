@@ -57,4 +57,4 @@ Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--h
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,
 Senda de los Surcos y Cañada del Eco hechos; faltan 4) y el misterio de los 9 ecos perdidos (5 hechos).
-En marcha: el Lago Espejo (jugable: agua turbia, quietud y puentes del reflejo; falta Kambare, Kimya y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
+En marcha: el Lago Espejo (jugable: agua turbia, Kambare, quietud y puentes del reflejo; falta Kimya en la isla, el secreto del islote y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.

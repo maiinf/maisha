@@ -1572,7 +1572,7 @@ def crear_lago():
         if 0 <= x < ANCHO and 0 <= y < ALTO:
             m[y][x] = c
 
-    zonas = {"1": (26, 56, 11, 5), "2": (76, 9, 8, 5)}
+    zonas = {"1": (26, 56, 13, 6), "2": (76, 9, 8, 5)}
 
     def en_zona(x, y, margen=2):
         for (zx, zy, rx, ry) in zonas.values():
@@ -1671,8 +1671,7 @@ def crear_lago():
     poner(91, 32, "S")
     for k, (zx_, zy_, rx_, ry_) in zonas.items():
         poner(zx_, zy_, k)
-    # (la arena «1» será la de Kambare; hasta que exista su pelea, es una zona corrupta normal)
-    textos = {"1": "11, 5, 4, 3", "2": "8, 5, 4, 3"}
+    textos = {"1": "13, 6, 4, 0, , jefe:kambare", "2": "8, 5, 4, 3"}
     return ["".join(f) for f in m], textos
 
 

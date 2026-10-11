@@ -556,6 +556,7 @@ TITULOS = {
     "cobrizo": "La loma de cobre",
     "surcos": "Canción de siega",
     "canada": "Lo que la peña devuelve",
+    "jefe_kambare": "Kambare, el siluro de cieno",
 }
 
 # =============================================================================
@@ -1032,13 +1033,51 @@ def canada():
     return final(p, sala=3.4, mezcla=0.34, brillo=5000)
 
 
+# =============================================================================
+# KAMBARE, EL SILURO DE CIENO: pesada y húmeda (mi menor con el segundo grado bajado), con chapoteos y burbujas
+# =============================================================================
+
+def jefe_kambare():
+    tempo = Tempo(104)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    acords = [["E2", "B2", "F3"], ["D2", "A2", "E3"], ["C2", "G2", "D3"], ["D2", "A2", "F3"], ["E2", "B2", "F3"], ["G2", "D3", "A3"]]
+    for i in range(6):
+        p.poner(coro(acords[i], tempo.s(16) + 1.0, "u", 0.7), tempo.s(i * 16), 0.5)
+        p.poner(bajo(acords[i][0][:-1] + "1", tempo.s(16)), tempo.s(i * 16), 0.6)
+    # el cieno: un tambor grave que se arrastra (1 . . 1 1 . 1 .) y un taiko en cada salto
+    for c in range(pulsos // 4):
+        base = c * 4
+        for (en, f) in ((0, 0.45), (1.5, 0.3), (2.0, 0.34), (3.0, 0.28)):
+            p.poner(tambor("E2", 0.45, f, golpe=0.35), tempo.s(base + en))
+        if c % 4 == 3:
+            p.poner(taiko(1.4, 0.8), tempo.s(base + 3.5))
+    # el agua turbia: un ostinato de kalimba grave que sube y baja como una ola
+    ostinato = ["E3", "F3", "B3", "F3", "E3", "D3", "C3", "D3"]
+    for b in range(16, pulsos * 2):
+        p.poner(kalimba(ostinato[b % 8], 0.5), tempo.s(b * 0.5), 0.3, pan=-0.3)
+    # el tema de Maisha, enturbiado, en la flauta grave
+    turbio = [("E5", 0, 3), ("B4", 3, 1), ("F5", 4, 3), ("G5", 7, 1), ("F5", 8, 2), ("E5", 10, 2), ("B4", 12, 4)]
+    for vuelta in (32, 48, 64, 80):
+        melodia(p, tempo, turbio, desde=vuelta, instrumento=lambda n, d: flauta(n, d, 0.48, vibrato=5.5), volumen=0.4, pan=0.25, sostener=0.95)
+    # burbujas y chapoteos
+    rng = np.random.default_rng(13)
+    for k in range(30):
+        p.poner(campanita(["E5", "B4", "F5", "G5"][rng.integers(4)], 0.5, 0.18), tempo.s(rng.random() * pulsos), pan=rng.random() - 0.5)
+    for k in range(10):
+        d = 0.3
+        chap = paso_banda(ruido_rosa(d), 400, 2400) * np.exp(-np.linspace(0, 6, int(d * SR)))
+        p.poner(chap * 0.25, tempo.s(rng.random() * pulsos), pan=rng.random() - 0.5)
+    return final(p, sala=2.2, mezcla=0.27, brillo=4600)
+
+
 NO_SE_REPITEN = ("raiz_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
 PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": prados, "aldea": aldea,
           "interior": interior, "combate": combate, "jefe": jefe, "purga": purga, "victoria": victoria, "objeto": objeto, "tarea": tarea,
           "recuerdo": recuerdo, "noche": noche, "amanece": amanece, "bosque": bosque, "jefe_pembe": jefe_pembe,
           "cienaga": cienaga, "jefe_konokono": jefe_konokono, "campo": campo, "jefe_cosechadora": jefe_cosechadora,
           "tienda": tienda, "raiz_libre": raiz_libre, "sendero": sendero, "pasarelas": pasarelas,
-          "cobrizo": cobrizo, "surcos": surcos, "canada": canada}
+          "cobrizo": cobrizo, "surcos": surcos, "canada": canada, "jefe_kambare": jefe_kambare}
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

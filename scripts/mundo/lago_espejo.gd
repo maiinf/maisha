@@ -18,6 +18,15 @@ func _ready() -> void:
 	$Corrupcion.region_purgada.connect(_al_purgar_region)
 	if not Estado.tiene("lago_llegada"):
 		_pensar_al_llegar.call_deferred()
+	Estado.marca_puesta.connect(_al_poner_marca_lago)
+
+
+func _al_poner_marca_lago(marca: String) -> void:
+	if marca != "kambare_vencido":
+		return
+	await get_tree().create_timer(6.0).timeout
+	if is_inside_tree():
+		await CHARLA_SCRIPT.hablar(self, "lago_kambare_libre")
 
 
 func _pensar_al_llegar() -> void:

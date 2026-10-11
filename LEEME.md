@@ -268,15 +268,21 @@ Escena `escenas/mundo/canada_eco.tscn` (mapa de 140×46 casillas, de este a oest
 - El **quinto eco**, en la cornisa: Maisha, Mauti y Kimya gritando sus nombres (ver «Los ecos perdidos»).
 - Sonidos propios (`crear_sonidos.py`): `murcielago_chillido`, `murcielago_aleteo`, `murcielago_grito`, `onda_rebota`, `murcielago_mareo`, `cencerro` (al recoger uno) y `escala_tramo` (cada tramo de la escala al desenrollarse).
 
-## Lago Espejo (en construcción)
+## Lago Espejo
 
 Escena `escenas/mundo/lago_espejo.tscn` (mapa de 96×64 casillas, `construir_mapa.py lago_espejo --crear`, `crear_lago`), al oeste de la **Cañada del Eco**. El paso de la Cañada se abre al escuchar el **quinto eco** (la puerta del oeste está `cerrada:eco/canada_eco`). Música: de momento «Agua quieta» de la Ciénaga.
 - Un lago grande con una **isla** en el centro (donde aparecerá **Kimya**) y un **islote** con un secreto. El suelo pinta el agua **quieta como un espejo** (`_agua_espejo` en `pintar_suelo.py`).
 - **Agua turbia** mientras vive **Kambare** (falta la marca `kambare_vencido`): dos capas de barro y óxido que se funden despacio, con burbujas y brillos de Giza (`scripts/mundo/lago/espejo_lago.gd`). Si Maisha intenta calmarla, piensa que algo grande remueve el fondo.
 - **La quietud**: sin Kambare, si Maisha se queda **quieta junto al agua** 3 segundos (`QUIETUD_SEGUNDOS`), un anillo se cierra a su alrededor y el lago se vuelve **espejo**. Andar no lo rompe; correr, golpear, lanzar una semilla, el Latido o una pelea, sí (salvo con Maisha encima de un puente).
 - **Puentes del reflejo** (`\` en el mapa, `scripts/mundo/objetos/puente_reflejo.gd`): tablas de luz que apenas se adivinan con el agua movida y que, con el lago en espejo, se encienden de la orilla hacia dentro y se pueden cruzar. Uno largo hasta la isla y otro corto hasta el islote.
-- En la orilla sur, la arena de **Kambare** (por ahora una zona corrupta normal); al noreste, otra zona corrupta (salen ranas de piedra y petrinos).
-- Capturas: `documentacion/lago_espejo_capturas.png`. Falta: **Kambare**, **Kimya** en la isla, el secreto del islote y la música propia.
+- Al noreste, una zona corrupta (salen ranas de piedra y petrinos). Misión «El Lago Espejo» (aparece al escuchar el quinto eco).
+- **Kambare, el siluro de cieno** (`scripts/enemigos/kambare.gd`, dibujo `herramientas/dibujar_kambare.py`, música «Kambare, el siluro de cieno»), minijefe en la arena de la orilla sur (zona `1` con `jefe:kambare`):
+  - **Nada** en su charca de cieno, medio hundido: solo asoman la cabeza, la aleta y las burbujas, y el cetro no le da. El cieno de la charca frena a Maisha.
+  - **Apunta**: una sombra (con el anillo de la ola) marca dónde caerá, cerca de Maisha. **Salta** y, al caer, levanta una **ola de barro** en anillo que hace daño.
+  - **Varado** en la orilla, coleteando y con estrellitas: el cetro le quita 1 y una semilla que le estalle al lado, 2. Luego vuelve arrastrándose a la charca.
+  - **Fase 2** (con la mitad de vida): escupe **chorros de cieno** en abanico (dejan charcos que frenan) y a veces salta dos veces seguidas.
+  - Al vencerlo se le cae el barro: queda un siluro limpio, pardo dorado, que se hunde en la charca. Marca `kambare_vencido`: el agua del lago se aclara y Maisha piensa que, si se queda quieta, el lago le enseñará lo que guarda. Números en `reglas_combate.gd` (`KAMBARE_*`).
+- Capturas: `documentacion/lago_espejo_capturas.png` y `documentacion/kambare_capturas.png`. Falta: **Kimya** en la isla, el secreto del islote y la música propia del lago.
 
 ### Los ecos perdidos (el misterio de Raíz)
 
@@ -573,7 +579,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_sendero.gd` va de los Prados al Sendero del Puente y a la aldea y vuelta, prueba los pretiles y el vado, el eco perdido (con su ilustración), el encargo de Msafiri y el cuaderno de ecos.
 - `pruebas/prueba_pasarelas.gd` va de la aldea a Las Pasarelas y a la ciénaga y vuelta, prueba el agua y las tablas, el tramo roto, la rana de piedra (aviso, salto, onda, atontada), el encargo de Korongo (que arregla la pasarela) y el segundo eco.
 - `pruebas/prueba_camino_cobrizo.gd` sube de los Prados al Camino Cobrizo y al bosque y vuelta, prueba la peña y el derrumbe, el topo de piedra (bajo tierra, aviso, mordisco, atontado, las raíces que lo sacan), el encargo de Fuko (que despeja la galería) y el tercer eco.
-- `pruebas/prueba_lago_espejo.gd` llega al Lago Espejo desde la Cañada, prueba el agua turbia (no se calma y los puentes no se pisan), la quietud que vuelve el lago espejo, el puente del reflejo que se enciende y se cruza hasta la isla, que andar no lo rompe y un golpe en la orilla sí, y la vuelta a la Cañada.
+- `pruebas/prueba_lago_espejo.gd` llega al Lago Espejo desde la Cañada, prueba el agua turbia (no se calma y los puentes no se pisan), la pelea contra Kambare (charca, salto con su sombra, ola de barro, varado, chorros de cieno, vencido y la arena purgada), la quietud que vuelve el lago espejo, el puente del reflejo que se enciende y se cruza hasta la isla, que andar no lo rompe y un golpe en la orilla sí, y la vuelta a la Cañada.
 - `pruebas/prueba_canada_eco.gd` va del Bosque Cobrizo a la Cañada del Eco y vuelta, prueba la peña de la garganta, el murciélago de eco (colgado, vuelo, aviso, la onda que va y vuelve, aturdido, el Latido que deshace la onda), la escala de cuerda (enrollada y descolgada), el encargo de Mbuzi, el quinto eco (con su ilustración) y el paso al Lago Espejo, aún cerrado.
 - `pruebas/prueba_senda_surcos.gd` sube de la aldea a la Senda de los Surcos y al Campo Segado y vuelta, prueba la acequia y el foso, el cuervo de óxido (vuelo, raya de aviso, picado, posado, raíces), el encargo de Sungura (que vacía el foso) y el cuarto eco.
 - `pruebas/prueba_aldea.gd` cruza el sendero hasta la aldea, habla con Bibi, entra y sale del Gran Árbol, rescata a Pino y comprueba que todo se recuerda al volver.
