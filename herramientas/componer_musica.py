@@ -12,6 +12,7 @@ Genera en audio/musica/:
   combate.ogg     dentro de una zona de Giza: tensión contenida (en bucle)
   jefe.ogg        la pelea contra Mzizi (en bucle)
   purga.ogg, victoria.ogg, objeto.ogg   fanfarrias cortas
+  canada.ogg      la Cañada del Eco: la flauta y su eco en la peña (en bucle)
 
 El tema de Maisha (la melodía que vuelve en todas): D5 A4 E5 F#5 | E5 D5 A4 (B4) D5
 Instrumentos: kalimba y balafón (por las raíces suajilis del mundo), flauta, voces y tambores de mano.
@@ -24,7 +25,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sintetizador import (SR, Pista, bajo, balafon, barrido_bajo, campanita, colchon, coro, estereo, flauta, guardar,
                           piano, acorde_piano, paso_bajo,
-                          kalimba, maraca, paso_bajo, reverb, semilla, suavizar_bordes, tambor, taiko, ruido_rosa)
+                          kalimba, maraca, paso_bajo, paso_banda, reverb, semilla, suavizar_bordes, tambor, taiko, ruido_rosa)
 import crear_sonidos
 
 DESTINO = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "audio", "musica")
@@ -554,6 +555,7 @@ TITULOS = {
     "pasarelas": "Entre juncos",
     "cobrizo": "La loma de cobre",
     "surcos": "Canción de siega",
+    "canada": "Lo que la peña devuelve",
 }
 
 # =============================================================================
@@ -979,13 +981,64 @@ def surcos():
     return final(p, sala=2.4, mezcla=0.26, brillo=5600)
 
 
+# =============================================================================
+# LA CAÑADA DEL ECO: «Lo que la peña devuelve» (flauta y su eco, kalimba, viento en la garganta, en mi dórico)
+# =============================================================================
+
+## El tema de Maisha en mi dórico, en frases cortas con silencios: en cada silencio, la peña la devuelve
+FRASES_PENA = [
+    [("E5", 0, 1.5), ("B4", 1.5, 0.5), ("F#5", 2, 1), ("G5", 3, 2)],
+    [("F#5", 8, 1.5), ("E5", 9.5, 0.5), ("B4", 10, 1), ("D5", 11, 2)],
+    [("A5", 16, 1.5), ("G5", 17.5, 0.5), ("F#5", 18, 1), ("E5", 19, 1), ("C#5", 20, 1)],
+    [("D5", 24, 1), ("E5", 25, 1), ("B4", 26, 3)],
+]
+## La frase de Kimya: sin eco, larga y quieta (al final de la vuelta)
+FRASE_QUIETA = [("B4", 48, 2), ("E5", 50, 2), ("D5", 52, 1), ("C#5", 53, 1), ("B4", 54, 6)]
+
+
+def canada():
+    tempo = Tempo(78)
+    pulsos = 64
+    p = Pista(tempo.s(pulsos))
+    progresion = [("E2", "m7"), ("A2", "M"), ("E2", "m7"), ("D2", "M"), ("C2", "M7"), ("A2", "M"), ("B1", "m"), ("E2", "m7")] * 2
+    colchones(p, tempo, progresion, compas=4, brillo=800, volumen=0.22, octava_bajo=1, fuerza_bajo=0.28)
+    # la kalimba: un ostinato tranquilo, como gotas que caen en la garganta
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=1.0, volumen=0.15, pan=-0.35, patron=(0, 2, 1, 2))
+    # el viento que pasa por la garganta: ráfagas de ruido rosa que suben y bajan
+    rng = np.random.default_rng(53)
+    for k in range(7):
+        d = 5.0 + rng.random() * 3
+        n = int(d * SR)
+        viento = ruido_rosa(d) * np.sin(np.linspace(0, np.pi, n)) ** 2
+        p.poner(paso_banda(viento, 300 + rng.random() * 200, 1400) * 0.22, k * tempo.s(pulsos) / 7, pan=rng.random() - 0.5)
+    # los cencerros de Mbuzi, lejos: clonc
+    for k in range(6):
+        b = 2 + k * 10 + rng.random() * 3
+        p.poner(campanita(["E4", "B3", "G4"][k % 3], 1.6, 0.1), tempo.s(b), pan=0.5 - rng.random())
+    # la flauta y su eco: cada frase vuelve dos veces, cada vez más suave, más lejos y del otro lado
+    flauta_ = lambda n, d: flauta(n, d, 0.42, vibrato=4.6)
+    eco_ = lambda n, d: flauta(n, d, 0.3, vibrato=3.0)
+    for vuelta in (0, 32):
+        for k, frase in enumerate(FRASES_PENA):
+            if vuelta == 32 and k == 3:
+                continue                            # (en la segunda vuelta, la última frase deja sitio a Kimya)
+            melodia(p, tempo, frase, desde=vuelta, instrumento=flauta_, volumen=0.34, sostener=0.9, pan=-0.2)
+            melodia(p, tempo, frase, desde=vuelta + 4, instrumento=eco_, volumen=0.13, sostener=0.9, pan=0.45)
+            melodia(p, tempo, frase, desde=vuelta + 6, instrumento=eco_, volumen=0.05, sostener=0.9, pan=0.6)
+    # la frase de Kimya: el piano, sin eco, sobre un acorde que se queda quieto
+    tocar(p, tempo, FRASE_QUIETA, desde=0, fuerza=0.28, pan=0.0)
+    p.poner(coro(["E3", "B3", "D4", "F#4"], tempo.s(12)), tempo.s(48), 0.06)
+    return final(p, sala=3.4, mezcla=0.34, brillo=5000)
+
+
 NO_SE_REPITEN = ("raiz_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
 PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": prados, "aldea": aldea,
           "interior": interior, "combate": combate, "jefe": jefe, "purga": purga, "victoria": victoria, "objeto": objeto, "tarea": tarea,
           "recuerdo": recuerdo, "noche": noche, "amanece": amanece, "bosque": bosque, "jefe_pembe": jefe_pembe,
           "cienaga": cienaga, "jefe_konokono": jefe_konokono, "campo": campo, "jefe_cosechadora": jefe_cosechadora,
           "tienda": tienda, "raiz_libre": raiz_libre, "sendero": sendero, "pasarelas": pasarelas,
-          "cobrizo": cobrizo, "surcos": surcos}
+          "cobrizo": cobrizo, "surcos": surcos, "canada": canada}
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

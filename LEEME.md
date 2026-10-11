@@ -255,7 +255,7 @@ Escena `escenas/mundo/senda_surcos.tscn` (64×100, de sur a norte), entre Cuna d
 
 ### Cañada del Eco
 
-Escena `escenas/mundo/canada_eco.tscn` (mapa de 140×46 casillas, de este a oeste: unas 3,5 pantallas), entre el **Bosque Cobrizo** (la nueva salida del oeste del bosque lleva aquí) y el **Lago Espejo** (el paso del oeste sigue cerrado: niebla, marca `camino_lago`). El mapa se genera con `construir_mapa.py canada_eco --crear` (`crear_canada`). Música: de momento suena «La loma de cobre» del Camino Cobrizo (falta una propia).
+Escena `escenas/mundo/canada_eco.tscn` (mapa de 140×46 casillas, de este a oeste: unas 3,5 pantallas), entre el **Bosque Cobrizo** (la nueva salida del oeste del bosque lleva aquí) y el **Lago Espejo** (el paso del oeste sigue cerrado: niebla, marca `camino_lago`). El mapa se genera con `construir_mapa.py canada_eco --crear` (`crear_canada`). Música propia: «Lo que la peña devuelve» (`componer_musica.py canada`): la flauta toca el tema de Maisha en frases cortas y la peña se las devuelve dos veces, más suaves y del otro lado; al final, una frase de piano sin eco (la de Kimya), con viento en la garganta, kalimba y cencerros lejanos.
 - Una **garganta** entre dos paredes de peña (`0`) con la **cara del acantilado el doble de alta** y, encima, una **meseta** de hierba (`_mesetas` en `pintar_suelo.py`): la roca solo se ve en el filo y en la cara.
 - Un **arroyo** baja hacia el lago y cruza el camino bajo un **puentecito** (este) y por un **vado** (oeste). Al este, hierba de bosque y hojarasca; al oeste, flores.
 - **Mbuzi** (`}` con `viajero = "mbuzi"`), la cabra montés pastora, mayor y tranquila, junto a su **aprisco** (`{`: cabaña de piedra seca con tejado de lajas, pesebre de heno y corral). Encargo: **tres cencerros** (`` ` `` con `objeto_encargo = "cencerro"`). Al devolvérselos da dos sopas y descuelga la **escala de cuerda** (`"` en esta cañada, `scripts/mundo/objetos/escala_cuerda.gd`: se desenrolla tramo a tramo; marca `escala_descolgada/canada_eco`) hasta la **cornisa** del **quinto eco**.
@@ -266,7 +266,7 @@ Escena `escenas/mundo/canada_eco.tscn` (mapa de 140×46 casillas, de este a oest
   - Al tragarse su propio eco cae **aturdido** (estrellitas encima): el cetro le quita 2. Las raíces de una semilla lo sujetan en el suelo; la explosión le da aunque vuele. Números en `reglas_combate.gd` (`MURCIELAGO_*`).
 - Arte: `herramientas/pintar_canada.py` (aprisco, escala, cencerro e icono, y el murciélago: 6 fotogramas), Mbuzi en `dibujar_aldeanos.py`. Bocetos y capturas en `documentacion/` (`boceto_canada_eco.png`, `boceto_canada_suelo.png`, `canada_eco_capturas.png`, `murcielago_eco_capturas.png`).
 - El **quinto eco**, en la cornisa: Maisha, Mauti y Kimya gritando sus nombres (ver «Los ecos perdidos»).
-- Falta: la música propia y los sonidos propios del murciélago (de momento usa «eco_voz»).
+- Sonidos propios (`crear_sonidos.py`): `murcielago_chillido`, `murcielago_aleteo`, `murcielago_grito`, `onda_rebota`, `murcielago_mareo`, `cencerro` (al recoger uno) y `escala_tramo` (cada tramo de la escala al desenrollarse).
 
 ### Los ecos perdidos (el misterio de Raíz)
 

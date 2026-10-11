@@ -92,10 +92,12 @@ func _physics_process(delta: float) -> void:
 	match fase:
 		Fase.COLGADO:
 			if _t >= R.MURCIELAGO_DESPIERTA:
-				Sonido.efecto("eco_voz", 0.0, global_position, 0.3)
+				Sonido.efecto("murcielago_chillido", 0.0, global_position, 0.2)
 				_cambiar(Fase.DESPEGA)
 		Fase.DESPEGA:
 			_alto = move_toward(_alto, R.MURCIELAGO_ALTURA, 70.0 * delta)
+			if _t < delta * 1.5:
+				Sonido.efecto("murcielago_aleteo", 0.0, global_position, 0.2)
 			if _t >= 0.4 and absf(_alto - R.MURCIELAGO_ALTURA) < 0.5:
 				_espera = R.MURCIELAGO_ESPERA
 				_cambiar(Fase.REVOLOTEA)
@@ -111,6 +113,7 @@ func _physics_process(delta: float) -> void:
 			if maisha and _espera <= 0.0 and maisha.global_position.distance_to(global_position) < R.MURCIELAGO_VE:
 				_direccion = (maisha.global_position - global_position).normalized()
 				_cambiar(Fase.AVISA)
+				Sonido.efecto("murcielago_chillido", -4.0, global_position, 0.15)
 		Fase.AVISA:
 			if maisha and _t < R.MURCIELAGO_AVISO * 0.5:
 				_direccion = (maisha.global_position - global_position).normalized()    # apunta hasta la mitad
@@ -136,7 +139,7 @@ func _physics_process(delta: float) -> void:
 
 func _gritar() -> void:
 	_cambiar(Fase.GRITA)
-	Sonido.efecto("eco_voz", 0.0, global_position)
+	Sonido.efecto("murcielago_grito", 0.0, global_position, 0.1)
 	Impacto.temblar(0.8, 0.12)
 	_onda = ONDA.new()
 	_onda.direccion = _direccion
@@ -154,7 +157,7 @@ func tragar_eco() -> void:
 	_onda = null
 	_alto = maxf(_alto, 6.0)
 	_cambiar(Fase.ATURDIDO)
-	Sonido.efecto("petrino_golpeado", 0.0, global_position, 0.2)
+	Sonido.efecto("murcielago_mareo", 0.0, global_position, 0.1)
 
 
 func _limitar(p: Vector2) -> Vector2:

@@ -57,6 +57,8 @@ const VOLUMEN := {
 	"cosechadora_ira": -3.0, "cosechadora_embiste": -3.0, "cosechadora_choque": -2.0, "cosechadora_dolor": -2.0,
 	"cosechadora_vencida": 0.0, "cosechadora_fuego": -3.0, "fuego_quema": -5.0, "comprar": -3.0, "cristal": -5.0, "eco_voz": -2.0, "pagina": -4.0, "libro_abrir": -3.0, "libro_cerrar": -3.0, "pluma": -8.0, "topo_excava": -4.0, "topo_sale": -1.0, "campanilla": -5.0, "cuervo_graznido": -4.0, "cuervo_picado": -3.0, "agua_baja": -3.0,
 	"rana_croa": -6.0, "rana_salta": -7.0, "rana_cae": -4.0,
+	"murcielago_chillido": -6.0, "murcielago_grito": -3.0, "onda_rebota": -5.0, "murcielago_mareo": -5.0,
+	"murcielago_aleteo": -8.0, "cencerro": -5.0, "escala_tramo": -5.0,
 }
 ## Nivel de cada bus (0 a 10) y su volumen en dB con el nivel al máximo (la música, sutil)
 const BUSES := {"Musica": -9.0, "Ambiente": -10.0, "Efectos": -3.0}

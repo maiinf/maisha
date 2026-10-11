@@ -58,7 +58,7 @@ func _disponible() -> bool:
 
 func _coger() -> void:
 	_cogido = true
-	Sonido.efecto({"seta_luminosa": "seta_recoger", "campanilla": "campanilla"}.get(objeto, "recoger"))
+	Sonido.efecto({"seta_luminosa": "seta_recoger", "campanilla": "campanilla", "cencerro": "cencerro"}.get(objeto, "recoger"))
 	if marca != "" and rebrota > 0.0:
 		var rebrotes: Dictionary = Estado.extra.get("rebrote", {})
 		rebrotes[marca] = Estado.tiempo_jugado

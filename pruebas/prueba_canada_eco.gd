@@ -99,6 +99,7 @@ func _ready() -> void:
 	await _esperar(2.5)
 	_comprobar(get_tree().get_first_node_in_group("dialogo").hablando, "Maisha piensa algo al llegar")
 	await _leer_dialogo()
+	_comprobar(Sonido.musica_actual == "canada", "suena su música: «Lo que la peña devuelve» (%s)" % Sonido.musica_actual)
 
 	print("La cañada:")
 	var region: Node2D = get_tree().get_first_node_in_group("region")
@@ -181,6 +182,9 @@ func _ready() -> void:
 	_comprobar(murcielago.fase != murcielago.Fase.ATURDIDO, "y sin su eco, no se marea")
 	murcielago.recibir_danio(1, murcielago.global_position, "explosion")
 	_comprobar(murcielago.get("_muriendo"), "la explosión de una semilla le da aunque vuele")
+	var oidos := ["murcielago_chillido", "murcielago_aleteo", "murcielago_grito", "onda_rebota", "murcielago_mareo"].filter(
+			func(n: String) -> bool: return int(Sonido.conteo.get(n, 0)) > 0)
+	_comprobar(oidos.size() == 5, "con sus sonidos: chillido, aleteo, grito, la onda que rebota y el mareo (%s)" % [oidos])
 	maisha.vida = maisha.vida_maxima()
 	await _esperar(0.5)
 
@@ -193,7 +197,7 @@ func _ready() -> void:
 	for n in cencerros:
 		maisha.global_position = n.global_position
 		await _esperar(0.25)
-	_comprobar(Estado.cuantos("cencerro") == 3, "se recogen al pasar (%d/3)" % Estado.cuantos("cencerro"))
+	_comprobar(Estado.cuantos("cencerro") == 3 and int(Sonido.conteo.get("cencerro", 0)) == 3, "se recogen al pasar, con su clonc (%d/3)" % Estado.cuantos("cencerro"))
 	var sopas: int = Estado.cuantos("sopa")
 	maisha.global_position = mbuzi.global_position + Vector2(0, 16)
 	await _esperar(0.3)
@@ -201,7 +205,7 @@ func _ready() -> void:
 	_comprobar(Estado.tiene("mbuzi_cencerros") and Estado.cuantos("cencerro") == 0, "se los entrega")
 	_comprobar(Estado.cuantos("sopa") == sopas + 2, "y Mbuzi le da dos sopas")
 	await _esperar(2.0)
-	_comprobar(escala.descolgada(), "Mbuzi descuelga la escala (tramo a tramo)")
+	_comprobar(escala.descolgada(), "Mbuzi descuelga la escala (tramo a tramo; desde el aprisco no se oye: está lejos)")
 	maisha.global_position = pie
 	await _esperar(0.2)
 	await _empujar("mover_arriba", 2.5)

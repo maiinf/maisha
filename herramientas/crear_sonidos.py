@@ -1459,6 +1459,99 @@ def libro_cerrar():
     return reverb(p.entera(), 0.5, 0.15)
 
 
+# =============================================================================
+# CAÑADA DEL ECO: el murciélago de eco, la onda, los cencerros y la escala de cuerda
+# =============================================================================
+
+def murcielago_chillido():
+    """El murciélago de eco despierta o avisa: tres chirridos agudos, muy rápidos, y la peña que los repite."""
+    p = Pista(1.2)
+    for k in range(3):
+        d = 0.05
+        f = _desliz(4200 - k * 300, 6800 - k * 500, d, 0.6)
+        x = seno(f, d) * adsr(_n(d), 0.003, 0.02, 0.5, 0.02)
+        x = x + paso_banda(ruido(d), 3000, 8000) * caida(_n(d), 0.01) * 0.25
+        p.poner(x * 0.5, k * 0.07)
+        p.poner(x * 0.16, 0.38 + k * 0.07)            # el eco de la peña, más lejos
+        p.poner(x * 0.06, 0.72 + k * 0.07)
+    return reverb(p.entera(), 1.4, 0.3)
+
+
+def murcielago_grito():
+    """El grito que suelta la onda: un chillido que baja y vuelve a subir, áspero y con anillo de piedra."""
+    d = 0.42
+    n = _n(d)
+    u = np.linspace(0, 1, n)
+    f = 2600 * (1 - 0.45 * np.sin(u * np.pi)) + 300 * np.sin(u * 2 * np.pi * 18)
+    x = seno(f, d) * 0.6 + seno(f * 1.5, d) * 0.25
+    x = x * (0.6 + 0.4 * np.sin(2 * np.pi * 70 * u * d))      # el anillo: un temblor rápido
+    x = x * adsr(n, 0.01, 0.1, 0.7, 0.15)
+    x = x + paso_banda(ruido(d), 1500, 5000) * adsr(n, 0.01, 0.1, 0.4, 0.15) * 0.25
+    p = Pista(1.6)
+    p.poner(x * 0.7, 0.0)
+    p.poner(paso_bajo(x, 3500) * 0.22, 0.5)
+    return reverb(p.entera(), 1.8, 0.35)
+
+
+def onda_rebota():
+    """La onda choca con la peña y se da la vuelta: un toc hueco de piedra y un silbido que se aleja al revés."""
+    p = Pista(0.9)
+    toc = seno(_desliz(420, 180, 0.12), 0.12) * caida(_n(0.12), 0.04) * 0.6
+    p.poner(toc, 0.0)
+    p.poner(paso_bajo(ruido_rosa(0.08), 900) * caida(_n(0.08), 0.02) * 0.6, 0.0)
+    d = 0.4
+    silbido = paso_banda(ruido(d), 1800, 6000) * np.linspace(0, 1, _n(d)) ** 2 * 0.3
+    p.poner(silbido[::-1] * 0.8, 0.05)
+    return reverb(p.entera(), 1.2, 0.3)
+
+
+def murcielago_mareo():
+    """Se traga su propio eco y se marea: un pitido que baja dando tumbos y un golpecito de piedra contra el suelo."""
+    p = Pista(1.2)
+    d = 0.7
+    u = np.linspace(0, 1, _n(d))
+    f = 1800 * (1 - 0.6 * u) * (1 + 0.08 * np.sin(2 * np.pi * 7 * u * d))
+    p.poner(seno(f, d) * adsr(_n(d), 0.02, 0.1, 0.6, 0.3) * 0.35, 0.0)
+    p.poner(paso_bajo(ruido_rosa(0.1), 700) * caida(_n(0.1), 0.03) * 0.7, 0.62)
+    p.poner(seno(140, 0.1) * caida(_n(0.1), 0.03) * 0.4, 0.62)
+    return reverb(p.entera(), 0.9, 0.25)
+
+
+def murcielago_aleteo():
+    """Despega: tres aletazos de piel, sordos y rápidos."""
+    p = Pista(0.6)
+    for k in range(3):
+        d = 0.09
+        x = paso_bajo(ruido_rosa(d), 700 + k * 100) * np.sin(np.linspace(0, np.pi, _n(d))) ** 2
+        p.poner(x * 0.8, k * 0.12)
+    return reverb(p.entera(), 0.5, 0.15)
+
+
+def cencerro():
+    """Un cencerro de Mbuzi: un «clonc» hueco de cobre viejo, con el badajo que repica dos veces."""
+    p = Pista(1.6)
+    for k, (dt, fuerza) in enumerate(((0.0, 0.6), (0.14, 0.35), (0.26, 0.18))):
+        d = 1.0
+        n = _n(d)
+        x = (seno(620, d) * caida(n, 0.35) + 0.6 * seno(620 * 2.37, d) * caida(n, 0.18) +
+             0.35 * seno(620 * 3.9, d) * caida(n, 0.08) + 0.25 * seno(310, d) * caida(n, 0.25))
+        golpe = paso_banda(ruido(0.03), 1200, 5000) * caida(_n(0.03), 0.008)
+        p.poner(x * fuerza * 0.5, dt)
+        p.poner(golpe * fuerza, dt)
+    return reverb(p.entera(), 1.6, 0.3)
+
+
+def escala_tramo():
+    """Un tramo de la escala de cuerda que se desenrolla: el zumbido de la cuerda y el peldaño que golpea la roca."""
+    p = Pista(0.5)
+    d = 0.14
+    p.poner(paso_banda(ruido(d), 500, 2500) * np.linspace(0, 1, _n(d)) * 0.25, 0.0)
+    toc = seno(_desliz(380, 260, 0.08), 0.08) * caida(_n(0.08), 0.025) * 0.5
+    p.poner(toc, 0.13)
+    p.poner(paso_banda(ruido(0.05), 800, 4000) * caida(_n(0.05), 0.012) * 0.5, 0.13)
+    return reverb(p.entera(), 0.8, 0.2)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -1499,6 +1592,9 @@ EFECTOS = {
     "comprar": (comprar, 0.6), "cristal": (cristal, 0.5),
     "eco_voz": (eco_voz, 0.6),
     "pagina": (pagina, 0.5), "libro_abrir": (libro_abrir, 0.6), "libro_cerrar": (libro_cerrar, 0.6), "pluma": (pluma, 0.35), "topo_excava": (topo_excava, 0.55), "topo_sale": (topo_sale, 0.85), "campanilla": (campanilla, 0.5), "cuervo_graznido": (cuervo_graznido, 0.6), "cuervo_picado": (cuervo_picado, 0.7), "agua_baja": (agua_baja, 0.6), "rana_croa": (rana_croa, 0.6), "rana_salta": (rana_salta, 0.5), "rana_cae": (rana_cae, 0.8),
+    "murcielago_chillido": (murcielago_chillido, 0.55), "murcielago_grito": (murcielago_grito, 0.7),
+    "onda_rebota": (onda_rebota, 0.6), "murcielago_mareo": (murcielago_mareo, 0.6),
+    "murcielago_aleteo": (murcielago_aleteo, 0.5), "cencerro": (cencerro, 0.6), "escala_tramo": (escala_tramo, 0.6),
 }
 
 AMBIENTES = {

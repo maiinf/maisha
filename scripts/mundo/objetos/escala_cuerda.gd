@@ -87,7 +87,7 @@ func _al_poner_marca(m: String) -> void:
 			s.visible = true
 			s.scale = Vector2(1, 0.2)
 			s.create_tween().tween_property(s, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_BACK)
-			Sonido.efecto("tablas_coger", 0.0, s.global_position + Vector2(8, 8))
+			Sonido.efecto("escala_tramo", 0.0, s.global_position + Vector2(8, 8))
 			_bajados += 1)
 		t.tween_interval(0.14)
 	t.tween_callback(func() -> void:

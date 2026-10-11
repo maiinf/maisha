@@ -42,7 +42,7 @@ func _physics_process(delta: float) -> void:
 		if _recorrido >= alcance or dentro.distance_to(global_position) > 0.5:
 			global_position = dentro if zona else global_position
 			volviendo = true
-			Sonido.efecto("eco_voz", 0.0, global_position, 0.25)
+			Sonido.efecto("onda_rebota", 0.0, global_position, 0.15)
 		_mira = (global_position - antes).normalized() if global_position != antes else _mira
 	else:
 		if not is_instance_valid(dueno):
