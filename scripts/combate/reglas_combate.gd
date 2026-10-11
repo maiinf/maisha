@@ -129,6 +129,18 @@ const CUERVO_APUNTA := 0.75            # segundos apuntando (la raya del suelo a
 const CUERVO_PICADO := 230.0           # velocidad del picado (píxeles por segundo)
 const CUERVO_POSADO := 1.4             # posado picoteando tras el picado: el cetro le quita 2
 const CUERVO_ESPERA := 1.3             # dando vueltas antes de volver a apuntar
+## Murciélago de eco (Cañada del Eco): revolotea, avisa y grita una onda que va y vuelve; al tragársela, cae aturdido
+const MURCIELAGO_VIDA := 3
+const MURCIELAGO_VE := 120.0           # a esta distancia (píxeles) se fija en Maisha
+const MURCIELAGO_ALTURA := 20.0        # lo alto que revolotea (no se le puede dar)
+const MURCIELAGO_VUELO := 85.0         # velocidad revoloteando (a tirones)
+const MURCIELAGO_DESPIERTA := 0.7      # colgado, antes de echar a volar
+const MURCIELAGO_ESPERA := 1.4         # revoloteando antes de avisar
+const MURCIELAGO_AVISO := 0.8          # segundos avisando (anillo y línea en el suelo)
+const MURCIELAGO_ALCANCE := 120.0      # lo lejos que llega la onda antes de volver
+const MURCIELAGO_ONDA := 150.0         # velocidad de la onda (píxeles por segundo)
+const MURCIELAGO_ONDA_RADIO := 11.0    # lo cerca que tiene que pasar la onda para hacer daño
+const MURCIELAGO_ATURDIDO := 1.6       # en el suelo, mareado por su propio eco: el cetro le quita 2
 
 # --- La Cosechadora Oxidada (jefe de Raíz, en el Campo Segado) --------------------
 # Se rompe POR PARTES: la caldera (atrás), el depósito frontal y el depósito del techo. Con las tres rotas,

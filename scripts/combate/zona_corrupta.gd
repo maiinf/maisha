@@ -27,7 +27,8 @@ const JEFES := {"mzizi": preload("res://scripts/enemigos/mzizi.gd"), "pembe": pr
 ## Los enemigos que puede invocar una zona (según la región): petrino (errante) y jabalí de hierro (cazador)
 const ENEMIGOS := {"petrino": preload("res://scripts/enemigos/petrino.gd"), "jabali": preload("res://scripts/enemigos/jabali.gd"),
 	"babosa": preload("res://scripts/enemigos/babosa.gd"), "rana": preload("res://scripts/enemigos/rana.gd"),
-	"topo": preload("res://scripts/enemigos/topo.gd"), "cuervo": preload("res://scripts/enemigos/cuervo.gd")}
+	"topo": preload("res://scripts/enemigos/topo.gd"), "cuervo": preload("res://scripts/enemigos/cuervo.gd"),
+	"murcielago": preload("res://scripts/enemigos/murcielago.gd")}
 const SOMBRA_GIZA := Color(0.10, 0.05, 0.14)
 const LUZ_GIZA := Color("a855d6")
 const LUZ_VIDA := Color("fff3c4")

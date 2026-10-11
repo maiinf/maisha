@@ -9,6 +9,8 @@ Genera:
                                                      corral, con su portillo de palos
   arte/mundos/raiz/canada/escala.png     3 × 16×16   la ESCALA DE CUERDA de la cornisa: 0 enrollada arriba (cerrada),
                                                      1 un tramo colgando, 2 el último tramo (con las puntas de cuerda)
+  arte/mundos/raiz/canada/murcielago.png 6 × 24×20   el MURCIÉLAGO DE ECO (enemigo): colgado, alas arriba, alas abajo,
+                                                     gritando, aturdido en el suelo y golpeado (blanco en el juego)
   arte/mundos/raiz/objetos/cencerro.png  2 × 12×12   un cencerro de Mbuzi
   y su icono (16×16) en arte/interfaz/objetos.png (el 23.º)
 """
@@ -21,7 +23,7 @@ from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pintor import Lienzo, RAIZ  # noqa: E402
 from pintar_casa_shamba import vetas, rect  # noqa: E402
-from pintar_pasarelas import tira, pixeles, MADERA, CONTORNO  # noqa: E402
+from pintar_pasarelas import tira, pixeles, MADERA, CONTORNO, GIZA  # noqa: E402
 
 SALIDA = os.path.join(RAIZ, "arte", "mundos", "raiz", "canada")
 LUZ = (-0.6, -0.7, 0.5)
@@ -152,6 +154,96 @@ def escala(k):
     return lz.sprite(contorno=CONTORNO * 0.8)
 
 
+# el murciélago: cuerpo de piedra gris con grietas de Giza, alas de piel oscura violácea
+PIEL_ALA = ["#120e16", "#1e1824", "#2c2434", "#3c3246", "#4e4258", "#62566c"]
+
+
+def murcielago(estado):
+    """El MURCIÉLAGO DE ECO, de frente. 0 colgado boca abajo, envuelto en las alas · 1 alas arriba · 2 alas abajo ·
+    3 gritando (alas abiertas del todo, boca abierta con luz violeta) · 4 aturdido en el suelo (alas caídas, ojos
+    en espiral) · 5 golpeado (igual que 4; se dibuja blanco en el juego)."""
+    W, H = 24, 20
+    lz = Lienzo(W, H, s=8, semilla=181 + estado)
+    suelo = estado in (4, 5)
+    cx = 12
+    if estado == 0:
+        # colgado de un saliente de roca, cabeza abajo, envuelto en las alas como un capullo
+        roca = lz.elipse(cx, 1.5, 6, 2.2)
+        lz.sombrear(roca, GRIS[1:7], 1.5, LUZ)
+        for xx in (cx - 1.2, cx + 1.2):
+            lz.pintar(lz.trazo([(xx, 3), (xx, 5)], 0.6), GRIS[2])
+        capullo = lz.elipse(cx, 10, 4.2, 6)
+        lz.sombrear(capullo, PIEL_ALA, 3, LUZ, textura=((lz.x - cx) % 2.2 < 0.6) * 1.0, fuerza_tex=0.4)
+        cabeza = lz.circulo(cx, 15.5, 2.6)
+        lz.sombrear(cabeza, GRIS[2:8], 1.5, LUZ, textura=lz.ruido(0.6, 1, semilla=182), fuerza_tex=0.3)
+        for xx in (cx - 2, cx + 2):                                 # orejas, hacia abajo
+            lz.pintar(lz.poligono([(xx - 1, 16.5), (xx + 1, 16.5), (xx + (0.6 if xx > cx else -0.6), 19)]), GRIS[3])
+        for xx in (cx - 1, cx + 1):                                 # ojos cerrados
+            lz.pintar(lz.trazo([(xx - 0.5, 14.8), (xx + 0.5, 14.8)], 0.3), GIZA[2])
+        return lz.sprite(contorno=CONTORNO)
+    cy = 15 if suelo else 11
+    if suelo:
+        lz.pintar(lz.desenfocar(lz.elipse(cx, 18.5, 9, 1.4), 0.6), "#0e0c0a", 0.6)
+    # las alas: dedos largos y la membrana entre ellos (arriba, abajo, abiertas del todo o caídas)
+    if estado == 1:
+        puntas = [(-11, -7), (-9, -2), (-6, 1)]
+    elif estado == 2:
+        puntas = [(-10, 6), (-7, 8), (-4, 7)]
+    elif estado == 3:
+        puntas = [(-12, -7), (-12, -1), (-10, 4)]
+    else:
+        puntas = [(-10, 3), (-8, 4), (-5, 4)]
+    for lado in (-1, 1):
+        hombro = (cx + lado * 2.5, cy - 1.5)
+        dedos = [(cx + lado * -dx, cy + dy) for (dx, dy) in puntas]
+        codo = (cx + lado * (7.5 if estado == 3 else 6.5), cy - (4 if estado in (1, 3) else (-1 if estado == 2 else -2)))
+        membrana = lz.poligono([hombro, codo] + dedos + [(cx + lado * 2.5, cy + 2.5)])
+        lz.sombrear(membrana, PIEL_ALA, 3, LUZ, textura=lz.ruido(0.7, 2, semilla=183), fuerza_tex=0.3)
+        # los dedos (huesos) y el borde ondulado
+        for d in dedos:
+            lz.pintar(lz.trazo([codo, d], 0.55), PIEL_ALA[5])
+        lz.pintar(lz.trazo([hombro, codo], 0.8), GRIS[4])
+        lz.pintar(lz.circulo(codo[0], codo[1], 0.8), GRIS[5])
+        # rasgones de Giza en la membrana
+        lz.pintar(lz.trazo([((codo[0] + dedos[0][0]) / 2, (codo[1] + dedos[0][1]) / 2), dedos[1]], 0.35), GIZA[3], 0.8)
+    # el cuerpo de piedra y la cabeza con orejas grandes
+    cuerpo = lz.elipse(cx, cy + 1, 3, 4)
+    lz.sombrear(cuerpo, GRIS[2:8], 2, LUZ, textura=lz.ruido(0.6, 2, semilla=184), fuerza_tex=0.35)
+    grieta = lz.trazo([(cx - 0.5, cy - 1.5), (cx + 0.6, cy + 0.5), (cx - 0.3, cy + 3)], 0.45)
+    lz.pintar(grieta, GIZA[3], 0.9)
+    lz.brillo(grieta, GIZA[3], 1.2, 0.5)
+    hy = cy - 4.5
+    for lado in (-1, 1):
+        oreja = lz.poligono([(cx + lado * 0.4, hy - 1.5), (cx + lado * 3.2, hy - 7), (cx + lado * 4.6, hy - 0.2), (cx + lado * 2.5, hy + 0.8)])
+        lz.sombrear(oreja, GRIS[2:7], 1.5, LUZ)
+        lz.pintar(lz.poligono([(cx + lado * 1.6, hy - 1.6), (cx + lado * 3.1, hy - 5.2), (cx + lado * 3.7, hy - 0.8)]), "#6e4258", 0.9)
+    cabeza = lz.circulo(cx, hy, 2.9)
+    lz.sombrear(cabeza, GRIS[2:8], 1.6, LUZ, textura=lz.ruido(0.6, 1, semilla=185), fuerza_tex=0.3)
+    # los ojos violetas (en espiral si está aturdido) y la boca
+    for lado in (-1, 1):
+        ox, oy = cx + lado * 1.2, hy - 0.3
+        if suelo:
+            t = np.linspace(0, 3 * np.pi, 16)
+            lz.pintar(lz.trazo([(ox + np.cos(a) * a * 0.1, oy + np.sin(a) * a * 0.1) for a in t], 0.3), GIZA[3])
+        else:
+            lz.pintar(lz.circulo(ox, oy, 0.75), GIZA[3])
+            lz.brillo(lz.circulo(ox, oy, 0.5), GIZA[3], 1.0, 0.8)
+            lz.pintar(lz.circulo(ox - 0.2, oy - 0.25, 0.25), "#f4e8ff")
+    if estado == 3:
+        boca = lz.elipse(cx, hy + 1.9, 1.7, 1.5)
+        lz.pintar(boca, "#1a0a20")
+        lz.brillo(boca, GIZA[3], 2.5, 0.9)
+        for lado in (-1, 1):
+            lz.pintar(lz.trazo([(cx + lado * 0.7, hy + 1.0), (cx + lado * 0.6, hy + 1.8)], 0.3), "#e8e4dc")
+    else:
+        for lado in (-1, 1):                                     # colmillitos
+            lz.pintar(lz.trazo([(cx + lado * 0.7, hy + 1.6), (cx + lado * 0.6, hy + 2.3)], 0.3), "#e8e4dc")
+    # las patitas
+    for lado in (-1, 1):
+        lz.pintar(lz.trazo([(cx + lado * 1.2, cy + 4.5), (cx + lado * 1.6, cy + 6)], 0.45), GRIS[3])
+    return lz.sprite(contorno=CONTORNO)
+
+
 # el cencerro: de cobre viejo, con su badajo y la correa de cuero
 CENCERRO_COL = {"o": "3a1a0c", "c": "9a4e24", "C": "c06a32", "L": "f4b470", "B": "ffe0b0", "h": "5c3e26",
                 "H": "a37036", "n": "1e1915"}
@@ -207,6 +299,7 @@ def main():
     os.makedirs(SALIDA, exist_ok=True)
     Image.fromarray(aprisco(), "RGBA").save(os.path.join(SALIDA, "aprisco.png"))
     tira([escala(k) for k in range(3)]).save(os.path.join(SALIDA, "escala.png"))
+    tira([murcielago(k) for k in range(6)]).save(os.path.join(SALIDA, "murcielago.png"))
     hoja = Image.new("RGBA", (24, 12), (0, 0, 0, 0))
     hoja.alpha_composite(pixeles(CENCERRO_1, CENCERRO_COL), (0, 0))
     hoja.alpha_composite(pixeles(CENCERRO_2, CENCERRO_COL), (12, 0))

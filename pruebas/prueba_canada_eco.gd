@@ -1,10 +1,11 @@
 extends Node
 ## Prueba automática de la Cañada del Eco (el quinto camino de Raíz): del Bosque Cobrizo hacia el Lago Espejo;
-## la garganta de peña, Mbuzi y sus cencerros, la escala de cuerda que descuelga hasta la cornisa del quinto eco
+## la garganta de peña, el murciélago de eco (enemigo nuevo), Mbuzi y sus cencerros, la escala de cuerda que descuelga hasta la cornisa del quinto eco
 ## y el paso al lago, aún cerrado.
 ## Se ejecuta sin abrir el editor:  godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_canada_eco
 
 const R := preload("res://scripts/combate/reglas_combate.gd")
+const MURCIELAGO := preload("res://scripts/enemigos/murcielago.gd")
 var _fallos := 0
 
 
@@ -102,7 +103,7 @@ func _ready() -> void:
 	var region: Node2D = get_tree().get_first_node_in_group("region")
 	_comprobar(region.tam.x >= 140 * 16, "va de este a oeste: unas 3,5 pantallas de largo")
 	var zonas := get_tree().get_nodes_in_group("zonas")
-	_comprobar(zonas.size() == 1, "una zona corrupta en el ensanche del sur")
+	_comprobar(zonas.size() == 1 and zonas[0].tipos_enemigo.has("murcielago"), "una zona corrupta en el ensanche del sur, con murciélagos de eco")
 	_comprobar(region.secretos_total == 1, "un secreto al noroeste")
 	var cencerros := get_tree().get_nodes_in_group("recogibles").filter(func(n: Node) -> bool: return n.objeto == "cencerro")
 	_comprobar(cencerros.size() == 3, "tres cencerros de Mbuzi")
@@ -124,6 +125,63 @@ func _ready() -> void:
 	await _esperar(0.2)
 	await _empujar("mover_arriba", 1.6)
 	_comprobar(maisha.global_position.y > 16 * 16, "las paredes de la garganta no dejan pasar (%.0f)" % maisha.global_position.y)
+
+	print("El murciélago de eco:")
+	var zona: Node2D = zonas[0]
+	var murcielago: CharacterBody2D = MURCIELAGO.new()
+	murcielago.zona = zona
+	murcielago.position = zona.global_position
+	region.get_node(region.entidades).add_child(murcielago)
+	maisha.global_position = zona.global_position + Vector2(-60, 10)
+	maisha.vida = maisha.vida_maxima()
+	await _esperar(0.2)
+	_comprobar(murcielago.fase == murcielago.Fase.COLGADO, "aparece colgado")
+	await _esperar(R.MURCIELAGO_DESPIERTA + 0.6)
+	_comprobar(murcielago.en_el_aire() and not murcielago.recibir_golpe(1, Vector2.LEFT) and murcielago.vida == R.MURCIELAGO_VIDA, "despierta y vuela: en el aire el cetro no le da")
+	var aviso := false
+	var onda: Node2D = null
+	for i in 120:
+		await _esperar(0.05)
+		if murcielago.fase == murcielago.Fase.AVISA:
+			aviso = true
+		if aviso and not get_tree().get_nodes_in_group("ondas").is_empty():
+			onda = get_tree().get_nodes_in_group("ondas")[0]
+			break
+	_comprobar(aviso and onda != null, "avisa (anillo y línea en el suelo) y grita: sale una onda")
+	var vuelve := false
+	for i in 80:
+		await _esperar(0.05)
+		if not is_instance_valid(onda):
+			break
+		if onda.volviendo:
+			vuelve = true
+	_comprobar(vuelve, "la onda llega lejos y vuelve, como un eco")
+	_comprobar(maisha.vida < maisha.vida_maxima(), "y si pilla a Maisha, le hace daño")
+	_comprobar(murcielago.fase == murcielago.Fase.ATURDIDO, "al tragarse su eco cae aturdido al suelo")
+	await _esperar(0.3)
+	_comprobar(murcielago.recibir_golpe(1, Vector2.LEFT) and murcielago.vida == R.MURCIELAGO_VIDA - 2, "aturdido, el cetro le quita 2")
+	await _esperar(R.MURCIELAGO_ATURDIDO + 0.8)
+	_comprobar(murcielago.en_el_aire(), "luego vuelve a volar")
+	# el Latido deshace la onda
+	onda = null
+	for i in 120:
+		await _esperar(0.05)
+		if not get_tree().get_nodes_in_group("ondas").is_empty():
+			onda = get_tree().get_nodes_in_group("ondas")[0]
+			break
+	if onda:
+		maisha.global_position = onda.global_position + Vector2(10, 0)
+		maisha.aliento = maisha.aliento_maximo()
+		maisha.set("_espera_latido", 0.0)
+		maisha.latido()
+		await _esperar(0.1)
+	_comprobar(onda != null and not onda.is_in_group("ondas"), "el Latido deshace la onda")
+	await _esperar(0.3)
+	_comprobar(murcielago.fase != murcielago.Fase.ATURDIDO, "y sin su eco, no se marea")
+	murcielago.recibir_danio(1, murcielago.global_position, "explosion")
+	_comprobar(murcielago.get("_muriendo"), "la explosión de una semilla le da aunque vuele")
+	maisha.vida = maisha.vida_maxima()
+	await _esperar(0.5)
 
 	print("Mbuzi y sus cencerros:")
 	maisha.global_position = mbuzi.global_position + Vector2(0, 16)

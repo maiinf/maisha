@@ -57,5 +57,5 @@ Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--h
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,
 Senda de los Surcos hechos; la Cañada del Eco, jugable pero sin terminar; faltan 4) y el misterio de los 9 ecos
-perdidos (4 hechos). En marcha: la Cañada del Eco (falta el recuerdo del 5.º eco, el murciélago de eco y su música)
+perdidos (4 hechos). En marcha: la Cañada del Eco (falta el recuerdo del 5.º eco y su música)
 y después el Lago Espejo. Detalles en `LEEME.md` y `documentacion/decisiones.md`.

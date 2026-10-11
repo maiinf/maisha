@@ -13,3 +13,4 @@ se pasan.
 | 2026-10-11 | Trazado de la Cañada del Eco aprobado tal cual. Enemigo nuevo: **murciélago de eco** (cuelga de las paredes; su grito en onda rebota en la peña y vuelve). | Elegido por Iam. |
 | 2026-10-11 | La cara del acantilado de la Cañada, el doble de alta. Mbuzi: cabra mayor y tranquila, blanca y gris, cuernos curvos, pañuelo rojo y cayado. | Elegido por Iam. |
 | 2026-10-11 | Mientras no haya música propia, la Cañada usa «La loma de cobre». El paso al Lago Espejo queda cerrado (marca `camino_lago`) hasta que el lago exista. | Falta ffmpeg en el Mac para guardar música nueva; el lago aún no está hecho. |
+| 2026-10-11 | Siguiente: el **murciélago de eco**. El recuerdo del 5.º eco será Maisha, Mauti y Kimya en la cañada gritando sus nombres; el de Kimya no vuelve («la Quietud no tiene eco»). Puente hacia el Lago Espejo. | Elegido por Iam. |

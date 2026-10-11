@@ -194,6 +194,10 @@ func latido() -> bool:
 			var hacia := objetivo.global_position - global_position
 			if hacia.length() <= Artes.latido_radio():
 				objetivo.call("empujar", hacia.normalized() * R.LATIDO_EMPUJE)
+	# las ondas de los murciélagos de eco se deshacen
+	for onda in get_tree().get_nodes_in_group("ondas"):
+		if (onda as Node2D).global_position.distance_to(global_position) <= Artes.latido_radio() + 8.0:
+			onda.call("disipar")
 	for s in get_tree().get_nodes_in_group("semillas"):
 		var hacia: Vector2 = s.global_position - global_position
 		if hacia.length() <= Artes.latido_radio() and hacia.length() > 1.0:
