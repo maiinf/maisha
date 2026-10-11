@@ -14,6 +14,11 @@
                   que caen despacio. Bajo él, sentados en la hierba llena de hojas, dos espíritus de luz pequeños:
                   Maisha (dorada, con su brote) y MAUTI (plateada y lila, con una hoja seca en lo alto), que recoge una
                   hoja que cae. Al fondo, colinas de árboles cobrizos y el sol bajo.
+  16_eco_canada   EL QUINTO ECO (Cañada del Eco). Atardecer en la garganta: el sol se pone en el hueco entre las
+                  dos paredes de peña. En una cornisa, Maisha (dorada) y Mauti (plateada y lila) gritan sus nombres
+                  hacia la pared de enfrente, y sus ondas (doradas y lilas) vuelven rebotadas. A su lado, KIMYA, la
+                  Quietud, flota en silencio mirando abajo: de ella no sale ninguna onda. Abajo, el arroyo está
+                  quieto como un espejo y solo refleja a Kimya.
   15_eco_surcos   EL CUARTO ECO (Senda de los Surcos). La fiesta de la última siega, de noche: campos con gavillas,
                   guirnaldas de farolillos, una hoguera en el centro y los seres de Raíz bailando a contraluz. En la
                   colina, el Primer Árbol dorado. Junto al fuego, Maisha y Mauti bailan de la mano.
@@ -307,13 +312,13 @@ def eco_pasarelas():
     return lz
 
 
-def _mauti_luz(lz, x, y, e=1.0):
+def _mauti_luz(lz, x, y, e=1.0, mira=-1):
     """Mauti hecha de luz: la misma forma que Maisha (son hermanos), pero plateada y lila, y en lo alto, en vez del
-    brote, una hoja seca de cobre. Tiende una mano para recoger una hoja que cae."""
+    brote, una hoja seca de cobre. Tiende una mano (hacia donde mira: -1 izquierda, 1 derecha)."""
     figura = np.maximum.reduce([lz.elipse(x, y - 15 * e, 9 * e, 8.5 * e), lz.elipse(x, y - 4.5 * e, 5 * e, 5 * e),
                                 lz.trazo([(x - 2.2 * e, y - 1 * e), (x - 2.4 * e, y + 2 * e)], 2.2 * e),
                                 lz.trazo([(x + 2.2 * e, y - 1 * e), (x + 2.4 * e, y + 2 * e)], 2.2 * e),
-                                lz.trazo([(x - 4 * e, y - 5 * e), (x - 10 * e, y - 6.5 * e)], 1.7 * e, 1.3 * e)])
+                                lz.trazo([(x + 4 * e * mira, y - 5 * e), (x + 10 * e * mira, y - 6.5 * e)], 1.7 * e, 1.3 * e)])
     lz.sumar_luz(lz.desenfocar(figura, 6 * e), "#b8a8e0", 0.7)
     lz.pintar(figura, rampa(["#8e86b4", "#c4c0e0", "#eeeaf8"], lz.volumen(figura, 6 * e, (-0.5, -0.7, 0.6))[0]))
     rabito = lz.trazo(lz.curva((x, y - 23 * e), (x - 0.5 * e, y - 26 * e), (x - 1 * e, y - 27.5 * e), n=8), 0.9 * e)
@@ -322,7 +327,7 @@ def _mauti_luz(lz, x, y, e=1.0):
     lz.pintar(lz.trazo([(x - 1 * e, y - 27.5 * e), (x + 3.5 * e, y - 30.5 * e)], 0.4 * e), "#f4b470", 0.8)
     corazon = lz.circulo(x - 0.5 * e, y - 5 * e, 1.4 * e)
     lz.sumar_luz(lz.desenfocar(corazon, 2 * e), "#a28ae0", 0.9)
-    lz.pintar(lz.elipse(x - 3.5 * e, y - 15 * e, 1.0 * e, 1.6 * e), "#2a2440", 0.85)
+    lz.pintar(lz.elipse(x + 3.5 * e * mira, y - 15 * e, 1.0 * e, 1.6 * e), "#2a2440", 0.85)
     return figura
 
 
@@ -464,4 +469,135 @@ def eco_surcos():
     return lz
 
 
-PIEZAS = {"12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}
+def _kimya_pie(lz, x, y, e=1.0):
+    """Kimya, la Quietud, pequeña y flotando: una figura de luz plateada, casi transparente, con la cabeza redonda
+    y serena (ojos cerrados, mirando abajo), dos hilos de luz largos que ondean hacia atrás como cintas y el cuerpo
+    que se deshace en niebla. Devuelve su figura (para el reflejo)."""
+    cuerpo = np.zeros((lz.H, lz.W))
+    for k in range(26):
+        t = k / 25
+        cuerpo = np.maximum(cuerpo, lz.elipse(x - np.sin(t * 2.5) * 3 * e, y - 22 * e + t * 30 * e, (6.0 - t * 4.5) * e, 3.0 * e))
+    cabeza = lz.circulo(x + 1 * e, y - 27 * e, 5.6 * e)
+    figura = lz.desenfocar(np.maximum(cuerpo * np.clip(1 - (lz.y - (y - 4 * e)) / (12 * e), 0.1, 1), cabeza), 1.0)
+    lz.sumar_luz(lz.desenfocar(figura, 12 * e), "#6db0b0", 0.45)
+    lz.sumar_luz(figura, "#d8ece8", 0.55)
+    lz.sumar_luz(lz.desenfocar(cabeza, 2 * e), "#ffffff", 0.25)
+    # los hilos de luz: salen de la nuca y ondean hacia atrás, largos y finos (no son cuernos)
+    hilos = np.zeros((lz.H, lz.W))
+    for k, d in enumerate((-1.0, 1.0)):
+        pts = [(x - 3 * e - t * 30 * e, y - 30 * e - d * 2 * e + np.sin(t * 6 + k) * 3 * e - t * 6 * e) for t in np.linspace(0, 1, 30)]
+        hilos = np.maximum(hilos, lz.trazo(pts, 0.7 * e, 0.15 * e))
+    lz.sumar_luz(lz.desenfocar(hilos, 0.8), "#e8f4f0", 0.6)
+    # los ojos cerrados, mirando abajo, y una sonrisa leve
+    for ox in (x - 0.8 * e, x + 3.2 * e):
+        lz.pintar(lz.trazo([(ox - 1.2 * e, y - 26.5 * e), (ox, y - 25.6 * e), (ox + 1.2 * e, y - 26.5 * e)], 0.45 * e), "#346161", 0.85)
+    return figura
+
+
+def _ondas(lz, cx, cy, radios, ang0, ang1, color, alfa):
+    """Arcos de una onda de sonido (centrados en cx, cy), de ang0 a ang1 (en grados)."""
+    m = np.zeros((lz.H, lz.W))
+    for r in radios:
+        pts = [(cx + np.cos(np.radians(a)) * r, cy + np.sin(np.radians(a)) * r) for a in np.linspace(ang0, ang1, 24)]
+        m = np.maximum(m, lz.trazo(pts, 1.2))
+    lz.sumar_luz(lz.desenfocar(m, 3), color, alfa * 0.5)
+    lz.sumar_luz(m, color, alfa)
+
+
+def _pared_garganta(lz, borde, lado, semilla):
+    """Una pared de la garganta, de roca a contraluz. borde(y) da el filo interior; lado -1 = pared izquierda.
+    Caras planas (facetas), estratos, grietas verticales y el filo encendido por el sol poniente."""
+    ys = np.arange(lz.H) / lz.s
+    filo_x = np.array([borde(y) for y in ys])[:, None]
+    dentro = (lz.x < filo_x) if lado < 0 else (lz.x > filo_x)
+    m = dentro.astype(float)
+    dist = np.abs(lz.x - filo_x)                                    # lo lejos que está del filo
+    faceta = np.floor(lz.ruido(26, 2, semilla=semilla) * 6) / 6     # caras planas de la roca
+    estratos = np.sin((lz.y + (lz.ruido(30, 2, semilla=semilla + 1) - 0.5) * 10) * 0.42) * 0.5 + 0.5
+    v = 0.18 + faceta * 0.22 + (estratos - 0.5) * 0.08 + np.clip(1 - dist / 70, 0, 1) * 0.25
+    lz.pintar(m, rampa(["#120a14", "#1e1220", "#2e1c2e", "#44283a", "#5e3646", "#80485a", "#a8606a"], np.clip(v, 0, 1)))
+    # la cara que mira al sol (cerca del filo) se enciende de naranja
+    lz.sumar_luz(m * np.clip(1 - dist / 26, 0, 1) * (faceta > 0.4), "#e08050", 0.35)
+    grietas = np.abs(np.sin(lz.x * 0.21 + lz.ruido(8, 2, semilla=semilla + 2) * 6)) < 0.05
+    lz.pintar(m * grietas * (lz.ruido(12, 2, semilla=semilla + 3) > 0.45), "#0c060e", 0.8)
+    lz.pintar(m * (np.abs(estratos - 0.5) < 0.035), "#0c060e", 0.5)
+    filo = m * (dist < 1.6)
+    lz.sumar_luz(lz.desenfocar(filo, 1.0), "#f9b070", 0.9)
+    # matas de hierba en los salientes
+    matas = np.clip((lz.ruido(2.5, 2, semilla=semilla + 4) - 0.74) * 6, 0, 1) * m * (estratos > 0.85)
+    lz.pintar(matas, "#2e3a24", 0.9)
+    return m
+
+
+def eco_canada():
+    """«¡Maisha!» … «¡Maisha!» — «¡Mauti!» … «¡Mauti!» — «Kimya, grita tú.» — «La Quietud no tiene eco.»"""
+    lz = Lienzo(W, H, semilla=180)
+    rng = np.random.default_rng(181)
+    # cielo de atardecer: violeta arriba, rosa y naranja en el hueco de la garganta, donde se pone el sol
+    lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(["#2a1e3e", "#5a3458", "#a8506a", "#e0805a", "#f9c27a"], desde=0, hasta=150))
+    sol = lz.circulo(318, 112, 15)
+    lz.sumar_luz(lz.desenfocar(sol, 50), "#f9a03a", 0.6)
+    lz.sumar_luz(lz.desenfocar(sol, 12), "#ffe0a0", 0.6)
+    lz.pintar(sol, "#fff0c8")
+    ci.cumulos(lz, [(200, 30, 70, 9), (360, 22, 90, 8), (470, 46, 60, 7)], colores=("#5a3458", "#8a4a62", "#d0706a", "#f9b080"), semilla=182, alfa=0.6)
+    lejos = ci.mascara_bajo(lz, ci.linea_horizonte(lz, 122, 6, 40, 183))
+    lz.pintar(lejos, "#a8607a")
+    lejos2 = ci.mascara_bajo(lz, ci.linea_horizonte(lz, 134, 5, 30, 184))
+    lz.pintar(lejos2, "#7a4060")
+    # las dos paredes: el hueco se abre hacia arriba, con salientes escalonados
+    _pared_garganta(lz, lambda y: 250 - y * 0.32 + 12 * np.floor(y / 46) - 6 * np.sin(y * 0.09), -1, 185)
+    _pared_garganta(lz, lambda y: 372 + y * 0.30 - 10 * np.floor(y / 52) + 5 * np.sin(y * 0.08 + 1), 1, 186)
+    # el fondo de la garganta y el arroyo, quieto como un espejo, que serpentea hacia nosotros
+    HZ_A = 196
+    t_ = np.clip((lz.y - HZ_A) / 60, 0, 1)
+    centro_a = 334 + np.sin(t_ * 3.2 + 0.4) * 22 + (lz.ruido(6, 2, semilla=190) - 0.5) * 4
+    ancho_a = 6 + t_ * 40 + np.sin(lz.y * 0.35) * 2
+    agua = np.clip(lz.desenfocar(((lz.y > HZ_A) * (np.abs(lz.x - centro_a) < ancho_a)).astype(float), 0.8), 0, 1)
+    orilla = np.clip(lz.desenfocar(((lz.y > HZ_A - 3) * (np.abs(lz.x - centro_a) < ancho_a + 6 + t_ * 10)).astype(float), 1.5), 0, 1)
+    lz.pintar(orilla, rampa(["#1a1020", "#2a1a2a", "#3e2834"], t_))
+    lz.pintar(orilla * (lz.ruido(1.2, 2, semilla=191) > 0.7), "#5a3a40", 0.7)
+    lz.pintar(agua, rampa(["#3a2a48", "#7a4a6a", "#c07070", "#f0a070", "#f9c890"], np.clip(1 - t_ * 0.9, 0, 1)))
+    # (el agua no se mueve: es un espejo; refleja el cielo y a Kimya)
+    # la cornisa, a la izquierda: un saliente de roca con hierba encima, donde están Mauti y Maisha
+    YC = 196
+    cornisa = lz.poligono([(0, YC + 2), (90, YC - 3), (230, YC - 1), (268, YC + 4), (276, YC + 14), (250, 230), (210, 256), (0, 256)])
+    lz.sombrear(cornisa, ["#120a14", "#1e1420", "#2e2030", "#46303e", "#6a4650", "#9a6a60"], 6, (0.6, -0.8, 0.5),
+                textura=np.floor(lz.ruido(10, 2, semilla=187) * 5) / 5, fuerza_tex=0.4)
+    filo_c = np.clip(cornisa - np.roll(cornisa, int(2 * lz.s), axis=0), 0, 1)
+    lz.sumar_luz(filo_c, "#f9a060", 0.7)
+    hierba = np.zeros((lz.H, lz.W))
+    for k in range(110):
+        x = rng.random() * 262
+        yb = YC - 2 + (x / 262) * 2
+        hierba = np.maximum(hierba, lz.trazo([(x, yb + 2), (x + (rng.random() - 0.5) * 3, yb - 2 - rng.random() * 4)], 0.5))
+    lz.pintar(hierba, "#3a4a2a", 0.9)
+    lz.sumar_luz(hierba * (lz.ruido(1, 1, semilla=188) > 0.5), "#e09a5a", 0.3)
+    # las ondas: las de Maisha (doradas) y las de Mauti (lilas, más altas) van hacia la pared de enfrente y vuelven
+    _ondas(lz, 214, 170, (14, 22, 30), -35, 25, "#f9c46a", 0.6)
+    _ondas(lz, 168, 160, (40, 50, 60), -48, -18, "#c4b0f0", 0.6)
+    _ondas(lz, 470, 150, (12, 20, 28), 155, 210, "#f9c46a", 0.45)       # (vuelven de la peña)
+    _ondas(lz, 470, 118, (12, 20, 28), 150, 205, "#c4b0f0", 0.45)
+    # Mauti y Maisha gritando hacia la peña; Kimya flota sobre el arroyo, en silencio, mirando el agua
+    lz.pintar(lz.desenfocar(lz.elipse(190, YC + 1, 40, 3.5), 2), "#0a060c", 0.5)
+    _mauti_luz(lz, 168, YC, e=1.35, mira=1)
+    ci.maisha_luz(lz, 210, YC, e=1.35)
+    kimya = _kimya_pie(lz, 330, 172, e=1.1)
+    # su reflejo en el agua quieta (lo único que devuelve la cañada de ella): la figura, dada la vuelta, más abajo
+    a0, a1 = int(132 * lz.s), int(178 * lz.s)
+    destino = int(206 * lz.s)
+    refl = np.zeros_like(kimya)
+    alto_r = min(a1 - a0, lz.H - destino)
+    refl[destino:destino + alto_r, :] = kimya[a0:a1, :][::-1, :][:alto_r, :]
+    refl = np.roll(refl, int(6 * lz.s), axis=1)              # (el arroyo se tuerce un poco hacia la derecha)
+    lz.sumar_luz(lz.desenfocar(refl, 1.5) * agua * (np.sin(lz.y * 2.0) > -0.6), "#d8ece8", 0.45)
+    # motas de luz que suben de la garganta
+    motas = np.zeros((lz.H, lz.W))
+    for k in range(30):
+        motas = np.maximum(motas, lz.circulo(250 + rng.random() * 160, 60 + rng.random() * 120, 0.5 + rng.random() * 0.4))
+    lz.sumar_luz(motas, "#ffe0b0", 0.8)
+    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.06)
+    ci.marco_recuerdo(lz, color="#f9e2c0", semilla=189)
+    return lz
+
+
+PIEZAS = {"16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}

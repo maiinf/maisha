@@ -265,7 +265,8 @@ Escena `escenas/mundo/canada_eco.tscn` (mapa de 140×46 casillas, de este a oest
   - **Grita**: una **onda** (arcos violetas y blancos) va en línea recta, rebota en el borde de la zona o al llegar lejos y **vuelve a él**. Hace daño a la ida y a la vuelta. El **Latido** la deshace.
   - Al tragarse su propio eco cae **aturdido** (estrellitas encima): el cetro le quita 2. Las raíces de una semilla lo sujetan en el suelo; la explosión le da aunque vuele. Números en `reglas_combate.gd` (`MURCIELAGO_*`).
 - Arte: `herramientas/pintar_canada.py` (aprisco, escala, cencerro e icono, y el murciélago: 6 fotogramas), Mbuzi en `dibujar_aldeanos.py`. Bocetos y capturas en `documentacion/` (`boceto_canada_eco.png`, `boceto_canada_suelo.png`, `canada_eco_capturas.png`, `murcielago_eco_capturas.png`).
-- Falta: el **recuerdo del quinto eco** (su texto y su ilustración: Maisha, Mauti y Kimya gritando sus nombres; el de Kimya no vuelve), la música propia y los sonidos propios del murciélago (de momento usa «eco_voz»).
+- El **quinto eco**, en la cornisa: Maisha, Mauti y Kimya gritando sus nombres (ver «Los ecos perdidos»).
+- Falta: la música propia y los sonidos propios del murciélago (de momento usa «eco_voz»).
 
 ### Los ecos perdidos (el misterio de Raíz)
 
@@ -274,6 +275,7 @@ Piedras altas con una espiral tallada (`scripts/mundo/objetos/eco_perdido.gd`). 
 - El segundo (Las Pasarelas): `13_eco_pasarelas.png`: una noche de luna; bajo el agua, las raíces doradas del Primer Árbol y **Kimya, la Quietud**, deslizándose entre ellas.
 - El tercero (Camino Cobrizo): `14_eco_cobrizo.png`: una tarde de otoño bajo un árbol de hojas de cobre; Maisha y **Mauti** (plateada y lila, con una hoja seca en lo alto) hablan de por qué caen las hojas: «Tú y yo somos el mismo árbol».
 - El cuarto (Senda de los Surcos): `15_eco_surcos.png`: la fiesta de la última siega, de noche, con farolillos, gavillas y una hoguera; Maisha y Mauti bailan de la mano. «Lo que se siembra, Maisha lo despierta. Lo que se siega, Mauti lo guarda.» Y una pregunta que da miedo: «¿Y si un día alguien quisiera que nada se segara nunca?»
+- El quinto (Cañada del Eco): `16_eco_canada.png`: un atardecer en la garganta. En la cornisa, Maisha y Mauti gritan sus nombres y la peña se los devuelve; **Kimya** flota sobre el arroyo quieto y no grita: «La Quietud no tiene eco. Por eso puedo oíros a los dos.» Solo el agua refleja a Kimya, y eso apunta al Lago Espejo.
 
 ## Bosque Cobrizo
 
@@ -561,7 +563,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_sendero.gd` va de los Prados al Sendero del Puente y a la aldea y vuelta, prueba los pretiles y el vado, el eco perdido (con su ilustración), el encargo de Msafiri y el cuaderno de ecos.
 - `pruebas/prueba_pasarelas.gd` va de la aldea a Las Pasarelas y a la ciénaga y vuelta, prueba el agua y las tablas, el tramo roto, la rana de piedra (aviso, salto, onda, atontada), el encargo de Korongo (que arregla la pasarela) y el segundo eco.
 - `pruebas/prueba_camino_cobrizo.gd` sube de los Prados al Camino Cobrizo y al bosque y vuelta, prueba la peña y el derrumbe, el topo de piedra (bajo tierra, aviso, mordisco, atontado, las raíces que lo sacan), el encargo de Fuko (que despeja la galería) y el tercer eco.
-- `pruebas/prueba_canada_eco.gd` va del Bosque Cobrizo a la Cañada del Eco y vuelta, prueba la peña de la garganta, el murciélago de eco (colgado, vuelo, aviso, la onda que va y vuelve, aturdido, el Latido que deshace la onda), la escala de cuerda (enrollada y descolgada), el encargo de Mbuzi y el paso al Lago Espejo, aún cerrado.
+- `pruebas/prueba_canada_eco.gd` va del Bosque Cobrizo a la Cañada del Eco y vuelta, prueba la peña de la garganta, el murciélago de eco (colgado, vuelo, aviso, la onda que va y vuelve, aturdido, el Latido que deshace la onda), la escala de cuerda (enrollada y descolgada), el encargo de Mbuzi, el quinto eco (con su ilustración) y el paso al Lago Espejo, aún cerrado.
 - `pruebas/prueba_senda_surcos.gd` sube de la aldea a la Senda de los Surcos y al Campo Segado y vuelta, prueba la acequia y el foso, el cuervo de óxido (vuelo, raya de aviso, picado, posado, raíces), el encargo de Sungura (que vacía el foso) y el cuarto eco.
 - `pruebas/prueba_aldea.gd` cruza el sendero hasta la aldea, habla con Bibi, entra y sale del Gran Árbol, rescata a Pino y comprueba que todo se recuerda al volver.
 - `pruebas/prueba_maisha_animaciones.gd` comprueba que existen las 6 animaciones, que Maisha mira hacia donde camina y que, si celebra a mitad de un golpe (al purgar una zona dando cetrazos), no se queda celebrando para siempre.

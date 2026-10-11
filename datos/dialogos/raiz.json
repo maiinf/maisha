@@ -1598,6 +1598,15 @@
 				]
 			},
 			{
+				"si": [
+					"eco/canada_eco"
+				],
+				"lineas": [
+					"¿La has oído? ¿Tres voces y solo dos ecos? Yo también la oigo, algunas tardes.",
+					"La que no vuelve es la más tranquila de todas. Mi abuela decía que vivía en el agua quieta, y que por eso el Lago Espejo nunca tiene olas."
+				]
+			},
+			{
 				"lineas": [
 					"La escala sube a la cornisa, al norte, pasado el puentecito. Despacio, despacio.",
 					"Más allá de la cañada, al oeste, está el Lago Espejo. Dicen que el agua de allí se acuerda de todo lo que ha visto."
@@ -1637,6 +1646,34 @@
 				"lineas": [
 					"Por aquí se va al Lago Espejo... pero la cañada se pierde en una niebla espesa que no deja ver el camino.",
 					"Todavía no. Primero tengo que entender qué cuentan los ecos."
+				]
+			}
+		]
+	},
+	"eco_canada_eco": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"marca": "eco/canada_eco",
+				"lineas": [
+					"La espiral de la piedra se enciende y, desde muy lejos, la peña devuelve unas voces que nadie está diciendo ahora..."
+				],
+				"historia": [
+					{
+						"imagen": "16_eco_canada",
+						"lineas": [
+							"«¡MAISHAAA!» … «…aisha… aisha…»",
+							"«¡MAUTIII!» … «…auti… auti…»",
+							"«Kimya, ahora tú. ¡Grita tu nombre!»",
+							"Kimya no grita. Mira el agua del arroyo, quieta como un cristal, y sonríe.",
+							"«La Quietud no tiene eco. Por eso puedo oíros a los dos.»"
+						]
+					}
+				],
+				"tras_historia": [
+					"Kimya... Allí abajo, en el agua quieta, el reflejo se queda un momento más de lo que debería.",
+					"Si en algún sitio el agua se acuerda de todo, será en el Lago Espejo."
 				]
 			}
 		]

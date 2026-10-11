@@ -1,11 +1,12 @@
 extends Node
 ## Prueba automática de la Cañada del Eco (el quinto camino de Raíz): del Bosque Cobrizo hacia el Lago Espejo;
 ## la garganta de peña, el murciélago de eco (enemigo nuevo), Mbuzi y sus cencerros, la escala de cuerda que descuelga hasta la cornisa del quinto eco
-## y el paso al lago, aún cerrado.
+## (con su recuerdo: Maisha, Mauti y Kimya en la cañada) y el paso al lago, aún cerrado.
 ## Se ejecuta sin abrir el editor:  godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_canada_eco
 
 const R := preload("res://scripts/combate/reglas_combate.gd")
 const MURCIELAGO := preload("res://scripts/enemigos/murcielago.gd")
+const ECO := preload("res://scripts/mundo/objetos/eco_perdido.gd")
 var _fallos := 0
 
 
@@ -207,6 +208,24 @@ func _ready() -> void:
 	_comprobar(maisha.global_position.y < 9 * 16, "por la escala se sube a la cornisa (%.0f)" % maisha.global_position.y)
 	var eco: Node2D = get_tree().get_first_node_in_group("ecos_perdidos")
 	_comprobar(eco != null and eco.global_position.y < 7 * 16, "arriba está la piedra del quinto eco")
+
+	print("El quinto eco perdido:")
+	maisha.global_position = eco.global_position + Vector2(-14, 4)
+	await _esperar(0.3)
+	eco.interactuar()
+	await _esperar(1.2)
+	var dialogo := get_tree().get_first_node_in_group("dialogo")
+	var con_imagen := false
+	for i in 120:
+		if dialogo.get("_ilustracion") != null and dialogo.get("_ilustracion_alfa") > 0.5:
+			con_imagen = true
+		if not dialogo.hablando:
+			break
+		dialogo.pasar()
+		await _esperar(0.12)
+	await _esperar(1.2)
+	_comprobar(con_imagen, "el recuerdo tiene su ilustración (16_eco_canada)")
+	_comprobar(Estado.tiene("eco/canada_eco") and ECO.cuantos_escuchados() == 1, "quinto eco apuntado (en esta prueba, el primero que se oye)")
 
 	print("El paso al lago, cerrado:")
 	var lago := _puerta("lago")
