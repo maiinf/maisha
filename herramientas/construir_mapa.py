@@ -1422,10 +1422,11 @@ def crear_canada():
         sur[x] = int(38 - 9 * cierre + 1.5 * math.sin(x * 0.17 + 2) + math.sin(x * 0.47))
     # bajo la cornisa la pared es más alta: entre la repisa y el fondo hay roca (solo se sube por la escala)
     for x in range(88, 121):
-        norte[x] = max(norte[x], int(13.5 - max(0, abs(x - 104) - 7) * 0.7))
+        norte[x] = max(norte[x], int(12.5 - max(0, abs(x - 104) - 7) * 0.7))
     # el ensanche del sur, donde está la zona corrupta
     for x in range(44, 74):
-        sur[x] = max(sur[x], 41 - int(2 * math.sin((x - 44) / 30 * math.pi)))
+        sur[x] = max(sur[x], int(40.5 - 2 * math.sin((x - 44) / 30 * math.pi) + 1.4 * math.sin(x * 0.45)
+                                 + math.sin(x * 0.9 + 1)))
     for x in range(ANCHO):
         for y in range(0, norte[x] + 1):
             poner(x, y, "0")
@@ -1433,11 +1434,11 @@ def crear_canada():
             poner(x, y, "0")
     # la cornisa del eco: una repisa en lo alto de la pared norte, encerrada por la peña
     for x in range(98, 111):
-        for y in range(2, 8):
-            if ((x - 104) / 6.5) ** 2 + ((y - 4) / 2.6) ** 2 <= 1.0:
+        for y in range(3, 10):
+            if ((x - 104) / 6.5) ** 2 + ((y - 6.5) / 2.6) ** 2 <= 1.0:
                 poner(x, y, ".")
     # la escala de cuerda: baja de la cornisa al fondo de la cañada (cerrada hasta que Mbuzi la descuelga)
-    for y in range(8, norte[104] + 1):
+    for y in range(9, norte[104] + 1):
         for x in (104, 105):
             poner(x, y, '"')
     # el aprisco de Mbuzi: un rellano al norte, al oeste de la garganta
@@ -1495,7 +1496,7 @@ def crear_canada():
     poner(40, 7, "{")
     poner(43, 11, "}")
     # el eco, en la cornisa
-    poner(104, 3, "@")
+    poner(104, 5, "@")
     # los tres cencerros: en la zona, junto al vado del oeste y en un saliente del este
     for (x, y) in ((61, 34), (12, arroyo[12] - 2), (122, sur[122] - 2)):
         poner(x, y, "`")
@@ -1506,7 +1507,7 @@ def crear_canada():
     for (x, y) in ((26, arroyo[26] + 3), (88, arroyo[88] - 1), (118, arroyo[118] + 3)):
         if m[y][x] == ".":
             poner(x, y, "$")
-    reservados = [(40, 7, 4), (43, 11, 2), (104, 3, 3), (17, 5, 2), (132, 22, 3), (4, 25, 3)]
+    reservados = [(40, 7, 4), (43, 11, 2), (104, 5, 3), (17, 5, 2), (132, 22, 3), (4, 25, 3)]
 
     def libre(x, y):
         if m[y][x] not in ".," or en_zona(x, y):

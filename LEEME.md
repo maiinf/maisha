@@ -253,14 +253,15 @@ Escena `escenas/mundo/senda_surcos.tscn` (64×100, de sur a norte), entre Cuna d
 - Una zona corrupta al este (cuervos y Petrinos) y un secreto tras un matorral en el seto del oeste.
 - Arte: `herramientas/pintar_senda.py` (hórreo, cuervo, mazorca e icono), Sungura en `dibujar_aldeanos.py`.
 
-### Cañada del Eco (en construcción)
+### Cañada del Eco
 
-Mapa `datos/mapas/canada_eco.txt` (140×46, de este a oeste), entre el Bosque Cobrizo y el Lago Espejo. Se genera con `construir_mapa.py canada_eco --crear` (`crear_canada`). Boceto: `documentacion/boceto_canada_eco.png`; suelo pintado: `documentacion/boceto_canada_suelo.png`.
-- Una **garganta** entre dos paredes de peña (`0`) que se estrecha en el centro. Encima de las peñas grandes se pinta una **meseta** de hierba (`_mesetas` en `pintar_suelo.py`): la roca solo se ve en el filo y en la cara del acantilado.
+Escena `escenas/mundo/canada_eco.tscn` (mapa de 140×46 casillas, de este a oeste: unas 3,5 pantallas), entre el **Bosque Cobrizo** (la nueva salida del oeste del bosque lleva aquí) y el **Lago Espejo** (el paso del oeste sigue cerrado: niebla, marca `camino_lago`). El mapa se genera con `construir_mapa.py canada_eco --crear` (`crear_canada`). Música: de momento suena «La loma de cobre» del Camino Cobrizo (falta una propia).
+- Una **garganta** entre dos paredes de peña (`0`) con la **cara del acantilado el doble de alta** y, encima, una **meseta** de hierba (`_mesetas` en `pintar_suelo.py`): la roca solo se ve en el filo y en la cara.
 - Un **arroyo** baja hacia el lago y cruza el camino bajo un **puentecito** (este) y por un **vado** (oeste). Al este, hierba de bosque y hojarasca; al oeste, flores.
-- **Mbuzi**, la cabra montés pastora, en su aprisco del norte. Encargo: **tres cencerros**. Al devolvérselos descuelga la **escala de cuerda** (`"` en esta cañada) hasta la **cornisa** del **quinto eco**.
-- Una zona corrupta en el ensanche del sur y un secreto tras un matorral al noroeste. Enemigo nuevo: el **murciélago de eco**.
-- Falta: la escena, el arte de los objetos y de Mbuzi, el murciélago, los diálogos, la música y la prueba.
+- **Mbuzi** (`}` con `viajero = "mbuzi"`), la cabra montés pastora, mayor y tranquila, junto a su **aprisco** (`{`: cabaña de piedra seca con tejado de lajas, pesebre de heno y corral). Encargo: **tres cencerros** (`` ` `` con `objeto_encargo = "cencerro"`). Al devolvérselos da dos sopas y descuelga la **escala de cuerda** (`"` en esta cañada, `scripts/mundo/objetos/escala_cuerda.gd`: se desenrolla tramo a tramo; marca `escala_descolgada/canada_eco`) hasta la **cornisa** del **quinto eco**.
+- Una zona corrupta en el ensanche del sur y un secreto tras un matorral al noroeste.
+- Arte: `herramientas/pintar_canada.py` (aprisco, escala, cencerro e icono), Mbuzi en `dibujar_aldeanos.py`. Bocetos y capturas en `documentacion/` (`boceto_canada_eco.png`, `boceto_canada_suelo.png`, `canada_eco_capturas.png`).
+- Falta: el **recuerdo del quinto eco** (su texto y su ilustración), el enemigo nuevo (**murciélago de eco**; mientras, salen petrinos y topos) y su música.
 
 ### Los ecos perdidos (el misterio de Raíz)
 
@@ -556,6 +557,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_sendero.gd` va de los Prados al Sendero del Puente y a la aldea y vuelta, prueba los pretiles y el vado, el eco perdido (con su ilustración), el encargo de Msafiri y el cuaderno de ecos.
 - `pruebas/prueba_pasarelas.gd` va de la aldea a Las Pasarelas y a la ciénaga y vuelta, prueba el agua y las tablas, el tramo roto, la rana de piedra (aviso, salto, onda, atontada), el encargo de Korongo (que arregla la pasarela) y el segundo eco.
 - `pruebas/prueba_camino_cobrizo.gd` sube de los Prados al Camino Cobrizo y al bosque y vuelta, prueba la peña y el derrumbe, el topo de piedra (bajo tierra, aviso, mordisco, atontado, las raíces que lo sacan), el encargo de Fuko (que despeja la galería) y el tercer eco.
+- `pruebas/prueba_canada_eco.gd` va del Bosque Cobrizo a la Cañada del Eco y vuelta, prueba la peña de la garganta, la escala de cuerda (enrollada y descolgada), el encargo de Mbuzi y el paso al Lago Espejo, aún cerrado.
 - `pruebas/prueba_senda_surcos.gd` sube de la aldea a la Senda de los Surcos y al Campo Segado y vuelta, prueba la acequia y el foso, el cuervo de óxido (vuelo, raya de aviso, picado, posado, raíces), el encargo de Sungura (que vacía el foso) y el cuarto eco.
 - `pruebas/prueba_aldea.gd` cruza el sendero hasta la aldea, habla con Bibi, entra y sale del Gran Árbol, rescata a Pino y comprueba que todo se recuerda al volver.
 - `pruebas/prueba_maisha_animaciones.gd` comprueba que existen las 6 animaciones, que Maisha mira hacia donde camina y que, si celebra a mitad de un golpe (al purgar una zona dando cetrazos), no se queda celebrando para siempre.

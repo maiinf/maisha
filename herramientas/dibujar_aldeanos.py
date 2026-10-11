@@ -47,6 +47,10 @@ MATERIALES = {
     "cobre":    ["6A3418", "9A4E24", "C06A32", "F4B470"],   # el casco de minero
     "liebre":   ["5C3E26", "8E6A44", "B8936A", "D9BC94"],   # pelo de liebre (pardo dorado)
     "maiz":     ["8A4418", "C0702A", "F2C45A", "FDE27E"],   # mazorcas
+    "cabra":    ["525649", "A0A596", "D6D4C8", "FFF8E8"],   # pelo blanco de cabra (Piedra y Pergamino)
+    "gris_c":   ["292C25", "525649", "7A806D", "A0A596"],   # manchas grises de la cabra
+    "cuerno":   ["5C3E26", "A57559", "C9B07E", "E2CEA0"],   # cuernos curvos, color hueso
+    "rojo":     ["5A1418", "8C2028", "B02531", "D53946"],   # pañuelo rojo
 }
 ANCHO, ALTO = 24, 32
 
@@ -414,7 +418,54 @@ def sungura():
     return l.imagen()
 
 
-ALDEANOS = {"sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+def mbuzi():
+    """MBUZI: cabra montés pastora de la Cañada del Eco, mayor y tranquila. Pelo blanco con manchas grises, cuernos
+    gruesos que se curvan hacia atrás y hacia fuera, barba larga, ojos entornados con cejas blancas, orejas caídas
+    a los lados, pañuelo rojo al cuello y un cayado de pastora con la punta curva."""
+    l = Lienzo()
+    for y in range(5, 31):                                    # el cayado, apoyado a su derecha
+        l.px(21, y, "concha", 2 if y % 4 else 3)
+    for (x, y) in ((21, 4), (20, 3), (19, 3), (18, 4), (18, 5)):   # la punta curva
+        l.px(x, y, "concha", 3 if y == 3 else 2)
+    l.ovalo(11.5, 23.5, 6.2, 7.0, "cabra")                    # cuerpo
+    for (x, y) in ((7, 21), (7, 22), (8, 22), (15, 25), (16, 26), (15, 26), (9, 28), (10, 28)):   # manchas grises
+        l.px(x, y, "gris_c", 2)
+    # los cuernos: gruesos en la base, suben y se curvan hacia atrás y hacia fuera (con anillos)
+    for lado in (-1, 1):
+        base = 9 if lado < 0 else 14
+        tramo = ((0, 8), (0, 7), (0, 6), (lado, 5), (lado * 2, 4), (lado * 3, 4), (lado * 4, 5), (lado * 4, 6))
+        for k, (dx, dy) in enumerate(tramo):
+            l.px(base + dx, dy, "cuerno", 3 if k % 2 == 0 else 2)
+            if k < 4:
+                l.px(base + dx - lado, dy, "cuerno", 1 if k % 2 else 2)   # la base, de dos píxeles
+    l.ovalo(11.5, 12.5, 4.4, 4.0, "cabra")                    # cabeza
+    l.ovalo(11.5, 16, 2.5, 2.8, "cabra")                      # el hocico largo de cabra
+    l.ovalo(11.5, 16.8, 1.8, 1.5, "pie_seta", plano=True)     # morro claro
+    l.px(10, 16, "nariz"); l.px(13, 16, "nariz")              # los agujeros de la nariz
+    l.px(11, 18, "gris_c", 1); l.px(12, 18, "gris_c", 1)      # la boca, tranquila
+    for (x0, x1, y) in ((5, 7, 12), (16, 18, 12)):            # orejas caídas a los lados, con el dentro gris
+        for x in range(x0, x1 + 1):
+            l.px(x, y, "cabra", 2)
+            l.px(x, y + 1, "gris_c", 2 if x != (x0 if x0 < 10 else x1) else 3)
+    for x in (8, 13):                                         # ojos entornados, con ceja blanca encima
+        l.px(x, 11, "cabra", 3); l.px(x + 1, 11, "cabra", 3)
+        l.px(x, 12, "ojo"); l.px(x + 1, 12, "ojo")
+        l.px(x, 13, "gris_c", 2); l.px(x + 1, 13, "gris_c", 2)
+    l.rect(7, 19, 16, 20, "rojo", 2); l.rect(7, 19, 16, 19, "rojo", 3)   # el pañuelo rojo, anudado al lado
+    l.px(15, 21, "rojo", 2); l.px(16, 21, "rojo", 1); l.px(16, 22, "rojo", 1)
+    for y in range(19, 25):                                   # la barba larga, por encima del pañuelo
+        for x in range(11, 13):
+            l.px(x, y, "cabra", 3 if (x + y) % 2 else 2)
+    l.px(11, 25, "cabra", 2)
+    l.ovalo(5, 23, 1.6, 2.6, "cabra")                         # brazos (el derecho sujeta el cayado)
+    l.ovalo(19.5, 20.5, 1.7, 2.0, "cabra")
+    l.px(20, 21, "gris_c", 1)
+    for x in (8, 15):                                         # pezuñas
+        l.rect(x - 1, 29, x + 1, 30, "gris_c", 1); l.px(x, 30, "nariz")
+    return l.imagen()
+
+
+ALDEANOS = {"mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

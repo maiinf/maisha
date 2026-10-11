@@ -23,7 +23,8 @@
 			"camino_cobrizo"
 		],
 		"bosque_cobrizo": [
-			"camino_cobrizo"
+			"camino_cobrizo",
+			"canada_eco"
 		],
 		"cuna_de_musgo": [
 			"sendero_del_puente",
@@ -63,6 +64,9 @@
 		"senda_surcos": [
 			"cuna_de_musgo",
 			"campo_segado"
+		],
+		"canada_eco": [
+			"bosque_cobrizo"
 		]
 	},
 	"misiones": [
@@ -878,6 +882,45 @@
 					"ir": {
 						"escena": "camino_cobrizo",
 						"buscar": "aldeano:fuko"
+					}
+				}
+			]
+		},
+		{
+			"id": "cencerros_mbuzi",
+			"tipo": "encargo",
+			"titulo": "Los cencerros de Mbuzi",
+			"quien": "mbuzi",
+			"texto": "Mbuzi, una cabra montés pastora de la Cañada del Eco, llamaba a su rebaño con tres cencerros. El eco de la peña los esparció por toda la cañada.",
+			"aparece": [
+				"encargo_mbuzi"
+			],
+			"hecha": [
+				"mbuzi_cencerros"
+			],
+			"premio": "La escala de la cornisa y dos sopas",
+			"pasos": [
+				{
+					"texto": "Busca los cencerros de Mbuzi ({n}/{total})",
+					"objeto": {
+						"cencerro": 3
+					},
+					"hecho_tambien": [
+						"mbuzi_cencerros"
+					],
+					"ir": {
+						"escena": "canada_eco",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Llévale los cencerros a Mbuzi",
+					"hecho": [
+						"mbuzi_cencerros"
+					],
+					"ir": {
+						"escena": "canada_eco",
+						"buscar": "aldeano:mbuzi"
 					}
 				}
 			]

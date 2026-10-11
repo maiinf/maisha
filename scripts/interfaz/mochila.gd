@@ -57,7 +57,8 @@ const PUNTO_RAIZ := {"prados_del_eco": Vector2(110, 178), "bosque_cobrizo": Vect
 	"claro_de_calma": Vector2(206, 142), "casa_pino": Vector2(200, 148), "taller_corteza": Vector2(214, 148), "kitovu": Vector2(53, 196),
 	"casa_shamba": Vector2(53, 196), "cienaga_quieta": Vector2(322, 182), "campo_segado": Vector2(208, 44),
 	"sendero_del_puente": Vector2(160, 166), "las_pasarelas": Vector2(268, 166),
-	"camino_cobrizo": Vector2(104, 132), "senda_surcos": Vector2(205, 90)}
+	"camino_cobrizo": Vector2(104, 132), "senda_surcos": Vector2(205, 90),
+	"canada_eco": Vector2(68, 91)}
 const NIEBLA := Color("e2cea0")
 const NIEBLA_SOMBRA := Color("c9b07e")
 const TINTA := Color("5c3e26")
@@ -101,6 +102,7 @@ const LAZOS := [
 	["bibi", "Bibi Musgo", "bibi_conocida", "Guardiana del Gran Árbol de Cuna de Musgo. Hay recuerdos suyos que no encuentra."],
 	["pino", "Pino", "rescatado_pino", "Niño-seta y vigía de Cuna de Musgo. Quiere ser explorador."],
 	["corteza", "Corteza", "rescatado_corteza", "Herrera de Cuna de Musgo. Gruñona y orgullosa, pero de buen corazón."],
+	["mbuzi", "Mbuzi", "mbuzi_conocida", "Cabra montés pastora de la Cañada del Eco. Habla despacio y escucha todavía más despacio."],
 	["sungura", "Sungura", "sungura_conocida", "Liebre guardasemillas de la Senda de los Surcos. Habla deprisa, siembra despacio."],
 	["fuko", "Fuko", "fuko_conocido", "Topo minero del Camino Cobrizo. No ve más allá de sus gafas, pero oye crecer las raíces."],
 	["korongo", "Korongo", "korongo_conocida", "Garza pescadora de Las Pasarelas. Paciente con los peces, no tanto con las ranas."],

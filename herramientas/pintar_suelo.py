@@ -249,11 +249,12 @@ def _puente_piedra(lz, tipos, alto, ancho, fina, media):
 PENA = ["#1a1c20", "#292c32", "#3a3e45", "#4d5259", "#62686e", "#7a8086", "#949a9e", "#b1b5b6", "#cfd2cf"]
 
 
-def _riscos(lz, tipos, fina, media):
+def _riscos(lz, tipos, fina, media, cara=1.0):
     """Las PEÑAS («0», en el Camino Cobrizo): roca natural de piedra parda en vista 3/4. Arriba, una masa de roca
     abombada, con bultos y grietas que siguen la piedra, musgo en lo que da a la sombra y hojas; al sur, la pared
     (de altura irregular) con estratos, grietas verticales y vetas de cobre (naranja) y malaquita (verde-agua);
-    al pie, piedras sueltas, hierba y la sombra sobre el suelo."""
+    al pie, piedras sueltas, hierba y la sombra sobre el suelo.
+    cara: cuántas veces más alta es la pared (en la Cañada del Eco, el doble: es una garganta)."""
     ri = mascara(lz, tipos, ("risco",), 4.0, 0.5, semilla=50)
     if ri.max() <= 0:
         return
@@ -265,9 +266,9 @@ def _riscos(lz, tipos, fina, media):
     alto = np.clip(dentro / 16.0, 0, 1) ** 0.7 * 16 + (bultos - 0.5) * 10
     alto = lz.desenfocar(alto * ri, 4.0)
     # la pared del sur: de 14 a 26 px según el sitio (el borde de arriba no es una línea recta)
-    alto_pared = 14 + estirar(lz.ruido(14, 2, semilla=59), int(60 * S)) * 10
+    alto_pared = (14 + estirar(lz.ruido(14, 2, semilla=59), int(60 * S)) * 10) * cara
     pared = np.zeros_like(ri)
-    for k in range(1, 27):
+    for k in range(1, int(27 * cara)):
         abajo = np.clip(desplazar(lz, ri, 0, -k), 0, 1)
         pared = np.maximum(pared, ri * (1 - abajo) * (alto_pared >= k))
     pared = np.clip((pared - 0.5) * 4 + 0.5, 0, 1) * ri
@@ -317,9 +318,10 @@ def _riscos(lz, tipos, fina, media):
     sueltas = np.clip((lz.ruido(1.4, 2, semilla=57) - 0.7) * 8, 0, 1) * (lz.desenfocar(pie, 1.5) > 0.15)
     lz.pintar(np.clip(desplazar(lz, sueltas, 0.6, 0.8) - sueltas, 0, 1), "#0b0907", 0.6)
     lz.pintar(sueltas, rampa(PENA[3:8], fina), 0.95)
+    return pared
 
 
-def _mesetas(lz, tipos, fina, media):
+def _mesetas(lz, tipos, fina, media, pared):
     """Encima de las peñas grandes (la Cañada del Eco): una MESETA de hierba, más alta que el fondo. La roca solo se
     ve en el filo (unos pocos píxeles con musgo) y en la cara del acantilado del sur; dentro, hierba oscura con
     matas, piedras sueltas y algún claro de roca desnuda."""
@@ -329,10 +331,11 @@ def _mesetas(lz, tipos, fina, media):
         return
     S = lz.s
     dentro = _cv.distanceTransform((ri > 0.5).astype(np.uint8), _cv.DIST_L2, 5) / S
-    # lejos del borde (más allá de la cara de la pared, que mide hasta 26 px): hierba; el borde, irregular
-    filo = 30 + (lz.ruido(10, 2, semilla=71) - 0.5) * 14
-    me = np.clip((dentro - filo) / 4.0, 0, 1)
-    calvas = np.clip((lz.ruido(16, 2, semilla=72) - 0.7) * 6, 0, 1)
+    # un poco dentro del borde y por encima de la cara de la pared: hierba; el borde, irregular
+    filo = 10 + (lz.ruido(10, 2, semilla=71) - 0.5) * 8
+    sobre_cara = lz.desenfocar(_cv.dilate((pared > 0.3).astype(np.uint8), np.ones((int(8 * S), int(8 * S)), np.uint8)).astype(float), 2.0)
+    me = np.clip((dentro - filo) / 4.0, 0, 1) * np.clip(1 - sobre_cara * 1.5, 0, 1)
+    calvas = np.clip((lz.ruido(16, 2, semilla=72) - 0.8) * 6, 0, 1)
     me = me * (1 - calvas * 0.9)
     v = 0.42 + (lz.ruido(40, 3, semilla=73) - 0.5) * 0.2 + (media - 0.5) * 0.2 + (estirar(fina, 5) - 0.5) * 0.3
     lz.pintar(me, rampa(HIERBA_BOSQUE, np.clip(v, 0, 1)))
@@ -546,9 +549,9 @@ def pintar(nombre, salida=None):
         lz.pintar(postes * (lz.ruido(0.5, 1, semilla=21) > 0.6), "#a8735a", 0.6)
 
     _puente_piedra(lz, tipos, alto, ancho, fina, media)
-    _riscos(lz, tipos, fina, media)
+    pared = _riscos(lz, tipos, fina, media, cara=2.0 if canada else 1.0)
     if canada:
-        _mesetas(lz, tipos, fina, media)
+        _mesetas(lz, tipos, fina, media, pared)
 
     if bosque:
         _hojarasca(lz, tipos, alto, ancho)

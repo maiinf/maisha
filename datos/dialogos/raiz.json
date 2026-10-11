@@ -1534,5 +1534,111 @@
 				]
 			}
 		]
+	},
+	"mbuzi": {
+		"nombre": "Mbuzi",
+		"conversaciones": [
+			{
+				"no": [
+					"mbuzi_conocida"
+				],
+				"marca": [
+					"mbuzi_conocida",
+					"encargo_mbuzi"
+				],
+				"lineas": [
+					"Despacio, despacio... Aquí nadie corre. La cañada te devuelve cada paso, y si corres, te persiguen tus propios pies.",
+					"Soy Mbuzi. Llevo más inviernos en esta peña que piedras tiene el arroyo.",
+					"Antes llamaba a mis cabras con tres cencerros: uno grave, uno alegre y uno que solo suena cuando llueve.",
+					"Pero desde que llegó ese gris, la peña grita en vez de cantar. El eco me arrancó los cencerros y los esparció por la cañada.",
+					"Uno quedó junto al vado del oeste, otro al pie de la pared del sur, hacia el bosque... y el tercero dentro de esa mancha que huele a hierro.",
+					"Si me los traes, te descuelgo la escala de la cornisa. Ahí arriba hay una piedra que habla. A mí me cuenta cosas de antes. A ti quizá también."
+				]
+			},
+			{
+				"si": [
+					"encargo_mbuzi"
+				],
+				"no": [
+					"mbuzi_cencerros"
+				],
+				"tiene": {
+					"cencerro": 3
+				},
+				"entrega": {
+					"cencerro": 3
+				},
+				"marca": [
+					"mbuzi_cencerros",
+					"escala_descolgada/canada_eco"
+				],
+				"recibe": {
+					"sopa": 2
+				},
+				"lineas": [
+					"Clonc... clinc... clan. ¿Los oyes? Los tres. La peña los repite y, por fin, parece que canta otra vez.",
+					"Toma, dos cuencos de sopa: con leche de mis cabras, que calienta el doble. Y ahora, la escala."
+				],
+				"despues": [
+					"Ya cuelga. Sube despacio, que la cuerda es vieja como yo, pero aguanta lo que haga falta.",
+					"Cuando la piedra te hable, escucha hasta el final. Los ecos solo dicen la verdad si nadie los interrumpe."
+				],
+				"aviso": "Mbuzi ha descolgado la escala de cuerda hasta la cornisa"
+			},
+			{
+				"si": [
+					"encargo_mbuzi"
+				],
+				"no": [
+					"mbuzi_cencerros"
+				],
+				"lineas": [
+					"Llevas {cencerro} de mis tres cencerros.",
+					"Junto al vado del oeste, al pie de la pared del sur y dentro de la mancha gris. Escucha: a veces todavía suenan solos."
+				]
+			},
+			{
+				"lineas": [
+					"La escala sube a la cornisa, al norte, pasado el puentecito. Despacio, despacio.",
+					"Más allá de la cañada, al oeste, está el Lago Espejo. Dicen que el agua de allí se acuerda de todo lo que ha visto."
+				]
+			}
+		]
+	},
+	"canada_llegada": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Las paredes de piedra se cierran a los lados y el viento sopla por en medio, como por una flauta...",
+					"Cada paso suena dos veces. Una mía y otra que vuelve de la peña."
+				]
+			}
+		]
+	},
+	"canada_aprisco": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una cabaña de piedra con tejado de lajas y un cayado colgado junto a la puerta. Dentro brilla un candil.",
+					"En el corral, el pesebre está lleno de heno... pero no hay ni una cabra."
+				]
+			}
+		]
+	},
+	"paso_cerrado_lago_espejo": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Por aquí se va al Lago Espejo... pero la cañada se pierde en una niebla espesa que no deja ver el camino.",
+					"Todavía no. Primero tengo que entender qué cuentan los ecos."
+				]
+			}
+		]
 	}
 }

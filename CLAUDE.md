@@ -21,7 +21,7 @@ creando jefes, enemigos, animaciones, mapas, música e ilustraciones igual que h
 pip3 install -r herramientas/requirements.txt
 brew install ffmpeg            # para guardar la música y los sonidos en .ogg
 ```
-Godot está en `/Applications/Godot.app/Contents/MacOS/Godot` (versión 4.6).
+Godot está en `/Applications/Godot.app/Contents/MacOS/Godot` (versión 4.7).
 
 ## Herramientas (en `herramientas/`)
 | Qué | Programa |
@@ -30,7 +30,7 @@ Godot está en `/Applications/Godot.app/Contents/MacOS/Godot` (versión 4.6).
 | Suelo pintado de un mapa | `pintar_suelo.py` (lo llama `construir_mapa.py`) |
 | Mapas (texto → JSON + suelo + zonas) | `construir_mapa.py <mapa> [--crear]` (con `--crear` se rehace el mapa y **se sobrescribe**) |
 | Aldeanos (24×32, frente) | `dibujar_aldeanos.py` |
-| Objetos y enemigos de cada camino | `pintar_sendero.py`, `pintar_pasarelas.py`, `pintar_camino.py`, `pintar_senda.py` |
+| Objetos y enemigos de cada camino | `pintar_sendero.py`, `pintar_pasarelas.py`, `pintar_camino.py`, `pintar_senda.py`, `pintar_canada.py` |
 | Ilustraciones de la historia (600×256) | `cinematicas.py <nombre>` (y `cinematicas_*.py`) |
 | Efectos y ambientes | `crear_sonidos.py [nombres]` |
 | Música | `componer_musica.py [nombres]` |
@@ -40,7 +40,7 @@ Para comprobar el arte, mira los PNG que salen (abrirlos con la herramienta de l
 
 ## Mapas
 Cada mapa es `datos/mapas/<mapa>.txt` (una letra por casilla de 16 px) + `.puertas` + `.zonas`.
-Letras nuevas de los caminos: `0` peña, `"` obstáculo que se abre (pasarela rota / derrumbe / foso, según el
+Letras nuevas de los caminos: `0` peña, `"` obstáculo que se abre (pasarela rota / derrumbe / foso / escala de cuerda, según el
 `viajero` del nodo Region), `@` eco perdido, `` ` `` objeto del encargo, `{` casa del viajero, `}` viajero,
 `-` `|` `'` puente de piedra, pretil y vado. Puertas: `letra = id, destino, puerta_llegada, salida[, cerrada:marca]`.
 El grafo de caminos para la flecha de misiones está en `datos/misiones.json` → `caminos`.
@@ -50,11 +50,12 @@ El grafo de caminos para la flecha de misiones está en `datos/misiones.json` �
 /Applications/Godot.app/Contents/MacOS/Godot --headless --import --path .
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_senda_surcos
 ```
-Hay 19 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
+Hay 20 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
 Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--headless`
 (guarda `get_viewport().get_texture().get_image()`); bórralo después.
 
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,
-Senda de los Surcos hechos; faltan 5) y el misterio de los 9 ecos perdidos (4 hechos). Siguiente propuesto:
-el Lago Espejo. Detalles en `LEEME.md`.
+Senda de los Surcos hechos; la Cañada del Eco, jugable pero sin terminar; faltan 4) y el misterio de los 9 ecos
+perdidos (4 hechos). En marcha: la Cañada del Eco (falta el recuerdo del 5.º eco, el murciélago de eco y su música)
+y después el Lago Espejo. Detalles en `LEEME.md` y `documentacion/decisiones.md`.

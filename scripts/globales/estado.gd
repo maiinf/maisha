@@ -48,6 +48,8 @@ const OBJETOS := {
 		"texto": "Una cesta de mimbre para pescar, de Korongo. Las ranas de piedra se la llevaron."},
 	"campanilla": {"uno": "Campanilla de cobre", "encargo": 3, "hecho": "fuko_campanillas", "icono": 20,
 		"texto": "Una campanilla de cobre de Fuko. Colgada en un cruce de galerías, le dice por dónde va sin necesidad de ver."},
+	"cencerro": {"uno": "Cencerro de Mbuzi", "encargo": 3, "hecho": "mbuzi_cencerros", "icono": 22,
+		"texto": "Un cencerro de cobre viejo, con su correa de cuero. En la Cañada del Eco suena tres veces: una tuya y dos de la peña."},
 	"mazorca": {"uno": "Mazorca antigua", "encargo": 3, "hecho": "sungura_mazorcas", "icono": 21,
 		"texto": "Maíz de los antiguos labradores de Raíz, de granos dorados y alguno rojo. Sungura guarda sus semillas para que no se pierdan."},
 	"sopa": {"uno": "Sopa de Juncia", "encargo": 0, "hecho": "", "icono": 10, "usable": true,

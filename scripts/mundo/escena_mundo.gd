@@ -13,7 +13,7 @@ extends Node2D
 @export var ayuda := "WASD mover · C correr · J golpe · K semilla · L latido"
 
 ## Música y ambiente de cada escena (por el nombre de su archivo)
-const MUSICA_DE := {"kitovu": "kitovu", "prados_del_eco": "prados", "cuna_de_musgo": "aldea", "bosque_cobrizo": "bosque", "cienaga_quieta": "cienaga", "campo_segado": "campo", "sendero_del_puente": "sendero", "las_pasarelas": "pasarelas", "camino_cobrizo": "cobrizo", "senda_surcos": "surcos", "casa_shamba": "interior",
+const MUSICA_DE := {"kitovu": "kitovu", "prados_del_eco": "prados", "cuna_de_musgo": "aldea", "bosque_cobrizo": "bosque", "cienaga_quieta": "cienaga", "campo_segado": "campo", "sendero_del_puente": "sendero", "las_pasarelas": "pasarelas", "camino_cobrizo": "cobrizo", "senda_surcos": "surcos", "canada_eco": "cobrizo", "casa_shamba": "interior",
 	"casa_pino": "interior", "taller_corteza": "interior", "claro_de_calma": "interior"}
 ## (los pájaros no se usan aquí: quedan guardados para un bioma de selva)
 const AMBIENTE_DE := {
@@ -27,6 +27,7 @@ const AMBIENTE_DE := {
 	"las_pasarelas": {"cienaga": 0.35, "brisa": 0.4},
 	"camino_cobrizo": {"viento": 0.3, "brisa": 0.5},
 	"senda_surcos": {"brisa": 0.55, "viento": 0.25},
+	"canada_eco": {"viento": 0.55, "brisa": 0.3},
 	"casa_shamba": {"fuego": 0.75},
 	"casa_pino": {"brisa": 0.15},
 	"taller_corteza": {"fuego": 0.45},

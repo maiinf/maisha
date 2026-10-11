@@ -88,6 +88,7 @@ const CAMPAMENTOS := {
 	"korongo": ["res://arte/mundos/raiz/pasarelas/palafito.png", Vector2(52, 10), "pasarelas_palafito", 34.0, false],
 	"fuko": ["res://arte/mundos/raiz/camino/madriguera.png", Vector2(60, 12), "camino_madriguera", 38.0, false],
 	"sungura": ["res://arte/mundos/raiz/senda/horreo.png", Vector2(52, 10), "senda_horreo", 36.0, false],
+	"mbuzi": ["res://arte/mundos/raiz/canada/aprisco.png", Vector2(40, 10), "canada_aprisco", 34.0, false],
 }
 ## Edificios de la aldea: letra -> [id, dibujo, tamaño de la colisión]
 const EDIFICIOS := {
@@ -150,7 +151,7 @@ func _ready() -> void:
 	_crear_pretiles()
 	if not _tablas_rotas.is_empty():
 		# «"»: en Las Pasarelas, un tramo de pasarela hundido; en el Camino Cobrizo, el derrumbe de la galería
-		# (y en la Senda de los Surcos, el foso de agua que Sungura vacía)
+		# (en la Senda de los Surcos, el foso de agua que Sungura vacía; en la Cañada del Eco, la escala de cuerda)
 		var rota: Node2D
 		match viajero:
 			"fuko":
@@ -159,6 +160,9 @@ func _ready() -> void:
 			"sungura":
 				rota = ACEQUIA_FOSO.new()
 				rota.marca = "acequia_vaciada/" + mapa
+			"mbuzi":
+				rota = ESCALA_CUERDA.new()
+				rota.marca = "escala_descolgada/" + mapa
 			_:
 				rota = PASARELA_ROTA.new()
 				rota.marca = "pasarela_reparada/" + mapa
@@ -246,6 +250,7 @@ var _tablas_rotas: Array[Vector2i] = []
 const PASARELA_ROTA := preload("res://scripts/mundo/objetos/pasarela_rota.gd")
 const DERRUMBE := preload("res://scripts/mundo/objetos/derrumbe.gd")
 const ACEQUIA_FOSO := preload("res://scripts/mundo/objetos/acequia_foso.gd")
+const ESCALA_CUERDA := preload("res://scripts/mundo/objetos/escala_cuerda.gd")
 
 
 func _crear_objetos(zonas: Dictionary) -> void:
