@@ -1,0 +1,48 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/mundo/sendero_del_puente.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/combate/gestor_corrupcion.gd" id="2"]
+[ext_resource type="PackedScene" path="res://escenas/personajes/maisha.tscn" id="3"]
+[ext_resource type="Script" path="res://scripts/mundo/region.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/combate/registro_brotes.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/interfaz/hud_combate.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/mundo/ambiente.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/interfaz/dialogo.gd" id="8"]
+
+[node name="SenderoDelPuente" type="Node2D"]
+script = ExtResource("1")
+titulo = "Sendero del Puente"
+color_fondo = Color(0.11, 0.18, 0.09, 1)
+
+[node name="Corrupcion" type="Node" parent="."]
+script = ExtResource("2")
+corrupcion_inicial = 0.45
+
+[node name="Brotes" type="Node2D" parent="."]
+z_index = -5
+script = ExtResource("5")
+
+[node name="Entidades" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Maisha" parent="Entidades" instance=ExtResource("3")]
+
+[node name="Region" type="Node2D" parent="."]
+script = ExtResource("4")
+mapa = "sendero_del_puente"
+densidad_decorado = 0.3
+nombre_region = "Sendero del Puente"
+entidades = NodePath("../Entidades")
+textos_carteles = Array[String](["Puente de los Antiguos · Río Lento", "← Prados del Eco", "Cuna de Musgo →"])
+tipos_enemigo = PackedStringArray("petrino")
+
+[node name="Ambiente" type="Node2D" parent="." groups=["ambiente"]]
+z_index = 3
+script = ExtResource("7")
+
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("6")
+
+[node name="Dialogo" type="CanvasLayer" parent="."]
+script = ExtResource("8")

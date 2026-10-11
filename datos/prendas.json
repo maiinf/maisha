@@ -1,0 +1,171 @@
+{
+ "corona_hojas": {
+  "nombre": "Corona de hojas",
+  "zona": "cabeza",
+  "arte": "raiz",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/corona_hojas_abajo.png",
+     "ancla": "cabeza",
+     "desplazamiento": [
+      -1,
+      0
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/corona_hojas_arriba.png",
+     "ancla": "cabeza",
+     "desplazamiento": [
+      -1,
+      0
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/corona_hojas_lado.png",
+     "ancla": "cabeza",
+     "desplazamiento": [
+      -1,
+      0
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "capa_musgo": {
+  "nombre": "Capa de musgo",
+  "zona": "espalda",
+  "arte": "raiz",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/capa_musgo_abajo.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -2,
+      0
+     ],
+     "delante": false
+    },
+    {
+     "textura": "res://arte/personajes/maisha/prendas/capa_musgo_broche.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      0,
+      1
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/capa_musgo_arriba.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -1,
+      1
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/capa_musgo_lado.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -3,
+      1
+     ],
+     "delante": false
+    }
+   ]
+  }
+ },
+ "cetro_raiz": {
+  "nombre": "Cetro-rama (Raíz)",
+  "zona": "arma",
+  "arte": "raiz",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_raiz.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -3,
+      -9
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_raiz.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -3,
+      -9
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_raiz.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -3,
+      -9
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "sombrero_paja": {
+  "nombre": "Sombrero de paja",
+  "zona": "cabeza",
+  "arte": "raiz",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/sombrero_paja_abajo.png",
+     "ancla": "cabeza",
+     "desplazamiento": [
+      -2,
+      -4
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/sombrero_paja_arriba.png",
+     "ancla": "cabeza",
+     "desplazamiento": [
+      -2,
+      -4
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/sombrero_paja_lado.png",
+     "ancla": "cabeza",
+     "desplazamiento": [
+      -2,
+      -4
+     ],
+     "delante": true
+    }
+   ]
+  }
+ }
+}

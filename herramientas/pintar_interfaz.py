@@ -1,0 +1,235 @@
+"""LA INTERFAZ COMO UN DIARIO DE CUERO (pintada con el pintor de las cinemáticas).
+
+    python3 herramientas/pintar_interfaz.py
+
+Genera en arte/interfaz/diario/:
+  libro.png          640×360   el diario abierto: tapas de cuero cosidas, dos páginas de pergamino y el lomo
+  tapa.png           296×318   la tapa de delante (para la animación de abrir): cuero con el Gran Árbol grabado
+  cintas.png         5 × 100×44 las cintas de marcapáginas de cada pestaña (rojo, ocre, verde, verde-agua, ciruela)
+  pergamino.png      48×48     caja de pergamino con borde de cuero cosido (se estira en 9 trozos: márgenes de 12)
+  papel.png          48×48     papel suelto con el borde rasgado (pensamientos; márgenes de 12)
+  cuero.png          32×32     etiqueta de cuero cosida (nombres, pestañas pequeñas; márgenes de 8)
+  noche.png          48×48     el panel del narrador: azul de noche con filigrana dorada (márgenes de 14)
+  sello.png          16×16     sello de lacre (misiones de la historia)
+"""
+import os
+import sys
+
+import numpy as np
+from PIL import Image
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from pintor import Lienzo, rampa, desplazar, RAIZ  # noqa: E402
+
+SALIDA = os.path.join(RAIZ, "arte", "interfaz", "diario")
+LUZ = (-0.6, -0.7, 0.5)
+CUERO = ["#170a06", "#2a130b", "#3d1d12", "#552a19", "#6e3a22", "#874c2e", "#a0613c"]
+PAPEL = ["#7d6443", "#a68a62", "#c4a97c", "#d9c293", "#e6d3a8", "#f0e2bf", "#f8efd6"]
+ORO = ["#5a3a10", "#8a6420", "#b88a34", "#d6b46e", "#f0d89a", "#fff1c8"]
+
+
+def _cuero(lz, mascara, radio=8, semilla=0):
+    poros = lz.ruido(0.7, 2, semilla=semilla)
+    arrugas = np.clip(1 - np.abs(lz.ruido(10, 3, semilla=semilla + 1) - 0.5) * 14, 0, 1)
+    lz.sombrear(mascara, CUERO, radio, LUZ, textura=lz.desenfocar(poros, 0.4) * 0.6 + (1 - arrugas) * 0.4, fuerza_tex=0.22)
+    lz.pintar(arrugas * mascara * (poros > 0.4), CUERO[1], 0.35)
+
+
+def _costura(lz, mascara, dentro=4.0, color="#d6b46e", paso=5.0):
+    d = lz.distancia(mascara)
+    linea = np.clip(1 - np.abs(d - dentro) / 0.7, 0, 1) * mascara
+    largo = (lz.x + lz.y) % paso
+    lz.pintar(linea * (largo < paso * 0.55), "#1a0c06", 0.6)
+    lz.pintar(np.clip(desplazar(lz, linea * (largo < paso * 0.55), -0.3, -0.3), 0, 1), color, 0.95)
+
+
+def _papel(lz, mascara, lomo_x=None, semilla=0, manchas=True):
+    v = 0.78 + (lz.ruido(40, 3, semilla=semilla) - 0.5) * 0.08 + (lz.ruido(1.0, 2, semilla=semilla + 1) - 0.5) * 0.05
+    if lomo_x is not None:
+        v = v - np.clip(1 - np.abs(lz.x - lomo_x) / 40, 0, 1) ** 1.6 * 0.42
+    lz.pintar(mascara, rampa(PAPEL, np.clip(v, 0, 1)))
+    if manchas:
+        m = np.clip((lz.ruido(30, 3, semilla=semilla + 2) - 0.84) * 3, 0, 1) * mascara
+        lz.pintar(lz.desenfocar(m, 3), "#c9ae80", 0.18)
+        aro = np.clip(1 - np.abs(np.hypot(lz.x - 560, lz.y - 290) - 14) / 1.2, 0, 1) * (lz.ruido(3, 2, semilla=9) > 0.35)
+        lz.pintar(aro * mascara, "#b8986a", 0.25)                  # la marca de una taza de té
+    # las fibras del papel
+    fibras = (lz.ruido(0.5, 1, semilla=semilla + 3) > 0.86) * mascara
+    lz.pintar(fibras, PAPEL[2], 0.25)
+
+
+def libro():
+    lz = Lienzo(640, 360, s=2, semilla=1)
+    lz.alfa[:] = 0
+    tapa = lz.poligono([(18, 30), (622, 30), (624, 348), (16, 348)])
+    lz.pintar(lz.desenfocar(np.clip(desplazar(lz, tapa, 3, 6), 0, 1), 4), "#000000", 0.65)
+    _cuero(lz, tapa, 12, semilla=3)
+    _costura(lz, tapa, 5.5)
+    # cantoneras de latón en las esquinas
+    for (cx, cy, sx, sy) in ((18, 30, 1, 1), (622, 30, -1, 1), (624, 348, -1, -1), (16, 348, 1, -1)):
+        c = lz.poligono([(cx, cy), (cx + 22 * sx, cy), (cx, cy + 22 * sy)])
+        lz.sombrear(c, ORO, 3, LUZ)
+        lz.pintar(lz.circulo(cx + 6 * sx, cy + 6 * sy, 1.3), ORO[0])
+    # el bloque de hojas (canto) que asoma bajo las páginas
+    for k in range(3):
+        canto = lz.poligono([(30 - k, 44 + k * 2), (610 + k, 44 + k * 2), (610 + k, 338 + k), (30 - k, 338 + k)])
+        lz.pintar(canto, PAPEL[2 - k], 1.0)
+        lz.pintar(canto * ((lz.y % 2) < 1), PAPEL[1], 0.4)
+    # las dos páginas, combadas hacia el lomo
+    for (x0, x1) in ((30, 319), (321, 610)):
+        pag = lz.poligono([(x0, 42), (x1, 40 if x0 < 320 else 42), (x1, 334), (x0, 336)])
+        if x0 > 320:
+            pag = lz.poligono([(x0, 40), (x1, 42), (x1, 336), (x0, 334)])
+        _papel(lz, pag, 320, semilla=5 if x0 < 320 else 6, manchas=x0 > 320)
+        lz.pintar(np.clip(1.6 - lz.distancia(pag), 0, 1) * pag, PAPEL[1], 0.6)
+    # el lomo: sombra honda y un hilo de costura
+    lomo = np.clip(1 - np.abs(lz.x - 320) / 5, 0, 1) * (lz.y > 40) * (lz.y < 336)
+    lz.pintar(lomo, "#4a3420", 0.55)
+    lz.pintar(np.clip(1 - np.abs(lz.x - 320) / 0.8, 0, 1) * (lz.y > 44) * (lz.y < 332) * ((lz.y % 12) < 7), "#e6d3a8", 0.8)
+    out = lz.sprite(tramado=0.008, umbral=0.5)
+    return out
+
+
+def tapa():
+    W, H = 296, 318
+    lz = Lienzo(W, H, s=2, semilla=2)
+    forma = lz.poligono([(0, 0), (W - 2, 0), (W, H), (0, H)])
+    _cuero(lz, forma, 14, semilla=11)
+    _costura(lz, forma, 6.0)
+    # un marco grabado y el Gran Árbol en el centro, con pan de oro gastado
+    marco = np.clip(1 - np.abs(lz.distancia(forma) - 16) / 0.9, 0, 1) * forma
+    lz.pintar(marco, ORO[2], 0.85)
+    lz.pintar(np.clip(1 - np.abs(lz.distancia(forma) - 19) / 0.6, 0, 1) * forma, ORO[1], 0.6)
+    cx, cy = W / 2, 150
+    tronco = lz.poligono([(cx - 9, cy + 60), (cx - 5, cy + 10), (cx + 5, cy + 10), (cx + 9, cy + 60)])
+    ramas = np.zeros_like(tronco)
+    for (a, b, c) in (((cx, cy + 14), (cx - 30, cy - 6), (cx - 56, cy - 18)), ((cx, cy + 14), (cx + 30, cy - 6), (cx + 56, cy - 18)),
+                      ((cx, cy + 10), (cx - 6, cy - 30), (cx - 2, cy - 54)), ((cx, cy + 10), (cx + 16, cy - 26), (cx + 30, cy - 44))):
+        ramas = np.maximum(ramas, lz.trazo(lz.curva(a, b, c, n=20), 3.4, 1.0))
+    raices = np.zeros_like(tronco)
+    for dx in (-30, -14, 14, 30):
+        raices = np.maximum(raices, lz.trazo(lz.curva((cx, cy + 56), (cx + dx * 0.6, cy + 64), (cx + dx * 1.4, cy + 72), n=16), 2.4, 0.8))
+    copa = np.zeros_like(tronco)
+    rng = np.random.default_rng(4)
+    for k in range(18):
+        a = rng.random() * np.pi
+        r = 26 + rng.random() * 30
+        copa = np.maximum(copa, lz.elipse(cx + np.cos(a) * r * 1.3, cy - 20 - np.sin(a) * r * 0.7, 12 + rng.random() * 6, 9 + rng.random() * 4))
+    dibujo = np.clip(np.maximum.reduce([tronco, ramas, raices]), 0, 1)
+    grabado = np.clip(copa - lz.desenfocar(copa, 1.2) * 0.0, 0, 1)
+    contorno_copa = np.clip(1 - np.abs(lz.distancia(copa) - 1.2) / 0.8, 0, 1)
+    lz.pintar(np.clip(desplazar(lz, dibujo + contorno_copa, 0.6, 0.8), 0, 1), CUERO[0], 0.8)      # hundido
+    lz.pintar(np.clip(dibujo + contorno_copa, 0, 1), rampa(ORO, np.clip(0.55 + (lz.ruido(2, 2, semilla=12) - 0.5) * 0.8, 0, 1)), 0.95)
+    hojas = (lz.ruido(1.5, 2, semilla=13) > 0.6) * copa
+    lz.pintar(hojas, ORO[3], 0.55)
+    # el desgaste del oro y del cuero en los bordes
+    gastado = np.clip((lz.ruido(3, 3, semilla=14) - 0.62) * 4, 0, 1)
+    lz.pintar(gastado * forma, CUERO[2], 0.5)
+    # cantoneras
+    for (x0, y0, sx, sy) in ((W, 0, -1, 1), (W, H, -1, -1)):
+        c = lz.poligono([(x0, y0), (x0 + 24 * sx, y0), (x0, y0 + 24 * sy)])
+        lz.sombrear(c, ORO, 3, LUZ)
+    # el cierre: una correa con su hebilla en el borde
+    correa = lz.poligono([(W - 30, 140), (W, 140), (W, 172), (W - 30, 172)])
+    _cuero(lz, correa, 4, semilla=15)
+    _costura(lz, correa, 2.5, paso=4)
+    hebilla = np.clip(lz.elipse(W - 30, 156, 9, 12) - lz.elipse(W - 30, 156, 6, 9), 0, 1)
+    lz.sombrear(hebilla, ORO, 2, LUZ)
+    return lz.sprite(tramado=0.008)
+
+
+def cintas():
+    cols = [["#2a0806", "#5a1410", "#8c2a20", "#b44634", "#d0624a"], ["#2a1806", "#5a3a10", "#8a5a1a", "#b47a2a", "#d49a44"],
+            ["#0a1a0a", "#1e3a1a", "#33582a", "#4e7a3a", "#6e9a52"], ["#06181a", "#103a3a", "#1e5a5a", "#2e7a78", "#4a9a94"],
+            ["#1a0612", "#3a1028", "#5a1e40", "#7e305a", "#a04a78"]]
+    tiras = []
+    for i, c in enumerate(cols):
+        W, H = 100, 44
+        lz = Lienzo(W, H, s=4, semilla=20 + i)
+        # la cinta cuelga del libro: el extremo de arriba en cola de golondrina
+        forma = lz.poligono([(2, 6), (50, 0), (98, 6), (98, H), (2, H)])
+        muesca = lz.poligono([(30, -1), (70, -1), (50, 9)])
+        forma = np.clip(forma - muesca, 0, 1)
+        tejido = (np.sin(lz.x * 6.0) * 0.5 + 0.5) * 0.4 + lz.ruido(0.6, 2) * 0.6
+        lz.sombrear(forma, c, 8, LUZ, textura=tejido, fuerza_tex=0.3)
+        brillo = np.clip(1 - np.abs(lz.x - 30) / 8, 0, 1) * forma
+        lz.pintar(brillo, c[4], 0.35)
+        hilo = np.clip(1 - np.abs(lz.distancia(forma) - 2.5) / 0.4, 0, 1) * forma * ((lz.x + lz.y) % 3 < 1.6)
+        lz.pintar(hilo, ORO[3], 0.7)
+        tiras.append(lz.sprite(tramado=0.008))
+    out = np.zeros((44, 500, 4), np.uint8)
+    for i, t in enumerate(tiras):
+        out[:, i * 100:(i + 1) * 100] = t
+    return out
+
+
+def nueve(tipo):
+    """Cajas que se estiran en 9 trozos."""
+    if tipo == "pergamino":
+        W = H = 48
+        lz = Lienzo(W, H, s=4, semilla=30)
+        borde = lz.poligono([(0, 0), (W, 0), (W, H), (0, H)])
+        _cuero(lz, borde, 5, semilla=31)
+        dentro = lz.poligono([(6, 6), (W - 6, 6), (W - 6, H - 6), (6, H - 6)])
+        lz.pintar(np.clip(desplazar(lz, dentro, 0.5, 0.8), 0, 1) - dentro * 0 , "#0a0503", 0.0)
+        _papel(lz, dentro, None, semilla=32, manchas=False)
+        lz.pintar(np.clip(1.4 - lz.distancia(dentro), 0, 1) * dentro, PAPEL[1], 0.7)
+        lz.pintar(np.clip(1 - np.abs(lz.distancia(borde) - 2.6) / 0.5, 0, 1) * (1 - dentro) * ((lz.x + lz.y) % 4 < 2), ORO[3], 0.9)
+        return lz.sprite(tramado=0.006)
+    if tipo == "papel":
+        W = H = 48
+        lz = Lienzo(W, H, s=4, semilla=33)
+        rasgado = lz.ruido(2.0, 3, semilla=34)
+        d = np.minimum.reduce([lz.x, lz.y, W - lz.x, H - lz.y])
+        forma = (d > 1.5 + rasgado * 2.5).astype(float)
+        _papel(lz, forma, None, semilla=35, manchas=False)
+        lz.pintar(np.clip(1.2 - lz.distancia(forma), 0, 1) * forma, PAPEL[1], 0.8)
+        return lz.sprite(tramado=0.006)
+    if tipo == "cuero":
+        W = H = 32
+        lz = Lienzo(W, H, s=4, semilla=36)
+        forma = lz.poligono([(0, 0), (W, 0), (W, H), (0, H)])
+        _cuero(lz, forma, 5, semilla=37)
+        _costura(lz, forma, 2.4, paso=3.5)
+        return lz.sprite(tramado=0.006)
+    if tipo == "noche":
+        W = H = 48
+        lz = Lienzo(W, H, s=4, semilla=38)
+        forma = lz.poligono([(0, 0), (W, 0), (W, H), (0, H)])
+        lz.pintar(forma, rampa(["#0a0a18", "#12142a", "#1c1f3c"], lz.ruido(10, 3, semilla=39)))
+        lz.pintar(np.clip(1 - np.abs(lz.distancia(forma) - 2.5) / 0.6, 0, 1), ORO[3], 0.9)
+        lz.pintar(np.clip(1 - np.abs(lz.distancia(forma) - 5) / 0.4, 0, 1), ORO[1], 0.6)
+        # filigrana en las esquinas: una espiral pequeña
+        for (cx, cy) in ((9, 9), (W - 9, 9), (W - 9, H - 9), (9, H - 9)):
+            t = np.linspace(0, 3.2 * np.pi, 40)
+            pts = [(cx + np.cos(a) * (0.4 + a * 0.45), cy + np.sin(a) * (0.4 + a * 0.45)) for a in t]
+            lz.pintar(lz.trazo(pts, 0.8), ORO[4], 0.95)
+        return lz.sprite(tramado=0.006)
+
+
+def sello():
+    lz = Lienzo(16, 16, s=8, semilla=40)
+    forma = lz.elipse(8, 8, 7, 7)
+    borde = (lz.ruido(1.2, 2, semilla=41) - 0.5) * 1.6
+    forma = np.clip(forma + (np.hypot(lz.x - 8, lz.y - 8) < 7.6 + borde) * 1.0, 0, 1)
+    lz.sombrear(forma, ["#2a0404", "#5a0e0c", "#8c1e18", "#b43a2c", "#d4604a"], 3, LUZ)
+    hoja = lz.poligono([(8, 3.5), (10.5, 8), (8, 12.5), (5.5, 8)])
+    lz.pintar(np.clip(desplazar(lz, hoja, 0.4, 0.4), 0, 1), "#3a0806", 0.8)
+    lz.pintar(hoja, "#a8302a", 0.9)
+    lz.pintar(lz.trazo([(8, 4), (8, 12)], 0.4), "#3a0806", 0.8)
+    return lz.sprite(tramado=0.004)
+
+
+def main():
+    os.makedirs(SALIDA, exist_ok=True)
+    Image.fromarray(libro(), "RGBA").save(os.path.join(SALIDA, "libro.png"))
+    Image.fromarray(tapa(), "RGBA").save(os.path.join(SALIDA, "tapa.png"))
+    Image.fromarray(cintas(), "RGBA").save(os.path.join(SALIDA, "cintas.png"))
+    for n in ("pergamino", "papel", "cuero", "noche"):
+        Image.fromarray(nueve(n), "RGBA").save(os.path.join(SALIDA, n + ".png"))
+    Image.fromarray(sello(), "RGBA").save(os.path.join(SALIDA, "sello.png"))
+    print("Interfaz de diario en", SALIDA)
+
+
+if __name__ == "__main__":
+    main()

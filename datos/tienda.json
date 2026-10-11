@@ -1,0 +1,35 @@
+{
+	"_ayuda": [
+		"LA TIENDA DE TAWI y los CRISTALES DEL NEXO (se leen solos; no hay que tocar código).",
+		"Los Cristales se ganan al cumplir misiones (según su tipo, o «cristales» en la propia misión) y con algunas marcas.",
+		"No se guardan aparte: se cuentan a partir de las marcas y de las misiones cumplidas. Lo gastado sí se guarda.",
+		"articulos: id, nombre, tipo (prenda | objeto | marca | olvido), precio, texto, icono (en arte/interfaz/objetos.png).",
+		"  requiere: marca que hace falta para que salga en la tienda · repetible: se puede comprar más de una vez",
+		"  objeto: «da» = objetos que recibe Maisha · marca: «marca» = la marca que pone · olvido: «sube» = cuánto sube el precio cada vez"
+	],
+	"cristales_por_tipo": {"historia": 3, "encargo": 2, "secreto": 2, "lazo": 2},
+	"cristales_por_marca": [
+		{"prefijo": "zona/kitovu/7", "cristales": 2, "motivo": "Mzizi"},
+		{"prefijo": "zona/bosque_cobrizo/4", "cristales": 3, "motivo": "Pembe"},
+		{"prefijo": "zona/cienaga_quieta/4", "cristales": 3, "motivo": "Konokono"},
+		{"prefijo": "zona/campo_segado/3", "cristales": 5, "motivo": "La Cosechadora"},
+		{"prefijo": "secreto/", "cristales": 1, "motivo": "Secreto"}
+	],
+	"articulos": [
+		{"id": "ingredientes", "nombre": "Bayas y junco", "tipo": "objeto", "precio": 2, "icono": 17, "repetible": true,
+			"da": {"bayas": 2, "junco": 1}, "requiere": "construido_cocina",
+			"texto": "Lo justo para que Juncia te cocine una sopa. Recogido por Tawi en persona. Bueno, en pájaro."},
+		{"id": "mapa_secretos", "nombre": "Mapa de los secretos", "tipo": "marca", "precio": 5, "icono": 14,
+			"marca": "mapa_secretos", "requiere": "mapa_raiz",
+			"texto": "Unas notas de Tawi para el Mapa de Raíz: cuántos secretos quedan por encontrar en cada sitio."},
+		{"id": "corona_hojas", "nombre": "Corona de hojas", "tipo": "prenda", "precio": 6, "icono": 11, "requiere": "",
+			"texto": "Un aro de hojas con un capullo cobrizo. Póntela desde la mochila (Objetos)."},
+		{"id": "sombrero_paja", "nombre": "Sombrero de paja", "tipo": "prenda", "precio": 7, "icono": 13, "requiere": "visto/campo_segado",
+			"texto": "De los viejos campos de trigo, con su cinta roja. Da sombra y estilo. Póntelo desde la mochila."},
+		{"id": "capa_musgo", "nombre": "Capa de musgo", "tipo": "prenda", "precio": 9, "icono": 12, "requiere": "",
+			"texto": "Musgo vivo cosido con hilo de raíz, con un broche de hoja. Póntela desde la mochila."},
+		{"id": "semilla_olvido", "nombre": "Semilla del olvido", "tipo": "olvido", "precio": 4, "sube": 2, "icono": 15,
+			"repetible": true, "requiere": "bibi_meditar",
+			"texto": "Al plantarla, el Árbol de la Vida olvida tus Artes y te devuelve toda la Esencia, para repartirla de nuevo. Cada una cuesta 2 más que la anterior."}
+	]
+}

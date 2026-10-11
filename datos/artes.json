@@ -1,0 +1,176 @@
+{
+	"_ayuda": [
+		"EL ÁRBOL DE LA VIDA: las Artes de Maisha y lo que da cada nivel.",
+		"La Esencia se gana sola al poner ciertas marcas (esencia_por_marca: vale la primera regla cuyo prefijo encaje).",
+		"Se gasta meditando en un Claro de Calma: subir al nivel N cuesta N de Esencia.",
+		"Cada nivel puede cambiar números del combate (efectos) y algunos añaden un rasgo visual a Maisha (rasgo).",
+		"Efectos: vida_maxima (+hojas), aliento_maximo (+), ritmo_aliento (multiplica), semilla_coste (-), semilla_alcance (+casillas),",
+		"  semilla_raices (+píxeles), semilla_mecha (-segundos), latido_coste (-), latido_radio (+píxeles), golpe_recarga (+Aliento por golpe)."
+	],
+	"esencia_por_marca": [
+		{
+			"prefijo": "zona/kitovu/7",
+			"esencia": 3,
+			"motivo": "Mzizi, la raíz del Arco"
+		},
+		{
+			"prefijo": "zona/kitovu/",
+			"esencia": 1,
+			"motivo": "Mancha de Giza limpia"
+		},
+		{
+			"prefijo": "zona/bosque_cobrizo/4",
+			"esencia": 4,
+			"motivo": "Pembe, el guardián del bosque"
+		},
+		{
+			"prefijo": "zona/cienaga_quieta/4",
+			"esencia": 4,
+			"motivo": "Konokono, la caracola más vieja"
+		},
+		{
+			"prefijo": "zona/campo_segado/3",
+			"esencia": 5,
+			"motivo": "La Cosechadora Oxidada"
+		},
+		{
+			"prefijo": "zona/",
+			"esencia": 1,
+			"motivo": "Zona purgada"
+		},
+		{
+			"prefijo": "secreto/",
+			"esencia": 1,
+			"motivo": "Secreto"
+		},
+		{
+			"prefijo": "construido_",
+			"esencia": 1,
+			"motivo": "La aldea crece"
+		}
+	],
+	"artes": [
+		{
+			"id": "raiz",
+			"nombre": "Arte de la Raíz",
+			"color": "8fd46a",
+			"texto": "La Semilla y las raíces. Hace que lo que planta Maisha crezca más fuerte.",
+			"niveles": [
+				{
+					"nombre": "Semilla ligera",
+					"texto": "La Semilla gasta menos Aliento (22 en vez de 25).",
+					"efectos": {
+						"semilla_coste": 3
+					}
+				},
+				{
+					"nombre": "Raíces largas",
+					"texto": "Las raíces de la Semilla atrapan a los enemigos desde más lejos.",
+					"efectos": {
+						"semilla_raices": 8
+					}
+				},
+				{
+					"nombre": "Brote en la cabeza",
+					"texto": "La cruz de la explosión llega una casilla más lejos. Y a Maisha le brota una hoja nueva.",
+					"efectos": {
+						"semilla_alcance": 1
+					},
+					"rasgo": "brote"
+				},
+				{
+					"nombre": "Semilla ligera II",
+					"texto": "La Semilla gasta aún menos Aliento (19).",
+					"efectos": {
+						"semilla_coste": 3
+					}
+				},
+				{
+					"nombre": "Mecha corta",
+					"texto": "La Semilla estalla antes (1,2 s en vez de 1,5): a los enemigos les da menos tiempo para escapar.",
+					"efectos": {
+						"semilla_mecha": 0.3
+					}
+				},
+				{
+					"nombre": "Hojas y flores",
+					"texto": "Las hojas florecen por todo el cuerpo de Maisha y la cruz llega aún más lejos.",
+					"efectos": {
+						"semilla_alcance": 1
+					},
+					"rasgo": "flores"
+				}
+			]
+		},
+		{
+			"id": "aliento",
+			"nombre": "Arte del Aliento",
+			"color": "9fd8e8",
+			"texto": "La Vida, el Aliento y el Latido. Hace que Maisha aguante más y respire mejor.",
+			"niveles": [
+				{
+					"nombre": "Pulmón de brisa",
+					"texto": "Más Aliento: 110 en vez de 100.",
+					"efectos": {
+						"aliento_maximo": 10
+					}
+				},
+				{
+					"nombre": "Respirar hondo",
+					"texto": "El Aliento se recupera un 15 % más rápido.",
+					"efectos": {
+						"ritmo_aliento": 0.15
+					}
+				},
+				{
+					"nombre": "Aura suave",
+					"texto": "Una hoja más de Vida. Y una luz suave rodea a Maisha.",
+					"efectos": {
+						"vida_maxima": 1
+					},
+					"rasgo": "aura"
+				},
+				{
+					"nombre": "Latido amplio",
+					"texto": "El Latido llega más lejos y gasta menos Aliento (30).",
+					"efectos": {
+						"latido_radio": 10,
+						"latido_coste": 5
+					}
+				},
+				{
+					"nombre": "Golpe que respira",
+					"texto": "Cada golpe del cetro que acierta devuelve más Aliento.",
+					"efectos": {
+						"golpe_recarga": 4
+					}
+				},
+				{
+					"nombre": "Cuerpo de brisa",
+					"texto": "Otra hoja de Vida y más Aliento (125). El cuerpo de Maisha se vuelve casi transparente.",
+					"efectos": {
+						"vida_maxima": 1,
+						"aliento_maximo": 15
+					},
+					"rasgo": "brisa"
+				}
+			]
+		},
+		{
+			"id": "runa",
+			"nombre": "Arte de la Runa",
+			"color": "c9a7e8",
+			"bloqueada": "Despierta en Sigilia",
+			"texto": "Sigilos y elementos. Aún duerme: alguien en Sigilia sabrá despertarla.",
+			"niveles": []
+		},
+		{
+			"id": "tierra",
+			"nombre": "Arte de la Tierra",
+			"color": "e6a852",
+			"bloqueada": "Despierta en Asterhaul",
+			"texto": "La Carga sísmica y el Mineral. Aún duerme: su eco viene de las estrellas.",
+			"niveles": []
+		}
+	]
+}

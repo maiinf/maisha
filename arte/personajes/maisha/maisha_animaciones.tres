@@ -1,0 +1,275 @@
+[gd_resource type="SpriteFrames" load_steps=82 format=3]
+
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_reposo_abajo.png" id="1"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_reposo_arriba.png" id="2"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_reposo_lado.png" id="3"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_andar_abajo.png" id="4"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_andar_arriba.png" id="5"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_andar_lado.png" id="6"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_golpe_abajo.png" id="7"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_golpe_arriba.png" id="8"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_golpe_lado.png" id="9"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_correr_abajo.png" id="10"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_correr_arriba.png" id="11"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_correr_lado.png" id="12"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_sorpresa_abajo.png" id="13"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_danio_abajo.png" id="14"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_danio_arriba.png" id="15"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_danio_lado.png" id="16"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_celebrar_abajo.png" id="17"]
+[ext_resource type="Texture2D" path="res://arte/personajes/maisha/maisha_despertar_abajo.png" id="18"]
+
+[sub_resource type="AtlasTexture" id="reposo_abajo_0"]
+atlas = ExtResource("1")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_abajo_1"]
+atlas = ExtResource("1")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_abajo_2"]
+atlas = ExtResource("1")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_abajo_3"]
+atlas = ExtResource("1")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_arriba_0"]
+atlas = ExtResource("2")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_arriba_1"]
+atlas = ExtResource("2")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_arriba_2"]
+atlas = ExtResource("2")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_arriba_3"]
+atlas = ExtResource("2")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_lado_0"]
+atlas = ExtResource("3")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_lado_1"]
+atlas = ExtResource("3")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_lado_2"]
+atlas = ExtResource("3")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="reposo_lado_3"]
+atlas = ExtResource("3")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_abajo_0"]
+atlas = ExtResource("4")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_abajo_1"]
+atlas = ExtResource("4")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_abajo_2"]
+atlas = ExtResource("4")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_abajo_3"]
+atlas = ExtResource("4")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_arriba_0"]
+atlas = ExtResource("5")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_arriba_1"]
+atlas = ExtResource("5")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_arriba_2"]
+atlas = ExtResource("5")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_arriba_3"]
+atlas = ExtResource("5")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_lado_0"]
+atlas = ExtResource("6")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_lado_1"]
+atlas = ExtResource("6")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_lado_2"]
+atlas = ExtResource("6")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="andar_lado_3"]
+atlas = ExtResource("6")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="golpe_abajo_0"]
+atlas = ExtResource("7")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="golpe_abajo_1"]
+atlas = ExtResource("7")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="golpe_abajo_2"]
+atlas = ExtResource("7")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="golpe_arriba_0"]
+atlas = ExtResource("8")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="golpe_arriba_1"]
+atlas = ExtResource("8")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="golpe_arriba_2"]
+atlas = ExtResource("8")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="golpe_lado_0"]
+atlas = ExtResource("9")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="golpe_lado_1"]
+atlas = ExtResource("9")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="golpe_lado_2"]
+atlas = ExtResource("9")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_abajo_0"]
+atlas = ExtResource("10")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_abajo_1"]
+atlas = ExtResource("10")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_abajo_2"]
+atlas = ExtResource("10")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_abajo_3"]
+atlas = ExtResource("10")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_arriba_0"]
+atlas = ExtResource("11")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_arriba_1"]
+atlas = ExtResource("11")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_arriba_2"]
+atlas = ExtResource("11")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_arriba_3"]
+atlas = ExtResource("11")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_lado_0"]
+atlas = ExtResource("12")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_lado_1"]
+atlas = ExtResource("12")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_lado_2"]
+atlas = ExtResource("12")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="correr_lado_3"]
+atlas = ExtResource("12")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="sorpresa_abajo_0"]
+atlas = ExtResource("13")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="sorpresa_abajo_1"]
+atlas = ExtResource("13")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="sorpresa_abajo_2"]
+atlas = ExtResource("13")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="sorpresa_abajo_3"]
+atlas = ExtResource("13")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="danio_abajo_0"]
+atlas = ExtResource("14")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="danio_abajo_1"]
+atlas = ExtResource("14")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="danio_arriba_0"]
+atlas = ExtResource("15")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="danio_arriba_1"]
+atlas = ExtResource("15")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="danio_lado_0"]
+atlas = ExtResource("16")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="danio_lado_1"]
+atlas = ExtResource("16")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="celebrar_abajo_0"]
+atlas = ExtResource("17")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="celebrar_abajo_1"]
+atlas = ExtResource("17")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="celebrar_abajo_2"]
+atlas = ExtResource("17")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="celebrar_abajo_3"]
+atlas = ExtResource("17")
+region = Rect2(72, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="despertar_abajo_0"]
+atlas = ExtResource("18")
+region = Rect2(0, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="despertar_abajo_1"]
+atlas = ExtResource("18")
+region = Rect2(24, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="despertar_abajo_2"]
+atlas = ExtResource("18")
+region = Rect2(48, 0, 24, 32)
+
+[sub_resource type="AtlasTexture" id="despertar_abajo_3"]
+atlas = ExtResource("18")
+region = Rect2(72, 0, 24, 32)
+
+[resource]
+animations = [{"frames": [{"duration": 2.0, "texture": SubResource("reposo_abajo_0")}, {"duration": 1.0, "texture": SubResource("reposo_abajo_1")}, {"duration": 1.0, "texture": SubResource("reposo_abajo_2")}, {"duration": 1.0, "texture": SubResource("reposo_abajo_3")}], "loop": true, "name": &"reposo_abajo", "speed": 4.0}, {"frames": [{"duration": 2.0, "texture": SubResource("reposo_arriba_0")}, {"duration": 1.0, "texture": SubResource("reposo_arriba_1")}, {"duration": 1.0, "texture": SubResource("reposo_arriba_2")}, {"duration": 1.0, "texture": SubResource("reposo_arriba_3")}], "loop": true, "name": &"reposo_arriba", "speed": 4.0}, {"frames": [{"duration": 2.0, "texture": SubResource("reposo_lado_0")}, {"duration": 1.0, "texture": SubResource("reposo_lado_1")}, {"duration": 1.0, "texture": SubResource("reposo_lado_2")}, {"duration": 1.0, "texture": SubResource("reposo_lado_3")}], "loop": true, "name": &"reposo_lado", "speed": 4.0}, {"frames": [{"duration": 1.0, "texture": SubResource("andar_abajo_0")}, {"duration": 1.0, "texture": SubResource("andar_abajo_1")}, {"duration": 1.0, "texture": SubResource("andar_abajo_2")}, {"duration": 1.0, "texture": SubResource("andar_abajo_3")}], "loop": true, "name": &"andar_abajo", "speed": 8.0}, {"frames": [{"duration": 1.0, "texture": SubResource("andar_arriba_0")}, {"duration": 1.0, "texture": SubResource("andar_arriba_1")}, {"duration": 1.0, "texture": SubResource("andar_arriba_2")}, {"duration": 1.0, "texture": SubResource("andar_arriba_3")}], "loop": true, "name": &"andar_arriba", "speed": 8.0}, {"frames": [{"duration": 1.0, "texture": SubResource("andar_lado_0")}, {"duration": 1.0, "texture": SubResource("andar_lado_1")}, {"duration": 1.0, "texture": SubResource("andar_lado_2")}, {"duration": 1.0, "texture": SubResource("andar_lado_3")}], "loop": true, "name": &"andar_lado", "speed": 8.0}, {"frames": [{"duration": 1.0, "texture": SubResource("golpe_abajo_0")}, {"duration": 1.0, "texture": SubResource("golpe_abajo_1")}, {"duration": 2.0, "texture": SubResource("golpe_abajo_2")}], "loop": false, "name": &"golpe_abajo", "speed": 16.0}, {"frames": [{"duration": 1.0, "texture": SubResource("golpe_arriba_0")}, {"duration": 1.0, "texture": SubResource("golpe_arriba_1")}, {"duration": 2.0, "texture": SubResource("golpe_arriba_2")}], "loop": false, "name": &"golpe_arriba", "speed": 16.0}, {"frames": [{"duration": 1.0, "texture": SubResource("golpe_lado_0")}, {"duration": 1.0, "texture": SubResource("golpe_lado_1")}, {"duration": 2.0, "texture": SubResource("golpe_lado_2")}], "loop": false, "name": &"golpe_lado", "speed": 16.0}, {"frames": [{"duration": 1.0, "texture": SubResource("correr_abajo_0")}, {"duration": 1.0, "texture": SubResource("correr_abajo_1")}, {"duration": 1.0, "texture": SubResource("correr_abajo_2")}, {"duration": 1.0, "texture": SubResource("correr_abajo_3")}], "loop": true, "name": &"correr_abajo", "speed": 12.0}, {"frames": [{"duration": 1.0, "texture": SubResource("correr_arriba_0")}, {"duration": 1.0, "texture": SubResource("correr_arriba_1")}, {"duration": 1.0, "texture": SubResource("correr_arriba_2")}, {"duration": 1.0, "texture": SubResource("correr_arriba_3")}], "loop": true, "name": &"correr_arriba", "speed": 12.0}, {"frames": [{"duration": 1.0, "texture": SubResource("correr_lado_0")}, {"duration": 1.0, "texture": SubResource("correr_lado_1")}, {"duration": 1.0, "texture": SubResource("correr_lado_2")}, {"duration": 1.0, "texture": SubResource("correr_lado_3")}], "loop": true, "name": &"correr_lado", "speed": 12.0}, {"frames": [{"duration": 1.0, "texture": SubResource("sorpresa_abajo_0")}, {"duration": 2.0, "texture": SubResource("sorpresa_abajo_1")}, {"duration": 1.0, "texture": SubResource("sorpresa_abajo_2")}, {"duration": 3.0, "texture": SubResource("sorpresa_abajo_3")}], "loop": false, "name": &"sorpresa_abajo", "speed": 10.0}, {"frames": [{"duration": 1.0, "texture": SubResource("danio_abajo_0")}, {"duration": 3.0, "texture": SubResource("danio_abajo_1")}], "loop": false, "name": &"danio_abajo", "speed": 10.0}, {"frames": [{"duration": 1.0, "texture": SubResource("danio_arriba_0")}, {"duration": 3.0, "texture": SubResource("danio_arriba_1")}], "loop": false, "name": &"danio_arriba", "speed": 10.0}, {"frames": [{"duration": 1.0, "texture": SubResource("danio_lado_0")}, {"duration": 3.0, "texture": SubResource("danio_lado_1")}], "loop": false, "name": &"danio_lado", "speed": 10.0}, {"frames": [{"duration": 2.0, "texture": SubResource("celebrar_abajo_0")}, {"duration": 1.0, "texture": SubResource("celebrar_abajo_1")}, {"duration": 1.0, "texture": SubResource("celebrar_abajo_2")}, {"duration": 2.0, "texture": SubResource("celebrar_abajo_3")}], "loop": true, "name": &"celebrar_abajo", "speed": 8.0}, {"frames": [{"duration": 6.0, "texture": SubResource("despertar_abajo_0")}, {"duration": 3.0, "texture": SubResource("despertar_abajo_1")}, {"duration": 3.0, "texture": SubResource("despertar_abajo_2")}, {"duration": 2.0, "texture": SubResource("despertar_abajo_3")}], "loop": false, "name": &"despertar_abajo", "speed": 3.0}]

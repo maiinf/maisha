@@ -1,0 +1,882 @@
+{
+	"_ayuda": "Diálogos del comienzo (el Kitovu y la granja de Mzee Shamba). Mismas reglas que raiz.json: se usa la PRIMERA conversación que cumple «si», «no» y «tiene». «estilo»: normal, pensamiento (lo que piensa Maisha) o narrador. Maisha es un espíritu sin género.",
+	"maisha_despierta": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"marca": "kitovu_despierta",
+				"lineas": [
+					"¿Dónde... estoy?",
+					"Todo está gris. Y roto. ¿Qué ha pasado aquí?",
+					"No recuerdo nada... ni siquiera cómo he llegado.",
+					"Me pesa todo el cuerpo, como si hubiera dormido cien años."
+				]
+			}
+		]
+	},
+	"kitovu_crater": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un hoyo que todavía humea...",
+					"¿He caído yo desde ahí arriba?"
+				]
+			}
+		]
+	},
+	"kitovu_portal": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"portal_raiz"
+				],
+				"lineas": [
+					"El arco brilla. Al otro lado se oye el viento entre la hierba."
+				]
+			},
+			{
+				"lineas": [
+					"Dos raíces enormes forman un arco. Dentro solo hay oscuridad...",
+					"...pero algo late al otro lado."
+				]
+			}
+		]
+	},
+	"kitovu_arbol_seco": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Este árbol está seco por completo. Como si algo le hubiera bebido la vida."
+				]
+			}
+		]
+	},
+	"shamba": {
+		"nombre": "Mzee Shamba",
+		"conversaciones": [
+			{
+				"si": [
+					"kuku_cogida"
+				],
+				"no": [
+					"kuku_devuelta"
+				],
+				"marca": "kuku_devuelta",
+				"lineas": [
+					"¡Alto ahí! ¿Quién anda rondando mi granja?",
+					"¿Eres otra criatura de Giza? ¡Te advierto que este rastrillo pica!",
+					"[sorpresa] ...Un momento. ¿Esa es... ¡Kuku! ¡Mi gallina!",
+					"[sonrisa] Llevaba toda la mañana buscándola. Y tú me la traes sana y salva.",
+					"[triste] Perdona a este castor viejo y gruñón. Por aquí ya solo vienen cosas malas.",
+					"[sonrisa] Pasa, pasa. Fuera hace frío y dentro hay fuego."
+				]
+			},
+			{
+				"no": [
+					"shamba_conocido"
+				],
+				"marca": [
+					"shamba_conocido",
+					"cena_shamba"
+				],
+				"lineas": [
+					"[sonrisa] Siéntate junto al fuego. Hoy hay sopa de zanahoria.",
+					"Soy Mzee Shamba. Cultivo este huerto desde... bueno, desde antes de que todo se volviera gris.",
+					"¿Que no sabes dónde estás? Esto es el Kitovu, el centro del mundo. Aquí se cruzan las raíces de todas las tierras.",
+					"[triste] O se cruzaban. Ahora casi nada crece, salvo lo que cuido yo con estas patas.",
+					"[sonrisa] Pero eso son historias para otro día. Ahora come, que se enfría."
+				]
+			},
+			{
+				"si": [
+					"amanecer_granja"
+				],
+				"no": [
+					"tarea_cosecha"
+				],
+				"marca": "tarea_cosecha",
+				"lineas": [
+					"[sonrisa] ¡Buenos días! Has dormido como un tronco. Kuku no se ha separado de la puerta en toda la noche.",
+					"Oye, estoy viejo y el huerto no se cuida solo. ¿Me echas una pata?",
+					"Arranca cinco zanahorias del huerto. Acércate a cada una y pulsa Acción."
+				],
+				"aviso": "Tarea: arranca 5 zanahorias · Tab abre la mochila"
+			},
+			{
+				"si": [
+					"cena_shamba"
+				],
+				"no": [
+					"amanecer_granja"
+				],
+				"lineas": [
+					"Descansa. Mañana será otro día."
+				]
+			},
+			{
+				"si": [
+					"tarea_cosecha"
+				],
+				"no": [
+					"hecha_cosecha"
+				],
+				"tiene": {
+					"zanahoria": 5
+				},
+				"entrega": {
+					"zanahoria": 5
+				},
+				"marca": [
+					"hecha_cosecha",
+					"tarea_pesca"
+				],
+				"lineas": [
+					"[sonrisa] ¡Cinco zanahorias, y ninguna rota! Tienes buenas manos.",
+					"Ahora, la cena. En el estanque aún quedan peces. Acércate a la orilla, pulsa Acción y espera a que piquen.",
+					"Cuando el pez esté dentro de la zona verde, ¡tira! Pulsa Acción en el momento justo."
+				],
+				"aviso": "Tarea: pesca un pez en el estanque"
+			},
+			{
+				"si": [
+					"tarea_cosecha"
+				],
+				"no": [
+					"hecha_cosecha"
+				],
+				"lineas": [
+					"Tienes {zanahoria} de las cinco zanahorias. El huerto está ahí fuera, junto a la casa."
+				]
+			},
+			{
+				"si": [
+					"tarea_pesca"
+				],
+				"no": [
+					"hecha_pesca"
+				],
+				"tiene": {
+					"pez": 1
+				},
+				"entrega": {
+					"pez": 1
+				},
+				"marca": [
+					"hecha_pesca",
+					"tarea_cerca"
+				],
+				"lineas": [
+					"[sonrisa] ¡Menudo pez! Esta noche cenamos bien.",
+					"[pensativo] Una última cosa: la cerca del huerto está rota y los bichos se meten a comerse las raíces.",
+					"Al oeste de la casa hay un tronco caído con tablas. Cógelas y tapa el hueco de la cerca."
+				],
+				"aviso": "Tarea: arregla la cerca del huerto"
+			},
+			{
+				"si": [
+					"tarea_pesca"
+				],
+				"no": [
+					"hecha_pesca"
+				],
+				"lineas": [
+					"Los peces del estanque son listos. Espera a que piquen y tira cuando estén en lo verde."
+				]
+			},
+			{
+				"si": [
+					"tarea_cerca",
+					"cerca_arreglada"
+				],
+				"no": [
+					"cetro_recibido"
+				],
+				"marca": [
+					"hecha_cerca",
+					"cetro_recibido",
+					"mapa_partido"
+				],
+				"lineas": [
+					"[sonrisa] La cerca ha quedado mejor que nueva. Gracias.",
+					"[pensativo] ...Hay algo que no te he dicho. Cuando entraste por esa puerta, el brote de tu cabeza brilló.",
+					"Siéntate un momento. Deja que te cuente una historia."
+				],
+				"despues": [
+					"Mira cómo brilla en tus manos. Mi abuela se habría echado a llorar.",
+					"Toma también esto: un mapa de todas las tierras. Está roto: el trozo del norte se perdió hace mucho.",
+					"Dicen que acabó en Sigilia. Si algún día llegas allí, búscalo.",
+					"Y escucha bien: Giza ha dejado manchas de piedra por todo el valle. Desde ellas se agarra a la raíz del Arco, al norte.",
+					"Limpia esas manchas y Giza tendrá que soltar la raíz... aunque no creo que lo haga sin pelear.",
+					"Ten cuidado. Y vuelve de vez en cuando, que el huerto te echará de menos."
+				],
+				"aviso": "¡Cetro de Raíz y mapa partido! Míralos en la mochila (Tab)",
+				"historia": [
+					{
+						"imagen": "1_kitovu_antes",
+						"lineas": [
+							"Hace mucho tiempo, el Kitovu era el corazón verde del mundo.",
+							"Por aquí pasaban las raíces de todas las tierras, y brillaban como ríos de luz."
+						]
+					},
+					{
+						"imagen": "2_familia_shamba",
+						"lineas": [
+							"Los castores Shamba cuidábamos sus huertos y sus raíces, de generación en generación.",
+							"Mi abuela, su abuela, la abuela de su abuela... todas con las patas en la tierra."
+						]
+					},
+					{
+						"imagen": "3_leyenda",
+						"lineas": [
+							"Mi abuela guardaba el Cetro de Raíz. Por las noches nos contaba la leyenda:",
+							"«Cuando el mundo pierda su color, llegará alguien con un brote de luz. Y el cetro despertará en sus manos.»"
+						]
+					},
+					{
+						"imagen": "4_giza",
+						"lineas": [
+							"[triste] Y un día, el color empezó a irse.",
+							"[triste] Llegó Giza: una sombra sin forma que se bebe la vida de todo lo que toca."
+						]
+					},
+					{
+						"imagen": "5_piedra",
+						"lineas": [
+							"[triste] Las raíces se secaron. Los vecinos se convirtieron en piedra. Los arcos a las otras tierras se cerraron.",
+							"[triste] Todos se fueron... o se quedaron quietos para siempre."
+						]
+					},
+					{
+						"imagen": "6_hoy",
+						"lineas": [
+							"[triste] Yo me quedé. Alguien tenía que cuidar lo poco que seguía vivo.",
+							"[triste] Y esperé. Esperé mucho tiempo... hasta hoy."
+						]
+					}
+				],
+				"tras_historia": [
+					"[sorpresa] El brote de luz de la leyenda... eres tú. Lo supe en cuanto te vi.",
+					"Y por cómo has cuidado mi huerto, el cetro también lo sabe.",
+					"[sonrisa] Tómalo. Ahora es tuyo."
+				]
+			},
+			{
+				"si": [
+					"tarea_cerca"
+				],
+				"no": [
+					"cerca_arreglada"
+				],
+				"lineas": [
+					"Las tablas están en el tronco caído, al oeste de la casa. Luego tapa el hueco de la cerca."
+				]
+			},
+			{
+				"si": [
+					"cetro_recibido"
+				],
+				"no": [
+					"portal_raiz"
+				],
+				"lineas": [
+					"El Arco de Raíz está al norte. Usa el cetro contra esas criaturas... y que la vida te acompañe."
+				]
+			},
+			{
+				"si": [
+					"cetro_recibido",
+					"portal_raiz"
+				],
+				"no": [
+					"shamba_historia_otra"
+				],
+				"marca": "shamba_historia_otra",
+				"lineas": [
+					"[sorpresa] ¿Ya has abierto el arco? ¡Lo sabía!",
+					"[sonrisa] Cuando vuelvas, aquí tendrás una sopa caliente... y un castor viejo muy orgulloso."
+				]
+			},
+			{
+				"lineas": [
+					"[sonrisa] ¿Has vuelto? El huerto está precioso. ¡Ve con cuidado por esas tierras!"
+				]
+			}
+		]
+	},
+	"narrador_cetro": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El cetro despierta en las manos de Maisha.",
+					"Pulsa J para golpear. Prueba con el espantapájaros del huerto."
+				]
+			}
+		]
+	},
+	"narrador_espantapajaros": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Bien. Giza ha dejado manchas de piedra por el valle: búscalas y límpialas."
+				]
+			}
+		]
+	},
+	"narrador_zona": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una mancha de Giza. Ha vuelto de piedra un trozo de raíz y le bebe la vida.",
+					"Esos seres son Petrinos: trozos de raíz que Giza ha vuelto de piedra y obliga a caminar.",
+					"Entra y limpia la mancha. Cuando estés dentro, ya no podrás salir hasta acabar."
+				]
+			}
+		]
+	},
+	"narrador_cerrada": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Las raíces de piedra se levantan y te encierran!",
+					"Golpea a los Petrinos con el cetro (J)."
+				]
+			}
+		]
+	},
+	"narrador_nucleo": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Ese tocón con el ojo violeta es el Corazón de Giza: ahí se agarra a la raíz. El cetro no le hace nada.",
+					"Pulsa K para plantar una semilla. Estalla en cruz al poco rato: ¡apártate de la cruz!"
+				]
+			}
+		]
+	},
+	"narrador_aliento": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Las semillas y el Latido gastan Aliento, la barra de arriba. Si se vacía, Maisha se cansa.",
+					"Golpear con el cetro lo recupera un poco."
+				]
+			}
+		]
+	},
+	"narrador_purgada": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [],
+				"historia": [
+					{
+						"imagen": "7_mzizi_madera",
+						"lineas": [
+							"La piedra se cae a trozos: debajo, Mzizi vuelve a ser madera viva.",
+							"Por primera vez en mucho tiempo, una raíz del Kitovu respira."
+						]
+					},
+					{
+						"imagen": "8_arco_despierta",
+						"lineas": [
+							"La vida corre por la raíz hasta el Arco. El Arco de Raíz despierta.",
+							"Al otro lado, la primera tierra espera: los Prados del Eco."
+						]
+					}
+				]
+			}
+		]
+	},
+	"kitovu_tronco_vacio": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Ya no quedan tablas en el tronco."
+				]
+			}
+		]
+	},
+	"kitovu_cerca_rota": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Hay un hueco en la cerca. Harían falta unas tablas."
+				]
+			}
+		]
+	},
+	"kitovu_cerca_bien": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La cerca ha quedado firme."
+				]
+			}
+		]
+	},
+	"casa_shamba_chimenea": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una olla de sopa de zanahoria. Huele de maravilla."
+				]
+			}
+		]
+	},
+	"casa_shamba_tarros": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Tarros de semillas con etiquetas: «calabaza», «trigo», «flor de luna»..."
+				]
+			}
+		]
+	},
+	"casa_shamba_cetro": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"si": [
+					"cetro_recibido"
+				],
+				"lineas": [
+					"El soporte del Cetro de Raíz, vacío. Ahora el cetro viaja contigo."
+				]
+			},
+			{
+				"lineas": [
+					"Un cetro de madera viva con un brote en la punta.",
+					"Parece... tranquilo. Como si esperara algo."
+				]
+			}
+		]
+	},
+	"casa_shamba_cama": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La cama de Mzee Shamba. La manta de cuadros la tejió su abuela."
+				]
+			}
+		]
+	},
+	"kitovu_ruina": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"cetro_recibido"
+				],
+				"lineas": [
+					"Los vecinos del Kitovu... Shamba dijo que se fueron, o que se quedaron quietos para siempre.",
+					"Volveré a llenar estas casas de vida. Lo prometo."
+				]
+			},
+			{
+				"lineas": [
+					"Aquí hubo una casa. Todavía se ve dónde estaba la puerta.",
+					"¿Quién viviría aquí? ¿Adónde habrá ido?"
+				]
+			}
+		]
+	},
+	"kitovu_pozo": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"cetro_recibido"
+				],
+				"lineas": [
+					"El agua bajaba por las raíces del mundo hasta aquí. Cuando Giza las secó, el pozo se quedó vacío.",
+					"Si las raíces vuelven a brillar, quizá vuelva el agua."
+				]
+			},
+			{
+				"lineas": [
+					"Un pozo. Está seco... ni una gota en el fondo.",
+					"Huele a polvo y a piedra."
+				]
+			}
+		]
+	},
+	"kitovu_torre": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"cetro_recibido"
+				],
+				"lineas": [
+					"Shamba me contó que desde aquí se avisaba cuando el color empezaba a irse.",
+					"La campana sonó... pero nadie pudo pararlo."
+				]
+			},
+			{
+				"lineas": [
+					"Una torre vieja, con la campana caída.",
+					"Desde arriba se tendría que ver todo el valle."
+				]
+			}
+		]
+	},
+	"kitovu_monumento": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"cetro_recibido"
+				],
+				"lineas": [
+					"Es la leyenda de la abuela de Shamba, tallada en piedra.",
+					"«Cuando el mundo pierda su color, llegará alguien con un brote de luz.»",
+					"...Soy yo. Todavía me cuesta creerlo."
+				]
+			},
+			{
+				"lineas": [
+					"Una piedra grande con dibujos tallados: raíces, un árbol... y algo que brilla en lo alto.",
+					"Ese brillo se parece un poco al de mi brote. Qué raro."
+				]
+			}
+		]
+	},
+	"kitovu_carro": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"cetro_recibido"
+				],
+				"lineas": [
+					"Quien huyó con este carro no pudo llevarse nada. Giza llegó demasiado rápido."
+				]
+			},
+			{
+				"lineas": [
+					"Un carro volcado, con la rueda rota. Alguien salió de aquí con prisa."
+				]
+			}
+		]
+	},
+	"kitovu_raiz_gigante": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"cetro_recibido"
+				],
+				"lineas": [
+					"Las raíces del mundo. Antes brillaban como ríos de luz.",
+					"Ahora parecen huesos. Tengo que devolverles el color."
+				]
+			},
+			{
+				"lineas": [
+					"Una raíz enorme sale de la tierra... y está seca como la madera vieja.",
+					"Tiene grietas por todas partes. ¿De qué árbol será?"
+				]
+			}
+		]
+	},
+	"narrador_zona2": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Otra mancha.",
+					"Esta vez prueba el Latido: si los Petrinos te rodean, pulsa L y los apartará."
+				]
+			}
+		]
+	},
+	"narrador_zona3": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La última mancha. Ya sabes todo lo que hace falta."
+				]
+			}
+		]
+	},
+	"narrador_purgada1": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El Corazón se rompe y la raíz vuelve a ser madera. Una mancha menos."
+				]
+			}
+		]
+	},
+	"narrador_purgada2": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Giza se debilita. Solo queda una mancha en el valle."
+				]
+			}
+		]
+	},
+	"narrador_despierta": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El valle está limpio... pero la tierra tiembla.",
+					"Giza no quiere soltar la raíz del Arco. Algo enorme se mueve bajo tierra, al norte."
+				]
+			}
+		]
+	},
+	"narrador_arena": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Aquí, bajo el Arco, Giza se agarra a la raíz más grande de todas.",
+					"Prepárate."
+				]
+			}
+		]
+	},
+	"narrador_mzizi": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Es Mzizi, la raíz del Arco! Giza la mueve como a una serpiente.",
+					"El cetro no le hace nada. Mira qué agujero se ilumina: planta una semilla al lado y le estallará al salir.",
+					"Y cuidado con las piedras que escupe: cuando abra la boca, apártate."
+				]
+			}
+		]
+	},
+	"kitovu_arena_dormida": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"cetro_recibido"
+				],
+				"lineas": [
+					"El suelo tiembla bajo el arco... Algo enorme se mueve ahí abajo.",
+					"Primero debería limpiar las manchas de Giza del valle."
+				]
+			},
+			{
+				"lineas": [
+					"Ahí hay algo horrible... Sin nada con que defenderme, mejor no acercarme."
+				]
+			}
+		]
+	},
+	"kitovu_mancha_sin_cetro": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una mancha de piedra que late... Sin nada con que defenderme, mejor no acercarme."
+				]
+			}
+		]
+	},
+	"kitovu_chispa": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¿Y esa lucecita? Parece que quiere que la siga."
+				]
+			}
+		]
+	},
+	"recuerdo_1": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"marca": "recuerdo_1",
+				"lineas": [
+					"La lucecita se ha parado junto al pozo... y algo se me enciende por dentro."
+				],
+				"historia": [
+					{
+						"imagen": "recuerdo_1",
+						"lineas": [
+							"Faroles encendidos. Gente que ríe alrededor de un fuego...",
+							"Yo estaba aquí. Lo sé. Pero... ¿cuándo?"
+						]
+					}
+				],
+				"tras_historia": [
+					"Se ha ido. Como un sueño al despertar."
+				]
+			}
+		]
+	},
+	"recuerdo_2": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"marca": "recuerdo_2",
+				"lineas": [
+					"Una torre con la campana caída. La lucecita tiembla aquí arriba."
+				],
+				"historia": [
+					{
+						"imagen": "recuerdo_2",
+						"lineas": [
+							"Oscuridad. Unos ojos violetas que no parpadean.",
+							"Y una voz, muy lejos: «...despierta»."
+						]
+					}
+				],
+				"tras_historia": [
+					"Tengo frío. ¿Qué era eso?"
+				]
+			}
+		]
+	},
+	"recuerdo_3": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"marca": "recuerdo_3",
+				"lineas": [
+					"Esta piedra tiene dibujos tallados: raíces, un árbol... y una luz que cae."
+				],
+				"historia": [
+					{
+						"imagen": "recuerdo_3",
+						"lineas": [
+							"Una luz que cae del cielo, como una estrella...",
+							"...y cae aquí, en el corazón del mundo."
+						]
+					}
+				],
+				"tras_historia": [
+					"Mi brote está caliente. Como si... como si reconociera esa luz."
+				]
+			}
+		]
+	},
+	"kitovu_cacareo": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¿Eso ha sido... una gallina?",
+					"Viene de abajo, de entre los árboles secos."
+				]
+			}
+		]
+	},
+	"kitovu_kuku_cogida": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Te tengo! Tranquila, tranquila...",
+					"Seguro que es de la casa del humo. Vamos a llevarla."
+				]
+			}
+		]
+	},
+	"kitovu_kuku_huye": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Si corro hacia ella, se asusta más.",
+					"Quizá, si la dejo correr un poco, acabe cansándose."
+				]
+			}
+		]
+	},
+	"kitovu_puerta_cerrada": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"kuku_perdida"
+				],
+				"no": [
+					"kuku_cogida"
+				],
+				"lineas": [
+					"Llamo a la puerta... nadie abre.",
+					"Dentro alguien refunfuña: «¿Dónde se habrá metido esa gallina...?»",
+					"¿Será suya la gallina que he oído?"
+				]
+			},
+			{
+				"lineas": [
+					"Llamo a la puerta... nadie contesta.",
+					"Dentro se oye a alguien refunfuñar. Mejor no molestar... de momento."
+				]
+			}
+		]
+	},
+	"kitovu_tras_puerta": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"(¿Una criatura de Giza... yo?)"
+				]
+			}
+		]
+	}
+}

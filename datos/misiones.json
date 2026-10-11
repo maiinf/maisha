@@ -1,0 +1,925 @@
+{
+	"_ayuda": [
+		"MISIONES: se leen solas a partir de las marcas de la partida (no hay que apuntar nada más).",
+		"tipo: historia (principal), encargo (ayudar en la aldea) o secreto.",
+		"aparece: marcas para que la misión salga en el diario · hecha: marcas para darla por cumplida.",
+		"pasos: el primero sin cumplir es el objetivo que se ve en pantalla. Cada paso se cumple con:",
+		"  hecho: marcas · objeto: {\"zanahoria\": 5} (llevar al menos eso) · cuenta: marcas que empiezan por «prefijo».",
+		"  {n} y {total} se cambian por cuánto llevas y cuánto hace falta.",
+		"ir: adónde apunta la flecha. escena + buscar: aldeano:<id>, grupo:<grupo>, puerta:<escena>, edificio:<id>, casilla:x,y",
+		"  Si Maisha está en otra escena, la flecha apunta a la puerta por la que se va hacia allí («caminos»)."
+	],
+	"caminos": {
+		"kitovu": [
+			"prados_del_eco",
+			"casa_shamba"
+		],
+		"casa_shamba": [
+			"kitovu"
+		],
+		"prados_del_eco": [
+			"kitovu",
+			"sendero_del_puente",
+			"camino_cobrizo"
+		],
+		"bosque_cobrizo": [
+			"camino_cobrizo"
+		],
+		"cuna_de_musgo": [
+			"sendero_del_puente",
+			"claro_de_calma",
+			"casa_pino",
+			"taller_corteza",
+			"las_pasarelas",
+			"senda_surcos"
+		],
+		"claro_de_calma": [
+			"cuna_de_musgo"
+		],
+		"casa_pino": [
+			"cuna_de_musgo"
+		],
+		"taller_corteza": [
+			"cuna_de_musgo"
+		],
+		"cienaga_quieta": [
+			"las_pasarelas"
+		],
+		"campo_segado": [
+			"senda_surcos"
+		],
+		"sendero_del_puente": [
+			"prados_del_eco",
+			"cuna_de_musgo"
+		],
+		"las_pasarelas": [
+			"cuna_de_musgo",
+			"cienaga_quieta"
+		],
+		"camino_cobrizo": [
+			"prados_del_eco",
+			"bosque_cobrizo"
+		],
+		"senda_surcos": [
+			"cuna_de_musgo",
+			"campo_segado"
+		]
+	},
+	"misiones": [
+		{
+			"id": "despertar",
+			"tipo": "historia",
+			"titulo": "Un despertar extraño",
+			"texto": "Maisha ha despertado en un valle gris y roto, sin recordar nada. Una lucecita parece querer enseñarle algo.",
+			"aparece": [
+				"kitovu_despierta"
+			],
+			"hecha": [
+				"kuku_devuelta"
+			],
+			"pasos": [
+				{
+					"texto": "Sigue a la chispa de vida",
+					"hecho": [
+						"recuerdo_3"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "grupo:chispas"
+					}
+				},
+				{
+					"texto": "La chispa entró en la granja: llama a la puerta",
+					"hecho": [
+						"kuku_perdida"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "puerta:casa_shamba"
+					}
+				},
+				{
+					"texto": "Atrapa a la gallina que cacarea",
+					"hecho": [
+						"kuku_cogida"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "grupo:gallina_perdida"
+					}
+				},
+				{
+					"texto": "Lleva la gallina a la puerta de la granja",
+					"hecho": [
+						"kuku_devuelta"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "puerta:casa_shamba"
+					}
+				}
+			]
+		},
+		{
+			"id": "granja",
+			"tipo": "historia",
+			"titulo": "La granja de Mzee Shamba",
+			"quien": "shamba",
+			"texto": "Mzee Shamba, un castor anciano, es el único que vive en el Kitovu. Su granja es lo único que conserva el color.",
+			"aparece": [
+				"kuku_devuelta"
+			],
+			"hecha": [
+				"cetro_recibido"
+			],
+			"premio": "Cetro de Raíz y mapa partido",
+			"pasos": [
+				{
+					"texto": "Entra en la granja con Mzee Shamba",
+					"hecho": [
+						"shamba_conocido"
+					],
+					"ir": {
+						"escena": "casa_shamba",
+						"buscar": "aldeano:shamba"
+					}
+				},
+				{
+					"texto": "Pasa la noche en la granja",
+					"hecho": [
+						"amanecer_granja"
+					],
+					"ir": {
+						"escena": "casa_shamba",
+						"buscar": "aldeano:shamba"
+					}
+				},
+				{
+					"texto": "Habla con Mzee Shamba",
+					"hecho": [
+						"tarea_cosecha"
+					],
+					"ir": {
+						"escena": "casa_shamba",
+						"buscar": "aldeano:shamba"
+					}
+				},
+				{
+					"texto": "Arranca zanahorias del huerto ({n}/{total})",
+					"objeto": {
+						"zanahoria": 5
+					},
+					"hecho_tambien": [
+						"hecha_cosecha"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "grupo:zanahorias"
+					}
+				},
+				{
+					"texto": "Lleva las zanahorias a Mzee Shamba",
+					"hecho": [
+						"hecha_cosecha"
+					],
+					"ir": {
+						"escena": "casa_shamba",
+						"buscar": "aldeano:shamba"
+					}
+				},
+				{
+					"texto": "Pesca un pez en el estanque",
+					"objeto": {
+						"pez": 1
+					},
+					"hecho_tambien": [
+						"hecha_pesca"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "grupo:sitios_pesca"
+					}
+				},
+				{
+					"texto": "Lleva el pez a Mzee Shamba",
+					"hecho": [
+						"hecha_pesca"
+					],
+					"ir": {
+						"escena": "casa_shamba",
+						"buscar": "aldeano:shamba"
+					}
+				},
+				{
+					"texto": "Coge tablas del tronco caído",
+					"hecho": [
+						"tablas_cogidas"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "grupo:troncos"
+					}
+				},
+				{
+					"texto": "Arregla la cerca del huerto",
+					"hecho": [
+						"cerca_arreglada"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "grupo:cercas"
+					}
+				},
+				{
+					"texto": "Cuéntaselo a Mzee Shamba",
+					"hecho": [
+						"cetro_recibido"
+					],
+					"ir": {
+						"escena": "casa_shamba",
+						"buscar": "aldeano:shamba"
+					}
+				}
+			]
+		},
+		{
+			"id": "manchas",
+			"tipo": "historia",
+			"titulo": "Las manchas de Giza",
+			"quien": "shamba",
+			"texto": "Giza ha dejado manchas por el valle y una raíz de piedra tapa el Arco de Raíz. Con el cetro, Maisha puede devolverles la vida.",
+			"aparece": [
+				"cetro_recibido"
+			],
+			"hecha": [
+				"portal_raiz"
+			],
+			"premio": "El Arco de Raíz se abre",
+			"pasos": [
+				{
+					"texto": "Limpia las manchas de Giza ({n}/{total})",
+					"cuenta": {
+						"prefijo": "zona/kitovu/",
+						"total": 3
+					},
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "grupo:zonas"
+					}
+				},
+				{
+					"texto": "Vence a Mzizi, la raíz del Arco",
+					"hecho": [
+						"portal_raiz"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "grupo:arena_jefe"
+					}
+				}
+			]
+		},
+		{
+			"id": "prados",
+			"tipo": "historia",
+			"titulo": "Ecos en los prados",
+			"texto": "Al otro lado del Arco, los Prados del Eco siguen apagados. Hay estatuas de piedra junto a las zonas corruptas... y tienen cara.",
+			"aparece": [
+				"portal_raiz"
+			],
+			"hecha": [],
+			"premio": "Los prados recuperan el color",
+			"pasos": [
+				{
+					"texto": "Cruza el Arco de Raíz",
+					"hecho": [
+						"visto/prados_del_eco"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "puerta:prados_del_eco"
+					}
+				},
+				{
+					"texto": "Purga las zonas corruptas ({n}/{total})",
+					"cuenta": {
+						"prefijo": "zona/prados_del_eco/",
+						"total": 3
+					},
+					"ir": {
+						"escena": "prados_del_eco",
+						"buscar": "grupo:zonas"
+					}
+				}
+			]
+		},
+		{
+			"id": "aldea",
+			"tipo": "historia",
+			"titulo": "Cuna de Musgo",
+			"quien": "bibi",
+			"texto": "Al este del río hay una aldea en un árbol hueco que aún conserva el color. Alguien vive allí.",
+			"aparece": [
+				"visto/prados_del_eco"
+			],
+			"hecha": [
+				"bibi_aldea_viva"
+			],
+			"pasos": [
+				{
+					"texto": "Sigue el camino al este y cruza el puente viejo, hasta la aldea",
+					"hecho": [
+						"visto/cuna_de_musgo"
+					],
+					"ir": {
+						"escena": "sendero_del_puente",
+						"buscar": "puerta:cuna_de_musgo"
+					}
+				},
+				{
+					"texto": "Habla con la guardiana del Gran Árbol",
+					"hecho": [
+						"bibi_conocida"
+					],
+					"ir": {
+						"escena": "cuna_de_musgo",
+						"buscar": "aldeano:bibi"
+					}
+				},
+				{
+					"texto": "Rescata a los aldeanos de piedra ({n}/{total})",
+					"cuenta": {
+						"prefijo": "rescatado_",
+						"total": 2
+					},
+					"ir": {
+						"escena": "prados_del_eco",
+						"buscar": "grupo:estatuas"
+					}
+				},
+				{
+					"texto": "Cuéntaselo a Bibi Musgo",
+					"hecho": [
+						"bibi_aldea_viva"
+					],
+					"ir": {
+						"escena": "cuna_de_musgo",
+						"buscar": "aldeano:bibi"
+					}
+				}
+			]
+		},
+		{
+			"id": "arbol_vida",
+			"tipo": "historia",
+			"titulo": "El Árbol de la Vida",
+			"quien": "bibi",
+			"texto": "Bibi dice que cada zona limpia deja Esencia dentro de Maisha, y que hay que meditar para dejarla crecer.",
+			"aparece": [
+				"bibi_meditar"
+			],
+			"hecha": [
+				"meditado"
+			],
+			"premio": "Las Artes de Maisha",
+			"pasos": [
+				{
+					"texto": "Entra en el Gran Árbol",
+					"hecho": [
+						"visto/claro_de_calma"
+					],
+					"ir": {
+						"escena": "cuna_de_musgo",
+						"buscar": "puerta:claro_de_calma"
+					}
+				},
+				{
+					"texto": "Medita junto al brote",
+					"hecho": [
+						"meditado"
+					],
+					"ir": {
+						"escena": "claro_de_calma",
+						"buscar": "grupo:brote_vida"
+					}
+				}
+			]
+		},
+		{
+			"id": "casa_pino",
+			"tipo": "encargo",
+			"titulo": "La casa-seta de Pino",
+			"quien": "pino",
+			"texto": "Pino quiere volver a levantar su casa-seta. Para eso necesita setas luminosas, que brillan a la sombra de los árboles de los prados.",
+			"aparece": [
+				"encargo_pino"
+			],
+			"hecha": [
+				"construido_casa_seta"
+			],
+			"premio": "Torre del vigía",
+			"pasos": [
+				{
+					"texto": "Busca setas luminosas ({n}/{total})",
+					"objeto": {
+						"seta_luminosa": 3
+					},
+					"hecho_tambien": [
+						"construido_casa_seta"
+					],
+					"ir": {
+						"escena": "prados_del_eco",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Llévale las setas a Pino",
+					"hecho": [
+						"construido_casa_seta"
+					],
+					"ir": {
+						"escena": "cuna_de_musgo",
+						"buscar": "aldeano:pino"
+					}
+				}
+			]
+		},
+		{
+			"id": "forja_corteza",
+			"tipo": "encargo",
+			"titulo": "La forja de Corteza",
+			"quien": "corteza",
+			"texto": "Corteza necesita mineral para encender su forja. Hay rocas con cristales ámbar en los prados: el cetro rebota en ellas, pero una semilla las rompe.",
+			"aparece": [
+				"encargo_corteza"
+			],
+			"hecha": [
+				"construido_taller"
+			],
+			"premio": "Cetro templado",
+			"pasos": [
+				{
+					"texto": "Consigue mineral ({n}/{total})",
+					"objeto": {
+						"mineral": 2
+					},
+					"hecho_tambien": [
+						"construido_taller"
+					],
+					"ir": {
+						"escena": "prados_del_eco",
+						"buscar": "grupo:rocas_mineral"
+					}
+				},
+				{
+					"texto": "Llévale el mineral a Corteza",
+					"hecho": [
+						"construido_taller"
+					],
+					"ir": {
+						"escena": "cuna_de_musgo",
+						"buscar": "aldeano:corteza"
+					}
+				}
+			]
+		},
+		{
+			"id": "bosque",
+			"tipo": "historia",
+			"titulo": "El Bosque Cobrizo",
+			"quien": "bibi",
+			"texto": "Al norte de los prados hay un bosque de hojas cobrizas que Giza cerró con espinas. Allí vivía Tawi, el mercader... y un ciervo guardián.",
+			"aparece": [
+				"camino_bosque"
+			],
+			"hecha": [
+				"zona/bosque_cobrizo/4"
+			],
+			"premio": "El bosque recupera su cobre",
+			"pasos": [
+				{
+					"texto": "Sube por el Camino Cobrizo, al norte de los prados, hasta el bosque",
+					"hecho": [
+						"visto/bosque_cobrizo"
+					],
+					"ir": {
+						"escena": "camino_cobrizo",
+						"buscar": "puerta:bosque_cobrizo"
+					}
+				},
+				{
+					"texto": "Purga las zonas del bosque ({n}/{total})",
+					"cuenta": {
+						"prefijo": "zona/bosque_cobrizo/",
+						"total": 3
+					},
+					"ir": {
+						"escena": "bosque_cobrizo",
+						"buscar": "grupo:zonas"
+					}
+				},
+				{
+					"texto": "Libera al guardián del bosque",
+					"hecho": [
+						"zona/bosque_cobrizo/4"
+					],
+					"ir": {
+						"escena": "bosque_cobrizo",
+						"buscar": "grupo:arena_jefe"
+					}
+				}
+			]
+		},
+		{
+			"id": "puesto_tawi",
+			"tipo": "encargo",
+			"titulo": "El puesto de Tawi",
+			"quien": "tawi",
+			"texto": "Tawi necesita madera para arreglar su puesto. Los troncos podridos del Bosque Cobrizo están blandos por dentro: una semilla los parte.",
+			"aparece": [
+				"encargo_tawi"
+			],
+			"hecha": [
+				"construido_puesto"
+			],
+			"premio": "Mapa de Raíz",
+			"pasos": [
+				{
+					"texto": "Consigue madera de los troncos podridos ({n}/{total})",
+					"objeto": {
+						"madera": 3
+					},
+					"hecho_tambien": [
+						"construido_puesto"
+					],
+					"ir": {
+						"escena": "bosque_cobrizo",
+						"buscar": "grupo:troncos_podridos"
+					}
+				},
+				{
+					"texto": "Llévale la madera a Tawi",
+					"hecho": [
+						"construido_puesto"
+					],
+					"ir": {
+						"escena": "cuna_de_musgo",
+						"buscar": "aldeano:tawi"
+					}
+				}
+			]
+		},
+		{
+			"id": "cienaga",
+			"tipo": "historia",
+			"titulo": "La Ciénaga Quieta",
+			"quien": "bibi",
+			"texto": "Al este de la aldea hay una ciénaga donde antes croaban las ranas toda la noche. Ahora está en silencio, bajo una niebla que no se mueve. Juncia, la cocinera, vivía en su orilla.",
+			"aparece": [
+				"camino_cienaga"
+			],
+			"hecha": [
+				"zona/cienaga_quieta/4"
+			],
+			"premio": "Las ranas vuelven a cantar",
+			"pasos": [
+				{
+					"texto": "Ve a la ciénaga por Las Pasarelas, al este de la aldea",
+					"hecho": [
+						"visto/cienaga_quieta"
+					],
+					"ir": {
+						"escena": "las_pasarelas",
+						"buscar": "puerta:cienaga_quieta"
+					}
+				},
+				{
+					"texto": "Purga las zonas de la ciénaga ({n}/{total})",
+					"cuenta": {
+						"prefijo": "zona/cienaga_quieta/",
+						"total": 3
+					},
+					"ir": {
+						"escena": "cienaga_quieta",
+						"buscar": "grupo:zonas"
+					}
+				},
+				{
+					"texto": "Encuentra lo que enturbia el agua",
+					"hecho": [
+						"zona/cienaga_quieta/4"
+					],
+					"ir": {
+						"escena": "cienaga_quieta",
+						"buscar": "grupo:arena_jefe"
+					}
+				}
+			]
+		},
+		{
+			"id": "cocina_juncia",
+			"tipo": "encargo",
+			"titulo": "La cocina de Juncia",
+			"quien": "juncia",
+			"texto": "Juncia quiere volver a cocinar. Necesita bayas moradas y juncos dorados de la Ciénaga Quieta para arreglar el tejado y llenar la olla.",
+			"aparece": [
+				"encargo_juncia"
+			],
+			"hecha": [
+				"construido_cocina"
+			],
+			"premio": "Sopa de Juncia (devuelve vida)",
+			"pasos": [
+				{
+					"texto": "Recoge bayas de la ciénaga ({n}/{total})",
+					"objeto": {
+						"bayas": 4
+					},
+					"hecho_tambien": [
+						"construido_cocina"
+					],
+					"ir": {
+						"escena": "cienaga_quieta",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Recoge juncos de la orilla ({n}/{total})",
+					"objeto": {
+						"junco": 3
+					},
+					"hecho_tambien": [
+						"construido_cocina"
+					],
+					"ir": {
+						"escena": "cienaga_quieta",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Llévaselo todo a Juncia",
+					"hecho": [
+						"construido_cocina"
+					],
+					"ir": {
+						"escena": "cuna_de_musgo",
+						"buscar": "aldeano:juncia"
+					}
+				}
+			]
+		},
+		{
+			"id": "campo",
+			"tipo": "historia",
+			"titulo": "El Campo Segado",
+			"quien": "bibi",
+			"texto": "Al norte de la aldea están los viejos campos de trigo de Raíz. Una máquina oxidada los siega una y otra vez: la Cosechadora. Bibi dice que su caldera, detrás, es su punto débil.",
+			"aparece": [
+				"camino_campo"
+			],
+			"hecha": [
+				"zona/campo_segado/3"
+			],
+			"premio": "Raíz vuelve a ser libre",
+			"pasos": [
+				{
+					"texto": "Sube por la Senda de los Surcos, al norte de la aldea, hasta el Campo Segado",
+					"hecho": [
+						"visto/campo_segado"
+					],
+					"ir": {
+						"escena": "senda_surcos",
+						"buscar": "puerta:campo_segado"
+					}
+				},
+				{
+					"texto": "Purga las zonas del campo ({n}/{total})",
+					"cuenta": {
+						"prefijo": "zona/campo_segado/",
+						"total": 2
+					},
+					"ir": {
+						"escena": "campo_segado",
+						"buscar": "grupo:zonas"
+					}
+				},
+				{
+					"texto": "Detén a la Cosechadora Oxidada",
+					"hecho": [
+						"zona/campo_segado/3"
+					],
+					"ir": {
+						"escena": "campo_segado",
+						"buscar": "grupo:arena_jefe"
+					}
+				}
+			]
+		},
+		{
+			"id": "secretos_prados",
+			"tipo": "secreto",
+			"titulo": "Los secretos de los prados",
+			"quien": "pino",
+			"texto": "Desde su torre, Pino ve dos haces de luz en los prados. Dice que ahí hay algo escondido.",
+			"aparece": [
+				"vigia"
+			],
+			"hecha": [],
+			"pasos": [
+				{
+					"texto": "Encuentra los secretos ({n}/{total})",
+					"cuenta": {
+						"prefijo": "secreto/prados_del_eco/",
+						"total": 2
+					},
+					"ir": {
+						"escena": "prados_del_eco",
+						"buscar": "grupo:secretos"
+					}
+				}
+			]
+		},
+		{
+			"id": "diario_msafiri",
+			"tipo": "encargo",
+			"titulo": "El diario de Msafiri",
+			"quien": "msafiri",
+			"texto": "Msafiri, un pangolín viajero, ha perdido tres páginas de su diario: el viento se las llevó por el Sendero del Puente.",
+			"aparece": [
+				"encargo_msafiri"
+			],
+			"hecha": [
+				"msafiri_diario"
+			],
+			"premio": "Cuaderno de ecos",
+			"pasos": [
+				{
+					"texto": "Busca las páginas del diario ({n}/{total})",
+					"objeto": {
+						"pagina": 3
+					},
+					"hecho_tambien": [
+						"msafiri_diario"
+					],
+					"ir": {
+						"escena": "sendero_del_puente",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Llévale las páginas a Msafiri",
+					"hecho": [
+						"msafiri_diario"
+					],
+					"ir": {
+						"escena": "sendero_del_puente",
+						"buscar": "aldeano:msafiri"
+					}
+				}
+			]
+		},
+		{
+			"id": "ecos",
+			"tipo": "historia",
+			"titulo": "Los ecos perdidos",
+			"quien": "msafiri",
+			"texto": "Por los caminos de Raíz hay piedras que guardan voces de antes de Giza. Msafiri cree que juntas cuentan qué le pasó al Primer Árbol.",
+			"aparece": [
+				"cuaderno_ecos"
+			],
+			"hecha": [
+				"sendero_olvidado"
+			],
+			"pasos": [
+				{
+					"texto": "Escucha los ecos perdidos de Raíz ({n}/{total})",
+					"cuenta": {
+						"prefijo": "eco/",
+						"total": 9
+					},
+					"ir": {
+						"escena": "sendero_del_puente",
+						"buscar": "grupo:ecos_perdidos"
+					}
+				}
+			]
+		},
+		{
+			"id": "nasas_korongo",
+			"tipo": "encargo",
+			"titulo": "Las nasas de Korongo",
+			"quien": "korongo",
+			"texto": "Korongo, una garza pescadora de Las Pasarelas, ha perdido tres nasas: las ranas de piedra de Giza se las llevaron.",
+			"aparece": [
+				"encargo_korongo"
+			],
+			"hecha": [
+				"korongo_nasas"
+			],
+			"premio": "La pasarela del sureste y dos sopas",
+			"pasos": [
+				{
+					"texto": "Busca las nasas de Korongo ({n}/{total})",
+					"objeto": {
+						"nasa": 3
+					},
+					"hecho_tambien": [
+						"korongo_nasas"
+					],
+					"ir": {
+						"escena": "las_pasarelas",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Llévale las nasas a Korongo",
+					"hecho": [
+						"korongo_nasas"
+					],
+					"ir": {
+						"escena": "las_pasarelas",
+						"buscar": "aldeano:korongo"
+					}
+				}
+			]
+		},
+		{
+			"id": "campanillas_fuko",
+			"tipo": "encargo",
+			"titulo": "Las campanillas de Fuko",
+			"quien": "fuko",
+			"texto": "Fuko, un topo minero del Camino Cobrizo, se orienta en sus galerías por el sonido de tres campanillas de cobre. Los topos de piedra de Giza se las han llevado.",
+			"aparece": [
+				"encargo_fuko"
+			],
+			"hecha": [
+				"fuko_campanillas"
+			],
+			"premio": "La vieja galería de la mina y dos sopas",
+			"pasos": [
+				{
+					"texto": "Busca las campanillas de Fuko ({n}/{total})",
+					"objeto": {
+						"campanilla": 3
+					},
+					"hecho_tambien": [
+						"fuko_campanillas"
+					],
+					"ir": {
+						"escena": "camino_cobrizo",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Llévale las campanillas a Fuko",
+					"hecho": [
+						"fuko_campanillas"
+					],
+					"ir": {
+						"escena": "camino_cobrizo",
+						"buscar": "aldeano:fuko"
+					}
+				}
+			]
+		},
+		{
+			"id": "mazorcas_sungura",
+			"tipo": "encargo",
+			"titulo": "Las mazorcas de Sungura",
+			"quien": "sungura",
+			"texto": "Sungura, una liebre de la Senda de los Surcos, guarda las semillas de los cultivos antiguos de Raíz. Los cuervos de óxido le han robado tres mazorcas.",
+			"aparece": [
+				"encargo_sungura"
+			],
+			"hecha": [
+				"sungura_mazorcas"
+			],
+			"premio": "El huerto de la acequia y dos sopas",
+			"pasos": [
+				{
+					"texto": "Busca las mazorcas de Sungura ({n}/{total})",
+					"objeto": {
+						"mazorca": 3
+					},
+					"hecho_tambien": [
+						"sungura_mazorcas"
+					],
+					"ir": {
+						"escena": "senda_surcos",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Llévale las mazorcas a Sungura",
+					"hecho": [
+						"sungura_mazorcas"
+					],
+					"ir": {
+						"escena": "senda_surcos",
+						"buscar": "aldeano:sungura"
+					}
+				}
+			]
+		}
+	]
+}

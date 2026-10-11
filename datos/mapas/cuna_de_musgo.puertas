@@ -1,0 +1,4 @@
+; puerta = nombre, escena a la que lleva, puerta por la que se aparece allí, hacia dónde sale Maisha al llegar aquí
+< = prados, sendero_del_puente, aldea, derecha
+) = cienaga, las_pasarelas, aldea, izquierda, cerrada:camino_cienaga
+^ = campo, senda_surcos, aldea, abajo, cerrada:camino_campo

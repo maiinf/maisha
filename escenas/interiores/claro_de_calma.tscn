@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/mundo/interiores/claro_de_calma.gd" id="1"]
+[ext_resource type="PackedScene" path="res://escenas/personajes/maisha.tscn" id="2"]
+[ext_resource type="Script" path="res://scripts/interfaz/hud_combate.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/interfaz/dialogo.gd" id="4"]
+
+[node name="ClaroDeCalma" type="Node2D"]
+script = ExtResource("1")
+titulo = "Claro de Calma"
+combate = false
+color_fondo = Color(0.0784, 0.0549, 0.0941, 1)
+ayuda = ""
+
+[node name="Entidades" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Maisha" parent="Entidades" instance=ExtResource("2")]
+position = Vector2(176, 180)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("3")
+
+[node name="Dialogo" type="CanvasLayer" parent="."]
+script = ExtResource("4")

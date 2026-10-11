@@ -1,0 +1,12 @@
+# Archivos que Godot genera solo: no se suben a GitHub
+.godot/
+/android/
+*.tmp
+# Exportaciones del juego (los .exe que generas para probar)
+exportaciones/
+
+# Archivos temporales de Python (herramientas/)
+__pycache__/
+
+# Archivos del Finder del Mac
+.DS_Store

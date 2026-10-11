@@ -1,0 +1,2 @@
+; puerta = nombre, escena a la que lleva, puerta por la que se aparece allí, hacia dónde sale Maisha al llegar aquí[, portal o portal:marca que lo abre]
+P = raiz, prados_del_eco, kitovu, abajo, portal:portal_raiz

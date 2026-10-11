@@ -1,0 +1,8 @@
+# Saltos de línea iguales en Windows y Mac
+* text=auto eol=lf
+*.png binary
+*.pixelorama binary
+*.ogg binary
+*.wav binary
+*.ttf binary
+*.otf binary

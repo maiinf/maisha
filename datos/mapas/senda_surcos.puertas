@@ -1,0 +1,3 @@
+; puerta = nombre, escena a la que lleva, puerta por la que se aparece allí, hacia dónde sale Maisha al llegar aquí
+_ = aldea, cuna_de_musgo, campo, arriba
+^ = campo, campo_segado, aldea, abajo

@@ -1,0 +1,4 @@
+; puerta = nombre, escena a la que lleva, puerta por la que se aparece allí, hacia dónde sale Maisha al llegar aquí
+> = aldea, sendero_del_puente, prados, izquierda
+P = kitovu, kitovu, raiz, abajo, portal
+^ = bosque, camino_cobrizo, prados, abajo, cerrada:camino_bosque

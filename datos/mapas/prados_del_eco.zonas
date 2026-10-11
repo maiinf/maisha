@@ -1,0 +1,4 @@
+; zona = semieje horizontal, semieje vertical (en casillas), borde de aviso (casillas), enemigos al cerrarse[, aldeano de piedra junto a la zona]
+1 = 11, 8, 6, 2
+2 = 13, 9, 6, 2, pino
+3 = 12, 8, 6, 2, corteza

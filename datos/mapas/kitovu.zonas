@@ -1,0 +1,8 @@
+; zona = semieje horizontal, semieje vertical (en casillas), borde de aviso (casillas), enemigos al cerrarse[, aldeano de piedra junto a la zona][, practica | jefe:<nombre>]
+1 = 4, 3, 3, 1, , practica
+2 = 4, 3, 3, 1, , practica
+3 = 4, 3, 3, 1, , practica
+4 = 4, 3, 3, 1, , practica
+5 = 4, 3, 3, 1, , practica
+6 = 4, 3, 3, 1, , practica
+7 = 6, 5, 3, 0, , jefe:mzizi
