@@ -50,7 +50,7 @@ def tipos_de(filas, derrumbe=False, escala=False):
     Cañada del Eco (escala=True) la escala de cuerda, que cuelga por la peña."""
     def tipo(c):
         return {"~": "agua", "=": "puente", "#": "camino", "%": "losas", ",": "flores", "/": "surco",
-                "-": "puente_piedra", "|": "pretil", "'": "vado",
+                "-": "puente_piedra", "|": "pretil", "'": "vado", "\\": "agua",
                 '"': "risco" if escala else ("camino" if derrumbe else "agua"),
                 "0": "risco"}.get(c, "hierba")
     alto, ancho = len(filas), len(filas[0])
@@ -321,6 +321,24 @@ def _riscos(lz, tipos, fina, media, cara=1.0):
     return pared
 
 
+def _agua_espejo(lz, agua, prof, fina):
+    """El agua del LAGO ESPEJO, quieta como un cristal: clara y lisa, con el cielo reflejado (vetas largas de luz),
+    la orilla del norte reflejada en oscuro justo debajo (los árboles se ven del revés en el agua) y casi sin ondas.
+    (Lo turbio, mientras vive Kambare, lo pone el juego encima.)"""
+    hondo = np.clip(prof / 40, 0, 1)
+    cielo = estirar(lz.ruido(30, 3, semilla=81), int(90 * lz.s), False)
+    v = 0.62 - hondo * 0.22 + (cielo - 0.5) * 0.25
+    lz.pintar(agua, rampa(["#1c3a3a", "#285050", "#346161", "#4c8d8d", "#6db0b0", "#9fd0d0", "#c8e6e2"], np.clip(v, 0, 1)), 0.9)
+    # el reflejo de la orilla del norte: una franja oscura y verdosa bajo el borde de arriba, deshilachada
+    for k in range(1, 22, 2):
+        bajo_orilla = np.clip(agua - desplazar(lz, agua, 0, k), 0, 1)
+        lz.pintar(bajo_orilla * (1 - k / 24) * (estirar(fina, 9) > 0.35), "#1d3a26", 0.35)
+    # vetas largas de luz (el cielo en el cristal) y algún destello
+    vetas_ = (estirar(lz.ruido(2, 2, semilla=82), int(60 * lz.s), False) > 0.66) * agua * np.clip(hondo * 2, 0, 1)
+    lz.pintar(vetas_, "#d8f0ec", 0.25)
+    lz.pintar((fina > 0.93) * agua * np.clip(hondo * 3, 0, 1), "#ffffff", 0.5)
+
+
 def _mesetas(lz, tipos, fina, media, pared):
     """Encima de las peñas grandes (la Cañada del Eco): una MESETA de hierba, más alta que el fondo. La roca solo se
     ve en el filo (unos pocos píxeles con musgo) y en la cara del acantilado del sur; dentro, hierba oscura con
@@ -357,6 +375,7 @@ def pintar(nombre, salida=None):
     cobrizo = nombre == "camino_cobrizo"
     senda = nombre == "senda_surcos"
     canada = nombre == "canada_eco"
+    espejo = nombre == "lago_espejo"
     tipos = tipos_de(filas, derrumbe=cobrizo or senda, escala=canada)
     alto, ancho = len(filas), len(filas[0])
     lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=7)
@@ -501,6 +520,8 @@ def pintar(nombre, salida=None):
         # piedrecitas y juncos en la orilla
         juncos = (orilla_moj > 0.5) * (lz.ruido(1.5, 2, semilla=17) > 0.8)
         lz.pintar(juncos * estirar(fina, 7) > 0.6, "#526d38", 0.9)
+        if espejo:
+            _agua_espejo(lz, agua, prof, fina)
 
     # ---- puentes y pasarelas de tablas: las tablas van de través (en las pasarelas que bajan, en horizontal),
     #      con vigas en los bordes, pilotes que asoman y la sombra sobre el agua

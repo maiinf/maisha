@@ -1,0 +1,3 @@
+; zona = semieje horizontal, semieje vertical (en casillas), borde de aviso (casillas), enemigos al cerrarse[, aldeano de piedra junto a la zona][, practica | jefe:<nombre>]
+1 = 11, 5, 4, 0, jefe:kambare
+2 = 8, 5, 4, 3

@@ -1557,6 +1557,124 @@ def crear_canada():
     return ["".join(f) for f in m], textos
 
 
+def crear_lago():
+    """El Lago Espejo (96x64): un lugar al oeste de la Cañada del Eco (puerta al este). Un lago grande y quieto con
+    una ISLA en el centro, donde aparecerá KIMYA, la Quietud. Lo que solo existe en el reflejo («\\»: un puente de
+    luz sobre el agua) se vuelve real cuando Maisha se queda quieta junto al agua y el lago se calma. Hay dos: el
+    largo, del sur a la isla, y uno corto, del oeste a un islote con un secreto. En la orilla sur, la ARENA del
+    minijefe de Giza que enturbia el agua (no deja que se calme hasta vencerlo); al noreste, una zona corrupta.
+    Sauces y juncos en la orilla, flores y bayas."""
+    ANCHO, ALTO = 96, 64
+    azar = random.Random(171)
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    zonas = {"1": (26, 56, 11, 5), "2": (76, 9, 8, 5)}
+
+    def en_zona(x, y, margen=2):
+        for (zx, zy, rx, ry) in zonas.values():
+            if ((x - zx) / (rx + margen)) ** 2 + ((y - zy) / (ry + margen)) ** 2 <= 1.0:
+                return True
+        return False
+
+    # el lago, con la orilla irregular
+    LX, LY, RX, RY = 46, 28, 31, 19
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            a = math.atan2(y - LY, x - LX)
+            r = 1.0 + 0.06 * math.sin(a * 3 + 0.5) + 0.04 * math.sin(a * 7 + 2)
+            if ((x - LX) / RX) ** 2 + ((y - LY) / RY) ** 2 <= r * r:
+                poner(x, y, "~")
+    # la isla del centro y el islote del noroeste
+    for (ix, iy, irx, iry) in ((46, 26, 6.5, 4.5), (35, 14, 3.2, 2.4)):
+        for y in range(ALTO):
+            for x in range(ANCHO):
+                if ((x - ix) / irx) ** 2 + ((y - iy) / iry) ** 2 <= 1.0:
+                    poner(x, y, ",")
+    # los puentes del reflejo: del sur a la isla y del oeste al islote
+    for y in range(31, 48):
+        for x in (45, 46):
+            if m[y][x] == "~":
+                poner(x, y, "\\")
+    for x in range(18, 33):
+        for y in (14, 15):
+            if m[y][x] == "~":
+                poner(x, y, "\\")
+
+    def camino(puntos, ancho=2):
+        for (a_, b_) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b_[0] - a_[0]), abs(b_[1] - a_[1])) * 2) + 1
+            for i in range(pasos + 1):
+                t_ = i / pasos
+                x = a_[0] + (b_[0] - a_[0]) * t_
+                y = a_[1] + (b_[1] - a_[1]) * t_ + math.sin(t_ * 3 + a_[0]) * 0.35
+                for dx in range(ancho):
+                    for dy in range(ancho):
+                        xx, yy = int(x) + dx, int(y) + dy
+                        if 0 <= xx < ANCHO and 0 <= yy < ALTO and m[yy][xx] in ".,":
+                            poner(xx, yy, "#")
+
+    # el camino: entra por el este y bordea la orilla sur hasta la arena; un ramal sube al pie del puente
+    camino([(95, 31), (84, 34), (78, 44), (66, 50), (52, 50), (40, 52), (32, 53)])
+    camino([(46, 50), (45, 48)], 2)
+    camino([(9, 20), (9, 30), (14, 44), (24, 50)], 1)                  # por el oeste, a la orilla del islote
+    camino([(9, 20), (16, 15), (20, 15)], 1)
+    # Kimya aparecerá en la isla: un círculo de piedras y el sitio donde se posa
+    for (dx, dy) in ((-3, -1), (3, -1), (-2, 2), (2, 2), (0, -3)):
+        poner(46 + dx, 26 + dy, "r")
+    # el secreto, en el islote
+    poner(35, 13, "X")
+    # sauces, juncos y bayas en la orilla
+    for (x, y) in ((84, 30), (70, 46), (16, 40), (12, 26), (60, 7), (30, 9)):
+        poner(x, y, "$")
+    reservados = [(95, 31, 4), (46, 26, 5), (35, 14, 3), (26, 56, 13), (76, 9, 10)]
+
+    def libre(x, y):
+        if m[y][x] not in ".," or en_zona(x, y):
+            return False
+        for (rx_, ry_, rr) in reservados:
+            if (x - rx_) ** 2 + (y - ry_) ** 2 <= rr * rr:
+                return False
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#~\\X$":
+                    return False
+        return True
+
+    def orilla(x, y):
+        return any(0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] == "~"
+                   for dx in (-2, 0, 2) for dy in (-2, 0, 2))
+
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            if not libre(x, y):
+                continue
+            borde = min(x, ANCHO - 1 - x, y, ALTO - 1 - y)
+            r = azar.random()
+            if borde < 3 and r < 0.75:
+                poner(x, y, azar.choice("TTts"))
+            elif orilla(x, y) and r < 0.12:
+                poner(x, y, "s" if r < 0.05 else ";")
+            elif r < 0.04:
+                poner(x, y, azar.choice("Ttrs"))
+            elif r < 0.16 and not orilla(x, y):
+                poner(x, y, ",")
+    # puerta al este, a la Cañada del Eco
+    for y in range(29, 35):
+        for x in range(ANCHO - 3, ANCHO):
+            poner(x, y, ">" if x == ANCHO - 1 else "#")
+    poner(88, 28, "L")
+    poner(48, 50, "L")
+    poner(91, 32, "S")
+    for k, (zx_, zy_, rx_, ry_) in zonas.items():
+        poner(zx_, zy_, k)
+    textos = {"1": "11, 5, 4, 0, jefe:kambare", "2": "8, 5, 4, 3"}
+    return ["".join(f) for f in m], textos
+
+
 # ---------------------------------------------------------------------------
 # Dibujar el suelo a partir del texto
 # ---------------------------------------------------------------------------
@@ -1652,7 +1770,7 @@ def exportar_json(nombre):
 
 # mapas cuyo suelo se pinta con detalle (herramientas/pintar_suelo.py); los demás, con el dibujo sencillo
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
-                  "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco"}
+                  "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo"}
 
 
 def construir_suelo(nombre):
@@ -1799,7 +1917,7 @@ if __name__ == "__main__":
                         "bosque_cobrizo": crear_bosque, "cienaga_quieta": crear_cienaga, "campo_segado": crear_campo,
                         "sendero_del_puente": crear_sendero, "las_pasarelas": crear_pasarelas,
                         "camino_cobrizo": crear_camino, "senda_surcos": crear_senda,
-                        "canada_eco": crear_canada}.get(nombre, crear_prados)()
+                        "canada_eco": crear_canada, "lago_espejo": crear_lago}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:
