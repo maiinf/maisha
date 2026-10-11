@@ -18,9 +18,9 @@ creando jefes, enemigos, animaciones, mapas, música e ilustraciones igual que h
 
 ## Preparar el Mac (una vez)
 ```
-pip3 install -r herramientas/requirements.txt
-brew install ffmpeg            # para guardar la música y los sonidos en .ogg
+pip3 install -r herramientas/requirements.txt   # incluye imageio-ffmpeg: el ffmpeg para guardar música y sonidos en .ogg
 ```
+(No hace falta Homebrew: `sintetizador.py` usa el ffmpeg del sistema si lo hay y, si no, el de imageio-ffmpeg.)
 Godot está en `/Applications/Godot.app/Contents/MacOS/Godot` (versión 4.7).
 
 ## Herramientas (en `herramientas/`)

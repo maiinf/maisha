@@ -265,7 +265,7 @@ Escena `escenas/mundo/canada_eco.tscn` (mapa de 140×46 casillas, de este a oest
   - **Grita**: una **onda** (arcos violetas y blancos) va en línea recta, rebota en el borde de la zona o al llegar lejos y **vuelve a él**. Hace daño a la ida y a la vuelta. El **Latido** la deshace.
   - Al tragarse su propio eco cae **aturdido** (estrellitas encima): el cetro le quita 2. Las raíces de una semilla lo sujetan en el suelo; la explosión le da aunque vuele. Números en `reglas_combate.gd` (`MURCIELAGO_*`).
 - Arte: `herramientas/pintar_canada.py` (aprisco, escala, cencerro e icono, y el murciélago: 6 fotogramas), Mbuzi en `dibujar_aldeanos.py`. Bocetos y capturas en `documentacion/` (`boceto_canada_eco.png`, `boceto_canada_suelo.png`, `canada_eco_capturas.png`, `murcielago_eco_capturas.png`).
-- Falta: el **recuerdo del quinto eco** (su texto y su ilustración: Maisha, Mauti y Kimya gritando sus nombres; el de Kimya no vuelve), la música propia y los sonidos propios del murciélago (de momento usa «eco_voz»; hace falta ffmpeg para crear sonidos nuevos).
+- Falta: el **recuerdo del quinto eco** (su texto y su ilustración: Maisha, Mauti y Kimya gritando sus nombres; el de Kimya no vuelve), la música propia y los sonidos propios del murciélago (de momento usa «eco_voz»).
 
 ### Los ecos perdidos (el misterio de Raíz)
 

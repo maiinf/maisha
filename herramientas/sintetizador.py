@@ -5,6 +5,7 @@ Todo lo que suena en el juego sale de aquí, así que es nuestro: no hay derecho
 Lo usan herramientas/crear_sonidos.py (efectos y ambientes) y herramientas/componer_musica.py (música).
 """
 import os
+import shutil
 import subprocess
 import wave
 
@@ -299,6 +300,18 @@ def suavizar_bordes(x, entrada=0.003, salida=0.01):
     return x * (e[:, None] if x.ndim == 2 else e)
 
 
+def _ffmpeg():
+    """El programa ffmpeg: el del sistema (Homebrew) o, si no hay, el que trae el paquete imageio-ffmpeg."""
+    ruta = shutil.which("ffmpeg")
+    if ruta:
+        return ruta
+    try:
+        import imageio_ffmpeg
+        return imageio_ffmpeg.get_ffmpeg_exe()
+    except ImportError:
+        raise SystemExit("Falta ffmpeg: pip3 install -r herramientas/requirements.txt")
+
+
 def guardar(x, ruta, pico=0.89, calidad=5, titulo=None):
     """Guarda en .ogg (Vorbis), que es lo que mejor lee Godot."""
     x = normalizar(estereo(x), pico)
@@ -311,7 +324,7 @@ def guardar(x, ruta, pico=0.89, calidad=5, titulo=None):
         w.setframerate(SR)
         w.writeframes(datos.tobytes())
     etiquetas = ["-metadata", f"title={titulo}", "-metadata", "artist=Maisha"] if titulo else []
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", tmp, "-c:a", "libvorbis", "-q:a", str(calidad)] + etiquetas + [ruta], check=True)
+    subprocess.run([_ffmpeg(), "-y", "-loglevel", "error", "-i", tmp, "-c:a", "libvorbis", "-q:a", str(calidad)] + etiquetas + [ruta], check=True)
     os.remove(tmp)
 
 
