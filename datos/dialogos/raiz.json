@@ -1645,7 +1645,7 @@
 			{
 				"lineas": [
 					"Por aquí se va al Lago Espejo... pero la cañada se pierde en una niebla espesa que no deja ver el camino.",
-					"Todavía no. Primero tengo que entender qué cuentan los ecos."
+					"Las piedras de la cornisa murmuran algo. Quizá, si escucho lo que guardan, la niebla se aparte."
 				]
 			}
 		]
@@ -1674,6 +1674,42 @@
 				"tras_historia": [
 					"Kimya... Allí abajo, en el agua quieta, el reflejo se queda un momento más de lo que debería.",
 					"Si en algún sitio el agua se acuerda de todo, será en el Lago Espejo."
+				]
+			}
+		]
+	},
+	"lago_llegada": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un lago enorme... Debería verse el cielo en él, como en un espejo. Pero el agua está marrón y espesa.",
+					"Algo se mueve muy al fondo. Las burbujas suben despacio, como si alguien respirara bajo el barro."
+				]
+			}
+		]
+	},
+	"lago_turbio": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Si me quedo quieta, el agua casi se calma... y de pronto vuelve a removerse desde abajo.",
+					"Hay algo grande en el fondo que no la deja estar quieta. Por la orilla sur, el barro está revuelto."
+				]
+			}
+		]
+	},
+	"lago_espejo_primera": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El agua se ha quedado lisa del todo. Veo el cielo... y a mí, del revés.",
+					"Y en el reflejo hay un puente que no está. Brilla, tabla a tabla, hasta la isla. ¿Se podrá pisar?"
 				]
 			}
 		]

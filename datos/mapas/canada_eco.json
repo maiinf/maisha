@@ -69,7 +69,7 @@
 "destino": "lago_espejo",
 "puerta": "canada",
 "salida": "derecha",
-"cerrada": "camino_lago"
+"cerrada": "eco/canada_eco"
 }
 },
 "casilla": 16

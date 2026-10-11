@@ -168,6 +168,7 @@ func _ready() -> void:
 				rota.marca = "pasarela_reparada/" + mapa
 		rota.casillas = _tablas_rotas
 		add_child(rota)
+	_crear_puentes_reflejo()
 	_crear_riscos()
 	_crear_limites()
 	for piedra in get_tree().get_nodes_in_group("piedras_eco"):
@@ -247,6 +248,8 @@ func _forma_de_practica(clave: String) -> int:
 
 var _espinas_pendientes: Array[Vector2] = []
 var _tablas_rotas: Array[Vector2i] = []
+var _reflejos: Array[Vector2i] = []      # «\»: lo que solo existe en el reflejo del lago (puentes de luz)
+const PUENTE_REFLEJO := preload("res://scripts/mundo/objetos/puente_reflejo.gd")
 const PASARELA_ROTA := preload("res://scripts/mundo/objetos/pasarela_rota.gd")
 const DERRUMBE := preload("res://scripts/mundo/objetos/derrumbe.gd")
 const ACEQUIA_FOSO := preload("res://scripts/mundo/objetos/acequia_foso.gd")
@@ -282,6 +285,8 @@ func _crear_objetos(zonas: Dictionary) -> void:
 				_poner(viaj, pos)
 			elif c == "\"":
 				_tablas_rotas.append(Vector2i(x, y))
+			elif c == "\\":
+				_reflejos.append(Vector2i(x, y))
 			elif c == "y":
 				var trigo: Sprite2D = MECERSE.new()
 				trigo.texture = load(KITOVU + "trigo.png")
@@ -595,6 +600,28 @@ func _crear_pretiles() -> void:
 
 
 ## Las peñas («0», en el Camino Cobrizo) son roca maciza: no se pueden cruzar
+## Los puentes del reflejo: cada grupo de casillas «\» que se tocan es un puente
+func _crear_puentes_reflejo() -> void:
+	var quedan := {}
+	for c in _reflejos:
+		quedan[c] = true
+	while not quedan.is_empty():
+		var inicio: Vector2i = quedan.keys()[0]
+		var grupo: Array[Vector2i] = []
+		var pendientes: Array[Vector2i] = [inicio]
+		quedan.erase(inicio)
+		while not pendientes.is_empty():
+			var c: Vector2i = pendientes.pop_back()
+			grupo.append(c)
+			for d in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+				if quedan.has(c + d):
+					quedan.erase(c + d)
+					pendientes.append(c + d)
+		var puente: Node2D = PUENTE_REFLEJO.new()
+		puente.casillas = grupo
+		add_child(puente)
+
+
 func _crear_riscos() -> void:
 	var cuerpo := StaticBody2D.new()
 	cuerpo.name = "Riscos"

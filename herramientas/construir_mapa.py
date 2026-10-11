@@ -1671,7 +1671,8 @@ def crear_lago():
     poner(91, 32, "S")
     for k, (zx_, zy_, rx_, ry_) in zonas.items():
         poner(zx_, zy_, k)
-    textos = {"1": "11, 5, 4, 0, jefe:kambare", "2": "8, 5, 4, 3"}
+    # (la arena «1» será la de Kambare; hasta que exista su pelea, es una zona corrupta normal)
+    textos = {"1": "11, 5, 4, 3", "2": "8, 5, 4, 3"}
     return ["".join(f) for f in m], textos
 
 

@@ -129,6 +129,8 @@ const CUERVO_APUNTA := 0.75            # segundos apuntando (la raya del suelo a
 const CUERVO_PICADO := 230.0           # velocidad del picado (píxeles por segundo)
 const CUERVO_POSADO := 1.4             # posado picoteando tras el picado: el cetro le quita 2
 const CUERVO_ESPERA := 1.3             # dando vueltas antes de volver a apuntar
+## Lago Espejo: segundos que Maisha tiene que estar quieta junto al agua para que el lago se vuelva espejo
+const QUIETUD_SEGUNDOS := 3.0
 ## Murciélago de eco (Cañada del Eco): revolotea, avisa y grita una onda que va y vuelve; al tragársela, cae aturdido
 const MURCIELAGO_VIDA := 3
 const MURCIELAGO_VE := 120.0           # a esta distancia (píxeles) se fija en Maisha

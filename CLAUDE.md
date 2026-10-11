@@ -41,7 +41,7 @@ Para comprobar el arte, mira los PNG que salen (abrirlos con la herramienta de l
 ## Mapas
 Cada mapa es `datos/mapas/<mapa>.txt` (una letra por casilla de 16 px) + `.puertas` + `.zonas`.
 Letras nuevas de los caminos: `0` peña, `"` obstáculo que se abre (pasarela rota / derrumbe / foso / escala de cuerda, según el
-`viajero` del nodo Region), `@` eco perdido, `` ` `` objeto del encargo, `{` casa del viajero, `}` viajero,
+`viajero` del nodo Region), `\` puente del reflejo (Lago Espejo), `@` eco perdido, `` ` `` objeto del encargo, `{` casa del viajero, `}` viajero,
 `-` `|` `'` puente de piedra, pretil y vado. Puertas: `letra = id, destino, puerta_llegada, salida[, cerrada:marca]`.
 El grafo de caminos para la flecha de misiones está en `datos/misiones.json` → `caminos`.
 
@@ -50,11 +50,11 @@ El grafo de caminos para la flecha de misiones está en `datos/misiones.json` �
 /Applications/Godot.app/Contents/MacOS/Godot --headless --import --path .
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_senda_surcos
 ```
-Hay 20 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
+Hay 21 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
 Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--headless`
 (guarda `get_viewport().get_texture().get_image()`); bórralo después.
 
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,
 Senda de los Surcos y Cañada del Eco hechos; faltan 4) y el misterio de los 9 ecos perdidos (5 hechos).
-Siguiente: el Lago Espejo (su gancho: el reflejo; el paso desde la Cañada está cerrado con la marca `camino_lago`). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
+En marcha: el Lago Espejo (jugable: agua turbia, quietud y puentes del reflejo; falta Kambare, Kimya y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.

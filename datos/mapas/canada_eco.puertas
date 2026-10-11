@@ -1,3 +1,3 @@
 ; puerta = nombre, escena a la que lleva, puerta por la que se aparece allí, hacia dónde sale Maisha al llegar aquí
 > = bosque, bosque_cobrizo, canada, izquierda
-< = lago, lago_espejo, canada, derecha, cerrada:camino_lago
+< = lago, lago_espejo, canada, derecha, cerrada:eco/canada_eco
