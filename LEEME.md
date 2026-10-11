@@ -253,6 +253,15 @@ Escena `escenas/mundo/senda_surcos.tscn` (64×100, de sur a norte), entre Cuna d
 - Una zona corrupta al este (cuervos y Petrinos) y un secreto tras un matorral en el seto del oeste.
 - Arte: `herramientas/pintar_senda.py` (hórreo, cuervo, mazorca e icono), Sungura en `dibujar_aldeanos.py`.
 
+### Cañada del Eco (en construcción)
+
+Mapa `datos/mapas/canada_eco.txt` (140×46, de este a oeste), entre el Bosque Cobrizo y el Lago Espejo. Se genera con `construir_mapa.py canada_eco --crear` (`crear_canada`). Boceto: `documentacion/boceto_canada_eco.png`; suelo pintado: `documentacion/boceto_canada_suelo.png`.
+- Una **garganta** entre dos paredes de peña (`0`) que se estrecha en el centro. Encima de las peñas grandes se pinta una **meseta** de hierba (`_mesetas` en `pintar_suelo.py`): la roca solo se ve en el filo y en la cara del acantilado.
+- Un **arroyo** baja hacia el lago y cruza el camino bajo un **puentecito** (este) y por un **vado** (oeste). Al este, hierba de bosque y hojarasca; al oeste, flores.
+- **Mbuzi**, la cabra montés pastora, en su aprisco del norte. Encargo: **tres cencerros**. Al devolvérselos descuelga la **escala de cuerda** (`"` en esta cañada) hasta la **cornisa** del **quinto eco**.
+- Una zona corrupta en el ensanche del sur y un secreto tras un matorral al noroeste. Enemigo nuevo: el **murciélago de eco**.
+- Falta: la escena, el arte de los objetos y de Mbuzi, el murciélago, los diálogos, la música y la prueba.
+
 ### Los ecos perdidos (el misterio de Raíz)
 
 Piedras altas con una espiral tallada (`scripts/mundo/objetos/eco_perdido.gd`). Al acercarse brillan y sueltan motas de luz; con **Acción**, el mundo se tiñe de verde-agua y se oye un recuerdo con su ilustración (conversación `eco_<mapa>` en `datos/dialogos/raiz.json`). Cada uno deja la marca `eco/<mapa>`. Hay **9** en todo Raíz (uno por camino, de momento solo el del puente): juntos abrirán el Sendero Olvidado hacia las Ruinas del Primer Árbol. Misión «Los ecos perdidos» en el diario.

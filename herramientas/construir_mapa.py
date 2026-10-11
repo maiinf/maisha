@@ -1390,6 +1390,172 @@ def crear_camino():
     return ["".join(f) for f in m], textos
 
 
+def crear_canada():
+    """La Cañada del Eco (140x46, de este a oeste): el camino del Bosque Cobrizo (este) al Lago Espejo (oeste).
+    Una garganta entre dos paredes de peña («0») que se estrecha en el centro; por el fondo baja un arroyo hacia el
+    lago, con un vado de piedras y un puentecito. Al este, árboles cobrizos del bosque; al oeste, hierba y flores
+    que anuncian el lago. Al norte, el aprisco de MBUZI, la cabra montés pastora (encargo: tres cencerros que el
+    eco esparció por la cañada). Muy arriba, en una CORNISA de la pared norte, el quinto ECO PERDIDO: solo se sube
+    por la ESCALA DE CUERDA («"» en esta cañada) que Mbuzi descuelga al devolverle los cencerros. Al sur, en un
+    ensanche, una zona corrupta. Al noroeste, un secreto tras un matorral."""
+    ANCHO, ALTO = 140, 46
+    azar = random.Random(153)
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    zonas = {"1": (58, 33, 9, 5)}
+
+    def en_zona(x, y, margen=2):
+        for (zx, zy, rx, ry) in zonas.values():
+            if ((x - zx) / (rx + margen)) ** 2 + ((y - zy) / (ry + margen)) ** 2 <= 1.0:
+                return True
+        return False
+
+    # las dos paredes de peña: más cerradas en el centro (la garganta) y abiertas en los extremos
+    norte, sur = {}, {}
+    for x in range(ANCHO):
+        cierre = math.exp(-((x - 84) / 22.0) ** 2)                  # 1 en la garganta, 0 lejos
+        norte[x] = int(8 + 9 * cierre + 1.5 * math.sin(x * 0.21) + math.sin(x * 0.53 + 1))
+        sur[x] = int(38 - 9 * cierre + 1.5 * math.sin(x * 0.17 + 2) + math.sin(x * 0.47))
+    # bajo la cornisa la pared es más alta: entre la repisa y el fondo hay roca (solo se sube por la escala)
+    for x in range(88, 121):
+        norte[x] = max(norte[x], int(13.5 - max(0, abs(x - 104) - 7) * 0.7))
+    # el ensanche del sur, donde está la zona corrupta
+    for x in range(44, 74):
+        sur[x] = max(sur[x], 41 - int(2 * math.sin((x - 44) / 30 * math.pi)))
+    for x in range(ANCHO):
+        for y in range(0, norte[x] + 1):
+            poner(x, y, "0")
+        for y in range(sur[x], ALTO):
+            poner(x, y, "0")
+    # la cornisa del eco: una repisa en lo alto de la pared norte, encerrada por la peña
+    for x in range(98, 111):
+        for y in range(2, 8):
+            if ((x - 104) / 6.5) ** 2 + ((y - 4) / 2.6) ** 2 <= 1.0:
+                poner(x, y, ".")
+    # la escala de cuerda: baja de la cornisa al fondo de la cañada (cerrada hasta que Mbuzi la descuelga)
+    for y in range(8, norte[104] + 1):
+        for x in (104, 105):
+            poner(x, y, '"')
+    # el aprisco de Mbuzi: un rellano al norte, al oeste de la garganta
+    for x in range(30, 50):
+        for y in range(2, norte[x] + 1):
+            if ((x - 40) / 10.0) ** 2 + ((y - 8) / 6.0) ** 2 <= 1.0:
+                poner(x, y, ".")
+    # el rincón del secreto, al noroeste
+    for x in range(12, 22):
+        for y in range(3, norte[x] + 1):
+            if ((x - 17) / 5.0) ** 2 + ((y - 6) / 3.5) ** 2 <= 1.0:
+                poner(x, y, ".")
+
+    def camino(puntos, ancho=2):
+        for (a, b) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b[0] - a[0]), abs(b[1] - a[1])) * 2) + 1
+            for i in range(pasos + 1):
+                t = i / pasos
+                x = a[0] + (b[0] - a[0]) * t
+                y = a[1] + (b[1] - a[1]) * t + math.sin(t * 3 + a[0]) * 0.35
+                for dx in range(ancho):
+                    for dy in range(ancho):
+                        xx, yy = int(x) + dx, int(y) + dy
+                        if 0 <= xx < ANCHO and 0 <= yy < ALTO and m[yy][xx] in ".,":
+                            poner(xx, yy, "#")
+
+    camino([(139, 23), (124, 22), (110, 20), (96, 21), (84, 22), (72, 21), (60, 20), (46, 21), (30, 23), (14, 25), (0, 25)])
+    camino([(42, 21), (41, 14)], 1)                                   # → el aprisco de Mbuzi
+    camino([(104, 20), (104, norte[104] + 1)], 1)                     # → el pie de la escala
+    camino([(64, 21), (60, 28)], 1)                                   # → el ensanche de la zona
+
+    # el arroyo baja hacia el lago (oeste): al este va por el norte del camino, lo cruza bajo un puentecito de
+    # tablas, recorre la garganta por el sur y vuelve a cruzarlo por un vado de piedras antes de llegar al lago
+    arroyo = {}
+    puntos = [(139, 15), (126, 16), (117, 18), (113, 22), (109, 26), (96, 27), (84, 26), (70, 27), (56, 26),
+              (44, 26), (37, 25), (33, 22), (26, 19), (14, 18), (0, 19)]
+    for (a, b) in zip(puntos, puntos[1:]):
+        pasos = int(max(abs(b[0] - a[0]), abs(b[1] - a[1])) * 2) + 1
+        for i in range(pasos + 1):
+            t = i / pasos
+            x = int(a[0] + (b[0] - a[0]) * t)
+            y = int(a[1] + (b[1] - a[1]) * t + math.sin(x * 0.4) * 0.6)
+            arroyo[x] = min(arroyo.get(x, 99), y)
+            for dy in range(3 if x < 30 else 2):
+                for dx in (0, 1):
+                    xx, yy = x + dx, y + dy
+                    if not (0 <= xx < ANCHO and 0 <= yy < ALTO):
+                        continue
+                    if m[yy][xx] in ".,":
+                        poner(xx, yy, "~")
+                    elif m[yy][xx] == "#":
+                        # donde cruza el camino: al este, un puentecito de tablas; al oeste, un vado de piedras
+                        poner(xx, yy, "=" if xx > 70 else "'")
+    # Mbuzi: su aprisco («{») y ella a la puerta
+    poner(40, 7, "{")
+    poner(43, 11, "}")
+    # el eco, en la cornisa
+    poner(104, 3, "@")
+    # los tres cencerros: en la zona, junto al vado del oeste y en un saliente del este
+    for (x, y) in ((61, 34), (12, arroyo[12] - 2), (122, sur[122] - 2)):
+        poner(x, y, "`")
+    # el secreto, tras un matorral
+    poner(17, 5, "X")
+    poner(16, 7, "M"); poner(17, 7, "M"); poner(18, 7, "M")
+    # bayas junto al arroyo
+    for (x, y) in ((26, arroyo[26] + 3), (88, arroyo[88] - 1), (118, arroyo[118] + 3)):
+        if m[y][x] == ".":
+            poner(x, y, "$")
+    reservados = [(40, 7, 4), (43, 11, 2), (104, 3, 3), (17, 5, 2), (132, 22, 3), (4, 25, 3)]
+
+    def libre(x, y):
+        if m[y][x] not in ".," or en_zona(x, y):
+            return False
+        for (rx_, ry_, rr) in reservados:
+            if (x - rx_) ** 2 + (y - ry_) ** 2 <= rr * rr:
+                return False
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#~='\"@{}`$X":
+                    return False
+        return True
+
+    def arbol(x):
+        # al este, árboles cobrizos del bosque; al oeste, árboles verdes del lago
+        cobre = min(1.0, max(0.0, (x - 90) / 30))
+        return azar.choice("Jj") if azar.random() < cobre else azar.choice("TTt")
+
+    for _ in range(2600):
+        x, y = azar.randrange(1, ANCHO - 1), azar.randrange(1, ALTO - 1)
+        if libre(x, y):
+            r = azar.random()
+            junto_pena = any(m[y + d][x] == "0" for d in (-2, -1, 1, 2) if 0 <= y + d < ALTO)
+            if r < (0.12 if junto_pena else 0.03):
+                poner(x, y, azar.choice("rrR"))
+            elif r < 0.17 and (x > 110 or x < 30):
+                poner(x, y, arbol(x))
+            elif r < 0.2 and x > 100:
+                poner(x, y, "g")
+            elif r < 0.32 and x < 50:
+                poner(x, y, ",")
+    # puertas: este al Bosque Cobrizo (>) y oeste al Lago Espejo (<)
+    for y in range(21, 27):
+        if m[y][ANCHO - 1] in ".,#":
+            for x in range(ANCHO - 3, ANCHO):
+                poner(x, y, ">" if x == ANCHO - 1 else "#")
+    for y in range(23, 29):
+        for x in range(0, 3):
+            poner(x, y, "<" if x == 0 else "#")
+    poner(132, 19, "L")
+    poner(6, 22, "L")
+    poner(45, 14, "L")
+    poner(134, 23, "S")
+    for k, (zx_, zy_, rx_, ry_) in zonas.items():
+        poner(zx_, zy_, k)
+    textos = {"1": "9, 5, 4, 3"}
+    return ["".join(f) for f in m], textos
+
+
 # ---------------------------------------------------------------------------
 # Dibujar el suelo a partir del texto
 # ---------------------------------------------------------------------------
@@ -1485,7 +1651,7 @@ def exportar_json(nombre):
 
 # mapas cuyo suelo se pinta con detalle (herramientas/pintar_suelo.py); los demás, con el dibujo sencillo
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
-                  "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos"}
+                  "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco"}
 
 
 def construir_suelo(nombre):
@@ -1631,7 +1797,8 @@ if __name__ == "__main__":
         filas, zonas = {"cuna_de_musgo": crear_aldea, "kitovu": crear_kitovu,
                         "bosque_cobrizo": crear_bosque, "cienaga_quieta": crear_cienaga, "campo_segado": crear_campo,
                         "sendero_del_puente": crear_sendero, "las_pasarelas": crear_pasarelas,
-                        "camino_cobrizo": crear_camino, "senda_surcos": crear_senda}.get(nombre, crear_prados)()
+                        "camino_cobrizo": crear_camino, "senda_surcos": crear_senda,
+                        "canada_eco": crear_canada}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

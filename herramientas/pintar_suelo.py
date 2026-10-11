@@ -44,12 +44,14 @@ def leer(nombre):
     return [f.ljust(ancho, ".") for f in filas]
 
 
-def tipos_de(filas, derrumbe=False):
+def tipos_de(filas, derrumbe=False, escala=False):
     """El tipo de suelo de cada casilla (bajo los objetos, el que más se repite alrededor).
-    «"» es una pasarela rota (agua) o, en el Camino Cobrizo (derrumbe=True), un derrumbe sobre el camino."""
+    «"» es una pasarela rota (agua), en el Camino Cobrizo (derrumbe=True) un derrumbe sobre el camino y en la
+    Cañada del Eco (escala=True) la escala de cuerda, que cuelga por la peña."""
     def tipo(c):
         return {"~": "agua", "=": "puente", "#": "camino", "%": "losas", ",": "flores", "/": "surco",
-                "-": "puente_piedra", "|": "pretil", "'": "vado", '"': "camino" if derrumbe else "agua",
+                "-": "puente_piedra", "|": "pretil", "'": "vado",
+                '"': "risco" if escala else ("camino" if derrumbe else "agua"),
                 "0": "risco"}.get(c, "hierba")
     alto, ancho = len(filas), len(filas[0])
     tipos = [[tipo(c) for c in f] for f in filas]
@@ -81,10 +83,11 @@ def estirar(campo, largo, vertical=True):
     return (c - c.min()) / (np.ptp(c) + 1e-6)
 
 
-def _hojarasca(lz, tipos, alto, ancho, por_fila=None):
+def _hojarasca(lz, tipos, alto, ancho, por_fila=None, por_columna=None):
     """Hojas caídas por todo el suelo del bosque (muchas en la hierba, pocas en el camino, ninguna en el agua):
     cada hoja es una elipse pequeña con su color, su luz arriba y su sombra abajo a la derecha.
-    por_fila(y): cuántas hojas hay en cada fila de casillas (0..1; en el Camino Cobrizo, más cuanto más al norte)."""
+    por_fila(y): cuántas hojas hay en cada fila de casillas (0..1; en el Camino Cobrizo, más cuanto más al norte).
+    por_columna(x): lo mismo por columnas (en la Cañada del Eco, más cuanto más al este, junto al bosque)."""
     rng = np.random.default_rng(33)
     densidad = np.zeros((alto, ancho))
     for y in range(alto):
@@ -92,6 +95,8 @@ def _hojarasca(lz, tipos, alto, ancho, por_fila=None):
             densidad[y, x] = {"hierba": 1.0, "flores": 1.0, "camino": 0.25, "losas": 0.2, "risco": 0.03}.get(tipos[y][x], 0.0)
             if por_fila:
                 densidad[y, x] *= por_fila(y)
+            if por_columna:
+                densidad[y, x] *= por_columna(x)
     mancha = lz.ruido(22, 3, semilla=34)
     hojas = np.zeros((lz.H, lz.W), np.float32)
     colores = np.zeros((lz.H, lz.W, 3), np.float32)
@@ -314,11 +319,42 @@ def _riscos(lz, tipos, fina, media):
     lz.pintar(sueltas, rampa(PENA[3:8], fina), 0.95)
 
 
+def _mesetas(lz, tipos, fina, media):
+    """Encima de las peñas grandes (la Cañada del Eco): una MESETA de hierba, más alta que el fondo. La roca solo se
+    ve en el filo (unos pocos píxeles con musgo) y en la cara del acantilado del sur; dentro, hierba oscura con
+    matas, piedras sueltas y algún claro de roca desnuda."""
+    import cv2 as _cv
+    ri = mascara(lz, tipos, ("risco",), 4.0, 0.5, semilla=50)
+    if ri.max() <= 0:
+        return
+    S = lz.s
+    dentro = _cv.distanceTransform((ri > 0.5).astype(np.uint8), _cv.DIST_L2, 5) / S
+    # lejos del borde (más allá de la cara de la pared, que mide hasta 26 px): hierba; el borde, irregular
+    filo = 30 + (lz.ruido(10, 2, semilla=71) - 0.5) * 14
+    me = np.clip((dentro - filo) / 4.0, 0, 1)
+    calvas = np.clip((lz.ruido(16, 2, semilla=72) - 0.7) * 6, 0, 1)
+    me = me * (1 - calvas * 0.9)
+    v = 0.42 + (lz.ruido(40, 3, semilla=73) - 0.5) * 0.2 + (media - 0.5) * 0.2 + (estirar(fina, 5) - 0.5) * 0.3
+    lz.pintar(me, rampa(HIERBA_BOSQUE, np.clip(v, 0, 1)))
+    # el filo de la meseta: una línea de roca clara y, por dentro, la sombra de la hierba que cuelga
+    labio = np.clip(me - lz.desenfocar(me, 1.5), 0, 1) * 2.5
+    lz.pintar(np.clip(labio, 0, 1), PENA[6], 0.6)
+    lz.pintar(np.clip(me - desplazar(lz, me, 0, -2.0), 0, 1), HIERBA_BOSQUE[1], 0.5)
+    # matas y piedrecitas en la meseta
+    matas = np.clip((lz.ruido(3.0, 3, semilla=74) - 0.64) * 6, 0, 1) * me
+    lz.pintar(np.clip(desplazar(lz, matas, 1.2, 1.4) - matas, 0, 1), "#0e160b", 0.5)
+    lz.pintar(matas, rampa(HIERBA_BOSQUE[4:], fina), 0.85)
+    piedras = np.clip((lz.ruido(1.2, 2, semilla=75) - 0.84) * 10, 0, 1) * me
+    lz.pintar(np.clip(desplazar(lz, piedras, 0.6, 0.8) - piedras, 0, 1), "#0b0907", 0.6)
+    lz.pintar(piedras, rampa(PENA[4:8], fina), 0.9)
+
+
 def pintar(nombre, salida=None):
     filas = leer(nombre)
     cobrizo = nombre == "camino_cobrizo"
     senda = nombre == "senda_surcos"
-    tipos = tipos_de(filas, derrumbe=cobrizo or senda)
+    canada = nombre == "canada_eco"
+    tipos = tipos_de(filas, derrumbe=cobrizo or senda, escala=canada)
     alto, ancho = len(filas), len(filas[0])
     lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=7)
     luz = (-0.6, -0.7)
@@ -341,6 +377,10 @@ def pintar(nombre, salida=None):
         desde, largo, rampa_n = (66, 40, HIERBA_BOSQUE) if cobrizo else (60, 45, HIERBA_CAMPO)
         hacia = np.clip((desde * CASILLA - lz.y) / (largo * CASILLA) + (grande - 0.5) * 0.5, 0, 1)
         lz.pintar(hacia, rampa(rampa_n, np.clip(v, 0, 1)))
+    if canada:
+        # la Cañada va de este a oeste: junto al Bosque Cobrizo (este) la hierba es la del bosque
+        hacia = np.clip((lz.x - 96 * CASILLA) / (34 * CASILLA) + (grande - 0.5) * 0.5, 0, 1)
+        lz.pintar(hacia, rampa(HIERBA_BOSQUE, np.clip(v, 0, 1)))
     # matas de hierba más alta (bultos con sombra abajo a la derecha)
     matas = np.clip((lz.ruido(3.2, 3, semilla=4) - 0.62) * 6, 0, 1)
     sombra_m = np.clip(desplazar(lz, matas, 1.2, 1.4) - matas, 0, 1)
@@ -507,11 +547,15 @@ def pintar(nombre, salida=None):
 
     _puente_piedra(lz, tipos, alto, ancho, fina, media)
     _riscos(lz, tipos, fina, media)
+    if canada:
+        _mesetas(lz, tipos, fina, media)
 
     if bosque:
         _hojarasca(lz, tipos, alto, ancho)
     if cobrizo:
         _hojarasca(lz, tipos, alto, ancho, lambda y: float(np.clip((70 - y) / 45, 0.05, 1.0)))
+    if canada:
+        _hojarasca(lz, tipos, alto, ancho, por_columna=lambda x: float(np.clip((x - 92) / 40, 0.0, 1.0)))
 
     # sombra muy suave de las nubes (da volumen al terreno)
     nubes = np.clip((lz.ruido(90, 3, semilla=20) - 0.6) * 3, 0, 1)
