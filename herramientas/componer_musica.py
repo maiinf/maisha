@@ -559,6 +559,7 @@ TITULOS = {
     "canada": "Lo que la peña devuelve",
     "jefe_kambare": "Kambare, el siluro de cieno",
     "lago": "El agua que recuerda",
+    "orilla": "La linterna en la orilla",
 }
 
 # =============================================================================
@@ -1117,13 +1118,52 @@ def lago():
     return final(p, sala=3.6, mezcla=0.36, brillo=4800)
 
 
+# =============================================================================
+# LA ORILLA DE JUNCOS: «La linterna en la orilla» (una barcarola: la canción de las barcas, en seis, meciéndose)
+# =============================================================================
+
+## En sol mayor, a corcheas (6 por compás): sube como una barca que se aleja y baja como quien espera en la orilla
+TEMA_LINTERNA = [("B4", 0, 3), ("D5", 3, 2), ("B4", 5, 1), ("G4", 6, 3), ("A4", 9, 2), ("B4", 11, 1),
+                 ("C5", 12, 2), ("E5", 14, 1), ("D5", 15, 2), ("C5", 17, 1), ("B4", 18, 3), ("A4", 21, 3),
+                 ("B4", 24, 3), ("D5", 27, 2), ("G5", 29, 1), ("F#5", 30, 3), ("D5", 33, 2), ("B4", 35, 1),
+                 ("C5", 36, 2), ("E5", 38, 1), ("D5", 39, 2), ("B4", 41, 1), ("A4", 42, 3), ("F#4", 45, 1), ("G4", 46, 2)]
+
+
+def orilla():
+    tempo = Tempo(132)                 # cada pulso, una corchea: dos «remadas» por compás
+    vuelta = 48
+    pulsos = vuelta * 3
+    p = Pista(tempo.s(pulsos))
+    progresion = [("G2", "M"), ("E2", "m"), ("C3", "M"), ("D3", "M"), ("G2", "M"), ("B2", "m"), ("C3", "M"), ("D3", "sus")] * 3
+    colchones(p, tempo, progresion, compas=6, brillo=800, volumen=0.2, octava_bajo=2, fuerza_bajo=0.26)
+    # el vaivén: la kalimba sube y baja dentro de cada compás, como el agua contra la barca
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 6, 6, cada=1.0, volumen=0.13, pan=-0.3, patron=(0, 1, 2, 3, 2, 1))
+    # gotas y el remo: campanitas sueltas y, de vez en cuando, un golpe de agua suave
+    rng = np.random.default_rng(81)
+    for k in range(26):
+        p.poner(campanita(["B6", "D7", "G6", "A6"][rng.integers(4)], 0.8, 0.09), tempo.s(rng.random() * pulsos), pan=rng.random() - 0.5)
+    for compas in range(0, pulsos // 6, 2):
+        chapoteo = paso_banda(ruido_rosa(0.5), 300, 1600) * np.exp(-np.arange(int(0.5 * SR)) / SR / 0.18)
+        p.poner(chapoteo * 0.05, tempo.s(compas * 6 + 3), pan=0.35)
+    # 1.ª vuelta: la flauta canta; 2.ª: el piano, y la kalimba le contesta una octava arriba; 3.ª: la flauta con las voces
+    melodia(p, tempo, TEMA_LINTERNA, desde=0, instrumento=lambda n, d: flauta(n, d, 0.4, vibrato=4.4), volumen=0.32, sostener=0.92, pan=0.15)
+    tocar(p, tempo, TEMA_LINTERNA, desde=vuelta, fuerza=0.32, pan=-0.05)
+    melodia(p, tempo, transportar(TEMA_LINTERNA[::3], 12), desde=vuelta, instrumento=kalimba, volumen=0.14, pan=0.3)
+    melodia(p, tempo, TEMA_LINTERNA, desde=vuelta * 2, instrumento=lambda n, d: flauta(n, d, 0.4, vibrato=4.4), volumen=0.3, sostener=0.92, pan=0.15)
+    p.poner(coro(["G3", "D4", "B4"], tempo.s(24)), tempo.s(vuelta * 2), 0.05)
+    p.poner(coro(["C4", "E4", "G4"], tempo.s(24)), tempo.s(vuelta * 2 + 24), 0.05)
+    return final(p, sala=3.0, mezcla=0.32, brillo=5000)
+
+
 NO_SE_REPITEN = ("raiz_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
 PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": prados, "aldea": aldea,
           "interior": interior, "combate": combate, "jefe": jefe, "purga": purga, "victoria": victoria, "objeto": objeto, "tarea": tarea,
           "recuerdo": recuerdo, "noche": noche, "amanece": amanece, "bosque": bosque, "jefe_pembe": jefe_pembe,
           "cienaga": cienaga, "jefe_konokono": jefe_konokono, "campo": campo, "jefe_cosechadora": jefe_cosechadora,
           "tienda": tienda, "raiz_libre": raiz_libre, "sendero": sendero, "pasarelas": pasarelas,
-          "cobrizo": cobrizo, "surcos": surcos, "canada": canada, "jefe_kambare": jefe_kambare, "lago": lago}
+          "cobrizo": cobrizo, "surcos": surcos, "canada": canada, "jefe_kambare": jefe_kambare, "lago": lago,
+          "orilla": orilla}
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

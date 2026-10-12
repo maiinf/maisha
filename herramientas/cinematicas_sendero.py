@@ -22,6 +22,10 @@
   17_kimya_lago   KIMYA EN EL LAGO ESPEJO (no es un recuerdo: pasa ahora). La hora azul sobre el lago, quieto como un
                   espejo. Maisha, en la orilla de la isla, mira el agua; Kimya se alza del lago, plateada. En el agua,
                   bajo Maisha, su reflejo no es ella: es MAUTI, del revés, mirándola.
+  18_eco_orilla   EL SEXTO ECO (Orilla de Juncos). La despedida: una noche de luna sobre el río ancho, que sube hacia
+                  el norte entre colinas oscuras. Mauti se aleja río arriba en una barca pequeña, con su luz lila, y
+                  mira hacia atrás. En la playa, entre los juncos, Maisha sostiene una linterna encendida para que Mauti
+                  sepa por dónde volver. Las dos luces, la dorada y la lila, se alargan sobre el agua.
   15_eco_surcos   EL CUARTO ECO (Senda de los Surcos). La fiesta de la última siega, de noche: campos con gavillas,
                   guirnaldas de farolillos, una hoguera en el centro y los seres de Raíz bailando a contraluz. En la
                   colina, el Primer Árbol dorado. Junto al fuego, Maisha y Mauti bailan de la mano.
@@ -673,6 +677,114 @@ def kimya_lago():
     return lz
 
 
+def eco_orilla():
+    """«Deja la linterna encendida en la orilla. Así sabré por dónde volver.»"""
+    lz = Lienzo(W, H, semilla=220)
+    rng = np.random.default_rng(221)
+    HZ = 104
+    # cielo de noche: azul hondo, un poco de verde-agua en el horizonte, estrellas y la luna creciente
+    lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(["#060a16", "#0c1426", "#142238", "#1e3446", "#2e4a52"], desde=0, hasta=HZ))
+    ci.estrellas(lz, 160, HZ - 14, semilla=222, color="#e8f0f4")
+    lx, ly = 470, 34
+    luna = np.clip(lz.circulo(lx, ly, 11) - lz.circulo(lx + 5, ly - 3, 10), 0, 1)
+    lz.sumar_luz(lz.desenfocar(lz.circulo(lx, ly, 11), 18), "#c8d8e8", 0.3)
+    lz.pintar(luna, "#f0f4e4")
+    ci.cumulos(lz, [(160, 50, 70, 8), (380, 64, 60, 7)], colores=("#0e1626", "#1a2638", "#2a3a4e", "#3e5262"), semilla=223, alfa=0.6)
+    # las colinas del norte, por donde se va el río (cuanto más lejos, más azuladas)
+    for k, (base, amp, col) in enumerate(((HZ - 6, 14, "#1a2a3a"), (HZ + 2, 10, "#121c28"))):
+        linea = ci.linea_horizonte(lz, base, amp, 60 - k * 10, 224 + k)
+        lz.pintar(ci.mascara_bajo(lz, linea), col)
+    # el río: estrecho en el horizonte (río arriba) y ancho al llegar delante, con las orillas en curva
+    t = np.clip((lz.y - HZ) / (256 - HZ), 0, 1)
+    xl = 296 - 70 * np.sin(np.pi * 0.8 * t) + 4 * np.sin(t * 9.0)
+    xr = 310 + 330 * t ** 1.7 + 7 * np.sin(t * 5.0 + 1.0)
+    rio = lz.desenfocar(((lz.x > xl) & (lz.x < xr) & (lz.y > HZ + 1)).astype(float), 0.8)
+    # las orillas: prados oscuros que se pierden en la niebla del horizonte
+    tierra = np.clip((lz.y > HZ).astype(float) - rio, 0, 1)
+    lz.pintar(tierra, rampa(["#0a120e", "#101c16", "#16261c", "#1c3022"], np.clip(t * 1.2 + (lz.ruido(4, 2, semilla=225) - 0.5) * 0.25, 0, 1)))
+    lz.pintar(tierra * np.clip(1 - t * 3.5, 0, 1), "#2a4450", 0.55)
+    # bosquecillos y sauces en las riberas, a lo lejos
+    copas = np.zeros((lz.H, lz.W))
+    for k in range(26):
+        lado = -1 if k % 2 else 1
+        tt = 0.04 + rng.random() * 0.35
+        yy = HZ + tt * (256 - HZ)
+        borde = (296 - 70 * np.sin(np.pi * 0.8 * tt)) if lado < 0 else (310 + 330 * tt ** 1.7)
+        xx = borde + lado * (6 + rng.random() * 60)
+        e = 0.4 + tt * 2.2
+        copas = np.maximum(copas, lz.elipse(xx, yy - 5 * e, (5 + rng.random() * 4) * e, (5 + rng.random() * 3) * e))
+    lz.pintar(copas, rampa(["#0a1410", "#0e1c16"], np.clip(lz.ruido(2, 2, semilla=232), 0, 1)))
+    lz.pintar(copas * np.clip(1 - t * 3.0, 0, 1), "#2a4450", 0.45)
+    # el agua: refleja el cielo, más clara a lo lejos, con ondas largas
+    agua_col = rampa(["#0a1820", "#10242e", "#18343e", "#24485a", "#3a6670"], np.clip(1 - t, 0, 1))
+    lz.pintar(rio, agua_col)
+    ondas = (estirar_h(lz, lz.ruido(1.2, 2, semilla=226), 26) > 0.66) * rio
+    lz.pintar(ondas, "#4c8d8d", 0.3)
+    lz.pintar(np.clip(rio - lz.desenfocar(tierra, 1.5) * 0, 0, 1) * np.clip(1 - np.abs(lz.x - xl) / 1.5, 0, 1), "#6db0b0", 0.35)
+    # la luna sobre el agua: una columna de destellos que tiembla
+    columna = np.clip(1 - np.abs(lz.x - 420 - np.sin(lz.y * 0.7) * 3) / 10, 0, 1) * (lz.y > 150) * rio
+    lz.sumar_luz(columna * (estirar_h(lz, lz.ruido(1.0, 2, semilla=227), 8) > 0.55), "#d8f0ec", 0.5)
+    # la playa de arena delante, a la izquierda, donde está Maisha
+    playa = np.clip(lz.desenfocar(((lz.y > 204 + 0.04 * (lz.x - 120) ** 1.3 * (lz.x > 120) - 6 * np.sin(lz.x * 0.03)) & (lz.x < xl + 4)).astype(float), 1.0), 0, 1)
+    lz.sombrear(playa, ["#100e0c", "#1a1612", "#28201a", "#382c20", "#4a3a28"], 6, (0.6, -0.6, 0.5),
+                textura=lz.ruido(1.2, 2, semilla=228), fuerza_tex=0.35)
+    filo = np.clip(playa - np.roll(playa, int(-3 * lz.s), axis=1), 0, 1) * (lz.y > 200)
+    lz.pintar(filo, "#5a7a78", 0.35)
+    # la barca de Mauti, río arriba, alejándose (con la estela que deja hacia nosotros)
+    bx, by = 336, 142
+    estela = np.zeros((lz.H, lz.W))
+    for lado in (-1, 1):
+        estela = np.maximum(estela, lz.trazo([(bx + 10 * lado, by + 3), (bx + 22 * lado + 4, by + 14), (bx + 30 * lado + 8, by + 24)], 0.5, 0.15))
+    lz.pintar(estela * rio, "#9fd0d0", 0.4)
+    barca = lz.poligono([(bx - 15, by - 3), (bx + 15, by - 3), (bx + 11, by + 2), (bx - 11, by + 2)])
+    lz.sombrear(barca, ["#140c08", "#24160c", "#3a2414", "#5a3a20"], 2, (0.6, -0.6, 0.5))
+    lz.pintar(lz.trazo([(bx - 15, by - 3), (bx + 15, by - 3)], 0.4), "#8a6040", 0.8)
+    pertiga = lz.trazo([(bx + 9, by + 8), (bx + 14, by - 26)], 0.5)
+    lz.pintar(pertiga, "#3a2a1e")
+    m_lz = Lienzo(W, H, semilla=229)
+    _mauti_luz(m_lz, bx + 2, by - 3, e=0.95, mira=-1)
+    _sumar_con_reflejo(lz, m_lz, by + 2, rio, 0.45)
+    lz.sumar_luz(lz.desenfocar(lz.elipse(bx, by + 10, 18, 22), 6) * rio, "#b8a8e0", 0.3)
+    # Maisha en la playa, con la linterna en alto
+    mx, my = 200, 228
+    # la luz de la linterna, primero (para que Maisha quede delante)
+    fx, fy = mx + 24, my - 34
+    lz.sumar_luz(lz.desenfocar(lz.elipse(fx, my + 4, 60, 14), 12) * playa, "#f9a83a", 0.4)
+    lz.sumar_luz(lz.desenfocar(lz.circulo(fx, fy, 6), 44), "#f9a83a", 0.35)
+    # su reflejo, alargado sobre el agua de la orilla
+    reflejo_l = np.clip(1 - np.abs(lz.x - (fx + 18) - np.sin(lz.y * 0.9) * 2) / 6, 0, 1) * (lz.y > my - 4) * rio
+    lz.sumar_luz(reflejo_l * (estirar_h(lz, lz.ruido(1.0, 2, semilla=230), 6) > 0.45), "#f9c46a", 0.6)
+    ci.maisha_luz(lz, mx, my, e=1.5)
+    palo = lz.trazo([(mx + 7, my - 7), (mx + 14, my - 26), (mx + 20, my - 42), (fx, fy - 9)], 0.9)
+    lz.pintar(palo, "#4a3018")
+    lz.pintar(lz.trazo([(fx, fy - 9), (fx, fy - 6)], 0.35), "#1a120c")
+    farol = lz.elipse(fx, fy, 4.4, 5.6)
+    lz.sumar_luz(lz.desenfocar(farol, 12), "#f9c46a", 0.7)
+    lz.pintar(farol, rampa(["#e6a852", "#fde27e", "#fffbe8"], np.clip(1 - np.hypot(lz.x - fx, lz.y - fy) / 5, 0, 1)))
+    lz.pintar(lz.trazo([(fx - 4.4, fy - 5.4), (fx + 4.4, fy - 5.4)], 0.8) + lz.trazo([(fx - 4.4, fy + 5.4), (fx + 4.4, fy + 5.4)], 0.8)
+              + lz.trazo([(fx, fy - 5.4), (fx, fy + 5.4)], 0.3), "#3a2414")
+    # los juncos, a contraluz, delante y a los lados
+    juncos = np.zeros((lz.H, lz.W))
+    for k in range(70):
+        lado = rng.random()
+        x = rng.random() * 130 if lado < 0.6 else 560 + rng.random() * 40
+        yb = 258 if lado < 0.6 else 240 + rng.random() * 18
+        alto = 26 + rng.random() * 46
+        juncos = np.maximum(juncos, lz.trazo([(x, yb), (x + (rng.random() - 0.5) * 8, yb - alto)], 0.7, 0.3))
+        if rng.random() < 0.35:
+            juncos = np.maximum(juncos, lz.elipse(x + (rng.random() - 0.5) * 4, yb - alto + 2, 1.1, 3.2))
+    lz.pintar(juncos, "#070c0a")
+    lz.sumar_luz(juncos * np.clip(1 - np.hypot(lz.x - fx, lz.y - fy) / 120, 0, 1), "#f9a83a", 0.25)
+    # luciérnagas
+    motas = np.zeros((lz.H, lz.W))
+    for k in range(22):
+        motas = np.maximum(motas, lz.circulo(rng.random() * 600, 150 + rng.random() * 100, 0.5 + rng.random() * 0.3))
+    lz.sumar_luz(motas, "#e8f0a0", 0.8)
+    lz.pintar(np.ones((lz.H, lz.W)), "#6db0b0", 0.05)
+    ci.marco_recuerdo(lz, color="#d8f0ec", semilla=231)
+    return lz
+
+
 def _sumar_con_reflejo(lz, otro, eje_y, agua, fuerza):
     """Como _pegar_con_reflejo, pero para lo que está hecho de luz (se suma: lo negro no tapa nada)."""
     lz.img = 1 - (1 - lz.img) * (1 - np.clip(otro.img, 0, 1))
@@ -704,4 +816,4 @@ def _pegar_con_reflejo(lz, otro, eje_y, agua, fuerza, solo_reflejo=False):
     lz.pintar(lz.desenfocar(alfa_r, 0.6) * agua * fuerza, img_r * 0.85 + np.array([0.02, 0.04, 0.08]))
 
 
-PIEZAS = {"17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}
+PIEZAS = {"18_eco_orilla": eco_orilla, "17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}

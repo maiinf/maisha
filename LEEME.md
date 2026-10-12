@@ -318,7 +318,8 @@ Escena `escenas/mundo/orilla_juncos.tscn` (mapa de 64×100 casillas, de sur a no
 - **La balsa** (`"` en esta orilla, `scripts/mundo/objetos/balsa.gd`): medio hundida hasta que Kasia la saca del agua (marca `balsa_arreglada/orilla_juncos`). Entonces, con Acción, Maisha se sube y **la balsa cruza sola el río** hasta el banco de arena (y vuelve igual).
 - **Cangrejos de herrumbre** (enemigo nuevo, `scripts/enemigos/cangrejo.gd`) en una zona corrupta de la playa del sur: andan de lado; de frente, el cetro rebota en su caparazón. Avisan levantando las pinzas y pellizcan con un pasito hacia delante; justo después quedan **expuestos** (el cetro les quita 1). La explosión de una semilla los **vuelca** panza arriba (el cetro les quita 2). Números en `reglas_combate.gd` (`CANGREJO_*`).
 - Un secreto entre los juncos del noroeste. Arte: `herramientas/pintar_orilla.py` (casa de barcas, balsa, cangrejo, remo e icono), Kasia en `dibujar_aldeanos.py`. Sonidos: `cangrejo_chasca`, `cangrejo_vuelca`.
-- Falta: el **recuerdo del sexto eco** (texto e ilustración), la música propia y el Embarcadero Junco.
+- Música propia: **«La linterna en la orilla»** (`orilla` en `componer_musica.py`), una barcarola en seis (la canción de las barcas, que se mece): kalimba en vaivén, flauta, piano, gotas y el chapoteo de un remo.
+- Falta: el Embarcadero Junco.
 
 ### Los ecos perdidos (el misterio de Raíz)
 
@@ -328,6 +329,7 @@ Piedras altas con una espiral tallada (`scripts/mundo/objetos/eco_perdido.gd`). 
 - El tercero (Camino Cobrizo): `14_eco_cobrizo.png`: una tarde de otoño bajo un árbol de hojas de cobre; Maisha y **Mauti** (plateada y lila, con una hoja seca en lo alto) hablan de por qué caen las hojas: «Tú y yo somos el mismo árbol».
 - El cuarto (Senda de los Surcos): `15_eco_surcos.png`: la fiesta de la última siega, de noche, con farolillos, gavillas y una hoguera; Maisha y Mauti bailan de la mano. «Lo que se siembra, Maisha lo despierta. Lo que se siega, Mauti lo guarda.» Y una pregunta que da miedo: «¿Y si un día alguien quisiera que nada se segara nunca?»
 - El quinto (Cañada del Eco): `16_eco_canada.png`: un atardecer en la garganta. En la cornisa, Maisha y Mauti gritan sus nombres y la peña se los devuelve; **Kimya** flota sobre el arroyo quieto y no grita: «El Silencio no tiene eco. Por eso puedo oíros a los dos.» Solo el agua refleja a Kimya, y eso apunta al Lago Espejo.
+- El sexto (Orilla de Juncos): `18_eco_orilla.png`: **la despedida**. Una noche de luna en el río ancho: Mauti se aleja río arriba en una barca pequeña, con su luz lila, y Maisha se queda en la playa con una linterna encendida. «Déjala encendida aquí, en la orilla. Así sabré por dónde volver.» Mauti iba a hablar con quien no quería que nada se segara nunca, río arriba, hacia el norte. Nadie volvió a buscar la linterna.
 
 ## Bosque Cobrizo
 

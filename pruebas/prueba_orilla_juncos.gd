@@ -6,6 +6,7 @@ extends Node
 
 const R := preload("res://scripts/combate/reglas_combate.gd")
 const CANGREJO := preload("res://scripts/enemigos/cangrejo.gd")
+const ECO := preload("res://scripts/mundo/objetos/eco_perdido.gd")
 var _fallos := 0
 
 
@@ -97,7 +98,7 @@ func _ready() -> void:
 	await _esperar(2.5)
 	_comprobar(get_tree().get_first_node_in_group("dialogo").hablando, "Maisha piensa algo al llegar")
 	await _leer_dialogo()
-	_comprobar(Sonido.musica_actual == "pasarelas", "suena la música del agua («Entre juncos»)")
+	_comprobar(Sonido.musica_actual == "orilla", "suena su propia música («La linterna en la orilla»)")
 
 	print("La orilla:")
 	var region: Node2D = get_tree().get_first_node_in_group("region")
@@ -177,6 +178,26 @@ func _ready() -> void:
 	_comprobar(balsa.en_el_este and maisha.global_position.x > 46 * 16, "Maisha se sube y la balsa cruza el río hasta el banco de arena (%.0f)" % maisha.global_position.x)
 	var eco: Node2D = get_tree().get_first_node_in_group("ecos_perdidos")
 	_comprobar(eco != null and eco.global_position.distance_to(maisha.global_position) < 80.0, "allí está la piedra del sexto eco")
+	print("El sexto eco perdido (la despedida):")
+	maisha.global_position = eco.global_position + Vector2(-14, 4)
+	await _esperar(0.3)
+	eco.interactuar()
+	await _esperar(1.2)
+	var dialogo := get_tree().get_first_node_in_group("dialogo")
+	var con_imagen := false
+	for i in 120:
+		if dialogo.get("_ilustracion") != null and dialogo.get("_ilustracion_alfa") > 0.5:
+			con_imagen = true
+		if not dialogo.hablando:
+			break
+		dialogo.pasar()
+		await _esperar(0.12)
+	await _esperar(1.2)
+	_comprobar(con_imagen, "el recuerdo tiene su ilustración (18_eco_orilla)")
+	_comprobar(Estado.tiene("eco/orilla_juncos") and ECO.cuantos_escuchados() == 1, "sexto eco apuntado (en esta prueba, el primero que se oye)")
+	# (de vuelta a la balsa, que está en el banco de arena)
+	maisha.global_position = balsa.punto_interaccion() + Vector2(18, 0)
+	await _esperar(0.3)
 	balsa.interactuar()
 	for i in 80:
 		await _esperar(0.1)

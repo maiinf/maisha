@@ -15,3 +15,5 @@ __pycache__/
 .claude/
 .obsidian/
 graphify-out/
+.agents/
+skills-lock.json

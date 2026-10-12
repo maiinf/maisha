@@ -1975,5 +1975,35 @@
 				]
 			}
 		]
+	},
+	"eco_orilla_juncos": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"marca": "eco/orilla_juncos",
+				"lineas": [
+					"La espiral de la piedra se enciende. El río se oscurece, se llena de estrellas, y en la arena aparece una luz que tiembla..."
+				],
+				"historia": [
+					{
+						"imagen": "18_eco_orilla",
+						"lineas": [
+							"«¿De verdad tienes que irte, Mauti?»",
+							"«Río arriba hay alguien que no quiere que nada se siegue nunca. Si nadie va a hablarle, todo se quedará quieto. Para siempre.»",
+							"«Pues llévate la linterna. Está muy oscuro.»",
+							"«No. Déjala encendida aquí, en la orilla. Así sabré por dónde volver.»",
+							"«¿Y si tardas mucho?»",
+							"«Entonces sigue despertando cosas. Lo que tú siembres, yo lo guardaré. Aunque esté lejos.»"
+						]
+					}
+				],
+				"tras_historia": [
+					"La barca se pierde río arriba y la luz lila se apaga entre las colinas.",
+					"En la arena, la linterna sigue encendida. Nadie volvió a buscarla.",
+					"Río arriba... hacia el norte. Hacia donde el río nace."
+				]
+			}
+		]
 	}
 }

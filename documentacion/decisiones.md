@@ -39,3 +39,10 @@ se pasan.
 | Dónde se mejora | Desde el diario, en cualquier momento (meditar sigue curando y guardando) |
 | Ramas | Raíz, Cetro (nueva), Aliento; Runa y Tierra dormidas |
 
+## 2026-10-12 · El sexto eco y la música de la Orilla
+| Decisión | Elegido |
+| --- | --- |
+| Recuerdo del 6.º eco | «La despedida»: Mauti se va en barca río arriba (a buscar a quien no quería que nada se segara); Maisha se queda con la linterna encendida en la orilla para que sepa volver. Ilustración `18_eco_orilla` |
+| Música de la Orilla de Juncos | «La linterna en la orilla», una barcarola en seis (sol mayor) |
+| `.agents/` y `skills-lock.json` | Ignorados en git (son las skills de Iam, no parte del juego) |
+
