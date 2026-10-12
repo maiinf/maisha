@@ -76,7 +76,7 @@ func _hablar_con(n: Node) -> void:
 
 
 func _quieta(segundos: float) -> void:
-	# Maisha no toca nada durante un rato
+	# Maisha no se mueve durante un rato
 	for i in int(segundos / 0.05):
 		await _esperar(0.05)
 		var d := get_tree().get_first_node_in_group("dialogo")
@@ -204,7 +204,7 @@ func _ready() -> void:
 	maisha.global_position = pie
 	await _esperar(0.5)
 	await _quieta(R.QUIETUD_SEGUNDOS + 0.6)
-	_comprobar(espejo.espejo, "quieta junto al agua, el lago se vuelve espejo")
+	_comprobar(espejo.espejo, "sin moverse junto al agua, el lago se vuelve espejo")
 	_comprobar(Estado.tiene("lago_espejo_visto"), "la primera vez, Maisha ve el puente en el reflejo")
 	await _quieta(1.5)
 	_comprobar(largo.cruzable(), "el puente se enciende tabla a tabla y se hace real")

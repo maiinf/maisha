@@ -1,7 +1,7 @@
 extends "res://scripts/mundo/escena_mundo.gd"
 ## LAGO ESPEJO: un lugar al oeste de la Cañada del Eco (se llega al escuchar el quinto eco).
 ## Un lago grande con una ISLA en el centro, donde aparecerá KIMYA, el Silencio. Su agua está TURBIA mientras vive
-## KAMBARE, el siluro de cieno (en la orilla sur). Sin él, si Maisha se queda quieta junto al agua, el lago se vuelve
+## KAMBARE, el siluro de cieno (en la orilla sur). Sin él, si Maisha espera sin moverse junto al agua, el lago se vuelve
 ## ESPEJO y lo que solo existe en el reflejo se hace real: el puente de luz hasta la isla y el del islote del secreto
 ## (scripts/mundo/lago/espejo_lago.gd y scripts/mundo/objetos/puente_reflejo.gd).
 

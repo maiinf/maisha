@@ -1159,7 +1159,7 @@
 					"encargo_korongo"
 				],
 				"lineas": [
-					"¡Chis! Quieta, quieta... que se me espantan los peces. Ah. No eres un pez. Eres una lucecita.",
+					"¡Chis! Sin moverte, sin moverte... que se me espantan los peces. Ah. No eres un pez. Eres una lucecita.",
 					"Soy Korongo. Pesco en estas aguas desde que las pasarelas eran nuevas. Que ya ni me acuerdo.",
 					"Desde que llegó lo gris, salen ranas de piedra del agua. Saltan sobre las tablas como si fueran suyas.",
 					"Y se han llevado mis tres nasas. Una está al norte de mi islote, otra en el islote del sur...",
@@ -1547,12 +1547,12 @@
 					"encargo_mbuzi"
 				],
 				"lineas": [
-					"Despacio, despacio... Aquí nadie corre. La cañada te devuelve cada paso, y si corres, te persiguen tus propios pies.",
-					"Soy Mbuzi. Llevo más inviernos en esta peña que piedras tiene el arroyo.",
-					"Antes llamaba a mis cabras con tres cencerros: uno grave, uno alegre y uno que solo suena cuando llueve.",
-					"Pero desde que llegó ese gris, la peña grita en vez de cantar. El eco me arrancó los cencerros y los esparció por la cañada.",
-					"Uno quedó junto al vado del oeste, otro al pie de la pared del sur, hacia el bosque... y el tercero dentro de esa mancha que huele a hierro.",
-					"Si me los traes, te descuelgo la escala de la cornisa. Ahí arriba hay una piedra que habla. A mí me cuenta cosas de antes. A ti quizá también."
+					"¡Eh, tú, lucecita! No corras, que aquí la peña repite todo lo que haces y luego no hay quien pegue ojo.",
+					"Me llamo Mbuzi. Cuido cabras en esta cañada desde que tenía los cuernos así de cortitos.",
+					"Tengo doce. Las llamaba con tres cencerros: el grave, para volver a casa; el alegre, para salir a pastar; y uno rajado que solo tocaba cuando venía tormenta.",
+					"Cuando llegó el gris, la peña empezó a devolver los sonidos torcidos. Mis cabras se asustaron, se subieron a las mesetas y ya no hay quien las baje.",
+					"Y yo, corriendo detrás de ellas, fui perdiendo los cencerros. Uno en el vado del oeste. Otro al pie de la pared sur, ya cerca del bosque. Y el rajado... dentro de esa mancha que huele a hierro.",
+					"Si me los traes, te descuelgo la escala de la cornisa. Arriba hay una piedra con una espiral que habla sola. Yo ya me la sé de memoria, pero a lo mejor a ti te cuenta otra cosa."
 				]
 			},
 			{
@@ -1576,12 +1576,13 @@
 					"sopa": 2
 				},
 				"lineas": [
-					"Clonc... clinc... clan. ¿Los oyes? Los tres. La peña los repite y, por fin, parece que canta otra vez.",
-					"Toma, dos cuencos de sopa: con leche de mis cabras, que calienta el doble. Y ahora, la escala."
+					"Clonc, clinc... clan. ¡Esos son! Hasta el rajado, que suena como una olla vieja.",
+					"Espera, que pruebo el grave. ¡Clooonc!",
+					"Toma, dos cuencos de sopa con leche de cabra, que entona el cuerpo. Y ahora la escala, que te lo he prometido."
 				],
 				"despues": [
-					"Ya cuelga. Sube despacio, que la cuerda es vieja como yo, pero aguanta lo que haga falta.",
-					"Cuando la piedra te hable, escucha hasta el final. Los ecos solo dicen la verdad si nadie los interrumpe."
+					"Ya está colgada. La cuerda tiene más años que tú, así que sube despacito y no te asomes mucho por el borde.",
+					"Y si la piedra empieza a hablar, no la interrumpas. Se lía y vuelve a empezar desde el principio."
 				],
 				"aviso": "Mbuzi ha descolgado la escala de cuerda hasta la cornisa"
 			},
@@ -1593,8 +1594,8 @@
 					"mbuzi_cencerros"
 				],
 				"lineas": [
-					"Llevas {cencerro} de mis tres cencerros.",
-					"Junto al vado del oeste, al pie de la pared del sur y dentro de la mancha gris. Escucha: a veces todavía suenan solos."
+					"Llevas {cencerro} de tres.",
+					"Uno en el vado del oeste, otro al pie de la pared sur y el rajado en la mancha gris. Y ojo con los murciélagos: cuando se paran en el aire y abren las alas, quítate de delante."
 				]
 			},
 			{
@@ -1602,14 +1603,23 @@
 					"eco/canada_eco"
 				],
 				"lineas": [
-					"¿La has oído? ¿Tres voces y solo dos ecos? Yo también la oigo, algunas tardes.",
-					"La que no vuelve es la más tranquila de todas. Mi abuela decía que vivía en el agua quieta, y que por eso el Lago Espejo nunca tiene olas."
+					"¿Tres voces y solo dos ecos? Eso me pasaba a mí de cría, las tardes de viento. Pensaba que era la peña, que se equivocaba.",
+					"Mi abuela decía que la tercera voz era de alguien que vive en el agua quieta del lago, al oeste, y que por eso allí nunca hay olas. Yo nunca he tenido paciencia para ir a comprobarlo."
+				]
+			},
+			{
+				"si": [
+					"mbuzi_cencerros"
+				],
+				"lineas": [
+					"¿Ves arriba, en el borde de la meseta? Han oído el grave y se van acercando. La negra es Tumbo: siempre la última en bajar.",
+					"La escala está al norte, pasado el puentecito. Y el lago, al oeste, al final de la cañada."
 				]
 			},
 			{
 				"lineas": [
-					"La escala sube a la cornisa, al norte, pasado el puentecito. Despacio, despacio.",
-					"Más allá de la cañada, al oeste, está el Lago Espejo. Dicen que el agua de allí se acuerda de todo lo que ha visto."
+					"La escala está al norte, pasado el puentecito. Pero sin mis cencerros no te la bajo, que la cuerda es mía.",
+					"Y no corras, que luego la peña no para de repetirlo."
 				]
 			}
 		]
@@ -1672,8 +1682,8 @@
 					}
 				],
 				"tras_historia": [
-					"Kimya... Allí abajo, en el agua quieta, el reflejo se queda un momento más de lo que debería.",
-					"Si en algún sitio el agua se acuerda de todo, será en el Lago Espejo."
+					"Kimya... Allí abajo, en el agua quieta del arroyo, el reflejo se queda un momento más de lo que debería.",
+					"Ese nombre suena a agua quieta. A lo mejor el lago del oeste sabe algo."
 				]
 			}
 		]
@@ -1696,8 +1706,8 @@
 		"conversaciones": [
 			{
 				"lineas": [
-					"Si me quedo quieta, el agua casi se calma... y de pronto vuelve a removerse desde abajo.",
-					"Hay algo grande en el fondo que no la deja estar quieta. Por la orilla sur, el barro está revuelto."
+					"Si no me muevo, el agua casi se calma... y de pronto vuelve a removerse desde abajo.",
+					"Hay algo grande en el fondo que no la deja estarse quieta. Por la orilla sur, el barro está revuelto."
 				]
 			}
 		]
@@ -1721,7 +1731,7 @@
 			{
 				"lineas": [
 					"Kambare se hunde en el lago, limpio y tranquilo. Era él quien removía el barro: Giza no le dejaba estarse quieto.",
-					"El agua se está aclarando... Si ahora me quedo quieta en la orilla, quizá el lago me enseñe lo que guarda."
+					"El agua se está aclarando... Si ahora espero sin moverme en la orilla, quizá el lago me enseñe lo que guarda."
 				]
 			}
 		]
@@ -1738,30 +1748,30 @@
 				],
 				"lineas": [
 					"...",
-					"Has venido despacio. Has esperado a que el agua se callara. Así es como se llega hasta mí.",
-					"Soy Kimya. El Silencio. Lo que queda cuando todo se calla... y aun así sigue ahí.",
-					"Tú despiertas lo que crece, Maisha. Mauti guarda lo que cae. Y yo me acuerdo de todo. Los tres somos el mismo árbol."
+					"Ah. Eres tú. Te oí llegar desde la cañada: tus pasos sonaban dos veces allí, y aquí ninguna.",
+					"Me llamo Kimya. En la cañada me llaman el Silencio, porque no tengo eco. Aquí no me llama nadie: hace mucho que nadie viene a hablar.",
+					"Gracias por soltar a Kambare. Giza le había llenado de barro por dentro y no podía parar de moverse. Llevaba años sin dormir, el pobre."
 				],
 				"historia": [
 					{
 						"imagen": "17_kimya_lago",
 						"lineas": [
-							"«Mira el agua. ¿A quién ves en tu reflejo?»",
-							"En el lago quieto, junto a Maisha, no está Maisha. Está Mauti, con su hoja seca en lo alto, mirándola.",
-							"«Mauti no se ha ido. Se fue a buscar a quien quería que nada se segara nunca... y no ha vuelto.»",
-							"«El que tiene miedo de que las cosas acaben las agarra tan fuerte que las vuelve de piedra. Así nació Giza.»"
+							"«Asómate al agua. ¿Qué ves?»",
+							"En el reflejo, bajo los pies de Maisha, no está Maisha. Está Mauti, con su hoja seca en lo alto, mirando hacia arriba muy en serio.",
+							"«Siempre fuisteis así. Cuando tú hacías brotar algo, Mauti ya sabía cuándo habría que recogerlo.»",
+							"«Un día, alguien que no soportaba que las cosas se acabaran empezó a volverlas de piedra, para que duraran siempre. Mauti fue a buscarle. Y no ha vuelto.»"
 						]
 					}
 				],
 				"tras_historia": [
-					"Busca los ecos que quedan, Maisha. Cuando los tengas todos, el camino olvidado se abrirá, y sabrás dónde está Mauti.",
-					"Yo me quedo aquí, quieta. Para que alguien se acuerde."
+					"Yo no puedo salir del agua. Tú sí.",
+					"Quedan ecos por los caminos de Raíz; cada uno es un trozo de lo que pasó. Cuando los hayas oído todos, se abrirá el camino olvidado. Por ahí se fue Mauti."
 				]
 			},
 			{
 				"lineas": [
-					"Cuando no sepas qué hacer, quédate quieta un momento. A veces el camino aparece en el reflejo.",
-					"Los ecos que faltan te esperan por los caminos de Raíz."
+					"¿Otra vez por aquí? Me alegro. El agua está más contenta cuando viene alguien.",
+					"Si alguna vez te pierdes, no te muevas un momento y mira el agua. No es magia: es que, sin moverte, se ve mejor."
 				]
 			}
 		]

@@ -2,7 +2,7 @@ extends Node2D
 ## EL ESPEJO DEL LAGO: decide cuándo el Lago Espejo está quieto y dibuja su agua turbia.
 ##   - Mientras KAMBARE vive (falta la marca «kambare_vencido»), el agua está TURBIA: barro y óxido que se arremolinan
 ##     encima del lago y no dejan que se calme. Si Maisha intenta calmarla, piensa que algo grande remueve el fondo.
-##   - Sin Kambare: si Maisha se queda QUIETA junto al agua (R.QUIETUD_SEGUNDOS), el lago se vuelve ESPEJO: un anillo
+##   - Sin Kambare: si Maisha espera SIN MOVERSE junto al agua (R.QUIETUD_SEGUNDOS), el lago se vuelve ESPEJO: un anillo
 ##     se va cerrando a su alrededor mientras tanto, y al cerrarse el agua se alisa y los puentes del reflejo se hacen
 ##     reales. Andar no lo rompe; correr, golpear, lanzar una semilla, el Latido o una pelea, sí (el agua tiembla y los
 ##     puentes se apagan poco a poco), salvo con Maisha encima de un puente: entonces espera a que baje.
@@ -15,7 +15,7 @@ const VIOLETA := Color(0.42, 0.17, 0.56)
 
 var calma := 0.0                  # 0 = agua movida, 1 = espejo
 var espejo := false
-var _quieta := 0.0                # segundos que lleva Maisha quieta junto al agua
+var _quieta := 0.0                # segundos que lleva Maisha sin moverse junto al agua
 var _turbio := 1.0                # 1 = turbia del todo; baja al vencer a Kambare
 var _tiempo := 0.0
 var _agua: Array[Vector2i] = []   # las casillas de agua (y de puente del reflejo), para la capa turbia
