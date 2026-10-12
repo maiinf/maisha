@@ -11,6 +11,7 @@ const VELOCIDAD := 58.0
 const ESPERA_A := 80.0           # si Maisha se queda más lejos, la chispa la espera (cerca, para no perderla)
 const LLEGA_A := 34.0            # distancia al sitio para que salte el recuerdo
 
+var altura_bocadillo := 4.0          # (la flecha de la misión se pone justo encima: la chispa ya va en el aire)
 var sitios: Array[Vector2] = []
 ## Puntos de paso antes de cada sitio (rutas[i] = camino hacia sitios[i]): así la chispa lleva a Maisha
 ## por los caminos y no por encima de las manchas dormidas, que no la dejarían pasar

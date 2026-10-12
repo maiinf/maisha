@@ -23,7 +23,7 @@ var _fuente: FontFile
 var _alfa := 0.0
 var _tiempo := 0.0
 var _destello := 0.0                 # el panel brilla un momento al cumplirse un paso
-var _objetivo: Variant = null        # posición global del objetivo (o null)
+var _objetivo: Variant = null        # adónde apunta: la cosa (Node2D, se sigue aunque se mueva), una posición o null
 var _buscar := 0.0
 var _avisos: Array[Dictionary] = []  # {titulo, texto, color, tiempo}
 var _aviso_t := 0.0
@@ -124,7 +124,8 @@ func _process(delta: float) -> void:
 	if _buscar <= 0.0:
 		_buscar = 0.2
 		var maisha := get_tree().get_first_node_in_group("maisha") as Node2D
-		_objetivo = Misiones.objetivo_aqui(maisha.global_position) if maisha and hay else null
+		# (la cosa misma, si es algo que se mueve, como la chispa o el castor: así la flecha la sigue al momento)
+		_objetivo = Misiones.objetivo_aqui(maisha.global_position, true) if maisha and hay else null
 	# los avisos esperan a que acabe la conversación
 	if not _avisos.is_empty() and not oculto_por_menu() and not _hablando() and not Estado.cambiando:
 		if _aviso_t <= 0.0:
@@ -232,15 +233,29 @@ func _dibujar_panel() -> void:
 func _dibujar_flecha() -> void:
 	if _objetivo == null:
 		return
+	# la posición se lee en cada fotograma (si el objetivo se mueve, la flecha va con él)
+	var donde: Vector2
+	var altura := 26.0
+	if _objetivo is Node2D:
+		if not is_instance_valid(_objetivo) or not (_objetivo as Node2D).is_inside_tree():
+			return
+		donde = (_objetivo as Node2D).global_position
+		var alto = (_objetivo as Node2D).get("altura_bocadillo")
+		if alto != null:
+			altura = float(alto) + 10.0
+	elif _objetivo is Vector2:
+		donde = _objetivo
+	else:
+		return
 	var maisha := get_tree().get_first_node_in_group("maisha") as Node2D
-	var en_pantalla := _a_pantalla(_objetivo as Vector2)
-	if maisha and (maisha.global_position.distance_to(_objetivo) < 22.0):
+	var en_pantalla := _a_pantalla(donde)
+	if maisha and (maisha.global_position.distance_to(donde) < 22.0):
 		return
 	var margen := Rect2(Vector2(14, 14), Vector2(640, 360) - Vector2(28, 28))
 	var a := _alfa
 	if margen.has_point(en_pantalla):
 		# encima del sitio: una flechita que bota
-		var p := en_pantalla + Vector2(0, -26 + sin(_tiempo * 4.0) * 2.0)
+		var p := en_pantalla + Vector2(0, -altura + sin(_tiempo * 4.0) * 2.0)
 		_punta(p, Vector2.DOWN, a)
 		return
 	# fuera de la pantalla: en el borde, apuntando hacia allí

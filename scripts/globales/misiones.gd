@@ -228,7 +228,8 @@ func siguiente_escena(desde: String, destino: String) -> String:
 
 ## Dónde está el objetivo en esta escena (posición global) o null.
 ## «cerca_de»: para elegir el más cercano cuando hay varios (p. ej. zanahorias)
-func objetivo_aqui(cerca_de: Vector2) -> Variant:
+## Adónde ir: una posición (Vector2) o, con nodo = true, la cosa misma (Node2D) si la hay, para seguirla aunque se mueva
+func objetivo_aqui(cerca_de: Vector2, nodo := false) -> Variant:
 	var m := seguida()
 	if m.is_empty():
 		return null
@@ -241,11 +242,11 @@ func objetivo_aqui(cerca_de: Vector2) -> Variant:
 		var siguiente := siguiente_escena(aqui, escena)
 		if siguiente == "":
 			return null
-		return _buscar_en_escena("puerta:" + siguiente, cerca_de)
-	return _buscar_en_escena(String(ir.get("buscar", "")), cerca_de)
+		return _buscar_en_escena("puerta:" + siguiente, cerca_de, nodo)
+	return _buscar_en_escena(String(ir.get("buscar", "")), cerca_de, nodo)
 
 
-func _buscar_en_escena(que: String, cerca_de: Vector2) -> Variant:
+func _buscar_en_escena(que: String, cerca_de: Vector2, nodo := false) -> Variant:
 	var partes := que.split(":", true, 1)
 	if partes.size() < 2:
 		return null
@@ -274,7 +275,7 @@ func _buscar_en_escena(que: String, cerca_de: Vector2) -> Variant:
 		var d: float = (n as Node2D).global_position.distance_squared_to(cerca_de)
 		if d < distancia:
 			distancia = d
-			mejor = (n as Node2D).global_position
+			mejor = n if nodo else (n as Node2D).global_position
 	return mejor
 
 
