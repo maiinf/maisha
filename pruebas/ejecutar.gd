@@ -17,3 +17,8 @@ func _ready() -> void:
 	prueba.set_script(load("res://pruebas/%s.gd" % argumentos[0]))
 	# cuelga de la raíz, no de esta escena: así sobrevive a los cambios de escena
 	get_tree().root.add_child.call_deferred(prueba)
+	# y un ayudante que pulsa la tecla de las lecciones (el mundo se para hasta que se pulsa)
+	var ayudante := Node.new()
+	ayudante.name = "AyudanteLecciones"
+	ayudante.set_script(load("res://pruebas/ayudante_lecciones.gd"))
+	get_tree().root.add_child.call_deferred(ayudante)

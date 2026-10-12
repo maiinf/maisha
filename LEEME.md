@@ -127,7 +127,17 @@ Escena `escenas/mundo/kitovu.tscn`: el centro del mundo, gris y roto. Solo la gr
   | `recuerdo_1` a `recuerdo_3` | Los recuerdos de Maisha, con un borde de niebla: la fiesta junto al fuego, los ojos de Giza en la oscuridad y la luz que cae del cielo |
 - **Retratos**: si existe `arte/retratos/<id>.png` (64×64), sale junto a la caja de diálogo y en la mochila (ahora solo lo tiene Mzee Shamba).
 
+### Las lecciones (el mundo se para hasta que pulsas)
+
+Como en otros juegos, el Kitovu enseña las acciones parando el mundo (`scripts/interfaz/leccion.gd`): la pantalla se oscurece salvo un círculo de luz sobre Maisha y aquello sobre lo que hay que actuar, aparece una tecla grande que late y un texto, y nada sigue hasta que se pulsa. Cada lección sale una sola vez (marcas `leccion/...`).
+- **El cetro (J)**: la primera vez que Maisha llega junto al espantapájaros con el cetro. Al pulsar, golpea.
+- **Las semillas (K)**: en la primera mancha, después de que el narrador presente el Corazón de Giza. Al pulsar, Maisha planta la semilla y el tiempo va **a cámara lenta** con «¡Sal de la cruz!» hasta que sale de la cruz (o estalla).
+- **El Latido (L)**: en la segunda mancha, la primera vez que un Petrino se le echa encima.
+- En las pruebas, `pruebas/ayudante_lecciones.gd` pulsa la tecla que pide cada lección.
+
 ## La mochila (Tab, I o Select)
+
+El diario tiene estilo **noche mágica** (`herramientas/pintar_interfaz.py`): tapas de cuero azul noche cosidas con hilo de oro y cantoneras doradas, páginas de cielo nocturno (nebulosa suave, estrellas, constelaciones) con borde de filigrana dorada, y la tapa con el Gran Árbol, la luna y estrellas en oro. Las letras de las páginas usan su propia paleta clara (`TN_*` en `mochila.gd`): títulos en oro, texto en crema, la historia en coral y lo cumplido en gris azulado; la fila elegida, en tinta oscura sobre la banda dorada. El mapa sigue siendo de pergamino.
 
 Es el **diario de cuero de Maisha**: un libro con tapas cosidas y cantoneras de latón, páginas de pergamino y una cinta de marcapáginas por pestaña. El juego se para mientras está abierto.
 - **Al abrirlo**, el libro sube desde abajo cerrado (se ve la tapa con el Gran Árbol grabado), la tapa gira hacia el lomo y aparecen las páginas; luego se escribe la tinta. **Al cambiar de pestaña** se pasa una hoja (con su sonido de papel). Lo elegido se marca con un **subrayado amarillo** que se desliza y una cinta roja; la historia lleva un **sello de lacre**; lo cumplido se tacha.

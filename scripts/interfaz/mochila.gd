@@ -76,7 +76,15 @@ enum { P_MISIONES, P_OBJETOS, P_HABILIDADES, P_MAPA, P_LAZOS }
 const ATAJOS := {KEY_1: 0, KEY_2: 1, KEY_3: 2, KEY_4: 3, KEY_5: 4, KEY_M: 3}
 ## Cuánto hay que mantener Tab para que salga la rueda (segundos)
 const ESPERA_RUEDA := 0.28
-const COLOR_TIPO := {"historia": Color("8c281e"), "encargo": Color("2a5a58"), "secreto": Color("5e3270"), "lazo": Color("8e3a5a")}
+## Los colores de lo que se escribe en las páginas de noche (el cielo es oscuro: letras claras)
+const TN_TINTA := Color("efe6cf")       # el texto
+const TN_SUAVE := Color("c8c8e4")       # lo secundario
+const TN_APAGADA := Color("7f86a8")     # lo cumplido, lo que no se puede
+const TN_ROJO := Color("f2a07a")        # la historia, lo importante (coral)
+const TN_VERDE := Color("a8e890")       # hecho
+const TN_TITULO := Color("f0d89a")      # los títulos, en oro
+const TN_ELEGIDA := Color("1a1410")     # la fila elegida, sobre la banda dorada
+const COLOR_TIPO := {"historia": Color("f2a07a"), "encargo": Color("7fd8d0"), "secreto": Color("c8a0f0"), "lazo": Color("f0a0c0")}
 const FILAS_VISIBLES := 9
 const ALTO_FILA := 24
 
@@ -568,14 +576,14 @@ func _dibujar_paginas(tinta: float) -> void:
 	if pestana == P_MAPA:
 		_dibujar_mapa()
 		return
-	_titulo(PESTANAS[pestana], PAG_IZQ.position + Vector2(6, 28), Color(PIEL.TINTA, tinta), 0.0)
-	_texto(ayuda, Vector2(PAG_DER.position.x + 6, PAG_DER.end.y - 4), Color(PIEL.TINTA_APAGADA, 0.9 * tinta))
+	_titulo(PESTANAS[pestana], PAG_IZQ.position + Vector2(6, 28), Color(TN_TITULO, tinta), 0.0)
+	_texto(ayuda, Vector2(PAG_DER.position.x + 16, PAG_DER.end.y - 14), Color(TN_APAGADA, 0.9 * tinta))
 	var filas := _lista()
 	var area := Rect2(PAG_IZQ.position + Vector2(6, 42), Vector2(PAG_IZQ.size.x - 12, FILAS_VISIBLES * ALTO_FILA))
 	if filas.is_empty():
 		var vacio: String = {P_MISIONES: "No hay nada apuntado en el diario.", P_OBJETOS: "La mochila está vacía.",
 			P_LAZOS: "Aún no conoces a nadie."}.get(pestana, "")
-		_texto(vacio, area.position + Vector2(4, 16), Color(PIEL.TINTA_APAGADA, tinta))
+		_texto(vacio, area.position + Vector2(4, 16), Color(TN_APAGADA, tinta))
 		return
 	seleccion = clampi(seleccion, 0, filas.size() - 1)
 	# si hay más filas de las que caben, la lista se desplaza para que se vea la elegida
@@ -599,16 +607,18 @@ func _dibujar_paginas(tinta: float) -> void:
 		if f.get("hecha", false) and hechas_desde < 0:
 			hechas_desde = i
 			if i > _desplazamiento:
-				PIEL.raya(_lienzo, Vector2(area.position.x + 14, y), Vector2(area.end.x - 6, y), PIEL.TINTA_APAGADA, 0.5 * tinta)
-		var color := PIEL.TINTA
+				PIEL.raya(_lienzo, Vector2(area.position.x + 14, y), Vector2(area.end.x - 6, y), TN_APAGADA, 0.5 * tinta)
+		var color := TN_TINTA
 		if f.get("apagada", false):
-			color = PIEL.TINTA_APAGADA
+			color = TN_APAGADA
+		if elegida:
+			color = TN_ELEGIDA
 		color.a *= tinta
 		var tx := area.position.x + 16
 		if f.has("tipo"):
-			var ct: Color = COLOR_TIPO.get(f["tipo"], PIEL.TINTA)
+			var ct: Color = COLOR_TIPO.get(f["tipo"], TN_TINTA)
 			if f.get("hecha", false):
-				_palomita(Vector2(tx + 4, y + 12), Color(PIEL.VERDE, 0.8 * tinta))
+				_palomita(Vector2(tx + 4, y + 12), Color(TN_VERDE, 0.8 * tinta))
 			elif f["tipo"] == "historia":
 				_lienzo.draw_texture_rect(SELLO, Rect2(tx - 2, y + 5, 13, 13), false, Color(1, 1, 1, tinta))
 			else:
@@ -625,11 +635,11 @@ func _dibujar_paginas(tinta: float) -> void:
 		var nombre := String(f["nombre"])
 		_texto(nombre, Vector2(tx, y + 17), color)
 		if f.get("hecha", false):
-			PIEL.raya(_lienzo, Vector2(tx, y + 12), Vector2(tx + _ancho(nombre), y + 12), PIEL.TINTA_APAGADA, 0.8 * tinta)
+			PIEL.raya(_lienzo, Vector2(tx, y + 12), Vector2(tx + _ancho(nombre), y + 12), TN_APAGADA, 0.8 * tinta)
 		if f.has("cantidad"):
-			_texto("x%d" % f["cantidad"], Vector2(area.end.x - 30, y + 17), Color(PIEL.TINTA_SUAVE, tinta))
+			_texto("x%d" % f["cantidad"], Vector2(area.end.x - 30, y + 17), Color(TN_SUAVE, tinta))
 		if f.get("clave", false):
-			_texto("clave", Vector2(area.end.x - 40, y + 17), Color(PIEL.ROJO, 0.85 * tinta))
+			_texto("clave", Vector2(area.end.x - 40, y + 17), Color(TN_ROJO, 0.85 * tinta))
 		if f.get("tecla", "") != "":
 			# la tecla, en una etiqueta de cuero
 			var tecla := String(f["tecla"])
@@ -639,14 +649,14 @@ func _dibujar_paginas(tinta: float) -> void:
 		if f.get("id", "") == seguida and seguida != "" and not f.get("hecha", false):
 			# la que se sigue en pantalla: una flechita roja que late
 			var c := Vector2(area.end.x - 8 + sin(_tiempo * 4.0), y + 12)
-			_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(-5, -4), c + Vector2(3, 0), c + Vector2(-5, 4)]), Color(PIEL.ROJO, tinta))
+			_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(-5, -4), c + Vector2(3, 0), c + Vector2(-5, 4)]), Color(TN_ROJO, tinta))
 	# flechas de que hay más arriba o abajo
 	if _desplazamiento > 0:
 		var c := Vector2(area.get_center().x, area.position.y - 4)
-		_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(-4, 2), c + Vector2(0, -2), c + Vector2(4, 2)]), Color(PIEL.TINTA_SUAVE, tinta))
+		_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(-4, 2), c + Vector2(0, -2), c + Vector2(4, 2)]), Color(TN_SUAVE, tinta))
 	if _desplazamiento + FILAS_VISIBLES < filas.size():
 		var c := Vector2(area.get_center().x, area.position.y + FILAS_VISIBLES * ALTO_FILA + 3)
-		_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(-4, -2), c + Vector2(0, 2), c + Vector2(4, -2)]), Color(PIEL.TINTA_SUAVE, tinta))
+		_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(-4, -2), c + Vector2(0, 2), c + Vector2(4, -2)]), Color(TN_SUAVE, tinta))
 	# el detalle de lo elegido, en la página de la derecha
 	var f: Dictionary = filas[seleccion]
 	var detalle := Rect2(PAG_DER.position + Vector2(4, 4), PAG_DER.size - Vector2(8, 26))
@@ -658,16 +668,16 @@ func _dibujar_paginas(tinta: float) -> void:
 		# el dibujo, pegado en la página con cuatro esquinitas de papel
 		var r := Rect2(detalle.get_center().x - 30, dy, 60, 60)
 		_lienzo.draw_rect(r, Color("efe0bc"))
-		_lienzo.draw_rect(r, Color(PIEL.TINTA_APAGADA, 0.5), false, 1.0)
+		_lienzo.draw_rect(r, Color(TN_APAGADA, 0.5), false, 1.0)
 		_icono(f["icono"], r.position + Vector2(6, 6), 3.0)
 		_esquinas_foto(r)
 		dy += 72
 	elif f.has("retrato"):
 		_retrato_pegado(f["retrato"], Vector2(detalle.get_center().x - 26, dy))
 		dy += 86
-	_texto(String(f["nombre"]), Vector2(detalle.position.x + 10, dy + 14), PIEL.ROJO, -1, 16)
-	PIEL.raya(_lienzo, Vector2(detalle.position.x + 10, dy + 19), Vector2(detalle.position.x + 10 + _ancho(String(f["nombre"])), dy + 19), PIEL.ROJO, 0.5)
-	_parrafo(String(f["texto"]), Vector2(detalle.position.x + 10, dy + 36), detalle.size.x - 20, PIEL.TINTA)
+	_texto(String(f["nombre"]), Vector2(detalle.position.x + 10, dy + 14), TN_TITULO, -1, 16)
+	PIEL.raya(_lienzo, Vector2(detalle.position.x + 10, dy + 19), Vector2(detalle.position.x + 10 + _ancho(String(f["nombre"])), dy + 19), TN_TITULO, 0.5)
+	_parrafo(String(f["texto"]), Vector2(detalle.position.x + 10, dy + 36), detalle.size.x - 20, TN_TINTA)
 
 
 ## Esquinitas de papel que sujetan una foto o un dibujo pegado en el diario
@@ -677,7 +687,7 @@ func _esquinas_foto(r: Rect2) -> void:
 		var sx := 1.0 if esq.x == r.position.x else -1.0
 		var sy := 1.0 if esq.y == r.position.y else -1.0
 		_lienzo.draw_colored_polygon(PackedVector2Array([esq + Vector2(-2 * sx, -2 * sy), esq + Vector2(9 * sx, -2 * sy), esq + Vector2(-2 * sx, 9 * sy)]), c)
-		_lienzo.draw_line(esq + Vector2(9 * sx, -2 * sy), esq + Vector2(-2 * sx, 9 * sy), Color(PIEL.TINTA_APAGADA, 0.6), 1.0)
+		_lienzo.draw_line(esq + Vector2(9 * sx, -2 * sy), esq + Vector2(-2 * sx, 9 * sy), Color(TN_APAGADA, 0.6), 1.0)
 
 
 ## El retrato de un lazo, como una foto pegada en el diario
@@ -706,7 +716,7 @@ func _detalle_mision(m: Dictionary, caja: Rect2, es_seguida: bool) -> void:
 	var x := caja.position.x + 10
 	var ancho := caja.size.x - 20
 	var tipo := String(m.get("tipo", ""))
-	var ct: Color = COLOR_TIPO.get(tipo, PIEL.TINTA)
+	var ct: Color = COLOR_TIPO.get(tipo, TN_TINTA)
 	var y := caja.position.y + 14
 	var cabecera := String(Misiones.TIPOS.get(tipo, ""))
 	var quien := String(m.get("quien", ""))
@@ -722,28 +732,28 @@ func _detalle_mision(m: Dictionary, caja: Rect2, es_seguida: bool) -> void:
 	if es_seguida and Misiones.estado(m) == "activa":
 		# «en pantalla»: un sello de tinta
 		var r := Rect2(caja.end.x - 16 - _ancho("en pantalla"), y - 13, _ancho("en pantalla") + 10, 17)
-		_lienzo.draw_rect(r, Color(PIEL.ROJO, 0.12))
-		_lienzo.draw_rect(r, Color(PIEL.ROJO, 0.7), false, 1.0)
-		_texto("en pantalla", r.position + Vector2(5, 13), Color(PIEL.ROJO, 0.85))
+		_lienzo.draw_rect(r, Color(TN_ROJO, 0.12))
+		_lienzo.draw_rect(r, Color(TN_ROJO, 0.7), false, 1.0)
+		_texto("en pantalla", r.position + Vector2(5, 13), Color(TN_ROJO, 0.85))
 	y += 22
 	var titulo := String(m["titulo"])
-	_texto(titulo, Vector2(x, y), PIEL.TINTA)
-	_texto(titulo, Vector2(x + 1, y), PIEL.TINTA)                 # (en negrita)
-	PIEL.raya(_lienzo, Vector2(x, y + 6), Vector2(x + ancho, y + 5), PIEL.TINTA_SUAVE, 0.5)
-	y = _parrafo(String(m.get("texto", "")), Vector2(x, y + 22), ancho, PIEL.TINTA_SUAVE, 15.0) + 6
+	_texto(titulo, Vector2(x, y), TN_TINTA)
+	_texto(titulo, Vector2(x + 1, y), TN_TINTA)                 # (en negrita)
+	PIEL.raya(_lienzo, Vector2(x, y + 6), Vector2(x + ancho, y + 5), TN_SUAVE, 0.5)
+	y = _parrafo(String(m.get("texto", "")), Vector2(x, y + 22), ancho, TN_SUAVE, 15.0) + 6
 	for paso in Misiones.pasos_visibles(m):
 		var hecho: bool = paso["hecho"]
 		if hecho:
-			_palomita(Vector2(x + 4, y - 4), PIEL.VERDE)
+			_palomita(Vector2(x + 4, y - 4), TN_VERDE)
 		else:
-			_lienzo.draw_rect(Rect2(x, y - 10, 9, 9), Color(PIEL.TINTA, 0.8), false, 1.0)      # casilla por marcar
-		y = _parrafo(String(paso["texto"]), Vector2(x + 14, y + 1), ancho - 14, PIEL.TINTA_APAGADA if hecho else PIEL.TINTA, 15.0) + 3
+			_lienzo.draw_rect(Rect2(x, y - 10, 9, 9), Color(TN_TINTA, 0.8), false, 1.0)      # casilla por marcar
+		y = _parrafo(String(paso["texto"]), Vector2(x + 14, y + 1), ancho - 14, TN_APAGADA if hecho else TN_TINTA, 15.0) + 3
 		if y > caja.end.y - 26:
 			break
 	var premio := String(m.get("premio", ""))
 	if premio != "":
 		var py := maxf(y + 8, caja.end.y - 26)
-		_parrafo("Recompensa: " + premio, Vector2(x, py), ancho, PIEL.VERDE if Misiones.estado(m) == "hecha" else PIEL.ROJO, 15.0)
+		_parrafo("Recompensa: " + premio, Vector2(x, py), ancho, TN_VERDE if Misiones.estado(m) == "hecha" else TN_ROJO, 15.0)
 
 
 func _cargar_retrato(id: String) -> Texture2D:
@@ -755,8 +765,8 @@ func _cargar_retrato(id: String) -> Texture2D:
 func _dibujar_mapa() -> void:
 	var area := Rect2(PAG_IZQ.position.x, PAG_IZQ.position.y + 4, PAG_DER.end.x - PAG_IZQ.position.x, PAG_IZQ.size.y - 4)
 	if not Estado.tiene("mapa_partido"):
-		_titulo("Mapa", PAG_IZQ.position + Vector2(6, 28), PIEL.TINTA)
-		_texto("Aún no tienes ningún mapa.", PAG_IZQ.position + Vector2(10, 64), PIEL.TINTA_APAGADA)
+		_titulo("Mapa", PAG_IZQ.position + Vector2(6, 28), TN_TITULO)
+		_texto("Aún no tienes ningún mapa.", PAG_IZQ.position + Vector2(10, 64), TN_APAGADA)
 		return
 	if _raiz_conocida() and not _mapa_mundo:
 		_dibujar_mapa_raiz(area)
@@ -769,7 +779,7 @@ func _dibujar_mapa() -> void:
 	var pie := "Falta el trozo del norte. Mzee Shamba cree que está en Sigilia."
 	if _raiz_conocida():
 		pie = "↑ ↓ ver el mapa de Raíz · " + "Falta el trozo de Sigilia."
-	_texto(pie, Vector2(area.position.x + 8, area.end.y - 2), PIEL.TINTA_SUAVE)
+	_texto(pie, Vector2(area.position.x + 16, area.end.y - 12), TN_SUAVE)
 
 
 func _punto(aqui: Vector2) -> void:
@@ -841,7 +851,7 @@ func _dibujar_mapa_raiz(area: Rect2) -> void:
 	for cam in CAMINOS_RAIZ:
 		if cam[1] == Estado.escena_actual:
 			pie = "Estás en: %s · %s" % [cam[0], pie]
-	_texto(pie + " · ↑ ↓ mundo", Vector2(area.position.x + 8, area.end.y - 2), PIEL.TINTA_SUAVE)
+	_texto(pie + " · ↑ ↓ mundo", Vector2(area.position.x + 16, area.end.y - 12), TN_SUAVE)
 	# el mapa está pegado sobre las dos páginas: el lomo lo dobla un poco
 	_lienzo.draw_rect(Rect2(LOMO - 4, pos.y, 8, MAPA_RAIZ.get_height()), Color(0.2, 0.12, 0.05, 0.18))
 

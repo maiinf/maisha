@@ -390,6 +390,8 @@ func _ready() -> void:
 	mochila.cerrar()
 	_comprobar(not get_tree().paused, "al cerrarla, el juego sigue")
 
+	var ayudante := get_tree().root.get_node_or_null("AyudanteLecciones")
+	_comprobar(Estado.tiene("leccion/golpe") and ayudante and "golpe" in ayudante.vistas, "junto al espantapájaros, el mundo se para y enseña el cetro (J)")
 	print("Las manchas de Giza (zonas de práctica):")
 	var practicas: Array = get_tree().get_nodes_in_group("zonas").filter(func(z: Node2D) -> bool: return z.jefe == "")
 	var arena: Node2D = get_tree().get_nodes_in_group("arena_jefe")[0]
@@ -421,6 +423,8 @@ func _ready() -> void:
 			_comprobar(Estado.tiene("narr/zona2"), "en la segunda, el narrador enseña el Latido")
 		await _romper_corazon(zona)
 		_comprobar(zona.estado == 4, "mancha %d purgada (con %d semillas)" % [i + 1, R.NUCLEO_VIDA_PEQUENO])
+		if i == 0:
+			_comprobar(Estado.tiene("leccion/semilla"), "en la primera mancha, el mundo se para y enseña la semilla (K)")
 	await _esperar(1.0)
 	await _atender(2.0)
 	_comprobar(Estado.tiene("narr/despierta") and arena.activa, "limpias las tres, la tierra tiembla y la arena despierta")

@@ -381,11 +381,85 @@ func _process(delta: float) -> void:
 				var dialogo := get_tree().get_first_node_in_group("dialogo")
 				if dialogo and not dialogo.hablando:
 					CHARLA.hablar(self, "kitovu_arena_dormida" if z == _arena else "kitovu_mancha_sin_cetro")
+	_comprobar_leccion_golpe()
+	_comprobar_leccion_latido()
 	# durante la pelea, el narrador explica el Corazón y el Aliento cuando hace falta
 	if _pelea and _pelea != _arena and _pelea.estado == 2:
 		var enemigos := get_tree().get_nodes_in_group("enemigos").size()
-		if _enemigos_antes >= 0 and enemigos < _enemigos_antes:
-			_narrar("narrador_nucleo", "narr/nucleo", 0.4)
+		if _enemigos_antes >= 0 and enemigos < _enemigos_antes and not Estado.tiene("narr/nucleo"):
+			_leccion_semilla()
 		_enemigos_antes = enemigos
 		if _maisha.aliento < 60.0 and Estado.tiene("narr/zona2"):
 			_narrar("narrador_aliento", "narr/aliento", 0.2)
+
+
+# --- Lecciones (el mundo se para hasta que se pulsa la tecla) ------------------------------------------
+
+const LECCION := preload("res://scripts/interfaz/leccion.gd")
+var _leccion: CanvasLayer
+var _ensenando := false
+
+
+func _leccion_lista() -> CanvasLayer:
+	if _leccion == null:
+		_leccion = LECCION.new()
+		add_child(_leccion)
+	return _leccion
+
+
+## El cetro: la primera vez que Maisha llega junto al espantapájaros con el cetro
+func _comprobar_leccion_golpe() -> void:
+	if _ensenando or not Estado.tiene("cetro_recibido") or Estado.tiene("leccion/golpe"):
+		return
+	var dialogo := get_tree().get_first_node_in_group("dialogo")
+	if dialogo and dialogo.hablando:
+		return
+	for e in get_tree().get_nodes_in_group("espantapajaros"):
+		if (e as Node2D).global_position.distance_to(_maisha.global_position) < 34.0:
+			_ensenando = true
+			Estado.marcar("leccion/golpe")
+			await _leccion_lista().ensenar("golpe", "J", "Pulsa J para golpear con el cetro", [_maisha, e])
+			_maisha.call("mirar", (e as Node2D).global_position - _maisha.global_position)
+			_maisha.call("golpear")
+			_ensenando = false
+			return
+
+
+## Las semillas: en la primera mancha, cuando cae el primer Petrino, el narrador presenta el Corazón de Giza
+func _leccion_semilla() -> void:
+	if _ensenando:
+		return
+	_ensenando = true
+	await _narrar("narrador_nucleo", "narr/nucleo", 0.4)
+	var nucleo: Node2D = _pelea.get("_nucleo") if _pelea else null
+	Estado.marcar("leccion/semilla")
+	await _leccion_lista().ensenar("explosivo", "K", "Pulsa K para plantar una semilla junto al Corazón", [_maisha, nucleo])
+	if _maisha.call("lanzar_semilla"):
+		var semilla := get_tree().get_nodes_in_group("semillas").back() as Node2D
+		var casilla := Vector2i((semilla.global_position / 16.0).floor()) if semilla else Vector2i.ZERO
+		# a cámara lenta hasta que Maisha sale de la cruz (o estalla)
+		await _leccion_lista().camara_lenta("¡Sal de la cruz!", func() -> bool:
+			if not is_instance_valid(semilla) or not semilla.is_inside_tree():
+				return false
+			var c := Vector2i((_maisha.global_position / 16.0).floor())
+			return (c.x == casilla.x and absi(c.y - casilla.y) <= 2) or (c.y == casilla.y and absi(c.x - casilla.x) <= 2))
+	_ensenando = false
+
+
+## El Latido: en la segunda mancha, la primera vez que un Petrino se le echa encima a Maisha
+func _comprobar_leccion_latido() -> void:
+	if _ensenando or Estado.tiene("leccion/latido") or not Estado.tiene("narr/zona2") or _pelea == null or _pelea == _arena:
+		return
+	var dialogo := get_tree().get_first_node_in_group("dialogo")
+	if dialogo and dialogo.hablando:
+		return
+	for e in get_tree().get_nodes_in_group("enemigos"):
+		if (e as Node2D).global_position.distance_to(_maisha.global_position) < 30.0:
+			_ensenando = true
+			Estado.marcar("leccion/latido")
+			_maisha.set("aliento", maxf(float(_maisha.get("aliento")), 60.0))
+			await _leccion_lista().ensenar("latido", "L", "Pulsa L: el Latido aparta a los Petrinos", [_maisha, e])
+			_maisha.call("latido")
+			_ensenando = false
+			return
+
