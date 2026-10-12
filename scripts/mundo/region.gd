@@ -41,6 +41,7 @@ const TRONCO_PODRIDO := preload("res://scripts/mundo/objetos/tronco_podrido.gd")
 const BOSQUE := "res://arte/mundos/raiz/bosque/"
 const CIENAGA := "res://arte/mundos/raiz/cienaga/"
 const CAMPO := "res://arte/mundos/raiz/campo/"
+const CANADA := "res://arte/mundos/raiz/canada/"
 const MECERSE := preload("res://scripts/mundo/objetos/mecerse.gd")
 const GALLINA := preload("res://scripts/mundo/kitovu/gallina.gd")
 const OBJ := "res://arte/mundos/raiz/objetos/"
@@ -81,6 +82,9 @@ const FIJOS := {
 	"]": [CAMPO + "molino.png", Vector2(24, 10), 16.0, 1, "campo_molino", 28.0],
 	"&": [CAMPO + "maquina.png", Vector2(38, 8), 20.0, 2, "campo_maquina", 28.0],
 	"+": [CAMPO + "paca.png", Vector2(14, 6), 8.0, 2],
+	# de la Cañada del Eco
+	"ñ": [CANADA + "bloque.png", Vector2(24, 9), 16.0, 3],
+	"ç": [CANADA + "tronco.png", Vector2(34, 7), 16.0, 2],
 }
 ## La casa del viajero de cada camino («{»): [dibujo, colisión, charla al usarla, radio, hoguera]
 const CAMPAMENTOS := {
@@ -88,7 +92,7 @@ const CAMPAMENTOS := {
 	"korongo": ["res://arte/mundos/raiz/pasarelas/palafito.png", Vector2(52, 10), "pasarelas_palafito", 34.0, false],
 	"fuko": ["res://arte/mundos/raiz/camino/madriguera.png", Vector2(60, 12), "camino_madriguera", 38.0, false],
 	"sungura": ["res://arte/mundos/raiz/senda/horreo.png", Vector2(52, 10), "senda_horreo", 36.0, false],
-	"mbuzi": ["res://arte/mundos/raiz/canada/aprisco.png", Vector2(40, 10), "canada_aprisco", 34.0, false],
+	"mbuzi": ["res://arte/mundos/raiz/canada/aprisco.png", Vector2(92, 22), "canada_aprisco", 46.0, false],
 }
 ## Edificios de la aldea: letra -> [id, dibujo, tamaño de la colisión]
 const EDIFICIOS := {

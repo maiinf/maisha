@@ -1473,8 +1473,9 @@ def crear_canada():
     # el arroyo baja hacia el lago (oeste): al este va por el norte del camino, lo cruza bajo un puentecito de
     # tablas, recorre la garganta por el sur y vuelve a cruzarlo por un vado de piedras antes de llegar al lago
     arroyo = {}
-    puntos = [(139, 15), (126, 16), (117, 18), (113, 22), (109, 26), (96, 27), (84, 26), (70, 27), (56, 26),
-              (44, 26), (37, 25), (33, 22), (26, 19), (14, 18), (0, 19)]
+    # (en los dos cruces con el camino baja recto, para que el puente y el vado crucen de lado a lado)
+    puntos = [(139, 15), (126, 16), (118, 16), (115, 18), (115, 24), (111, 26), (96, 27), (84, 26), (70, 27), (56, 26),
+              (44, 26), (38, 26), (34, 25), (34, 19), (28, 18), (14, 18), (0, 19)]
     for (a, b) in zip(puntos, puntos[1:]):
         pasos = int(max(abs(b[0] - a[0]), abs(b[1] - a[1])) * 2) + 1
         for i in range(pasos + 1):
@@ -1492,6 +1493,29 @@ def crear_canada():
                     elif m[yy][xx] == "#":
                         # donde cruza el camino: al este, un puentecito de tablas; al oeste, un vado de piedras
                         poner(xx, yy, "=" if xx > 70 else "'")
+    # el puentecito: una tabla más a cada lado, sobre la orilla (así se apoya en tierra)
+    for y in range(ALTO):
+        fila = [x for x in range(ANCHO) if m[y][x] == "="]
+        if fila:
+            for x in (min(fila) - 1, max(fila) + 1):
+                if m[y][x] == "#":
+                    poner(x, y, "=")
+    # rocas caídas de las paredes («ñ»): al pie de la peña, sobre todo en la garganta
+    caidas = 0
+    for _ in range(400):
+        x = azar.randrange(4, ANCHO - 4)
+        for y in (norte[x] + 1, sur[x] - 1):
+            if caidas >= 22 or not (0 < y < ALTO - 1) or m[y][x] != ".":
+                continue
+            if any(m[y + dy][x + dx] in "#~='\"{}`@" for dx in (-2, -1, 0, 1, 2) for dy in (-1, 0, 1)):
+                continue
+            if azar.random() < 0.5 + 0.4 * math.exp(-((x - 84) / 22.0) ** 2):
+                poner(x, y, "ñ")
+                caidas += 1
+    # troncos secos caídos («ç»), hacia el bosque
+    for (x, y) in ((124, 29), (100, 30), (131, 13)):
+        if m[y][x] == ".":
+            poner(x, y, "ç")
     # Mbuzi: su aprisco («{») y ella a la puerta
     poner(40, 7, "{")
     poner(43, 11, "}")
