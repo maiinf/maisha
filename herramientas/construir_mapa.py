@@ -1840,6 +1840,143 @@ def crear_orilla():
     return ["".join(f) for f in m], textos
 
 
+def crear_embarcadero():
+    """El Embarcadero Junco (96x72): el puerto del río de Raíz, al norte de la Orilla de Juncos (puerta al sur). El río
+    ancho baja por el este; en la orilla del oeste, el PUEBLO DE BARQUEROS: casas de juncos sobre pilotes («æ»),
+    pasarelas de madera, un almacén y una grúa rota («å»). Arriba, el MUELLE DEL NORTE con el TRANSBORDADOR varado
+    («ß»), y junto a él BATA, el pato barquero, de piedra (zona 2). Abajo, la DÁRSENA: una balsa de agua cerrada por
+    muelles, con una gran plataforma de madera en medio, donde acecha el jefe del lugar (zona 1). Al despertar a Bata
+    y arreglar el transbordador, el muelle del norte lleva río arriba: LA TRAVESÍA."""
+    ANCHO, ALTO = 96, 72
+    azar = random.Random(211)
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    zonas = {"1": (44, 56, 9, 6), "2": (44, 9, 7, 4), "3": (14, 36, 8, 6)}
+
+    def en_zona(x, y, margen=2):
+        for (zx, zy, rx, ry) in zonas.values():
+            if ((x - zx) / (rx + margen)) ** 2 + ((y - zy) / (ry + margen)) ** 2 <= 1.0:
+                return True
+        return False
+
+    # el río ancho, por el este, y la dársena: un entrante de agua cerrado por muelles, abajo
+    rio = {}
+    for y in range(ALTO):
+        cx = 66 + int(3 * math.sin(y * 0.06 + 1) + 1.5 * math.sin(y * 0.17))
+        ancho = 11 + int(2 * math.sin(y * 0.09))
+        rio[y] = (cx - ancho, cx + ancho)
+        for x in range(cx - ancho, min(ANCHO, cx + ancho + 1)):
+            poner(x, y, "~")
+    for y in range(44, 66):
+        for x in range(28, rio[y][0] + 1):
+            if ((x - 44) / 15) ** 2 + ((y - 56) / 10) ** 2 <= 1.0:
+                poner(x, y, "~")
+    # la plataforma de madera en medio de la dársena (la arena del jefe), con una pasarela desde el oeste
+    for y in range(52, 61):
+        for x in range(37, 52):
+            poner(x, y, "=")
+    for x in range(26, 37):
+        for y in (56, 57):
+            if m[y][x] == "~":
+                poner(x, y, "=")
+    # los muelles que cierran la dársena por el norte y por el sur (no se pisan: pilotes y tablas rotas)
+    # el muelle del norte, largo, con el transbordador varado al final
+    for x in range(rio[12][0], rio[12][0] + 9):
+        for y in (12, 13):
+            poner(x, y, "=")
+    poner(rio[12][0] + 11, 12, "ß")
+    # el muelle del medio, con dos casas de juncos sobre pilotes
+    for x in range(rio[30][0], rio[30][0] + 6):
+        for y in (30, 31):
+            poner(x, y, "=")
+
+    def camino(puntos, ancho=2):
+        for (a_, b_) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b_[0] - a_[0]), abs(b_[1] - a_[1])) * 2) + 1
+            for i in range(pasos + 1):
+                t_ = i / pasos
+                x = a_[0] + (b_[0] - a_[0]) * t_ + math.sin(t_ * 3 + a_[1]) * 0.35
+                y = a_[1] + (b_[1] - a_[1]) * t_
+                for dx in range(ancho):
+                    for dy in range(ancho):
+                        xx, yy = int(x) + dx, int(y) + dy
+                        if 0 <= xx < ANCHO and 0 <= yy < ALTO and m[yy][xx] in ".,;":
+                            poner(xx, yy, "#")
+
+    # el camino: entra por el sur, sube por el pueblo hasta el muelle del norte; ramales a la dársena y al prado
+    camino([(22, 71), (22, 62), (24, 54), (32, 44), (40, 36), (44, 24), (42, 16), (36, 6), (33, 0)])
+    camino([(22, 56), (26, 56)], 2)
+    camino([(40, 36), (26, 36), (14, 36)], 1)
+    camino([(42, 30), (rio[30][0] - 1, 30)], 2)
+    camino([(43, 16), (rio[12][0] - 1, 12)], 2)
+    # el pueblo de barqueros: casas de juncos en la orilla y sobre el agua, el almacén y la grúa rota
+    for (x, y) in ((rio[20][0] - 3, 20), (rio[25][0] - 3, 25), (rio[36][0] - 3, 37), (rio[30][0] + 2, 28),
+                   (rio[30][0] + 5, 33), (48, 22), (36, 30), (rio[42][0] - 3, 42)):
+        poner(x, y, "æ")
+    poner(rio[16][0] - 2, 16, "å")
+    poner(34, 20, "[")
+    # Bata, el pato barquero (cuando se le rescata), junto al transbordador
+    poner(rio[12][0] + 3, 11, "}")
+    # secretos: tras matorrales en el prado del oeste, en el muelle del medio y entre los juncos del sureste
+    poner(5, 22, "X"); poner(5, 23, "M"); poner(6, 23, "M"); poner(4, 23, "M")
+    poner(rio[30][0] + 3, 30, "X")
+    poner(8, 64, "X")
+    # juncos en la orilla del río y de la dársena
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            if m[y][x] == "." and any(0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] == "~"
+                                      for dx in (-1, 0, 1) for dy in (-1, 0, 1)) and azar.random() < 0.45:
+                poner(x, y, ";")
+    for (x, y) in ((10, 48), (20, 8), (rio[60][0] - 3, 66)):
+        poner(x, y, "$")
+    reservados = [(rio[12][0] - 2, 10, 3), (34, 20, 4), (5, 22, 2), (8, 64, 2), (22, 68, 3), (32, 3, 3)]
+
+    def libre(x, y):
+        if m[y][x] not in ".," or en_zona(x, y):
+            return False
+        for (rx_, ry_, rr) in reservados:
+            if (x - rx_) ** 2 + (y - ry_) ** 2 <= rr * rr:
+                return False
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#~=æåß[}X$":
+                    return False
+        return True
+
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            if not libre(x, y):
+                continue
+            borde = min(x, y, ALTO - 1 - y)
+            r = azar.random()
+            if borde < 3 and r < 0.75:
+                poner(x, y, azar.choice("sstT"))
+            elif r < 0.05:
+                poner(x, y, azar.choice("ssTr"))
+            elif r < 0.12:
+                poner(x, y, ";")
+            elif r < 0.2:
+                poner(x, y, ",")
+    # puertas: sur a la Orilla de Juncos (_) y norte, río arriba: La Travesía (^, cerrada hasta el transbordador)
+    for x in range(20, 26):
+        for y in range(ALTO - 3, ALTO):
+            poner(x, y, "_" if y == ALTO - 1 else "#")
+    for x in range(31, 37):
+        for y in range(0, 3):
+            poner(x, y, "^" if y == 0 else "#")
+    poner(27, 66, "L")
+    poner(38, 8, "L")
+    poner(23, 68, "S")
+    for k, (zx_, zy_, rx_, ry_) in zonas.items():
+        poner(zx_, zy_, k)
+    textos = {"1": "9, 6, 4, 0, , jefe:mamba", "2": "8, 5, 4, 3, bata", "3": "8, 6, 4, 3"}
+    return ["".join(f) for f in m], textos
+
+
 # ---------------------------------------------------------------------------
 # Dibujar el suelo a partir del texto
 # ---------------------------------------------------------------------------
