@@ -177,7 +177,9 @@ func _por_que_no() -> String:
 	var id := String(arte["id"])
 	if Artes.nivel(id) >= Artes.nivel_maximo(id):
 		return "Esta rama ya ha crecido todo lo que puede en Raíz."
-	return "Hace falta más Esencia (%d de %d)." % [Artes.esencia(), Artes.coste_siguiente(id)]
+	if Artes.esencia() < Artes.coste_siguiente(id):
+		return "Hace falta más Esencia (%d de %d)." % [Artes.esencia(), Artes.coste_siguiente(id)]
+	return "Este nodo grande pide también Cristales del Nexo (%d de %d)." % [Tienda.cristales(), Artes.cristales_siguiente(id)]
 
 
 func _subir() -> void:
@@ -430,8 +432,13 @@ func _dibujar_detalle(a: float) -> void:
 		elif estado == "siguiente":
 			if Artes.puede_subir(id):
 				pie = "Mantén Acción: %d de Esencia" % Artes.coste_siguiente(id)
-			else:
+				if Artes.cristales_siguiente(id) > 0:
+					pie += " y %d Cristales" % Artes.cristales_siguiente(id)
+			elif Artes.esencia() < Artes.coste_siguiente(id):
 				pie = "Cuesta %d de Esencia (tienes %d)" % [Artes.coste_siguiente(id), Artes.esencia()]
+				color_pie = Color(APAGADO, 0.8)
+			else:
+				pie = "Pide %d Cristales (tienes %d)" % [Artes.cristales_siguiente(id), Tienda.cristales()]
 				color_pie = Color(APAGADO, 0.8)
 		else:
 			pie = "Antes, el nivel %d" % (nivel_actual + 1)

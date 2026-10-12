@@ -84,10 +84,27 @@ const TN_ROJO := Color("f2a07a")        # la historia, lo importante (coral)
 const TN_VERDE := Color("a8e890")       # hecho
 const TN_TITULO := Color("f0d89a")      # los títulos, en oro
 const TN_ELEGIDA := Color("1a1410")     # la fila elegida, sobre la banda dorada
+const ORO_CLARO := Color("f9d77a")
 const COLOR_TIPO := {"historia": Color("f2a07a"), "encargo": Color("7fd8d0"), "secreto": Color("c8a0f0"), "lazo": Color("f0a0c0")}
 const FILAS_VISIBLES := 9
 const ALTO_FILA := 24
 
+## EL ÁRBOL DE HABILIDADES (pestaña Habilidades): las ramas, de izquierda a derecha, y dónde está cada nodo en el
+## libro (las mismas posiciones que RAMAS en herramientas/pintar_interfaz.py, que pinta las ramas)
+const ARBOL_RAMAS := preload("res://arte/interfaz/diario/arbol_ramas.png")
+const NODOS_ICONOS := preload("res://arte/interfaz/diario/nodos.png")
+const RAMAS_ARBOL := ["raiz", "cetro", "aliento"]
+const NODOS_ARBOL := {
+	"raiz": [Vector2(262, 236), Vector2(220, 222), Vector2(182, 204), Vector2(150, 180), Vector2(124, 152), Vector2(104, 120), Vector2(92, 84)],
+	"cetro": [Vector2(320, 214), Vector2(320, 186), Vector2(320, 160), Vector2(320, 134), Vector2(320, 108), Vector2(320, 84), Vector2(320, 60)],
+	"aliento": [Vector2(378, 236), Vector2(420, 222), Vector2(458, 204), Vector2(490, 180), Vector2(516, 152), Vector2(536, 120), Vector2(548, 84)],
+}
+const COLOR_RAMA := {"raiz": Color("8fe06a"), "cetro": Color("f9c46a"), "aliento": Color("8fd8f0")}
+const NOMBRE_RAMA := {"raiz": "RAÍZ", "cetro": "CETRO", "aliento": "ALIENTO"}
+const ICONO_RAMA := {"raiz": 0, "cetro": 1, "aliento": 2}
+## la habilidad básica de cada rama (la raíz de la rama): índice en HABILIDADES
+const BASICA_RAMA := {"raiz": 1, "cetro": 0, "aliento": 2}
+const MANTENER := 0.8            # segundos manteniendo Acción para despertar un nodo
 ## Objetos clave: marca -> [nombre, icono, descripción]
 const CLAVE := {
 	"cetro_recibido": ["Cetro de Raíz", 4, "El cetro de la familia de Mzee Shamba. Despierta en manos de quien trae la vida de vuelta."],
@@ -124,6 +141,11 @@ const LAZOS := [
 var abierta := false
 var pestana := 0
 var seleccion := 0
+var _rama := 1                   # árbol de habilidades: la rama elegida (0 Raíz, 1 Cetro, 2 Aliento)
+var _nodo := 0                   # y el nodo de esa rama (0 = la habilidad básica)
+var _mantenido := 0.0            # cuánto se lleva manteniendo Acción sobre el nodo
+var _soltar := false             # tras despertar un nodo, hay que soltar Acción antes de otro
+var _destello_nodo := 0.0
 var _lienzo: Control
 var _fuente: FontFile
 var _tiempo := 0.0
@@ -216,6 +238,9 @@ func _process(delta: float) -> void:
 		return
 	if Input.is_action_just_pressed("mochila") or Input.is_action_just_pressed("menu"):
 		cerrar()
+		return
+	if pestana == P_HABILIDADES:
+		_mover_arbol(delta)
 		return
 	if Input.is_action_just_pressed("mover_derecha") or Input.is_action_just_pressed("ui_right"):
 		_ir_a_pestana((pestana + 1) % PESTANAS.size())
@@ -575,6 +600,9 @@ func _dibujar_paginas(tinta: float) -> void:
 		ayuda = "↑ ↓ elegir · Acción: usar o ponerse"
 	if pestana == P_MAPA:
 		_dibujar_mapa()
+		return
+	if pestana == P_HABILIDADES:
+		_dibujar_arbol(tinta)
 		return
 	_titulo(PESTANAS[pestana], PAG_IZQ.position + Vector2(6, 28), Color(TN_TITULO, tinta), 0.0)
 	_texto(ayuda, Vector2(PAG_DER.position.x + 16, PAG_DER.end.y - 14), Color(TN_APAGADA, 0.9 * tinta))
@@ -941,3 +969,199 @@ func _dibujar_rueda() -> void:
 	_texto(nombre, Vector2(round(centro.x - _ancho(nombre) / 2.0), centro.y + 5), Color(PIEL.TINTA, a))
 	var pista := "inclina y suelta" if _eleccion_rueda < 0 else "suelta para abrir"
 	_texto(pista, Vector2(round(centro.x - _ancho(pista) / 2.0), centro.y + radio + 46), Color(PIEL.CREMA, 0.9 * a))
+
+
+# --- El árbol de habilidades --------------------------------------------------------------------------
+
+func _mover_arbol(delta: float) -> void:
+	_destello_nodo = maxf(0.0, _destello_nodo - delta)
+	var antes := Vector2i(_rama, _nodo)
+	if Input.is_action_just_pressed("mover_derecha") or Input.is_action_just_pressed("ui_right"):
+		if _rama < RAMAS_ARBOL.size() - 1:
+			_rama += 1
+		else:
+			_ir_a_pestana((pestana + 1) % PESTANAS.size())
+			return
+	elif Input.is_action_just_pressed("mover_izquierda") or Input.is_action_just_pressed("ui_left"):
+		if _rama > 0:
+			_rama -= 1
+		else:
+			_ir_a_pestana((pestana - 1 + PESTANAS.size()) % PESTANAS.size())
+			return
+	if Input.is_action_just_pressed("mover_arriba") or Input.is_action_just_pressed("ui_up"):
+		_nodo = mini(_nodo + 1, NODOS_ARBOL[RAMAS_ARBOL[_rama]].size() - 1)
+	elif Input.is_action_just_pressed("mover_abajo") or Input.is_action_just_pressed("ui_down"):
+		_nodo = maxi(_nodo - 1, 0)
+	if Vector2i(_rama, _nodo) != antes:
+		Sonido.efecto("menu_mover")
+		_mantenido = 0.0
+	# mantener Acción sobre el siguiente nodo (si se puede pagar) lo despierta
+	var id: String = RAMAS_ARBOL[_rama]
+	if _soltar:
+		_soltar = Input.is_action_pressed("accion")
+		return
+	if Input.is_action_pressed("accion") and _nodo == Artes.nivel(id) + 1 and Artes.puede_subir(id):
+		_mantenido += delta
+		if _mantenido >= MANTENER:
+			_mantenido = 0.0
+			_soltar = true
+			if Artes.subir(id):
+				Sonido.efecto("arte_sube")
+				_destello_nodo = 0.6
+	else:
+		_mantenido = maxf(0.0, _mantenido - delta * 3.0)
+
+
+## El estado de un nodo: "basica", "despierto", "siguiente" o "dormido"
+func _estado_nodo(id: String, i: int) -> String:
+	if i == 0:
+		return "basica"
+	var n := Artes.nivel(id)
+	if i <= n:
+		return "despierto"
+	if i == n + 1:
+		return "siguiente"
+	return "dormido"
+
+
+func _dibujar_arbol(tinta: float) -> void:
+	_lienzo.draw_texture(ARBOL_RAMAS, Vector2.ZERO, Color(1, 1, 1, tinta))
+	# lo despierto de cada rama brilla por encima de la madera
+	for id in RAMAS_ARBOL:
+		var pts: Array = NODOS_ARBOL[id]
+		var n := Artes.nivel(id)
+		var col: Color = COLOR_RAMA[id]
+		for i in range(0, mini(n, pts.size() - 1)):
+			var pulso := 0.55 + 0.25 * sin(_tiempo * 3.0 - i * 0.6)
+			_lienzo.draw_line(pts[i], pts[i + 1], Color(col, 0.35 * tinta), 5.0)
+			_lienzo.draw_line(pts[i], pts[i + 1], Color(col.lightened(0.4), pulso * tinta), 2.0)
+	# las ramas dormidas: Runa y Tierra, en la niebla
+	for d in [[Vector2(64, 236), "Runa"], [Vector2(576, 236), "Tierra"]]:
+		var c: Vector2 = d[0]
+		_lienzo.draw_circle(c, 11.0, Color(0.05, 0.06, 0.12, 0.85 * tinta))
+		_lienzo.draw_arc(c, 11.0, 0, TAU, 24, Color(0.45, 0.5, 0.7, 0.6 * tinta), 1.5)
+		_texto("?", c + Vector2(-3, 6), Color(0.6, 0.65, 0.85, 0.8 * tinta))
+		_texto(String(d[1]), c + Vector2(-_ancho(String(d[1])) / 2.0, -16), Color(TN_APAGADA, 0.8 * tinta))
+	# los nodos
+	for r in RAMAS_ARBOL.size():
+		var id: String = RAMAS_ARBOL[r]
+		var pts: Array = NODOS_ARBOL[id]
+		for i in pts.size():
+			_dibujar_nodo(id, i, pts[i], tinta, r == _rama and i == _nodo)
+		# el nombre de la rama, encima de su último nodo, con lo que lleva despierto
+		var arriba: Vector2 = pts[pts.size() - 1]
+		var nombre: String = NOMBRE_RAMA[id] + "  %d/%d" % [Artes.nivel(id), Artes.nivel_maximo(id)]
+		# (al lado del último nodo: Raíz y Cetro a su derecha, Aliento a su izquierda)
+		var x_n := arriba.x - 20.0 - _ancho(nombre) if id == "aliento" else arriba.x + 20.0
+		var y_n := arriba.y + (12.0 if id == "cetro" else 5.0)
+		_texto(nombre, Vector2(x_n, y_n), Color(COLOR_RAMA[id], tinta))
+	_dibujar_panel_nodo(tinta)
+
+
+func _dibujar_nodo(id: String, i: int, p: Vector2, tinta: float, elegido: bool) -> void:
+	var estado := _estado_nodo(id, i)
+	var grande := Artes.es_grande(id, i)
+	var r := 12.0 if grande else (10.0 if i == 0 else 9.0)
+	var col: Color = COLOR_RAMA[id]
+	match estado:
+		"basica", "despierto":
+			var halo := 0.18 + 0.08 * sin(_tiempo * 2.5 + i)
+			_lienzo.draw_circle(p, r + 7.0, Color(col, halo * tinta))
+			_lienzo.draw_circle(p, r + 1.5, Color(0.05, 0.04, 0.08, 0.9 * tinta))
+			_lienzo.draw_circle(p, r, Color(col.darkened(0.35), tinta))
+			_lienzo.draw_arc(p, r, 0, TAU, 32, Color(col.lightened(0.5), tinta), 1.5)
+		"siguiente":
+			var late := 0.5 + 0.5 * sin(_tiempo * 4.0)
+			_lienzo.draw_circle(p, r + 1.5, Color(0.05, 0.04, 0.08, 0.95 * tinta))
+			_lienzo.draw_circle(p, r, Color(0.12, 0.13, 0.24, tinta))
+			_lienzo.draw_arc(p, r + 3.0 + late * 2.0, 0, TAU, 32, Color(col, (0.3 + 0.4 * late) * tinta), 1.5)
+			_lienzo.draw_arc(p, r, 0, TAU, 32, Color(col, tinta), 1.5)
+		_:
+			_lienzo.draw_circle(p, r + 1.5, Color(0.04, 0.04, 0.07, 0.95 * tinta))
+			_lienzo.draw_circle(p, r, Color(0.09, 0.09, 0.16, tinta))
+			_lienzo.draw_arc(p, r, 0, TAU, 32, Color(0.35, 0.37, 0.52, tinta), 1.0)
+	if grande:
+		# los nodos grandes llevan una corona de cuatro puntas
+		for k in 4:
+			var a := k * PI / 2.0 + PI / 4.0
+			var q := p + Vector2(cos(a), sin(a)) * (r + 4.0)
+			_lienzo.draw_circle(q, 1.6, Color(ORO_CLARO if estado in ["despierto", "basica"] else Color(0.5, 0.48, 0.4), tinta))
+	# el icono de la rama
+	var mod := Color(1, 1, 1, tinta) if estado in ["basica", "despierto"] else Color(0.55, 0.55, 0.7, 0.75 * tinta)
+	var lado := 16.0 if r >= 10.0 else 14.0
+	_lienzo.draw_texture_rect_region(NODOS_ICONOS, Rect2(p - Vector2.ONE * lado / 2.0, Vector2.ONE * lado), Rect2(ICONO_RAMA[id] * 16, 0, 16, 16), mod)
+	if i == 0:
+		# la tecla de la habilidad básica
+		var tecla: String = HABILIDADES[BASICA_RAMA[id]][1]
+		var c := p + Vector2(r + 6, r - 2)
+		_lienzo.draw_rect(Rect2(c - Vector2(5, 7), Vector2(11, 12)), Color(0.08, 0.06, 0.1, 0.9 * tinta))
+		_lienzo.draw_rect(Rect2(c - Vector2(5, 7), Vector2(11, 12)), Color(TN_TITULO, tinta), false, 1.0)
+		_texto(tecla, c + Vector2(-3, 4), Color(TN_TITULO, tinta), -1, 12)
+	if elegido:
+		# el aro dorado de lo elegido, que gira, y lo que se lleva manteniendo Acción
+		var giro := _tiempo * 2.0
+		for k in 8:
+			var a0 := giro + k * TAU / 8.0
+			_lienzo.draw_arc(p, r + 5.0, a0, a0 + TAU / 16.0, 6, Color(ORO_CLARO, tinta), 2.0)
+		if _mantenido > 0.0:
+			_lienzo.draw_arc(p, r + 9.0, -PI / 2.0, -PI / 2.0 + TAU * (_mantenido / MANTENER), 32, Color(col.lightened(0.5), tinta), 3.0)
+		if _destello_nodo > 0.0:
+			_lienzo.draw_circle(p, r + 20.0 * (1.0 - _destello_nodo / 0.6), Color(col.lightened(0.6), _destello_nodo * tinta))
+
+
+func _dibujar_panel_nodo(tinta: float) -> void:
+	var caja := Rect2(46, 262, 548, 66)
+	_lienzo.draw_rect(caja, Color(0.04, 0.04, 0.09, 0.88 * tinta))
+	_lienzo.draw_rect(caja, Color(TN_TITULO, 0.8 * tinta), false, 1.0)
+	_lienzo.draw_rect(caja.grow(-3), Color(TN_TITULO, 0.3 * tinta), false, 1.0)
+	var id: String = RAMAS_ARBOL[_rama]
+	var col: Color = COLOR_RAMA[id]
+	var x := caja.position.x + 12
+	var y := caja.position.y + 18
+	# lo que tienes, abajo a la derecha del panel
+	var bolsa := "◆ Esencia %d   ✧ Cristales %d" % [Artes.esencia(), Tienda.cristales()]
+	_texto(bolsa, Vector2(caja.end.x - 10 - _ancho(bolsa), caja.end.y - 6), Color(TN_TITULO, tinta))
+	if _nodo == 0:
+		var h: Array = HABILIDADES[BASICA_RAMA[id]]
+		_texto("%s  (%s)" % [h[0], h[1]], Vector2(x, y), Color(col, tinta))
+		_parrafo(String(h[3]), Vector2(x, y + 18), caja.size.x - 24, Color(TN_TINTA, tinta), 15.0)
+		return
+	var niveles: Array = Artes.buscar(id).get("niveles", [])
+	var nivel_d: Dictionary = niveles[_nodo - 1]
+	var titulo := "%s %s · %s" % [NOMBRE_RAMA[id].capitalize(), _romano(_nodo), String(nivel_d["nombre"])]
+	if bool(nivel_d.get("grande", false)):
+		titulo += "  ✦"
+	_texto(titulo, Vector2(x, y), Color(col, tinta))
+	_parrafo(String(nivel_d["texto"]), Vector2(x, y + 18), caja.size.x - 200, Color(TN_TINTA, tinta), 15.0)
+	# a la derecha: lo que cuesta y si se puede
+	var estado := _estado_nodo(id, _nodo)
+	var xd := caja.end.x - 176
+	if estado == "despierto":
+		_texto("Despierto", Vector2(xd + 50, y + 22), Color(TN_VERDE, tinta))
+		return
+	var esencia := _nodo
+	var cristales := int(nivel_d.get("cristales", 0))
+	var coste := "◆ %d Esencia" % esencia + ("   ✧ %d" % cristales if cristales > 0 else "")
+	_texto(coste, Vector2(xd, y), Color(TN_TITULO, tinta))
+	var aviso := ""
+	var color_aviso := TN_APAGADA
+	if estado == "dormido":
+		aviso = "Primero el anterior"
+	elif Artes.esencia() < esencia:
+		aviso = "Te falta Esencia"
+		color_aviso = TN_ROJO
+	elif Tienda.cristales() < cristales:
+		aviso = "Te faltan Cristales"
+		color_aviso = TN_ROJO
+	else:
+		aviso = "Mantén Acción"
+		color_aviso = col
+		var barra := Rect2(xd, y + 26, 160, 4)
+		_lienzo.draw_rect(barra, Color(0.1, 0.1, 0.2, tinta))
+		_lienzo.draw_rect(Rect2(barra.position, Vector2(barra.size.x * (_mantenido / MANTENER), barra.size.y)), Color(col, tinta))
+	_texto(aviso, Vector2(xd, y + 22), Color(color_aviso, tinta))
+
+
+func _romano(n: int) -> String:
+	return ["", "I", "II", "III", "IV", "V", "VI"][clampi(n, 0, 6)]
+

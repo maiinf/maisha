@@ -115,5 +115,24 @@ func _ready() -> void:
 	_comprobar(not arbol.abierto and not get_tree().paused and maisha.puede_actuar, "Tab deja de meditar y se puede seguir jugando (%s %s %s)" % [arbol.abierto, get_tree().paused, maisha.puede_actuar])
 	_comprobar(Misiones.estado(Misiones.buscar("arbol_vida")) == "hecha", "misión «El Árbol de la Vida» cumplida")
 
+	print("El árbol de habilidades del diario (rama Cetro, Cristales en los nodos grandes):")
+	_comprobar(Artes.cristales_gastados() == 4, "los nodos grandes Raíz III y Aliento III gastaron 2 + 2 Cristales (%d)" % Artes.cristales_gastados())
+	var cristales := Tienda.cristales()
+	for m in ["zona/prados_del_eco/4", "zona/prados_del_eco/5", "zona/prados_del_eco/6", "secreto/prados_del_eco/1,1", "secreto/prados_del_eco/2,2", "secreto/prados_del_eco/5,5"]:
+		Estado.marcar(m)
+	_comprobar(Artes.subir("cetro") and Artes.golpe_alcance() == R.GOLPE_ALCANCE + 4.0, "Cetro I: el golpe llega más lejos")
+	_comprobar(Artes.subir("cetro") and Artes.golpe_angulo() == R.GOLPE_ANGULO + 20.0, "Cetro II: barre más ancho")
+	_comprobar(Artes.cristales_siguiente("cetro") == 2 and Artes.es_grande("cetro", 3), "Cetro III es un nodo grande: pide 2 Cristales")
+	if Tienda.cristales() >= 2 and Artes.esencia() >= 3:
+		_comprobar(Artes.subir("cetro") and Artes.golpe_danio() == R.GOLPE_DANIO + 1 and Tienda.cristales() == cristales - 2, "Cetro III: pega más fuerte y se gastan los Cristales")
+	else:
+		_comprobar(not Artes.puede_subir("cetro"), "sin Cristales o Esencia, Cetro III no se puede despertar")
+	Estado.extra["cristales_gastados"] = 999
+	_comprobar(Tienda.cristales() == 0 and Artes.nivel("cetro") >= 2, "sin Cristales…")
+	var antes := Artes.nivel("cetro")
+	if Artes.cristales_siguiente("cetro") > 0:
+		_comprobar(not Artes.subir("cetro") and Artes.nivel("cetro") == antes, "…un nodo grande no se despierta")
+	Estado.extra["cristales_gastados"] = 0
+
 	print("RESULTADO: ", "todo correcto" if _fallos == 0 else "%d fallos" % _fallos)
 	get_tree().quit(_fallos)

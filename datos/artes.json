@@ -76,7 +76,9 @@
 					"efectos": {
 						"semilla_alcance": 1
 					},
-					"rasgo": "brote"
+					"rasgo": "brote",
+					"grande": true,
+					"cristales": 2
 				},
 				{
 					"nombre": "Semilla ligera II",
@@ -98,7 +100,64 @@
 					"efectos": {
 						"semilla_alcance": 1
 					},
-					"rasgo": "flores"
+					"rasgo": "flores",
+					"grande": true,
+					"cristales": 4
+				}
+			]
+		},
+		{
+			"id": "cetro",
+			"nombre": "Arte del Cetro",
+			"icono": "cetro",
+			"texto": "El Cetro de Raíz y sus golpes. Hace que Maisha llegue más lejos, golpee más ancho y pegue más fuerte.",
+			"niveles": [
+				{
+					"nombre": "Mano firme",
+					"texto": "El cetro llega un poco más lejos.",
+					"efectos": {
+						"golpe_alcance": 4
+					}
+				},
+				{
+					"nombre": "Barrido",
+					"texto": "El golpe barre más ancho: alcanza también a los que están a los lados.",
+					"efectos": {
+						"golpe_angulo": 20
+					}
+				},
+				{
+					"nombre": "Corteza de roble",
+					"texto": "El cetro pega más fuerte: quita 2 en vez de 1.",
+					"efectos": {
+						"golpe_danio": 1
+					},
+					"grande": true,
+					"cristales": 2
+				},
+				{
+					"nombre": "Mano ligera",
+					"texto": "Se puede golpear más seguido (un golpe cada 0,24 s en vez de cada 0,32 s).",
+					"efectos": {
+						"golpe_espera": 0.08
+					}
+				},
+				{
+					"nombre": "Golpe que despierta",
+					"texto": "Cada golpe que acierta devuelve más Aliento.",
+					"efectos": {
+						"golpe_recarga": 3
+					}
+				},
+				{
+					"nombre": "Cetro del Primer Árbol",
+					"texto": "El cetro pega aún más fuerte (quita 3) y llega todavía más lejos.",
+					"efectos": {
+						"golpe_danio": 1,
+						"golpe_alcance": 4
+					},
+					"grande": true,
+					"cristales": 4
 				}
 			]
 		},
@@ -128,7 +187,9 @@
 					"efectos": {
 						"vida_maxima": 1
 					},
-					"rasgo": "aura"
+					"rasgo": "aura",
+					"grande": true,
+					"cristales": 2
 				},
 				{
 					"nombre": "Latido amplio",
@@ -152,7 +213,9 @@
 						"vida_maxima": 1,
 						"aliento_maximo": 15
 					},
-					"rasgo": "brisa"
+					"rasgo": "brisa",
+					"grande": true,
+					"cristales": 4
 				}
 			]
 		},

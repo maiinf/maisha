@@ -121,7 +121,7 @@ func golpear() -> void:
 	if _golpeando or _espera_golpe > 0.0:
 		return
 	_golpeando = true
-	_espera_golpe = R.GOLPE_ESPERA
+	_espera_golpe = Artes.golpe_espera()
 	Sonido.efecto("cetro_golpe")
 	_sprite.play("golpe_" + mirando)
 	if _ropa.lleva("cetro_raiz"):
@@ -140,7 +140,7 @@ func _comprobar_golpe() -> void:
 	var centro := global_position + Vector2(0, -8)
 	var mira := direccion_mirada()
 	var aciertos := 0
-	var alcance := R.GOLPE_ALCANCE * (R.CETRO_TEMPLADO_ALCANCE if Estado.tiene("cetro_templado") else 1.0)
+	var alcance := Artes.golpe_alcance() * (R.CETRO_TEMPLADO_ALCANCE if Estado.tiene("cetro_templado") else 1.0)
 	for nodo in get_tree().get_nodes_in_group("golpeables"):
 		var objetivo := nodo as Node2D
 		if objetivo == null or not is_instance_valid(objetivo):
@@ -148,9 +148,9 @@ func _comprobar_golpe() -> void:
 		var hacia := (objetivo.global_position + Vector2(0, -5)) - centro
 		if hacia.length() > alcance:
 			continue
-		if hacia.length() > 4.0 and rad_to_deg(abs(mira.angle_to(hacia))) > R.GOLPE_ANGULO:
+		if hacia.length() > 4.0 and rad_to_deg(abs(mira.angle_to(hacia))) > Artes.golpe_angulo():
 			continue
-		if objetivo.call("recibir_golpe", R.GOLPE_DANIO, mira):
+		if objetivo.call("recibir_golpe", Artes.golpe_danio(), mira):
 			aciertos += 1
 			Impacto.chispa(objetivo.global_position + Vector2(0, -6) - mira * 4.0, mira)
 		else:

@@ -139,6 +139,16 @@ Como en otros juegos, el Kitovu enseña las acciones parando el mundo (`scripts/
 
 El diario tiene estilo **noche mágica** (`herramientas/pintar_interfaz.py`): tapas de cuero azul noche cosidas con hilo de oro y cantoneras doradas, páginas de cielo nocturno (nebulosa suave, estrellas, constelaciones) con borde de filigrana dorada, y la tapa con el Gran Árbol, la luna y estrellas en oro. Las letras de las páginas usan su propia paleta clara (`TN_*` en `mochila.gd`): títulos en oro, texto en crema, la historia en coral y lo cumplido en gris azulado; la fila elegida, en tinta oscura sobre la banda dorada. El mapa sigue siendo de pergamino.
 
+**El árbol de habilidades** (pestaña Habilidades del diario): un árbol dorado que crece del lomo del libro
+(`arbol_ramas.png` y `nodos.png`, en `pintar_interfaz.py`) con tres ramas: **Raíz** (Semilla, K) a la izquierda,
+**Cetro** (golpe, J) hacia arriba y **Aliento** (Latido, L) a la derecha; Runa y Tierra asoman dormidas a los lados.
+Cada rama tiene en su base la habilidad básica y encima 6 nodos (los niveles de `datos/artes.json`). Los nodos 3 y 6
+son **grandes** (corona de cuatro puntas) y, además de Esencia, piden **Cristales del Nexo** (2 y 4). ← → cambian de
+rama (en los bordes, de pestaña), ↑ ↓ suben y bajan por ella, y **manteniendo Acción** sobre el siguiente nodo se
+despierta, en cualquier momento (meditar en el Claro de Calma sigue curando y guardando, y su árbol también deja
+subir). Rama Cetro: alcance +4, barrido más ancho, golpe 2 (grande), golpes más seguidos, más Aliento por golpe,
+golpe 3 y más alcance (grande). Los Cristales gastados se cuentan a partir de los niveles (`Artes.cristales_gastados`).
+
 Es el **diario de cuero de Maisha**: un libro con tapas cosidas y cantoneras de latón, páginas de pergamino y una cinta de marcapáginas por pestaña. El juego se para mientras está abierto.
 - **Al abrirlo**, el libro sube desde abajo cerrado (se ve la tapa con el Gran Árbol grabado), la tapa gira hacia el lomo y aparecen las páginas; luego se escribe la tinta. **Al cambiar de pestaña** se pasa una hoja (con su sonido de papel). Lo elegido se marca con un **subrayado amarillo** que se desliza y una cinta roja; la historia lleva un **sello de lacre**; lo cumplido se tacha.
 - El **mapa** se ve pegado sobre las dos páginas.

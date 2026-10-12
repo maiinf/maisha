@@ -89,11 +89,34 @@ func coste_siguiente(id: String) -> int:
 	return nivel(id) + 1
 
 
+## Los nodos grandes (los niveles 3 y 6) cuestan también Cristales del Nexo
+func cristales_siguiente(id: String) -> int:
+	var niveles: Array = buscar(id).get("niveles", [])
+	var n := nivel(id)
+	return int(niveles[n].get("cristales", 0)) if n < niveles.size() else 0
+
+
+func es_grande(id: String, nivel_n: int) -> bool:
+	var niveles: Array = buscar(id).get("niveles", [])
+	return nivel_n >= 1 and nivel_n <= niveles.size() and bool(niveles[nivel_n - 1].get("grande", false))
+
+
+## Los Cristales gastados en los nodos grandes (se cuentan a partir de los niveles, como la Esencia)
+func cristales_gastados() -> int:
+	var total := 0
+	for arte in lista:
+		var niveles: Array = arte.get("niveles", [])
+		for i in mini(nivel(String(arte["id"])), niveles.size()):
+			total += int(niveles[i].get("cristales", 0))
+	return total
+
+
 func puede_subir(id: String) -> bool:
 	var arte := buscar(id)
 	if arte.is_empty() or arte.has("bloqueada"):
 		return false
-	return nivel(id) < nivel_maximo(id) and esencia() >= coste_siguiente(id)
+	return nivel(id) < nivel_maximo(id) and esencia() >= coste_siguiente(id) \
+			and Tienda.cristales() >= cristales_siguiente(id)
 
 
 func subir(id: String) -> bool:
@@ -179,3 +202,19 @@ func latido_radio() -> float:
 
 func golpe_recarga() -> float:
 	return R.GOLPE_RECARGA_ALIENTO + valor("golpe_recarga")
+
+
+func golpe_alcance() -> float:
+	return R.GOLPE_ALCANCE + valor("golpe_alcance")
+
+
+func golpe_angulo() -> float:
+	return R.GOLPE_ANGULO + valor("golpe_angulo")
+
+
+func golpe_danio() -> int:
+	return R.GOLPE_DANIO + int(valor("golpe_danio"))
+
+
+func golpe_espera() -> float:
+	return R.GOLPE_ESPERA - valor("golpe_espera")

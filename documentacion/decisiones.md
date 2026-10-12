@@ -30,3 +30,12 @@ se pasan.
 | 2026-10-12 | Arreglado: la flecha de la misión no seguía a lo que se mueve (la chispa, el castor…). Solo se recalculaba cada 0,2 s y guardaba una posición fija; ahora guarda la cosa y lee su posición en cada fotograma, y la flechita de encima se pone según la altura de cada uno. | Lo encontró Iam jugando. |
 | 2026-10-12 | Tutorial: lecciones que paran el mundo hasta pulsar la tecla (cetro J junto al espantapájaros; semillas K en la primera mancha, con cámara lenta «¡Sal de la cruz!»; Latido L en la segunda). | Pedido por Iam. |
 | 2026-10-12 | Diario nuevo y árbol de habilidades: estilo **noche mágica** (libro de cuero con filigrana dorada, cielo nocturno dentro). Árbol con tronco de raíz dorada y ramas **Raíz**, **Cetro** (nueva) y **Aliento**, y Runa y Tierra dormidas. Nodos normales con **Esencia**; nodos grandes también con **Cristales del Nexo**. Se mejora **desde el diario** en cualquier momento (meditar sigue curando y guardando). | Iam aceptó las propuestas. |
+
+## 2026-10-12 · Diario «noche mágica» y árbol de habilidades
+| Decisión | Elegido |
+| --- | --- |
+| Estilo del diario | Noche mágica: cuero azul, páginas de cielo con estrellas y filigrana dorada |
+| Coste de los nodos | Normales con Esencia; los grandes (3 y 6) también con Cristales del Nexo (2 y 4) |
+| Dónde se mejora | Desde el diario, en cualquier momento (meditar sigue curando y guardando) |
+| Ramas | Raíz, Cetro (nueva), Aliento; Runa y Tierra dormidas |
+

@@ -71,7 +71,8 @@ func cristales_gastados() -> int:
 
 
 func cristales() -> int:
-	return maxi(0, cristales_ganados_total() - cristales_gastados())
+	# (también los que se han gastado en los nodos grandes del árbol de habilidades)
+	return maxi(0, cristales_ganados_total() - cristales_gastados() - Artes.cristales_gastados())
 
 
 # --- Artículos ----------------------------------------------------------------------
