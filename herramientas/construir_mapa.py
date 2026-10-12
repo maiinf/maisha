@@ -1559,7 +1559,7 @@ def crear_canada():
 
 def crear_lago():
     """El Lago Espejo (96x64): un lugar al oeste de la Cañada del Eco (puerta al este). Un lago grande y quieto con
-    una ISLA en el centro, donde aparecerá KIMYA, la Quietud. Lo que solo existe en el reflejo («\\»: un puente de
+    una ISLA en el centro, donde aparecerá KIMYA, el Silencio. Lo que solo existe en el reflejo («\\»: un puente de
     luz sobre el agua) se vuelve real cuando Maisha se queda quieta junto al agua y el lago se calma. Hay dos: el
     largo, del sur a la isla, y uno corto, del oeste a un islote con un secreto. En la orilla sur, la ARENA del
     minijefe de Giza que enturbia el agua (no deja que se calme hasta vencerlo); al noreste, una zona corrupta.

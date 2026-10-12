@@ -1,6 +1,6 @@
 extends Node
 ## Prueba automática del Lago Espejo: el agua turbia mientras vive Kambare, la pelea contra Kambare (el siluro de
-## cieno), la quietud que vuelve el lago espejo,
+## cieno), la quietud que vuelve el lago espejo, Kimya en la isla,
 ## los puentes del reflejo (que se encienden, se cruzan y se apagan si el agua tiembla) y la vuelta a la Cañada.
 ## Se ejecuta sin abrir el editor:  godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_lago_espejo
 
@@ -211,6 +211,26 @@ func _ready() -> void:
 	_comprobar(maisha.global_position.y < 31 * 16, "y se cruza andando hasta la isla (%.0f)" % maisha.global_position.y)
 	_comprobar(espejo.espejo, "andar no rompe el espejo")
 
+	print("Kimya, el Silencio:")
+	var kimya: Node2D = get_tree().get_first_node_in_group("kimya")
+	await _esperar(1.5)
+	_comprobar(kimya != null and kimya.visible, "con el lago en espejo, Kimya aparece en el círculo de piedras de la isla")
+	maisha.global_position = kimya.global_position + Vector2(0, 18)
+	await _esperar(0.3)
+	kimya.interactuar()
+	await _esperar(0.5)
+	var dialogo := get_tree().get_first_node_in_group("dialogo")
+	var con_imagen := false
+	for i in 120:
+		if dialogo.get("_ilustracion") != null and dialogo.get("_ilustracion_alfa") > 0.5:
+			con_imagen = true
+		if not dialogo.hablando:
+			break
+		dialogo.pasar()
+		await _esperar(0.12)
+	await _esperar(0.8)
+	_comprobar(Estado.tiene("kimya_conocida") and con_imagen, "habla con Maisha, con su ilustración (en el reflejo de Maisha está Mauti)")
+
 	print("El agua tiembla:")
 	maisha.global_position = Vector2(46 * 16, 40 * 16)
 	await _esperar(0.2)
@@ -224,6 +244,7 @@ func _ready() -> void:
 	_comprobar(not espejo.espejo, "en la orilla, un golpe hace temblar el agua")
 	await _esperar(2.8)
 	_comprobar(not largo.cruzable(), "y el puente se apaga poco a poco")
+	_comprobar(not kimya.visible, "y Kimya se desvanece con el reflejo")
 
 	print("De vuelta a la cañada:")
 	maisha.global_position = _puerta("canada").global_position + Vector2(-40, 0)

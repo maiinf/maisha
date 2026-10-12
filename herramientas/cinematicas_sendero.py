@@ -9,16 +9,19 @@
                   Todo tiene el tono verde-agua y la niebla clara de los recuerdos.
   13_eco_pasarelas EL SEGUNDO ECO (Las Pasarelas). Una noche de luna en el prado inundado: una garza vieja y su cría,
                   con un farolillo, miran el agua desde la pasarela. Bajo el agua brillan las raíces doradas del Primer
-                  Árbol, como una red, y entre ellas se desliza Kimya, la Quietud: una forma plateada, larga y tranquila.
+                  Árbol, como una red, y entre ellas se desliza Kimya, el Silencio: una forma plateada, larga y tranquila.
   14_eco_cobrizo  EL TERCER ECO (Camino Cobrizo). Una tarde de otoño en la loma: un árbol enorme de hojas de cobre
                   que caen despacio. Bajo él, sentados en la hierba llena de hojas, dos espíritus de luz pequeños:
                   Maisha (dorada, con su brote) y MAUTI (plateada y lila, con una hoja seca en lo alto), que recoge una
                   hoja que cae. Al fondo, colinas de árboles cobrizos y el sol bajo.
   16_eco_canada   EL QUINTO ECO (Cañada del Eco). Atardecer en la garganta: el sol se pone en el hueco entre las
                   dos paredes de peña. En una cornisa, Maisha (dorada) y Mauti (plateada y lila) gritan sus nombres
-                  hacia la pared de enfrente, y sus ondas (doradas y lilas) vuelven rebotadas. A su lado, KIMYA, la
-                  Quietud, flota en silencio mirando abajo: de ella no sale ninguna onda. Abajo, el arroyo está
+                  hacia la pared de enfrente, y sus ondas (doradas y lilas) vuelven rebotadas. A su lado, KIMYA, el
+                  Silencio, flota en silencio mirando abajo: de ella no sale ninguna onda. Abajo, el arroyo está
                   quieto como un espejo y solo refleja a Kimya.
+  17_kimya_lago   KIMYA EN EL LAGO ESPEJO (no es un recuerdo: pasa ahora). La hora azul sobre el lago, quieto como un
+                  espejo. Maisha, en la orilla de la isla, mira el agua; Kimya se alza del lago, plateada. En el agua,
+                  bajo Maisha, su reflejo no es ella: es MAUTI, del revés, mirándola.
   15_eco_surcos   EL CUARTO ECO (Senda de los Surcos). La fiesta de la última siega, de noche: campos con gavillas,
                   guirnaldas de farolillos, una hoguera en el centro y los seres de Raíz bailando a contraluz. En la
                   colina, el Primer Árbol dorado. Junto al fuego, Maisha y Mauti bailan de la mano.
@@ -220,7 +223,7 @@ def _garza(lz, x, y, e, mira=1, cria=False):
 
 
 def eco_pasarelas():
-    """«Mira abajo, pequeña. Esas luces son las raíces del Primer Árbol.» / «Es Kimya. La Quietud.»"""
+    """«Mira abajo, pequeña. Esas luces son las raíces del Primer Árbol.» / «Es Kimya. El Silencio.»"""
     lz = Lienzo(W, H, semilla=140)
     HZ = 78
     # cielo de noche con luna llena y estrellas
@@ -264,7 +267,7 @@ def eco_pasarelas():
     lz.sumar_luz(lz.desenfocar(raices, 10), "#8a6a22", 0.5)
     lz.sumar_luz(raices_v, "#d8901e", 0.6)
     lz.sumar_luz(lz.desenfocar(raices, 0.6) * (1 - hondo), "#ffd98a", 0.15)
-    # Kimya, la Quietud: un ser largo de luz plateada (cabeza serena, cuerpo que se afina en una cola de niebla y
+    # Kimya, el Silencio: un ser largo de luz plateada (cabeza serena, cuerpo que se afina en una cola de niebla y
     # dos hilos de luz como astas), que se desliza entre las raíces
     kimya = np.zeros((lz.H, lz.W))
     for k in range(40):
@@ -470,7 +473,7 @@ def eco_surcos():
 
 
 def _kimya_pie(lz, x, y, e=1.0):
-    """Kimya, la Quietud, pequeña y flotando: una figura de luz plateada, casi transparente, con la cabeza redonda
+    """Kimya, el Silencio, pequeña y flotando: una figura de luz plateada, casi transparente, con la cabeza redonda
     y serena (ojos cerrados, mirando abajo), dos hilos de luz largos que ondean hacia atrás como cintas y el cuerpo
     que se deshace en niebla. Devuelve su figura (para el reflejo)."""
     cuerpo = np.zeros((lz.H, lz.W))
@@ -530,7 +533,7 @@ def _pared_garganta(lz, borde, lado, semilla):
 
 
 def eco_canada():
-    """«¡Maisha!» … «¡Maisha!» — «¡Mauti!» … «¡Mauti!» — «Kimya, grita tú.» — «La Quietud no tiene eco.»"""
+    """«¡Maisha!» … «¡Maisha!» — «¡Mauti!» … «¡Mauti!» — «Kimya, grita tú.» — «El Silencio no tiene eco.»"""
     lz = Lienzo(W, H, semilla=180)
     rng = np.random.default_rng(181)
     # cielo de atardecer: violeta arriba, rosa y naranja en el hueco de la garganta, donde se pone el sol
@@ -600,4 +603,105 @@ def eco_canada():
     return lz
 
 
-PIEZAS = {"16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}
+def kimya_lago():
+    """«Mira el agua. ¿A quién ves en tu reflejo?» — en el lago quieto, bajo Maisha, está Mauti."""
+    lz = Lienzo(W, H, semilla=200)
+    rng = np.random.default_rng(201)
+    HZ = 98
+    # el cielo de la hora azul: azul hondo arriba, lila y melocotón pálido en el horizonte, las primeras estrellas
+    cielo_cols = ["#0e1428", "#1c2a4a", "#3a3e6a", "#7a6a90", "#c8a0a8", "#f0c8a8"]
+    lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(cielo_cols, desde=0, hasta=HZ))
+    ci.estrellas(lz, 70, HZ - 30, semilla=202, color="#e8f0f4")
+    luna = lz.circulo(120, 30, 8)
+    lz.sumar_luz(lz.desenfocar(luna, 14), "#c8d8e8", 0.4)
+    lz.pintar(luna, "#f0f4ec")
+    # la orilla lejana: sauces y, al este, las paredes de la Cañada, a contraluz
+    arboles = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 8, 7, 34, 203))
+    lz.pintar(arboles * (lz.y < HZ + 1), "#141a28")
+    sauces = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 4, 4, 14, 208))
+    lz.pintar(sauces * (lz.y < HZ + 1), "#10141f")
+    pena = lz.poligono([(470, HZ + 2), (490, HZ - 26), (520, HZ - 30), (560, HZ - 22), (600, HZ - 34), (600, HZ + 2)])
+    lz.pintar(pena, "#1a1a2c")
+    # el lago: un espejo. Refleja el cielo del revés (más oscuro) y la orilla lejana
+    agua = (lz.y >= HZ).astype(float)
+    filas = lz.img.shape[0]
+    eje = int(HZ * lz.s)
+    # cada fila del agua toma la del cielo que tiene encima en espejo (más abajo de lo que refleja, el cielo de arriba)
+    origen = np.clip(2 * eje - 1 - np.arange(filas), 0, filas - 1)
+    reflejo = lz.img[origen]
+    lz.pintar(agua, reflejo * 0.82)
+    lz.pintar(agua * np.clip((lz.y - HZ) / 160, 0, 1), "#0a1424", 0.25)
+    vetas = (estirar_h(lz, lz.ruido(1.5, 2, semilla=204), 40) > 0.72) * agua
+    lz.pintar(vetas, "#c8e0e8", 0.12)
+    # Kimya, alzándose del agua, a la derecha (con su reflejo)
+    kx, ky = 400, 176
+    k_lz = Lienzo(W, H, semilla=205)
+    _kimya_pie(k_lz, kx, ky, e=1.9)
+    _sumar_con_reflejo(lz, k_lz, ky + 4, agua, 0.55)
+    lz.sumar_luz(lz.desenfocar(lz.elipse(kx, ky + 4, 26, 4), 4) * agua, "#9fd0d0", 0.5)
+    # la orilla de la isla, a la izquierda: hierba, el círculo de piedras y el borde donde está Maisha
+    YO = 196
+    isla = lz.poligono([(0, 150), (60, 158), (140, 172), (200, YO - 2), (250, YO), (262, YO + 6), (240, YO + 12),
+                        (150, 230), (90, 256), (0, 256)])
+    lz.sombrear(isla, ["#0e1a14", "#16261c", "#203422", "#2c4428", "#3a5430"], 6, (0.5, -0.8, 0.5),
+                textura=lz.ruido(1.5, 2, semilla=206), fuerza_tex=0.35)
+    filo = np.clip(isla - np.roll(isla, int(2 * lz.s), axis=0), 0, 1)
+    lz.sumar_luz(filo, "#9fb8c8", 0.35)
+    for (x, y, r) in ((40, 178, 6), (78, 190, 5), (120, 206, 5.5), (26, 214, 6)):
+        piedra = lz.elipse(x, y, r * 1.3, r * 0.8)
+        lz.sombrear(piedra, ["#1a1c24", "#2e3240", "#4a5060", "#6a7080"], r, (0.5, -0.8, 0.5))
+    hierba = np.zeros((lz.H, lz.W))
+    for k in range(140):
+        x = rng.random() * 250
+        yb = 150 + x * 0.18 + rng.random() * 40
+        hierba = np.maximum(hierba, lz.trazo([(x, yb), (x + (rng.random() - 0.5) * 3, yb - 3 - rng.random() * 4)], 0.5))
+    lz.pintar(hierba * isla, "#3e5a34", 0.9)
+    # Maisha en el borde, mirando el agua; y en el agua, bajo ella, del revés... Mauti
+    mx = 222
+    m_lz = Lienzo(W, H, semilla=207)
+    _mauti_luz(m_lz, mx, YO, e=1.6, mira=1)
+    _pegar_con_reflejo(lz, m_lz, YO + 2, agua, 0.75, solo_reflejo=True)
+    ci.maisha_luz(lz, mx, YO, e=1.6)
+    # la luz de las dos, sobre el agua quieta
+    lz.sumar_luz(lz.desenfocar(lz.elipse(mx, YO + 22, 14, 18), 8) * agua, "#b8a8e0", 0.35)
+    motas = np.zeros((lz.H, lz.W))
+    for k in range(26):
+        motas = np.maximum(motas, lz.circulo(300 + rng.random() * 200, 80 + rng.random() * 100, 0.5 + rng.random() * 0.4))
+    lz.sumar_luz(motas, "#e8f4f0", 0.8)
+    # viñeta suave
+    lz.pintar(np.clip((np.hypot((lz.x - 300) / 330, (lz.y - 140) / 170) - 0.75) * 2.0, 0, 1), "#05070c", 0.6)
+    return lz
+
+
+def _sumar_con_reflejo(lz, otro, eje_y, agua, fuerza):
+    """Como _pegar_con_reflejo, pero para lo que está hecho de luz (se suma: lo negro no tapa nada)."""
+    lz.img = 1 - (1 - lz.img) * (1 - np.clip(otro.img, 0, 1))
+    eje = int(eje_y * lz.s)
+    img_r = np.zeros_like(otro.img)
+    alto = min(eje, lz.H - eje)
+    img_r[eje:eje + alto] = otro.img[eje - alto:eje][::-1]
+    img_r = img_r * (agua * fuerza)[..., None]
+    lz.img = 1 - (1 - lz.img) * (1 - np.clip(img_r, 0, 1))
+
+
+def estirar_h(lz, campo, largo):
+    import cv2
+    k = np.ones((1, int(largo * lz.s)), np.float32) / int(largo * lz.s)
+    return cv2.filter2D(campo.astype(np.float32), -1, k)
+
+
+def _pegar_con_reflejo(lz, otro, eje_y, agua, fuerza, solo_reflejo=False):
+    """Pega lo pintado en «otro» (un lienzo aparte) y, debajo de eje_y, su reflejo del revés sobre el agua."""
+    eje = int(eje_y * lz.s)
+    if not solo_reflejo:
+        lz.pintar(otro.alfa, otro.img)
+    img_r = np.zeros_like(otro.img)
+    alfa_r = np.zeros_like(otro.alfa)
+    alto = min(eje, lz.H - eje)
+    img_r[eje:eje + alto] = otro.img[eje - alto:eje][::-1]
+    alfa_r[eje:eje + alto] = otro.alfa[eje - alto:eje][::-1]
+    # el reflejo tiembla un poco y es algo más oscuro y azulado
+    lz.pintar(lz.desenfocar(alfa_r, 0.6) * agua * fuerza, img_r * 0.85 + np.array([0.02, 0.04, 0.08]))
+
+
+PIEZAS = {"17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}

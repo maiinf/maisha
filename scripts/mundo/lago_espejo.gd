@@ -1,12 +1,14 @@
 extends "res://scripts/mundo/escena_mundo.gd"
 ## LAGO ESPEJO: un lugar al oeste de la Cañada del Eco (se llega al escuchar el quinto eco).
-## Un lago grande con una ISLA en el centro, donde aparecerá KIMYA, la Quietud. Su agua está TURBIA mientras vive
+## Un lago grande con una ISLA en el centro, donde aparecerá KIMYA, el Silencio. Su agua está TURBIA mientras vive
 ## KAMBARE, el siluro de cieno (en la orilla sur). Sin él, si Maisha se queda quieta junto al agua, el lago se vuelve
 ## ESPEJO y lo que solo existe en el reflejo se hace real: el puente de luz hasta la isla y el del islote del secreto
 ## (scripts/mundo/lago/espejo_lago.gd y scripts/mundo/objetos/puente_reflejo.gd).
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const ESPEJO := preload("res://scripts/mundo/lago/espejo_lago.gd")
+const KIMYA := preload("res://scripts/mundo/lago/kimya.gd")
+const ISLA := Vector2i(46, 26)            # el círculo de piedras del centro de la isla
 
 
 func _ready() -> void:
@@ -14,6 +16,9 @@ func _ready() -> void:
 	var espejo: Node2D = ESPEJO.new()
 	espejo.name = "Espejo"
 	$Region.add_child(espejo)
+	var kimya: Node2D = KIMYA.new()
+	kimya.position = Vector2(ISLA) * 16.0 + Vector2(8, 14)
+	$Entidades.add_child(kimya)
 	_maisha.caida.connect(_al_caer_fuera_de_zona)
 	$Corrupcion.region_purgada.connect(_al_purgar_region)
 	if not Estado.tiene("lago_llegada"):

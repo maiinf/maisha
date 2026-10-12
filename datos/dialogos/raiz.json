@@ -1215,7 +1215,7 @@
 				],
 				"lineas": [
 					"¿Has oído al agua? Mi abuela decía que bajo Las Pasarelas duerme algo tranquilo, muy tranquilo.",
-					"Lo llamaba «la Quietud». Decía que cuidaba de que nada creciera demasiado deprisa.",
+					"Lo llamaba «el Silencio». Decía que cuidaba de que nada creciera demasiado deprisa.",
 					"Ahora el agua está quieta de otra manera. Fea. No sé explicarlo."
 				]
 			},
@@ -1242,7 +1242,7 @@
 						"lineas": [
 							"«Mira abajo, pequeña. Esas luces son las raíces del Primer Árbol. Llegan hasta aquí a beber.»",
 							"«¿Y esa sombra plateada que se mueve entre ellas?»",
-							"«Es Kimya. La Quietud. Cuida de que nada crezca demasiado deprisa, ni se pudra demasiado pronto.»",
+							"«Es Kimya. El Silencio. Cuida de que nada crezca demasiado deprisa, ni se pudra demasiado pronto.»",
 							"«¿Kimya es buena?»  «Kimya es necesaria. Como la noche. Como el invierno.»"
 						]
 					}
@@ -1667,7 +1667,7 @@
 							"«¡MAUTIII!» … «…auti… auti…»",
 							"«Kimya, ahora tú. ¡Grita tu nombre!»",
 							"Kimya no grita. Mira el agua del arroyo, quieta como un cristal, y sonríe.",
-							"«La Quietud no tiene eco. Por eso puedo oíros a los dos.»"
+							"«El Silencio no tiene eco. Por eso puedo oíros a los dos.»"
 						]
 					}
 				],
@@ -1722,6 +1722,46 @@
 				"lineas": [
 					"Kambare se hunde en el lago, limpio y tranquilo. Era él quien removía el barro: Giza no le dejaba estarse quieto.",
 					"El agua se está aclarando... Si ahora me quedo quieta en la orilla, quizá el lago me enseñe lo que guarda."
+				]
+			}
+		]
+	},
+	"kimya": {
+		"nombre": "Kimya",
+		"conversaciones": [
+			{
+				"no": [
+					"kimya_conocida"
+				],
+				"marca": [
+					"kimya_conocida"
+				],
+				"lineas": [
+					"...",
+					"Has venido despacio. Has esperado a que el agua se callara. Así es como se llega hasta mí.",
+					"Soy Kimya. El Silencio. Lo que queda cuando todo se calla... y aun así sigue ahí.",
+					"Tú despiertas lo que crece, Maisha. Mauti guarda lo que cae. Y yo me acuerdo de todo. Los tres somos el mismo árbol."
+				],
+				"historia": [
+					{
+						"imagen": "17_kimya_lago",
+						"lineas": [
+							"«Mira el agua. ¿A quién ves en tu reflejo?»",
+							"En el lago quieto, junto a Maisha, no está Maisha. Está Mauti, con su hoja seca en lo alto, mirándola.",
+							"«Mauti no se ha ido. Se fue a buscar a quien quería que nada se segara nunca... y no ha vuelto.»",
+							"«El que tiene miedo de que las cosas acaben las agarra tan fuerte que las vuelve de piedra. Así nació Giza.»"
+						]
+					}
+				],
+				"tras_historia": [
+					"Busca los ecos que quedan, Maisha. Cuando los tengas todos, el camino olvidado se abrirá, y sabrás dónde está Mauti.",
+					"Yo me quedo aquí, quieta. Para que alguien se acuerde."
+				]
+			},
+			{
+				"lineas": [
+					"Cuando no sepas qué hacer, quédate quieta un momento. A veces el camino aparece en el reflejo.",
+					"Los ecos que faltan te esperan por los caminos de Raíz."
 				]
 			}
 		]
