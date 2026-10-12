@@ -1034,7 +1034,7 @@ if __name__ == "__main__":
     tira([farol(0), farol(1)]).save(os.path.join(destino, "farol.png"))
     valla().save(os.path.join(destino, "valla.png"))
     tira([setitas(0), setitas(1)]).save(os.path.join(destino, "setitas.png"))
-    for n in ("pino", "corteza", "juncia", "tawi"):
+    for n in ("pino", "corteza", "juncia", "tawi", "mdiria"):
         estatua(n).save(os.path.join(destino, f"estatua_{n}.png"))
     interior_claro().save(os.path.join(destino, "interior_claro.png"))
     interior_casa_pino().save(os.path.join(destino, "interior_casa_pino.png"))

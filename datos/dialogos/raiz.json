@@ -1775,5 +1775,88 @@
 				]
 			}
 		]
+	},
+	"estatua_mdiria": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un martín pescador de piedra, con una red al hombro. Tiene el pico apuntando al lago, como si estuviera a punto de lanzarse.",
+					"La red también es de piedra. Hasta los flotadores."
+				]
+			}
+		]
+	},
+	"rescate_mdiria": {
+		"nombre": "Mdiria",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Puaj! Tengo la boca llena de barro. ¿Cuánto tiempo llevo aquí plantado?",
+					"Me acuerdo de que el viejo Bigotes, Kambare, se puso a dar coletazos como loco y lo puso todo perdido... y luego, nada.",
+					"Soy Mdiria. Pesco en este lago desde antes de que hubiera embarcadero. Lo hice yo, el embarcadero. Bueno, casi todo.",
+					"Me voy a mi sitio, que con el agua así de limpia hoy pican seguro."
+				]
+			}
+		]
+	},
+	"mdiria": {
+		"nombre": "Mdiria",
+		"conversaciones": [
+			{
+				"no": [
+					"mdiria_conocido"
+				],
+				"marca": [
+					"mdiria_conocido"
+				],
+				"lineas": [
+					"Ah, eres tú, la lucecita que soltó a Bigotes. Kambare, quiero decir. Yo le llamo Bigotes; a él no le importa.",
+					"Llevamos años compartiendo el lago: él se come lo que yo no pesco, y yo pesco lo que él no espanta. Un trato justo.",
+					"¿Ves esas tablas de luz que salen cuando el agua se queda lisa? Las veo desde que era así de pequeño. Mi abuela decía que eran el camino de quien vive en el agua.",
+					"Yo nunca las he pisado, ¿eh? Tengo las rodillas para pocos sustos."
+				]
+			},
+			{
+				"si": [
+					"kimya_conocida"
+				],
+				"lineas": [
+					"¿Has hablado con quien vive en la isla? ¡Ja! Mi abuela tenía razón, y yo pensando que eran cuentos.",
+					"Cuando vuelvas, dile que el viejo Mdiria deja cada mañana una concha en el altar. Desde hace cuarenta años. Por si acaso."
+				]
+			},
+			{
+				"lineas": [
+					"Si quieres ver bien el fondo, no hagas ruido y espera. El lago es como los peces: si corres, se esconde.",
+					"El altar de la orilla del este lo puso alguien antes que yo. Yo solo le llevo conchas."
+				]
+			}
+		]
+	},
+	"lago_barca": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una barca vieja, varada de lado en la arena. La pintura turquesa se cae a trozos.",
+					"Dentro hay un remo y una lata llena de anzuelos oxidados."
+				]
+			}
+		]
+	},
+	"lago_altar": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Piedras planas apiladas, con un cuenco de agua encima. El agua del cuenco no se mueve ni cuando sopla el viento.",
+					"Al pie hay conchas, unas flores y una piedra con una espiral como la de los ecos."
+				]
+			}
+		]
 	}
 }

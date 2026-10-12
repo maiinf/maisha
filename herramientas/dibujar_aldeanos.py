@@ -465,7 +465,41 @@ def mbuzi():
     return l.imagen()
 
 
-ALDEANOS = {"mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+def mdiria():
+    """MDIRIA: martín pescador viejo del Lago Espejo. Cabeza grande, lomo turquesa, pecho naranja y garganta blanca,
+    un pico larguísimo y oscuro, cejas blancas de viejo, una bufanda de lana amarilla y una red de pescar al hombro."""
+    l = Lienzo()
+    l.ovalo(12, 22, 6, 6.5, "escarabajo")                     # cuerpo
+    l.ovalo(12.5, 23.5, 3.6, 4.6, "pajaro")                   # pecho naranja
+    l.ovalo(6.5, 21.5, 2, 4.5, "escarabajo")                  # ala recogida
+    for (x, y) in ((6, 19), (6, 21), (7, 23)):
+        l.px(x, y, "escarabajo", 3)
+    for x in range(4, 8):                                     # la cola, cortita
+        l.px(x, 27, "escarabajo", 1)
+    l.ovalo(11, 11, 5.5, 5, "escarabajo")                     # cabeza grande
+    l.ovalo(10.5, 14.6, 2.6, 1.4, "pecho_g", plano=True)      # garganta blanca
+    l.ovalo(8.5, 11.6, 1.6, 1.0, "pajaro", plano=True)        # la mejilla naranja
+    l.px(12, 10, "ojo"); l.px(12, 11, "ojo"); l.px(11, 10, "brillo")
+    for x in (10, 11, 12, 13):                                # cejas blancas, de viejo
+        l.px(x, 8, "cana", 3 if x % 2 else 2)
+    l.px(9, 7, "cana", 3)
+    for x in range(16, 23):                                   # el pico, largo y oscuro
+        l.px(x, 11, "metal", 1 if x > 19 else 2)
+        if x < 21:
+            l.px(x, 12, "metal", 0 if x > 18 else 1)
+    l.rect(7, 16, 15, 17, "maiz", 2); l.rect(7, 16, 15, 16, "maiz", 3)   # bufanda de lana
+    l.px(14, 18, "maiz", 2); l.px(14, 19, "maiz", 1)
+    for y in range(17, 27):                                   # la red al hombro, con sus nudos
+        for x in range(16, 21):
+            if (x + y) % 2 == 0:
+                l.px(x, y, "delantal", 2 if (x * y) % 3 else 3)
+    l.px(17, 17, "seta", 2); l.px(19, 22, "seta", 2)          # flotadores rojos
+    for x in (10, 14):                                        # patitas rojas
+        l.px(x, 29, "seta", 2); l.px(x - 1, 30, "seta", 1); l.px(x + 1, 30, "seta", 1)
+    return l.imagen()
+
+
+ALDEANOS = {"mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

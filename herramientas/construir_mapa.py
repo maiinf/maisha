@@ -1646,15 +1646,33 @@ def crear_lago():
     camino([(46, 50), (45, 48)], 2)
     camino([(9, 20), (9, 30), (14, 44), (24, 50)], 1)                  # por el oeste, a la orilla del islote
     camino([(9, 20), (16, 15), (20, 15)], 1)
-    # Kimya aparecerá en la isla: un círculo de piedras y el sitio donde se posa
+    # la isla de Kimya: un círculo de piedras talladas («ø») y un sauce viejo en la orilla de la isla
     for (dx, dy) in ((-3, -1), (3, -1), (-2, 2), (2, 2), (0, -3)):
-        poner(46 + dx, 26 + dy, "r")
+        poner(46 + dx, 26 + dy, "ø")
+    poner(51, 25, "s")
+    # el embarcadero viejo de madera, junto al pie del puente del reflejo (de la orilla sur hacia dentro)
+    for y in range(42, 48):
+        for x in (51, 52):
+            if m[y][x] == "~":
+                poner(x, y, "=")
+    # la barca varada en la playa del oeste y el altar de Kimya en la orilla del este, junto a la entrada
+    poner(14, 38, "þ")
+    poner(79, 26, "ð")
+    # nenúfares («*») cerca de las orillas, en las calas tranquilas
+    for _ in range(300):
+        x, y = azar.randrange(ANCHO), azar.randrange(ALTO)
+        if m[y][x] != "~":
+            continue
+        cerca = any(m[y + dy][x + dx] not in "~*\\=" for dx in (-3, 0, 3) for dy in (-3, 0, 3)
+                    if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO)
+        if cerca and azar.random() < 0.35:
+            poner(x, y, "*")
     # el secreto, en el islote
     poner(35, 13, "X")
     # sauces, juncos y bayas en la orilla
     for (x, y) in ((84, 30), (70, 46), (16, 40), (12, 26), (60, 7), (30, 9)):
         poner(x, y, "$")
-    reservados = [(95, 31, 4), (46, 26, 5), (35, 14, 3), (26, 56, 13), (76, 9, 10)]
+    reservados = [(95, 31, 4), (46, 26, 5), (35, 14, 3), (26, 56, 13), (76, 9, 10), (14, 38, 3), (79, 26, 3), (53, 49, 2)]
 
     def libre(x, y):
         if m[y][x] not in ".," or en_zona(x, y):
@@ -1677,10 +1695,12 @@ def crear_lago():
             if not libre(x, y):
                 continue
             borde = min(x, ANCHO - 1 - x, y, ALTO - 1 - y)
+            # el bosque del borde, de ancho irregular (sin filas)
+            grueso = 2.5 + 2.2 * math.sin(x * 0.31 + y * 0.17) + 1.3 * math.sin(x * 0.07 - y * 0.23 + 1)
             r = azar.random()
-            if borde < 3 and r < 0.75:
-                poner(x, y, azar.choice("TTts"))
-            elif orilla(x, y) and r < 0.12:
+            if borde < grueso and r < 0.7:
+                poner(x, y, azar.choice("TTtts"))
+            elif orilla(x, y) and r < 0.4:
                 poner(x, y, "s" if r < 0.05 else ";")
             elif r < 0.04:
                 poner(x, y, azar.choice("Ttrs"))
@@ -1692,10 +1712,11 @@ def crear_lago():
             poner(x, y, ">" if x == ANCHO - 1 else "#")
     poner(88, 28, "L")
     poner(48, 50, "L")
+    poner(53, 49, "}")                       # Mdiria, el martín pescador (solo cuando ya se le ha rescatado)
     poner(91, 32, "S")
     for k, (zx_, zy_, rx_, ry_) in zonas.items():
         poner(zx_, zy_, k)
-    textos = {"1": "13, 6, 4, 0, , jefe:kambare", "2": "8, 5, 4, 3"}
+    textos = {"1": "13, 6, 4, 0, mdiria, jefe:kambare", "2": "8, 5, 4, 3"}
     return ["".join(f) for f in m], textos
 
 

@@ -2,16 +2,20 @@ extends StaticBody2D
 ## ESTATUA: un aldeano convertido en piedra por Giza, junto a una zona corrupta.
 ## Al purgar la zona, la piedra se resquebraja y el aldeano vuelve a la vida:
 ## da las gracias, se marcha a la aldea y queda la marca «rescatado_<id>».
+## Si tiene «se_queda_en» (p. ej. Mdiria, que vive en el Lago Espejo), en vez de irse anda hasta ese sitio y se
+## queda allí como aldeano.
 
 signal rescatado
 
 const CHARLA := preload("res://scripts/mundo/charla.gd")
+const ALDEANO := preload("res://scripts/mundo/aldea/aldeano.gd")
 const SOMBRA := preload("res://scripts/personajes/sombra.gd")
 const PIEDRAS := [Color("a0a596"), Color("7a806d"), Color("525649")]
 
 @export var id := ""
 @export var radio_interaccion := 26.0
 @export var altura_bocadillo := 46.0
+var se_queda_en := Vector2.INF
 
 var despierto := false
 var _sprite: Sprite2D
@@ -75,8 +79,19 @@ func despertar() -> void:
 	await CHARLA.hablar(self, "rescate_" + id)
 	Estado.marcar("rescatado_" + id)
 	rescatado.emit()
-	# se va hacia la aldea (al este) y desaparece
 	_forma.set_deferred("disabled", true)
+	if se_queda_en != Vector2.INF:
+		# anda hasta su sitio y se queda allí, como aldeano
+		var camino := create_tween()
+		camino.tween_property(self, "global_position", se_queda_en, global_position.distance_to(se_queda_en) / 65.0)
+		await camino.finished
+		var aldeano: StaticBody2D = ALDEANO.new()
+		aldeano.id = id
+		aldeano.position = position
+		get_parent().add_child(aldeano)
+		queue_free()
+		return
+	# se va hacia la aldea (al este) y desaparece
 	var salida := create_tween().set_parallel(true)
 	salida.tween_property(self, "position", position + Vector2(70, 0), 1.4)
 	salida.tween_property(self, "modulate:a", 0.0, 1.4).set_delay(0.4)

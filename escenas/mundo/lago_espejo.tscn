@@ -35,6 +35,8 @@ nombre_region = "Lago Espejo"
 entidades = NodePath("../Entidades")
 textos_carteles = Array[String](["→ Cañada del Eco", "↑ La isla"])
 tipos_enemigo = PackedStringArray("rana", "petrino", "rana")
+viajero = "mdiria"
+viajero_requiere = "rescatado_mdiria"
 
 [node name="Ambiente" type="Node2D" parent="." groups=["ambiente"]]
 z_index = 3

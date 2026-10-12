@@ -192,6 +192,17 @@ func _ready() -> void:
 			break
 	_comprobar(arena.estado == arena.Estado.PURGADA and Estado.tiene("zona/lago_espejo/1"), "Kambare se va nadando y la arena queda purgada")
 	_comprobar(Misiones.hechas().any(func(m: Dictionary) -> bool: return m["id"] == "lago_espejo"), "misión del lago cumplida")
+	var mdiria: Node2D = null
+	for i in 60:
+		await _esperar(0.3)
+		await _leer_dialogo()
+		for n in get_tree().get_nodes_in_group("aldeanos"):
+			if n.get("id") == "mdiria":
+				mdiria = n
+		if mdiria:
+			break
+	_comprobar(Estado.tiene("rescatado_mdiria"), "la estatua de Mdiria, el martín pescador, vuelve a la vida")
+	_comprobar(mdiria != null and mdiria.global_position.distance_to(Vector2(53 * 16 + 8, 49 * 16 + 14)) < 4.0, "y se queda en el embarcadero, en vez de irse a la aldea")
 	for i in 20:
 		await _esperar(0.5)
 		if get_tree().get_first_node_in_group("dialogo").hablando:

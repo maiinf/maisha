@@ -42,6 +42,7 @@ const BOSQUE := "res://arte/mundos/raiz/bosque/"
 const CIENAGA := "res://arte/mundos/raiz/cienaga/"
 const CAMPO := "res://arte/mundos/raiz/campo/"
 const CANADA := "res://arte/mundos/raiz/canada/"
+const LAGO := "res://arte/mundos/raiz/lago/"
 const MECERSE := preload("res://scripts/mundo/objetos/mecerse.gd")
 const GALLINA := preload("res://scripts/mundo/kitovu/gallina.gd")
 const OBJ := "res://arte/mundos/raiz/objetos/"
@@ -85,6 +86,10 @@ const FIJOS := {
 	# de la Cañada del Eco
 	"ñ": [CANADA + "bloque.png", Vector2(24, 9), 16.0, 3],
 	"ç": [CANADA + "tronco.png", Vector2(34, 7), 16.0, 2],
+	# del Lago Espejo
+	"þ": [LAGO + "barca.png", Vector2(40, 8), 22.0, 1, "lago_barca", 30.0],
+	"ð": [LAGO + "altar.png", Vector2(24, 8), 14.0, 1, "lago_altar", 26.0],
+	"ø": [LAGO + "menhir.png", Vector2(10, 6), 8.0, 3],
 }
 ## La casa del viajero de cada camino («{»): [dibujo, colisión, charla al usarla, radio, hoguera]
 const CAMPAMENTOS := {
@@ -122,6 +127,8 @@ const DIRECCIONES := {"arriba": Vector2.UP, "abajo": Vector2.DOWN, "izquierda": 
 ## En los caminos: el viajero que vive aquí («}», con su casa «{») y lo que se recoge con «`» para su encargo
 @export var viajero := "msafiri"
 @export var objeto_encargo := "pagina"
+## (en los lugares) el «}» solo aparece con esta marca: p. ej. Mdiria, cuando ya se le ha rescatado
+@export var viajero_requiere := ""
 
 var inicio := Vector2.ZERO               # donde despierta Maisha
 var tam := Vector2.ZERO                  # tamaño del mapa en píxeles
@@ -252,7 +259,8 @@ func _forma_de_practica(clave: String) -> int:
 
 var _espinas_pendientes: Array[Vector2] = []
 var _tablas_rotas: Array[Vector2i] = []
-var _reflejos: Array[Vector2i] = []      # «\»: lo que solo existe en el reflejo del lago (puentes de luz)
+var _reflejos: Array[Vector2i] = []
+var _sitio_viajero := Vector2.INF        # dónde está el «}» (si el aldeano de piedra de una zona es el viajero, va allí)      # «\»: lo que solo existe en el reflejo del lago (puentes de luz)
 const PUENTE_REFLEJO := preload("res://scripts/mundo/objetos/puente_reflejo.gd")
 const PASARELA_ROTA := preload("res://scripts/mundo/objetos/pasarela_rota.gd")
 const DERRUMBE := preload("res://scripts/mundo/objetos/derrumbe.gd")
@@ -286,6 +294,8 @@ func _crear_objetos(zonas: Dictionary) -> void:
 			elif c == "}":
 				var viaj: StaticBody2D = ALDEANO.new()
 				viaj.id = viajero
+				viaj.requiere = viajero_requiere
+				_sitio_viajero = pos
 				_poner(viaj, pos)
 			elif c == "\"":
 				_tablas_rotas.append(Vector2i(x, y))
@@ -465,6 +475,8 @@ func _crear_zona(clave: String, z: Dictionary, casilla: Vector2i) -> void:
 	if aldeano != "" and not Estado.rescatado(aldeano):
 		var estatua: StaticBody2D = ESTATUA.new()
 		estatua.id = aldeano
+		if aldeano == viajero and _sitio_viajero != Vector2.INF:
+			estatua.se_queda_en = _sitio_viajero          # (no se va a la aldea: vive aquí)
 		_poner(estatua, zona.position + Vector2(0, -44))
 		zona.estado_cambiado.connect(func(e: int) -> void:
 			if e == ZONA.Estado.PURGADA and is_instance_valid(estatua):
