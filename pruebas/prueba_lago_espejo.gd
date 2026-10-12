@@ -104,6 +104,7 @@ func _ready() -> void:
 	_comprobar(get_tree().get_first_node_in_group("dialogo").hablando, "Maisha piensa algo al llegar")
 	await _leer_dialogo()
 	_comprobar(Estado.tiene("visto/lago_espejo"), "el lago queda apuntado en el mapa")
+	_comprobar(Sonido.musica_actual == "lago", "suena su música: «El agua que recuerda» (%s)" % Sonido.musica_actual)
 
 	print("El agua turbia:")
 	var espejo: Node2D = get_tree().get_first_node_in_group("espejo_lago")

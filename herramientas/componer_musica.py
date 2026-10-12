@@ -13,6 +13,7 @@ Genera en audio/musica/:
   jefe.ogg        la pelea contra Mzizi (en bucle)
   purga.ogg, victoria.ogg, objeto.ogg   fanfarrias cortas
   canada.ogg      la Cañada del Eco: la flauta y su eco en la peña (en bucle)
+  lago.ogg        el Lago Espejo: el piano y su reflejo (la misma frase al revés) (en bucle)
 
 El tema de Maisha (la melodía que vuelve en todas): D5 A4 E5 F#5 | E5 D5 A4 (B4) D5
 Instrumentos: kalimba y balafón (por las raíces suajilis del mundo), flauta, voces y tambores de mano.
@@ -557,6 +558,7 @@ TITULOS = {
     "surcos": "Canción de siega",
     "canada": "Lo que la peña devuelve",
     "jefe_kambare": "Kambare, el siluro de cieno",
+    "lago": "El agua que recuerda",
 }
 
 # =============================================================================
@@ -1071,13 +1073,57 @@ def jefe_kambare():
     return final(p, sala=2.2, mezcla=0.27, brillo=4600)
 
 
+# =============================================================================
+# EL LAGO ESPEJO: «El agua que recuerda» (piano y su reflejo, voces suaves y gotas, en re mayor)
+# =============================================================================
+
+## Una frase del tema de Maisha y, después, su reflejo: las mismas notas al revés (como en el agua)
+FRASE_ORILLA = [("D5", 0, 1.5), ("A4", 1.5, 0.5), ("E5", 2, 1), ("F#5", 3, 1), ("A5", 4, 2), ("G5", 6, 2)]
+
+
+def _reflejo(frase, desde):
+    """La frase al revés en el tiempo (la última nota primero), empezando en «desde»."""
+    fin = max(en + d for (_, en, d) in frase)
+    return [(n, desde + (fin - en - d), d) for (n, en, d) in frase]
+
+
+def lago():
+    tempo = Tempo(66)
+    pulsos = 64
+    p = Pista(tempo.s(pulsos))
+    progresion = [("D3", "M7"), ("B2", "m7"), ("G2", "M7"), ("A2", "M"), ("D3", "M7"), ("F#2", "m7"), ("G2", "M7"), ("A2", "sus")] * 2
+    colchones(p, tempo, progresion, compas=4, brillo=700, volumen=0.2, octava_bajo=2, fuerza_bajo=0.22)
+    # la kalimba, muy lenta: una nota por pulso, como ondas que se abren
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=1.0, volumen=0.12, pan=-0.35, patron=(0, 2, 1, 3))
+    # voces sin palabras, lejos
+    p.poner(coro(["D4", "A4", "F#4"], tempo.s(16)), tempo.s(16), 0.05)
+    p.poner(coro(["G3", "D4", "B4"], tempo.s(16)), tempo.s(40), 0.05)
+    # gotas de agua: campanitas agudas sueltas, cada una con su eco más suave
+    rng = np.random.default_rng(71)
+    for k in range(18):
+        b = rng.random() * pulsos
+        nota = ["A6", "F#6", "D6", "E6"][rng.integers(4)]
+        p.poner(campanita(nota, 1.2, 0.1), tempo.s(b), pan=rng.random() - 0.5)
+        p.poner(campanita(nota, 1.0, 0.04), tempo.s(b + 0.75), pan=rng.random() - 0.5)
+    # el piano: la frase en la orilla y su reflejo en el agua (al revés, más suave y más grave)
+    for vuelta in (0, 32):
+        tocar(p, tempo, FRASE_ORILLA, desde=vuelta, fuerza=0.34, pan=-0.1)
+        tocar(p, tempo, transportar(_reflejo(FRASE_ORILLA, 0), -12), desde=vuelta + 8, fuerza=0.22, pan=0.2)
+        melodia(p, tempo, FRASE_ORILLA, desde=vuelta + 16, instrumento=lambda n, d: flauta(n, d, 0.36, vibrato=4.2),
+                volumen=0.26, sostener=0.92, pan=0.15)
+    # y la frase de Kimya, sin eco, al final de la vuelta
+    tocar(p, tempo, FRASE_QUIETA, desde=0, fuerza=0.26, pan=0.0)
+    return final(p, sala=3.6, mezcla=0.36, brillo=4800)
+
+
 NO_SE_REPITEN = ("raiz_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
 PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": prados, "aldea": aldea,
           "interior": interior, "combate": combate, "jefe": jefe, "purga": purga, "victoria": victoria, "objeto": objeto, "tarea": tarea,
           "recuerdo": recuerdo, "noche": noche, "amanece": amanece, "bosque": bosque, "jefe_pembe": jefe_pembe,
           "cienaga": cienaga, "jefe_konokono": jefe_konokono, "campo": campo, "jefe_cosechadora": jefe_cosechadora,
           "tienda": tienda, "raiz_libre": raiz_libre, "sendero": sendero, "pasarelas": pasarelas,
-          "cobrizo": cobrizo, "surcos": surcos, "canada": canada, "jefe_kambare": jefe_kambare}
+          "cobrizo": cobrizo, "surcos": surcos, "canada": canada, "jefe_kambare": jefe_kambare, "lago": lago}
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

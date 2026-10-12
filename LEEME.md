@@ -270,7 +270,7 @@ Escena `escenas/mundo/canada_eco.tscn` (mapa de 140×46 casillas, de este a oest
 
 ## Lago Espejo
 
-Escena `escenas/mundo/lago_espejo.tscn` (mapa de 96×64 casillas, `construir_mapa.py lago_espejo --crear`, `crear_lago`), al oeste de la **Cañada del Eco**. El paso de la Cañada se abre al escuchar el **quinto eco** (la puerta del oeste está `cerrada:eco/canada_eco`). Música: de momento «Agua quieta» de la Ciénaga.
+Escena `escenas/mundo/lago_espejo.tscn` (mapa de 96×64 casillas, `construir_mapa.py lago_espejo --crear`, `crear_lago`), al oeste de la **Cañada del Eco**. El paso de la Cañada se abre al escuchar el **quinto eco** (la puerta del oeste está `cerrada:eco/canada_eco`). Música propia: «El agua que recuerda» (`componer_musica.py lago`): el piano toca una frase del tema de Maisha y luego su **reflejo** (las mismas notas al revés, más graves y suaves); al final, la frase de Kimya, sin eco; con voces lejanas, kalimba lenta y gotas de agua.
 - Un lago grande con una **isla** en el centro (donde aparecerá **Kimya**) y un **islote** con un secreto. El suelo pinta el agua **quieta como un espejo** (`_agua_espejo` en `pintar_suelo.py`).
 - **Agua turbia** mientras vive **Kambare** (falta la marca `kambare_vencido`): dos capas de barro y óxido que se funden despacio, con burbujas y brillos de Giza (`scripts/mundo/lago/espejo_lago.gd`). Si Maisha intenta calmarla, piensa que algo grande remueve el fondo.
 - **La quietud**: sin Kambare, si Maisha se queda **quieta junto al agua** 3 segundos (`QUIETUD_SEGUNDOS`), un anillo se cierra a su alrededor y el lago se vuelve **espejo**. Andar no lo rompe; correr, golpear, lanzar una semilla, el Latido o una pelea, sí (salvo con Maisha encima de un puente).
@@ -284,7 +284,7 @@ Escena `escenas/mundo/lago_espejo.tscn` (mapa de 96×64 casillas, `construir_map
   - Al vencerlo se le cae el barro: queda un siluro limpio, pardo dorado, que se hunde en la charca. Marca `kambare_vencido`: el agua del lago se aclara y Maisha piensa que, si se queda quieta, el lago le enseñará lo que guarda. Números en `reglas_combate.gd` (`KAMBARE_*`).
 - **Kimya, el Silencio** (`scripts/mundo/lago/kimya.gd`), en el círculo de piedras de la isla: solo existe en el reflejo, así que aparece cuando el lago es espejo y se desvanece si el agua tiembla. Hecha de luz plateada, con los ojos cerrados y dos hilos de luz que caen como cintas. Al hablar con ella (conversación `kimya`, marca `kimya_conocida`) cuenta quién es y, con la ilustración `17_kimya_lago` (`cinematicas_sendero.py`), Maisha ve en el agua que su reflejo no es ella sino **Mauti**, del revés. Kimya cuenta que Mauti fue a buscar a quien quería que nada se segara nunca y no volvió, y cómo nació Giza; y que, con todos los ecos, el camino olvidado se abrirá.
 - En el islote del norte hay un **secreto** (esencia), al que se llega por el puente del reflejo corto.
-- Capturas: `documentacion/lago_espejo_capturas.png` y `documentacion/kambare_capturas.png`. Falta: la música propia del lago.
+- Capturas: `documentacion/lago_espejo_capturas.png` y `documentacion/kambare_capturas.png`.
 
 ### Los ecos perdidos (el misterio de Raíz)
 
