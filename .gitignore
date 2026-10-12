@@ -10,3 +10,8 @@ __pycache__/
 
 # Archivos del Finder del Mac
 .DS_Store
+
+# Carpetas de herramientas de Iam (Claude, Obsidian, graphify): no son del juego
+.claude/
+.obsidian/
+graphify-out/
