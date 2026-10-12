@@ -50,6 +50,8 @@ const OBJETOS := {
 		"texto": "Una campanilla de cobre de Fuko. Colgada en un cruce de galerías, le dice por dónde va sin necesidad de ver."},
 	"cencerro": {"uno": "Cencerro de Mbuzi", "encargo": 3, "hecho": "mbuzi_cencerros", "icono": 22,
 		"texto": "Un cencerro de cobre viejo, con su correa de cuero. En la Cañada del Eco suena tres veces: una tuya y dos de la peña."},
+	"remo": {"uno": "Remo de Kasia", "encargo": 3, "hecho": "kasia_remos", "icono": 23,
+		"texto": "Un remo de madera de fresno, con una cinta roja atada en el mango. Kasia ata una cinta a cada remo para saber cuál es cuál."},
 	"mazorca": {"uno": "Mazorca antigua", "encargo": 3, "hecho": "sungura_mazorcas", "icono": 21,
 		"texto": "Maíz de los antiguos labradores de Raíz, de granos dorados y alguno rojo. Sungura guarda sus semillas para que no se pierdan."},
 	"sopa": {"uno": "Sopa de Juncia", "encargo": 0, "hecho": "", "icono": 10, "usable": true,

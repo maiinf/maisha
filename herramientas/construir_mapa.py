@@ -1776,15 +1776,15 @@ def crear_orilla():
                             poner(xx, yy, "#")
 
     camino([(20, 99), (21, 88), (16, 72), (18, 58), (24, 46), (22, 32), (17, 18), (20, 0)])
-    camino([(19, 44), (27, 42), (31, 41)], 1)                     # → la casa de barcas y el embarcadero roto
+    camino([(19, 44), (27, 43), (34, 43), (rio[41][0] - 1, 42)], 1)   # → la casa de barcas y el embarcadero de la balsa
     # el embarcadero roto: la balsa que cruza al banco de arena (cerrado hasta que la nutria la arregla)
     for x in range(rio[41][0], 46):
         for y in (41, 42):
             if m[y][x] == "~":
                 poner(x, y, '"')
     # la casa de barcas de la nutria y la nutria a la puerta
-    poner(28, 37, "{")
-    poner(31, 40, "}")
+    poner(rio[37][0] - 6, 37, "{")
+    poner(rio[41][0] - 4, 41, "}")
     # el eco, en el banco de arena
     poner(50, 40, "@")
     # los tres remos: en la playa de la zona, entre los juncos del norte y río abajo, en la orilla
@@ -1796,7 +1796,7 @@ def crear_orilla():
     # bayas y junco dulce en la orilla
     for (x, y) in ((12, 60), (rio[26][0] - 3, 26), (8, 88)):
         poner(x, y, "$")
-    reservados = [(28, 37, 4), (31, 40, 2), (6, 12, 2), (20, 96, 3), (20, 3, 3)]
+    reservados = [(rio[37][0] - 6, 37, 6), (rio[41][0] - 4, 41, 2), (6, 12, 2), (20, 96, 3), (20, 3, 3)]
 
     def libre(x, y):
         if m[y][x] not in ".," or en_zona(x, y):

@@ -44,7 +44,8 @@
 			"cuna_de_musgo"
 		],
 		"cienaga_quieta": [
-			"las_pasarelas"
+			"las_pasarelas",
+			"orilla_juncos"
 		],
 		"campo_segado": [
 			"senda_surcos"
@@ -71,6 +72,9 @@
 		],
 		"lago_espejo": [
 			"canada_eco"
+		],
+		"orilla_juncos": [
+			"cienaga_quieta"
 		]
 	},
 	"misiones": [
@@ -961,6 +965,45 @@
 					"ir": {
 						"escena": "canada_eco",
 						"buscar": "aldeano:mbuzi"
+					}
+				}
+			]
+		},
+		{
+			"id": "remos_kasia",
+			"tipo": "encargo",
+			"titulo": "Los remos de Kasia",
+			"quien": "kasia",
+			"texto": "Kasia, una nutria barquera de la Orilla de Juncos, cruza el río en su balsa. La corriente se le llevó tres remos y los cangrejos de herrumbre se los han quedado.",
+			"aparece": [
+				"encargo_kasia"
+			],
+			"hecha": [
+				"kasia_remos"
+			],
+			"premio": "Un viaje en balsa al banco de arena y dos sopas",
+			"pasos": [
+				{
+					"texto": "Busca los remos de Kasia ({n}/{total})",
+					"objeto": {
+						"remo": 3
+					},
+					"hecho_tambien": [
+						"kasia_remos"
+					],
+					"ir": {
+						"escena": "orilla_juncos",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Llévale los remos a Kasia",
+					"hecho": [
+						"kasia_remos"
+					],
+					"ir": {
+						"escena": "orilla_juncos",
+						"buscar": "aldeano:kasia"
 					}
 				}
 			]

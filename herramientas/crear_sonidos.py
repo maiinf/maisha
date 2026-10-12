@@ -1624,6 +1624,27 @@ def kambare_vencido():
     return reverb(p.entera(), 1.8, 0.35)
 
 
+def cangrejo_chasca():
+    """El cangrejo de herrumbre chasca las pinzas: dos clics metálicos secos, con un rechinar de óxido."""
+    p = Pista(0.5)
+    for k in range(2):
+        d = 0.05
+        p.poner(paso_banda(ruido(d), 2500, 8000) * caida(_n(d), 0.008) * 0.8, k * 0.09)
+        p.poner(seno(_desliz(1800, 1200, d), d) * caida(_n(d), 0.01) * 0.3, k * 0.09)
+    p.poner(paso_banda(ruido(0.12), 900, 2600) * np.linspace(0.3, 0, _n(0.12)), 0.2)
+    return reverb(p.entera(), 0.4, 0.15)
+
+
+def cangrejo_vuelca():
+    """La semilla vuelca al cangrejo: un golpe de chapa contra la arena y un pataleo de patitas."""
+    p = Pista(0.9)
+    p.poner(seno(_desliz(320, 140, 0.18), 0.18) * caida(_n(0.18), 0.06) * 0.6, 0.0)
+    p.poner(paso_banda(ruido(0.1), 1500, 6000) * caida(_n(0.1), 0.03) * 0.5, 0.0)
+    for k in range(6):
+        p.poner(paso_banda(ruido(0.03), 3000, 9000) * caida(_n(0.03), 0.008) * 0.35, 0.25 + k * 0.07)
+    return reverb(p.entera(), 0.5, 0.18)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -1669,6 +1690,7 @@ EFECTOS = {
     "murcielago_aleteo": (murcielago_aleteo, 0.5), "cencerro": (cencerro, 0.6), "escala_tramo": (escala_tramo, 0.6),
     "kambare_ruge": (kambare_ruge, 0.85), "kambare_salta": (kambare_salta, 0.7), "kambare_cae": (kambare_cae, 0.9),
     "kambare_escupe": (kambare_escupe, 0.65), "kambare_dolor": (kambare_dolor, 0.8), "kambare_vencido": (kambare_vencido, 0.85),
+    "cangrejo_chasca": (cangrejo_chasca, 0.55), "cangrejo_vuelca": (cangrejo_vuelca, 0.65),
 }
 
 AMBIENTES = {

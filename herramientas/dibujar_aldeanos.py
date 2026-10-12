@@ -499,7 +499,38 @@ def mdiria():
     return l.imagen()
 
 
-ALDEANOS = {"mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+def kasia():
+    """KASIA: nutria barquera de la Orilla de Juncos. Risueña y charlatana: pelo pardo brillante, barriga y morro
+    claros, orejitas redondas, bigotes, un sombrero de paja con una cinta azul y un remo al hombro."""
+    l = Lienzo()
+    for y in range(4, 29):                                    # el remo al hombro (la pala arriba)
+        l.px(19, y, "concha", 2 if y % 4 else 3)
+    l.ovalo(19.5, 4.5, 1.6, 3.2, "concha")
+    l.px(19, 3, "concha", 3)
+    l.ovalo(12, 22, 6.2, 7.5, "pelo")                         # cuerpo, alargado
+    l.ovalo(12, 23.5, 3.4, 5, "hocico", plano=True)           # barriga clara
+    l.ovalo(5, 22, 1.6, 2.6, "pelo")                          # brazos (el derecho, sujetando el remo)
+    l.ovalo(18, 19, 1.8, 2.0, "pelo")
+    for (x, y) in ((3, 28), (2, 29), (2, 30), (3, 30)):        # la cola, gruesa
+        l.px(x, y, "pelo", 2)
+    l.ovalo(12, 12.5, 5.2, 4.6, "pelo")                       # cabeza
+    l.ovalo(12, 15, 3.0, 2.0, "hocico", plano=True)           # morro claro
+    l.px(11, 14, "nariz"); l.px(12, 14, "nariz"); l.px(13, 14, "nariz")
+    l.px(12, 16, "rubor")                                      # la sonrisa
+    ojos(l, 11, 8, 14, alto=2)
+    for (x0, lado) in ((7, -1), (16, 1)):                     # bigotes
+        for k in range(3):
+            l.px(x0 + lado * k, 15 + (k % 2), "cana", 3)
+    l.px(7, 9, "pelo", 1); l.px(17, 9, "pelo", 1)             # orejitas redondas
+    l.rect(6, 6, 18, 7, "paja", 2); l.rect(6, 6, 18, 6, "paja", 3)   # el sombrero de paja
+    l.rect(8, 3, 16, 5, "paja", 2); l.rect(8, 3, 16, 3, "paja", 3)
+    l.rect(8, 5, 16, 5, "bufanda", 2)                         # la cinta azul
+    for x in (9, 15):                                         # patas
+        l.rect(x - 1, 29, x + 1, 30, "pelo", 1)
+    return l.imagen()
+
+
+ALDEANOS = {"kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

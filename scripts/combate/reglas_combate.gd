@@ -138,6 +138,14 @@ const KAMBARE_VARADO := 2.2             # coleteando en la orilla: el cetro le q
 const KAMBARE_DANIO_SEMILLA := 2
 const KAMBARE_ESPERA := 2.0             # nadando en la charca antes de volver a saltar
 const KAMBARE_CHORROS := 3              # fase 2: chorros de cieno en abanico
+## Cangrejo de herrumbre (Orilla de Juncos): anda de lado; el cetro rebota salvo si está expuesto o volcado
+const CANGREJO_VIDA := 3
+const CANGREJO_VELOCIDAD := 46.0       # de lado (en vertical va a menos de la mitad)
+const CANGREJO_ALCANCE := 18.0         # lo cerca que pellizca
+const CANGREJO_AVISO := 0.45           # levanta las pinzas antes de pellizcar
+const CANGREJO_EXPUESTO := 1.0         # tras pellizcar, abierto: el cetro le quita 1
+const CANGREJO_GUARDIA := 0.6          # si le rebota un golpe, se queda en guardia
+const CANGREJO_VOLCADO := 2.6          # panza arriba tras una explosión: el cetro le quita 2
 ## Lago Espejo: segundos que Maisha tiene que estar quieta junto al agua para que el lago se vuelva espejo
 const QUIETUD_SEGUNDOS := 3.0
 ## Murciélago de eco (Cañada del Eco): revolotea, avisa y grita una onda que va y vuelve; al tragársela, cae aturdido

@@ -1858,5 +1858,122 @@
 				]
 			}
 		]
+	},
+	"kasia": {
+		"nombre": "Kasia",
+		"conversaciones": [
+			{
+				"no": [
+					"kasia_conocida"
+				],
+				"marca": [
+					"kasia_conocida",
+					"encargo_kasia"
+				],
+				"lineas": [
+					"¡Hola, hola! ¿Vienes de la ciénaga? ¿A pie? ¡Qué valiente! Yo por ahí solo paso remando, que el barro se me mete entre los dedos.",
+					"Soy Kasia. Tengo la balsa más rápida de este río. Bueno, la única. Pero es rápida.",
+					"O lo era, porque ahora no tengo remos. Los dejé secando en la orilla, vino una crecida, se los llevó la corriente... y esos cangrejos de hierro los han ido pescando.",
+					"No los quieren para nada, ¿eh? Les gusta cualquier cosa que flote. Tienen uno junto a la playa del sur, otro río abajo y otro entre los juncos del norte.",
+					"Si me los traes, saco la balsa del agua, la arreglo y te cruzo al banco de arena. Desde allí se oye cantar una piedra, ¿sabes? Por las noches."
+				]
+			},
+			{
+				"si": [
+					"encargo_kasia"
+				],
+				"no": [
+					"kasia_remos"
+				],
+				"tiene": {
+					"remo": 3
+				},
+				"entrega": {
+					"remo": 3
+				},
+				"marca": [
+					"kasia_remos",
+					"balsa_arreglada/orilla_juncos"
+				],
+				"recibe": {
+					"sopa": 2
+				},
+				"lineas": [
+					"¡Mis remos! Este de la cinta roja es el bueno, el que no se tuerce. ¡Gracias, gracias!",
+					"Toma, dos cuencos de sopa de pescado, que la hago yo y está riquísima. ¡Y ahora a por la balsa!"
+				],
+				"despues": [
+					"Ya está a flote. Súbete cuando quieras: la balsa ya se sabe el camino, solo hay que dejarla ir.",
+					"Y no te asomes por el borde, que el río aquí es más hondo de lo que parece."
+				],
+				"aviso": "Kasia ha sacado la balsa del agua: ya puedes cruzar al banco de arena"
+			},
+			{
+				"si": [
+					"encargo_kasia"
+				],
+				"no": [
+					"kasia_remos"
+				],
+				"lineas": [
+					"Llevas {remo} de mis tres remos.",
+					"Uno junto a la playa del sur, otro río abajo y otro entre los juncos del norte. Y cuidado con los cangrejos: de frente no hay quien les haga nada. Espera a que pellizquen y dales entonces."
+				]
+			},
+			{
+				"lineas": [
+					"La balsa está en el embarcadero, aquí al lado. Ya sabes: te subes, y ella sola.",
+					"Al norte, río arriba, está el Embarcadero Junco. Allí no he vuelto desde que se puso todo gris."
+				]
+			}
+		]
+	},
+	"orilla_llegada": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un río ancho, con juncos más altos que yo en las dos orillas. El agua baja despacio, casi sin ruido.",
+					"En la arena hay huellas pequeñas, en fila, que van de lado."
+				]
+			}
+		]
+	},
+	"orilla_casa_barcas": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una caseta de tablas sobre pilotes, medio metida en el río. Por la puerta grande asoma la proa de una barca.",
+					"En la pared hay un soporte para cinco remos. Solo quedan dos."
+				]
+			}
+		]
+	},
+	"orilla_balsa_rota": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una balsa de troncos atada al embarcadero, medio hundida. Le falta un tronco y no tiene con qué remar.",
+					"Así no llega ni a la mitad del río."
+				]
+			}
+		]
+	},
+	"paso_cerrado_embarcadero_junco": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Río arriba se ven los tejados del Embarcadero Junco... pero la orilla se ha hundido y el camino se pierde en un barrizal.",
+					"Por aquí todavía no puedo pasar."
+				]
+			}
+		]
 	}
 }

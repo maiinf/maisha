@@ -98,6 +98,7 @@ const CAMPAMENTOS := {
 	"fuko": ["res://arte/mundos/raiz/camino/madriguera.png", Vector2(60, 12), "camino_madriguera", 38.0, false],
 	"sungura": ["res://arte/mundos/raiz/senda/horreo.png", Vector2(52, 10), "senda_horreo", 36.0, false],
 	"mbuzi": ["res://arte/mundos/raiz/canada/aprisco.png", Vector2(92, 22), "canada_aprisco", 46.0, false],
+	"kasia": ["res://arte/mundos/raiz/orilla/casa_barcas.png", Vector2(64, 14), "orilla_casa_barcas", 44.0, false],
 }
 ## Edificios de la aldea: letra -> [id, dibujo, tamaño de la colisión]
 const EDIFICIOS := {
@@ -174,6 +175,9 @@ func _ready() -> void:
 			"mbuzi":
 				rota = ESCALA_CUERDA.new()
 				rota.marca = "escala_descolgada/" + mapa
+			"kasia":
+				rota = BALSA.new()
+				rota.marca = "balsa_arreglada/" + mapa
 			_:
 				rota = PASARELA_ROTA.new()
 				rota.marca = "pasarela_reparada/" + mapa
@@ -266,6 +270,7 @@ const PASARELA_ROTA := preload("res://scripts/mundo/objetos/pasarela_rota.gd")
 const DERRUMBE := preload("res://scripts/mundo/objetos/derrumbe.gd")
 const ACEQUIA_FOSO := preload("res://scripts/mundo/objetos/acequia_foso.gd")
 const ESCALA_CUERDA := preload("res://scripts/mundo/objetos/escala_cuerda.gd")
+const BALSA := preload("res://scripts/mundo/objetos/balsa.gd")
 
 
 func _crear_objetos(zonas: Dictionary) -> void:
