@@ -1675,6 +1675,126 @@ def crear_lago():
     return ["".join(f) for f in m], textos
 
 
+def crear_orilla():
+    """La Orilla de Juncos (64x100, de sur a norte): el camino de la Ciénaga Quieta (sur) al Embarcadero Junco
+    (norte). Por el este baja el RÍO ANCHO, con camas de juncos en las orillas y un banco de arena en medio, donde
+    está el sexto ECO PERDIDO. Por el oeste, el camino entre juncos y sauces. A media altura, la CASA DE BARCAS de
+    KASIA, la nutria barquera (encargo: tres remos que se llevó la corriente); al devolvérselos arregla su BALSA («"» en
+    esta orilla: el embarcadero roto) y lleva a Maisha al banco de arena. Una zona corrupta en una playa del sur
+    y un secreto entre los juncos del noroeste."""
+    ANCHO, ALTO = 64, 100
+    azar = random.Random(191)
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    zonas = {"1": (22, 76, 9, 6)}
+
+    def en_zona(x, y, margen=2):
+        for (zx, zy, rx, ry) in zonas.values():
+            if ((x - zx) / (rx + margen)) ** 2 + ((y - zy) / (ry + margen)) ** 2 <= 1.0:
+                return True
+        return False
+
+    # el río ancho, por el este (con curvas), y el banco de arena en medio
+    rio = {}
+    for y in range(ALTO):
+        cx = 47 + int(3 * math.sin(y * 0.07) + 1.5 * math.sin(y * 0.19 + 1))
+        ancho = 9 + int(2 * math.sin(y * 0.11 + 2))
+        rio[y] = (cx - ancho, cx + ancho)
+        for x in range(cx - ancho, min(ANCHO, cx + ancho + 1)):
+            poner(x, y, "~")
+    for y in range(36, 47):
+        for x in range(ANCHO):
+            if ((x - 50) / 4.5) ** 2 + ((y - 41) / 4.0) ** 2 <= 1.0:
+                poner(x, y, ".")
+    # juncos en las dos orillas del río (adorno, se recogen... no: solo adorno)
+    for y in range(ALTO):
+        x0, x1 = rio[y]
+        for x in (x0 - 1, x0 - 2, x1 + 1):
+            if 0 <= x < ANCHO and m[y][x] == "." and azar.random() < 0.55:
+                poner(x, y, ";")
+
+    def camino(puntos, ancho=2):
+        for (a_, b_) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b_[0] - a_[0]), abs(b_[1] - a_[1])) * 2) + 1
+            for i in range(pasos + 1):
+                t_ = i / pasos
+                x = a_[0] + (b_[0] - a_[0]) * t_ + math.sin(t_ * 3 + a_[1]) * 0.35
+                y = a_[1] + (b_[1] - a_[1]) * t_
+                for dx in range(ancho):
+                    for dy in range(ancho):
+                        xx, yy = int(x) + dx, int(y) + dy
+                        if 0 <= xx < ANCHO and 0 <= yy < ALTO and m[yy][xx] in ".,;":
+                            poner(xx, yy, "#")
+
+    camino([(20, 99), (21, 88), (16, 72), (18, 58), (24, 46), (22, 32), (17, 18), (20, 0)])
+    camino([(19, 44), (27, 42), (31, 41)], 1)                     # → la casa de barcas y el embarcadero roto
+    # el embarcadero roto: la balsa que cruza al banco de arena (cerrado hasta que la nutria la arregla)
+    for x in range(rio[41][0], 46):
+        for y in (41, 42):
+            if m[y][x] == "~":
+                poner(x, y, '"')
+    # la casa de barcas de la nutria y la nutria a la puerta
+    poner(28, 37, "{")
+    poner(31, 40, "}")
+    # el eco, en el banco de arena
+    poner(50, 40, "@")
+    # los tres remos: en la playa de la zona, entre los juncos del norte y río abajo, en la orilla
+    for (x, y) in ((24, 78), (rio[14][0] - 2, 14), (rio[90][0] - 2, 90)):
+        poner(x, y, "`")
+    # el secreto, entre los juncos del noroeste, tras un matorral
+    poner(6, 12, "X")
+    poner(5, 13, "M"); poner(6, 13, "M"); poner(7, 13, "M")
+    # bayas y junco dulce en la orilla
+    for (x, y) in ((12, 60), (rio[26][0] - 3, 26), (8, 88)):
+        poner(x, y, "$")
+    reservados = [(28, 37, 4), (31, 40, 2), (6, 12, 2), (20, 96, 3), (20, 3, 3)]
+
+    def libre(x, y):
+        if m[y][x] not in ".," or en_zona(x, y):
+            return False
+        for (rx_, ry_, rr) in reservados:
+            if (x - rx_) ** 2 + (y - ry_) ** 2 <= rr * rr:
+                return False
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#~\"@{}`$X":
+                    return False
+        return True
+
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            if not libre(x, y):
+                continue
+            borde = x
+            r = azar.random()
+            if borde < 3 and r < 0.75:
+                poner(x, y, azar.choice("sst"))
+            elif r < 0.05:
+                poner(x, y, azar.choice("ssTr"))
+            elif r < 0.12:
+                poner(x, y, ";")
+            elif r < 0.2:
+                poner(x, y, ",")
+    # puertas: sur a la Ciénaga Quieta (_) y norte al Embarcadero Junco (^)
+    for x in range(18, 24):
+        for y in range(0, 3):
+            poner(x, y, "^" if y == 0 else "#")
+        for y in range(ALTO - 3, ALTO):
+            poner(x, y, "_" if y == ALTO - 1 else "#")
+    poner(24, 94, "L")
+    poner(25, 45, "L")
+    poner(23, 5, "L")
+    poner(21, 96, "S")
+    for k, (zx_, zy_, rx_, ry_) in zonas.items():
+        poner(zx_, zy_, k)
+    textos = {"1": "9, 6, 4, 3"}
+    return ["".join(f) for f in m], textos
+
+
 # ---------------------------------------------------------------------------
 # Dibujar el suelo a partir del texto
 # ---------------------------------------------------------------------------
@@ -1770,7 +1890,8 @@ def exportar_json(nombre):
 
 # mapas cuyo suelo se pinta con detalle (herramientas/pintar_suelo.py); los demás, con el dibujo sencillo
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
-                  "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo"}
+                  "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
+                  "orilla_juncos"}
 
 
 def construir_suelo(nombre):
@@ -1917,7 +2038,8 @@ if __name__ == "__main__":
                         "bosque_cobrizo": crear_bosque, "cienaga_quieta": crear_cienaga, "campo_segado": crear_campo,
                         "sendero_del_puente": crear_sendero, "las_pasarelas": crear_pasarelas,
                         "camino_cobrizo": crear_camino, "senda_surcos": crear_senda,
-                        "canada_eco": crear_canada, "lago_espejo": crear_lago}.get(nombre, crear_prados)()
+                        "canada_eco": crear_canada, "lago_espejo": crear_lago,
+                        "orilla_juncos": crear_orilla}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

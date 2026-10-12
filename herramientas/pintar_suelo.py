@@ -339,6 +339,39 @@ def _agua_espejo(lz, agua, prof, fina):
     lz.pintar((fina > 0.93) * agua * np.clip(hondo * 3, 0, 1), "#ffffff", 0.5)
 
 
+def _playas(lz, agua, fina, media):
+    """Las orillas del río de la Orilla de Juncos: una franja de arena clara y barro húmedo a lo largo del agua
+    (más ancha en los recodos), con huellas de pájaro, conchitas y ramitas que ha dejado la corriente; y el banco de
+    arena del río, de arena del todo (lo que no es agua y está rodeado de agua)."""
+    import cv2 as _cv
+    S = lz.s
+    seco = (agua < 0.5).astype(np.uint8)
+    # lo que está rodeado de agua por los dos lados (el banco de arena): tierra que no toca el borde del mapa
+    n, etiquetas = _cv.connectedComponents(seco)
+    banco = np.zeros_like(agua)
+    for k in range(1, n):
+        trozo = etiquetas == k
+        ys, xs = np.nonzero(trozo)
+        if xs.min() > 2 and xs.max() < lz.W - 3 and ys.min() > 2 and ys.max() < lz.H - 3:
+            banco = np.maximum(banco, trozo.astype(float))
+    ancho = (20 + (lz.ruido(30, 2, semilla=91) - 0.5) * 22) * S
+    cerca = _cv.distanceTransform(seco, _cv.DIST_L2, 5)
+    playa = np.clip((ancho - cerca) / (4 * S), 0, 1) * (1 - agua)
+    playa = np.maximum(playa, lz.desenfocar(banco, 1.0))
+    v = 0.5 + (media - 0.5) * 0.3 + (fina - 0.5) * 0.25
+    lz.pintar(playa, rampa(["#6e5a3a", "#8a7350", "#a68e64", "#c2aa7c", "#d8c294"], np.clip(v, 0, 1)), 0.95)
+    # barro húmedo justo junto al agua
+    humedo = np.clip((6 * S - cerca) / (3 * S), 0, 1) * (1 - agua)
+    lz.pintar(humedo, rampa(["#3f3420", "#52442a", "#66563a"], np.clip(media, 0, 1)), 0.8)
+    # huellas de pájaro, conchitas y ramitas
+    marcas = (lz.ruido(0.6, 1, semilla=92) > 0.9) * playa
+    lz.pintar(marcas * (fina > 0.5), "#5a4a30", 0.7)
+    conchas = (lz.ruido(0.5, 1, semilla=93) > 0.93) * playa
+    lz.pintar(conchas, "#efe6cf", 0.85)
+    ramitas = (estirar(lz.ruido(0.8, 1, semilla=94), int(4 * S), False) > 0.86) * playa
+    lz.pintar(ramitas, "#4a3624", 0.6)
+
+
 def _mesetas(lz, tipos, fina, media, pared):
     """Encima de las peñas grandes (la Cañada del Eco): una MESETA de hierba, más alta que el fondo. La roca solo se
     ve en el filo (unos pocos píxeles con musgo) y en la cara del acantilado del sur; dentro, hierba oscura con
@@ -376,6 +409,7 @@ def pintar(nombre, salida=None):
     senda = nombre == "senda_surcos"
     canada = nombre == "canada_eco"
     espejo = nombre == "lago_espejo"
+    orilla_j = nombre == "orilla_juncos"
     tipos = tipos_de(filas, derrumbe=cobrizo or senda, escala=canada)
     alto, ancho = len(filas), len(filas[0])
     lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=7)
@@ -522,6 +556,8 @@ def pintar(nombre, salida=None):
         lz.pintar(juncos * estirar(fina, 7) > 0.6, "#526d38", 0.9)
         if espejo:
             _agua_espejo(lz, agua, prof, fina)
+        if orilla_j:
+            _playas(lz, agua, fina, media)
 
     # ---- puentes y pasarelas de tablas: las tablas van de través (en las pasarelas que bajan, en horizontal),
     #      con vigas en los bordes, pilotes que asoman y la sombra sobre el agua
