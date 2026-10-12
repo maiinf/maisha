@@ -45,6 +45,4 @@ se pasan.
 | Recuerdo del 6.º eco | «La despedida»: Mauti se va en barca río arriba (a buscar a quien no quería que nada se segara); Maisha se queda con la linterna encendida en la orilla para que sepa volver. Ilustración `18_eco_orilla` |
 | Música de la Orilla de Juncos | «La linterna en la orilla», una barcarola en seis (sol mayor) |
 | `.agents/` y `skills-lock.json` | Ignorados en git (son las skills de Iam, no parte del juego) |
-
-
-| 2026-10-12 | Embarcadero Junco: propuesta de trazado (96×72, `crear_embarcadero`; boceto `documentacion/boceto_embarcadero_junco.png`). Pueblo de barqueros con casas de juncos sobre pilotes, transbordador varado, la dársena con el jefe, 3 zonas y 3 secretos. Pendiente de que Iam elija jefe, vecino y cómo se abre. | Propuesta de Claude. |
+| Embarcadero Junco (trazado) | Propuesta de Claude: 96×72 (`crear_embarcadero`, boceto `documentacion/boceto_embarcadero_junco.png`), pueblo de barqueros, transbordador varado, la dársena con el jefe, 3 zonas, 3 secretos. Pendiente de Iam: jefe, vecino y cómo se abre |
