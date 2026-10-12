@@ -46,3 +46,12 @@ se pasan.
 | Música de la Orilla de Juncos | «La linterna en la orilla», una barcarola en seis (sol mayor) |
 | `.agents/` y `skills-lock.json` | Ignorados en git (son las skills de Iam, no parte del juego) |
 | Embarcadero Junco (trazado) | Propuesta de Claude: 96×72 (`crear_embarcadero`, boceto `documentacion/boceto_embarcadero_junco.png`), pueblo de barqueros, transbordador varado, la dársena con el jefe, 3 zonas, 3 secretos. Pendiente de Iam: jefe, vecino y cómo se abre |
+
+## 2026-10-12 · Embarcadero Junco
+| Decisión | Elegido |
+| --- | --- |
+| Cómo se abre | Al escuchar el 6.º eco (el barrizal de la orilla se seca) |
+| Jefe de la dársena | **Mamba, el cocodrilo de herrumbre**: flota como un tronco y salta a morder la plataforma; si se le esquiva, se le clavan los dientes en un poste y el cetro le hace daño |
+| Vecino | **Bata, el pato barquero**: de piedra junto a la dársena; arregla el transbordador y abre La Travesía |
+| Hecho en este paso | Mapa, suelo, pueblo de barqueros (casas, grúa, almacén), transbordador, Bata, textos y prueba. Mamba y el arreglo del transbordador, en el paso siguiente |
+

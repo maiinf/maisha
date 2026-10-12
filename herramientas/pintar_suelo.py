@@ -409,7 +409,7 @@ def pintar(nombre, salida=None):
     senda = nombre == "senda_surcos"
     canada = nombre == "canada_eco"
     espejo = nombre == "lago_espejo"
-    orilla_j = nombre == "orilla_juncos"
+    orilla_j = nombre in ("orilla_juncos", "embarcadero_junco")
     tipos = tipos_de(filas, derrumbe=cobrizo or senda, escala=canada)
     alto, ancho = len(filas), len(filas[0])
     lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=7)

@@ -74,7 +74,11 @@
 			"canada_eco"
 		],
 		"orilla_juncos": [
-			"cienaga_quieta"
+			"cienaga_quieta",
+			"embarcadero_junco"
+		],
+		"embarcadero_junco": [
+			"orilla_juncos"
 		]
 	},
 	"misiones": [

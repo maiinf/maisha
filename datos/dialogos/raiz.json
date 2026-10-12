@@ -1971,7 +1971,7 @@
 			{
 				"lineas": [
 					"Río arriba se ven los tejados del Embarcadero Junco... pero la orilla se ha hundido y el camino se pierde en un barrizal.",
-					"Por aquí todavía no puedo pasar."
+					"Por aquí todavía no puedo pasar. A lo mejor el río sabe algo que yo no: viene de allí."
 				]
 			}
 		]
@@ -2001,7 +2001,140 @@
 				"tras_historia": [
 					"La barca se pierde río arriba y la luz lila se apaga entre las colinas.",
 					"En la arena, la linterna sigue encendida. Nadie volvió a buscarla.",
-					"Río arriba... hacia el norte. Hacia donde el río nace."
+					"Río arriba... hacia el norte. Hacia donde el río nace.",
+					"Al norte, donde la orilla se había hundido, el barrizal se ha secado. Ya se puede seguir río arriba, hacia el Embarcadero Junco."
+				]
+			}
+		]
+	},
+	"embarcadero_llegada": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un pueblo entero sobre el agua: casas de juncos subidas en palos, pasarelas, barcas boca abajo...",
+					"Y nadie. Ni una voz. Solo el agua, que golpea los pilotes despacio.",
+					"Allí arriba hay una barca enorme, varada en el muelle. Si alguien la hiciera navegar otra vez, podría ir río arriba. Por donde se fue Mauti."
+				]
+			}
+		]
+	},
+	"paso_cerrado_la_travesia": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El río sigue hacia el norte, pero aquí el muelle se acaba. A nado no: la corriente es muy fuerte.",
+					"Ese transbordador varado... Si volviera a navegar, me llevaría río arriba."
+				]
+			}
+		]
+	},
+	"embarcadero_casa": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una casa de juncos atados, subida en palos para que el río no entre cuando crece.",
+					"Dentro hay una cama de esteras, una cazuela y una nasa a medio tejer. Quien vivía aquí se fue con prisa... o no se fue."
+				]
+			}
+		]
+	},
+	"embarcadero_grua": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una grúa para subir la carga de las barcas. La polea está partida y el gancho cuelga sin nada.",
+					"Al pie hay un fardo de red que se cayó y nadie volvió a recoger."
+				]
+			}
+		]
+	},
+	"embarcadero_almacen": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El almacén del puerto: sacos, barriles, cajas con un pez pintado.",
+					"Huele a río y a madera mojada. Encima de la puerta, un letrero con un pez. Todo está gris."
+				]
+			}
+		]
+	},
+	"embarcadero_transbordador": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una barca enorme, plana como una plaza, con una casita para el barquero y una campana.",
+					"Está varada y escorada, con un boquete en el casco. Así no va a ninguna parte.",
+					"Alguien que supiera de barcas podría arreglarla. Alguien que conociera el río."
+				]
+			}
+		]
+	},
+	"estatua_bata": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un pato de piedra con gorra de barquero, agarrado a una pértiga. Mira hacia el agua de la dársena, con el pico abierto, como si fuera a gritar algo.",
+					"Hasta el pañuelo del cuello es de piedra. Y una grieta violeta le cruza la gorra."
+				]
+			}
+		]
+	},
+	"rescate_bata": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Cuac! ¡Todos fuera del agua! ¡Hay algo en la dársena que...!",
+					"...Ah. Ya no hay nadie. ¿Cuánto tiempo...? Da igual. Gracias, lucecita.",
+					"Soy Bata. Llevo el transbordador desde que mi pico era así de corto. Bueno, lo llevaba.",
+					"Voy a ver cómo está mi barca. Si el casco aguanta, a lo mejor aún sabe nadar."
+				]
+			}
+		]
+	},
+	"bata": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"no": [
+					"bata_conocido"
+				],
+				"marca": [
+					"bata_conocido"
+				],
+				"lineas": [
+					"El transbordador subía y bajaba el río todos los días: piedras para el puente, sacos de grano, abuelas con sus nietos...",
+					"Río arriba está la Gruta de las Raíces. Antes de lo gris, allí se llevaban las semillas para que durmieran el invierno.",
+					"Ahora mírala: varada, escorada, con un boquete que cabe un cangrejo. Hay que arreglarla, y no es cosa de un día."
+				]
+			},
+			{
+				"si": [
+					"eco/orilla_juncos"
+				],
+				"lineas": [
+					"¿Una luz pequeña, lila, que se fue río arriba en una barquita? Hmm...",
+					"Mi abuelo contaba algo así. Que una noche, hace muchísimo, vio pasar una barca sin remos, con una luz dentro. Y que nunca bajó.",
+					"Él decía que fue a la Gruta. Pero mi abuelo también decía que los peces hablaban, así que..."
+				]
+			},
+			{
+				"lineas": [
+					"El río siempre vuelve a pasar por el mismo sitio. Lo que no vuelve es el agua. ¡Cuac!"
 				]
 			}
 		]

@@ -123,7 +123,7 @@
 "destino": "embarcadero_junco",
 "puerta": "orilla",
 "salida": "abajo",
-"cerrada": "embarcadero_abierto"
+"cerrada": "eco/orilla_juncos"
 }
 },
 "casilla": 16

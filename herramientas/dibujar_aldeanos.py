@@ -499,6 +499,37 @@ def mdiria():
     return l.imagen()
 
 
+def bata():
+    """BATA: el pato barquero del Embarcadero Junco. Viejo y orondo, de plumas blancas, con el pico ancho y las patas
+    naranjas, una gorra de barquero azul con visera, un pañuelo rojo al cuello y la pértiga larga en el ala."""
+    l = Lienzo()
+    l.ovalo(12, 22, 7, 6.5, "cabra")                          # cuerpo orondo
+    l.ovalo(11.5, 23.5, 4.2, 4.4, "pecho_g")                  # la pechuga
+    l.ovalo(5.8, 21.5, 2.2, 4.4, "cabra")                     # ala recogida
+    for (x, y) in ((5, 20), (5, 22), (6, 24)):
+        l.px(x, y, "gris_c", 2)
+    for x in range(17, 21):                                   # la cola, levantada
+        l.px(x, 19 - (x - 17) // 2, "cabra", 2)
+    l.ovalo(12, 11, 5, 4.8, "cabra")                          # cabeza
+    ojos(l, 10, 10, 13, alto=2)
+    for x in range(8, 16):                                    # el pico ancho y plano
+        l.px(x, 14, "pico", 2 if 9 < x < 14 else 1)
+        l.px(x, 15, "pico", 1)
+    l.px(10, 14, "pico", 3); l.px(11, 14, "pico", 3)
+    l.rect(7, 6, 17, 7, "bufanda", 1)                         # la gorra de barquero, con visera
+    l.rect(8, 4, 16, 6, "bufanda", 2); l.rect(9, 4, 15, 4, "bufanda", 3)
+    l.rect(6, 7, 11, 7, "bufanda", 0)
+    l.px(12, 5, "maiz", 3)                                    # el ancla bordada
+    l.rect(8, 16, 16, 17, "rojo", 3); l.rect(8, 17, 16, 17, "rojo", 2)   # el pañuelo
+    l.px(15, 18, "rojo", 2); l.px(16, 19, "rojo", 1)
+    for y in range(3, 31):                                    # la pértiga, larga
+        l.px(20 + (1 if y < 12 else 0), y, "concha", 2 if y % 5 else 3)
+    l.px(19, 21, "cabra", 3); l.px(19, 22, "cabra", 2)        # el ala que la sujeta
+    for x in (9, 15):                                         # patas naranjas, palmeadas
+        l.px(x, 29, "pico", 2); l.px(x - 1, 30, "pico", 1); l.px(x, 30, "pico", 2); l.px(x + 1, 30, "pico", 1)
+    return l.imagen()
+
+
 def kasia():
     """KASIA: nutria barquera de la Orilla de Juncos. Risueña y charlatana: pelo pardo brillante, barriga y morro
     claros, orejitas redondas, bigotes, un sombrero de paja con una cinta azul y un remo al hombro."""
@@ -530,7 +561,7 @@ def kasia():
     return l.imagen()
 
 
-ALDEANOS = {"kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+ALDEANOS = {"bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

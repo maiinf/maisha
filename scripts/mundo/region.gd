@@ -43,6 +43,7 @@ const CIENAGA := "res://arte/mundos/raiz/cienaga/"
 const CAMPO := "res://arte/mundos/raiz/campo/"
 const CANADA := "res://arte/mundos/raiz/canada/"
 const LAGO := "res://arte/mundos/raiz/lago/"
+const EMBARCADERO := "res://arte/mundos/raiz/embarcadero/"
 const MECERSE := preload("res://scripts/mundo/objetos/mecerse.gd")
 const GALLINA := preload("res://scripts/mundo/kitovu/gallina.gd")
 const OBJ := "res://arte/mundos/raiz/objetos/"
@@ -90,6 +91,11 @@ const FIJOS := {
 	"þ": [LAGO + "barca.png", Vector2(40, 8), 22.0, 1, "lago_barca", 30.0],
 	"ð": [LAGO + "altar.png", Vector2(24, 8), 14.0, 1, "lago_altar", 26.0],
 	"ø": [LAGO + "menhir.png", Vector2(10, 6), 8.0, 3],
+	# del Embarcadero Junco (el transbordador: 0 varado, 1 arreglado, según la marca «transbordador_listo»)
+	"æ": [EMBARCADERO + "casa_juncos.png", Vector2(40, 10), 0.0, 2, "embarcadero_casa", 30.0],
+	"å": [EMBARCADERO + "grua.png", Vector2(12, 6), 10.0, 1, "embarcadero_grua", 26.0],
+	"œ": [EMBARCADERO + "almacen.png", Vector2(72, 14), 0.0, 1, "embarcadero_almacen", 40.0],
+	"ß": [EMBARCADERO + "transbordador.png", Vector2(104, 14), 0.0, 2, "embarcadero_transbordador", 56.0],
 }
 ## La casa del viajero de cada camino («{»): [dibujo, colisión, charla al usarla, radio, hoguera]
 const CAMPAMENTOS := {
@@ -286,7 +292,10 @@ func _crear_objetos(zonas: Dictionary) -> void:
 				if c in "JjIsx":
 					# en el bosque, los árboles no van en filas: cada uno un poco movido (siempre igual)
 					desvio = Vector2(((x * 73 + y * 31) % 9) - 4, ((x * 17 + y * 53) % 7) - 3)
-				var fijo := _fijo(FIJOS[c], pos + desvio, x * 3 + y)
+				var variante := x * 3 + y
+				if c == "ß":
+					variante = 1 if Estado.tiene("transbordador_listo") else 0
+				var fijo := _fijo(FIJOS[c], pos + desvio, variante)
 				if c in "TtJjIdsx":
 					fijo.add_to_group("arboles")
 

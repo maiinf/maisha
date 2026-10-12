@@ -1871,10 +1871,16 @@ def crear_embarcadero():
         rio[y] = (cx - ancho, cx + ancho)
         for x in range(cx - ancho, min(ANCHO, cx + ancho + 1)):
             poner(x, y, "~")
-    for y in range(44, 66):
-        for x in range(28, rio[y][0] + 1):
-            if ((x - 44) / 15) ** 2 + ((y - 56) / 10) ** 2 <= 1.0:
+    for y in range(40, ALTO):
+        for x in range(26, rio[y][0] + 1):
+            ang = math.atan2(y - 56, x - 44)
+            r = 1.0 + 0.08 * math.sin(ang * 3 + 1.2) + 0.05 * math.sin(ang * 7 + 0.4)
+            if ((x - 44) / 14) ** 2 + ((y - 56) / 8.5) ** 2 <= r * r:
                 poner(x, y, "~")
+    # el canal que une la dársena con el río, por el este
+    for y in range(52, 61):
+        for x in range(54, rio[y][0] + 1):
+            poner(x, y, "~")
     # la plataforma de madera en medio de la dársena (la arena del jefe), con una pasarela desde el oeste
     for y in range(52, 61):
         for x in range(37, 52):
@@ -1918,7 +1924,7 @@ def crear_embarcadero():
                    (rio[30][0] + 5, 33), (48, 22), (36, 30), (rio[42][0] - 3, 42)):
         poner(x, y, "æ")
     poner(rio[16][0] - 2, 16, "å")
-    poner(34, 20, "[")
+    poner(34, 20, "œ")
     # Bata, el pato barquero (cuando se le rescata), junto al transbordador
     poner(rio[12][0] + 3, 11, "}")
     # secretos: tras matorrales en el prado del oeste, en el muelle del medio y entre los juncos del sureste
@@ -1943,7 +1949,7 @@ def crear_embarcadero():
                 return False
         for dy in (-1, 0, 1):
             for dx in (-1, 0, 1):
-                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#~=æåß[}X$":
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#~=æåßœ}X$":
                     return False
         return True
 
@@ -1973,7 +1979,7 @@ def crear_embarcadero():
     poner(23, 68, "S")
     for k, (zx_, zy_, rx_, ry_) in zonas.items():
         poner(zx_, zy_, k)
-    textos = {"1": "9, 6, 4, 0, , jefe:mamba", "2": "8, 5, 4, 3, bata", "3": "8, 6, 4, 3"}
+    textos = {"1": "9, 6, 4, 3, bata", "2": "7, 4, 4, 3", "3": "8, 6, 4, 3"}
     return ["".join(f) for f in m], textos
 
 
@@ -2073,7 +2079,7 @@ def exportar_json(nombre):
 # mapas cuyo suelo se pinta con detalle (herramientas/pintar_suelo.py); los demás, con el dibujo sencillo
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
-                  "orilla_juncos"}
+                  "orilla_juncos", "embarcadero_junco"}
 
 
 def construir_suelo(nombre):
@@ -2221,7 +2227,7 @@ if __name__ == "__main__":
                         "sendero_del_puente": crear_sendero, "las_pasarelas": crear_pasarelas,
                         "camino_cobrizo": crear_camino, "senda_surcos": crear_senda,
                         "canada_eco": crear_canada, "lago_espejo": crear_lago,
-                        "orilla_juncos": crear_orilla}.get(nombre, crear_prados)()
+                        "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

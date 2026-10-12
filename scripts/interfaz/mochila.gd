@@ -58,7 +58,7 @@ const PUNTO_RAIZ := {"prados_del_eco": Vector2(110, 178), "bosque_cobrizo": Vect
 	"casa_shamba": Vector2(53, 196), "cienaga_quieta": Vector2(322, 182), "campo_segado": Vector2(208, 44),
 	"sendero_del_puente": Vector2(160, 166), "las_pasarelas": Vector2(268, 166),
 	"camino_cobrizo": Vector2(104, 132), "senda_surcos": Vector2(205, 90),
-	"canada_eco": Vector2(68, 91), "lago_espejo": Vector2(40, 110), "orilla_juncos": Vector2(370, 150)}
+	"canada_eco": Vector2(68, 91), "lago_espejo": Vector2(40, 110), "orilla_juncos": Vector2(370, 150), "embarcadero_junco": Vector2(388, 124)}
 const NIEBLA := Color("e2cea0")
 const NIEBLA_SOMBRA := Color("c9b07e")
 const TINTA := Color("5c3e26")
@@ -129,6 +129,7 @@ const LAZOS := [
 	["corteza", "Corteza", "rescatado_corteza", "Herrera de Cuna de Musgo. Gruñona y orgullosa, pero de buen corazón."],
 	["kasia", "Kasia", "kasia_conocida", "Nutria barquera de la Orilla de Juncos. Habla sin parar y rema sin cansarse."],
 	["mdiria", "Mdiria", "mdiria_conocido", "Martín pescador viejo del Lago Espejo. Hizo el embarcadero (casi todo)."],
+	["bata", "Bata", "bata_conocido", "El pato barquero del Embarcadero Junco. Llevaba el transbordador río arriba, hasta la Gruta de las Raíces."],
 	["mbuzi", "Mbuzi", "mbuzi_conocida", "Cabra montés pastora de la Cañada del Eco. Habla despacio y escucha todavía más despacio."],
 	["sungura", "Sungura", "sungura_conocida", "Liebre guardasemillas de la Senda de los Surcos. Habla deprisa, siembra despacio."],
 	["fuko", "Fuko", "fuko_conocido", "Topo minero del Camino Cobrizo. No ve más allá de sus gafas, pero oye crecer las raíces."],
