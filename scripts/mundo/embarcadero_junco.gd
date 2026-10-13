@@ -8,11 +8,13 @@ extends "res://scripts/mundo/escena_mundo.gd"
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const CASA_SELLADA := preload("res://scripts/mundo/embarcadero/casa_sellada.gd")
+const ARREGLO := preload("res://scripts/mundo/embarcadero/arreglo_transbordador.gd")
 
 
 func _ready() -> void:
 	super()
 	_crear_casa_sellada()
+	_crear_arreglo.call_deferred()
 	_activar_darsena.call_deferred()
 	_maisha.caida.connect(_al_caer_fuera_de_zona)
 	$Corrupcion.region_purgada.connect(_al_purgar_region)
@@ -63,6 +65,19 @@ func _process(_delta: float) -> void:
 		if z.get_meta("clave", "") == "1" and z.en_borde(_maisha.global_position):
 			Estado.marcar("darsena_vista")
 			CHARLA_SCRIPT.hablar(self, "embarcadero_darsena_sola")
+
+
+## Arreglar el transbordador con los poderes de Maisha (scripts/mundo/embarcadero/arreglo_transbordador.gd)
+func _crear_arreglo() -> void:
+	var arreglo: Node2D = ARREGLO.new()
+	arreglo.name = "ArregloTransbordador"
+	for cuerpo in $Entidades.get_children():
+		for h in cuerpo.get_children():
+			if h is Sprite2D and (h as Sprite2D).texture and (h as Sprite2D).texture.resource_path.ends_with("transbordador.png"):
+				arreglo.sprite = h
+				arreglo.base = (cuerpo as Node2D).global_position
+	if arreglo.sprite:
+		add_child(arreglo)
 
 
 func _pensar_al_llegar() -> void:

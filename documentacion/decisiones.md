@@ -68,4 +68,5 @@ se pasan.
 | Construcciones | Casas, almacén, grúa y transbordador rehechos al nivel de la casa del castor |
 | Rescate de Bata | Ya no es estatua: está encerrado vivo en su casa sellada por raíces. Se siguen las venas violetas hasta un nudo de Giza tapado por sacos; Latido para apartarlos, semilla para reventarlo |
 | Pelea contra Mamba | Será 2 contra 1: Bata en su barca ayudando con la pértiga (siguiente paso) |
-
+| Arreglar el transbordador | Con los poderes: semilla junto al boquete → juncos tejidos; Latido pegado al casco → la endereza. Sin recados |
+| La Travesía | Será un viaje en el transbordador (propuesta ⭐, pendiente de confirmar) |

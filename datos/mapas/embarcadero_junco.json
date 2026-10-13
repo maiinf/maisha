@@ -112,7 +112,7 @@
 "destino": "la_travesia",
 "puerta": "embarcadero",
 "salida": "abajo",
-"cerrada": "transbordador_listo"
+"cerrada": "travesia_abierta"
 }
 },
 "casilla": 16

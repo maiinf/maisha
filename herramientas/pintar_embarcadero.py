@@ -22,10 +22,10 @@ Genera (en arte/mundos/raiz/embarcadero/):
                                   barriles, cajas, sacos, tendedero de redes y carretilla
   poste.png           2 × 22×44   un poste de amarre de la dársena (alto, de madera clara, con anillo de cuerda): 0 entero,
                                   1 mordido por Mamba (con las marcas de los dientes y astillas)
-  transbordador.png   2 × 160×84  el TRANSBORDADOR: barcaza de tablas con la proa levantada, barandilla de cuerda,
+  transbordador.png   3 × 160×84  el TRANSBORDADOR: barcaza de tablas con la proa levantada, barandilla de cuerda,
                                   caseta de troncos con tejado de paja, ventana, campana, farol de proa, bandera,
                                   pértiga y carga. 0 varado (escorado, boquete, algas, barandilla rota), 1 arreglado
-                                  (parche de juncos tejidos, farol y ventana encendidos)
+                                  (parche de juncos tejidos, farol y ventana encendidos), 2 tapado pero aún escorado
 """
 import os
 import sys
@@ -44,6 +44,7 @@ LUZ = (-0.6, -0.7, 0.5)
 AGUA = ["#1c3535", "#285050", "#346161", "#4c8d8d", "#6db0b0", "#9fd0d0"]
 HIERRO = ["#1a1a1c", "#2c2c30", "#424248", "#5a5a62", "#76767e"]
 CUERDA = "#a48656"
+BX = 26                                   # dónde está el boquete del transbordador (en su dibujo): del lado del muelle
 GIZA_V = ["#2a0d3a", "#3a1650", "#6b2a8f", "#a855d6", "#d6a8f0"]
 
 
@@ -394,6 +395,9 @@ def almacen():
 
 
 def transbordador(k):
+    # k: 0 varado (escorado, con boquete), 1 arreglado y a flote, 2 con el boquete tapado pero aún escorado
+    parcheado = k in (1, 2)
+    recto = k == 1
     """El transbordador, al nivel de la casa del castor: una barcaza grande de tablas con la proa levantada, la
     cubierta con barandilla de postes y cuerda, la caseta del barquero de troncos con tejado de paja, su ventana
     (encendida si navega) y la campana; una pértiga larga, un farol en la proa, una bandera, rollos de cuerda, cajas y
@@ -402,7 +406,7 @@ def transbordador(k):
     W, H = 160, 84
     lz = Lienzo(W, H, s=4, semilla=331 + k)
     TR = ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33", "#9a6544", "#b88259"]
-    inclina = 0.07 if k == 0 else 0.0
+    inclina = 0.0 if recto else 0.07
     cy = 58
 
     def y_(y, x):
@@ -422,23 +426,26 @@ def transbordador(k):
     # una franja de pintura azul a lo largo del casco (desconchada)
     franja = casco * (np.abs(lz.y - y_(cy - 1, lz.x)) < 1.6) * (lz.ruido(1.2, 2, semilla=333) > 0.35)
     lz.pintar(franja, "#4c8d8d", 0.85)
-    if k == 0:
+    if not recto:
         algas = casco * (lz.y > y_(cy + 5, lz.x)) * (lz.ruido(0.8, 2, semilla=334) > 0.35)
         lz.pintar(algas, "#2e4a2a", 0.85)
-        boquete = lz.elipse(100, y_(cy + 2, 100), 7, 4)
+    if not parcheado:
+        boquete = lz.elipse(BX, y_(cy + 2, BX), 7, 4)
         lz.pintar(boquete, "#0a0806")
         for a in range(10):
             ang = a * np.pi / 5
-            lz.pintar(lz.trazo([(100 + np.cos(ang) * 5.5, y_(cy + 2, 100) + np.sin(ang) * 3.2),
-                                (100 + np.cos(ang) * 8.5, y_(cy + 2, 100) + np.sin(ang) * 5)], 0.6), TR[5])
+            lz.pintar(lz.trazo([(BX + np.cos(ang) * 5.5, y_(cy + 2, BX) + np.sin(ang) * 3.2),
+                                (BX + np.cos(ang) * 8.5, y_(cy + 2, BX) + np.sin(ang) * 5)], 0.6), TR[5])
     else:
-        # el parche de juncos tejidos que tapa el boquete
-        parche = lz.elipse(100, cy + 2, 8, 4.6)
+        # el parche de juncos tejidos que tapa el boquete (los hizo crecer una semilla de Maisha)
+        parche = lz.elipse(BX, y_(cy + 2, BX), 8, 4.6)
         lz.sombrear(parche, ["#3d3214", "#5c4a22", "#7a6431", "#958043", "#b09c5c", "#c9b77d"], 3, LUZ,
                     textura=(np.sin(lz.x * 2.2) * np.sin(lz.y * 2.2) > 0).astype(float), fuerza_tex=0.5)
-        lz.pintar(np.clip(parche - lz.elipse(100, cy + 2, 7, 3.6), 0, 1), CUERDA)
+        lz.pintar(np.clip(parche - lz.elipse(BX, y_(cy + 2, BX), 7, 3.6), 0, 1), CUERDA)
+        for j in range(5):
+            lz.pintar(lz.trazo([(BX - 6 + j * 3, y_(cy - 2, BX)), (BX - 7 + j * 3.2, y_(cy - 7 - j % 2 * 2, BX))], 0.5), "#6fcf4f")
     # la línea de flotación y las ondas
-    linea = y_(cy + (6 if k == 0 else 8), lz.x)
+    linea = y_(cy + (8 if recto else 6), lz.x)
     lz.pintar(casco * (lz.y > linea), AGUA[2], 0.9)
     lz.pintar(np.clip(1 - np.abs(lz.y - linea - 0.3) / 0.6, 0, 1) * (lz.x > 6) * (lz.x < 152) * (np.sin(lz.x * 0.6) > -0.3), AGUA[5], 0.85)
     # la cubierta, vista desde arriba
@@ -449,26 +456,26 @@ def transbordador(k):
                 textura=1 - tabl * 0.9 + vetas(lz, 0.5, 13) * 0.2, fuerza_tex=0.5)
     # la barandilla: postes y una cuerda (rota en el varado)
     for x in range(10, 150, 9):
-        if k == 0 and 84 < x < 118:
+        if not recto and 84 < x < 118:
             continue
         top = y_(cy - 17 if x < 138 else cy - 22, x)
         lz.sombrear(rect(lz, x - 0.7, top - 6, x + 0.7, top + 1), TR[3:], 0.6, LUZ)
-    tramos = [(10, 82), (118, 146)] if k == 0 else [(10, 146)]
+    tramos = [(10, 146)] if recto else [(10, 82), (118, 146)]
     for (a, b) in tramos:
         pts = [(x, y_(cy - 22.5, x) + (np.sin((x - a) / 9 * np.pi) * 0.6 if True else 0)) for x in np.linspace(a, b, 30)]
         lz.pintar(lz.trazo(pts, 0.6), CUERDA)
-    if k == 0:
+    if not recto:
         lz.pintar(lz.trazo([(82, y_(cy - 22.5, 82)), (88, y_(cy - 10, 88)), (92, y_(cy + 6, 92))], 0.6), CUERDA)
     # la caseta del barquero: troncos, tejado de paja, ventana y la campana
     cx0, cx1 = 34, 64
     troncos(lz, cx0, cx1, y_(cy - 46, 49), y_(cy - 18, 49), alto=4.6, semilla=335)
     puertita = rect(lz, cx0 + 4, y_(cy - 38, 40), cx0 + 11, y_(cy - 18, 40))
     lz.pintar(puertita, "#120c08")
-    ventana(lz, cx0 + 16, y_(cy - 40, 55), cx0 + 26, y_(cy - 31, 55), encendida=0.75 if k == 1 else 0.0, contras=False, semilla=336, luz=LUZ)
+    ventana(lz, cx0 + 16, y_(cy - 40, 55), cx0 + 26, y_(cy - 31, 55), encendida=0.75 if recto else 0.0, contras=False, semilla=336, luz=LUZ)
     tej = lz.poligono([(cx0 - 6, y_(cy - 44, cx0)), (49, y_(cy - 62, 49)), (cx1 + 6, y_(cy - 44, cx1)), (cx1 + 6, y_(cy - 41, cx1)), (cx0 - 6, y_(cy - 41, cx0))])
     paja(lz, tej, semilla=337, capas=4.0, y0=cy - 62)
     flecos(lz, cx0 - 6, cx1 + 6, y_(cy - 41.5, 49), 2.2, semilla=338)
-    if k == 0:
+    if not recto:
         lz.pintar(lz.elipse(56, y_(cy - 50, 56), 3.4, 1.8), "#120c08")
         for x in (54, 56, 58):
             lz.pintar(lz.trazo([(x, y_(cy - 52, x)), (x + 0.6, y_(cy - 49, x))], 0.4), "#a37036")
@@ -481,15 +488,15 @@ def transbordador(k):
     fx, fy = 150, y_(cy - 28, 150)
     lz.sombrear(lz.trazo([(fx, y_(cy - 20, fx)), (fx, fy - 3)], 0.7), TR[3:], 0.6, LUZ)
     farol = rect(lz, fx - 2.2, fy - 2, fx + 2.2, fy + 3)
-    lz.pintar(farol, rampa(["#47291c", "#a8380f", "#ef8a26", "#fde27e"] if k == 1 else ["#1a1414", "#2a2420", "#3e3630", "#5a4e44"],
+    lz.pintar(farol, rampa(["#47291c", "#a8380f", "#ef8a26", "#fde27e"] if recto else ["#1a1414", "#2a2420", "#3e3630", "#5a4e44"],
                            np.clip(1 - np.hypot(lz.x - fx, lz.y - fy) / 3, 0, 1)))
-    if k == 1:
+    if recto:
         lz.sumar_luz(lz.desenfocar(farol, 4), "#ef8a26", 0.45)
     lz.sombrear(lz.trazo([(16, y_(cy - 18, 16)), (16, y_(cy - 44, 16))], 0.7), TR[3:], 0.6, LUZ)
     bandera = lz.poligono([(16.5, y_(cy - 44, 16)), (26, y_(cy - 42, 26) + 1), (16.5, y_(cy - 38, 16))])
-    lz.sombrear(bandera, ["#8f2532", "#b02531", "#d5525e", "#f4b39a"] if k == 1 else ["#4a3a3a", "#6a5252", "#8a7070"], 1, LUZ)
+    lz.sombrear(bandera, ["#8f2532", "#b02531", "#d5525e", "#f4b39a"] if recto else ["#4a3a3a", "#6a5252", "#8a7070"], 1, LUZ)
     # la pértiga (en el arreglado, apoyada; en el varado, caída al agua) y la carga
-    if k == 1:
+    if recto:
         lz.sombrear(lz.trazo([(76, y_(cy - 12, 76)), (150, y_(cy - 46, 150))], 1.0), TR[3:], 0.8, LUZ)
     else:
         lz.sombrear(lz.trazo([(118, y_(cy - 12, 118)), (158, y_(cy + 14, 158))], 1.0), TR[2:], 0.8, LUZ)
@@ -640,7 +647,7 @@ def main():
     tira([barca_bata(k) for k in range(2)]).save(os.path.join(SALIDA, "barca_bata.png"))
     Image.fromarray(grua()).save(os.path.join(SALIDA, "grua.png"))
     Image.fromarray(almacen()).save(os.path.join(SALIDA, "almacen.png"))
-    tira([transbordador(k) for k in range(2)]).save(os.path.join(SALIDA, "transbordador.png"))
+    tira([transbordador(k) for k in range(3)]).save(os.path.join(SALIDA, "transbordador.png"))
     tira([poste(k) for k in range(2)]).save(os.path.join(SALIDA, "poste.png"))
     print("Objetos del Embarcadero Junco en", SALIDA)
 

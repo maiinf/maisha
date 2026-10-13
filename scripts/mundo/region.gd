@@ -95,7 +95,7 @@ const FIJOS := {
 	"æ": [EMBARCADERO + "casa_juncos.png", Vector2(40, 10), 0.0, 2, "embarcadero_casa", 30.0],
 	"å": [EMBARCADERO + "grua.png", Vector2(30, 10), 0.0, 1, "embarcadero_grua", 34.0],
 	"œ": [EMBARCADERO + "almacen.png", Vector2(100, 16), 0.0, 1, "embarcadero_almacen", 50.0],
-	"ß": [EMBARCADERO + "transbordador.png", Vector2(140, 16), 0.0, 2, "embarcadero_transbordador", 70.0],
+	"ß": [EMBARCADERO + "transbordador.png", Vector2(140, 16), 0.0, 3, "embarcadero_transbordador", 70.0],
 	"ł": [EMBARCADERO + "poste.png", Vector2(12, 7), 8.0, 2],
 }
 ## La casa del viajero de cada camino («{»): [dibujo, colisión, charla al usarla, radio, hoguera]
@@ -296,7 +296,7 @@ func _crear_objetos(zonas: Dictionary) -> void:
 					desvio = Vector2(((x * 73 + y * 31) % 9) - 4, ((x * 17 + y * 53) % 7) - 3)
 				var variante := x * 3 + y
 				if c == "ß":
-					variante = 1 if Estado.tiene("transbordador_listo") else 0
+					variante = 1 if Estado.tiene("transbordador_listo") else (2 if Estado.tiene("boquete_tapado") else 0)
 				elif c == "ł":
 					variante = 0                    # (los postes, enteros: Mamba los muerde)
 				var fijo := _fijo(FIJOS[c], pos + desvio, variante)

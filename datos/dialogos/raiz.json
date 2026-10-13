@@ -2025,6 +2025,15 @@
 		"estilo": "pensamiento",
 		"conversaciones": [
 			{
+				"si": [
+					"transbordador_listo"
+				],
+				"lineas": [
+					"Por tierra, el camino del norte se pierde en el barro. Río arriba se va en barca.",
+					"Bata dice que zarpamos cuando el río se calme. Pronto."
+				]
+			},
+			{
 				"lineas": [
 					"El río sigue hacia el norte, pero aquí el muelle se acaba. A nado no: la corriente es muy fuerte.",
 					"Ese transbordador varado... Si volviera a navegar, me llevaría río arriba."
@@ -2121,6 +2130,49 @@
 					"Río arriba está la Gruta de las Raíces. Antes de lo gris, llevábamos allí las semillas para que durmieran el invierno.",
 					"Y ahora tiene un boquete en el que cabe un cangrejo. Lo sé porque había uno dentro. Lo eché. Me miró mal.",
 					"Hay que arreglarlo. Pero antes... algo grande se mueve en la dársena. No pienso arreglar nada con eso suelto."
+				]
+			},
+			{
+				"no": [
+					"mamba_vencido"
+				],
+				"lineas": [
+					"Ni me pidas que toque la barca con eso suelto en la dársena. Que yo ya he oído cómo muerde la madera.",
+					"Cuando quieras ir a por él, yo voy contigo. Con la pértiga. Desde lejos. Bastante lejos."
+				]
+			},
+			{
+				"si": [
+					"mamba_vencido"
+				],
+				"no": [
+					"boquete_tapado"
+				],
+				"lineas": [
+					"Bueno. Ya nadie muerde nada. Ahora, el boquete.",
+					"Tus semillas hacen crecer cosas, ¿no? Pues... ¿y si plantas una en la punta del muelle, pegada al agujero? A ver qué sale.",
+					"No tengo ni idea de si funcionará. Pero tampoco tengo tablas."
+				]
+			},
+			{
+				"si": [
+					"boquete_tapado"
+				],
+				"no": [
+					"transbordador_listo"
+				],
+				"lineas": [
+					"El agujero está tapado, pero sigue escorada. Pesa como un buey dormido.",
+					"Pégate al casco y empuja con ese latido tuyo. Yo hago fuerza con la pértiga. Bueno, hago como que hago fuerza."
+				]
+			},
+			{
+				"si": [
+					"transbordador_listo"
+				],
+				"lineas": [
+					"Está lista. Cuando el río se calme, zarpamos.",
+					"Río arriba, a la Gruta. Si de verdad alguien pasó por ahí en una barca sin remos, allí habrá dejado algo."
 				]
 			},
 			{
@@ -2234,6 +2286,30 @@
 				"lineas": [
 					"El agua de la dársena se mueve sola. Algo muy largo pasa por debajo de la plataforma... y vuelve.",
 					"No. Sola no. Si al menos conociera a alguien que supiera de este río..."
+				]
+			}
+		]
+	},
+	"embarcadero_juncos_crecen": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¿Pero qué...? ¡Juncos! ¡Han salido juncos del agua y se han tejido solos en el agujero!",
+					"Mi abuela tejía así las nasas. Bueno, más despacio. Y con las manos.",
+					"Ahora solo falta enderezarla, que sigue torcida como un pato con tortícolis. ¿Y si la empujas con eso que haces? Lo del latido."
+				]
+			}
+		]
+	},
+	"embarcadero_flota": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡FLOTA! ¡Mírala, flota! ¡Cuac!",
+					"...Perdona. Llevaba mucho sin ver algo que saliera bien.",
+					"Cuando quieras, subimos río arriba. Yo llevo la pértiga; tú vigila el agua, que por ahí arriba no sé qué nos vamos a encontrar."
 				]
 			}
 		]

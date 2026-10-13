@@ -117,7 +117,7 @@ func _ready() -> void:
 
 	print("La Travesía, cerrada:")
 	var norte := _puerta("travesia")
-	_comprobar(norte != null and norte.destino == "la_travesia" and norte.cerrada_hasta == "transbordador_listo", "al norte, La Travesía (cerrada hasta que el transbordador navegue)")
+	_comprobar(norte != null and norte.destino == "la_travesia" and norte.cerrada_hasta == "travesia_abierta", "al norte, La Travesía (cerrada: se irá en el transbordador)")
 	_maisha().global_position = norte.global_position + Vector2(0, 30)
 	await _esperar(0.3)
 	await _empujar("mover_arriba", 1.2)
@@ -237,6 +237,33 @@ func _ready() -> void:
 		if darsena.estado == darsena.Estado.PURGADA:
 			break
 	_comprobar(darsena.estado == darsena.Estado.PURGADA, "Mamba se va nadando y la dársena queda purgada")
+
+	print("Arreglar el transbordador con los poderes de Maisha:")
+	var arreglo: Node2D = get_tree().current_scene.get_node("ArregloTransbordador")
+	var boquete: Vector2 = arreglo.call("_boquete")
+	_maisha().global_position = boquete + Vector2(4, 22)
+	_maisha().set("aliento", 100.0)
+	await _esperar(0.4)
+	_comprobar(_maisha().lanzar_semilla(), "Maisha planta una semilla en la punta del muelle, junto al boquete")
+	_maisha().global_position = boquete + Vector2(-60, 40)
+	for i in 40:
+		await _esperar(0.2)
+		await _leer_dialogo()
+		if Estado.tiene("boquete_tapado"):
+			break
+	_comprobar(Estado.tiene("boquete_tapado") and arreglo.sprite.frame == 2, "al estallar, crecen juncos que se tejen y tapan el boquete")
+	await _leer_dialogo()
+	_maisha().global_position = arreglo.base + Vector2(-40, 14)
+	_maisha().set("aliento", 100.0)
+	await _esperar(3.0)
+	_maisha().latido()
+	for i in 30:
+		await _esperar(0.2)
+		await _leer_dialogo()
+		if Estado.tiene("transbordador_listo"):
+			break
+	_comprobar(Estado.tiene("transbordador_listo") and arreglo.sprite.frame == 1, "el Latido, pegado al casco, la endereza: vuelve a flotar")
+	await _leer_dialogo()
 
 	print("RESULTADO: ", "todo correcto" if _fallos == 0 else "%d fallos" % _fallos)
 	get_tree().quit(_fallos)
