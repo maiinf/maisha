@@ -125,6 +125,49 @@ func _ready() -> void:
 	var norte := _puerta("olvidado")
 	_comprobar(norte != null and norte.cerrada_hasta != "", "al fondo, el Sendero Olvidado (cerrado)")
 
+	print("El pasillo de las raíces dormidas:")
+	var raices := get_tree().get_nodes_in_group("raices_dormidas")
+	_comprobar(raices.size() == 3, "tres raíces enormes duermen atravesadas en el pasillo")
+	_comprobar(get_tree().get_nodes_in_group("tapon_raices").size() == 1, "y una maraña de raíces tapa el atajo al fondo")
+	var raiz: Node2D = raices[0]
+	for r in raices:
+		if (r as Node2D).global_position.y > raiz.global_position.y:
+			raiz = r
+	var vida0: int = _maisha().vida
+	_maisha().global_position = raiz.global_position + Vector2(0, 40)
+	await _esperar(0.4)
+	await _empujar("mover_arriba", 1.4)
+	await _esperar(0.3)
+	_comprobar(_maisha().global_position.y < raiz.global_position.y - 10.0, "andando, Maisha pasa por encima de la raíz")
+	_comprobar(raiz.fase == raiz.Fase.DUERME and _maisha().vida == vida0, "y la raíz sigue dormida")
+	_maisha().global_position = raiz.global_position + Vector2(0, 50)
+	await _esperar(0.4)
+	Input.action_press("correr")
+	await _empujar("mover_arriba", 0.35)
+	_comprobar(raiz.fase != raiz.Fase.DUERME, "corriendo cerca, la raíz abre su ojo violeta")
+	_maisha().global_position = raiz.global_position + Vector2(0, 20)
+	Input.action_press("mover_abajo")
+	await _esperar(0.25)
+	Input.action_press("mover_arriba")
+	Input.action_release("mover_abajo")
+	await _esperar(0.25)
+	Input.action_release("mover_arriba")
+	_maisha().global_position = raiz.global_position + Vector2(0, 20)
+	for i in 30:
+		if raiz.fase == raiz.Fase.AZOTA:
+			break
+		Input.action_press("mover_izquierda")
+		await _esperar(0.05)
+		Input.action_release("mover_izquierda")
+		Input.action_press("mover_derecha")
+		await _esperar(0.05)
+		Input.action_release("mover_derecha")
+	Input.action_release("correr")
+	await _esperar(0.3)
+	_comprobar(_maisha().vida < vida0, "si sigue el ruido, azota: daño y empujón")
+	await _esperar(2.5)
+	_comprobar(raiz.fase == raiz.Fase.DUERME, "y luego se vuelve a dormir")
+
 	print("De vuelta a La Travesía:")
 	_maisha().global_position = _puerta("travesia").global_position + Vector2(0, -30)
 	await _cruzar("mover_abajo", "LaTravesia")

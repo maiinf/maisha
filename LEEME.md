@@ -350,9 +350,11 @@ Escena `escenas/mundo/la_travesia.tscn` (mapa de 48×170, de sur a norte, `const
 
 Escena `escenas/mundo/gruta_raices.tscn` (mapa de 64×84, de sur a norte, `construir_mapa.py gruta_raices --crear`, `crear_gruta`; boceto `documentacion/boceto_gruta_raices.png`). **Una cueva por dentro**: el suelo se pinta aparte (`pintar_gruta` en `pintar_suelo.py`: tierra oscura con guijarros, raíces finas y algún charco; la roca, «0», maciza y con la cara iluminada junto al suelo). Se entra desde el muelle de piedra de La Travesía con la hoja de Mauti.
 - **A oscuras** (`scripts/mundo/gruta/oscuridad.gd`, capturas `documentacion/gruta_capturas.png`): un CanvasModulate deja todo en penumbra; alumbran Maisha (una luz que respira), las **semillas dormidas** de los nichos (`ŝ`, `semilla_dormida.png`, laten verdes) y las **huellas lilas de Mauti** (`huella.png`), que van de la entrada al fondo. Sin rayos de sol (`rayos_de_sol = false` en el Ambiente).
-- Salas: el vestíbulo de las semillas, el pasillo de las raíces dormidas (`ŕ`), el santuario de corteza (`ą`, el escudo), la galería de las espinas (`ę`) y el fondo, con un atajo tapado por raíces (`ř`) y dos secretos. Al norte, el Sendero Olvidado (cerrado: `sendero_abierto`).
+- **El pasillo de las raíces dormidas** (sigilo; `scripts/mundo/gruta/raiz_dormida.gd`, `raiz_dormida.png`, capturas `documentacion/gruta_pasillo.png`): tres raíces enormes atravesadas (`ŕ`) duermen y roncan («zzz»). Andando se pasa por encima. El ruido cerca (correr, golpear, una semilla o el Latido) las inquieta: abren un ojo violeta que da luz (el aviso); si el ruido sigue, se levantan y azotan a lo largo del pasillo (daño y empujón); luego se vuelven a dormir. Sonidos `raiz_ronca`, `raiz_despierta`, `raiz_azota`.
+- La **maraña de raíces** (`ř`, `raiz_tapon.png`) tapa el atajo del pasillo al fondo hasta que despierte el Guardián (`gruta_guardian`).
+- Salas: el vestíbulo de las semillas, el pasillo de las raíces dormidas, el santuario de corteza (`ą`, el escudo), la galería de las espinas (`ę`) y el fondo, con un atajo tapado por raíces (`ř`) y dos secretos. Al norte, el Sendero Olvidado (cerrado: `sendero_abierto`).
 - Arte: `herramientas/pintar_gruta.py`. Música: de momento la del Lago. Prueba: `pruebas/prueba_gruta_raices.gd`.
-- Falta: el sigilo del pasillo, el santuario y el escudo (J mantenida), la galería de las espinas y el Guardián con su pesadilla.
+- Falta: el santuario y el escudo (J mantenida), la galería de las espinas y el Guardián con su pesadilla.
 
 ### Los ecos perdidos (el misterio de Raíz)
 

@@ -6,6 +6,8 @@ extends "res://scripts/mundo/escena_mundo.gd"
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const OSCURIDAD := preload("res://scripts/mundo/gruta/oscuridad.gd")
+const RAIZ_DORMIDA := preload("res://scripts/mundo/gruta/raiz_dormida.gd")
+const TAPON := preload("res://arte/mundos/raiz/gruta/raiz_tapon.png")
 
 
 func _ready() -> void:
@@ -13,9 +15,45 @@ func _ready() -> void:
 	var oscuridad: Node2D = OSCURIDAD.new()
 	oscuridad.name = "Oscuridad"
 	add_child(oscuridad)
+	_crear_raices()
 	_maisha.caida.connect(_al_caer)
 	if not Estado.tiene("gruta_llegada"):
 		_pensar_al_llegar.call_deferred()
+
+
+## Las raíces del mapa: «ŕ» las dormidas del pasillo (cada par, una raíz) y «ř» la maraña que tapa el atajo
+func _crear_raices() -> void:
+	var filas: PackedStringArray = $Region._filas
+	for y in filas.size():
+		var fila := filas[y]
+		for x in fila.length():
+			var c := fila[x]
+			if (c == "ŕ" or c == "ř") and (x == 0 or fila[x - 1] != c):
+				var pos := Vector2(x + 1, y) * 16.0 + Vector2(0, 14)
+				if c == "ŕ":
+					var raiz: Node2D = RAIZ_DORMIDA.new()
+					raiz.position = pos
+					$Entidades.add_child(raiz)
+				elif not Estado.tiene("gruta_guardian"):
+					var tapon := StaticBody2D.new()
+					tapon.add_to_group("tapon_raices")
+					tapon.position = pos
+					var forma := CollisionShape2D.new()
+					var caja := RectangleShape2D.new()
+					caja.size = Vector2(44, 14)
+					forma.shape = caja
+					forma.position = Vector2(0, -6)
+					tapon.add_child(forma)
+					var sprite := Sprite2D.new()
+					sprite.texture = TAPON
+					sprite.offset = Vector2(0, -26)
+					tapon.add_child(sprite)
+					var cosa := Node2D.new()
+					cosa.set_script(load("res://scripts/mundo/objetos/cosa.gd"))
+					cosa.set("charla", "gruta_tapon")
+					cosa.set("radio_interaccion", 34.0)
+					tapon.add_child(cosa)
+					$Entidades.add_child(tapon)
 
 
 func _pensar_al_llegar() -> void:

@@ -1690,6 +1690,37 @@ def mamba_vencido():
     return reverb(p.entera(), 1.8, 0.35)
 
 
+def raiz_ronca():
+    """Una raíz enorme que ronca: un rugido de madera muy grave, lento, que sube y baja."""
+    d = 1.6
+    n = _n(d)
+    f = 38 + 6 * np.sin(np.linspace(0, np.pi, n))
+    x = (sierra(f, d) * 0.4 + seno(f * 2, d) * 0.3) * np.sin(np.linspace(0, np.pi, n)) ** 2
+    crujido = paso_banda(ruido(d), 600, 2000) * (np.sin(np.linspace(0, 40, n)) > 0.95) * 0.15
+    return reverb(paso_bajo(x, 300) + crujido, 1.2, 0.3)
+
+
+def raiz_despierta():
+    """Se le abre el ojo: un crujido seco de madera que se tensa."""
+    p = Pista(0.8)
+    for k in range(6):
+        d = 0.05
+        p.poner(paso_banda(ruido(d), 900 + k * 200, 4000) * caida(_n(d), 0.02) * 0.5, k * 0.07)
+    p.poner(seno(_desliz(60, 90, 0.5), 0.5) * caida(_n(0.5), 0.2) * 0.5, 0.0)
+    return reverb(p.entera(), 0.8, 0.25)
+
+
+def raiz_azota():
+    """El latigazo de la raíz: aire que silba y un golpe de madera contra la roca."""
+    p = Pista(0.9)
+    d = 0.3
+    p.poner(paso_banda(ruido(d), 500, 2600) * np.sin(np.linspace(0, np.pi, _n(d))) * 0.8, 0.0)
+    golpe = seno(_desliz(120, 45, 0.25), 0.25) * caida(_n(0.25), 0.07)
+    p.poner(golpe, 0.28)
+    p.poner(paso_banda(ruido(0.1), 1500, 5000) * caida(_n(0.1), 0.03) * 0.6, 0.28)
+    return reverb(p.entera(), 0.7, 0.22)
+
+
 def cangrejo_chasca():
     """El cangrejo de herrumbre chasca las pinzas: dos clics metálicos secos, con un rechinar de óxido."""
     p = Pista(0.5)
@@ -1756,6 +1787,7 @@ EFECTOS = {
     "murcielago_aleteo": (murcielago_aleteo, 0.5), "cencerro": (cencerro, 0.6), "escala_tramo": (escala_tramo, 0.6),
     "kambare_ruge": (kambare_ruge, 0.85), "kambare_salta": (kambare_salta, 0.7), "kambare_cae": (kambare_cae, 0.9),
     "kambare_escupe": (kambare_escupe, 0.65), "kambare_dolor": (kambare_dolor, 0.8), "kambare_vencido": (kambare_vencido, 0.85),
+    "raiz_ronca": (raiz_ronca, 0.7), "raiz_despierta": (raiz_despierta, 0.8), "raiz_azota": (raiz_azota, 0.9),
     "mamba_ruge": (mamba_ruge, 0.85), "mamba_salta": (mamba_salta, 0.7), "mamba_muerde": (mamba_muerde, 0.85),
     "mamba_dolor": (mamba_dolor, 0.8), "mamba_coletazo": (mamba_coletazo, 0.7), "mamba_vencido": (mamba_vencido, 0.85),
     "cangrejo_chasca": (cangrejo_chasca, 0.55), "cangrejo_vuelca": (cangrejo_vuelca, 0.65),

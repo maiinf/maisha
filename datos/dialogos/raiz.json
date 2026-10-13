@@ -2433,5 +2433,17 @@
 				]
 			}
 		]
+	},
+	"gruta_tapon": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una maraña de raíces tapa este paso, apretada como un puño. Detrás se oye algo enorme respirar.",
+					"No se aparta. Ni con la hoja de Mauti. Por aquí, de momento, no."
+				]
+			}
+		]
 	}
 }

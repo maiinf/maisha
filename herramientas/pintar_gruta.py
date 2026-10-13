@@ -6,6 +6,10 @@ Genera (en arte/mundos/raiz/gruta/):
   semilla_dormida.png   3 × 24×26   una semilla grande dormida en su nicho de raíces, que respira: brilla verde por
                                     dentro (0 apagándose, 1 media, 2 encendida)
   huella.png            2 × 8×8     una huella de Mauti, de luz lila (dos pies)
+  raiz_dormida.png      4 × 56×36   una raíz enorme atravesada en el pasillo: 0-1 dormida (respira: se hincha y se
+                                    deshincha, con el «ojo» de su nudo cerrado), 2 despertando (el ojo violeta
+                                    entreabierto), 3 azotando (se levanta en arco, el ojo abierto)
+  raiz_tapon.png        48×56       la maraña de raíces que tapa el atajo del pasillo al fondo
 """
 import os
 import sys
@@ -54,10 +58,72 @@ def huella(k):
     return lz.sprite(tramado=0.0, contorno=0.0)
 
 
+RAIZ_C = ["#140c08", "#22160e", "#342216", "#4a3220", "#62442c", "#7c583a", "#9a724c"]
+GIZA_V = ["#2a0d3a", "#3a1650", "#6b2a8f", "#a855d6", "#d6a8f0"]
+
+
+def raiz_dormida(k):
+    """La raíz del pasillo: un tronco de raíz gordo y nudoso que cruza de pared a pared, con musgo y un nudo con forma de
+    ojo cerrado. Respira (0-1), abre el ojo (2) o se levanta en arco para azotar (3)."""
+    W, H = 56, 36
+    lz = Lienzo(W, H, s=6, semilla=521 + k)
+    alza = 14 if k == 3 else 0
+    hincha = 0.6 if k == 1 else 0.0
+    lz.pintar(lz.desenfocar(lz.elipse(28, 31, 26, 3.4), 0.8), "#050404", 0.6)
+    pts = []
+    for j in range(30):
+        t = j / 29
+        x = 1 + t * 54
+        y = 26 - np.sin(t * np.pi) * (4 + alza) + np.sin(t * 9) * 1.2
+        pts.append((x, y))
+    cuerpo = np.zeros((lz.H, lz.W))
+    for j, (x, y) in enumerate(pts):
+        g = 5.0 + hincha + np.sin(j / 29 * np.pi) * 2.0
+        cuerpo = np.maximum(cuerpo, lz.elipse(x, y, g, g * 0.8))
+    vetas_ = (np.abs(np.sin(lz.x * 0.25 + np.sin(lz.y * 0.6) * 2)) < 0.12).astype(float)
+    lz.sombrear(cuerpo, RAIZ_C, 5, LUZ, textura=lz.ruido(0.7, 2, semilla=522) * 0.6 + (1 - vetas_) * 0.4, fuerza_tex=0.5)
+    lz.pintar(cuerpo * (lz.ruido(1.2, 2, semilla=523) > 0.66) * (lz.y < 24 - alza * 0.5), "#2f4a2a", 0.75)   # musgo
+    # raicillas que se clavan en el suelo a los lados
+    for (x0, lado) in ((4, -1), (9, -1), (47, 1), (52, 1)):
+        lz.pintar(lz.trazo([(x0, 27), (x0 + lado * 3, 33)], 0.8, 0.3), RAIZ_C[2])
+    # el nudo con forma de ojo, en medio
+    ox, oy = 28, 22 - alza - 2
+    nudo = lz.elipse(ox, oy, 5.5, 3.6)
+    lz.sombrear(nudo, RAIZ_C[1:], 2.5, LUZ)
+    if k in (0, 1):
+        lz.pintar(lz.trazo([(ox - 3.5, oy + 0.3), (ox, oy + 1.2), (ox + 3.5, oy + 0.3)], 0.5), "#0a0604")
+    else:
+        abre = 1.2 if k == 2 else 2.2
+        ojo = lz.elipse(ox, oy, 3.6, abre)
+        lz.pintar(ojo, "#0a0604")
+        lz.pintar(lz.elipse(ox, oy, 1.6, min(abre, 1.6)), GIZA_V[3])
+        lz.brillo(lz.elipse(ox, oy, 1.6, min(abre, 1.6)), GIZA_V[4], 2.0, 0.7)
+        lz.pintar(lz.elipse(ox, oy, 0.5, min(abre, 1.4)), "#0a0604")
+    return lz.sprite(contorno=CONTORNO)
+
+
+def raiz_tapon():
+    W, H = 48, 56
+    lz = Lienzo(W, H, s=6, semilla=531)
+    rng = np.random.default_rng(532)
+    lz.pintar(lz.desenfocar(lz.elipse(24, 52, 22, 3), 0.8), "#050404", 0.6)
+    marana = np.zeros((lz.H, lz.W))
+    for j in range(30):
+        a = (4 + rng.random() * 40, rng.random() * 8)
+        b = (rng.random() * 48, 18 + rng.random() * 18)
+        c = (4 + rng.random() * 40, 50 + rng.random() * 4)
+        marana = np.maximum(marana, lz.trazo(lz.curva(a, b, c, n=24), 3.0 + rng.random() * 2.6, 1.6))
+    lz.sombrear(marana, RAIZ_C, 3, LUZ, textura=lz.ruido(0.6, 2, semilla=533), fuerza_tex=0.45)
+    lz.pintar(marana * (lz.ruido(1.2, 2, semilla=534) > 0.7), "#2f4a2a", 0.7)
+    return lz.sprite(contorno=CONTORNO)
+
+
 def main():
     os.makedirs(SALIDA, exist_ok=True)
     tira([semilla_dormida(k) for k in range(3)]).save(os.path.join(SALIDA, "semilla_dormida.png"))
     tira([huella(k) for k in range(2)]).save(os.path.join(SALIDA, "huella.png"))
+    tira([raiz_dormida(k) for k in range(4)]).save(os.path.join(SALIDA, "raiz_dormida.png"))
+    Image.fromarray(raiz_tapon()).save(os.path.join(SALIDA, "raiz_tapon.png"))
     print("Lo de la Gruta en", SALIDA)
 
 
