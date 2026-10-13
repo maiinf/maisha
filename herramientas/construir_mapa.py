@@ -1989,6 +1989,71 @@ def crear_embarcadero():
     return ["".join(f) for f in m], textos
 
 
+def crear_travesia():
+    """La Travesía (48x170, de sur a norte): el río ancho río arriba, del Embarcadero Junco a la Gruta de las Raíces.
+    No se anda: se viaja en el TRANSBORDADOR, que sube solo por el centro del río (scripts/mundo/travesia/viaje.gd).
+    Las orillas cambian por el camino: juncos y sauces abajo, bosque cerrado en medio, rocas y peñas arriba, cerca de
+    la Gruta. A media subida, una ISLA en el lado este (la parada del séptimo eco). Arriba, el MUELLE DE PIEDRA de la
+    Gruta, en la orilla oeste, con su camino (cerrado de momento)."""
+    ANCHO, ALTO = 48, 170
+    azar = random.Random(231)
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    # el río: ancho, con curvas suaves; el centro lo usa el viaje (misma fórmula en viaje.gd)
+    for y in range(ALTO):
+        cx = 24 + 5 * math.sin(y * 0.045) + 2 * math.sin(y * 0.11 + 1)
+        ancho = 9 + 1.5 * math.sin(y * 0.07 + 2)
+        for x in range(ANCHO):
+            if abs(x - cx) <= ancho:
+                poner(x, y, "~")
+    # la isla del este, a media subida
+    for y in range(76, 92):
+        for x in range(ANCHO):
+            if ((x - 33) / 5.0) ** 2 + ((y - 84) / 7.0) ** 2 <= 1.0:
+                poner(x, y, ".")
+    poner(34, 84, "@")
+    # el muelle de piedra de la Gruta, arriba a la izquierda, y su camino
+    cx_m = int(24 + 5 * math.sin(12 * 0.045) + 2 * math.sin(12 * 0.11 + 1) - 9)
+    for x in range(cx_m - 1, cx_m + 6):
+        for y in (11, 12, 13):
+            poner(x, y, "%")
+    for y in range(0, 12):
+        for x in range(cx_m - 4, cx_m - 1):
+            if m[y][x] != "~":
+                poner(x, y, "#")
+    # orillas: juncos junto al agua; abajo sauces, en medio bosque cerrado, arriba rocas y peñas
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            if m[y][x] != ".":
+                continue
+            junto = any(0 <= x + dx < ANCHO and m[y][x + dx] == "~" for dx in (-1, 1))
+            r = azar.random()
+            if junto and r < 0.6:
+                poner(x, y, ";")
+            elif y > 110:
+                if r < 0.35:
+                    poner(x, y, azar.choice("ssTt"))
+            elif y > 40:
+                if r < 0.55:
+                    poner(x, y, azar.choice("TTtsI"))
+            else:
+                if r < 0.35:
+                    poner(x, y, azar.choice("RrrT"))
+    # (la isla, con sauces y juncos, y su eco libre)
+    for (x, y) in ((31, 80), (36, 82), (32, 89)):
+        poner(x, y, "s")
+    # puertas: abajo, el Embarcadero (se llega en el transbordador); arriba, el camino de la Gruta (cerrado)
+    for x in range(20, 28):
+        poner(x, ALTO - 1, "_")
+    for x in range(cx_m - 4, cx_m - 1):
+        poner(x, 0, "^")
+    return ["".join(f) for f in m], {}
+
+
 # ---------------------------------------------------------------------------
 # Dibujar el suelo a partir del texto
 # ---------------------------------------------------------------------------
@@ -2085,7 +2150,7 @@ def exportar_json(nombre):
 # mapas cuyo suelo se pinta con detalle (herramientas/pintar_suelo.py); los demás, con el dibujo sencillo
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
-                  "orilla_juncos", "embarcadero_junco"}
+                  "orilla_juncos", "embarcadero_junco", "la_travesia"}
 
 
 def construir_suelo(nombre):
@@ -2233,7 +2298,7 @@ if __name__ == "__main__":
                         "sendero_del_puente": crear_sendero, "las_pasarelas": crear_pasarelas,
                         "camino_cobrizo": crear_camino, "senda_surcos": crear_senda,
                         "canada_eco": crear_canada, "lago_espejo": crear_lago,
-                        "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero}.get(nombre, crear_prados)()
+                        "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

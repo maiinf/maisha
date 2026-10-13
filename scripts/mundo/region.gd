@@ -138,6 +138,8 @@ const DIRECCIONES := {"arriba": Vector2.UP, "abajo": Vector2.DOWN, "izquierda": 
 @export var objeto_encargo := "pagina"
 ## (en los lugares) el «}» solo aparece con esta marca: p. ej. Mdiria, cuando ya se le ha rescatado
 @export var viajero_requiere := ""
+## Si el agua no se puede pisar (en La Travesía no: Maisha va en el transbordador, que la sujeta a su cubierta)
+@export var agua_solida := true
 
 var inicio := Vector2.ZERO               # donde despierta Maisha
 var tam := Vector2.ZERO                  # tamaño del mapa en píxeles
@@ -584,10 +586,11 @@ func _fijo(def: Array, pos: Vector2, semilla := 0) -> StaticBody2D:
 
 
 ## El agua no se puede pisar (los puentes sí). Une las casillas seguidas de cada fila en un solo bloque.
-func _crear_agua() -> void:
+func _crear_agua(solida := agua_solida) -> void:
 	var cuerpo := StaticBody2D.new()
 	cuerpo.name = "Agua"
-	add_child(cuerpo)
+	if solida:
+		add_child(cuerpo)
 	var centros: Array[Vector2] = []
 	for y in _filas.size():
 		var x := 0
@@ -598,14 +601,17 @@ func _crear_agua() -> void:
 				while x < fila.length() and (fila[x] == "~" or fila[x] == "*"):
 					centros.append(Vector2(x, y) * R.CASILLA + Vector2.ONE * 8)
 					x += 1
-				var forma := CollisionShape2D.new()
-				var caja := RectangleShape2D.new()
-				caja.size = Vector2((x - inicio_x) * R.CASILLA - 4, R.CASILLA)
-				forma.shape = caja
-				forma.position = Vector2((inicio_x + x) * R.CASILLA / 2.0, y * R.CASILLA + 8)
-				cuerpo.add_child(forma)
+				if solida:
+					var forma := CollisionShape2D.new()
+					var caja := RectangleShape2D.new()
+					caja.size = Vector2((x - inicio_x) * R.CASILLA - 4, R.CASILLA)
+					forma.shape = caja
+					forma.position = Vector2((inicio_x + x) * R.CASILLA / 2.0, y * R.CASILLA + 8)
+					cuerpo.add_child(forma)
 			else:
 				x += 1
+	if not solida:
+		cuerpo.queue_free()
 	var ambiente := get_tree().get_first_node_in_group("ambiente")
 	if ambiente:
 		ambiente.agua = centros

@@ -78,7 +78,11 @@
 			"embarcadero_junco"
 		],
 		"embarcadero_junco": [
-			"orilla_juncos"
+			"orilla_juncos",
+			"la_travesia"
+		],
+		"la_travesia": [
+			"embarcadero_junco"
 		]
 	},
 	"misiones": [

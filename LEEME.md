@@ -332,9 +332,17 @@ Escena `escenas/mundo/embarcadero_junco.tscn` (mapa de 96×72 casillas, `constru
 - **Mamba, el cocodrilo de herrumbre** (jefe de la dársena, `scripts/enemigos/mamba.gd`, dibujo `herramientas/dibujar_mamba.py`, capturas `documentacion/mamba_capturas.png`): flota como un tronco alrededor de la plataforma (en el agua no se le puede dar); avisa con una raya de por dónde va a embestir; embiste en línea recta y, si hay un **poste de amarre** (`ł`, cuatro en la plataforma) en su camino, se le clavan los dientes y queda atascado: el cetro le quita 1, una semilla 2. **Pelea 2 contra 1**: si Bata ya está libre, rema en su barca (`barca_bata.gd`, `barca_bata.png`) alrededor de la plataforma persiguiendo a Mamba y, cuando lo alcanza, lo **sujeta con la pértiga** contra el borde: a tiro desde la plataforma (cetro 1, semilla 2). La dársena no despierta hasta que Bata está libre (antes, Maisha piensa que sola no). Fase 2: avisa más deprisa, si Bata lo sujeta al soltarse le muerde la barca (Bata se aparta asustado), a veces embiste dos veces y al soltarse da un coletazo en círculo. Vencido, se le cae la herrumbre y se va río abajo (marca `mamba_vencido`). Música propia «Mamba, el cocodrilo de herrumbre» y sonidos `mamba_*`.
 - Los vecinos con su sitio lejos (como Bata y su transbordador) dan unos pasos, se pierden de vista y aparecen allí (`estatua.gd`).
 - **Arreglar el transbordador**, con los poderes de Maisha y sin recados (`scripts/mundo/embarcadero/arreglo_transbordador.gd`, capturas `documentacion/transbordador_arreglo.png`), solo cuando Mamba ya no está: una **semilla** que estalle en la punta del muelle, junto al boquete, hace crecer **juncos que se tejen** y lo tapan (`boquete_tapado`, dibujo 2: tapado pero escorado); después, el **Latido** pegado al casco la endereza y vuelve a flotar (`transbordador_listo`). Bata va dando las pistas según el momento.
-- La puerta del norte (La Travesía) sigue cerrada (`travesia_abierta`) hasta que exista ese camino: se irá en el transbordador.
+- Con el transbordador a flote, en la punta del muelle se **sube** (Bata: «¡Arriba!») y se zarpa a **La Travesía**. La puerta del norte por tierra sigue cerrada (`travesia_abierta`): río arriba se va en barca.
 - Música propia: **«Canción de barqueros»** (`embarcadero` en `componer_musica.py`), una canción de trabajo en re dórico: la flauta pregunta y las voces graves contestan, con el balafón y el tambor al ritmo de los remos, la cuerda que cruje y la campana del muelle.
-- Falta: La Travesía.
+
+### La Travesía
+
+Escena `escenas/mundo/la_travesia.tscn` (mapa de 48×170, de sur a norte, `construir_mapa.py la_travesia --crear`, `crear_travesia`). **No se anda: se viaja en el transbordador** (`scripts/mundo/travesia/viaje.gd`). Se sube en la punta del muelle del Embarcadero cuando el transbordador ya flota.
+- La barca (`cubierta.png`, vista desde arriba: tablas, borda con postes y cuerda, caseta con tejado de paja, campana, farol, cajas y sacos) sube sola por el centro del río, a 34 píxeles por segundo, con su estela. Maisha va en la cubierta: se puede mover por ella pero no salirse (en este mapa el agua no es sólida: `agua_solida = false` en el nodo Region). Bata, en la popa, clava la pértiga al ritmo de la barca.
+- Las orillas cambian por el camino: juncos y sauces abajo, bosque cerrado en medio, rocas arriba. A media subida, una isla en el lado este (para el séptimo eco).
+- Arriba atraca junto al **muelle de piedra** de la Gruta de las Raíces: Bata lo anuncia, Maisha baja (marca `travesia_hecha`) y el agua vuelve a ser sólida. Desde la barca se puede volver al Embarcadero. El camino de la Gruta sigue cerrado (`gruta_abierta`).
+- Música: de momento la barcarola de la Orilla. Prueba: `pruebas/prueba_la_travesia.gd`.
+- Falta: lo que sale del agua durante el viaje (oleadas), la parada en la isla con el séptimo eco y la música propia.
 
 ### Los ecos perdidos (el misterio de Raíz)
 

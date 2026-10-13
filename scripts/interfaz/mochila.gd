@@ -58,7 +58,7 @@ const PUNTO_RAIZ := {"prados_del_eco": Vector2(110, 178), "bosque_cobrizo": Vect
 	"casa_shamba": Vector2(53, 196), "cienaga_quieta": Vector2(322, 182), "campo_segado": Vector2(208, 44),
 	"sendero_del_puente": Vector2(160, 166), "las_pasarelas": Vector2(268, 166),
 	"camino_cobrizo": Vector2(104, 132), "senda_surcos": Vector2(205, 90),
-	"canada_eco": Vector2(68, 91), "lago_espejo": Vector2(40, 110), "orilla_juncos": Vector2(370, 150), "embarcadero_junco": Vector2(388, 124)}
+	"canada_eco": Vector2(68, 91), "lago_espejo": Vector2(40, 110), "orilla_juncos": Vector2(370, 150), "embarcadero_junco": Vector2(388, 124), "la_travesia": Vector2(356, 90)}
 const NIEBLA := Color("e2cea0")
 const NIEBLA_SOMBRA := Color("c9b07e")
 const TINTA := Color("5c3e26")

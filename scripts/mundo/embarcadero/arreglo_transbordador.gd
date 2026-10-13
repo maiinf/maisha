@@ -21,6 +21,28 @@ var _enderezando := false
 
 func _ready() -> void:
 	z_index = 2
+	if Estado.tiene("transbordador_listo"):
+		_poner_embarque()
+
+
+## Ya flota: en la punta del muelle, el sitio para subir (Bata zarpa río arriba: La Travesía)
+func _poner_embarque() -> void:
+	var embarque := _Embarque.new()
+	embarque.position = _boquete() + Vector2(-6, 26)
+	add_child(embarque)
+
+
+class _Embarque:
+	extends Node2D
+	var radio_interaccion := 26.0
+	var altura_bocadillo := 30.0
+
+	func _ready() -> void:
+		add_to_group("interactuables")
+
+	func interactuar() -> void:
+		await CHARLA.hablar(self, "embarcadero_zarpar")
+		Estado.ir_a("la_travesia", "embarcadero")
 
 
 func _boquete() -> Vector2:
@@ -91,3 +113,4 @@ func _enderezar() -> void:
 	await t.finished
 	Estado.marcar("transbordador_listo")
 	await CHARLA.hablar(self, "embarcadero_flota")
+	_poner_embarque()

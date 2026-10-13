@@ -1,0 +1,3 @@
+; puerta = nombre, escena a la que lleva, puerta por la que se aparece allí, hacia dónde sale Maisha al llegar aquí
+_ = embarcadero, embarcadero_junco, travesia, arriba
+^ = gruta, gruta_raices, travesia, abajo, cerrada:gruta_abierta

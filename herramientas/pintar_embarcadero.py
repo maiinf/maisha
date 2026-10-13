@@ -14,6 +14,8 @@ Genera (en arte/mundos/raiz/embarcadero/):
   nudo_giza.png       2 × 28×26   el nudo de Giza escondido en el almacén (late)
   saco.png            2 × 18×18   sacos de grano que lo tapan (se apartan con el Latido)
   barca_bata.png      2 × 48×26   la barca de remos de Bata, a flote (Bata va encima en la pelea contra Mamba)
+  cubierta.png        192×128     el transbordador visto desde arriba, para La Travesía: cubierta de tablas, borda
+                                  con postes y cuerda, caseta con tejado de paja, campana, farol, cajas y sacos
   grua.png            72×104      la grúa del muelle, rota: base de piedras, poste de tronco con tornapuntas, pluma
                                   rajada y atada, polea partida con el gancho, torno bajo un tejadillo de paja, un
                                   nido arriba; al pie, el fardo de red, un tonel y cabos
@@ -637,6 +639,79 @@ def barca_bata(k):
     return lz.sprite(contorno=CONTORNO)
 
 
+def cubierta():
+    """El transbordador visto desde arriba, para La Travesía (Maisha va encima): una barcaza ancha con la proa al norte,
+    la cubierta de tablas, la borda alta con postes y cuerda alrededor, la caseta del barquero atrás (su tejado de paja
+    visto desde arriba), la campana, el farol de la proa, cajas y sacos para cubrirse y rollos de cuerda.
+    Lo que se pisa: el rectángulo de tablas dentro de la borda (viaje.gd: CUBIERTA)."""
+    W, H = 192, 128
+    lz = Lienzo(W, H, s=4, semilla=391)
+    TR = ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33", "#9a6544", "#b88259"]
+    # el casco, con la proa en punta arriba, y su sombra en el agua
+    casco_pts = [(96, 0), (150, 10), (178, 30), (182, 100), (172, 124), (20, 124), (10, 100), (14, 30), (42, 10)]
+    lz.pintar(lz.desenfocar(lz.poligono([(x + 4, y + 5) for (x, y) in casco_pts]), 2), AGUA[0], 0.55)
+    casco = lz.poligono(casco_pts)
+    lz.sombrear(casco, TR[1:], 6, LUZ, textura=vetas(lz, 0.5, 15, False, 392), fuerza_tex=0.4)
+    lz.pintar(np.clip(casco - lz.poligono([(96, 4), (146, 13), (172, 32), (176, 98), (167, 119), (25, 119), (16, 98), (20, 32), (46, 13)]), 0, 1) * (lz.ruido(1.0, 2, semilla=393) > 0.3), "#4c8d8d", 0.8)
+    # la cubierta de tablas (de proa a popa)
+    cub = lz.poligono([(96, 10), (142, 18), (164, 36), (166, 96), (158, 112), (34, 112), (26, 96), (28, 36), (50, 18)])
+    tabl = (np.abs(np.sin(lz.x / 6 * np.pi)) < 0.1).astype(float)
+    v = 0.42 + (vetas(lz, 0.5, 15, False, 394) - 0.5) * 0.35 + (lz.ruido(6, 2, semilla=397) - 0.5) * 0.25 - tabl * 0.35
+    lz.pintar(cub, rampa(["#1e130c", "#2e1d12", "#47291c", "#5e3a26", "#7a4e33", "#94643f"], np.clip(v, 0, 1)))
+    # la sombra de la borda sobre la cubierta y manchas de agua, musgo y paja suelta
+    borde_in = lz.poligono([(96, 16), (138, 23), (158, 39), (160, 94), (153, 106), (39, 106), (32, 94), (34, 39), (54, 23)])
+    lz.pintar(np.clip(cub - borde_in, 0, 1), "#120b08", 0.45)
+    lz.pintar((lz.ruido(4, 2, semilla=398) > 0.72) * cub, "#2a3a34", 0.35)
+    lz.pintar((lz.ruido(1.5, 2, semilla=399) > 0.8) * np.clip(cub - borde_in, 0, 1), "#3f5a2f", 0.6)
+    paja_s = np.zeros((lz.H, lz.W))
+    rng = np.random.default_rng(400)
+    for j in range(40):
+        x, y = 40 + rng.random() * 110, 20 + rng.random() * 70
+        a_ = rng.random() * np.pi
+        paja_s = np.maximum(paja_s, lz.trazo([(x, y), (x + np.cos(a_) * 3, y + np.sin(a_) * 3)], 0.35))
+    lz.pintar(paja_s * cub, "#d29a43", 0.7)
+    for x in range(30, 166, 12):                                       # los clavos de las tablas
+        for y in range(24, 110, 18):
+            if cub[int(y * 4), int(x * 4)] > 0.5:
+                lz.pintar(lz.circulo(x, y, 0.4), "#6a6c6f")
+    # la borda: postes y cuerda alrededor
+    borde = [(96, 9), (143, 17), (165, 35), (167, 96), (159, 113), (33, 113), (25, 96), (27, 35), (49, 17), (96, 9)]
+    borda = lz.trazo(borde, 3.2)
+    lz.sombrear(borda, TR, 2.5, LUZ, textura=vetas(lz, 0.5, 9), fuerza_tex=0.4)
+    lz.pintar(lz.trazo(borde, 0.6), TR[6], 0.8)
+    for (a, b) in zip(borde, borde[1:]):
+        n = max(1, int(np.hypot(b[0] - a[0], b[1] - a[1]) / 12))
+        for k in range(n):
+            t = k / n
+            px, py = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
+            lz.sombrear(lz.circulo(px, py, 2.4), ["#1a0f0b", "#47291c", "#7f4d33", "#b88259", "#d8b080"], 1.6, LUZ)
+    # la caseta del barquero, atrás: su tejado de paja visto desde arriba, y la puertecita
+    tej = lz.poligono([(70, 92), (122, 92), (126, 120), (66, 120)])
+    paja(lz, tej, semilla=395, capas=4.0, y0=92)
+    lz.pintar(lz.trazo([(96, 92), (96, 120)], 1.0), "#4a3012", 0.8)
+    flecos(lz, 66, 126, 91.5, 1.8, semilla=396)
+    lz.pintar(rect(lz, 90, 88, 102, 92), "#120c08")
+    # la campana, en su poste, junto a la caseta
+    lz.sombrear(rect(lz, 134, 92, 137, 104), TR[3:], 1, LUZ)
+    lz.sombrear(lz.poligono([(132, 92), (133, 87), (138, 87), (139, 92)]), ["#5a4210", "#8a6a20", "#c09a40", "#e8c868", "#fff1c0"], 1.5, LUZ)
+    # el farol de la proa
+    lz.pintar(rect(lz, 94, 6, 98, 11), "#f9b947")
+    lz.brillo(rect(lz, 94, 6, 98, 11), "#fde27e", 3, 0.6)
+    # cajas, sacos y rollos de cuerda (se puede uno cubrir detrás)
+    for (bx, by, w, h_) in ((40, 44, 14, 12), (148, 60, 12, 14)):
+        caja = rect(lz, bx, by, bx + w, by + h_)
+        lz.sombrear(caja, COBRE, 2, LUZ, textura=vetas(lz, 0.5, 11), fuerza_tex=0.35)
+        lz.pintar(lz.trazo([(bx, by), (bx + w, by + h_)], 0.5) + lz.trazo([(bx + w, by), (bx, by + h_)], 0.5), "#47291c", 0.85)
+    for (sx, sy) in ((40, 70), (152, 84)):
+        lz.sombrear(lz.elipse(sx, sy, 6, 4.4), ["#5a4630", "#8a7454", "#b8a07a", "#d8c49c", "#efe0bf"], 3, LUZ)
+        lz.pintar(lz.trazo([(sx - 3, sy - 2.5), (sx + 3, sy - 2.5)], 0.7), "#47291c")
+    for (cx, cy) in ((62, 30), (130, 30)):
+        lz.pintar(lz.desenfocar(lz.circulo(cx + 1, cy + 1.5, 5), 1), "#0e0a08", 0.5)
+        for r in (5, 3.8, 2.6, 1.4):
+            lz.sombrear(np.clip(lz.circulo(cx, cy, r) - lz.circulo(cx, cy, r - 0.9), 0, 1), ["#5a4a30", "#8a7048", CUERDA, "#c8a878"], 1, LUZ)
+    return lz.sprite(contorno=CONTORNO)
+
+
 def main():
     os.makedirs(SALIDA, exist_ok=True)
     tira([casa_juncos(k) for k in range(2)]).save(os.path.join(SALIDA, "casa_juncos.png"))
@@ -645,6 +720,7 @@ def main():
     tira([nudo(k) for k in range(2)]).save(os.path.join(SALIDA, "nudo_giza.png"))
     tira([saco(k) for k in range(2)]).save(os.path.join(SALIDA, "saco.png"))
     tira([barca_bata(k) for k in range(2)]).save(os.path.join(SALIDA, "barca_bata.png"))
+    Image.fromarray(cubierta()).save(os.path.join(SALIDA, "cubierta.png"))
     Image.fromarray(grua()).save(os.path.join(SALIDA, "grua.png"))
     Image.fromarray(almacen()).save(os.path.join(SALIDA, "almacen.png"))
     tira([transbordador(k) for k in range(3)]).save(os.path.join(SALIDA, "transbordador.png"))

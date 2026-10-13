@@ -2313,5 +2313,38 @@
 				]
 			}
 		]
+	},
+	"travesia_llegada": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Tierra! Bueno... piedra. Es lo mismo pero más duro.",
+					"Ese es el muelle de la Gruta de las Raíces. Hace años que nadie amarra aquí: mira cómo ha crecido el musgo.",
+					"Yo te espero en la barca. No es que me dé miedo la Gruta. Es que alguien tiene que vigilar la barca. Sí. Eso."
+				]
+			}
+		]
+	},
+	"travesia_volver": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¿Volvemos al Embarcadero? Agárrate, que río abajo se va solo."
+				]
+			}
+		]
+	},
+	"embarcadero_zarpar": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¿Subes? ¡Pues arriba! Agárrate a algo que no sea yo.",
+					"Río arriba, a la Gruta de las Raíces. Y vigila el agua, que este río ya no es el que era."
+				]
+			}
+		]
 	}
 }
