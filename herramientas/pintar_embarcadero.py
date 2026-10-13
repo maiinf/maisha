@@ -7,16 +7,18 @@ Genera (en arte/mundos/raiz/embarcadero/):
                                   verdín, plataforma de tablas, paredes de esteras con armazón de troncos, tejado de
                                   paja a capas, ventana con contraventanas y jardinera, porche, escalerilla, barquita
                                   amarrada y cosas de barquero (redes, remos, nasa, peces, cántaros, farolillo)
-  grua.png            48×76       la grúa del muelle, rota: un poste grueso con su pluma inclinada, la polea
-                                  partida, la cuerda colgando y el gancho; un fardo caído al pie
+  grua.png            72×104      la grúa del muelle, rota: base de piedras, poste de tronco con tornapuntas, pluma
+                                  rajada y atada, polea partida con el gancho, torno bajo un tejadillo de paja, un
+                                  nido arriba; al pie, el fardo de red, un tonel y cabos
   almacen.png         132×108     el almacén, al nivel de la casa del castor: zócalo de piedra, troncos, tejado de
                                   paja con buhardilla de carga y polea, portón abierto, letrero del pez, ventana,
                                   barriles, cajas, sacos, tendedero de redes y carretilla
   poste.png           2 × 22×44   un poste de amarre de la dársena (alto, de madera clara, con anillo de cuerda): 0 entero,
                                   1 mordido por Mamba (con las marcas de los dientes y astillas)
-  transbordador.png   2 × 120×60  el TRANSBORDADOR: una barcaza grande y plana con barandilla, una caseta para el
-                                  barquero, una campana y una pértiga larga. 0 varado (escorado, con un boquete en
-                                  el casco y algas), 1 arreglado y a flote
+  transbordador.png   2 × 160×84  el TRANSBORDADOR: barcaza de tablas con la proa levantada, barandilla de cuerda,
+                                  caseta de troncos con tejado de paja, ventana, campana, farol de proa, bandera,
+                                  pértiga y carga. 0 varado (escorado, boquete, algas, barandilla rota), 1 arreglado
+                                  (parche de juncos tejidos, farol y ventana encendidos)
 """
 import os
 import sys
@@ -175,37 +177,71 @@ def casa_juncos(k):
 
 
 def grua():
-    W, H = 48, 76
-    lz = Lienzo(W, H, s=6, semilla=311)
-    lz.pintar(lz.desenfocar(lz.elipse(16, 72, 14, 2.6), 0.8), "#0e0c0a", 0.5)
-    # la base de piedras y el poste grueso, con dos tornapuntas
-    base = lz.elipse(16, 70, 9, 3.4)
-    lz.sombrear(base, ["#2e302a", "#41443a", "#5c6052", "#7a806d", "#9aa08a"], 3, LUZ, textura=lz.ruido(1, 2, semilla=312), fuerza_tex=0.4)
-    poste = rect(lz, 13, 10, 19, 70)
-    lz.sombrear(poste, MADERA[1:7], 3, LUZ, textura=vetas(lz, 0.5, 11, False, 313), fuerza_tex=0.45)
+    """La grúa del muelle, rota, al nivel de la casa del castor: una base de piedras con musgo, un poste de tronco
+    grueso con sus tornapuntas, la pluma inclinada sobre el agua (rajada y atada con cuerda), la polea de hierro partida
+    con el gancho colgando, el torno de manivela bajo un tejadillo de paja con la cuerda enrollada, un nido en lo alto
+    y, al pie, el fardo de red que se cayó, un tonel y unos cabos."""
+    W, H = 72, 104
+    lz = Lienzo(W, H, s=4, semilla=311)
+    TR = ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33", "#9a6544", "#b88259"]
+    lz.pintar(lz.desenfocar(lz.elipse(24, 100, 20, 3), 0.8), "#0e0c0a", 0.5)
+    # la base de piedras
+    base = lz.poligono([(8, 100), (10, 88), (16, 85), (32, 85), (38, 88), (40, 100)])
+    piedras(lz, base, tam=4.2, semilla=312, luz=LUZ, mortero="#525449",
+            rampa_p=["#3a3b33", "#5a5d50", "#7a806d", "#9aa08c", "#b9bdaa", "#d6d8c8"])
+    lz.pintar(lz.desenfocar((lz.ruido(2.5, 3, semilla=313) > 0.62) * base, 0.3), "#3f5a2f", 0.75)
+    # el poste, un tronco gordo, y dos tornapuntas
+    poste = rect(lz, 20, 14, 28, 88)
+    lz.sombrear(poste, TR, 4, LUZ, textura=vetas(lz, 0.6, 15, False, 314), fuerza_tex=0.5)
     for lado in (-1, 1):
-        lz.sombrear(lz.trazo([(16 + lado * 10, 69), (16 + lado * 1.5, 50)], 1.3), MADERA[2:6], 1, LUZ)
-    # la pluma inclinada hacia el agua, rajada en la punta
-    pluma = lz.trazo([(16, 16), (44, 6)], 1.8)
-    lz.sombrear(pluma, MADERA[2:7], 1.6, LUZ, textura=vetas(lz, 0.5, 11, True, 314), fuerza_tex=0.4)
-    lz.pintar(lz.trazo([(36, 9), (41, 7.5)], 0.35), MADERA[0])
-    lz.pintar(lz.trazo([(16, 30), (34, 10)], 0.7), CUERDA)                        # el tirante
-    # la polea partida y la cuerda colgando con el gancho
-    lz.sombrear(lz.circulo(42, 8, 2.4), HIERRO[1:], 2, LUZ)
-    lz.pintar(lz.trazo([(42, 8), (43.5, 10.5)], 0.6), "#8a3a1a")                   # la grieta oxidada
-    cuerda = lz.trazo(lz.curva((42, 10), (44, 28), (40, 42), n=20), 0.45)
+        t = lz.trazo([(24 + lado * 14, 87), (24 + lado * 3, 62)], 2.0, 1.4)
+        lz.sombrear(t, TR[1:], 1.4, LUZ, textura=vetas(lz, 0.6, 9, False, 315), fuerza_tex=0.4)
+    for y in (30, 60):
+        lz.pintar(lz.trazo([(19.5, y), (28.5, y + 0.8)], 0.8), CUERDA)
+    # la pluma, inclinada hacia el agua, rajada y atada con cuerda
+    pluma = lz.trazo([(24, 22), (68, 8)], 2.6, 1.8)
+    lz.sombrear(pluma, TR, 2.2, LUZ, textura=vetas(lz, 0.6, 15, True, 316), fuerza_tex=0.45)
+    lz.pintar(lz.trazo([(52, 13.5), (58, 11.4)], 0.4), "#0e0a08")
+    for x in (49, 51.5):
+        lz.pintar(lz.trazo([(x, 11), (x + 0.8, 17)], 0.7), CUERDA)
+    lz.pintar(lz.trazo([(24, 40), (60, 10.5)], 0.7), CUERDA)                       # el tirante
+    # el nido en la punta del poste, con ramitas
+    nido = lz.elipse(24, 12, 7, 3)
+    lz.pintar(nido * (np.sin(lz.x * 3 + lz.y * 5) > -0.2), "#5a4426")
+    lz.pintar(np.clip(nido - lz.elipse(24, 11.4, 5, 1.6), 0, 1), "#7a5a32")
+    for (a, b) in ((17, 10), (31, 9), (19, 14), (29, 14.5)):
+        lz.pintar(lz.trazo([(24, 12), (a, b)], 0.35), "#6a4e2a")
+    # la polea de hierro, partida, y la cuerda con el gancho
+    lz.sombrear(lz.circulo(65, 10, 3.2), ["#1b1c1f", "#3d3f43", "#6a6c6f", "#a3a4a6"], 2, LUZ)
+    lz.pintar(lz.circulo(65, 10, 1.0), "#1b1c1f")
+    lz.pintar(lz.trazo([(65, 7), (67.5, 12.5)], 0.6), "#8a3a1a")
+    cuerda = lz.trazo(lz.curva((66.5, 13), (68, 34), (63, 50), n=24), 0.45)
     lz.pintar(cuerda, CUERDA)
-    gancho = np.clip(lz.circulo(40, 44.5, 2.2) - lz.circulo(40.6, 44, 1.3), 0, 1) * (lz.x < 41.5)
-    lz.sombrear(gancho + lz.trazo([(40, 42), (40, 43)], 0.6), HIERRO[1:], 1, LUZ)
-    # la manivela del torno, en el poste
-    lz.sombrear(lz.circulo(16, 50, 3.4), MADERA[2:6], 2, LUZ)
-    lz.pintar(lz.trazo([(16, 50), (21, 46)], 0.7), HIERRO[3])
-    for r in (2.4, 1.6):
-        lz.pintar(np.clip(lz.circulo(16, 50, r) - lz.circulo(16, 50, r - 0.4), 0, 1), CUERDA, 0.8)
-    # el fardo caído al pie, con la red rota
-    fardo = lz.elipse(31, 68, 6.5, 4)
-    lz.sombrear(fardo, ["#4a3a22", "#6a5232", "#8a6e46", "#a88a5e"], 3, LUZ, textura=lz.ruido(0.6, 2, semilla=315), fuerza_tex=0.4)
+    gancho = np.clip(lz.circulo(63, 53.5, 2.6) - lz.circulo(63.7, 53, 1.6), 0, 1) * (lz.x < 64.8)
+    lz.sombrear(gancho + lz.trazo([(63, 50), (63, 51.5)], 0.7), ["#1b1c1f", "#3d3f43", "#6a6c6f", "#a3a4a6"], 1, LUZ)
+    # el torno de manivela bajo su tejadillo de paja
+    tambor = rect(lz, 30, 66, 44, 74)
+    lz.sombrear(tambor, TR[1:], 3, LUZ, textura=vetas(lz, 0.5, 9, False, 317), fuerza_tex=0.4)
+    for x in np.arange(31, 44, 1.3):
+        lz.pintar(lz.trazo([(x, 66.5), (x + 0.6, 73.5)], 0.4), CUERDA, 0.9)
+    lz.sombrear(rect(lz, 29, 64, 31, 80) + rect(lz, 43, 64, 45, 80), TR[2:], 1, LUZ)
+    lz.pintar(lz.trazo([(45, 70), (49, 66), (50, 67.5)], 0.8), "#3d3f43")
+    lz.sombrear(lz.circulo(50.5, 68, 1.1), ["#3d2418", "#7a4e35", "#9a6847"], 0.8, LUZ)
+    techo = lz.poligono([(26, 64), (37, 56), (48, 64), (47, 66), (27, 66)])
+    paja(lz, techo, semilla=318, capas=3.0, y0=56)
+    flecos(lz, 26, 48, 65.5, 1.6, semilla=319)
+    # al pie: el fardo de red caído, un tonel y unos cabos enrollados
+    fardo = lz.elipse(52, 96, 9, 6)
+    lz.sombrear(fardo, ["#4a3a22", "#6a5232", "#8a6e46", "#a88a5e", "#c8aa7a"], 4, LUZ, textura=lz.ruido(0.6, 2, semilla=320), fuerza_tex=0.4)
     lz.pintar(((np.abs((lz.x + lz.y) % 2.4) < 0.3) | (np.abs((lz.x - lz.y) % 2.4) < 0.3)) * fardo, CUERDA, 0.8)
+    for x in (47, 55):
+        lz.sombrear(lz.circulo(x, 91.5, 1.1), ["#8f2532", "#d5525e", "#f4b39a"], 0.8, LUZ)
+    tonel = lz.elipse(6, 95, 4.6, 5.8)
+    duelas = (np.abs(np.sin((lz.x - 6) / 2.2 * np.pi)) < 0.12).astype(float)
+    lz.sombrear(tonel, TR, 3, LUZ, textura=1 - duelas * 0.7, fuerza_tex=0.4)
+    lz.sombrear(lz.elipse(6, 89.5, 4.1, 1.2), ["#5a3a22", "#8a6440", "#b38c5c", "#d2ac78"], 1, LUZ)
+    for r in (3.2, 2.2, 1.2):
+        lz.pintar(np.clip(lz.elipse(64, 100, r * 1.6, r * 0.7) - lz.elipse(64, 100, r * 1.6 - 0.5, r * 0.7 - 0.35), 0, 1), CUERDA)
     return lz.sprite(contorno=CONTORNO)
 
 
@@ -320,79 +356,113 @@ def almacen():
 
 
 def transbordador(k):
-    """La barcaza grande del río: casco ancho y plano, cubierta de tablas con barandilla, la caseta del barquero con
-    su campana y una pértiga larga. Varado (0) está escorado, con algas, un boquete en el casco y la barandilla rota."""
-    W, H = 120, 60
-    lz = Lienzo(W, H, s=5, semilla=331 + k)
-    inclina = 0.06 if k == 0 else 0.0
-    cy = 40
+    """El transbordador, al nivel de la casa del castor: una barcaza grande de tablas con la proa levantada, la
+    cubierta con barandilla de postes y cuerda, la caseta del barquero de troncos con tejado de paja, su ventana
+    (encendida si navega) y la campana; una pértiga larga, un farol en la proa, una bandera, rollos de cuerda, cajas y
+    sacos. 0 varado: escorado, con un boquete en el casco, algas, la barandilla rota, agujeros en la paja y la pértiga
+    en el agua; 1 arreglado y a flote, con un parche de juncos tejidos donde estaba el boquete."""
+    W, H = 160, 84
+    lz = Lienzo(W, H, s=4, semilla=331 + k)
+    TR = ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33", "#9a6544", "#b88259"]
+    inclina = 0.07 if k == 0 else 0.0
+    cy = 58
 
     def y_(y, x):
-        return y + (x - 60) * inclina
+        return y + (x - 80) * inclina
 
-    # la sombra del casco en el agua
-    lz.pintar(lz.desenfocar(lz.elipse(60, cy + 9, 56, 3.5), 1.2), AGUA[0], 0.55)
-    # el casco: un costado largo, plano, con tablas horizontales
-    casco = lz.poligono([(4, y_(cy - 6, 4)), (116, y_(cy - 6, 116)), (110, y_(cy + 8, 110)), (12, y_(cy + 8, 12))])
-    tablas = np.sin((lz.y - (lz.x - 60) * inclina) * 1.8) * 0.5 + 0.5
-    lz.sombrear(casco, MADERA[1:7], 4, LUZ, textura=tablas * 0.5 + vetas(lz, 0.4, 13, True, 332) * 0.5, fuerza_tex=0.5)
-    lz.pintar(casco * (np.abs(np.sin((lz.y - (lz.x - 60) * inclina) * 1.8)) < 0.14), MADERA[0], 0.8)
+    lz.pintar(lz.desenfocar(lz.elipse(80, cy + 13, 76, 4.5), 1.2), AGUA[0], 0.55)
+    # el casco: un costado largo con tablas, la proa (derecha) levantada
+    casco = lz.poligono([(4, y_(cy - 8, 4)), (140, y_(cy - 8, 140)), (156, y_(cy - 14, 156)), (150, y_(cy + 4, 150)),
+                         (138, y_(cy + 11, 138)), (14, y_(cy + 11, 14))])
+    tablas = np.sin((lz.y - (lz.x - 80) * inclina) * 1.5) * 0.5 + 0.5
+    lz.sombrear(casco, TR[1:], 5, LUZ, textura=tablas * 0.5 + vetas(lz, 0.5, 15, True, 332) * 0.5, fuerza_tex=0.5)
+    lz.pintar(casco * (np.abs(np.sin((lz.y - (lz.x - 80) * inclina) * 1.5)) < 0.13), "#120b08", 0.85)
+    for x in range(14, 140, 9):                                                           # los clavos
+        for yy in (cy - 4, cy + 3):
+            lz.pintar(lz.circulo(x, y_(yy, x), 0.45), "#6a6c6f")
+    lz.pintar(lz.trazo([(4, y_(cy - 8, 4)), (140, y_(cy - 8, 140)), (156, y_(cy - 14, 156))], 1.0), TR[6])
+    # una franja de pintura azul a lo largo del casco (desconchada)
+    franja = casco * (np.abs(lz.y - y_(cy - 1, lz.x)) < 1.6) * (lz.ruido(1.2, 2, semilla=333) > 0.35)
+    lz.pintar(franja, "#4c8d8d", 0.85)
     if k == 0:
-        # algas y verdín por la línea de agua, y el boquete
-        algas = casco * (lz.y > y_(cy + 3, lz.x)) * (lz.ruido(0.8, 2, semilla=333) > 0.4)
-        lz.pintar(algas, "#2e4a2a", 0.8)
-        boquete = lz.elipse(78, y_(cy + 1, 78), 5, 3)
+        algas = casco * (lz.y > y_(cy + 5, lz.x)) * (lz.ruido(0.8, 2, semilla=334) > 0.35)
+        lz.pintar(algas, "#2e4a2a", 0.85)
+        boquete = lz.elipse(100, y_(cy + 2, 100), 7, 4)
         lz.pintar(boquete, "#0a0806")
-        for a in range(8):
-            ang = a * np.pi / 4
-            lz.pintar(lz.trazo([(78 + np.cos(ang) * 4, y_(cy + 1, 78) + np.sin(ang) * 2.4),
-                                (78 + np.cos(ang) * 6.5, y_(cy + 1, 78) + np.sin(ang) * 3.6)], 0.5), MADERA[5])
-    # la línea de agua (el agua tapa el fondo del casco)
-    linea = y_(cy + 5 if k == 0 else cy + 6, lz.x)
-    agua = casco * (lz.y > linea)
-    lz.pintar(agua, AGUA[2], 0.9)
-    onda = np.clip(1 - np.abs(lz.y - linea - 0.3) / 0.5, 0, 1) * (lz.x > 6) * (lz.x < 114) * (np.sin(lz.x * 0.7) > -0.3)
-    lz.pintar(onda, AGUA[5], 0.8)
-    # la cubierta, que se ve desde arriba
-    cubierta = lz.poligono([(6, y_(cy - 6, 6)), (114, y_(cy - 6, 114)), (110, y_(cy - 14, 110)), (10, y_(cy - 14, 10))])
-    lz.sombrear(cubierta, MADERA[3:8], 2, LUZ, textura=((lz.x % 5) < 0.6) * 1.0, fuerza_tex=-0.4)
-    lz.pintar(lz.trazo([(4, y_(cy - 6, 4)), (116, y_(cy - 6, 116))], 0.8), MADERA[7])
-    # la barandilla: postes y un pasamanos (rota en el varado)
-    for x in range(10, 112, 8):
-        if k == 0 and 60 < x < 84:
-            continue
-        lz.pintar(lz.trazo([(x, y_(cy - 7, x)), (x, y_(cy - 12, x))], 0.6), MADERA[5])
-    tramos = [(10, 58), (86, 110)] if k == 0 else [(10, 110)]
-    for (a, b) in tramos:
-        lz.pintar(lz.trazo([(a, y_(cy - 12, a)), (b, y_(cy - 12, b))], 0.6), MADERA[6])
-    if k == 0:
-        lz.pintar(lz.trazo([(58, y_(cy - 12, 58)), (64, y_(cy - 7, 64))], 0.6), MADERA[6])     # el pasamanos caído
-    # la caseta del barquero, con su tejadillo de juncos, una ventana y la campana
-    cx = 40
-    caseta = rect(lz, cx - 9, y_(cy - 30, cx), cx + 9, y_(cy - 11, cx))
-    lz.sombrear(caseta, MADERA[2:7], 4, LUZ, textura=vetas(lz, 0.45, 13, False, 334), fuerza_tex=0.4)
-    lz.pintar(caseta * ((lz.x % 3.5) < 0.5), MADERA[0], 0.7)
-    ventana = rect(lz, cx - 4, y_(cy - 25, cx), cx + 4, y_(cy - 19, cx))
-    lz.pintar(ventana, "#f9b947" if k == 1 else "#140e0a")
-    if k == 1:
-        lz.brillo(ventana, "#f9b947", 2.5, 0.5)
-    techo = lz.poligono([(cx - 13, y_(cy - 29, cx)), (cx, y_(cy - 38, cx)), (cx + 13, y_(cy - 29, cx))])
-    lz.sombrear(techo, JUNCO, 4, LUZ, textura=np.sin(lz.x * 3.1 + lz.y * 0.9) * 0.5 + 0.5, fuerza_tex=0.4)
-    if k == 0:
-        lz.pintar(lz.elipse(cx + 5, y_(cy - 32, cx), 2.6, 1.4), "#1a120c")             # un agujero en el tejadillo
-    campana_y = y_(cy - 33, cx + 16)
-    lz.pintar(lz.trazo([(cx + 13, y_(cy - 29, cx)), (cx + 17, campana_y - 1)], 0.5), MADERA[4])
-    lz.sombrear(lz.poligono([(cx + 15, campana_y + 4), (cx + 16, campana_y), (cx + 18, campana_y), (cx + 19, campana_y + 4)]),
-                ["#5a4210", "#8a6a20", "#c09a40", "#e8c868"], 1.5, LUZ)
-    # la pértiga larga, apoyada en la cubierta (en el varado, caída al agua)
-    if k == 1:
-        lz.sombrear(lz.trazo([(60, y_(cy - 9, 60)), (110, y_(cy - 30, 110))], 0.8), MADERA[4:8], 0.6, LUZ)
+        for a in range(10):
+            ang = a * np.pi / 5
+            lz.pintar(lz.trazo([(100 + np.cos(ang) * 5.5, y_(cy + 2, 100) + np.sin(ang) * 3.2),
+                                (100 + np.cos(ang) * 8.5, y_(cy + 2, 100) + np.sin(ang) * 5)], 0.6), TR[5])
     else:
-        lz.sombrear(lz.trazo([(90, y_(cy - 9, 90)), (118, y_(cy + 10, 118))], 0.8), MADERA[3:7], 0.6, LUZ)
-    # unas cuerdas de amarre enrolladas y un par de cajas en cubierta
-    for r in (2.2, 1.5):
-        lz.pintar(np.clip(lz.elipse(98, y_(cy - 9, 98), r * 1.5, r * 0.6) - lz.elipse(98, y_(cy - 9, 98), r * 1.5 - 0.4, r * 0.6 - 0.3), 0, 1), CUERDA)
-    lz.sombrear(rect(lz, 16, y_(cy - 17, 16), 24, y_(cy - 9, 16)), MADERA[3:8], 2, LUZ)
+        # el parche de juncos tejidos que tapa el boquete
+        parche = lz.elipse(100, cy + 2, 8, 4.6)
+        lz.sombrear(parche, ["#3d3214", "#5c4a22", "#7a6431", "#958043", "#b09c5c", "#c9b77d"], 3, LUZ,
+                    textura=(np.sin(lz.x * 2.2) * np.sin(lz.y * 2.2) > 0).astype(float), fuerza_tex=0.5)
+        lz.pintar(np.clip(parche - lz.elipse(100, cy + 2, 7, 3.6), 0, 1), CUERDA)
+    # la línea de flotación y las ondas
+    linea = y_(cy + (6 if k == 0 else 8), lz.x)
+    lz.pintar(casco * (lz.y > linea), AGUA[2], 0.9)
+    lz.pintar(np.clip(1 - np.abs(lz.y - linea - 0.3) / 0.6, 0, 1) * (lz.x > 6) * (lz.x < 152) * (np.sin(lz.x * 0.6) > -0.3), AGUA[5], 0.85)
+    # la cubierta, vista desde arriba
+    cubierta = lz.poligono([(6, y_(cy - 8, 6)), (140, y_(cy - 8, 140)), (154, y_(cy - 14, 154)), (148, y_(cy - 22, 148)),
+                            (136, y_(cy - 18, 136)), (12, y_(cy - 18, 12))])
+    tabl = (np.abs(np.sin(lz.x / 5 * np.pi)) < 0.1).astype(float)
+    lz.sombrear(cubierta, ["#2a1c14", "#47291c", "#643a26", "#7f4d33", "#9a6544", "#b88259"], 2, LUZ,
+                textura=1 - tabl * 0.9 + vetas(lz, 0.5, 13) * 0.2, fuerza_tex=0.5)
+    # la barandilla: postes y una cuerda (rota en el varado)
+    for x in range(10, 150, 9):
+        if k == 0 and 84 < x < 118:
+            continue
+        top = y_(cy - 17 if x < 138 else cy - 22, x)
+        lz.sombrear(rect(lz, x - 0.7, top - 6, x + 0.7, top + 1), TR[3:], 0.6, LUZ)
+    tramos = [(10, 82), (118, 146)] if k == 0 else [(10, 146)]
+    for (a, b) in tramos:
+        pts = [(x, y_(cy - 22.5, x) + (np.sin((x - a) / 9 * np.pi) * 0.6 if True else 0)) for x in np.linspace(a, b, 30)]
+        lz.pintar(lz.trazo(pts, 0.6), CUERDA)
+    if k == 0:
+        lz.pintar(lz.trazo([(82, y_(cy - 22.5, 82)), (88, y_(cy - 10, 88)), (92, y_(cy + 6, 92))], 0.6), CUERDA)
+    # la caseta del barquero: troncos, tejado de paja, ventana y la campana
+    cx0, cx1 = 34, 64
+    troncos(lz, cx0, cx1, y_(cy - 46, 49), y_(cy - 18, 49), alto=4.6, semilla=335)
+    puertita = rect(lz, cx0 + 4, y_(cy - 38, 40), cx0 + 11, y_(cy - 18, 40))
+    lz.pintar(puertita, "#120c08")
+    ventana(lz, cx0 + 16, y_(cy - 40, 55), cx0 + 26, y_(cy - 31, 55), encendida=0.75 if k == 1 else 0.0, contras=False, semilla=336, luz=LUZ)
+    tej = lz.poligono([(cx0 - 6, y_(cy - 44, cx0)), (49, y_(cy - 62, 49)), (cx1 + 6, y_(cy - 44, cx1)), (cx1 + 6, y_(cy - 41, cx1)), (cx0 - 6, y_(cy - 41, cx0))])
+    paja(lz, tej, semilla=337, capas=4.0, y0=cy - 62)
+    flecos(lz, cx0 - 6, cx1 + 6, y_(cy - 41.5, 49), 2.2, semilla=338)
+    if k == 0:
+        lz.pintar(lz.elipse(56, y_(cy - 50, 56), 3.4, 1.8), "#120c08")
+        for x in (54, 56, 58):
+            lz.pintar(lz.trazo([(x, y_(cy - 52, x)), (x + 0.6, y_(cy - 49, x))], 0.4), "#a37036")
+    by = y_(cy - 52, 70)
+    lz.sombrear(lz.trazo([(66, y_(cy - 44, 66)), (66, by - 4), (72, by - 4)], 0.8), TR[2:], 0.6, LUZ)
+    campana = lz.poligono([(69.5, by + 3), (70.5, by - 2), (73.5, by - 2), (74.5, by + 3)])
+    lz.sombrear(campana, ["#5a4210", "#8a6a20", "#c09a40", "#e8c868", "#fff1c0"], 1.6, LUZ)
+    lz.pintar(lz.circulo(72, by + 3.2, 0.6), "#5a4210")
+    # el farol de la proa y la bandera
+    fx, fy = 150, y_(cy - 28, 150)
+    lz.sombrear(lz.trazo([(fx, y_(cy - 20, fx)), (fx, fy - 3)], 0.7), TR[3:], 0.6, LUZ)
+    farol = rect(lz, fx - 2.2, fy - 2, fx + 2.2, fy + 3)
+    lz.pintar(farol, rampa(["#47291c", "#a8380f", "#ef8a26", "#fde27e"] if k == 1 else ["#1a1414", "#2a2420", "#3e3630", "#5a4e44"],
+                           np.clip(1 - np.hypot(lz.x - fx, lz.y - fy) / 3, 0, 1)))
+    if k == 1:
+        lz.sumar_luz(lz.desenfocar(farol, 4), "#ef8a26", 0.45)
+    lz.sombrear(lz.trazo([(16, y_(cy - 18, 16)), (16, y_(cy - 44, 16))], 0.7), TR[3:], 0.6, LUZ)
+    bandera = lz.poligono([(16.5, y_(cy - 44, 16)), (26, y_(cy - 42, 26) + 1), (16.5, y_(cy - 38, 16))])
+    lz.sombrear(bandera, ["#8f2532", "#b02531", "#d5525e", "#f4b39a"] if k == 1 else ["#4a3a3a", "#6a5252", "#8a7070"], 1, LUZ)
+    # la pértiga (en el arreglado, apoyada; en el varado, caída al agua) y la carga
+    if k == 1:
+        lz.sombrear(lz.trazo([(76, y_(cy - 12, 76)), (150, y_(cy - 46, 150))], 1.0), TR[3:], 0.8, LUZ)
+    else:
+        lz.sombrear(lz.trazo([(118, y_(cy - 12, 118)), (158, y_(cy + 14, 158))], 1.0), TR[2:], 0.8, LUZ)
+    for r in (2.8, 1.9, 1.0):
+        lz.pintar(np.clip(lz.elipse(124, y_(cy - 13, 124), r * 1.6, r * 0.65) - lz.elipse(124, y_(cy - 13, 124), r * 1.6 - 0.5, r * 0.65 - 0.3), 0, 1), CUERDA)
+    for (bx, bw) in ((84, 10), (96, 8)):
+        caja = rect(lz, bx, y_(cy - 24, bx), bx + bw, y_(cy - 15, bx))
+        lz.sombrear(caja, COBRE, 1.6, LUZ, textura=vetas(lz, 0.5, 11), fuerza_tex=0.35)
+        lz.pintar(lz.trazo([(bx, y_(cy - 24, bx)), (bx + bw, y_(cy - 15, bx))], 0.4), "#47291c", 0.8)
+    saco = lz.elipse(110, y_(cy - 17, 110), 4.4, 3.4)
+    lz.sombrear(saco, ["#5a4630", "#8a7454", "#b8a07a", "#d8c49c", "#efe0bf"], 2.5, LUZ)
     return lz.sprite(contorno=CONTORNO)
 
 
