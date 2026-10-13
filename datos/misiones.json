@@ -82,7 +82,11 @@
 			"la_travesia"
 		],
 		"la_travesia": [
-			"embarcadero_junco"
+			"embarcadero_junco",
+			"gruta_raices"
+		],
+		"gruta_raices": [
+			"la_travesia"
 		]
 	},
 	"misiones": [

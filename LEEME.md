@@ -342,9 +342,17 @@ Escena `escenas/mundo/la_travesia.tscn` (mapa de 48×170, de sur a norte, `const
 - Las orillas cambian por el camino: juncos y sauces abajo, bosque cerrado en medio, rocas arriba.
 - **Lo que sale del agua** (`OLEADAS` en `viaje.gd`, capturas `documentacion/travesia_oleada.png`): en cuatro momentos del viaje Bata grita y salen cangrejos de herrumbre que **trepan por la borda** (van encima de la barca, como Maisha) y, en la segunda mitad, **anguilas de óxido** (`scripts/enemigos/anguila.gd`, enemigo nuevo, `herramientas/pintar_travesia.py`): saltan de un lado al otro de la cubierta en arco (una sombra avisa); si caen encima de Maisha, daño; un golpe de cetro en el aire las tumba en la cubierta, aturdidas, y entonces el cetro les quita vida. Tras tres saltos se van. Si Maisha cae, vuelve en la cubierta.
 - **La isla del séptimo eco** (a media subida, rodeada de agua; `documentacion/travesia_isla.png`): la barca se arrima y se para, Bata tiende una **pasarela** y Maisha puede bajar (a la isla y a la cubierta; nunca al agua). El **séptimo eco** (ilustración `19_eco_travesia`): Mauti llega de noche en su barca sin remos y deja su **hoja de cobre** debajo de una piedra plana para Maisha («Si subes a buscarme, tráemela»). Tras el eco aparece la **hoja de Mauti** (objeto clave `hoja_mauti`, icono 25.º de `objetos.png`). Al volver a bordo, Bata sigue río arriba.
-- Arriba atraca junto al **muelle de piedra** de la Gruta de las Raíces: Bata lo anuncia, Maisha baja (marca `travesia_hecha`) y el agua vuelve a ser sólida. Desde la barca se puede volver al Embarcadero. El camino de la Gruta sigue cerrado (`gruta_abierta`).
+- Arriba atraca junto al **muelle de piedra** de la Gruta de las Raíces: Bata lo anuncia, Maisha baja (marca `travesia_hecha`) y el agua vuelve a ser sólida. Desde la barca se puede volver al Embarcadero. El camino de la Gruta sube del muelle hacia el norte: las raíces de la boca solo se apartan con la **hoja de Mauti** (`cerrada:hoja_mauti`).
 - Música: de momento la barcarola de la Orilla. Prueba: `pruebas/prueba_la_travesia.gd`.
-- Falta: la música propia del viaje y la Gruta de las Raíces.
+- Falta: la música propia del viaje.
+
+## Gruta de las Raíces
+
+Escena `escenas/mundo/gruta_raices.tscn` (mapa de 64×84, de sur a norte, `construir_mapa.py gruta_raices --crear`, `crear_gruta`; boceto `documentacion/boceto_gruta_raices.png`). **Una cueva por dentro**: el suelo se pinta aparte (`pintar_gruta` en `pintar_suelo.py`: tierra oscura con guijarros, raíces finas y algún charco; la roca, «0», maciza y con la cara iluminada junto al suelo). Se entra desde el muelle de piedra de La Travesía con la hoja de Mauti.
+- **A oscuras** (`scripts/mundo/gruta/oscuridad.gd`, capturas `documentacion/gruta_capturas.png`): un CanvasModulate deja todo en penumbra; alumbran Maisha (una luz que respira), las **semillas dormidas** de los nichos (`ŝ`, `semilla_dormida.png`, laten verdes) y las **huellas lilas de Mauti** (`huella.png`), que van de la entrada al fondo. Sin rayos de sol (`rayos_de_sol = false` en el Ambiente).
+- Salas: el vestíbulo de las semillas, el pasillo de las raíces dormidas (`ŕ`), el santuario de corteza (`ą`, el escudo), la galería de las espinas (`ę`) y el fondo, con un atajo tapado por raíces (`ř`) y dos secretos. Al norte, el Sendero Olvidado (cerrado: `sendero_abierto`).
+- Arte: `herramientas/pintar_gruta.py`. Música: de momento la del Lago. Prueba: `pruebas/prueba_gruta_raices.gd`.
+- Falta: el sigilo del pasillo, el santuario y el escudo (J mantenida), la galería de las espinas y el Guardián con su pesadilla.
 
 ### Los ecos perdidos (el misterio de Raíz)
 

@@ -2408,5 +2408,30 @@
 				]
 			}
 		]
+	},
+	"gruta_llegada": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Las raíces de la boca se han apartado solas al acercarles la hoja de Mauti. Como si la reconocieran.",
+					"Aquí dentro no se ve casi nada. Huele a tierra mojada y a algo dulce, como a pan.",
+					"...Y en el suelo hay huellas. Pequeñas, de luz lila. Van hacia dentro."
+				]
+			}
+		]
+	},
+	"paso_cerrado_gruta_raices": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Raíces enormes tapan la boca de la cueva, apretadas como dedos. No se mueven.",
+					"Mauti dijo algo de su hoja... «Sin ella no me reconocerán.»"
+				]
+			}
+		]
 	}
 }

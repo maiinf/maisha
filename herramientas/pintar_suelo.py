@@ -403,7 +403,62 @@ def _mesetas(lz, tipos, fina, media, pared):
     lz.pintar(piedras, rampa(PENA[4:8], fina), 0.9)
 
 
+def pintar_gruta(nombre, salida=None):
+    """El suelo de una cueva (la Gruta de las Raíces): tierra oscura con guijarros, raíces finas que corren por el
+    suelo y algún charco; las paredes («0») son roca maciza, con la cara iluminada donde se juntan con el suelo y raíces
+    que bajan por ella. Se verá a oscuras en el juego (scripts/mundo/gruta/oscuridad.gd)."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=17)
+    roca_t = [["roca" if c == "0" else "suelo" for c in f] for f in filas]
+    roca = mascara(lz, roca_t, ("roca",), 4.0, 0.9, semilla=171)
+    fina = lz.ruido(0.8, 2, semilla=172)
+    media = lz.ruido(7, 3, semilla=173)
+    # el suelo: tierra oscura, con manchas y guijarros
+    v = 0.45 + (media - 0.5) * 0.35 + (fina - 0.5) * 0.25
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#0e0b0a", "#17120f", "#211a15", "#2c231c", "#3a2e24", "#4a3c2e"], np.clip(v, 0, 1)))
+    guij = (lz.ruido(0.9, 1, semilla=174) > 0.86).astype(np.float32)
+    lz.pintar(np.clip(desplazar(lz, guij, 0.6, 0.8) - guij, 0, 1), "#0a0706", 0.6)
+    lz.pintar(guij, rampa(["#3e342c", "#5a4e44", "#7a6c5e"], fina), 0.85)
+    # raíces finas que corren por el suelo (vienen del Primer Árbol, arriba)
+    raices = np.zeros((lz.H, lz.W), np.float32)
+    rng = np.random.default_rng(175)
+    for k in range(70):
+        x, y = rng.random() * lz.w, rng.random() * lz.h
+        pts = []
+        ang = -np.pi / 2 + (rng.random() - 0.5) * 1.6
+        for j in range(18):
+            pts.append((x, y))
+            x += np.cos(ang) * 6
+            y += np.sin(ang) * 6
+            ang += (rng.random() - 0.5) * 0.7
+        raices = np.maximum(raices, lz.trazo(pts, 0.9 + rng.random() * 0.8, 0.3).astype(np.float32))
+    lz.pintar(np.clip(desplazar(lz, raices, 0.5, 0.8) - raices, 0, 1), "#070504", 0.6)
+    lz.pintar(raices, rampa(["#3e2a1a", "#563a24", "#74502e", "#94683c"], fina), 0.95)
+    # charcos donde gotea
+    charcos = (lz.ruido(18, 2, semilla=176) > 0.95).astype(np.float32) * (1 - roca)
+    lz.pintar(charcos, "#18262a", 0.85)
+    lz.pintar(charcos * (fina > 0.7), "#4c8d8d", 0.4)
+    # la roca: maciza, con grietas, y la cara iluminada donde se junta con el suelo (las paredes miran al sur)
+    vr = 0.35 + (media - 0.5) * 0.4 + (fina - 0.5) * 0.3
+    lz.pintar(roca, rampa(["#0b0a0b", "#151315", "#211e21", "#2e2a2c", "#3d383a", "#504a4a"], np.clip(vr, 0, 1)))
+    grietas = (np.abs(np.sin(lz.x * 0.21 + lz.ruido(5, 2, semilla=177) * 9)) < 0.05) * roca
+    lz.pintar(grietas, "#050405", 0.8)
+    cara = np.clip(roca - desplazar(lz, roca, 0, -7), 0, 1)             # la franja de roca justo encima del suelo
+    tono = np.clip((lz.y % 7) / 7 + (fina - 0.5) * 0.3, 0, 1)
+    lz.pintar(cara, rampa(["#2a2624", "#3e3834", "#57504a", "#6e665e"], tono), 0.95)
+    lz.pintar(np.clip(desplazar(lz, roca, 0, -1.5) - roca, 0, 1), "#080606", 0.7)   # la sombra al pie de la pared
+    musgo = (lz.ruido(2, 2, semilla=178) > 0.7) * cara
+    lz.pintar(musgo, "#2f4a2a", 0.6)
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "raiz", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.012)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
 def pintar(nombre, salida=None):
+    if nombre == "gruta_raices":
+        return pintar_gruta(nombre, salida)
     filas = leer(nombre)
     cobrizo = nombre == "camino_cobrizo"
     senda = nombre == "senda_surcos"

@@ -2025,13 +2025,13 @@ def crear_travesia():
     poner(34, 84, "@")
     # el muelle de piedra de la Gruta, arriba a la izquierda, y su camino
     cx_m = int(24 + 5 * math.sin(12 * 0.045) + 2 * math.sin(12 * 0.11 + 1) - 9)
-    for x in range(cx_m - 1, cx_m + 6):
+    for x in range(cx_m - 4, cx_m + 6):
         for y in (11, 12, 13):
             poner(x, y, "%")
-    for y in range(0, 12):
-        for x in range(cx_m - 4, cx_m - 1):
-            if m[y][x] != "~":
-                poner(x, y, "#")
+    # el camino de la Gruta: sube del muelle hacia el norte, apartado del agua
+    for y in range(0, 11):
+        for x in range(cx_m - 7, cx_m - 3):
+            poner(x, y, "#")
     # orillas: juncos junto al agua; abajo sauces, en medio bosque cerrado, arriba rocas y peñas
     for y in range(ALTO):
         for x in range(ANCHO):
@@ -2058,7 +2058,7 @@ def crear_travesia():
     # puertas: abajo, el Embarcadero (se llega en el transbordador); arriba, el camino de la Gruta (cerrado)
     for x in range(20, 28):
         poner(x, ALTO - 1, "_")
-    for x in range(cx_m - 4, cx_m - 1):
+    for x in range(cx_m - 7, cx_m - 3):
         poner(x, 0, "^")
     return ["".join(f) for f in m], {}
 
@@ -2140,7 +2140,7 @@ def crear_gruta():
     tunel([(6, 42), (4, 43)], 0.8)
     poner(61, 52, "X")
     tunel([(59, 48), (61, 52)], 0.8)
-    textos = {"1": "12, 7, 4, 0, , jefe:nudo"}
+    textos = {"1": "12, 7, 4, 3"}
     return ["".join(f) for f in m], textos
 
 
@@ -2240,7 +2240,7 @@ def exportar_json(nombre):
 # mapas cuyo suelo se pinta con detalle (herramientas/pintar_suelo.py); los demás, con el dibujo sencillo
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
-                  "orilla_juncos", "embarcadero_junco", "la_travesia"}
+                  "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices"}
 
 
 def construir_suelo(nombre):
@@ -2388,7 +2388,7 @@ if __name__ == "__main__":
                         "sendero_del_puente": crear_sendero, "las_pasarelas": crear_pasarelas,
                         "camino_cobrizo": crear_camino, "senda_surcos": crear_senda,
                         "canada_eco": crear_canada, "lago_espejo": crear_lago,
-                        "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia}.get(nombre, crear_prados)()
+                        "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

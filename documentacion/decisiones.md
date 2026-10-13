@@ -79,5 +79,4 @@ se pasan.
 | Tipo de lugar | Cueva por dentro (64×84, `crear_gruta`, boceto `documentacion/boceto_gruta_raices.png`) |
 | Mecánicas nuevas propuestas | Oscuridad (solo el brillo de Maisha, las semillas dormidas y las huellas lilas de Mauti); pasillo de raíces dormidas (sigilo: andar sí, correr o pelear las despierta); escudo del cetro en el santuario; galería de espinas que necesita el escudo |
 | Entrada | Las raíces de la boca se apartan con la hoja de Mauti |
-| Pendiente de Iam | Tecla del escudo, qué duerme en el fondo, cuánta oscuridad |
-
+| Elegido por Iam | Escudo con J mantenida; en el fondo, el Guardián de la Gruta con una pesadilla de Giza (se pelea contra la pesadilla); bastante oscuridad |
