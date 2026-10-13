@@ -139,6 +139,8 @@ Como en otros juegos, el Kitovu enseña las acciones parando el mundo (`scripts/
 
 El diario tiene estilo **noche mágica** (`herramientas/pintar_interfaz.py`): tapas de cuero azul noche cosidas con hilo de oro y cantoneras doradas, páginas de cielo nocturno (nebulosa suave, estrellas, constelaciones) con borde de filigrana dorada, y la tapa con el Gran Árbol, la luna y estrellas en oro. Las letras de las páginas usan su propia paleta clara (`TN_*` en `mochila.gd`): títulos en oro, texto en crema, la historia en coral y lo cumplido en gris azulado; la fila elegida, en tinta oscura sobre la banda dorada. El mapa sigue siendo de pergamino.
 
+**Para que se lea** (`documentacion/diario_legible.png`): el texto de las páginas va sobre **láminas oscuras** con un borde dorado fino (`_lamina`), y cada letra clara lleva un **contorno oscuro** (`draw_string_outline` en `_texto`), así que no se mezcla con las estrellas ni la nebulosa. Los tonos secundarios son más claros y la ayuda de abajo se encoge hasta caber en la página.
+
 **El árbol de habilidades** (pestaña Habilidades del diario): un árbol dorado que crece del lomo del libro
 (`arbol_ramas.png` y `nodos.png`, en `pintar_interfaz.py`) con tres ramas: **Raíz** (Semilla, K) a la izquierda,
 **Cetro** (golpe, J) hacia arriba y **Aliento** (Latido, L) a la derecha; Runa y Tierra asoman dormidas a los lados.

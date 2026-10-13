@@ -78,8 +78,8 @@ const ATAJOS := {KEY_1: 0, KEY_2: 1, KEY_3: 2, KEY_4: 3, KEY_5: 4, KEY_M: 3}
 const ESPERA_RUEDA := 0.28
 ## Los colores de lo que se escribe en las páginas de noche (el cielo es oscuro: letras claras)
 const TN_TINTA := Color("efe6cf")       # el texto
-const TN_SUAVE := Color("c8c8e4")       # lo secundario
-const TN_APAGADA := Color("7f86a8")     # lo cumplido, lo que no se puede
+const TN_SUAVE := Color("e2e2f6")       # lo secundario
+const TN_APAGADA := Color("aab2d0")     # lo cumplido, lo que no se puede
 const TN_ROJO := Color("f2a07a")        # la historia, lo importante (coral)
 const TN_VERDE := Color("a8e890")       # hecho
 const TN_TITULO := Color("f0d89a")      # los títulos, en oro
@@ -453,10 +453,19 @@ func _lista() -> Array:
 # --- Dibujo -----------------------------------------------------------------------------
 
 func _texto(texto: String, pos: Vector2, color: Color, ancho := -1.0, tam := 16) -> void:
-	# sobre el papel, la tinta no lleva sombra negra (solo un poco de brillo); lo claro, sí
+	# lo claro (sobre las páginas de noche) lleva un contorno oscuro alrededor de cada letra, para que se lea sobre
+	# cualquier fondo; la tinta oscura (la fila elegida, sobre la banda dorada) no lo necesita
 	if color.get_luminance() > 0.5:
-		_lienzo.draw_string(_fuente, pos + Vector2(1, 1), texto, HORIZONTAL_ALIGNMENT_LEFT, ancho, tam, Color(0, 0, 0, 0.6 * color.a))
+		_lienzo.draw_string_outline(_fuente, pos, texto, HORIZONTAL_ALIGNMENT_LEFT, ancho, tam, 4, Color(0.04, 0.02, 0.07, 0.95 * color.a))
+		_lienzo.draw_string(_fuente, pos + Vector2(1, 1), texto, HORIZONTAL_ALIGNMENT_LEFT, ancho, tam, Color(0, 0, 0, 0.7 * color.a))
 	_lienzo.draw_string(_fuente, pos, texto, HORIZONTAL_ALIGNMENT_LEFT, ancho, tam, color)
+
+
+## Una lámina oscura detrás del texto de una página (para que las estrellas y la nebulosa no se mezclen con las letras)
+func _lamina(r: Rect2, tinta: float) -> void:
+	_lienzo.draw_rect(r, Color(0.035, 0.03, 0.07, 0.86 * tinta))
+	_lienzo.draw_rect(r, Color(TN_TITULO, 0.35 * tinta), false, 1.0)
+	_lienzo.draw_rect(r.grow(-3), Color(TN_TITULO, 0.12 * tinta), false, 1.0)
 
 
 ## Un título a mano, grande, con su raya debajo
@@ -596,19 +605,26 @@ func _dibujar_hoja_que_pasa() -> void:
 
 ## Lo que hay escrito en las dos páginas
 func _dibujar_paginas(tinta: float) -> void:
-	var ayuda := "← → pestañas · ↑ ↓ elegir · Tab cerrar"
+	var ayuda := "←→ pestañas · ↑↓ elegir · Tab cerrar"
 	if pestana == P_MISIONES:
-		ayuda = "↑ ↓ elegir · Acción: seguir · Tab cerrar"
+		ayuda = "↑↓ elegir · Acción seguir · Tab cerrar"
 	elif pestana == P_OBJETOS and (Estado.cuantos("sopa") > 0 or not Tienda.prendas_compradas().is_empty()):
-		ayuda = "↑ ↓ elegir · Acción: usar o ponerse"
+		ayuda = "↑↓ elegir · Acción usar o ponerse"
 	if pestana == P_MAPA:
 		_dibujar_mapa()
 		return
 	if pestana == P_HABILIDADES:
 		_dibujar_arbol(tinta)
 		return
+	_lamina(Rect2(PAG_IZQ.position + Vector2(2, 38), PAG_IZQ.size - Vector2(4, 44)), tinta)
+	_lamina(Rect2(PAG_DER.position + Vector2(8, 8), PAG_DER.size - Vector2(16, 36)), tinta)
 	_titulo(PESTANAS[pestana], PAG_IZQ.position + Vector2(6, 28), Color(TN_TITULO, tinta), 0.0)
-	_texto(ayuda, Vector2(PAG_DER.position.x + 16, PAG_DER.end.y - 14), Color(TN_APAGADA, 0.9 * tinta))
+	# la ayuda, abajo, que quepa en la página (si no cabe, un poco más pequeña)
+	var ancho_ayuda := PAG_DER.size.x - 28
+	var tam_ayuda := 16
+	while tam_ayuda > 10 and _fuente.get_string_size(ayuda, HORIZONTAL_ALIGNMENT_LEFT, -1, tam_ayuda).x > ancho_ayuda:
+		tam_ayuda -= 1
+	_texto(ayuda, Vector2(PAG_DER.position.x + 14, PAG_DER.end.y - 10), Color(TN_SUAVE, tinta), -1, tam_ayuda)
 	var filas := _lista()
 	var area := Rect2(PAG_IZQ.position + Vector2(6, 42), Vector2(PAG_IZQ.size.x - 12, FILAS_VISIBLES * ALTO_FILA))
 	if filas.is_empty():
