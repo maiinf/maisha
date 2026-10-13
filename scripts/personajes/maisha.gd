@@ -38,6 +38,9 @@ var _tiempo_agotada := 0.0
 var _desde_ultima_semilla := 99.0
 var _empuje := Vector2.ZERO
 var _ultimo_danio := -100000.0
+var escudo := false            # con el Escudo de corteza: J mantenida (para lo que viene de frente)
+var _j_mantenida := 0.0
+var _escudo_dibujo: Sprite2D
 var _emocion := 0.0           # mientras dure, se ve una expresión (sorpresa, daño, celebrar...) y no se pisa
 
 @onready var _sprite: AnimatedSprite2D = $Sprite
@@ -91,11 +94,19 @@ func _physics_process(delta: float) -> void:
 		rapidez *= R.GOLPE_FRENA
 	if pegajoso > 0.0:
 		rapidez *= 0.55
+	if escudo:
+		rapidez *= 0.5
 	velocity = direccion * rapidez + _empuje
 	_empuje = _empuje.move_toward(Vector2.ZERO, 600.0 * delta)
 	move_and_slide()
 
 	if combate_activo:
+		# tocar J golpea; mantenerla (con el Escudo de corteza) levanta el escudo
+		if Input.is_action_pressed("golpe") and Estado.tiene("escudo_corteza"):
+			_j_mantenida += delta
+		else:
+			_j_mantenida = 0.0
+		_poner_escudo(_j_mantenida >= R.ESCUDO_MANTENER)
 		if Input.is_action_just_pressed("golpe"):
 			golpear()
 		if Input.is_action_just_pressed("explosivo"):
@@ -216,6 +227,14 @@ func latido() -> bool:
 func recibir_danio(cantidad: int, desde: Vector2, tipo: String) -> bool:
 	if esta_caida or _invulnerable > 0.0:
 		return false
+	# el escudo para lo que viene de frente (no las explosiones)
+	if escudo and tipo != "explosion":
+		var hacia := (desde - global_position)
+		if hacia.length() < 1.0 or hacia.normalized().dot(direccion_mirada()) > 0.15:
+			Sonido.efecto("clinc", 0.0, global_position)
+			Impacto.chispa(global_position + direccion_mirada() * 10.0 + Vector2(0, -10), -direccion_mirada(), Color("f9d77a"))
+			_empuje = -direccion_mirada() * 50.0
+			return false
 	if tipo == "explosion":
 		cantidad = R.EXPLOSION_AUTODANIO
 	vida = maxi(0, vida - cantidad)
@@ -250,6 +269,32 @@ func revivir(posicion: Vector2) -> void:
 	esta_caida = false
 	_empuje = Vector2.ZERO
 	_invulnerable = 1.0
+
+
+## Levanta o baja el escudo de corteza (se dibuja delante de Maisha, hacia donde mira)
+func _poner_escudo(si: bool) -> void:
+	if si == escudo:
+		if escudo:
+			_colocar_escudo()
+		return
+	escudo = si
+	if si:
+		if _escudo_dibujo == null:
+			_escudo_dibujo = Sprite2D.new()
+			_escudo_dibujo.texture = load("res://arte/mundos/raiz/gruta/escudo.png")
+			add_child(_escudo_dibujo)
+		Sonido.efecto("tablas_coger", -6.0, global_position)
+		_colocar_escudo()
+	if _escudo_dibujo:
+		_escudo_dibujo.visible = si
+
+
+func _colocar_escudo() -> void:
+	var d := direccion_mirada()
+	# (de espaldas, el escudo asoma por encima del hombro, para que se vea que está levantado)
+	_escudo_dibujo.position = Vector2(d.x * 9.0, -11.0 + d.y * 4.0) if mirando != "arriba" else Vector2(5, -21)
+	_escudo_dibujo.z_index = 1
+	_escudo_dibujo.scale = Vector2(0.75 if mirando == "lado" else 1.0, 1.0)
 
 
 ## Se toma una sopa de Juncia (tecla F o desde la mochila): devuelve hojas de vida.

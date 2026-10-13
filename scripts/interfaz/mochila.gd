@@ -120,6 +120,7 @@ const HABILIDADES := [
 	["Latido", "L", "cetro_recibido", "Gasta Aliento. Empuja a todo lo que esté cerca y te protege un instante."],
 	["Cetro templado", "", "cetro_templado", "Corteza templó el cetro en su forja: el golpe llega más lejos."],
 	["Torre del vigía", "", "vigia", "Desde el tejado de Pino, los secretos de los prados se ven desde lejos."],
+	["Escudo de corteza", "J (mantener)", "escudo_corteza", "Mantén J: Maisha levanta el escudo de corteza del Primer Árbol. Para todo lo que venga de frente (espinas, mordiscos, latigazos), pero con él anda despacio y no golpea."],
 	["Tomar sopa", "F", "receta_sopa", "Si llevas sopa de Juncia, devuelve 3 hojas de vida al momento, también en plena pelea."],
 ]
 ## Lazos: [id, nombre, marca para conocerle, descripción]

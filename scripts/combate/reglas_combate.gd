@@ -27,6 +27,7 @@ const GOLPE_EMPUJE := 150.0
 const GOLPE_ATURDE := 0.35               # segundos que el enemigo queda aturdido
 const GOLPE_RECARGA_ALIENTO := 6.0       # Aliento que recupera cada golpe que acierta
 const GOLPE_FRENA := 0.4                 # Maisha se mueve más despacio mientras golpea
+const ESCUDO_MANTENER := 0.25            # segundos manteniendo J para levantar el escudo de corteza
 const CETRO_TEMPLADO_ALCANCE := 1.35     # con el cetro templado por Corteza, el golpe llega más lejos
 
 # --- Semilla (gasta Aliento) ---------------------------------------------------
@@ -148,6 +149,11 @@ const MAMBA_DANIO_SEMILLA := 2
 const MAMBA_COLETAZO := 40.0            # fase 2: al soltarse del poste, el coletazo llega hasta aquí
 const MAMBA_RONDA := Vector2(150, 96)   # semiejes del círculo de agua por donde acecha
 const MAMBA_SUJETO := 2.4               # Bata lo sujeta con la pértiga contra el borde: a tiro desde la plataforma
+
+const ESPINO_VIDA := 2                  # el espino de Giza: el cetro rebota; una semilla lo deshace
+const ESPINO_CADA := 1.7                # escupe una espina cada tanto, si Maisha está cerca
+const ESPINO_ALCANCE := 150.0
+const ESPINA_VELOCIDAD := 130.0
 
 const CANGREJO_VIDA := 3
 const CANGREJO_VELOCIDAD := 46.0       # de lado (en vertical va a menos de la mitad)

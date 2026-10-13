@@ -354,7 +354,10 @@ Escena `escenas/mundo/gruta_raices.tscn` (mapa de 64×84, de sur a norte, `const
 - La **maraña de raíces** (`ř`, `raiz_tapon.png`) tapa el atajo del pasillo al fondo hasta que despierte el Guardián (`gruta_guardian`).
 - Salas: el vestíbulo de las semillas, el pasillo de las raíces dormidas, el santuario de corteza (`ą`, el escudo), la galería de las espinas (`ę`) y el fondo, con un atajo tapado por raíces (`ř`) y dos secretos. Al norte, el Sendero Olvidado (cerrado: `sendero_abierto`).
 - Arte: `herramientas/pintar_gruta.py`. Música: de momento la del Lago. Prueba: `pruebas/prueba_gruta_raices.gd`.
-- Falta: el santuario y el escudo (J mantenida), la galería de las espinas y el Guardián con su pesadilla.
+- **El santuario de corteza** (`ą`, `scripts/mundo/gruta/altar_corteza.gd`, `altar_corteza.png`): un tocón enorme del Primer Árbol con un escudo de corteza encima, que brilla. Al tocarlo, la corteza se enrosca en el cetro: **Escudo de corteza** (marca `escudo_corteza`).
+- **El escudo** (en `maisha.gd`): tocar J golpea; **mantener J** (`ESCUDO_MANTENER`, 0,25 s) levanta el escudo (`escudo.png`, delante de Maisha). Para todo lo que viene de frente (no las explosiones): suena «clinc» y no hace daño. Con él, Maisha anda a la mitad y no golpea. Está en la pestaña Habilidades del diario.
+- **La galería de las espinas** (`ę`): cuatro **espinos de Giza** (`scripts/enemigos/espino.gd`, `espino.png`, enemigo nuevo) que, con Maisha cerca, se hinchan (su capullo violeta da luz) y escupen **espinas** (`espina.gd`) cada 1,7 s. El cetro rebota; una semilla los deshace (marca `espino/x,y`). Capturas: `documentacion/gruta_escudo.png`.
+- Falta: el Guardián con su pesadilla.
 
 ### Los ecos perdidos (el misterio de Raíz)
 

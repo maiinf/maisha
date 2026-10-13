@@ -2445,5 +2445,29 @@
 				]
 			}
 		]
+	},
+	"gruta_altar": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un tocón enorme. Tiene tantos anillos que no se pueden contar: tiene que ser del Primer Árbol.",
+					"Encima hay un escudo hecho de su corteza, con una espiral dorada. Brilla como si respirara.",
+					"...Al tocarlo, la corteza se enrosca en el cetro, despacio, como un abrazo. Pesa poco. Huele a bosque."
+				]
+			}
+		]
+	},
+	"gruta_altar_vacio": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El tocón del Primer Árbol, sin su escudo. Los anillos siguen brillando un poco."
+				]
+			}
+		]
 	}
 }

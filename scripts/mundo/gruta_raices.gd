@@ -8,6 +8,8 @@ const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const OSCURIDAD := preload("res://scripts/mundo/gruta/oscuridad.gd")
 const RAIZ_DORMIDA := preload("res://scripts/mundo/gruta/raiz_dormida.gd")
 const TAPON := preload("res://arte/mundos/raiz/gruta/raiz_tapon.png")
+const ALTAR := preload("res://scripts/mundo/gruta/altar_corteza.gd")
+const ESPINO := preload("res://scripts/enemigos/espino.gd")
 
 
 func _ready() -> void:
@@ -28,6 +30,17 @@ func _crear_raices() -> void:
 		var fila := filas[y]
 		for x in fila.length():
 			var c := fila[x]
+			if c == "ą":
+				var altar: Node2D = ALTAR.new()
+				altar.position = Vector2(x, y) * 16.0 + Vector2(8, 14)
+				$Entidades.add_child(altar)
+			elif c == "ę":
+				var marca := "espino/%d,%d" % [x, y]
+				if not Estado.tiene(marca):
+					var espino: Node2D = ESPINO.new()
+					espino.marca = marca
+					espino.position = Vector2(x, y) * 16.0 + Vector2(8, 14)
+					$Entidades.add_child(espino)
 			if (c == "ŕ" or c == "ř") and (x == 0 or fila[x - 1] != c):
 				var pos := Vector2(x + 1, y) * 16.0 + Vector2(0, 14)
 				if c == "ŕ":
