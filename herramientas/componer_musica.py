@@ -561,6 +561,7 @@ TITULOS = {
     "lago": "El agua que recuerda",
     "orilla": "La linterna en la orilla",
     "jefe_mamba": "Mamba, el cocodrilo de herrumbre",
+    "embarcadero": "Canción de barqueros",
 }
 
 # =============================================================================
@@ -1192,6 +1193,53 @@ def jefe_mamba():
     return final(p, sala=2.2, mezcla=0.27, brillo=4800)
 
 
+# =============================================================================
+# EL EMBARCADERO JUNCO: «Canción de barqueros» (una canción de trabajo: pregunta de la flauta, respuesta de las voces)
+# =============================================================================
+
+## En re dórico: la flauta pregunta (sube) y las voces contestan (bajan), como cuando se rema a la vez
+PREGUNTA = [("D5", 0, 1), ("F5", 1, 1), ("G5", 2, 1), ("A5", 3, 2), ("G5", 5, 1), ("F5", 6, 2)]
+RESPUESTA = [("A4", 0, 1), ("G4", 1, 1), ("F4", 2, 1), ("E4", 3, 1), ("D4", 4, 4)]
+PREGUNTA_2 = [("A5", 0, 1), ("C6", 1, 1), ("B5", 2, 1), ("A5", 3, 2), ("G5", 5, 1), ("E5", 6, 2)]
+RESPUESTA_2 = [("C5", 0, 1), ("A4", 1, 1), ("G4", 2, 1), ("E4", 3, 1), ("D4", 4, 4)]
+
+
+def embarcadero():
+    tempo = Tempo(96)
+    pulsos = 128
+    p = Pista(tempo.s(pulsos))
+    progresion = [("D3", "m"), ("C3", "M"), ("D3", "m"), ("A2", "m"), ("D3", "m"), ("G2", "M"), ("A2", "m"), ("D3", "m")] * 4
+    colchones(p, tempo, progresion, compas=4, brillo=900, volumen=0.2, octava_bajo=2, fuerza_bajo=0.3)
+    # el remo: balafón en el 1 y el 3 (la pala entra en el agua) y un tambor sordo en el 2 y el 4 (el tirón)
+    for i, (raiz, tipo) in enumerate(progresion):
+        notas = acorde(raiz[:-1] + "4", tipo)
+        for k in (0, 2):
+            p.poner(balafon(notas[k // 2], 0.4, 0.26), tempo.s(i * 4 + k), pan=-0.25)
+        for k in (1, 3):
+            p.poner(tambor("D2", 0.3, 0.2, golpe=0.4), tempo.s(i * 4 + k))
+        p.poner(maraca(0.1, 0.08), tempo.s(i * 4 + 3.5), pan=0.3)               # la cuerda que cruje
+    # pregunta y respuesta, cuatro veces (cada vuelta de 32 pulsos)
+    for vuelta in range(4):
+        b = vuelta * 32
+        preg, resp = (PREGUNTA, RESPUESTA) if vuelta % 2 == 0 else (PREGUNTA_2, RESPUESTA_2)
+        for (desde, frase, quien) in ((b, preg, "flauta"), (b + 8, resp, "voces"), (b + 16, preg, "flauta"), (b + 24, resp, "voces")):
+            if quien == "flauta":
+                melodia(p, tempo, frase, desde=desde, instrumento=lambda n, d: flauta(n, d, 0.42, vibrato=4.6), volumen=0.34, sostener=0.92, pan=0.2)
+            else:
+                for (n, en, d) in frase:
+                    p.poner(coro([n, transportar([(n, 0, 1)], -12)[0][0]], tempo.s(d) + 0.3, "o", 0.8), tempo.s(desde + en), 0.13)
+        if vuelta >= 2:
+            tocar(p, tempo, transportar(preg, -12), desde=b + 16, fuerza=0.22, pan=-0.1)
+    # la campana del muelle, de vez en cuando, y el agua
+    for b in (14, 62, 110):
+        p.poner(campanita("A5", 2.4, 0.22), tempo.s(b), pan=0.4)
+        p.poner(campanita("A5", 2.0, 0.08), tempo.s(b + 1.5), pan=0.45)
+    rng = np.random.default_rng(91)
+    for k in range(24):
+        p.poner(campanita(["D7", "A6", "F6", "G6"][rng.integers(4)], 0.6, 0.08), tempo.s(rng.random() * pulsos), pan=rng.random() - 0.5)
+    return final(p, sala=2.6, mezcla=0.28, brillo=5200)
+
+
 NO_SE_REPITEN = ("raiz_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
 PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": prados, "aldea": aldea,
           "interior": interior, "combate": combate, "jefe": jefe, "purga": purga, "victoria": victoria, "objeto": objeto, "tarea": tarea,
@@ -1199,7 +1247,8 @@ PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": 
           "cienaga": cienaga, "jefe_konokono": jefe_konokono, "campo": campo, "jefe_cosechadora": jefe_cosechadora,
           "tienda": tienda, "raiz_libre": raiz_libre, "sendero": sendero, "pasarelas": pasarelas,
           "cobrizo": cobrizo, "surcos": surcos, "canada": canada, "jefe_kambare": jefe_kambare, "lago": lago,
-          "orilla": orilla, "jefe_mamba": jefe_mamba}
+          "orilla": orilla, "jefe_mamba": jefe_mamba,
+          "embarcadero": embarcadero}
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

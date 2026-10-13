@@ -333,7 +333,8 @@ Escena `escenas/mundo/embarcadero_junco.tscn` (mapa de 96×72 casillas, `constru
 - Los vecinos con su sitio lejos (como Bata y su transbordador) dan unos pasos, se pierden de vista y aparecen allí (`estatua.gd`).
 - **Arreglar el transbordador**, con los poderes de Maisha y sin recados (`scripts/mundo/embarcadero/arreglo_transbordador.gd`, capturas `documentacion/transbordador_arreglo.png`), solo cuando Mamba ya no está: una **semilla** que estalle en la punta del muelle, junto al boquete, hace crecer **juncos que se tejen** y lo tapan (`boquete_tapado`, dibujo 2: tapado pero escorado); después, el **Latido** pegado al casco la endereza y vuelve a flotar (`transbordador_listo`). Bata va dando las pistas según el momento.
 - La puerta del norte (La Travesía) sigue cerrada (`travesia_abierta`) hasta que exista ese camino: se irá en el transbordador.
-- Falta: La Travesía y la música propia del Embarcadero.
+- Música propia: **«Canción de barqueros»** (`embarcadero` en `componer_musica.py`), una canción de trabajo en re dórico: la flauta pregunta y las voces graves contestan, con el balafón y el tambor al ritmo de los remos, la cuerda que cruje y la campana del muelle.
+- Falta: La Travesía.
 
 ### Los ecos perdidos (el misterio de Raíz)
 

@@ -103,7 +103,7 @@ func _ready() -> void:
 	await _esperar(2.5)
 	_comprobar(get_tree().get_first_node_in_group("dialogo").hablando, "Maisha piensa algo al llegar")
 	await _leer_dialogo()
-	_comprobar(Sonido.musica_actual == "orilla", "suena la música del río")
+	_comprobar(Sonido.musica_actual == "embarcadero", "suena su propia música («Canción de barqueros»)")
 
 	print("El pueblo de barqueros:")
 	var region: Node2D = get_tree().get_first_node_in_group("region")
