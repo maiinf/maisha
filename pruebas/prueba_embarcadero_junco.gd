@@ -130,6 +130,11 @@ func _ready() -> void:
 	_comprobar(casa_s != null and casa_s.get("_sello") != null, "la casa de Bata, junto al muelle, sellada por raíces de piedra")
 	_comprobar(get_tree().get_nodes_in_group("aldeanos").filter(func(n: Node) -> bool: return n.get("id") == "bata").is_empty(), "Bata no está fuera: está encerrado dentro")
 	_comprobar(get_tree().get_nodes_in_group("estatuas").is_empty(), "y ya no hay ninguna estatua de Bata")
+	var zona1: Node2D = null
+	for z in get_tree().get_nodes_in_group("zonas"):
+		if z.get_meta("clave") == "1":
+			zona1 = z
+	_comprobar(not zona1.activa, "mientras Bata siga encerrado, la dársena duerme (sola, Maisha no se atreve)")
 	_maisha().global_position = casa_s.casa + Vector2(-18, 22)
 	await _esperar(0.3)
 	var puerta_casa: Node2D = null
@@ -194,6 +199,17 @@ func _ready() -> void:
 			break
 	_comprobar(mamba.fase == mamba.Fase.ACECHA and mamba.global_position.distance_to(darsena.global_position) > 90.0, "acecha en el agua, alrededor de la plataforma")
 	_comprobar(not mamba.recibir_golpe(1, Vector2.RIGHT), "en el agua, el cetro no le hace nada")
+	var barca_bata: Node2D = mamba.get("_barca")
+	_comprobar(is_instance_valid(barca_bata), "Bata pelea a su lado, en su barca (2 contra 1)")
+	mamba.sujetar(barca_bata)
+	_comprobar(mamba.fase == mamba.Fase.SUJETO, "Bata lo sujeta con la pértiga contra el borde")
+	var vida0: int = mamba.vida
+	_comprobar(mamba.recibir_golpe(1, Vector2.RIGHT) and mamba.vida == vida0 - 1, "sujeto, el cetro le quita 1")
+	barca_bata.set("_espera", 999.0)       # (para probar los postes a solas, Bata espera)
+	for i in 60:
+		await _esperar(0.1)
+		if mamba.fase == mamba.Fase.ACECHA:
+			break
 	# cuando avisa, Maisha se pone detrás del poste que tiene más cerca (el poste entre ella y Mamba)
 	for i in 80:
 		await _esperar(0.05)

@@ -9,8 +9,10 @@ extends Node2D
 ##     daño. Si llega al otro lado, se tira al agua y vuelve a acechar.
 ##   - Si en su camino hay un POSTE de amarre, SE LE CLAVAN LOS DIENTES en la madera y queda ATASCADO, tirando para
 ##     soltarse: el cetro le quita 1; una semilla que le estalle al lado, 2. (La gracia: ponerse detrás de un poste.)
+##   - BATA, en su barca (si ya está libre: 2 contra 1), persigue a Mamba por el agua y, cuando lo alcanza, lo
+##     SUJETA con la pértiga contra el borde de la plataforma: a tiro desde el borde (scripts/mundo/embarcadero/barca_bata.gd).
 ##   - Fase 2 (con la mitad de vida): avisa más deprisa, a veces embiste dos veces seguidas y, al soltarse del
-##     poste, da un COLETAZO en círculo que hace daño cerca.
+##     poste, da un COLETAZO en círculo que hace daño cerca; y si Bata lo sujeta, al soltarse le muerde la barca.
 ## Al vencerlo se le cae la herrumbre: queda un cocodrilo verde y bronce, limpio, que se va nadando
 ## (marca «mamba_vencido»). Hace de «Corazón» de su zona (zona_corrupta.gd con jefe = "mamba").
 ## Los postes son las «ł» del mapa (grupo «postes»).
@@ -18,11 +20,12 @@ extends Node2D
 signal destruido
 signal vida_cambiada(vida: int)
 
-enum Fase { DORMIDO, PRESENTACION, ACECHA, AVISA, EMBISTE, ATASCADO, COLETAZO, AL_AGUA, VENCIDO }
+enum Fase { DORMIDO, PRESENTACION, ACECHA, AVISA, EMBISTE, ATASCADO, COLETAZO, AL_AGUA, SUJETO, VENCIDO }
 
 const R := preload("res://scripts/combate/reglas_combate.gd")
 const ASTILLAS := preload("res://scripts/efectos/astillas.gd")
 const BARRA := preload("res://scripts/interfaz/barra_jefe.gd")
+const BARCA_BATA := preload("res://scripts/mundo/embarcadero/barca_bata.gd")
 const SOMBRA := preload("res://scripts/personajes/sombra.gd")
 const NOMBRE := "Mamba, el cocodrilo de herrumbre"
 # fotogramas de arte/zonas/raiz/mamba.png
@@ -58,6 +61,8 @@ var _sprite: Sprite2D
 var _sombra: Node2D
 var _capa: Node2D                        # la raya del aviso, las ondas y el coletazo (bajo todo)
 var _barra: CanvasLayer
+var _barca: Node2D = null                # Bata en su barca, ayudando (si ya está libre)
+var _sujetado_ya := false                # el «¡Lo tengo!» de Bata, solo la primera vez
 
 
 func _ready() -> void:
@@ -103,6 +108,10 @@ func despertar() -> void:
 	_barra.maximo = R.MAMBA_VIDA
 	add_child(_barra)
 	vida_cambiada.connect(_barra.poner)
+	if Estado.tiene("casa_bata_abierta") and _barca == null:
+		_barca = BARCA_BATA.new()
+		_barca.mamba = self
+		get_parent().add_child(_barca)
 
 
 func reiniciar() -> void:
@@ -112,6 +121,9 @@ func reiniciar() -> void:
 	if _barra:
 		_barra.queue_free()
 		_barra = null
+	if is_instance_valid(_barca):
+		_barca.queue_free()
+	_barca = null
 	fase = Fase.DORMIDO
 	visible = false
 	remove_from_group("golpeables")
@@ -172,6 +184,13 @@ func _process(delta: float) -> void:
 		Fase.COLETAZO:
 			if _t >= 0.5:
 				_al_agua()
+		Fase.SUJETO:
+			if _t >= R.MAMBA_SUJETO:
+				# se suelta de la pértiga; en la fase 2, se revuelve y le muerde la barca a Bata
+				if _en_fase_2() and is_instance_valid(_barca):
+					_barca.call("asustar")
+					Sonido.efecto("mamba_muerde", -4.0, global_position)
+				_al_agua()
 		Fase.AL_AGUA:
 			# vuelve a la ronda de agua más cercana, nadando
 			var objetivo := _en_ronda(_angulo)
@@ -210,7 +229,7 @@ func _apuntar(maisha: Node2D) -> void:
 	Sonido.efecto("mamba_ruge", -8.0, global_position)
 	if not _avisado and zona:
 		_avisado = true
-		zona.mensaje.emit("¡Ponte detrás de un poste!")
+		zona.mensaje.emit("Bata: «¡Lucecita, detrás de un poste! ¡Que se clave!»" if is_instance_valid(_barca) else "¡Ponte detrás de un poste!")
 
 
 ## La raya: desde donde está, pasando por Maisha, hasta el otro lado de la plataforma
@@ -246,6 +265,19 @@ func _embestir(delta: float, maisha: Node2D) -> void:
 		# ha cruzado sin clavarse: se tira al agua por el otro lado
 		_angulo = atan2((global_position - _centro()).y / R.MAMBA_RONDA.y, (global_position - _centro()).x / R.MAMBA_RONDA.x)
 		_al_agua()
+
+
+## Bata lo alcanza con la pértiga mientras acecha: lo sujeta contra el borde de la plataforma, a tiro de Maisha
+func sujetar(_quien: Node2D) -> void:
+	if fase != Fase.ACECHA:
+		return
+	_cambiar(Fase.SUJETO)
+	Sonido.efecto("mamba_dolor", -4.0, global_position)
+	var borde := _centro() + (global_position - _centro()) * 0.8
+	create_tween().tween_property(self, "global_position", borde, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if not _sujetado_ya and zona:
+		_sujetado_ya = true
+		zona.mensaje.emit("Bata: «¡Lo tengo! ¡Dale, dale, que se me escurre!»")
 
 
 func _clavarse(poste: Node2D) -> void:
@@ -305,7 +337,7 @@ func _mover_coletazo(delta: float, maisha: Node2D) -> void:
 # --- Daño ---------------------------------------------------------------------------
 
 func recibir_golpe(danio: int, _direccion: Vector2) -> bool:
-	if fase == Fase.ATASCADO:
+	if fase in [Fase.ATASCADO, Fase.SUJETO]:
 		_herir(danio)
 		return true
 	_blanco = 0.04
@@ -315,7 +347,7 @@ func recibir_golpe(danio: int, _direccion: Vector2) -> bool:
 
 func recibir_danio(_cantidad: int, _desde_p: Vector2, tipo: String) -> void:
 	# las semillas solo le hacen daño con los dientes clavados
-	if tipo == "explosion" and fase == Fase.ATASCADO:
+	if tipo == "explosion" and fase in [Fase.ATASCADO, Fase.SUJETO]:
 		_herir(R.MAMBA_DANIO_SEMILLA)
 
 
@@ -371,6 +403,10 @@ func _proceso_vencido() -> void:
 		modulate.a = maxf(0.0, 1.0 - (_t - 3.4) / 1.6)
 	if _t > 5.0 and is_in_group("jefes"):
 		remove_from_group("jefes")
+		if is_instance_valid(_barca):
+			var fuera := _barca.create_tween()
+			fuera.tween_property(_barca, "modulate:a", 0.0, 1.0)
+			fuera.tween_callback(_barca.queue_free)
 		if _barra:
 			_barra.call("cerrar")
 		destruido.emit()
@@ -390,7 +426,7 @@ func _animar() -> void:
 			_sprite.frame = FLOTA
 		Fase.EMBISTE:
 			_sprite.frame = EMBISTE_F
-		Fase.ATASCADO:
+		Fase.ATASCADO, Fase.SUJETO:
 			_sprite.frame = ATASCADO_F[int(_tiempo * 7.0) % 2]
 		Fase.COLETAZO:
 			_sprite.frame = COLETAZO_F
@@ -409,7 +445,7 @@ func _animar() -> void:
 
 
 func _draw() -> void:
-	if fase == Fase.ATASCADO:
+	if fase in [Fase.ATASCADO, Fase.SUJETO]:
 		# tira y se marea: estrellitas sobre la cabeza
 		for k in 3:
 			var a := _tiempo * 5.0 + k * TAU / 3.0

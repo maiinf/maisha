@@ -147,6 +147,7 @@ const MAMBA_ATASCADO := 2.4             # con los dientes clavados en un poste: 
 const MAMBA_DANIO_SEMILLA := 2
 const MAMBA_COLETAZO := 40.0            # fase 2: al soltarse del poste, el coletazo llega hasta aquí
 const MAMBA_RONDA := Vector2(150, 96)   # semiejes del círculo de agua por donde acecha
+const MAMBA_SUJETO := 2.4               # Bata lo sujeta con la pértiga contra el borde: a tiro desde la plataforma
 
 const CANGREJO_VIDA := 3
 const CANGREJO_VELOCIDAD := 46.0       # de lado (en vertical va a menos de la mitad)

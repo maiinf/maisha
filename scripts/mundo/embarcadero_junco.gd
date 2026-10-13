@@ -13,6 +13,7 @@ const CASA_SELLADA := preload("res://scripts/mundo/embarcadero/casa_sellada.gd")
 func _ready() -> void:
 	super()
 	_crear_casa_sellada()
+	_activar_darsena.call_deferred()
 	_maisha.caida.connect(_al_caer_fuera_de_zona)
 	$Corrupcion.region_purgada.connect(_al_purgar_region)
 	if not Estado.tiene("embarcadero_llegada"):
@@ -21,6 +22,9 @@ func _ready() -> void:
 
 
 func _al_poner_marca_embarcadero(marca: String) -> void:
+	if marca == "casa_bata_abierta":
+		_activar_darsena()
+		return
 	if marca != "mamba_vencido":
 		return
 	await get_tree().create_timer(6.0).timeout
@@ -43,6 +47,22 @@ func _crear_casa_sellada() -> void:
 			elif c == "}":
 				casa_sellada.sitio_bata = $Region._base(x, y)
 	add_child(casa_sellada)
+
+
+## La dársena (zona 1, la de Mamba) no despierta hasta que Bata está libre: sola, Maisha no se atreve
+func _activar_darsena() -> void:
+	for z in get_tree().get_nodes_in_group("zonas"):
+		if z.get_meta("clave", "") == "1":
+			z.activa = Estado.tiene("casa_bata_abierta")
+
+
+func _process(_delta: float) -> void:
+	if Estado.tiene("casa_bata_abierta") or Estado.tiene("darsena_vista"):
+		return
+	for z in get_tree().get_nodes_in_group("zonas"):
+		if z.get_meta("clave", "") == "1" and z.en_borde(_maisha.global_position):
+			Estado.marcar("darsena_vista")
+			CHARLA_SCRIPT.hablar(self, "embarcadero_darsena_sola")
 
 
 func _pensar_al_llegar() -> void:

@@ -13,6 +13,7 @@ Genera (en arte/mundos/raiz/embarcadero/):
                                   1 resquebrajadas
   nudo_giza.png       2 × 28×26   el nudo de Giza escondido en el almacén (late)
   saco.png            2 × 18×18   sacos de grano que lo tapan (se apartan con el Latido)
+  barca_bata.png      2 × 48×26   la barca de remos de Bata, a flote (Bata va encima en la pelea contra Mamba)
   grua.png            72×104      la grúa del muelle, rota: base de piedras, poste de tronco con tornapuntas, pluma
                                   rajada y atada, polea partida con el gancho, torno bajo un tejadillo de paja, un
                                   nido arriba; al pie, el fardo de red, un tonel y cabos
@@ -604,6 +605,31 @@ def saco(k):
     return lz.sprite(contorno=CONTORNO)
 
 
+def barca_bata(k):
+    """La barca de remos de Bata (sin Bata: él se pone encima en el juego), a flote, vista un poco desde arriba:
+    casco de tablas con la franja azul, los bancos, un farolito en la proa y las ondas. k: 0 y 1, el agua que se mueve."""
+    W, H = 48, 26
+    lz = Lienzo(W, H, s=6, semilla=381 + k)
+    TR = ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33", "#9a6544", "#b88259"]
+    lz.pintar(lz.desenfocar(lz.elipse(24, 20, 22, 3.4), 1.0), AGUA[0], 0.6)
+    casco = lz.poligono([(3, 12), (8, 21), (40, 21), (46, 10), (40, 13), (8, 13)])
+    lz.sombrear(casco, TR[1:], 3, LUZ, textura=(np.sin(lz.y * 1.7) * 0.5 + 0.5) * 0.5 + vetas(lz, 0.4, 11, True, 382) * 0.5, fuerza_tex=0.5)
+    lz.pintar(casco * (np.abs(lz.y - 16.5) < 1.0), "#4c8d8d", 0.9)
+    dentro = lz.poligono([(8, 13), (40, 13), (44, 11), (5, 11.5)])
+    lz.pintar(dentro, TR[1])
+    for x in (15, 29):
+        lz.pintar(lz.trazo([(x, 11.5), (x + 1, 13)], 1.3), TR[5])
+    lz.pintar(lz.trazo([(3, 12), (8, 13), (40, 13), (46, 10)], 0.8), TR[6])
+    lz.pintar(lz.trazo([(44, 10.5), (44, 5)], 0.4), "#1a120c")
+    farol = rect(lz, 42.8, 5, 45.2, 8)
+    lz.pintar(farol, "#f9b947")
+    lz.brillo(farol, "#fde27e", 2, 0.5)
+    for y in (21.5, 23):
+        fase = k * 1.5
+        lz.pintar(lz.trazo([(2 + fase, y), (46 - fase, y)], 0.4), AGUA[5], 0.6)
+    return lz.sprite(contorno=CONTORNO)
+
+
 def main():
     os.makedirs(SALIDA, exist_ok=True)
     tira([casa_juncos(k) for k in range(2)]).save(os.path.join(SALIDA, "casa_juncos.png"))
@@ -611,6 +637,7 @@ def main():
     tira([sello(k) for k in range(2)]).save(os.path.join(SALIDA, "sello_raices.png"))
     tira([nudo(k) for k in range(2)]).save(os.path.join(SALIDA, "nudo_giza.png"))
     tira([saco(k) for k in range(2)]).save(os.path.join(SALIDA, "saco.png"))
+    tira([barca_bata(k) for k in range(2)]).save(os.path.join(SALIDA, "barca_bata.png"))
     Image.fromarray(grua()).save(os.path.join(SALIDA, "grua.png"))
     Image.fromarray(almacen()).save(os.path.join(SALIDA, "almacen.png"))
     tira([transbordador(k) for k in range(2)]).save(os.path.join(SALIDA, "transbordador.png"))

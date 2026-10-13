@@ -2225,5 +2225,17 @@
 				]
 			}
 		]
+	},
+	"embarcadero_darsena_sola": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El agua de la dársena se mueve sola. Algo muy largo pasa por debajo de la plataforma... y vuelve.",
+					"No. Sola no. Si al menos conociera a alguien que supiera de este río..."
+				]
+			}
+		]
 	}
 }
