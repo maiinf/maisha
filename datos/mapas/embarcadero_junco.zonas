@@ -1,4 +1,4 @@
 ; zona = semieje horizontal, semieje vertical (en casillas), borde de aviso (casillas), enemigos al cerrarse[, aldeano de piedra junto a la zona][, practica | jefe:<nombre>]
-1 = 9, 6, 4, 3, bata
+1 = 9, 6, 4, 0, bata, jefe:mamba
 2 = 7, 4, 4, 3
 3 = 8, 6, 4, 3

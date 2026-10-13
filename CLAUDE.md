@@ -57,7 +57,7 @@ Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--h
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,
 Senda de los Surcos, Cañada del Eco y Orilla de Juncos hechos; faltan 3) y el misterio de los 9 ecos perdidos (6 hechos).
-El Embarcadero Junco tiene mapa, pueblo y a Bata (falta su jefe, Mamba). El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
+El Embarcadero Junco tiene mapa, pueblo, Bata y su jefe Mamba (falta arreglar el transbordador). El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
 
 ## graphify
 

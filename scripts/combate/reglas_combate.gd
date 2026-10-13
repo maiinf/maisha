@@ -139,6 +139,15 @@ const KAMBARE_DANIO_SEMILLA := 2
 const KAMBARE_ESPERA := 2.0             # nadando en la charca antes de volver a saltar
 const KAMBARE_CHORROS := 3              # fase 2: chorros de cieno en abanico
 ## Cangrejo de herrumbre (Orilla de Juncos): anda de lado; el cetro rebota salvo si está expuesto o volcado
+const MAMBA_VIDA := 10
+const MAMBA_ACECHA := 2.2               # flotando como un tronco alrededor de la plataforma
+const MAMBA_AVISO := 1.0                # la raya marca por dónde va a embestir (en la fase 2, menos)
+const MAMBA_VELOCIDAD := 300.0          # embistiendo, en línea recta
+const MAMBA_ATASCADO := 2.4             # con los dientes clavados en un poste: el cetro le quita 1 (una semilla, 2)
+const MAMBA_DANIO_SEMILLA := 2
+const MAMBA_COLETAZO := 40.0            # fase 2: al soltarse del poste, el coletazo llega hasta aquí
+const MAMBA_RONDA := Vector2(150, 96)   # semiejes del círculo de agua por donde acecha
+
 const CANGREJO_VIDA := 3
 const CANGREJO_VELOCIDAD := 46.0       # de lado (en vertical va a menos de la mitad)
 const CANGREJO_ALCANCE := 18.0         # lo cerca que pellizca

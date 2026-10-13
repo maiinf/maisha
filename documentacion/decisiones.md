@@ -54,4 +54,4 @@ se pasan.
 | Jefe de la dársena | **Mamba, el cocodrilo de herrumbre**: flota como un tronco y salta a morder la plataforma; si se le esquiva, se le clavan los dientes en un poste y el cetro le hace daño |
 | Vecino | **Bata, el pato barquero**: de piedra junto a la dársena; arregla el transbordador y abre La Travesía |
 | Hecho en este paso | Mapa, suelo, pueblo de barqueros (casas, grúa, almacén), transbordador, Bata, textos y prueba. Mamba y el arreglo del transbordador, en el paso siguiente |
-
+| Mamba hecho | Pelea con 4 postes de amarre en la plataforma, raya de aviso, coletazo en la fase 2; música y sonidos propios. Pendiente: patas más gruesas y raya del aviso más visible |

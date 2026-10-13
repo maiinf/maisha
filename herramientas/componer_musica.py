@@ -560,6 +560,7 @@ TITULOS = {
     "jefe_kambare": "Kambare, el siluro de cieno",
     "lago": "El agua que recuerda",
     "orilla": "La linterna en la orilla",
+    "jefe_mamba": "Mamba, el cocodrilo de herrumbre",
 }
 
 # =============================================================================
@@ -1156,6 +1157,41 @@ def orilla():
     return final(p, sala=3.0, mezcla=0.32, brillo=5000)
 
 
+def jefe_mamba():
+    """El tema de la barcarola, pero en menor y a golpes: el río ya no mece, muerde."""
+    tempo = Tempo(116)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    acords = [["G2", "D3", "A#3"], ["D#2", "A#2", "G3"], ["C2", "G2", "D#3"], ["D2", "A2", "F#3"]] * 2
+    for i in range(6):
+        a = acords[i % len(acords)]
+        p.poner(coro(a, tempo.s(16) + 1.0, "o", 0.65), tempo.s(i * 16), 0.45)
+        p.poner(bajo(a[0][:-1] + "1", tempo.s(16)), tempo.s(i * 16), 0.6)
+    # las mandíbulas: dos golpes secos juntos (clac-clac) y un silencio, y un taiko cuando embiste
+    for c in range(pulsos // 4):
+        base = c * 4
+        for (en, f) in ((0, 0.5), (0.5, 0.42), (2.0, 0.3), (3.0, 0.36), (3.5, 0.3)):
+            p.poner(tambor("G2", 0.4, f, golpe=0.25), tempo.s(base + en))
+        if c % 4 == 3:
+            p.poner(taiko(1.4, 0.85), tempo.s(base + 2.5))
+    # el agua: un ostinato de balafón grave en seis contra cuatro (el vaivén de la barcarola, torcido)
+    ostinato = ["G3", "A#3", "D4", "A#3", "D#4", "D4"]
+    for b in range(16, pulsos * 2):
+        p.poner(balafon(ostinato[b % 6], 0.4, 0.22), tempo.s(b * 0.5), pan=-0.3)
+    # la barcarola de la Orilla, en menor y más grave, en la flauta
+    menor = [(n.replace("B4", "A#4").replace("B5", "A#5").replace("E5", "D#5").replace("F#5", "F#5"), en, d) for (n, en, d) in TEMA_LINTERNA[:12]]
+    for vuelta in (32, 64):
+        melodia(p, tempo, [(n, en * 0.5, d * 0.5) for (n, en, d) in menor], desde=vuelta, instrumento=lambda n, d: flauta(n, d, 0.48, vibrato=5.5),
+                volumen=0.4, pan=0.25, sostener=0.95)
+        melodia(p, tempo, [(n, en * 0.5 + 12, d * 0.5) for (n, en, d) in transportar(menor, -12)], desde=vuelta, instrumento=kalimba, volumen=0.3, pan=-0.2)
+    rng = np.random.default_rng(17)
+    for k in range(12):
+        d = 0.3
+        chap = paso_banda(ruido_rosa(d), 400, 2400) * np.exp(-np.linspace(0, 6, int(d * SR)))
+        p.poner(chap * 0.25, tempo.s(rng.random() * pulsos), pan=rng.random() - 0.5)
+    return final(p, sala=2.2, mezcla=0.27, brillo=4800)
+
+
 NO_SE_REPITEN = ("raiz_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
 PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": prados, "aldea": aldea,
           "interior": interior, "combate": combate, "jefe": jefe, "purga": purga, "victoria": victoria, "objeto": objeto, "tarea": tarea,
@@ -1163,7 +1199,7 @@ PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": 
           "cienaga": cienaga, "jefe_konokono": jefe_konokono, "campo": campo, "jefe_cosechadora": jefe_cosechadora,
           "tienda": tienda, "raiz_libre": raiz_libre, "sendero": sendero, "pasarelas": pasarelas,
           "cobrizo": cobrizo, "surcos": surcos, "canada": canada, "jefe_kambare": jefe_kambare, "lago": lago,
-          "orilla": orilla}
+          "orilla": orilla, "jefe_mamba": jefe_mamba}
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

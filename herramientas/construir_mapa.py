@@ -1885,6 +1885,9 @@ def crear_embarcadero():
     for y in range(52, 61):
         for x in range(37, 52):
             poner(x, y, "=")
+    # los cuatro postes de amarre de la plataforma (Mamba se clava en ellos)
+    for (x, y) in ((40, 54), (48, 54), (40, 58), (48, 58)):
+        poner(x, y, "ł")
     for x in range(26, 37):
         for y in (56, 57):
             if m[y][x] == "~":
@@ -1979,7 +1982,7 @@ def crear_embarcadero():
     poner(23, 68, "S")
     for k, (zx_, zy_, rx_, ry_) in zonas.items():
         poner(zx_, zy_, k)
-    textos = {"1": "9, 6, 4, 3, bata", "2": "7, 4, 4, 3", "3": "8, 6, 4, 3"}
+    textos = {"1": "9, 6, 4, 0, bata, jefe:mamba", "2": "7, 4, 4, 3", "3": "8, 6, 4, 3"}
     return ["".join(f) for f in m], textos
 
 

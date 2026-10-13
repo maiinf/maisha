@@ -96,6 +96,7 @@ const FIJOS := {
 	"å": [EMBARCADERO + "grua.png", Vector2(12, 6), 10.0, 1, "embarcadero_grua", 26.0],
 	"œ": [EMBARCADERO + "almacen.png", Vector2(72, 14), 0.0, 1, "embarcadero_almacen", 40.0],
 	"ß": [EMBARCADERO + "transbordador.png", Vector2(104, 14), 0.0, 2, "embarcadero_transbordador", 56.0],
+	"ł": [EMBARCADERO + "poste.png", Vector2(12, 7), 8.0, 2],
 }
 ## La casa del viajero de cada camino («{»): [dibujo, colisión, charla al usarla, radio, hoguera]
 const CAMPAMENTOS := {
@@ -295,9 +296,13 @@ func _crear_objetos(zonas: Dictionary) -> void:
 				var variante := x * 3 + y
 				if c == "ß":
 					variante = 1 if Estado.tiene("transbordador_listo") else 0
+				elif c == "ł":
+					variante = 0                    # (los postes, enteros: Mamba los muerde)
 				var fijo := _fijo(FIJOS[c], pos + desvio, variante)
 				if c in "TtJjIdsx":
 					fijo.add_to_group("arboles")
+				elif c == "ł":
+					fijo.add_to_group("postes")
 
 			elif c == "{":
 				var casa: Array = CAMPAMENTOS.get(viajero, CAMPAMENTOS["msafiri"])

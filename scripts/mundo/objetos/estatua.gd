@@ -3,7 +3,7 @@ extends StaticBody2D
 ## Al purgar la zona, la piedra se resquebraja y el aldeano vuelve a la vida:
 ## da las gracias, se marcha a la aldea y queda la marca «rescatado_<id>».
 ## Si tiene «se_queda_en» (p. ej. Mdiria, que vive en el Lago Espejo), en vez de irse anda hasta ese sitio y se
-## queda allí como aldeano.
+## queda allí como aldeano (si está lejos, como el transbordador de Bata, se pierde de vista y aparece allí).
 
 signal rescatado
 
@@ -81,12 +81,25 @@ func despertar() -> void:
 	rescatado.emit()
 	_forma.set_deferred("disabled", true)
 	if se_queda_en != Vector2.INF:
-		# anda hasta su sitio y se queda allí, como aldeano
+		# anda hasta su sitio y se queda allí, como aldeano. Si su sitio está lejos (p. ej. Bata, que se va a su
+		# transbordador), da unos pasos hacia allí, se pierde de vista y aparece ya en su sitio.
+		var lejos := global_position.distance_to(se_queda_en) > 240.0
+		var aldeano: StaticBody2D = ALDEANO.new()
+		aldeano.id = id
+		if lejos:
+			var pasos := create_tween().set_parallel(true)
+			pasos.tween_property(self, "global_position", global_position + (se_queda_en - global_position).normalized() * 60.0, 1.2)
+			pasos.tween_property(self, "modulate:a", 0.0, 1.2).set_delay(0.3)
+			await pasos.finished
+			aldeano.position = se_queda_en - (get_parent() as Node2D).global_position
+			aldeano.modulate.a = 0.0
+			get_parent().add_child(aldeano)
+			aldeano.create_tween().tween_property(aldeano, "modulate:a", 1.0, 0.8)
+			queue_free()
+			return
 		var camino := create_tween()
 		camino.tween_property(self, "global_position", se_queda_en, global_position.distance_to(se_queda_en) / 65.0)
 		await camino.finished
-		var aldeano: StaticBody2D = ALDEANO.new()
-		aldeano.id = id
 		aldeano.position = position
 		get_parent().add_child(aldeano)
 		queue_free()

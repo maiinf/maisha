@@ -328,7 +328,9 @@ Escena `escenas/mundo/embarcadero_junco.tscn` (mapa de 96×72 casillas, `constru
 - Abajo, la **dársena**: un entrante de agua con una gran **plataforma de madera** en medio (zona 1). Allí está **Bata**, el pato barquero, de piedra (`dibujar_aldeanos.py`). Al purgar la dársena despierta y se va a su transbordador (`viajero = "bata"`, `viajero_requiere = "rescatado_bata"`). Cuenta que el transbordador llevaba las semillas a dormir el invierno a la Gruta y, tras el sexto eco, que su abuelo vio pasar una barca sin remos con una luz dentro, río arriba.
 - Tres zonas corruptas (cangrejos, petrinos y babosas) y tres secretos. Música: de momento la de la Orilla.
 - Arte: `herramientas/pintar_embarcadero.py`. Prueba: `pruebas/prueba_embarcadero_junco.gd`.
-- Falta: **Mamba, el cocodrilo de herrumbre** (el jefe de la dársena; hasta entonces la zona 1 es normal), arreglar el transbordador y la música propia.
+- **Mamba, el cocodrilo de herrumbre** (jefe de la dársena, `scripts/enemigos/mamba.gd`, dibujo `herramientas/dibujar_mamba.py`, capturas `documentacion/mamba_capturas.png`): flota como un tronco alrededor de la plataforma (en el agua no se le puede dar); avisa con una raya de por dónde va a embestir; embiste en línea recta y, si hay un **poste de amarre** (`ł`, cuatro en la plataforma) en su camino, se le clavan los dientes y queda atascado: el cetro le quita 1, una semilla 2. Fase 2: avisa más deprisa, a veces embiste dos veces y al soltarse da un coletazo en círculo. Vencido, se le cae la herrumbre y se va río abajo (marca `mamba_vencido`); entonces despierta Bata. Música propia «Mamba, el cocodrilo de herrumbre» y sonidos `mamba_*`.
+- Los vecinos con su sitio lejos (como Bata y su transbordador) dan unos pasos, se pierden de vista y aparecen allí (`estatua.gd`).
+- Falta: arreglar el transbordador (Bata pedirá brea y tablas) y la música propia del Embarcadero.
 
 ### Los ecos perdidos (el misterio de Raíz)
 

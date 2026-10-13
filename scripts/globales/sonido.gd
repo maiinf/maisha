@@ -61,6 +61,7 @@ const VOLUMEN := {
 	"murcielago_aleteo": -8.0, "cencerro": -5.0, "escala_tramo": -5.0,
 	"kambare_ruge": -1.0, "kambare_salta": -3.0, "kambare_cae": -1.0, "kambare_escupe": -4.0, "kambare_dolor": -2.0,
 	"kambare_vencido": 0.0, "cangrejo_chasca": -6.0, "cangrejo_vuelca": -4.0,
+	"mamba_ruge": -1.0, "mamba_salta": -3.0, "mamba_muerde": -1.0, "mamba_dolor": -2.0, "mamba_coletazo": -3.0, "mamba_vencido": 0.0,
 }
 ## Nivel de cada bus (0 a 10) y su volumen en dB con el nivel al máximo (la música, sutil)
 const BUSES := {"Musica": -9.0, "Ambiente": -10.0, "Efectos": -3.0}

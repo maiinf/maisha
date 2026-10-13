@@ -2,8 +2,9 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ## EMBARCADERO JUNCO: el puerto del río de Raíz, al norte de la Orilla de Juncos (se llega al escuchar el sexto eco).
 ## En la orilla del oeste, el pueblo de barqueros: casas de juncos sobre pilotes, pasarelas, un almacén y una grúa
 ## rota. Arriba, el muelle del norte con el TRANSBORDADOR varado, que un día llevaba río arriba (La Travesía, cerrada
-## hasta que vuelva a navegar). Abajo, la DÁRSENA, con su plataforma de madera; junto a ella, BATA, el pato barquero,
-## de piedra. Tres zonas corruptas y tres secretos.
+## hasta que vuelva a navegar). Abajo, la DÁRSENA, con su plataforma de madera y cuatro postes de amarre: allí
+## acecha MAMBA, el cocodrilo de herrumbre (scripts/enemigos/mamba.gd); junto a ella, BATA, el pato barquero, de piedra.
+## Tres zonas corruptas y tres secretos.
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 
@@ -14,6 +15,15 @@ func _ready() -> void:
 	$Corrupcion.region_purgada.connect(_al_purgar_region)
 	if not Estado.tiene("embarcadero_llegada"):
 		_pensar_al_llegar.call_deferred()
+	Estado.marca_puesta.connect(_al_poner_marca_embarcadero)
+
+
+func _al_poner_marca_embarcadero(marca: String) -> void:
+	if marca != "mamba_vencido":
+		return
+	await get_tree().create_timer(6.0).timeout
+	if is_inside_tree():
+		await CHARLA_SCRIPT.hablar(self, "embarcadero_mamba_libre")
 
 
 func _pensar_al_llegar() -> void:

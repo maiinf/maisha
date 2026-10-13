@@ -1624,6 +1624,72 @@ def kambare_vencido():
     return reverb(p.entera(), 1.8, 0.35)
 
 
+def mamba_ruge():
+    """Mamba: un bramido grave de cocodrilo que hace vibrar el agua (y un chirrido de hierro viejo)."""
+    p = Pista(1.8)
+    d = 1.2
+    n = _n(d)
+    f = _desliz(55, 42, d)
+    voz = (sierra(f, d) * 0.5 + seno(f * 2, d) * 0.35) * adsr(n, 0.1, 0.2, 0.7, 0.5)
+    temblor = 1 + 0.35 * np.sin(np.arange(n) / SR * 2 * np.pi * 9)
+    p.poner(paso_bajo(voz * temblor, 450) * 0.9, 0.0)
+    p.poner(paso_banda(ruido(0.5), 2500, 6000) * caida(_n(0.5), 0.2) * 0.12, 0.3)
+    for k in range(4):
+        p.poner(_chapoteo(0.1, 500, 2200, 0.3), 0.15 + k * 0.22)
+    return reverb(p.entera(), 1.2, 0.25)
+
+
+def mamba_salta():
+    """Sale del agua (o se tira): un chapuzón grande."""
+    p = Pista(0.9)
+    p.poner(_chapoteo(0.45, 250, 3200, 1.0), 0.0)
+    p.poner(paso_banda(ruido(0.35), 1800, 6000) * np.linspace(1, 0, _n(0.35)) * 0.3, 0.04)
+    return reverb(p.entera(), 0.7, 0.2)
+
+
+def mamba_muerde():
+    """Las mandíbulas se cierran en el poste: un chasquido seco y madera que cruje y se astilla."""
+    p = Pista(1.0)
+    golpe = seno(_desliz(180, 60, 0.12), 0.12) * caida(_n(0.12), 0.04)
+    p.poner(golpe * 1.0, 0.0)
+    p.poner(paso_banda(ruido(0.08), 1500, 5000) * caida(_n(0.08), 0.02) * 0.8, 0.0)
+    for k in range(5):
+        d = 0.05
+        p.poner(paso_banda(ruido(d), 800 + k * 300, 4000) * caida(_n(d), 0.015) * (0.5 - k * 0.07), 0.08 + k * 0.06)
+    return reverb(p.entera(), 0.6, 0.18)
+
+
+def mamba_dolor():
+    """Le duele: un bufido que sube, con el hierro de las placas rechinando."""
+    d = 0.5
+    n = _n(d)
+    f = _desliz(70, 130, d)
+    x = (sierra(f, d) * 0.5 + seno(f * 3, d) * 0.2) * adsr(n, 0.01, 0.1, 0.6, 0.2)
+    chirrido = paso_banda(ruido(d), 3000, 7000) * caida(n, 0.15) * 0.15
+    return reverb(paso_bajo(x, 800) * 0.9 + chirrido, 0.6, 0.2)
+
+
+def mamba_coletazo():
+    """El coletazo: un latigazo de aire y agua que barre."""
+    p = Pista(0.8)
+    d = 0.35
+    silbido = paso_banda(ruido(d), 600, 3000) * np.sin(np.linspace(0, np.pi, _n(d))) * 0.7
+    p.poner(silbido, 0.0)
+    p.poner(_chapoteo(0.3, 300, 2500, 0.6), 0.25)
+    return reverb(p.entera(), 0.6, 0.2)
+
+
+def mamba_vencido():
+    """Vencido: las placas de herrumbre caen al agua una a una y queda un borboteo tranquilo y limpio."""
+    p = Pista(3.2)
+    for k in range(8):
+        p.poner(paso_banda(ruido(0.06), 1200, 5000) * caida(_n(0.06), 0.02) * 0.4, k * 0.16)
+        p.poner(_chapoteo(0.18, 400 + k * 50, 2600, 0.5 - k * 0.04), k * 0.16 + 0.05)
+    for k, nota in enumerate(("D5", "F#5", "A5", "D6")):
+        p.poner(campanita(nota, 1.4, 0.35), 1.6 + k * 0.15)
+    return reverb(p.entera(), 1.8, 0.35)
+
+
 def cangrejo_chasca():
     """El cangrejo de herrumbre chasca las pinzas: dos clics metálicos secos, con un rechinar de óxido."""
     p = Pista(0.5)
@@ -1690,6 +1756,8 @@ EFECTOS = {
     "murcielago_aleteo": (murcielago_aleteo, 0.5), "cencerro": (cencerro, 0.6), "escala_tramo": (escala_tramo, 0.6),
     "kambare_ruge": (kambare_ruge, 0.85), "kambare_salta": (kambare_salta, 0.7), "kambare_cae": (kambare_cae, 0.9),
     "kambare_escupe": (kambare_escupe, 0.65), "kambare_dolor": (kambare_dolor, 0.8), "kambare_vencido": (kambare_vencido, 0.85),
+    "mamba_ruge": (mamba_ruge, 0.85), "mamba_salta": (mamba_salta, 0.7), "mamba_muerde": (mamba_muerde, 0.85),
+    "mamba_dolor": (mamba_dolor, 0.8), "mamba_coletazo": (mamba_coletazo, 0.7), "mamba_vencido": (mamba_vencido, 0.85),
     "cangrejo_chasca": (cangrejo_chasca, 0.55), "cangrejo_vuelca": (cangrejo_vuelca, 0.65),
 }
 

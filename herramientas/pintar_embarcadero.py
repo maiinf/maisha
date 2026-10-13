@@ -10,6 +10,8 @@ Genera (en arte/mundos/raiz/embarcadero/):
                                   partida, la cuerda colgando y el gancho; un fardo caído al pie
   almacen.png         88×64       el almacén: un cobertizo largo de tablas con tejado de juncos, el portón abierto
                                   y, delante, barriles, cajas y sacos
+  poste.png           2 × 22×44   un poste de amarre de la dársena (alto, de madera clara, con anillo de cuerda): 0 entero,
+                                  1 mordido por Mamba (con las marcas de los dientes y astillas)
   transbordador.png   2 × 120×60  el TRANSBORDADOR: una barcaza grande y plana con barandilla, una caseta para el
                                   barquero, una campana y una pértiga larga. 0 varado (escorado, con un boquete en
                                   el casco y algas), 1 arreglado y a flote
@@ -275,12 +277,41 @@ def transbordador(k):
     return lz.sprite(contorno=CONTORNO)
 
 
+def poste(k):
+    """Un poste de amarre alto y gordo, de madera clara gastada por el sol (para que se vea bien sobre la plataforma
+    oscura: es donde Mamba se clava), con un anillo de cuerda clara y la cabeza redondeada."""
+    W, H = 22, 44
+    lz = Lienzo(W, H, s=8, semilla=341 + k)
+    claro = ["#4a3a2a", "#6e5a40", "#8e7656", "#ae9670", "#c8b28a", "#e2d0a8"]
+    lz.pintar(lz.desenfocar(lz.elipse(11, 41, 9, 2.4), 0.6), "#0e0c0a", 0.55)
+    tronco = rect(lz, 5, 8, 17, 41)
+    lz.sombrear(tronco, claro, 6, LUZ, textura=vetas(lz, 0.5, 9, False, 342), fuerza_tex=0.5)
+    lz.pintar(tronco * ((lz.x % 3.2) < 0.35), claro[1], 0.5)                         # las grietas de la madera
+    lz.sombrear(lz.elipse(11, 8, 6, 2.4), claro[2:], 2, LUZ)                         # la cabeza, redondeada
+    for r in (4.2, 2.8, 1.4):
+        lz.pintar(np.clip(lz.elipse(11, 8, r, r * 0.4) - lz.elipse(11, 8, r - 0.45, r * 0.4 - 0.18), 0, 1), claro[1], 0.7)
+    for y in (16, 19):                                                                # el anillo de cuerda, claro
+        lz.pintar(lz.trazo([(4.6, y), (17.4, y + 0.7)], 1.1), "#e8d8a8")
+        lz.pintar(lz.trazo([(4.6, y + 0.6), (17.4, y + 1.3)], 0.4), "#8a7048")
+    lz.pintar(lz.trazo([(16.5, 20), (19, 26), (18, 31)], 0.6), "#e8d8a8")             # el cabo que cuelga
+    lz.pintar(rect(lz, 5, 35, 17, 41), "#3e5a34", 0.5)                               # el verdín del pie
+    if k == 1:
+        # las marcas de los dientes, en dos filas, y astillas levantadas
+        for j in range(5):
+            for fila in (24, 30):
+                lz.pintar(lz.poligono([(5.6 + j * 2.4, fila), (6.6 + j * 2.4, fila + 2.2), (7.6 + j * 2.4, fila)]), "#1a120c")
+        for (x, y) in ((4.5, 27), (17.5, 29), (17, 23)):
+            lz.pintar(lz.trazo([(x, y), (x + (-2 if x < 11 else 2), y - 2.5)], 0.5), claro[5])
+    return lz.sprite(contorno=CONTORNO)
+
+
 def main():
     os.makedirs(SALIDA, exist_ok=True)
     tira([casa_juncos(k) for k in range(2)]).save(os.path.join(SALIDA, "casa_juncos.png"))
     Image.fromarray(grua()).save(os.path.join(SALIDA, "grua.png"))
     Image.fromarray(almacen()).save(os.path.join(SALIDA, "almacen.png"))
     tira([transbordador(k) for k in range(2)]).save(os.path.join(SALIDA, "transbordador.png"))
+    tira([poste(k) for k in range(2)]).save(os.path.join(SALIDA, "poste.png"))
     print("Objetos del Embarcadero Junco en", SALIDA)
 
 

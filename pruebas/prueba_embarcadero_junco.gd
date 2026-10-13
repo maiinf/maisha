@@ -1,7 +1,7 @@
 extends Node
 ## Prueba automática del Embarcadero Junco: se sube desde la Orilla de Juncos tras el sexto eco; el pueblo de barqueros
-## (casas de juncos, grúa, almacén), el transbordador varado, las zonas y los secretos, Bata de piedra junto a la
-## dársena (despierta al purgarla y se va a su transbordador) y el paso de La Travesía, aún cerrado.
+## (casas de juncos, grúa, almacén), el transbordador varado, las zonas y los secretos, Mamba, el cocodrilo de
+## herrumbre (se clava en los postes), Bata de piedra junto a la dársena (despierta y se va a su transbordador) y el paso de La Travesía, aún cerrado.
 ## Se ejecuta sin abrir el editor:  godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_embarcadero_junco
 
 var _fallos := 0
@@ -135,7 +135,44 @@ func _ready() -> void:
 	for z in get_tree().get_nodes_in_group("zonas"):
 		if z.get_meta("clave") == "1":
 			darsena = z
-	darsena._al_romper_nucleo()
+	_comprobar(darsena.jefe == "mamba", "en la dársena vive Mamba, el cocodrilo de herrumbre")
+	var postes := get_tree().get_nodes_in_group("postes")
+	_comprobar(postes.size() == 4, "cuatro postes de amarre en la plataforma")
+
+	print("Mamba, el cocodrilo de herrumbre:")
+	var maisha := _maisha()
+	maisha.global_position = darsena.global_position + Vector2(0, 20)
+	await _esperar(1.0)
+	var mamba: Node2D = get_tree().get_first_node_in_group("jefes")
+	_comprobar(mamba != null and mamba.fase != mamba.Fase.DORMIDO, "al pisar la plataforma se cierra la zona y Mamba sale del agua")
+	_comprobar(Sonido.musica_actual == "jefe_mamba", "con su propia música")
+	for i in 60:
+		await _esperar(0.1)
+		if mamba.fase == mamba.Fase.ACECHA:
+			break
+	_comprobar(mamba.fase == mamba.Fase.ACECHA and mamba.global_position.distance_to(darsena.global_position) > 90.0, "acecha en el agua, alrededor de la plataforma")
+	_comprobar(not mamba.recibir_golpe(1, Vector2.RIGHT), "en el agua, el cetro no le hace nada")
+	# cuando avisa, Maisha se pone detrás del poste que tiene más cerca (el poste entre ella y Mamba)
+	for i in 80:
+		await _esperar(0.05)
+		if mamba.fase == mamba.Fase.AVISA:
+			break
+	_comprobar(mamba.fase == mamba.Fase.AVISA, "se para y avisa: una raya marca por dónde va a embestir")
+	var poste: Node2D = postes[0]
+	for pt in postes:
+		if (pt as Node2D).global_position.distance_to(mamba.global_position) < poste.global_position.distance_to(mamba.global_position):
+			poste = pt
+	maisha.global_position = poste.global_position + (poste.global_position - mamba.global_position).normalized() * 26.0
+	for i in 80:
+		await _esperar(0.05)
+		if mamba.fase in [mamba.Fase.ATASCADO, mamba.Fase.AL_AGUA]:
+			break
+	_comprobar(mamba.fase == mamba.Fase.ATASCADO, "embiste... y se le clavan los dientes en el poste")
+	var vida: int = mamba.vida
+	_comprobar(mamba.recibir_golpe(1, Vector2.RIGHT) and mamba.vida == vida - 1, "atascado, el cetro le quita 1")
+	mamba.vida = 1
+	mamba.recibir_golpe(1, Vector2.RIGHT)
+	_comprobar(mamba.fase == mamba.Fase.VENCIDO and Estado.tiene("mamba_vencido"), "vencido: se le cae la herrumbre")
 	var bata: Node2D = null
 	for i in 60:
 		await _esperar(0.3)
@@ -145,7 +182,8 @@ func _ready() -> void:
 				bata = n
 		if bata:
 			break
-	_comprobar(Estado.tiene("rescatado_bata"), "al purgar la dársena, Bata vuelve a la vida")
+	_comprobar(darsena.estado == darsena.Estado.PURGADA, "Mamba se va nadando y la dársena queda purgada")
+	_comprobar(Estado.tiene("rescatado_bata"), "Bata vuelve a la vida")
 	var sitio := Vector2(region.get("_sitio_viajero"))
 	_comprobar(bata != null and bata.global_position.distance_to(sitio) < 4.0, "y se va a su transbordador, en vez de a la aldea")
 	await _leer_dialogo()

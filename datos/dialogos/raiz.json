@@ -2138,5 +2138,18 @@
 				]
 			}
 		]
+	},
+	"embarcadero_mamba_libre": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Las placas de hierro se le han caído al agua una a una. Debajo, Mamba es verde y bronce, y mucho más pequeño de lo que parecía.",
+					"Se ha quedado un momento flotando junto al muelle, mirándome con un ojo. Luego se ha ido río abajo, despacio, como un tronco de verdad.",
+					"Creo que solo quería que lo dejaran tranquilo en su dársena. Como antes."
+				]
+			}
+		]
 	}
 }
