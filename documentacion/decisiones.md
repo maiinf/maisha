@@ -90,3 +90,12 @@ se pasan.
 | Bocetos | A «la bolsa» (mochila + lista + descripción), B libro de borde a borde, C casillas |
 | Elegido | ⭐ A: mochila grande con 5 bolsillos a la izquierda, lista grande a la derecha, descripción abajo; Mapa y Habilidades a pantalla entera |
 | Orden siguiente | Rangos y enemigos nuevos (mago, bruja) → Paso de Piedra (casa abandonada) → construcciones antiguas → diálogos antiguos |
+
+### Enemigos nuevos y rangos (13-10)
+| Qué | Decisión |
+| --- | --- |
+| Mago | **Bundi, el búho-mago**: se esfuma si te acercas, lanza bolas que persiguen; el escudo se las devuelve |
+| Bruja | **Buibui, la araña-bruja**: invoca bichos de óxido (mende) desde su nido; una semilla se lo sella |
+| Dónde | Bundi en el Bosque Cobrizo y la Cañada; Buibui en el Camino Cobrizo y el Campo Segado (la Gruta no tiene zonas normales) |
+| Rango | Bronce/plata/oro por cuántos vences (10/30/60); jefes por golpes encajados (cualquiera/≤3/0). Plata da 2 cristales y el secreto; oro, 4 |
+| Bestiario | 6.º bolsillo del diario, con medallas, fichas y «???» para los que no has vencido |

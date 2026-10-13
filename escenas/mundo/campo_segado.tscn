@@ -34,7 +34,7 @@ densidad_decorado = 0.12
 nombre_region = "Campo Segado"
 entidades = NodePath("../Entidades")
 textos_carteles = Array[String](["↓ Cuna de Musgo"])
-tipos_enemigo = PackedStringArray("jabali", "babosa", "petrino")
+tipos_enemigo = PackedStringArray("jabali", "babosa", "petrino", "buibui")
 
 [node name="Ambiente" type="Node2D" parent="." groups=["ambiente"]]
 z_index = 3

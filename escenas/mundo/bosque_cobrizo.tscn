@@ -34,7 +34,7 @@ densidad_decorado = 0.18
 nombre_region = "Bosque Cobrizo"
 entidades = NodePath("../Entidades")
 textos_carteles = Array[String](["↓ Prados del Eco"])
-tipos_enemigo = PackedStringArray("jabali", "petrino")
+tipos_enemigo = PackedStringArray("jabali", "petrino", "bundi")
 
 [node name="Ambiente" type="Node2D" parent="." groups=["ambiente"]]
 z_index = 3

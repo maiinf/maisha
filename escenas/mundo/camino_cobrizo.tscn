@@ -34,7 +34,7 @@ densidad_decorado = 0.28
 nombre_region = "Camino Cobrizo"
 entidades = NodePath("../Entidades")
 textos_carteles = Array[String](["↑ Bosque Cobrizo", "→ Madriguera de Fuko", "↓ Prados del Eco"])
-tipos_enemigo = PackedStringArray("topo", "petrino", "topo")
+tipos_enemigo = PackedStringArray("topo", "petrino", "buibui")
 viajero = "fuko"
 objeto_encargo = "campanilla"
 

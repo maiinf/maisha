@@ -164,6 +164,8 @@ func _herir(cuanto: int) -> void:
 
 
 func morir() -> void:
+	if is_in_group("enemigos"):
+		Bestiario.vencido("anguila", self)
 	remove_from_group("enemigos")
 	remove_from_group("golpeables")
 	remove_from_group("daniables")

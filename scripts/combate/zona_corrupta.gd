@@ -30,7 +30,8 @@ const JEFES := {"mzizi": preload("res://scripts/enemigos/mzizi.gd"), "pembe": pr
 const ENEMIGOS := {"petrino": preload("res://scripts/enemigos/petrino.gd"), "jabali": preload("res://scripts/enemigos/jabali.gd"),
 	"babosa": preload("res://scripts/enemigos/babosa.gd"), "rana": preload("res://scripts/enemigos/rana.gd"),
 	"topo": preload("res://scripts/enemigos/topo.gd"), "cuervo": preload("res://scripts/enemigos/cuervo.gd"),
-	"murcielago": preload("res://scripts/enemigos/murcielago.gd"), "cangrejo": preload("res://scripts/enemigos/cangrejo.gd")}
+	"murcielago": preload("res://scripts/enemigos/murcielago.gd"), "cangrejo": preload("res://scripts/enemigos/cangrejo.gd"),
+	"bundi": preload("res://scripts/enemigos/bundi.gd"), "buibui": preload("res://scripts/enemigos/buibui.gd")}
 const SOMBRA_GIZA := Color(0.10, 0.05, 0.14)
 const LUZ_GIZA := Color("a855d6")
 const LUZ_VIDA := Color("fff3c4")
@@ -261,6 +262,10 @@ func _cerrar() -> void:
 	Sonido.musica(_musica_de_jefe() if jefe != "" else "combate", 0.8)
 	_invocar = R.NUCLEO_INVOCA_CADA
 	if jefe != "":
+		# el Bestiario cuenta los golpes que se lleva Maisha en la pelea (para el rango del jefe)
+		Bestiario.empezar_jefe(jefe)
+		if _maisha and _maisha.has_signal("herida") and not _maisha.is_connected("herida", Bestiario.al_herir):
+			_maisha.connect("herida", Bestiario.al_herir)
 		_nucleo.call("despertar")
 		return
 	mensaje.emit("¡Las raíces de piedra te encierran! Rompe el Corazón de Giza con semillas")
@@ -326,7 +331,10 @@ func _al_romper_nucleo() -> void:
 	_cambiar(Estado.PURGANDO)
 	Sonido.efecto("ola_purga")
 	mensaje.emit("¡Zona purgada!")
+	if jefe != "":
+		Bestiario.jefe_vencido(jefe)
 	for e in get_tree().get_nodes_in_group("enemigos"):
+		e.set_meta("sin_contar", true)          # (los que se desmoronan con la purga no cuentan en el Bestiario)
 		e.call("morir")
 	var t := create_tween()
 	t.tween_method(_poner_radio_purga, 0.0, 1.0 + ancho_borde / radios_umbral.x + 0.1, 2.4).set_trans(Tween.TRANS_SINE)

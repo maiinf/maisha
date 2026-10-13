@@ -192,6 +192,7 @@ func morir() -> void:
 	if _muriendo:
 		return
 	_muriendo = true
+	Bestiario.vencido("petrino", self)
 	Sonido.efecto("petrino_muere", 0.0, global_position)
 	Impacto.temblar(1.2, 0.12)
 	remove_from_group("enemigos")

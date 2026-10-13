@@ -18,7 +18,7 @@ Genera en arte/interfaz/diario/:
   bolsa_fondo.png    640×360   el diario a pantalla completa (como la bolsa de Pokémon Platino): cielo de noche y
                                tres marcos con filigrana (la mochila, la lista y la descripción; BOLSA_R...)
   bolsa_fondo_pleno.png        el mismo cielo, sin marcos (para el Mapa y las Habilidades)
-  mochila.png        5 × 160×160 la mochila grande de Maisha: el bolsillo elegido brilla y asoma lo que guarda
+  mochila.png        6 × 160×160 la mochila grande de Maisha: el bolsillo elegido brilla y asoma lo que guarda
   arbol_ramas.png    640×360   el árbol de habilidades (pestaña Habilidades): el tronco de raíz dorada en el lomo y
                                las tres ramas (Raíz a la izquierda, Cetro hacia arriba, Aliento a la derecha), con
                                corteza, vetas de luz y hojitas; y dos ramitas dormidas, plateadas, hacia Runa y Tierra.
@@ -442,9 +442,9 @@ def bolsa_fondo(con_marcos=True):
 
 def mochila(k):
     """La mochila de Maisha, grande (la de la bolsa): de cuero, con la solapa de hojas, hebillas de latón, un farolito
-    colgado y cinco bolsillos. k (0-4) es el bolsillo elegido: brilla y asoma lo que guarda (0 misiones: un rollo de
+    colgado y cinco bolsillos. k (0-5) es el bolsillo elegido: brilla y asoma lo que guarda (0 misiones: un rollo de
     papel con sello; 1 objetos: el cetro; 2 habilidades: un brote; 3 mapa: un mapa doblado; 4 lazos: un colgante de
-    corazón)."""
+    corazón; 5 bestiario: una pluma de búho)."""
     W, H = 160, 160
     lz = Lienzo(W, H, s=4, semilla=611 + k)
     CUERO = ["#1e0e06", "#341a0c", "#4e2a14", "#6e3e20", "#8e5630", "#ae7040", "#c98a54"]
@@ -463,7 +463,7 @@ def mochila(k):
             if j % 2 == 0:
                 lz.pintar(lz.circulo(q[0], q[1], 0.6), "#d6b46e", 0.8)
     # los cinco bolsillos: dos a los lados, uno grande delante, uno pequeño arriba, uno en la solapa
-    sitios = {0: (40, 112, 18, 24), 1: (80, 118, 26, 22), 2: (120, 112, 18, 24), 3: (60, 74, 0, 0), 4: (102, 76, 0, 0)}
+    sitios = {0: (40, 112, 18, 24), 1: (80, 118, 26, 22), 2: (120, 112, 18, 24), 3: (60, 74, 0, 0), 4: (102, 76, 0, 0), 5: (40, 112, 18, 24)}
     for i, (x, y, rx, ry) in sitios.items():
         if rx == 0:
             continue
@@ -508,6 +508,12 @@ def mochila(k):
         lz.sombrear(mapa, ["#a08a5a", "#c8b080", "#e2cea0", "#f4e4c0"], 3, LUZ)
         lz.pintar(lz.trazo([(54, 52), (62, 58), (70, 50)], 0.6) * mapa, "#8c281e", 0.8)
         lz.pintar(lz.trazo([(62, 44), (63, 66)], 0.4), "#8a7450", 0.8)
+    elif k == 5:                                                 # una pluma de búho (la del Bestiario)
+        pluma = lz.trazo(lz.curva((36, 104), (30, 80), (44, 60), n=20), 1.0, 5.0)
+        pluma = np.maximum(pluma, lz.elipse(41, 70, 4.5, 11, 25))
+        lz.sombrear(pluma, ["#3a2a50", "#5c4680", "#8a72b0", "#b9a6d6", "#e9dcff"], 3, LUZ,
+                    textura=((lz.y - lz.x * 0.5) % 2.2 < 0.8) * 1.0, fuerza_tex=0.35)
+        lz.pintar(lz.trazo(lz.curva((36, 104), (32, 84), (43, 60), n=20), 0.5), "#e9dcff", 0.8)
     else:                                                        # un colgante de corazón
         lz.pintar(lz.trazo(lz.curva((92, 40), (102, 60), (112, 40), n=12), 0.5), "#d4ac4a")
         corazon = np.maximum(lz.circulo(100, 62, 4), lz.circulo(106, 62, 4))
@@ -528,8 +534,8 @@ def main():
     Image.fromarray(arbol_ramas(), "RGBA").save(os.path.join(SALIDA, "arbol_ramas.png"))
     Image.fromarray(bolsa_fondo(True), "RGBA").save(os.path.join(SALIDA, "bolsa_fondo.png"))
     Image.fromarray(bolsa_fondo(False), "RGBA").save(os.path.join(SALIDA, "bolsa_fondo_pleno.png"))
-    tiras = [mochila(k) for k in range(5)]
-    hoja = np.zeros((160, 800, 4), np.uint8)
+    tiras = [mochila(k) for k in range(6)]
+    hoja = np.zeros((160, 960, 4), np.uint8)
     for i, t in enumerate(tiras):
         hoja[:, i * 160:(i + 1) * 160] = t
     Image.fromarray(hoja, "RGBA").save(os.path.join(SALIDA, "mochila.png"))

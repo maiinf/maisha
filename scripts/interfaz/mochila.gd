@@ -76,11 +76,11 @@ const APAGADO := Color("c9b07e")
 const AMBAR := Color("e6a852")
 const VERDE := Color("6fcf4f")
 const CAJA := Rect2(24, 22, 592, 316)
-const PESTANAS := ["Misiones", "Objetos", "Habilidades", "Mapa", "Lazos"]
+const PESTANAS := ["Misiones", "Objetos", "Habilidades", "Mapa", "Lazos", "Bestiario"]
 const ICONOS_PESTANA := preload("res://arte/interfaz/pestanas.png")
-enum { P_MISIONES, P_OBJETOS, P_HABILIDADES, P_MAPA, P_LAZOS }
+enum { P_MISIONES, P_OBJETOS, P_HABILIDADES, P_MAPA, P_LAZOS, P_BESTIARIO }
 ## Teclas de acceso directo a cada pestaña
-const ATAJOS := {KEY_1: 0, KEY_2: 1, KEY_3: 2, KEY_4: 3, KEY_5: 4, KEY_M: 3}
+const ATAJOS := {KEY_1: 0, KEY_2: 1, KEY_3: 2, KEY_4: 3, KEY_5: 4, KEY_6: 5, KEY_M: 3}
 ## Cuánto hay que mantener Tab para que salga la rueda (segundos)
 const ESPERA_RUEDA := 0.28
 ## Los colores de lo que se escribe en las páginas de noche (el cielo es oscuro: letras claras)
@@ -373,8 +373,9 @@ func cerrar() -> void:
 # --- Rueda rápida ----------------------------------------------------------------------
 
 ## Ángulo (en la pantalla) de cada pestaña en la rueda: Misiones arriba y el resto en el sentido del reloj
+## Las casillas de la rueda, como un reloj: Objetos (la segunda) queda justo a la derecha
 func _angulo_rueda(i: int) -> float:
-	return -PI / 2.0 + TAU * i / PESTANAS.size()
+	return TAU * (i - 1) / PESTANAS.size()
 
 
 func _mover_rueda() -> void:
@@ -454,6 +455,15 @@ func _lista() -> Array:
 			for z in LAZOS:
 				if Estado.tiene(z[2]):
 					filas.append({"nombre": z[1], "retrato": z[0], "texto": z[3]})
+		P_BESTIARIO:
+			# todos, en orden; los que aún no has vencido salen como «???»
+			for tipo in Bestiario.FICHAS:
+				var conocido := Bestiario.conocido(tipo)
+				var fila := {"nombre": String(Bestiario.FICHAS[tipo]["nombre"]) if conocido else "???", "bestia": tipo,
+					"rango": Bestiario.rango(tipo), "apagada": not conocido, "texto": ""}
+				if conocido and not Bestiario.es_jefe(tipo):
+					fila["cantidad"] = Bestiario.cuantos(tipo)
+				filas.append(fila)
 	return filas
 
 
@@ -567,14 +577,14 @@ func _dibujar_bolsa(tinta: float) -> void:
 	# los bolsillos
 	var y := BOLSA.end.y - 38
 	for k in PESTANAS.size():
-		var r := Rect2(BOLSA.get_center().x - 83 + k * 34, y, 30, 26)
+		var r := Rect2(BOLSA.get_center().x - PESTANAS.size() * 15.5 + k * 31, y, 28, 26)
 		var elegido := k == pestana
 		_lienzo.draw_rect(r, Color(0.28, 0.2, 0.08, 0.95 * tinta) if elegido else Color(0.08, 0.08, 0.16, 0.9 * tinta))
 		_lienzo.draw_rect(r, Color(TN_TITULO if elegido else TN_APAGADA, (1.0 if elegido else 0.5) * tinta), false, 1.5 if elegido else 1.0)
-		_icono_pestana(k, r.position + Vector2(7, 5), 1.0, Color(1, 1, 1, tinta * (1.0 if elegido else 0.6)))
+		_icono_pestana(k, r.position + Vector2(6, 5), 1.0, Color(1, 1, 1, tinta * (1.0 if elegido else 0.6)))
 	# las flechitas de los lados
 	for lado in [-1.0, 1.0]:
-		var p := Vector2(BOLSA.get_center().x + lado * 94, y + 13) + Vector2(lado * sin(_tiempo * 4.0) * 1.5, 0)
+		var p := Vector2(BOLSA.get_center().x + lado * 102, y + 13) + Vector2(lado * sin(_tiempo * 4.0) * 1.5, 0)
 		_lienzo.draw_colored_polygon(PackedVector2Array([p + Vector2(-lado * 4, -5), p + Vector2(lado * 4, 0), p + Vector2(-lado * 4, 5)]), Color(TN_TITULO, tinta))
 
 
@@ -662,6 +672,9 @@ func _dibujar_paginas(tinta: float) -> void:
 		if f.has("icono"):
 			_icono(f["icono"], Vector2(tx, y + 5))
 			tx += 24
+		if f.has("rango"):
+			_medalla(Vector2(tx + 7, y + 13), int(f["rango"]), tinta)
+			tx += 20
 		if f.has("retrato"):
 			var t := _cargar_retrato(f["retrato"])
 			var ancho_t := t.get_width()
@@ -697,6 +710,9 @@ func _dibujar_paginas(tinta: float) -> void:
 	var detalle := Rect2(DESC.position + Vector2(20, 12), DESC.size - Vector2(40, 30))
 	if f.has("mision"):
 		_detalle_mision(f["mision"], detalle, f.get("id", "") == seguida)
+		return
+	if f.has("bestia"):
+		_detalle_bestia(String(f["bestia"]), detalle)
 		return
 	var dx := detalle.position.x
 	if f.has("icono"):
@@ -789,6 +805,69 @@ func _detalle_mision(m: Dictionary, caja: Rect2, es_seguida: bool) -> void:
 	var premio := String(m.get("premio", ""))
 	if premio != "":
 		_parrafo("Recompensa: " + premio, Vector2(x2, maxf(y2 + 4, caja.end.y - 26)), ancho2, TN_VERDE if Misiones.estado(m) == "hecha" else TN_ROJO, 15.0)
+
+
+## Una medalla de rango: un círculo con el color del rango (gris si aún no tiene) y un brillo
+func _medalla(c: Vector2, rango: int, tinta := 1.0) -> void:
+	var color: Color = Bestiario.COLOR_RANGO[rango]
+	_lienzo.draw_circle(c + Vector2(0, 1), 6.0, Color(0, 0, 0, 0.5 * tinta))
+	_lienzo.draw_circle(c, 6.0, Color(color.darkened(0.45), tinta))
+	_lienzo.draw_circle(c, 4.5, Color(color, tinta * (1.0 if rango > 0 else 0.4)))
+	if rango > 0:
+		_lienzo.draw_circle(c + Vector2(-1.5, -1.5), 1.5, Color(1, 1, 1, 0.7 * tinta))
+		# las estrellitas: una por rango
+		for k in rango:
+			_lienzo.draw_rect(Rect2(c + Vector2(-3 + k * 3, 7), Vector2(2, 2)), Color(color, tinta))
+
+
+## La ficha de un enemigo del Bestiario: el dibujo grande, dónde vive, cómo es, cuántos llevas y el secreto (con plata)
+func _detalle_bestia(tipo: String, caja: Rect2) -> void:
+	var ficha: Dictionary = Bestiario.FICHAS[tipo]
+	var conocido := Bestiario.conocido(tipo)
+	var rango := Bestiario.rango(tipo)
+	# el dibujo, en un marco (en sombra si aún no lo conoces)
+	var marco := Rect2(caja.position + Vector2(4, 4), Vector2(84, 84))
+	_lienzo.draw_rect(marco, Color(0.05, 0.05, 0.1, 0.9))
+	_lienzo.draw_rect(marco, Color(Bestiario.COLOR_RANGO[rango], 0.8), false, 2.0)
+	var d: Array = ficha["dibujo"]
+	if not _retratos.has(d[0]):
+		_retratos[d[0]] = load(String(d[0]))
+	var t: Texture2D = _retratos[d[0]]
+	var fw := t.get_width() / int(d[1])
+	var fh := t.get_height() / int(d[2])
+	var esc := minf(76.0 / fw, 76.0 / fh)
+	esc = floorf(esc) if esc >= 1.0 else esc
+	var tam := Vector2(fw, fh) * esc
+	_lienzo.draw_texture_rect_region(t, Rect2(marco.get_center() - tam / 2.0, tam), Rect2(int(d[3]) * fw, 0, fw, fh),
+		Color.WHITE if conocido else Color(0, 0, 0, 0.85))
+	var x := marco.end.x + 16
+	var ancho := caja.end.x - x - 4
+	if not conocido:
+		_texto("???", Vector2(x, caja.position.y + 22), TN_TITULO, -1, 20)
+		_parrafo("Aún no lo has vencido. Dicen que anda por: " + String(ficha["donde"]) + ".", Vector2(x, caja.position.y + 48), ancho, TN_APAGADA, 19.0)
+		return
+	_texto(String(ficha["nombre"]), Vector2(x, caja.position.y + 18), TN_TITULO, -1, 20)
+	if not Bestiario.es_jefe(tipo):
+		# cuántos lleva y cuántos faltan para el siguiente rango, arriba a la derecha
+		var n := Bestiario.cuantos(tipo)
+		var u := Bestiario.umbrales(tipo)
+		var cuenta := "%d vencidos" % n
+		if rango < 3:
+			cuenta += " · %s con %d" % [String(Bestiario.NOMBRE_RANGO[rango + 1]), int(u[rango])]
+		_texto(cuenta, Vector2(caja.end.x - 4 - _fuente.get_string_size(cuenta, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x, caja.position.y + 18), TN_SUAVE, -1, 13)
+	var linea := String(ficha["donde"])
+	if rango > 0:
+		linea += " · rango de " + String(Bestiario.NOMBRE_RANGO[rango])
+	_texto(linea, Vector2(x, caja.position.y + 34), Bestiario.COLOR_RANGO[rango] if rango > 0 else TN_SUAVE, -1, 14)
+	var y := _parrafo(String(ficha["texto"]), Vector2(x, caja.position.y + 52), ancho, TN_TINTA, 15.0)
+	if rango >= 2:
+		_parrafo("Secreto: " + String(ficha["secreto"]), Vector2(x, y + 2), ancho, TN_VERDE, 15.0)
+	else:
+		var pista := "Secreto: se descubre con el rango de plata."
+		if Bestiario.es_jefe(tipo):
+			pista = "Plata: vencerlo dejándote dar 3 veces o menos. Oro: sin que te den."
+		_parrafo(pista, Vector2(x, y + 2), ancho, TN_APAGADA, 15.0)
+
 
 
 func _cargar_retrato(id: String) -> Texture2D:

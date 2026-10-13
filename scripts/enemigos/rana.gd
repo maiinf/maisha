@@ -230,6 +230,7 @@ func morir() -> void:
 	if _muriendo:
 		return
 	_muriendo = true
+	Bestiario.vencido("rana", self)
 	Sonido.efecto("petrino_muere", 0.0, global_position)
 	remove_from_group("enemigos")
 	remove_from_group("daniables")

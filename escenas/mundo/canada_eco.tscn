@@ -34,7 +34,7 @@ densidad_decorado = 0.22
 nombre_region = "Cañada del Eco"
 entidades = NodePath("../Entidades")
 textos_carteles = Array[String](["↑ Aprisco de Mbuzi", "→ Bosque Cobrizo", "← Lago Espejo"])
-tipos_enemigo = PackedStringArray("murcielago", "petrino", "murcielago")
+tipos_enemigo = PackedStringArray("murcielago", "petrino", "bundi")
 viajero = "mbuzi"
 objeto_encargo = "cencerro"
 

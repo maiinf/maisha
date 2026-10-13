@@ -13,7 +13,9 @@
 		{"prefijo": "zona/bosque_cobrizo/4", "cristales": 3, "motivo": "Pembe"},
 		{"prefijo": "zona/cienaga_quieta/4", "cristales": 3, "motivo": "Konokono"},
 		{"prefijo": "zona/campo_segado/3", "cristales": 5, "motivo": "La Cosechadora"},
-		{"prefijo": "secreto/", "cristales": 1, "motivo": "Secreto"}
+		{"prefijo": "secreto/", "cristales": 1, "motivo": "Secreto"},
+		{"prefijo": "rango/plata/", "cristales": 2, "motivo": "Rango de plata"},
+		{"prefijo": "rango/oro/", "cristales": 4, "motivo": "Rango de oro"}
 	],
 	"articulos": [
 		{"id": "ingredientes", "nombre": "Bayas y junco", "tipo": "objeto", "precio": 2, "icono": 17, "repetible": true,

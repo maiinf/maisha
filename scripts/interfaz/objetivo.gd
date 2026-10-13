@@ -48,6 +48,13 @@ func _ready() -> void:
 	Misiones.paso_cumplido.connect(_al_cumplir_paso)
 	Artes.esencia_ganada.connect(_al_ganar_esencia)
 	Tienda.cristales_ganados.connect(_al_ganar_cristales)
+	Bestiario.rango_nuevo.connect(_al_subir_rango)
+
+
+func _al_subir_rango(tipo: String, rango: int) -> void:
+	var nombre := String(Bestiario.FICHAS.get(tipo, {}).get("nombre", tipo))
+	_avisos.append({"titulo": "Bestiario: rango de " + String(Bestiario.NOMBRE_RANGO[rango]), "texto": nombre,
+		"color": Bestiario.COLOR_RANGO[rango], "sonido": "rango_nuevo"})
 
 
 func _al_ganar_esencia(n: int, motivo: String) -> void:

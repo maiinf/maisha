@@ -30,6 +30,7 @@ Godot está en `/Applications/Godot.app/Contents/MacOS/Godot` (versión 4.7).
 | Suelo pintado de un mapa | `pintar_suelo.py` (lo llama `construir_mapa.py`) |
 | Mapas (texto → JSON + suelo + zonas) | `construir_mapa.py <mapa> [--crear]` (con `--crear` se rehace el mapa y **se sobrescribe**) |
 | Aldeanos (24×32, frente) | `dibujar_aldeanos.py` |
+| Enemigos hechiceros (búho-mago, araña-bruja) | `pintar_hechiceros.py` |
 | Objetos y enemigos de cada camino | `pintar_sendero.py`, `pintar_pasarelas.py`, `pintar_camino.py`, `pintar_senda.py`, `pintar_canada.py`, `pintar_orilla.py`, `pintar_lago.py`, `pintar_embarcadero.py`, `pintar_travesia.py`, `pintar_gruta.py` |
 | Ilustraciones de la historia (600×256) | `cinematicas.py <nombre>` (y `cinematicas_*.py`) |
 | Efectos y ambientes | `crear_sonidos.py [nombres]` |
@@ -50,7 +51,7 @@ El grafo de caminos para la flecha de misiones está en `datos/misiones.json` �
 /Applications/Godot.app/Contents/MacOS/Godot --headless --import --path .
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_senda_surcos
 ```
-Hay 25 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
+Hay 26 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
 Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--headless`
 (guarda `get_viewport().get_texture().get_image()`); bórralo después.
 

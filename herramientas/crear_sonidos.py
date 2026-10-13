@@ -1783,6 +1783,107 @@ def cangrejo_vuelca():
     return reverb(p.entera(), 0.5, 0.18)
 
 
+
+# =============================================================================
+# LOS HECHICEROS DE GIZA (Bundi, el búho-mago, y Buibui, la araña-bruja)
+# =============================================================================
+
+def bundi_ulula():
+    """Bundi se fija en Maisha: un «u-uu» de búho, hueco y grave, con un temblor violeta por debajo."""
+    p = Pista(1.4)
+    for k, (f0, f1, d, en) in enumerate(((330, 300, 0.22, 0.0), (360, 290, 0.42, 0.32))):
+        f = _desliz(f0, f1, d)
+        x = seno(f, d) * 0.7 + seno(f * 2, d) * 0.12 + paso_bajo(ruido_rosa(d), 900) * 0.15
+        x = x * adsr(_n(d), 0.04, 0.05, 0.8, 0.12)
+        p.poner(x * 0.7, en)
+    d = 1.0
+    p.poner(seno(_desliz(110, 90, d), d) * adsr(_n(d), 0.2, 0.2, 0.5, 0.4) * 0.15, 0.1)
+    return reverb(p.entera(), 1.6, 0.35)
+
+
+def bundi_conjura():
+    """Alza el bastón: un zumbido que sube y unas campanitas desafinadas que se van juntando."""
+    d = 0.8
+    p = Pista(1.3)
+    f = _desliz(180, 720, d, 1.6)
+    zumbido = (seno(f, d) * 0.4 + sierra(f * 0.5, d) * 0.08) * np.linspace(0, 1, _n(d)) ** 1.5
+    p.poner(paso_bajo(zumbido, 2500) * 0.6, 0.0)
+    for k in range(5):
+        p.poner(campanita(1400 + k * 173, 0.25) * 0.12, 0.1 + k * 0.13)
+    return reverb(p.entera(), 1.4, 0.3)
+
+
+def bundi_lanza():
+    """Suelta la bola de Giza: un «fsss» que se aleja con un tono que baja."""
+    d = 0.45
+    p = Pista(0.9)
+    p.poner(paso_banda(ruido(d), 900, 4000) * caida(_n(d), 0.18) * 0.5, 0.0)
+    p.poner(seno(_desliz(900, 300, d), d) * caida(_n(d), 0.2) * 0.35, 0.0)
+    return reverb(p.entera(), 1.0, 0.3)
+
+
+def bundi_esfuma():
+    """Desaparece en plumas: un aleteo suave y un soplo que se cierra de golpe."""
+    p = Pista(0.9)
+    for k in range(2):
+        d = 0.1
+        x = paso_bajo(ruido_rosa(d), 1200) * np.sin(np.linspace(0, np.pi, _n(d))) ** 2
+        p.poner(x * 0.5, k * 0.09)
+    d = 0.35
+    soplo = paso_banda(ruido(d), 2000, 7000) * np.linspace(1, 0, _n(d)) ** 2
+    p.poner(soplo[::-1] * 0.35, 0.15)
+    return reverb(p.entera(), 1.2, 0.35)
+
+
+def orbe_rebota():
+    """El escudo devuelve la bola: un «clinc» de cristal y la bola que vuelve silbando más aguda."""
+    p = Pista(0.8)
+    p.poner(campanita(2200, 0.3) * 0.5, 0.0)
+    p.poner(campanita(3300, 0.2) * 0.25, 0.01)
+    d = 0.35
+    p.poner(seno(_desliz(500, 1300, d), d) * caida(_n(d), 0.2) * 0.3, 0.05)
+    return reverb(p.entera(), 1.0, 0.3)
+
+
+def buibui_invoca():
+    """La araña-bruja abre su nido: un rasgueo de patas secas y un chirrido de bichos que salen."""
+    p = Pista(1.2)
+    for k in range(8):
+        d = 0.03
+        x = paso_banda(ruido(d), 2500, 7000) * caida(_n(d), 0.01)
+        p.poner(x * 0.35, k * 0.045)
+    for k in range(4):
+        d = 0.08
+        x = seno(_desliz(3200 + k * 200, 2600, d), d) * adsr(_n(d), 0.005, 0.02, 0.5, 0.03)
+        p.poner(x * 0.18, 0.4 + k * 0.09)
+    return reverb(p.entera(), 1.1, 0.3)
+
+
+def mende_corre():
+    """Un bicho de óxido correteando: tic-tic-tic metálico, muy rápido."""
+    p = Pista(0.3)
+    for k in range(5):
+        d = 0.012
+        p.poner(paso_alto(ruido(d), 3500) * caida(_n(d), 0.004) * 0.4, k * 0.035)
+    return p.entera()
+
+
+def mende_muere():
+    """Se aplasta un bicho: un crujido de chapa pequeñita."""
+    p = Pista(0.35)
+    p.poner(paso_banda(ruido(0.06), 1500, 6000) * caida(_n(0.06), 0.02) * 0.6, 0.0)
+    p.poner(seno(_desliz(900, 300, 0.08), 0.08) * caida(_n(0.08), 0.03) * 0.3, 0.0)
+    return reverb(p.entera(), 0.6, 0.2)
+
+
+def rango_nuevo():
+    """Un rango nuevo del Bestiario: tres notas de kalimba que suben y una campanita."""
+    p = Pista(1.4)
+    for k, f in enumerate((523.25, 659.25, 783.99)):
+        p.poner(kalimba(f, 0.5) * 0.4, k * 0.1)
+    p.poner(campanita(1567.98, 0.6) * 0.25, 0.32)
+    return reverb(p.entera(), 1.4, 0.3)
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -1825,7 +1926,10 @@ EFECTOS = {
     "pagina": (pagina, 0.5), "libro_abrir": (libro_abrir, 0.6), "libro_cerrar": (libro_cerrar, 0.6), "pluma": (pluma, 0.35), "topo_excava": (topo_excava, 0.55), "topo_sale": (topo_sale, 0.85), "campanilla": (campanilla, 0.5), "cuervo_graznido": (cuervo_graznido, 0.6), "cuervo_picado": (cuervo_picado, 0.7), "agua_baja": (agua_baja, 0.6), "rana_croa": (rana_croa, 0.6), "rana_salta": (rana_salta, 0.5), "rana_cae": (rana_cae, 0.8),
     "murcielago_chillido": (murcielago_chillido, 0.55), "murcielago_grito": (murcielago_grito, 0.7),
     "onda_rebota": (onda_rebota, 0.6), "murcielago_mareo": (murcielago_mareo, 0.6),
-    "murcielago_aleteo": (murcielago_aleteo, 0.5), "cencerro": (cencerro, 0.6), "escala_tramo": (escala_tramo, 0.6),
+    "murcielago_aleteo": (murcielago_aleteo, 0.5),
+    "bundi_ulula": (bundi_ulula, 0.55), "bundi_conjura": (bundi_conjura, 0.5), "bundi_lanza": (bundi_lanza, 0.5),
+    "bundi_esfuma": (bundi_esfuma, 0.5), "orbe_rebota": (orbe_rebota, 0.55), "buibui_invoca": (buibui_invoca, 0.5),
+    "mende_corre": (mende_corre, 0.35), "mende_muere": (mende_muere, 0.45), "rango_nuevo": (rango_nuevo, 0.6), "cencerro": (cencerro, 0.6), "escala_tramo": (escala_tramo, 0.6),
     "kambare_ruge": (kambare_ruge, 0.85), "kambare_salta": (kambare_salta, 0.7), "kambare_cae": (kambare_cae, 0.9),
     "kambare_escupe": (kambare_escupe, 0.65), "kambare_dolor": (kambare_dolor, 0.8), "kambare_vencido": (kambare_vencido, 0.85),
     "raiz_ronca": (raiz_ronca, 0.7), "raiz_despierta": (raiz_despierta, 0.8), "raiz_azota": (raiz_azota, 0.9),

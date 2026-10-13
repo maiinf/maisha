@@ -76,6 +76,7 @@ func recibir_danio(_cantidad: int, _desde: Vector2, tipo: String) -> void:
 		return
 	vida -= 2
 	if vida <= 0:
+		Bestiario.vencido("espino", self)
 		if marca != "":
 			Estado.marcar(marca)
 		var astillas: Node2D = ASTILLAS.new()

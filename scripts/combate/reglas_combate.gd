@@ -214,3 +214,29 @@ const COSECHADORA_ESTAMPADA := 1.5        # si acelera contra unos brotes, se qu
 const COSECHADORA_ANILLO_CADA := [2.4, 2.0]   # segundos entre anillos (al principio, con el corazón tocado)
 const COSECHADORA_ANILLO_VEL := 90.0          # px/s
 const COSECHADORA_ANILLO_HUECO := 50.0        # grados de cada hueco
+
+# --- Los hechiceros de Giza ----------------------------------------------------
+## BUNDI, el búho-mago: no pelea cuerpo a cuerpo; lanza bolas de Giza que persiguen y desaparece si te acercas
+const BUNDI_VIDA := 3
+const BUNDI_VE := 140.0                 # a esta distancia se fija en Maisha
+const BUNDI_HUYE := 44.0                # si Maisha se acerca más, se esfuma y aparece lejos
+const BUNDI_ESPERA := 1.8               # entre bola y bola
+const BUNDI_CONJURA := 0.8              # el aviso: bastón en alto, la gema brilla
+const BUNDI_ESFUMA := 0.45              # lo que tarda en irse y en volver
+const BUNDI_ATONTADO := 1.8             # tras tragarse su propia bola: ahí no se va y el cetro le da
+const ORBE_VELOCIDAD := 58.0
+const ORBE_GIRO := 1.7                  # lo que puede torcer persiguiendo (radianes por segundo)
+const ORBE_DURA := 4.0                  # segundos antes de apagarse sola
+const ORBE_RADIO := 8.0                 # lo cerca que tiene que pasar para tocar
+const ORBE_DANIO_DEVUELTA := 2          # devuelta con el escudo, le quita esto a quien toque
+## BUIBUI, la araña-bruja: invoca bichos de óxido desde su nido; una semilla le sella el nido
+const BUIBUI_VIDA := 4
+const BUIBUI_VE := 150.0
+const BUIBUI_CADA := 4.5                # entre invocación e invocación
+const BUIBUI_AVISO := 0.9               # el nido brilla antes de abrirse
+const BUIBUI_BICHOS := 2                # los que salen cada vez
+const BUIBUI_MAX_BICHOS := 4            # los que puede tener a la vez
+const BUIBUI_ANDA := 14.0               # se recoloca muy despacio
+const MENDE_VIDA := 1
+const MENDE_VELOCIDAD := 66.0
+const MENDE_VE := 160.0

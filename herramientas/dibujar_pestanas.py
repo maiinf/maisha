@@ -2,9 +2,10 @@
 ICONOS DE LAS PESTAÑAS DE LA MOCHILA (y de la rueda rápida), píxel a píxel.
 
 Uso:  python3 herramientas/dibujar_pestanas.py
-Genera arte/interfaz/pestanas.png: 5 iconos de 16×16 en fila
+Genera arte/interfaz/pestanas.png: 6 iconos de 16×16 en fila
   0 Misiones (un pergamino con sello)   1 Objetos (la bolsa)   2 Habilidades (un brote de luz)
   3 Mapa (un mapa doblado)              4 Lazos (un corazón con un brote)
+  5 Bestiario (una huella de garra)
 Cada letra es un color; el borde oscuro se pone solo alrededor de lo dibujado.
 """
 import os
@@ -27,6 +28,8 @@ COLORES = {
     "M": "#efd9a6", "N": "#d4b47a", "n": "#b08a55", "v": "#6d9e4c", "a": "#5f9fb8", "x": "#c23b30",
     # lazos
     "K": "#f29bb0", "k": "#c9607d", "h": "#ffd7e0", "e": "#e6a852", "E": "#ffe2a0",
+    # bestiario (una huella de garra con el brillo violeta de Giza)
+    "Q": "#b9a6d6", "q": "#8a72b0", "j": "#5c4680", "z": "#e9dcff",
 }
 
 MISIONES = [
@@ -125,6 +128,26 @@ LAZOS = [
 ]
 
 
+BESTIARIO = [
+    "................",
+    "................",
+    "...qq......qq...",
+    "..qQQq....qQQq..",
+    "..qzQq.qq.qzQq..",
+    "...qq.qQQq.qq...",
+    "......qzQq......",
+    ".......qq.......",
+    "....jjqqqqjj....",
+    "...jqQQQQQQqj...",
+    "..jqQzzQQQQQqj..",
+    "..jqQzQQQQQQqj..",
+    "..jqQQQQQQQQqj..",
+    "...jqQQQQQQqj...",
+    "....jjqqqqjj....",
+    "................",
+]
+
+
 def icono(filas):
     alto, ancho = len(filas), len(filas[0])
     out = np.zeros((alto, ancho, 4), np.uint8)
@@ -152,7 +175,7 @@ def icono(filas):
 
 
 def main():
-    tira = np.concatenate([icono(f) for f in (MISIONES, OBJETOS, HABILIDADES, MAPA, LAZOS)], axis=1)
+    tira = np.concatenate([icono(f) for f in (MISIONES, OBJETOS, HABILIDADES, MAPA, LAZOS, BESTIARIO)], axis=1)
     ruta = os.path.join(RAIZ, "arte", "interfaz", "pestanas.png")
     Image.fromarray(tira, "RGBA").save(ruta)
     print("guardado:", ruta)

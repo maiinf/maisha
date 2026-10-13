@@ -139,7 +139,7 @@ Como en otros juegos, el Kitovu enseña las acciones parando el mundo (`scripts/
 
 El diario tiene estilo **noche mágica** (`herramientas/pintar_interfaz.py`): tapas de cuero azul noche cosidas con hilo de oro y cantoneras doradas, páginas de cielo nocturno (nebulosa suave, estrellas, constelaciones) con borde de filigrana dorada, y la tapa con el Gran Árbol, la luna y estrellas en oro. Las letras de las páginas usan su propia paleta clara (`TN_*` en `mochila.gd`): títulos en oro, texto en crema, la historia en coral y lo cumplido en gris azulado; la fila elegida, en tinta oscura sobre la banda dorada. El mapa sigue siendo de pergamino.
 
-**A pantalla completa, como la bolsa de Pokémon Platino** (`documentacion/diario_bolsa.png`): a la izquierda, la **mochila grande** de Maisha con el nombre del bolsillo encima y los **5 bolsillos** debajo (← → para cambiar; la mochila da un saltito, el bolsillo elegido brilla y asoma lo que guarda: un rollo con sello, el cetro, un brote, un mapa o un colgante); a la derecha, la **lista grande** (letra de 18, 7 filas); abajo, a lo ancho, la **descripción** con el dibujo grande (en las misiones, de qué va a la izquierda y los pasos y la recompensa a la derecha). El Mapa y las Habilidades ocupan la pantalla entera, con los bolsillos pequeños arriba. Arte: `bolsa_fondo.png` (cielo de noche con tres marcos de filigrana; los mismos rectángulos que `BOLSA`, `LISTA` y `DESC` en `mochila.gd`), `bolsa_fondo_pleno.png` y `mochila.png` (5 dibujos de 160×160), en `pintar_interfaz.py`. Las letras claras llevan contorno oscuro (`draw_string_outline` en `_texto`).
+**A pantalla completa, como la bolsa de Pokémon Platino** (`documentacion/diario_bolsa.png`): a la izquierda, la **mochila grande** de Maisha con el nombre del bolsillo encima y los **6 bolsillos** debajo (← → para cambiar; la mochila da un saltito, el bolsillo elegido brilla y asoma lo que guarda: un rollo con sello, el cetro, un brote, un mapa, un colgante o una pluma de búho); a la derecha, la **lista grande** (letra de 18, 7 filas); abajo, a lo ancho, la **descripción** con el dibujo grande (en las misiones, de qué va a la izquierda y los pasos y la recompensa a la derecha). El Mapa y las Habilidades ocupan la pantalla entera, con los bolsillos pequeños arriba. Arte: `bolsa_fondo.png` (cielo de noche con tres marcos de filigrana; los mismos rectángulos que `BOLSA`, `LISTA` y `DESC` en `mochila.gd`), `bolsa_fondo_pleno.png` y `mochila.png` (5 dibujos de 160×160), en `pintar_interfaz.py`. Las letras claras llevan contorno oscuro (`draw_string_outline` en `_texto`).
 
 **El árbol de habilidades** (pestaña Habilidades del diario): un árbol dorado que crece del lomo del libro
 (`arbol_ramas.png` y `nodos.png`, en `pintar_interfaz.py`) con tres ramas: **Raíz** (Semilla, K) a la izquierda,
@@ -166,13 +166,14 @@ Es el **diario de cuero de Maisha**: un libro con tapas cosidas y cantoneras de 
 | Habilidades | 3 | Golpe, semilla y Latido, las mejoras conseguidas y las **Artes** del Árbol de la Vida con su nivel |
 | Mapa | 4 o M | El **mapa de Raíz** (con niebla: ver abajo) y el mapa del mundo de Mzee Shamba (↑ ↓ cambian de uno a otro), con un alfiler donde está Maisha |
 | Lazos | 5 | Los personajes que conoce |
+| Bestiario | 6 | Todos los enemigos y jefes, con su **rango** (medalla), cuántos llevas vencidos y su ficha; los que aún no has vencido salen como «???» |
 
 ← → cambian de pestaña, ↑ ↓ eligen. Los objetos se describen en `scripts/globales/estado.gd` (`OBJETOS`).
 
 ### Acciones rápidas
 
-- **Teclas 1 a 5** (y **M** para el mapa): abren la mochila directamente en esa pestaña. Si ya está abierta en esa pestaña, la cierran.
-- **Rueda rápida**: mantén pulsado **Tab** (o **Select** en el mando) y aparece una rueda con las 5 pestañas sobre el juego parado. Inclina hacia una (WASD, flechas o el stick) y suelta: se abre esa pestaña. Si sueltas sin elegir, se cierra. Pulsar Tab sin mantener abre la mochila como siempre.
+- **Teclas 1 a 6** (y **M** para el mapa): abren la mochila directamente en esa pestaña. Si ya está abierta en esa pestaña, la cierran.
+- **Rueda rápida**: mantén pulsado **Tab** (o **Select** en el mando) y aparece una rueda con las 6 pestañas sobre el juego parado. Inclina hacia una (WASD, flechas o el stick) y suelta: se abre esa pestaña. Si sueltas sin elegir, se cierra. Pulsar Tab sin mantener abre la mochila como siempre.
 
 ## Misiones y objetivo en pantalla
 
@@ -696,3 +697,28 @@ No hace falta ejecutarlas; sirven para detectar si algo se rompe al cambiar el c
 | Menú | Esc | Start |
 
 (Se pueden cambiar en Godot: Proyecto → Configuración del proyecto → Mapa de entrada.)
+
+
+## Los hechiceros de Giza y el Bestiario
+
+Dos enemigos nuevos que no pelean cuerpo a cuerpo (`documentacion/boceto_hechiceros.png`; arte en `herramientas/pintar_hechiceros.py` → `arte/mundos/raiz/hechiceros/`):
+
+| Enemigo | Dónde | Cómo pelea |
+| --- | --- | --- |
+| **Bundi, el búho-mago** (`bundi.gd`) | Bosque Cobrizo, Cañada del Eco | Guarda las distancias: si Maisha se acerca, **se esfuma en plumas** y aparece en otro sitio. **Conjura** (alza el bastón, runas en el suelo) y lanza una **bola de Giza** que persigue (`orbe_giza.gd`). El Latido la deshace; el **escudo** (J mantenida, de frente) **se la devuelve**: si le da, se queda **atontado** y no puede irse. 3 de vida |
+| **Buibui, la araña-bruja** (`buibui.gd`) | Camino Cobrizo, Campo Segado | Se queda en su sitio y cada 4,5 s **invoca** (el nido brilla) 2 **bichos de óxido** (`mende.gd`, mueren de un golpe), hasta 4 a la vez. Muerde si te pegas. Una **semilla le sella el nido** con raíces y ya no invoca. 4 de vida |
+
+Los números están en `reglas_combate.gd` (`BUNDI_*`, `ORBE_*`, `BUIBUI_*`, `MENDE_*`). Sonidos: `bundi_ulula`, `bundi_conjura`, `bundi_lanza`, `bundi_esfuma`, `orbe_rebota`, `buibui_invoca`, `mende_corre`, `mende_muere` y `rango_nuevo`.
+
+**El Bestiario** (`scripts/globales/bestiario.gd`, autoload `Bestiario`) cuenta los enemigos que vence Maisha y les da un **rango** para los logros:
+
+| Rango | Enemigos | Jefes | Premio |
+| --- | --- | --- | --- |
+| 🥉 Bronce | 10 vencidos (los bichos de la bruja, 20) | Vencerlo | La ficha completa |
+| 🥈 Plata | 30 (bichos, 60) | Vencerlo dejándote dar 3 veces o menos | 2 cristales y el **secreto** del enemigo |
+| 🥇 Oro | 60 (bichos, 120) | Vencerlo sin que te den | 4 cristales |
+
+- Cada enemigo llama a `Bestiario.vencido(tipo, self)` al morir; los que se desmoronan con la purga de una zona no cuentan (meta `sin_contar`). La zona de un jefe avisa al empezar la pelea y cuenta los golpes que se lleva Maisha.
+- Las cuentas van en la partida (`Estado.extra["bestiario"]`) y los rangos son marcas `rango/<bronce|plata|oro>/<tipo>` (los cristales, en `datos/tienda.json`). Los jefes vencidos antes del Bestiario cuentan como bronce.
+- Al subir de rango sale un aviso («Bestiario: rango de plata»). La ficha de cada uno, con su dibujo, está en el 6.º bolsillo del diario.
+- Prueba: `prueba_hechiceros`.
