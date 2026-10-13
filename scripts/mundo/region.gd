@@ -106,6 +106,7 @@ const CAMPAMENTOS := {
 	"sungura": ["res://arte/mundos/raiz/senda/horreo.png", Vector2(52, 10), "senda_horreo", 36.0, false],
 	"mbuzi": ["res://arte/mundos/raiz/canada/aprisco.png", Vector2(92, 22), "canada_aprisco", 46.0, false],
 	"kasia": ["res://arte/mundos/raiz/orilla/casa_barcas.png", Vector2(64, 14), "orilla_casa_barcas", 44.0, false],
+	"bata": ["res://arte/mundos/raiz/embarcadero/casa_bata.png", Vector2(60, 12), "embarcadero_casa_bata", 46.0, false],
 }
 ## Edificios de la aldea: letra -> [id, dibujo, tamaño de la colisión]
 const EDIFICIOS := {

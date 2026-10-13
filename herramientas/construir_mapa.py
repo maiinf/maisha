@@ -1855,7 +1855,7 @@ def crear_embarcadero():
         if 0 <= x < ANCHO and 0 <= y < ALTO:
             m[y][x] = c
 
-    zonas = {"1": (44, 56, 9, 6), "2": (44, 9, 7, 4), "3": (14, 36, 8, 6)}
+    zonas = {"1": (44, 56, 9, 6), "2": (12, 12, 7, 5), "3": (14, 36, 8, 6)}
 
     def en_zona(x, y, margen=2):
         for (zx, zy, rx, ry) in zonas.values():
@@ -1929,8 +1929,10 @@ def crear_embarcadero():
         poner(x, y, "æ")
     poner(rio[16][0] - 2, 16, "å")
     poner(34, 20, "œ")
-    # Bata, el pato barquero (cuando se le rescata), junto al transbordador
-    poner(rio[12][0] + 3, 11, "}")
+    # la casa de Bata, en la orilla junto al muelle del norte (sellada por raíces de Giza: está dentro, vivo),
+    # y Bata en el muelle, junto a su transbordador (cuando ya ha salido)
+    poner(rio[10][0] - 4, 10, "{")
+    poner(rio[12][0] + 3, 12, "}")
     # secretos: tras matorrales en el prado del oeste, en el muelle del medio y entre los juncos del sureste
     poner(5, 22, "X"); poner(5, 23, "M"); poner(6, 23, "M"); poner(4, 23, "M")
     poner(rio[30][0] + 3, 30, "X")
@@ -1943,7 +1945,7 @@ def crear_embarcadero():
                 poner(x, y, ";")
     for (x, y) in ((10, 48), (20, 8), (rio[60][0] - 3, 66)):
         poner(x, y, "$")
-    reservados = [(rio[12][0] - 2, 10, 3), (34, 19, 6), (31, 20, 5), (38, 20, 5), (5, 22, 2), (8, 64, 2), (22, 68, 3), (32, 3, 3)]
+    reservados = [(rio[10][0] - 4, 9, 5), (rio[12][0] - 2, 10, 3), (34, 19, 6), (31, 20, 5), (38, 20, 5), (5, 22, 2), (8, 64, 2), (22, 68, 3), (32, 3, 3)]
 
     def libre(x, y):
         if m[y][x] not in ".," or en_zona(x, y):
@@ -1953,7 +1955,7 @@ def crear_embarcadero():
                 return False
         for dy in (-1, 0, 1):
             for dx in (-1, 0, 1):
-                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#~=æåßœ}X$":
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#~=æåßœ{}X$":
                     return False
         return True
 
@@ -1983,7 +1985,7 @@ def crear_embarcadero():
     poner(23, 68, "S")
     for k, (zx_, zy_, rx_, ry_) in zonas.items():
         poner(zx_, zy_, k)
-    textos = {"1": "9, 6, 4, 0, bata, jefe:mamba", "2": "7, 4, 4, 3", "3": "8, 6, 4, 3"}
+    textos = {"1": "9, 6, 4, 0, , jefe:mamba", "2": "7, 5, 4, 3", "3": "8, 6, 4, 3"}
     return ["".join(f) for f in m], textos
 
 

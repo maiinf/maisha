@@ -62,3 +62,10 @@ se pasan.
 | Normas nuevas | Edificios al nivel de la casa del castor; cada ruta con historia y mecánica propias (no recado + zona + jefe); diálogos más humanos; más enemigos con rango |
 | Fallo «no puede correr» / «se queda bugueado» | Causa encontrada: la cámara lenta y el parón de impacto se pisaban y el juego quedaba lento. Ahora solo `Impacto` cambia la velocidad |
 
+## 2026-10-13 · Embarcadero con historia propia
+| Decisión | Elegido |
+| --- | --- |
+| Construcciones | Casas, almacén, grúa y transbordador rehechos al nivel de la casa del castor |
+| Rescate de Bata | Ya no es estatua: está encerrado vivo en su casa sellada por raíces. Se siguen las venas violetas hasta un nudo de Giza tapado por sacos; Latido para apartarlos, semilla para reventarlo |
+| Pelea contra Mamba | Será 2 contra 1: Bata en su barca ayudando con la pértiga (siguiente paso) |
+

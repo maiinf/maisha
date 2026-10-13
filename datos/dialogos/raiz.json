@@ -2117,9 +2117,10 @@
 					"bata_conocido"
 				],
 				"lineas": [
-					"El transbordador subía y bajaba el río todos los días: piedras para el puente, sacos de grano, abuelas con sus nietos...",
-					"Río arriba está la Gruta de las Raíces. Antes de lo gris, allí se llevaban las semillas para que durmieran el invierno.",
-					"Ahora mírala: varada, escorada, con un boquete que cabe un cangrejo. Hay que arreglarla, y no es cosa de un día."
+					"¿Ves ese trasto escorado? Es el transbordador. Mi transbordador. Subía y bajaba el río todos los días: piedras, sacos de grano, abuelas con sus nietos...",
+					"Río arriba está la Gruta de las Raíces. Antes de lo gris, llevábamos allí las semillas para que durmieran el invierno.",
+					"Y ahora tiene un boquete en el que cabe un cangrejo. Lo sé porque había uno dentro. Lo eché. Me miró mal.",
+					"Hay que arreglarlo. Pero antes... algo grande se mueve en la dársena. No pienso arreglar nada con eso suelto."
 				]
 			},
 			{
@@ -2148,6 +2149,79 @@
 					"Las placas de hierro se le han caído al agua una a una. Debajo, Mamba es verde y bronce, y mucho más pequeño de lo que parecía.",
 					"Se ha quedado un momento flotando junto al muelle, mirándome con un ojo. Luego se ha ido río abajo, despacio, como un tronco de verdad.",
 					"Creo que solo quería que lo dejaran tranquilo en su dársena. Como antes."
+				]
+			}
+		]
+	},
+	"embarcadero_casa_bata": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"no": [
+					"casa_bata_abierta",
+					"bata_puerta"
+				],
+				"marca": [
+					"bata_puerta"
+				],
+				"lineas": [
+					"¿Quién anda ahí? ¡Si eres un cangrejo, te aviso de que tengo una pértiga! ...Bueno, la tenía. Está fuera.",
+					"...Un momento. Los cangrejos no llaman a la puerta. ¿Quién eres?",
+					"¿Maisha? No te conozco. Pero tienes voz de no ser un cangrejo, y hoy eso me vale.",
+					"Mira, llevo aquí encerrado... no sé. Días. Una mañana voy a salir a por pan y la puerta no se abre. Raíces. De PIEDRA. En MI puerta.",
+					"Y lo raro es que no crecen de aquí. Por las noches las oigo crujir, como si alguien tirara de ellas desde lejos. Desde el almacén, diría yo.",
+					"Si sigues las rayas moradas del suelo, a lo mejor encuentras de dónde salen. Yo te espero aquí. Tampoco es que tenga otros planes."
+				]
+			},
+			{
+				"no": [
+					"casa_bata_abierta"
+				],
+				"lineas": [
+					"¿Sigues ahí? ¿Algo? ...Vale. Las rayas moradas. El almacén. Ya lo sé, ya lo he dicho.",
+					"Es que aquí dentro solo tengo una cazuela, una manta y mis pensamientos. Y los pensamientos ya me los sé todos."
+				]
+			},
+			{
+				"lineas": [
+					"La casa de Bata. Huele a río, a cuerda mojada y a sopa de ayer.",
+					"En la puerta aún quedan trocitos de piedra violeta, como si fueran migas."
+				]
+			}
+		]
+	},
+	"embarcadero_nudo_tapado": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Las venas moradas acaban aquí, debajo de los sacos. Algo late entre ellos, como un corazón enfadado.",
+					"Los sacos pesan demasiado para moverlos a golpes... pero el Latido empuja todo lo que tiene cerca."
+				]
+			}
+		]
+	},
+	"embarcadero_nudo": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un nudo de raíces de piedra, con algo violeta latiendo dentro. De aquí salen todas las venas.",
+					"El cetro rebota. Habrá que hacerlo estallar."
+				]
+			}
+		]
+	},
+	"bata_libre": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡AIRE! ¡Aire de río! ...Perdona. Llevaba días oliendo a sopa de ayer. Y de anteayer.",
+					"Así que eras tú. Una lucecita con hojas en la cabeza. Pues gracias, lucecita. Te debo una. De las grandes.",
+					"Ahora, si me disculpas, voy a ver qué ha sido de mi barca. Si le ha pasado algo, me la cargo yo solito. A quien sea."
 				]
 			}
 		]

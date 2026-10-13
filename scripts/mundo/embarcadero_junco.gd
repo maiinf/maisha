@@ -7,10 +7,12 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ## Tres zonas corruptas y tres secretos.
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
+const CASA_SELLADA := preload("res://scripts/mundo/embarcadero/casa_sellada.gd")
 
 
 func _ready() -> void:
 	super()
+	_crear_casa_sellada()
 	_maisha.caida.connect(_al_caer_fuera_de_zona)
 	$Corrupcion.region_purgada.connect(_al_purgar_region)
 	if not Estado.tiene("embarcadero_llegada"):
@@ -24,6 +26,23 @@ func _al_poner_marca_embarcadero(marca: String) -> void:
 	await get_tree().create_timer(6.0).timeout
 	if is_inside_tree():
 		await CHARLA_SCRIPT.hablar(self, "embarcadero_mamba_libre")
+
+
+## La casa de Bata, sellada por raíces de Giza (scripts/mundo/embarcadero/casa_sellada.gd)
+func _crear_casa_sellada() -> void:
+	var casa_sellada: Node2D = CASA_SELLADA.new()
+	casa_sellada.name = "CasaSellada"
+	var filas: PackedStringArray = $Region._filas
+	for y in filas.size():
+		for x in filas[y].length():
+			var c := filas[y][x]
+			if c == "{":
+				casa_sellada.casa = $Region._base(x, y)
+			elif c == "œ":
+				casa_sellada.almacen = $Region._base(x, y)
+			elif c == "}":
+				casa_sellada.sitio_bata = $Region._base(x, y)
+	add_child(casa_sellada)
 
 
 func _pensar_al_llegar() -> void:

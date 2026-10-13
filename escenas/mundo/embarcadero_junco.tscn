@@ -36,7 +36,7 @@ entidades = NodePath("../Entidades")
 textos_carteles = Array[String](["↑ La Travesía (río arriba)", "↑ Embarcadero Junco · ↓ Orilla de Juncos"])
 tipos_enemigo = PackedStringArray("cangrejo", "petrino", "babosa")
 viajero = "bata"
-viajero_requiere = "rescatado_bata"
+viajero_requiere = "casa_bata_abierta"
 
 [node name="Ambiente" type="Node2D" parent="." groups=["ambiente"]]
 z_index = 3

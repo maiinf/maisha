@@ -7,6 +7,12 @@ Genera (en arte/mundos/raiz/embarcadero/):
                                   verdín, plataforma de tablas, paredes de esteras con armazón de troncos, tejado de
                                   paja a capas, ventana con contraventanas y jardinera, porche, escalerilla, barquita
                                   amarrada y cosas de barquero (redes, remos, nasa, peces, cántaros, farolillo)
+  casa_bata.png       100×92      la casa del barquero Bata, en tierra junto al muelle: como las de juncos, pero
+                                  sobre el barro, con el letrero del transbordador, remos cruzados y la campana
+  sello_raices.png    2 × 100×92  las raíces de piedra de Giza que sellan su puerta y su ventana: 0 enteras,
+                                  1 resquebrajadas
+  nudo_giza.png       2 × 28×26   el nudo de Giza escondido en el almacén (late)
+  saco.png            2 × 18×18   sacos de grano que lo tapan (se apartan con el Latido)
   grua.png            72×104      la grúa del muelle, rota: base de piedras, poste de tronco con tornapuntas, pluma
                                   rajada y atada, polea partida con el gancho, torno bajo un tejadillo de paja, un
                                   nido arriba; al pie, el fardo de red, un tonel y cabos
@@ -37,6 +43,7 @@ LUZ = (-0.6, -0.7, 0.5)
 AGUA = ["#1c3535", "#285050", "#346161", "#4c8d8d", "#6db0b0", "#9fd0d0"]
 HIERRO = ["#1a1a1c", "#2c2c30", "#424248", "#5a5a62", "#76767e"]
 CUERDA = "#a48656"
+GIZA_V = ["#2a0d3a", "#3a1650", "#6b2a8f", "#a855d6", "#d6a8f0"]
 
 
 def _pilotes(lz, xs, arriba, abajo, agua=True):
@@ -55,7 +62,7 @@ def _juncos_atados(lz, mascara, semilla, rampa=JUNCO):
     lz.pintar(mascara * ((lz.x % 2.4) < 0.35), rampa[0], 0.6)
 
 
-def casa_juncos(k):
+def casa_juncos(k, bata=False):
     """Una casa de barqueros al nivel de detalle de la casa del castor: plataforma de tablas sobre pilotes (con
     verdín y el agua al pie), paredes de esteras de junco tejido con un armazón de troncos, un tejado grueso de paja a
     capas con caballete, una ventana con contraventanas y jardinera (encendida), la puerta con cortina de esteras, un
@@ -66,26 +73,38 @@ def casa_juncos(k):
     rng = np.random.default_rng(302 + k)
     abajo = 88
     plat_y = 62
-    # el agua al pie, con sombra de la casa y reflejos
-    agua = lz.poligono([(0, 78), (100, 74), (100, 92), (0, 92)])
-    lz.sombrear(agua, AGUA, 4, LUZ, textura=(np.sin(lz.y * 1.6 + lz.x * 0.25) * 0.5 + 0.5), fuerza_tex=0.35)
-    lz.pintar(lz.desenfocar(rect(lz, 8, 76, 92, 92), 3) * agua, "#0a1414", 0.45)
-    ondas = (np.abs(np.sin(lz.x * 0.45 + lz.y * 1.9)) < 0.08) * agua
-    lz.pintar(ondas, AGUA[5], 0.5)
+    if bata:
+        # en tierra: la sombra de la casa sobre el barro de la orilla, con charcos y juncos
+        lz.pintar(lz.desenfocar(lz.elipse(50, 86, 46, 5), 1.2), "#0e0c0a", 0.5)
+        for (cx, cy, rx) in ((30, 87, 9), (70, 88, 7)):
+            charco = lz.elipse(cx, cy, rx, 1.8)
+            lz.pintar(charco, AGUA[2], 0.8)
+            lz.pintar(charco * (lz.x < cx - rx * 0.3), AGUA[5], 0.5)
+        for x in (4, 7, 92, 96):
+            lz.pintar(lz.trazo([(x, 90), (x + 1, 76)], 0.6) + lz.trazo([(x + 2, 90), (x + 1.5, 79)], 0.5), JUNCO[3])
+    else:
+        # el agua al pie, con sombra de la casa y reflejos
+        agua = lz.poligono([(0, 78), (100, 74), (100, 92), (0, 92)])
+        lz.sombrear(agua, AGUA, 4, LUZ, textura=(np.sin(lz.y * 1.6 + lz.x * 0.25) * 0.5 + 0.5), fuerza_tex=0.35)
+        lz.pintar(lz.desenfocar(rect(lz, 8, 76, 92, 92), 3) * agua, "#0a1414", 0.45)
+        ondas = (np.abs(np.sin(lz.x * 0.45 + lz.y * 1.9)) < 0.08) * agua
+        lz.pintar(ondas, AGUA[5], 0.5)
     # la barquita amarrada debajo, entre los pilotes
-    barca = lz.poligono([(18, 80), (52, 79), (48, 85), (22, 86)])
+    barca = lz.poligono([(18, 80), (52, 79), (48, 85), (22, 86)]) * (0.0 if bata else 1.0)
     lz.sombrear(barca, MADERA[1:7], 2, LUZ, textura=vetas(lz, 0.5, 9, True, 303 + k), fuerza_tex=0.4)
-    lz.pintar(lz.poligono([(21, 80.4), (49, 79.6), (46.5, 81.6), (23, 82)]), "#1a120c")
-    lz.pintar(lz.trazo([(18, 80), (52, 79)], 0.6), MADERA[7])
-    lz.pintar(barca * (lz.y > 83) * (np.sin(lz.x * 0.8) > 0), "#4c8d8d", 0.5)          # pintura azul desconchada
-    lz.pintar(lz.trazo([(50, 79.5), (58, 68)], 0.4), CUERDA)
+    if not bata:
+        lz.pintar(lz.poligono([(21, 80.4), (49, 79.6), (46.5, 81.6), (23, 82)]), "#1a120c")
+        lz.pintar(lz.trazo([(18, 80), (52, 79)], 0.6), MADERA[7])
+    if not bata:
+        lz.pintar(barca * (lz.y > 83) * (np.sin(lz.x * 0.8) > 0), "#4c8d8d", 0.5)      # pintura azul desconchada
+        lz.pintar(lz.trazo([(50, 79.5), (58, 68)], 0.4), CUERDA)
     # los pilotes, con verdín y el agua al pie
     for x in (10, 26, 42, 58, 74, 90):
         p = rect(lz, x - 2.2, plat_y, x + 2.2, abajo)
         lz.sombrear(p, ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33", "#9a6544"], 2.2, LUZ,
                     textura=vetas(lz, 0.6, 11, False, int(x)), fuerza_tex=0.4)
-        lz.pintar(rect(lz, x - 2.2, 74, x + 2.2, 80) * (lz.ruido(0.6, 2, semilla=int(x)) > 0.35), "#2e4a2a", 0.75)
-        lz.pintar(lz.elipse(x, 78.5, 3.4, 0.9), AGUA[5], 0.7)
+        lz.pintar(rect(lz, x - 2.2, 74, x + 2.2, 80) * (lz.ruido(0.6, 2, semilla=int(x)) > 0.35), "#2e4a2a" if not bata else "#3a2a1a", 0.75)
+        lz.pintar(lz.elipse(x, 78.5 if not bata else 88, 3.4, 0.9), AGUA[5] if not bata else "#2a1a10", 0.7)
         lz.pintar(lz.trazo([(x - 2.2, 70), (x + 2.2, 70.6)], 0.5), CUERDA, 0.9)       # la ligadura de cuerda
     # tornapuntas en cruz entre los pilotes
     for (a, b) in ((10, 26), (42, 58), (74, 90)):
@@ -169,6 +188,24 @@ def casa_juncos(k):
         fz = lz.elipse(88, yt + 8.5, 2.2, 2.8)
         lz.pintar(fz, rampa(["#ef8a26", "#f9b947", "#fde27e"], np.clip(1 - np.hypot(lz.x - 88, lz.y - yt - 8) / 3, 0, 1)))
         lz.sumar_luz(lz.desenfocar(fz, 3), "#ef8a26", 0.35)
+    if bata:
+        # el letrero del transbordador sobre la puerta (una barcaza tallada) y dos remos cruzados en la pared
+        letrero = rect(lz, px - 3, 31, px + 15, 36)
+        lz.sombrear(letrero, COBRE, 1, LUZ, textura=vetas(lz, 0.5, 9), fuerza_tex=0.3)
+        lz.pintar(lz.poligono([(px, 34.5), (px + 12, 34.5), (px + 13.5, 32.5), (px - 1.5, 32.5)]), "#47291c")
+        lz.pintar(rect(lz, px + 3, 31.5, px + 6, 33), "#47291c")
+        for (a_, b_) in (((58, 33), (72, 52)), ((72, 33), (58, 52))):
+            lz.sombrear(lz.trazo([a_, b_], 0.8), MADERA[4:8], 0.6, LUZ)
+        for (ex, ey) in ((59, 50.5), (71, 50.5)):
+            lz.sombrear(lz.elipse(ex, ey, 1.6, 3.2), MADERA[4:8], 1, LUZ)
+        # la campana del barquero, colgada del porche
+        lz.pintar(lz.trazo([(10, plat_y - 14), (10, plat_y - 18)], 0.5), "#1a120c")
+        lz.sombrear(lz.poligono([(7.6, plat_y - 9), (8.6, plat_y - 14), (11.4, plat_y - 14), (12.4, plat_y - 9)]),
+                    ["#5a4210", "#8a6a20", "#c09a40", "#e8c868", "#fff1c0"], 1.4, LUZ)
+        # rollos de cuerda de amarre
+        for (cx, cy) in ((80, plat_y - 4), (87, plat_y - 4.5)):
+            for r in (2.6, 1.7, 0.8):
+                lz.pintar(np.clip(lz.elipse(cx, cy, r * 1.5, r * 0.65) - lz.elipse(cx, cy, r * 1.5 - 0.5, r * 0.65 - 0.3), 0, 1), CUERDA)
     # una maceta con flores junto a la puerta
     mx = px + 15 if k == 0 else px - 4
     lz.sombrear(lz.poligono([(mx - 2.5, plat_y - 7), (mx + 2.5, plat_y - 7), (mx + 1.8, plat_y - 3), (mx - 1.8, plat_y - 3)]), COBRE, 1.2, LUZ)
@@ -494,9 +531,86 @@ def poste(k):
     return lz.sprite(contorno=CONTORNO)
 
 
+def sello(k):
+    """Las raíces de piedra de Giza que tapan la puerta y la ventana de la casa de Bata (encima de casa_bata.png, con
+    el mismo tamaño). Bajan por los pilotes hasta el suelo, de donde salen las venas. 0 enteras, con grietas violetas
+    que brillan; 1 resquebrajadas (al reventar el nudo), a punto de deshacerse."""
+    W, H = 100, 92
+    lz = Lienzo(W, H, s=4, semilla=351 + k)
+    lz.alfa[:] = 0
+    rng = np.random.default_rng(352)
+    PIEDRA_G = ["#1c1a22", "#2c2a34", "#403c4a", "#57525f", "#6e6878", "#8a8494"]
+    raices = np.zeros((lz.H, lz.W))
+    # una maraña sobre la puerta (26..38, 38..59) y otra sobre la ventana (49..63, 36..49)
+    for (x0, y0, x1, y1, n) in ((24, 36, 40, 60, 11), (47, 34, 65, 51, 8)):
+        for j in range(n):
+            a = (x0 + rng.random() * (x1 - x0), y0 - 2)
+            b = (x0 + rng.random() * (x1 - x0), y1 + 1)
+            m = (a[0] + (rng.random() - 0.5) * 10, (a[1] + b[1]) / 2)
+            raices = np.maximum(raices, lz.trazo(lz.curva(a, m, b, n=16), 1.6 + rng.random() * 1.2, 0.8))
+        for j in range(n // 2):
+            y = y0 + rng.random() * (y1 - y0)
+            raices = np.maximum(raices, lz.trazo([(x0 - 2, y), ((x0 + x1) / 2, y + (rng.random() - 0.5) * 6), (x1 + 2, y + 1)], 1.2, 0.6))
+    # las que bajan por los pilotes hasta el suelo
+    for x in (26, 42):
+        raices = np.maximum(raices, lz.trazo(lz.curva((x + 4, 58), (x - 2, 72), (x + 1, 90), n=18), 1.4, 0.9))
+    lz.sombrear(raices, PIEDRA_G, 1.6, LUZ, textura=lz.ruido(0.5, 2, semilla=353), fuerza_tex=0.4)
+    grietas = (np.abs(np.sin(lz.x * 1.3 + lz.ruido(1.0, 2, semilla=354) * 7)) < 0.2) * raices
+    lz.pintar(grietas, GIZA_V[3] if k == 0 else GIZA_V[4], 1.0)
+    lz.pintar(lz.desenfocar(grietas, 0.6) * raices, GIZA_V[2], 0.6)
+    if k == 1:
+        # resquebrajadas: grietas claras y trozos que se sueltan
+        rotas = (np.abs(np.sin(lz.x * 2.3 + lz.y * 1.7)) < 0.07) * raices
+        lz.pintar(rotas, "#d6d0dc", 0.9)
+        for j in range(14):
+            lz.pintar(lz.circulo(24 + rng.random() * 42, 36 + rng.random() * 50, 0.8 + rng.random() * 0.6), PIEDRA_G[3])
+    return lz.sprite(tramado=0.0, contorno=CONTORNO)
+
+
+def nudo(k):
+    """El nudo de Giza: una bola de raíces de piedra enredadas con un corazón violeta que late. 0 y 1 laten."""
+    W, H = 28, 26
+    lz = Lienzo(W, H, s=8, semilla=361 + k)
+    lz.pintar(lz.desenfocar(lz.elipse(14, 23, 11, 2), 0.6), "#0e0c0a", 0.55)
+    rng = np.random.default_rng(362)
+    bola = np.zeros((lz.H, lz.W))
+    for j in range(16):
+        a = rng.random() * np.pi * 2
+        r = 7 + rng.random() * 2
+        bola = np.maximum(bola, lz.trazo(lz.curva((14 + np.cos(a) * r, 14 + np.sin(a) * r * 0.8),
+                                                  (14 + (rng.random() - 0.5) * 6, 14 + (rng.random() - 0.5) * 5),
+                                                  (14 + np.cos(a + 2.4) * r, 14 + np.sin(a + 2.4) * r * 0.8), n=14), 1.3, 0.8))
+    lz.sombrear(bola, ["#1c1a22", "#2c2a34", "#403c4a", "#57525f", "#6e6878", "#8a8494"], 2.4, LUZ, textura=lz.ruido(0.5, 2, semilla=363), fuerza_tex=0.35)
+    corazon = lz.elipse(14, 14, 4.2 + k * 0.8, 3.6 + k * 0.7)
+    lz.pintar(lz.desenfocar(corazon, 1.5), GIZA_V[2], 0.8)
+    lz.sombrear(corazon, GIZA_V[2:] + ["#f4e0ff"], 2.4, LUZ)
+    lz.pintar(bola * (lz.ruido(0.4, 1, semilla=364) > 0.55) * corazon, "#2c2a34", 0.9)       # raíces por delante
+    for (a, b) in (((4, 22), (0, 25)), ((24, 21), (28, 24)), ((10, 23), (8, 26))):
+        lz.pintar(lz.trazo([a, b], 0.9), "#403c4a")
+    return lz.sprite(contorno=CONTORNO)
+
+
+def saco(k):
+    """Un saco de grano del almacén (se aparta con el Latido)."""
+    W, H = 18, 18
+    lz = Lienzo(W, H, s=8, semilla=371 + k)
+    lz.pintar(lz.desenfocar(lz.elipse(9, 16, 7, 1.6), 0.6), "#0e0c0a", 0.5)
+    s_ = lz.poligono([(3, 16), (2.5, 10), (5, 5), (7, 4 if k else 5), (11, 4 if k else 5), (13, 5), (15.5, 10), (15, 16)])
+    lz.sombrear(s_, ["#5a4630", "#8a7454", "#b8a07a", "#d8c49c", "#efe0bf"], 4, LUZ,
+                textura=(np.sin(lz.x * 4) * np.sin(lz.y * 4) > 0).astype(float), fuerza_tex=0.15)
+    lz.pintar(lz.trazo([(5, 6.5), (13, 6.5)], 0.8), "#47291c")
+    if k == 1:
+        lz.pintar(lz.elipse(9, 4.5, 2.6, 0.9), "#c9a046")
+    return lz.sprite(contorno=CONTORNO)
+
+
 def main():
     os.makedirs(SALIDA, exist_ok=True)
     tira([casa_juncos(k) for k in range(2)]).save(os.path.join(SALIDA, "casa_juncos.png"))
+    Image.fromarray(casa_juncos(0, bata=True)).save(os.path.join(SALIDA, "casa_bata.png"))
+    tira([sello(k) for k in range(2)]).save(os.path.join(SALIDA, "sello_raices.png"))
+    tira([nudo(k) for k in range(2)]).save(os.path.join(SALIDA, "nudo_giza.png"))
+    tira([saco(k) for k in range(2)]).save(os.path.join(SALIDA, "saco.png"))
     Image.fromarray(grua()).save(os.path.join(SALIDA, "grua.png"))
     Image.fromarray(almacen()).save(os.path.join(SALIDA, "almacen.png"))
     tira([transbordador(k) for k in range(2)]).save(os.path.join(SALIDA, "transbordador.png"))

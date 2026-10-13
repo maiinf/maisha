@@ -125,12 +125,54 @@ func _ready() -> void:
 	_comprobar(_escena() == "EmbarcaderoJunco" and get_tree().get_first_node_in_group("dialogo").hablando, "no deja pasar, y Maisha piensa por qué")
 	await _leer_dialogo()
 
-	print("Bata, el pato barquero:")
-	var estatua: Node2D = null
-	for e in get_tree().get_nodes_in_group("estatuas"):
-		if e.id == "bata":
-			estatua = e
-	_comprobar(estatua != null, "Bata está de piedra junto a la dársena")
+	print("La casa sellada de Bata:")
+	var casa_s: Node2D = get_tree().current_scene.get_node("CasaSellada")
+	_comprobar(casa_s != null and casa_s.get("_sello") != null, "la casa de Bata, junto al muelle, sellada por raíces de piedra")
+	_comprobar(get_tree().get_nodes_in_group("aldeanos").filter(func(n: Node) -> bool: return n.get("id") == "bata").is_empty(), "Bata no está fuera: está encerrado dentro")
+	_comprobar(get_tree().get_nodes_in_group("estatuas").is_empty(), "y ya no hay ninguna estatua de Bata")
+	_maisha().global_position = casa_s.casa + Vector2(-18, 22)
+	await _esperar(0.3)
+	var puerta_casa: Node2D = null
+	for n in get_tree().get_nodes_in_group("interactuables"):
+		if n.get("charla") == "embarcadero_casa_bata":
+			puerta_casa = n
+	await _hablar_con(puerta_casa)
+	_comprobar(Estado.tiene("bata_puerta"), "Bata habla a través de la puerta y da la pista del almacén")
+	var nudo: Node2D = casa_s.get("_nudo")
+	var sacos: Array = casa_s.get("_sacos")
+	_comprobar(nudo != null and sacos.size() == 4 and casa_s.nudo_tapado(), "las venas llevan a un nudo de Giza tapado por sacos, delante del almacén")
+	nudo.recibir_danio(1, nudo.global_position, "explosion")
+	_comprobar(is_instance_valid(nudo) and not Estado.tiene("casa_bata_abierta") and casa_s.get("_seca") < 0.0, "con los sacos encima, la semilla no le alcanza")
+	_maisha().global_position = nudo.global_position + Vector2(0, 22)
+	_maisha().set("aliento", 100.0)
+	await _esperar(0.3)
+	_maisha().latido()
+	await _esperar(0.6)
+	_comprobar(not casa_s.nudo_tapado(), "el Latido aparta los sacos")
+	_comprobar(not nudo.recibir_golpe(1, Vector2.UP), "el cetro rebota en el nudo")
+	nudo.recibir_danio(1, nudo.global_position, "explosion")
+	await _esperar(0.2)
+	_comprobar(casa_s.get("_seca") >= 0.0, "una semilla lo revienta: las venas se secan hacia la casa")
+	var bata: Node2D = null
+	for i in 60:
+		await _esperar(0.25)
+		await _leer_dialogo()
+		for n in get_tree().get_nodes_in_group("aldeanos"):
+			if n.get("id") == "bata":
+				bata = n
+		if bata and Estado.tiene("casa_bata_abierta"):
+			break
+	_comprobar(Estado.tiene("casa_bata_abierta") and bata != null, "las raíces de la puerta se deshacen y Bata sale")
+	for i in 30:
+		await _leer_dialogo()
+		await _esperar(0.3)
+	var sitio := Vector2(region.get("_sitio_viajero"))
+	_comprobar(bata.global_position.distance_to(sitio) < 6.0, "y se va a su muelle, junto al transbordador")
+	_maisha().global_position = bata.global_position + Vector2(-18, 0)
+	await _esperar(0.3)
+	await _hablar_con(bata)
+	_comprobar(Estado.tiene("bata_conocido"), "Bata cuenta lo del transbordador, la Gruta y lo que se mueve en la dársena")
+
 	var darsena: Node2D = null
 	for z in get_tree().get_nodes_in_group("zonas"):
 		if z.get_meta("clave") == "1":
@@ -173,24 +215,12 @@ func _ready() -> void:
 	mamba.vida = 1
 	mamba.recibir_golpe(1, Vector2.RIGHT)
 	_comprobar(mamba.fase == mamba.Fase.VENCIDO and Estado.tiene("mamba_vencido"), "vencido: se le cae la herrumbre")
-	var bata: Node2D = null
-	for i in 60:
+	for i in 40:
 		await _esperar(0.3)
 		await _leer_dialogo()
-		for n in get_tree().get_nodes_in_group("aldeanos"):
-			if n.get("id") == "bata":
-				bata = n
-		if bata:
+		if darsena.estado == darsena.Estado.PURGADA:
 			break
 	_comprobar(darsena.estado == darsena.Estado.PURGADA, "Mamba se va nadando y la dársena queda purgada")
-	_comprobar(Estado.tiene("rescatado_bata"), "Bata vuelve a la vida")
-	var sitio := Vector2(region.get("_sitio_viajero"))
-	_comprobar(bata != null and bata.global_position.distance_to(sitio) < 4.0, "y se va a su transbordador, en vez de a la aldea")
-	await _leer_dialogo()
-	_maisha().global_position = bata.global_position + Vector2(-18, 0)
-	await _esperar(0.3)
-	await _hablar_con(bata)
-	_comprobar(Estado.tiene("bata_conocido"), "Bata cuenta lo del transbordador y la Gruta de las Raíces")
 
 	print("RESULTADO: ", "todo correcto" if _fallos == 0 else "%d fallos" % _fallos)
 	get_tree().quit(_fallos)
