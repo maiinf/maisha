@@ -49,6 +49,7 @@ var _oido_agua: Node
 
 func _ready() -> void:
 	get_tree().paused = false            # por si se cambió de escena con algo en pausa (un narrador, un menú)
+	Impacto.restablecer_velocidad()      # (y por si se quedó a cámara lenta o en un parón)
 	RenderingServer.set_default_clear_color(color_fondo)
 	_region = get_node_or_null("Region")
 	_oido_agua = OIDO_AGUA.new()

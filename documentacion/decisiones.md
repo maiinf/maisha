@@ -55,3 +55,10 @@ se pasan.
 | Vecino | **Bata, el pato barquero**: de piedra junto a la dársena; arregla el transbordador y abre La Travesía |
 | Hecho en este paso | Mapa, suelo, pueblo de barqueros (casas, grúa, almacén), transbordador, Bata, textos y prueba. Mamba y el arreglo del transbordador, en el paso siguiente |
 | Mamba hecho | Pelea con 4 postes de amarre en la plataforma, raya de aviso, coletazo en la fase 2; música y sonidos propios. Pendiente: patas más gruesas y raya del aviso más visible |
+
+## 2026-10-13 · Análisis de Iam y fallos
+| Decisión | Elegido |
+| --- | --- |
+| Normas nuevas | Edificios al nivel de la casa del castor; cada ruta con historia y mecánica propias (no recado + zona + jefe); diálogos más humanos; más enemigos con rango |
+| Fallo «no puede correr» / «se queda bugueado» | Causa encontrada: la cámara lenta y el parón de impacto se pisaban y el juego quedaba lento. Ahora solo `Impacto` cambia la velocidad |
+

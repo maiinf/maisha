@@ -532,6 +532,8 @@ La escena anterior, solo para pasear y probar la ropa, sigue en `escenas/prueba_
 
 ## Impacto: que los golpes se sientan
 
+**La velocidad del juego la lleva solo `Impacto`** (`poner_lenta`, `pausa`, `restablecer_velocidad`): la velocidad es la de base × la cámara lenta × el parón del golpe. Antes, la cámara lenta de la lección de la semilla y el parón de un golpe se guardaban «cómo estaba» cada uno, y si se cruzaban el juego se quedaba a cámara lenta para siempre (parecía que Maisha no podía correr). Cada escena deja la velocidad normal al empezar.
+
 El autoload **Impacto** (`scripts/globales/impacto.gd`) da contundencia al combate:
 
 | Cuándo | Qué pasa |

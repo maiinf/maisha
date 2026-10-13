@@ -5,6 +5,9 @@ extends Node
 ##   Impacto.chispa(pos, direccion)   estrella de chispas donde acierta el cetro
 ##   Impacto.onda(pos)                destello, onda, humo y chispas de una explosión
 ##   Impacto.fogonazo(color, a)       la pantalla entera se tiñe un instante (daño, Corazón roto)
+##   Impacto.poner_lenta(0.35)        cámara lenta (1.0 = velocidad normal)
+## La velocidad del juego (Engine.time_scale) solo la toca este script: cámara lenta × parón de impacto. Así un parón
+## que empieza durante la cámara lenta no puede dejar el juego lento para siempre al terminar.
 ## Todo se puede apagar con «activo = false» (para quien se maree con los temblores).
 
 const CHISPA := preload("res://scripts/efectos/chispa_golpe.gd")
@@ -14,7 +17,8 @@ var activo := true
 var temblores := true
 
 var _pausas := 0
-var _escala := 1.0
+var _lenta := 1.0                  # la cámara lenta (1.0 = normal)
+var _base := 1.0                   # la velocidad sin efectos (las pruebas la suben para ir más deprisa)
 var _temblor := 0.0
 var _temblor_dura := 0.0
 var _temblor_tiempo := 0.0
@@ -55,15 +59,38 @@ func poner_temblores(si: bool) -> void:
 func pausa(segundos: float) -> void:
 	if not activo or segundos <= 0.0:
 		return
-	if _pausas == 0:
-		_escala = Engine.time_scale
+	_tomar_base()
 	_pausas += 1
-	Engine.time_scale = _escala * 0.05
+	_aplicar_velocidad()
 	await get_tree().create_timer(segundos, true, false, true).timeout
-	_pausas -= 1
-	if _pausas <= 0:
-		_pausas = 0
-		Engine.time_scale = _escala
+	_pausas = maxi(0, _pausas - 1)
+	_aplicar_velocidad()
+
+
+## Cámara lenta (1.0 = velocidad normal)
+func poner_lenta(factor: float) -> void:
+	_tomar_base()
+	_lenta = clampf(factor, 0.05, 1.0)
+	_aplicar_velocidad()
+
+
+## Todo a velocidad normal (al cambiar de escena, por si algo se quedó a medias)
+func restablecer_velocidad() -> void:
+	if _pausas == 0 and is_equal_approx(_lenta, 1.0):
+		return                         # (no hay nada a medias: no se toca)
+	_lenta = 1.0
+	_pausas = 0
+	_aplicar_velocidad()
+
+
+## Si no hay ningún efecto en marcha, la velocidad que haya ahora es la de base
+func _tomar_base() -> void:
+	if _pausas == 0 and is_equal_approx(_lenta, 1.0):
+		_base = Engine.time_scale
+
+
+func _aplicar_velocidad() -> void:
+	Engine.time_scale = _base * _lenta * (0.05 if _pausas > 0 else 1.0)
 
 
 func temblar(fuerza: float, segundos: float) -> void:

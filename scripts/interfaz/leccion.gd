@@ -83,13 +83,12 @@ func ensenar(accion_: String, tecla: String, texto: String, focos: Array) -> voi
 func camara_lenta(aviso: String, sigue_haciendo_falta: Callable, maximo := 2.5) -> void:
 	_lenta = true
 	_aviso_lento = aviso
-	var antes := Engine.time_scale
-	Engine.time_scale = 0.35
+	Impacto.poner_lenta(0.35)
 	var t := 0.0
 	while t < maximo and sigue_haciendo_falta.call():
 		await get_tree().process_frame
 		t += get_process_delta_time() / maxf(Engine.time_scale, 0.01)
-	Engine.time_scale = antes
+	Impacto.poner_lenta(1.0)
 	_lenta = false
 
 

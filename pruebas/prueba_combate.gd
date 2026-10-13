@@ -180,6 +180,18 @@ func _ready() -> void:
 	_comprobar(cam == null or cam.offset == Vector2.ZERO, "sin temblores, la cámara no tiembla")
 	Impacto.poner_temblores(true)
 
+	print("La velocidad del juego (cámara lenta y parón de impacto):")
+	var normal := Engine.time_scale
+	Impacto.poner_lenta(0.35)
+	Impacto.pausa(0.1)                    # un parón que empieza durante la cámara lenta...
+	await get_tree().create_timer(0.02, true, false, true).timeout
+	Impacto.poner_lenta(1.0)              # ...la cámara lenta acaba antes que el parón...
+	await get_tree().create_timer(0.3, true, false, true).timeout
+	_comprobar(is_equal_approx(Engine.time_scale, normal), "...y el juego vuelve a su velocidad normal (%.2f)" % Engine.time_scale)
+	Impacto.poner_lenta(0.35)
+	Impacto.restablecer_velocidad()
+	_comprobar(is_equal_approx(Engine.time_scale, normal), "al cambiar de escena, todo a velocidad normal")
+
 	print("RESULTADO: ", "todo correcto" if _fallos == 0 else "%d fallos" % _fallos)
 	await Sonido.callar()
 	get_tree().quit(_fallos)
