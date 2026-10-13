@@ -22,6 +22,7 @@ const R := preload("res://scripts/combate/reglas_combate.gd")
 const PETRINO := preload("res://scripts/enemigos/petrino.gd")
 const NUCLEO := preload("res://scripts/enemigos/nucleo_giza.gd")
 const FORMA := preload("res://scripts/combate/forma_zona.gd")
+const RESCOLDO := preload("res://scripts/mundo/objetos/rescoldo.gd")
 const JEFES := {"mzizi": preload("res://scripts/enemigos/mzizi.gd"), "pembe": preload("res://scripts/enemigos/pembe.gd"),
 	"konokono": preload("res://scripts/enemigos/konokono.gd"), "cosechadora": preload("res://scripts/enemigos/cosechadora.gd"),
 	"kambare": preload("res://scripts/enemigos/kambare.gd"), "mamba": preload("res://scripts/enemigos/mamba.gd"),
@@ -71,6 +72,9 @@ var _tiempo := 0.0
 var _vida_raices := 0.0           # 0..1: la luz de la vida que corre hacia fuera al purgar
 var forma := PackedFloat32Array() # la forma natural del borde (ver forma_zona.gd)
 var _invocados := 0
+var modo_eco := false             # la pelea de ahora es el ECO de un jefe ya vencido (ver revivir_eco)
+var _rescoldo: Node2D
+var _ocultos: Array[Node2D] = []   # durante el eco, el jefe despierto de verdad (el Guardián) se aparta
 
 
 func _ready() -> void:
@@ -91,6 +95,7 @@ func _ready() -> void:
 			_suelo_vivo.modulate.a = 1.0
 		estado = Estado.PURGADA
 		queue_redraw()
+		_poner_rescoldo.call_deferred()
 		return
 	_crear_espinas.call_deferred()
 	_crear_nucleo.call_deferred()
@@ -348,7 +353,7 @@ func _al_romper_nucleo() -> void:
 
 
 func _terminar_purga() -> void:
-	if _gestor:
+	if _gestor and not modo_eco:
 		_gestor.purgar(_indice)
 	for espina in _espinas:
 		espina.queue_free()
@@ -357,6 +362,10 @@ func _terminar_purga() -> void:
 	if _suelo_piedra:
 		_suelo_piedra.visible = false
 	_cambiar(Estado.PURGADA)
+	if modo_eco:
+		_acabar_eco()
+	modo_eco = false
+	_poner_rescoldo()
 	_volver_a_la_musica()
 	Sonido.fanfarria("victoria" if jefe != "" else "purga")
 	create_tween().tween_property(self, "_vida_raices", 0.0, 1.2)
@@ -376,11 +385,93 @@ func _brotar_flores() -> void:
 func _al_caer_maisha() -> void:
 	if estado != Estado.CERRADA:
 		return
+	if modo_eco:
+		# en el eco no pasa nada: el eco se deshace y el rescoldo vuelve
+		var hud_eco := get_tree().get_first_node_in_group("hud")
+		if hud_eco:
+			hud_eco.call("fundido", _deshacer_eco)
+		else:
+			_deshacer_eco()
+		return
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud:
 		hud.call("fundido", _reiniciar_tras_caida)
 	else:
 		_reiniciar_tras_caida()
+
+
+# --- El eco de un jefe ya vencido (para mejorar su rango en el Bestiario) ---------------------------
+
+## El rescoldo de Giza, en medio de la arena de un jefe vencido, mientras no tenga el oro
+func _poner_rescoldo() -> void:
+	if jefe == "" or Bestiario.rango(jefe) >= 3 or is_instance_valid(_rescoldo) or _entidades == null:
+		return
+	_rescoldo = RESCOLDO.new()
+	_rescoldo.zona = self
+	_rescoldo.position = global_position + Vector2(0, radios_umbral.y * 0.45)      # (abajo: el centro es del jefe)
+	_entidades.add_child(_rescoldo)
+
+
+## Revive el eco del jefe: las espinas vuelven y el jefe despierta. Al vencerlo solo cuenta para el Bestiario.
+func revivir_eco() -> void:
+	if jefe == "" or estado != Estado.PURGADA:
+		return
+	modo_eco = true
+	_avisada = true
+	var nombre_jefe := String(Bestiario.FICHAS.get(jefe, {}).get("nombre", jefe))
+	var falta := "la plata" if Bestiario.rango(jefe) < 2 else "el oro"
+	mensaje.emit("El eco de %s despierta (buscas %s)" % [nombre_jefe.get_slice(",", 0), falta])
+	Sonido.efecto("bundi_conjura", 0.0, global_position)
+	# el jefe despierto de verdad (si se queda en la sala, como el Guardián) se aparta mientras dura el eco
+	_ocultos.clear()
+	for n in _entidades.get_children():
+		if n.has_meta("despierto") and n is Node2D:
+			_ocultos.append(n)
+			n.visible = false
+			n.remove_from_group("interactuables")
+	_crear_espinas()
+	_crear_nucleo()
+	# Maisha se aparta hacia el borde (el jefe sale en medio)
+	if _maisha:
+		var lado := (_maisha.global_position - global_position).normalized()
+		_maisha.global_position = punto_del_umbral((lado if lado != Vector2.ZERO else Vector2.DOWN).angle(), 0.8)
+	_cambiar(Estado.DORMIDA)
+
+
+## Al acabar el eco: el jefe del eco se desvanece y vuelve el de verdad
+func _acabar_eco() -> void:
+	if is_instance_valid(_nucleo):
+		var eco := _nucleo
+		eco.remove_from_group("interactuables")
+		var t := eco.create_tween()
+		t.tween_interval(1.5)
+		t.tween_property(eco, "modulate:a", 0.0, 1.0)
+		t.tween_callback(eco.queue_free)
+	for n in _ocultos:
+		if is_instance_valid(n):
+			n.visible = true
+			n.add_to_group("interactuables")
+	_ocultos.clear()
+
+
+func _deshacer_eco() -> void:
+	for e in get_tree().get_nodes_in_group("enemigos"):
+		e.queue_free()
+	for s in get_tree().get_nodes_in_group("semillas"):
+		s.queue_free()
+	if is_instance_valid(_nucleo):
+		_nucleo.queue_free()
+	for espina in _espinas:
+		espina.queue_free()
+	_espinas.clear()
+	_acabar_eco()
+	modo_eco = false
+	var fuera := (_punto_entrada - global_position).normalized()
+	_cambiar(Estado.PURGADA)
+	_volver_a_la_musica()
+	_maisha.call("revivir", punto_del_umbral((fuera if fuera != Vector2.ZERO else Vector2.LEFT).angle(), 1.12))
+	mensaje.emit("El eco se deshace. El rescoldo sigue ahí")
+	_poner_rescoldo()
 
 
 func _reiniciar_tras_caida() -> void:

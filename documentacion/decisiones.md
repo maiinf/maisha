@@ -99,3 +99,4 @@ se pasan.
 | Dónde | Bundi en el Bosque Cobrizo y la Cañada; Buibui en el Camino Cobrizo y el Campo Segado (la Gruta no tiene zonas normales) |
 | Rango | Bronce/plata/oro por cuántos vences (10/30/60); jefes por golpes encajados (cualquiera/≤3/0). Plata da 2 cristales y el secreto; oro, 4 |
 | Bestiario | 6.º bolsillo del diario, con medallas, fichas y «???» para los que no has vencido |
+| Oro de los jefes | Se puede repetir la pelea: en cada arena de jefe vencido queda un **rescoldo de Giza** que revive su eco (sin consecuencias para la historia) hasta tener el oro |

@@ -62,9 +62,9 @@ func _ready() -> void:
 	Bestiario.vencido("petrino", sin_contar)
 	sin_contar.free()
 	_comprobar(Bestiario.cuantos("petrino") == 30, "lo que se desmorona con la purga no cuenta")
-	Bestiario.empezar_jefe("pembe")
-	Bestiario.jefe_vencido("pembe")
-	_comprobar(Bestiario.rango("pembe") == 3, "un jefe vencido sin que te den: rango de oro")
+	Bestiario.empezar_jefe("konokono")
+	Bestiario.jefe_vencido("konokono")
+	_comprobar(Bestiario.rango("konokono") == 3, "un jefe vencido sin que te den: rango de oro")
 	Bestiario.empezar_jefe("kambare")
 	for i in 4:
 		Bestiario.al_herir(5)
@@ -74,6 +74,7 @@ func _ready() -> void:
 	_comprobar(Bestiario.rango("mzizi") == 1, "los jefes vencidos antes del Bestiario cuentan como bronce")
 
 	print("Bundi, el búho-mago:")
+	Estado.marcar("zona/bosque_cobrizo/4")          # Pembe ya vencido (sin rango del Bestiario: bronce)
 	Estado.llegada = ""
 	get_tree().change_scene_to_file("res://escenas/mundo/bosque_cobrizo.tscn")
 	await _esperar(1.5)
@@ -167,6 +168,48 @@ func _ready() -> void:
 	await _esperar(0.5)
 	_comprobar(not is_instance_valid(buibui) or buibui.vida <= 0, "con dos golpes más cae")
 	_comprobar(Bestiario.cuantos("buibui") == 1, "y entra en el Bestiario")
+
+	print("El eco de un jefe (el rescoldo de Giza):")
+	var arena: Node2D = zonas.filter(func(z: Node) -> bool: return z.jefe == "pembe")[0]
+	var rescoldo: Node2D = get_tree().get_first_node_in_group("rescoldos")
+	_comprobar(rescoldo != null and rescoldo.zona == arena, "en la arena de Pembe (vencido, con bronce) hay un rescoldo de Giza")
+	arena.set("activa", true)
+	maisha.global_position = rescoldo.global_position
+	maisha.vida = maisha.vida_maxima()
+	rescoldo.interactuar()
+	_comprobar(arena.modo_eco and arena.estado == arena.Estado.DORMIDA, "al tocarlo, revive el eco de Pembe")
+	for i in 60:
+		if arena.estado == arena.Estado.CERRADA:
+			break
+		await _esperar(0.05)
+	_comprobar(arena.estado == arena.Estado.CERRADA, "las espinas suben y empieza la pelea")
+	maisha.recibir_danio(99, maisha.global_position + Vector2(10, 0), "contacto")
+	for i in 80:
+		if arena.estado == arena.Estado.PURGADA:
+			break
+		await _esperar(0.05)
+	_comprobar(arena.estado == arena.Estado.PURGADA and not arena.modo_eco, "si Maisha cae en el eco, no pasa nada: el eco se deshace")
+	await _esperar(0.3)
+	rescoldo = get_tree().get_first_node_in_group("rescoldos")
+	_comprobar(rescoldo != null and Estado.tiene("zona/bosque_cobrizo/4"), "el rescoldo vuelve y la zona sigue limpia")
+	maisha = _maisha()
+	maisha.vida = maisha.vida_maxima()
+	maisha.global_position = rescoldo.global_position
+	rescoldo.interactuar()
+	for i in 60:
+		if arena.estado == arena.Estado.CERRADA:
+			break
+		await _esperar(0.05)
+	arena._nucleo.destruido.emit()                    # (vencido sin que le den)
+	for i in 120:
+		if arena.estado == arena.Estado.PURGADA:
+			break
+		await _esperar(0.05)
+	_comprobar(Bestiario.rango("pembe") == 3, "vencer al eco sin que te den da el oro")
+	await _esperar(0.3)
+	_comprobar(get_tree().get_first_node_in_group("rescoldos") == null, "con el oro, el rescoldo se apaga")
+	for z in zonas:
+		z.set("activa", false)
 
 	print("El bolsillo del Bestiario:")
 	var mochila := get_tree().get_first_node_in_group("mochila")

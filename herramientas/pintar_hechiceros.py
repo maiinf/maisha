@@ -9,6 +9,8 @@
       del que salen los bichos. 0-1 quieta · 2 invoca (patas delanteras arriba, el nido brilla) · 3 golpeada
   MENDE, el bicho de óxido (12×10): el escarabajo que invoca la bruja. 0-1 corre · 2 golpeado
   ORBE (12×12): la bola de Giza que lanza el búho. 0-1 late
+  RESCOLDO (22×28): lo que queda de un jefe en su arena: un anillo de piedras rotas con una llama violeta y dorada
+      que flota encima. Si Maisha lo toca, revive el eco del jefe para pelear otra vez. 0-1 la llama baila
 """
 import os
 import sys
@@ -205,6 +207,33 @@ def orbe(f):
     return lz.sprite(contorno=0.0)
 
 
+def rescoldo(f):
+    W, H = 22, 28
+    lz = Lienzo(W, H, s=8, semilla=761 + f)
+    cx, cy = 11, 23
+    # el anillo de piedras rotas, con brasas violetas entre ellas
+    for k in range(7):
+        a = k / 7 * 2 * np.pi + 0.3
+        px, py = cx + np.cos(a) * 7.5, cy + np.sin(a) * 3
+        piedra = lz.elipse(px, py, 2.2, 1.6, np.degrees(a))
+        lz.sombrear(piedra, PIEDRA[1:], 1.2, LUZ, textura=lz.ruido(0.5, 1, semilla=762 + k), fuerza_tex=0.3)
+    brasas = lz.elipse(cx, cy, 5.5, 2)
+    lz.pintar(brasas, "#1a0c22")
+    lz.brillo(brasas, GIZA[3], 2.5, 0.8)
+    # la llama: violeta por fuera, dorada por dentro, que se mece
+    m = 0.9 if f else -0.9
+    llama = lz.poligono([(cx - 4, cy - 1), (cx - 3.5 + m * 0.3, cy - 8), (cx - 1 + m, cy - 14), (cx + m * 1.4, cy - 20),
+                         (cx + 1.6 + m, cy - 13), (cx + 4, cy - 7), (cx + 4, cy - 1)])
+    lz.brillo(llama, GIZA[3], 4, 0.7)
+    lz.pintar(llama, rampa(["#3a1450", "#7a3aa8", "#b070e0"], np.clip(1 - (cy - lz.y) / 22, 0, 1)))
+    dentro = lz.poligono([(cx - 2, cy - 1), (cx - 1 + m * 0.6, cy - 8), (cx + m * 0.8, cy - 12), (cx + 1.6, cy - 7), (cx + 2, cy - 1)])
+    lz.pintar(dentro, rampa(["#f4b040", "#f9d77a", "#fff4c8"], np.clip(1 - (cy - lz.y) / 12, 0, 1)))
+    lz.brillo(dentro, "#f9d77a", 2, 0.6)
+    for (x, y) in ((cx - 5 + m, cy - 16), (cx + 4 - m, cy - 19)):                  # chispas
+        lz.pintar(lz.circulo(x, y, 0.5), "#f9d77a")
+    return lz.sprite(contorno=0.0)
+
+
 def hoja(fotos):
     w, h = fotos[0].shape[1], fotos[0].shape[0]
     t = np.zeros((h, w * len(fotos), 4), np.uint8)
@@ -215,7 +244,7 @@ def hoja(fotos):
 
 def main():
     os.makedirs(SALIDA, exist_ok=True)
-    for nombre, fn, n in (("bundi", bundi, 6), ("buibui", buibui, 4), ("mende", mende, 3), ("orbe", orbe, 2)):
+    for nombre, fn, n in (("bundi", bundi, 6), ("buibui", buibui, 4), ("mende", mende, 3), ("orbe", orbe, 2), ("rescoldo", rescoldo, 2)):
         Image.fromarray(hoja([fn(k) for k in range(n)]), "RGBA").save(os.path.join(SALIDA, nombre + ".png"))
     print("hechiceros pintados en", SALIDA)
 
