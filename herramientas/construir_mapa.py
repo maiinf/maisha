@@ -2063,6 +2063,87 @@ def crear_travesia():
     return ["".join(f) for f in m], {}
 
 
+def crear_gruta():
+    """La Gruta de las Raíces (64x84, de sur a norte): una CUEVA por dentro, a oscuras. Se entra por el sur, desde el
+    muelle de piedra de La Travesía (las raíces de la boca se apartan con la hoja de Mauti). «0» es roca (paredes).
+      - EL VESTÍBULO DE LAS SEMILLAS (abajo): una sala amplia con nichos donde duermen semillas que brillan.
+      - EL PASILLO DE LAS RAÍCES DORMIDAS: estrecho y largo, con raíces atravesadas que roncan (sigilo).
+      - EL SANTUARIO DE CORTEZA (a la izquierda): donde se consigue el escudo del cetro.
+      - LA GALERÍA DE LAS ESPINAS (a la derecha): plantas de Giza que disparan espinas (con el escudo).
+      - EL FONDO (arriba): la sala grande donde algo duerme abrazado a las raíces del Primer Árbol.
+    Las huellas lilas de Mauti van de la entrada al fondo."""
+    ANCHO, ALTO = 64, 84
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+    azar = random.Random(251)
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    def sala(cx, cy, rx, ry, semilla):
+        az = random.Random(semilla)
+        fase = az.random() * 6
+        for y in range(ALTO):
+            for x in range(ANCHO):
+                a = math.atan2(y - cy, x - cx)
+                r = 1.0 + 0.12 * math.sin(a * 3 + fase) + 0.07 * math.sin(a * 7 + fase * 2)
+                if ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= r * r:
+                    poner(x, y, ".")
+
+    def tunel(puntos, ancho):
+        for (a_, b_) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b_[0] - a_[0]), abs(b_[1] - a_[1])) * 2) + 1
+            for i in range(pasos + 1):
+                t_ = i / pasos
+                x = a_[0] + (b_[0] - a_[0]) * t_
+                y = a_[1] + (b_[1] - a_[1]) * t_
+                w = ancho + math.sin(t_ * 5 + a_[0]) * 0.6
+                for dx in range(-int(w), int(w) + 1):
+                    for dy in range(-int(w), int(w) + 1):
+                        if dx * dx + dy * dy <= w * w:
+                            poner(int(x) + dx, int(y) + dy, ".")
+
+    # las salas
+    sala(32, 72, 12, 7, 1)          # el vestíbulo de las semillas
+    sala(12, 40, 7, 6, 2)           # el santuario de corteza
+    sala(52, 40, 8, 9, 3)           # la galería de las espinas
+    sala(32, 14, 15, 9, 4)          # el fondo
+    # los túneles: la boca, el pasillo de las raíces dormidas, los ramales y la subida al fondo
+    tunel([(32, 83), (32, 78)], 2.2)
+    tunel([(32, 65), (31, 56), (33, 46), (31, 36)], 1.6)          # el pasillo (estrecho)
+    tunel([(31, 44), (22, 42), (17, 41)], 1.4)                      # al santuario
+    tunel([(33, 48), (42, 44), (46, 42)], 1.4)                      # a la galería
+    tunel([(52, 31), (48, 24), (42, 20)], 1.6)                      # de la galería al fondo
+    tunel([(31, 36), (31, 30), (30, 23)], 1.2)                      # el atajo del pasillo al fondo (tapado por raíces)
+    # las raíces dormidas atravesadas en el pasillo (y la que tapa el atajo)
+    for y in (60, 54, 49):
+        poner(31, y, "ŕ"); poner(32, y, "ŕ")
+    poner(31, 28, "ř"); poner(30, 28, "ř")
+    # semillas dormidas en los nichos del vestíbulo y del fondo; el altar del escudo; las espinas de la galería
+    for (x, y) in ((22, 70), (25, 66), (40, 66), (43, 71), (36, 77), (27, 77), (20, 14), (44, 12), (26, 8), (38, 8)):
+        poner(x, y, "ŝ")
+    poner(10, 38, "ą")
+    for (x, y) in ((49, 36), (56, 38), (50, 45), (55, 46)):
+        poner(x, y, "ę")
+    # el corazón del fondo (lo que duerme) y la salida del norte (el Sendero Olvidado, cerrado)
+    poner(32, 10, "1")
+    for x in range(30, 35):
+        poner(x, 0, "^")
+        for y in range(1, 6):
+            poner(x, y, ".")
+    # la entrada (sur)
+    for x in range(30, 35):
+        poner(x, ALTO - 1, "_")
+    poner(32, 80, "S")
+    # secretos: dos nichos escondidos
+    poner(4, 43, "X")
+    tunel([(6, 42), (4, 43)], 0.8)
+    poner(61, 52, "X")
+    tunel([(59, 48), (61, 52)], 0.8)
+    textos = {"1": "12, 7, 4, 0, , jefe:nudo"}
+    return ["".join(f) for f in m], textos
+
+
 # ---------------------------------------------------------------------------
 # Dibujar el suelo a partir del texto
 # ---------------------------------------------------------------------------

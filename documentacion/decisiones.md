@@ -73,3 +73,11 @@ se pasan.
 | La Travesía, oleadas | Cangrejos que trepan por la borda; anguilas de óxido (nuevas) que saltan por encima de la cubierta (golpe en el aire las tumba) |
 | 7.º eco | En la isla: Mauti llega a la Gruta y deja su hoja de cobre bajo una piedra para Maisha (objeto clave «hoja_mauti») |
 
+## 2026-10-13 · Gruta de las Raíces (propuesta)
+| Decisión | Elegido |
+| --- | --- |
+| Tipo de lugar | Cueva por dentro (64×84, `crear_gruta`, boceto `documentacion/boceto_gruta_raices.png`) |
+| Mecánicas nuevas propuestas | Oscuridad (solo el brillo de Maisha, las semillas dormidas y las huellas lilas de Mauti); pasillo de raíces dormidas (sigilo: andar sí, correr o pelear las despierta); escudo del cetro en el santuario; galería de espinas que necesita el escudo |
+| Entrada | Las raíces de la boca se apartan con la hoja de Mauti |
+| Pendiente de Iam | Tecla del escudo, qué duerme en el fondo, cuánta oscuridad |
+
