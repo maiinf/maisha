@@ -150,6 +150,12 @@ const MAMBA_COLETAZO := 40.0            # fase 2: al soltarse del poste, el cole
 const MAMBA_RONDA := Vector2(150, 96)   # semiejes del círculo de agua por donde acecha
 const MAMBA_SUJETO := 2.4               # Bata lo sujeta con la pértiga contra el borde: a tiro desde la plataforma
 
+const GUARDIAN_VIDA := 12
+const GUARDIAN_AVISO := 0.9              # escarba antes de embestir (la raya marca hacia dónde)
+const GUARDIAN_ATURDIDO := 2.4           # tras chocar contra la pared: la máscara, a tiro (cetro 1, semilla 2)
+const GUARDIAN_DANIO_SEMILLA := 2
+const GUARDIAN_ESPERA := 1.6
+
 const ESPINO_VIDA := 2                  # el espino de Giza: el cetro rebota; una semilla lo deshace
 const ESPINO_CADA := 1.7                # escupe una espina cada tanto, si Maisha está cerca
 const ESPINO_ALCANCE := 150.0

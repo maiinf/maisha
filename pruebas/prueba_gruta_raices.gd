@@ -218,6 +218,53 @@ func _ready() -> void:
 	await _esperar(0.2)
 	_comprobar(not is_instance_valid(espino), "una semilla lo deshace")
 
+	print("El Guardián y su pesadilla:")
+	var fondo: Node2D = null
+	for z in get_tree().get_nodes_in_group("zonas"):
+		if z.get_meta("clave") == "1":
+			fondo = z
+	_comprobar(fondo != null and fondo.jefe == "guardian", "en el fondo duerme el Guardián de la Gruta")
+	_maisha().vida = _maisha().vida_maxima()
+	_maisha().global_position = fondo.global_position + Vector2(0, 50)
+	await _esperar(1.2)
+	var g: Node2D = get_tree().get_first_node_in_group("jefes")
+	_comprobar(g != null and g.fase != g.Fase.DORMIDO, "al entrar, la pesadilla lo despierta como a una marioneta")
+	_comprobar(Sonido.musica_actual == "jefe_guardian", "con su música («La pesadilla del Guardián»)")
+	_comprobar(not g.recibir_golpe(1, Vector2.UP), "con la máscara puesta, el cetro rebota")
+	# la ola de raíces: de frente y con el escudo, no hace daño
+	g.call("_cambiar", g.Fase.ESPERA)
+	g.set("_espera", 99.0)                 # (quieto, para probar la ola a solas)
+	_maisha().mirar(Vector2.UP)
+	Input.action_press("golpe")
+	await _esperar(0.45)
+	_maisha().set("_invulnerable", 0.0)
+	var vida_ola: int = _maisha().vida
+	g.set("_ola_desde", _maisha().global_position + Vector2(0, -60))
+	g.set("_ola_hacia", Vector2.DOWN)
+	g.set("_ola_pillo", false)
+	g.set("_ola", 30.0)
+	await _esperar(0.5)
+	Input.action_release("golpe")
+	_comprobar(_maisha().vida == vida_ola, "la ola de raíces se para con el escudo, de frente")
+	g.call("_chocar")
+	_comprobar(g.fase == g.Fase.ATURDIDO, "si choca contra la pared, queda aturdido con la máscara torcida")
+	var vida_g: int = g.vida
+	_comprobar(g.recibir_golpe(1, Vector2.UP) and g.vida == vida_g - 1, "aturdido, el cetro le agrieta la máscara")
+	g.vida = 1
+	g.recibir_golpe(1, Vector2.UP)
+	_comprobar(g.fase == g.Fase.VENCIDO, "la máscara estalla")
+	for i in 60:
+		await _esperar(0.25)
+		await _leer_dialogo()
+		if Estado.tiene("gruta_guardian") and fondo.estado == fondo.Estado.PURGADA:
+			break
+	_comprobar(Estado.tiene("gruta_guardian") and fondo.estado == fondo.Estado.PURGADA, "el Guardián despierta y el fondo queda purgado")
+	for i in 20:
+		await _esperar(0.25)
+		await _leer_dialogo()
+	_comprobar(get_tree().get_nodes_in_group("tapon_raices").is_empty(), "la maraña del atajo se aparta")
+	_comprobar(g.is_in_group("interactuables"), "y se queda en la sala, despierto, para hablar")
+
 	print("De vuelta a La Travesía:")
 	_maisha().global_position = _puerta("travesia").global_position + Vector2(0, -30)
 	await _cruzar("mover_abajo", "LaTravesia")

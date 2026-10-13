@@ -1,2 +1,2 @@
 ; zona = semieje horizontal, semieje vertical (en casillas), borde de aviso (casillas), enemigos al cerrarse[, aldeano de piedra junto a la zona][, practica | jefe:<nombre>]
-1 = 12, 7, 4, 3
+1 = 12, 7, 4, 0, , jefe:guardian

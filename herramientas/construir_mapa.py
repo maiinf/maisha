@@ -2126,7 +2126,7 @@ def crear_gruta():
     for (x, y) in ((49, 36), (56, 38), (50, 45), (55, 46)):
         poner(x, y, "ę")
     # el corazón del fondo (lo que duerme) y la salida del norte (el Sendero Olvidado, cerrado)
-    poner(32, 10, "1")
+    poner(32, 15, "1")
     for x in range(30, 35):
         poner(x, 0, "^")
         for y in range(1, 6):
@@ -2140,7 +2140,7 @@ def crear_gruta():
     tunel([(6, 42), (4, 43)], 0.8)
     poner(61, 52, "X")
     tunel([(59, 48), (61, 52)], 0.8)
-    textos = {"1": "12, 7, 4, 3"}
+    textos = {"1": "12, 7, 4, 0, , jefe:guardian"}
     return ["".join(f) for f in m], textos
 
 

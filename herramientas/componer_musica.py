@@ -562,6 +562,7 @@ TITULOS = {
     "orilla": "La linterna en la orilla",
     "jefe_mamba": "Mamba, el cocodrilo de herrumbre",
     "embarcadero": "Canción de barqueros",
+    "jefe_guardian": "La pesadilla del Guardián",
 }
 
 # =============================================================================
@@ -1240,6 +1241,38 @@ def embarcadero():
     return final(p, sala=2.6, mezcla=0.28, brillo=5200)
 
 
+def jefe_guardian():
+    """Un coro grave y lento como un órgano de raíces, un latido de corazón que se acelera y, por encima, una frase
+    de Maisha que intenta despertar al Guardián (y casi lo consigue)."""
+    tempo = Tempo(92)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    acords = [["D2", "A2", "F3"], ["A#1", "F2", "D3"], ["G1", "D2", "A#2"], ["A1", "E2", "C#3"]] * 2
+    for i in range(6):
+        a = acords[i]
+        p.poner(coro(a, tempo.s(16) + 1.2, "o", 0.75), tempo.s(i * 16), 0.5)
+        p.poner(bajo(a[0][:-1] + "1", tempo.s(16)), tempo.s(i * 16), 0.6)
+    # el latido: dos golpes (pum-pum) y silencio; en la segunda mitad, más seguido
+    for c in range(pulsos // 4):
+        base = c * 4
+        p.poner(tambor("D2", 0.5, 0.55, golpe=0.3), tempo.s(base))
+        p.poner(tambor("D2", 0.4, 0.4, golpe=0.3), tempo.s(base + 0.5))
+        if c >= 12:
+            p.poner(tambor("D2", 0.4, 0.4, golpe=0.3), tempo.s(base + 2))
+            p.poner(tambor("D2", 0.3, 0.3, golpe=0.3), tempo.s(base + 2.5))
+        if c % 4 == 3:
+            p.poner(taiko(1.6, 0.85), tempo.s(base + 3))
+    # la marioneta: balafón agudo y desafinado, como hilos que tiran
+    for b in range(0, pulsos * 2, 3):
+        p.poner(balafon(["A4", "A#4", "D5", "C#5"][b % 4], 0.3, 0.16), tempo.s(b * 0.5), pan=0.35)
+    # la frase de Maisha en la flauta (el tema que intenta despertarlo)
+    frase = [("D5", 0, 2), ("F5", 2, 1), ("A5", 3, 3), ("G5", 6, 1), ("F5", 7, 1), ("E5", 8, 4)]
+    for vuelta in (32, 64):
+        melodia(p, tempo, frase, desde=vuelta, instrumento=lambda n, d: flauta(n, d, 0.46, vibrato=5.0), volumen=0.4, pan=0.2, sostener=0.95)
+        melodia(p, tempo, frase, desde=vuelta + 16, instrumento=kalimba, volumen=0.3, pan=-0.2)
+    return final(p, sala=3.0, mezcla=0.35, brillo=4400)
+
+
 NO_SE_REPITEN = ("raiz_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
 PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": prados, "aldea": aldea,
           "interior": interior, "combate": combate, "jefe": jefe, "purga": purga, "victoria": victoria, "objeto": objeto, "tarea": tarea,
@@ -1248,7 +1281,7 @@ PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": 
           "tienda": tienda, "raiz_libre": raiz_libre, "sendero": sendero, "pasarelas": pasarelas,
           "cobrizo": cobrizo, "surcos": surcos, "canada": canada, "jefe_kambare": jefe_kambare, "lago": lago,
           "orilla": orilla, "jefe_mamba": jefe_mamba,
-          "embarcadero": embarcadero}
+          "embarcadero": embarcadero, "jefe_guardian": jefe_guardian}
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

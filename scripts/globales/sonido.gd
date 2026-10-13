@@ -61,6 +61,7 @@ const VOLUMEN := {
 	"murcielago_aleteo": -8.0, "cencerro": -5.0, "escala_tramo": -5.0,
 	"kambare_ruge": -1.0, "kambare_salta": -3.0, "kambare_cae": -1.0, "kambare_escupe": -4.0, "kambare_dolor": -2.0,
 	"kambare_vencido": 0.0, "cangrejo_chasca": -6.0, "cangrejo_vuelca": -4.0,
+	"guardian_brama": -1.0, "guardian_carga": -2.0, "mascara_cruje": -3.0, "mascara_rompe": 0.0,
 	"raiz_ronca": -10.0, "raiz_despierta": -3.0, "raiz_azota": -1.0,
 	"mamba_ruge": -1.0, "mamba_salta": -3.0, "mamba_muerde": -1.0, "mamba_dolor": -2.0, "mamba_coletazo": -3.0, "mamba_vencido": 0.0,
 }

@@ -57,7 +57,7 @@ Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--h
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,
 Senda de los Surcos, Cañada del Eco y Orilla de Juncos hechos; faltan 3) y el misterio de los 9 ecos perdidos (7 hechos).
-El Embarcadero Junco está hecho (casa sellada de Bata, Mamba 2 contra 1, transbordador arreglado con poderes) y La Travesía es un viaje en barca con oleadas (cangrejos y anguilas) y la isla del 7.º eco. La Gruta de las Raíces tiene la entrada, la oscuridad, el sigilo, el escudo (J mantenida) y las espinas; falta el Guardián. El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
+El Embarcadero Junco está hecho (casa sellada de Bata, Mamba 2 contra 1, transbordador arreglado con poderes) y La Travesía es un viaje en barca con oleadas (cangrejos y anguilas) y la isla del 7.º eco. La Gruta de las Raíces está hecha (oscuridad, sigilo, escudo con J mantenida, espinos y el Guardián). Faltan el Paso de Piedra, los ecos 8 y 9 y el Sendero Olvidado. El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
 
 ## graphify
 

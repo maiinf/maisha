@@ -2469,5 +2469,39 @@
 				]
 			}
 		]
+	},
+	"guardian_despierta": {
+		"nombre": "El Guardián",
+		"conversaciones": [
+			{
+				"lineas": [
+					"...Mmm. Qué sueño tan largo. Y tan feo. Soñaba que me movían como a un muñeco de ramas.",
+					"Tú me has despertado, ¿verdad, lucecita de hojas? Tienes la misma luz que la otra. La lila.",
+					"Mauti. Sí. Mauti durmió aquí, a mi lado, una noche entera. Me contaba cosas para que yo no tuviera pesadillas. Qué ironía.",
+					"Por la mañana siguió hacia arriba, por el Sendero Olvidado, a las Ruinas del Primer Árbol. Dijo que allí estaba quien no quería que nada se segara.",
+					"El sendero está cerrado. Lo cerró el propio Primer Árbol cuando empezó a enfermar. Solo se abre con todas sus voces: los nueve ecos.",
+					"Cuando los tengas, vuelve. Yo te abriré el paso. Ah, y esa maraña del atajo... ya no hace falta. Ya no tengo miedo de que entre nadie."
+				]
+			}
+		]
+	},
+	"guardian": {
+		"nombre": "El Guardián",
+		"conversaciones": [
+			{
+				"si": [
+					"sendero_abierto"
+				],
+				"lineas": [
+					"Las nueve voces. El sendero ya te reconoce. Ve. Y si ves a Mauti, dile que el viejo ciervo duerme bien."
+				]
+			},
+			{
+				"lineas": [
+					"Nueve ecos, lucecita. Cuantos más escuches, más fuerte se oirá el Primer Árbol desde aquí.",
+					"Yo me quedo. Alguien tiene que cuidar de las semillas que duermen. Y de no volver a soñar con muñecos."
+				]
+			}
+		]
 	}
 }

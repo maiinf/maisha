@@ -10,6 +10,7 @@ const RAIZ_DORMIDA := preload("res://scripts/mundo/gruta/raiz_dormida.gd")
 const TAPON := preload("res://arte/mundos/raiz/gruta/raiz_tapon.png")
 const ALTAR := preload("res://scripts/mundo/gruta/altar_corteza.gd")
 const ESPINO := preload("res://scripts/enemigos/espino.gd")
+const GUARDIAN := preload("res://scripts/enemigos/guardian.gd")
 
 
 func _ready() -> void:
@@ -18,6 +19,12 @@ func _ready() -> void:
 	oscuridad.name = "Oscuridad"
 	add_child(oscuridad)
 	_crear_raices()
+	Estado.marca_puesta.connect(_al_poner_marca_gruta)
+	if Estado.tiene("gruta_guardian"):
+		# ya despierto: se queda en el fondo, tranquilo (su zona ya está purgada)
+		var guardian: Node2D = GUARDIAN.new()
+		guardian.position = Vector2(32, 15) * 16.0 + Vector2(8, -12)
+		$Entidades.add_child(guardian)
 	_maisha.caida.connect(_al_caer)
 	if not Estado.tiene("gruta_llegada"):
 		_pensar_al_llegar.call_deferred()
@@ -67,6 +74,19 @@ func _crear_raices() -> void:
 					cosa.set("radio_interaccion", 34.0)
 					tapon.add_child(cosa)
 					$Entidades.add_child(tapon)
+
+
+## Al despertar el Guardián, la maraña del atajo se aparta; y al poco, habla
+func _al_poner_marca_gruta(marca: String) -> void:
+	if marca != "gruta_guardian":
+		return
+	for tapon in get_tree().get_nodes_in_group("tapon_raices"):
+		var t := create_tween()
+		t.tween_property(tapon, "modulate:a", 0.0, 1.5)
+		t.tween_callback(tapon.queue_free)
+	await get_tree().create_timer(2.0).timeout
+	if is_inside_tree():
+		await CHARLA_SCRIPT.hablar(self, "guardian_despierta")
 
 
 func _pensar_al_llegar() -> void:

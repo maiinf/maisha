@@ -1721,6 +1721,47 @@ def raiz_azota():
     return reverb(p.entera(), 0.7, 0.22)
 
 
+def guardian_brama():
+    """El Guardián brama dormido: un bramido de ciervo enorme, ronco y hueco, con un eco de madera."""
+    p = Pista(2.0)
+    d = 1.4
+    n = _n(d)
+    f = np.concatenate([np.linspace(70, 140, n // 3), np.linspace(140, 60, n - n // 3)])
+    voz = (sierra(f, d) * 0.45 + seno(f * 2, d) * 0.3 + seno(f * 3.01, d) * 0.12) * adsr(n, 0.15, 0.2, 0.7, 0.5)
+    p.poner(paso_bajo(voz, 900) * 0.9, 0.0)
+    p.poner(paso_banda(ruido(0.6), 300, 1200) * caida(_n(0.6), 0.3) * 0.15, 0.2)
+    return reverb(p.entera(), 1.8, 0.4)
+
+
+def guardian_carga():
+    """Carga: pezuñas de madera que golpean la roca, cada vez más deprisa."""
+    p = Pista(0.9)
+    for k in range(6):
+        t = 0.15 * (1 - k * 0.08) * k
+        golpe = seno(_desliz(160, 70, 0.08), 0.08) * caida(_n(0.08), 0.03)
+        p.poner(golpe * 0.8, t)
+        p.poner(paso_banda(ruido(0.05), 800, 3000) * caida(_n(0.05), 0.02) * 0.4, t)
+    return reverb(p.entera(), 0.9, 0.3)
+
+
+def mascara_cruje():
+    """La máscara de hueso se agrieta: un crujido seco y un pitido violeta."""
+    p = Pista(0.6)
+    p.poner(paso_banda(ruido(0.12), 2000, 7000) * caida(_n(0.12), 0.04) * 0.7, 0.0)
+    p.poner(seno(_desliz(1800, 900, 0.3), 0.3) * caida(_n(0.3), 0.1) * 0.15, 0.02)
+    return reverb(p.entera(), 0.7, 0.25)
+
+
+def mascara_rompe():
+    """La máscara estalla: cristal de hueso que se rompe y una nota limpia que sube, de alivio."""
+    p = Pista(3.2)
+    for k in range(10):
+        p.poner(paso_banda(ruido(0.08), 1500 + k * 300, 8000) * caida(_n(0.08), 0.03) * (0.6 - k * 0.04), k * 0.05)
+    for k, nota in enumerate(("D5", "A5", "D6", "F#6")):
+        p.poner(campanita(nota, 1.6, 0.35), 0.9 + k * 0.18)
+    return reverb(p.entera(), 2.0, 0.4)
+
+
 def cangrejo_chasca():
     """El cangrejo de herrumbre chasca las pinzas: dos clics metálicos secos, con un rechinar de óxido."""
     p = Pista(0.5)
@@ -1788,6 +1829,8 @@ EFECTOS = {
     "kambare_ruge": (kambare_ruge, 0.85), "kambare_salta": (kambare_salta, 0.7), "kambare_cae": (kambare_cae, 0.9),
     "kambare_escupe": (kambare_escupe, 0.65), "kambare_dolor": (kambare_dolor, 0.8), "kambare_vencido": (kambare_vencido, 0.85),
     "raiz_ronca": (raiz_ronca, 0.7), "raiz_despierta": (raiz_despierta, 0.8), "raiz_azota": (raiz_azota, 0.9),
+    "guardian_brama": (guardian_brama, 0.85), "guardian_carga": (guardian_carga, 0.8),
+    "mascara_cruje": (mascara_cruje, 0.75), "mascara_rompe": (mascara_rompe, 0.85),
     "mamba_ruge": (mamba_ruge, 0.85), "mamba_salta": (mamba_salta, 0.7), "mamba_muerde": (mamba_muerde, 0.85),
     "mamba_dolor": (mamba_dolor, 0.8), "mamba_coletazo": (mamba_coletazo, 0.7), "mamba_vencido": (mamba_vencido, 0.85),
     "cangrejo_chasca": (cangrejo_chasca, 0.55), "cangrejo_vuelca": (cangrejo_vuelca, 0.65),

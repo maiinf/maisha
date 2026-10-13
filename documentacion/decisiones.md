@@ -80,3 +80,5 @@ se pasan.
 | Mecánicas nuevas propuestas | Oscuridad (solo el brillo de Maisha, las semillas dormidas y las huellas lilas de Mauti); pasillo de raíces dormidas (sigilo: andar sí, correr o pelear las despierta); escudo del cetro en el santuario; galería de espinas que necesita el escudo |
 | Entrada | Las raíces de la boca se apartan con la hoja de Mauti |
 | Elegido por Iam | Escudo con J mantenida; en el fondo, el Guardián de la Gruta con una pesadilla de Giza (se pelea contra la pesadilla); bastante oscuridad |
+| El Guardián | Ciervo de raíz con máscara de Giza (marioneta): embestida contra la pared, ola de raíces que para el escudo, 3 fases. Al despertar cuenta que Mauti siguió por el Sendero Olvidado (9 ecos) |
+
