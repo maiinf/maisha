@@ -115,6 +115,92 @@ func _ready() -> void:
 	_comprobar(cubierta.grow(1).has_point(local), "por mucho que ande, Maisha no se sale de la cubierta")
 	_comprobar(Sonido.musica_actual == "orilla", "suena la barcarola de la Orilla")
 
+	print("Lo que sale del agua:")
+	viaje.recorrido = viaje._largo * 0.125
+	await _esperar(1.5)
+	var cangrejos := get_tree().get_nodes_in_group("enemigos").filter(func(e: Node) -> bool: return String(e.get_script().resource_path).ends_with("cangrejo.gd"))
+	_comprobar(cangrejos.size() >= 2 and viaje._a_bordo.size() >= 2, "los cangrejos trepan por la borda a la cubierta (%d)" % cangrejos.size())
+	for e in get_tree().get_nodes_in_group("enemigos"):
+		e.call("morir")
+	await _esperar(0.5)
+
+	print("La isla del séptimo eco:")
+	viaje._oleada = 2
+	viaje.recorrido = viaje._parada - 10.0
+	for i in 40:
+		await _esperar(0.2)
+		await _leer_dialogo()
+		if viaje.fase == viaje.Fase.PARADA:
+			break
+	_comprobar(viaje.fase == viaje.Fase.PARADA, "junto a la isla, la barca se para")
+	await _esperar(1.5)
+	await _leer_dialogo()
+	# baja andando por la pasarela hasta la isla
+	_maisha().global_position = viaje.position + Vector2(40, -5)
+	await _esperar(0.2)
+	await _empujar("mover_derecha", 1.6)
+	_comprobar(_maisha().global_position.x > viaje.position.x + 100.0, "Bata tiende una pasarela y Maisha baja andando a la isla (%.0f)" % (_maisha().global_position.x - viaje.position.x))
+	var eco: Node2D = get_tree().get_first_node_in_group("ecos_perdidos")
+	_maisha().global_position = eco.global_position + Vector2(-14, 6)
+	await _esperar(0.3)
+	_comprobar(_maisha().global_position.distance_to(eco.global_position + Vector2(-14, 6)) < 3.0, "Maisha baja a la isla")
+	var en_tierra := _maisha().global_position
+	_maisha().global_position = Vector2(viaje.position.x, en_tierra.y + 120.0)
+	await _esperar(0.2)
+	_comprobar(_maisha().global_position.distance_to(en_tierra) < 3.0, "pero no puede meterse en el agua")
+	eco.interactuar()
+	await _esperar(1.2)
+	var dialogo := get_tree().get_first_node_in_group("dialogo")
+	var con_imagen := false
+	for i in 120:
+		if dialogo.get("_ilustracion") != null and dialogo.get("_ilustracion_alfa") > 0.5:
+			con_imagen = true
+		if not dialogo.hablando:
+			break
+		dialogo.pasar()
+		await _esperar(0.12)
+	await _esperar(1.2)
+	_comprobar(con_imagen and Estado.tiene("eco/la_travesia"), "el séptimo eco, con su ilustración (19_eco_travesia)")
+	var hoja: Node2D = null
+	for n in get_tree().get_nodes_in_group("interactuables"):
+		for h in n.get_children():
+			if h is Sprite2D and (h as Sprite2D).texture and (h as Sprite2D).texture.resource_path.ends_with("hoja_mauti.png"):
+				hoja = n
+	_comprobar(hoja != null, "debajo de la piedra plana aparece la hoja de Mauti")
+	_maisha().global_position = hoja.global_position + Vector2(-10, 4)
+	await _esperar(0.3)
+	hoja.interactuar()
+	for i in 40:
+		await _esperar(0.2)
+		await _leer_dialogo()
+		if Estado.tiene("hoja_mauti"):
+			break
+	_comprobar(Estado.tiene("hoja_mauti"), "Maisha recoge la hoja de Mauti")
+	_maisha().global_position = viaje.position + Vector2(0, -10)
+	for i in 30:
+		await _esperar(0.2)
+		await _leer_dialogo()
+		if viaje.fase == viaje.Fase.NAVEGA:
+			break
+	_comprobar(viaje.fase == viaje.Fase.NAVEGA, "de vuelta a bordo, Bata sigue río arriba")
+
+	print("Las anguilas de óxido:")
+	viaje.recorrido = viaje._largo * 0.625
+	await _esperar(1.5)
+	var anguila: Node2D = null
+	for e in get_tree().get_nodes_in_group("enemigos"):
+		if String(e.get_script().resource_path).ends_with("anguila.gd"):
+			anguila = e
+	_comprobar(anguila != null, "salen anguilas que saltan por encima de la cubierta")
+	for i in 60:
+		if anguila.fase == anguila.Fase.SALTA:
+			break
+		await _esperar(0.05)
+	_comprobar(anguila.recibir_golpe(1, Vector2.RIGHT) and anguila.fase == anguila.Fase.ATURDIDA, "un golpe en el aire la tumba en la cubierta")
+	for e in get_tree().get_nodes_in_group("enemigos"):
+		e.call("morir")
+	viaje._oleada = 4
+
 	print("La llegada al muelle de la Gruta:")
 	viaje.recorrido = viaje._largo - 40.0
 	for i in 60:

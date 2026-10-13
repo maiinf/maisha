@@ -2346,5 +2346,67 @@
 				]
 			}
 		]
+	},
+	"eco_la_travesia": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"marca": "eco/la_travesia",
+				"lineas": [
+					"La espiral de la piedra se enciende. El río se queda en silencio, y entre la niebla aparece una barca pequeña, sin remos, que sube sola..."
+				],
+				"historia": [
+					{
+						"imagen": "19_eco_travesia",
+						"lineas": [
+							"Dentro de la barca hay una luz lila. La barca roza la isla y se queda quieta entre los juncos.",
+							"«Ya casi. La Gruta está ahí arriba. Se la oye respirar.»",
+							"«Maisha... si algún día oyes esto: te dejo algo aquí. Debajo de la piedra plana.»",
+							"«Es mi hoja. La de cobre. Sin ella a lo mejor no me reconoces. Bueno, tú sí. Tú siempre.»",
+							"«Si subes a buscarme, tráemela. Y no te asustes de lo que oigas en la Gruta: las raíces hablan muy alto cuando duermen.»"
+						]
+					}
+				],
+				"tras_historia": [
+					"La luz lila se aleja río arriba, hacia la boca oscura de la Gruta.",
+					"Debajo de una piedra plana, junto a los juncos, algo brilla con color de cobre."
+				]
+			}
+		]
+	},
+	"travesia_isla": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Paramos un momento. ¿Ves eso que brilla en la isla? Hace años que nadie pisa esa isla, y hoy brilla.",
+					"Baja si quieres. Yo sujeto la barca. No tardes, que este río tiene la costumbre de arrastrar lo que se para."
+				]
+			}
+		]
+	},
+	"travesia_hoja": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Debajo de la piedra plana, una hoja seca de cobre. Está tibia, como si la hubieran dejado ayer.",
+					"La hoja de Mauti. «Tráemela.» ...Ahí voy."
+				]
+			}
+		]
+	},
+	"travesia_seguimos": {
+		"nombre": "Bata",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¿Ya? ¿Todo bien? Tienes cara de haber oído algo. ...No me lo cuentes. O sí. Luego.",
+					"¡Seguimos!"
+				]
+			}
+		]
 	}
 }

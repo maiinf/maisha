@@ -26,6 +26,10 @@
                   el norte entre colinas oscuras. Mauti se aleja río arriba en una barca pequeña, con su luz lila, y
                   mira hacia atrás. En la playa, entre los juncos, Maisha sostiene una linterna encendida para que Mauti
                   sepa por dónde volver. Las dos luces, la dorada y la lila, se alargan sobre el agua.
+  19_eco_travesia EL SÉPTIMO ECO (La Travesía). Noche de niebla en el río, cerca de la Gruta: al fondo, la peña con
+                  la boca oscura de la Gruta de las Raíces y raíces enormes que bajan por la roca. Delante, la isla:
+                  la barca de Mauti, sin remos, varada entre los juncos; Mauti, de rodillas junto a una piedra plana,
+                  deja debajo su hoja de cobre, que brilla. Luciérnagas y la luna tapada por la niebla.
   15_eco_surcos   EL CUARTO ECO (Senda de los Surcos). La fiesta de la última siega, de noche: campos con gavillas,
                   guirnaldas de farolillos, una hoguera en el centro y los seres de Raíz bailando a contraluz. En la
                   colina, el Primer Árbol dorado. Junto al fuego, Maisha y Mauti bailan de la mano.
@@ -785,6 +789,96 @@ def eco_orilla():
     return lz
 
 
+def eco_travesia():
+    """«Te dejo algo aquí, en la isla. Debajo de la piedra plana.»"""
+    lz = Lienzo(W, H, semilla=240)
+    rng = np.random.default_rng(241)
+    HZ = 120
+    # cielo de noche con niebla y la luna tapada
+    lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(["#070a12", "#0e1420", "#18202e", "#26303c", "#36424a"], desde=0, hasta=HZ))
+    ci.estrellas(lz, 60, 70, semilla=242, color="#e8f0f4")
+    luna = lz.circulo(140, 34, 12)
+    lz.sumar_luz(lz.desenfocar(luna, 30), "#a8b8c8", 0.25)
+    lz.pintar(luna, "#c8d0d0", 0.5)
+    # la peña del fondo, irregular, con la boca de la Gruta
+    pts = [(200, HZ + 6)]
+    for k in range(15):
+        t = k / 14
+        x = 210 + t * 250
+        y = 26 + 40 * (abs(t - 0.45) * 2) ** 1.6 + math.sin(t * 17) * 5 + rng.random() * 4
+        pts.append((x, y))
+    pts.append((470, HZ + 6))
+    pena = lz.poligono(pts)
+    grietas = (np.abs(np.sin(lz.x * 0.25 + lz.ruido(6, 2, semilla=243) * 9)) < 0.07) * pena
+    lz.sombrear(pena, ["#08090c", "#0e1014", "#161a1e", "#1e2428", "#283036"], 30, (0.4, -0.7, 0.5), textura=lz.ruido(2.5, 3, semilla=243), fuerza_tex=0.55)
+    lz.pintar(grietas, "#050608", 0.8)
+    boca = lz.poligono([(304, HZ + 4), (308, 84), (322, 68), (338, 66), (352, 78), (358, HZ + 4)])
+    lz.pintar(lz.desenfocar(boca, 1), "#020203")
+    lz.sumar_luz(lz.desenfocar(lz.elipse(331, 104, 16, 12), 9), "#6a4a9a", 0.3)
+    # raíces enormes que bajan por la roca, se retuercen y abrazan la boca de la cueva
+    raices = np.zeros((lz.H, lz.W))
+    for k in range(7):
+        lado = -1 if k % 2 == 0 else 1
+        x0 = 330 + lado * (8 + k * 9)
+        a = (x0 + rng.random() * 10, 20 + rng.random() * 8)
+        b = (330 + lado * (26 + k * 6) + math.sin(k) * 12, 60 + k * 4)
+        c = (330 + lado * (20 + k * 11), HZ + 3)
+        pts_r = lz.curva(a, b, c, n=40)
+        raices = np.maximum(raices, lz.trazo(pts_r, 3.2 - k * 0.25, 1.0))
+        for (px, py) in pts_r[8::9]:
+            raices = np.maximum(raices, lz.trazo(lz.curva((px, py), (px + lado * 8, py + 6), (px + lado * 12, py + 16 + rng.random() * 8), n=12), 1.0, 0.3))
+    lz.sombrear(raices, ["#120c08", "#22180e", "#342414", "#4a3420", "#64482c"], 2.4, (0.4, -0.7, 0.5), textura=np.clip(lz.ruido(0.6, 2, semilla=244), 0, 1), fuerza_tex=0.5)
+    lz.pintar(raices * (lz.ruido(1.2, 2, semilla=250) > 0.7), "#2a3a22", 0.6)                 # musgo
+    # las orillas: laderas con bosque a contraluz
+    for (base, amp, sem, col) in ((HZ - 30, 20, 251, "#0b100d"), (HZ - 12, 14, 252, "#080c0a")):
+        linea = ci.linea_horizonte(lz, base, amp, 40, sem)
+        orilla = ci.mascara_bajo(lz, linea) * ((lz.x < 230) | (lz.x > 440)).astype(float) * (lz.y <= HZ + 2)
+        lz.pintar(orilla, col)
+    # el río, con la niebla encima
+    rio = (lz.y > HZ).astype(float)
+    lz.pintar(rio, lz.gradiente(["#1e2e36", "#16242c", "#0e181e", "#0a1014"], desde=HZ, hasta=256))
+    lz.sumar_luz(np.clip(1 - np.abs(lz.x - 140) / 8, 0, 1) * (lz.y > HZ + 4) * (estirar_h(lz, lz.ruido(1.0, 2, semilla=245), 8) > 0.6), "#a8b8c8", 0.25)
+    lz.pintar(np.clip(1 - (lz.y - HZ) / 16, 0, 1) * (lz.y >= HZ), "#141c22", 0.7)            # (el borde del agua, sin raya)
+    lz.pintar(np.clip(1 - (HZ - lz.y) / 10, 0, 1) * (lz.y < HZ) * ((lz.x < 230) | (lz.x > 440)), "#141c22", 0.5)
+    niebla = np.clip(1 - np.abs(lz.y - HZ) / 22, 0, 1) * (lz.ruido(30, 2, semilla=246) * 0.5 + 0.5)
+    lz.pintar(lz.desenfocar(niebla, 4), "#7a8a98", 0.45)
+    # la isla delante, con juncos, y la piedra plana
+    isla = lz.poligono([(120, 256), (150, 214), (210, 196), (300, 192), (380, 200), (430, 222), (460, 256)])
+    lz.sombrear(isla, ["#0c120e", "#141e16", "#1c2a1e", "#263826"], 8, (0.5, -0.7, 0.5), textura=lz.ruido(1.5, 2, semilla=247), fuerza_tex=0.4)
+    piedra = lz.elipse(290, 222, 22, 7)
+    lz.sombrear(piedra, ["#1a1c20", "#2a2e34", "#3e444c", "#565e66"], 6, (0.5, -0.7, 0.5))
+    # la barca de Mauti, sin remos, varada a la izquierda
+    barca = lz.poligono([(150, 222), (158, 232), (210, 232), (218, 220), (210, 224), (158, 224)])
+    lz.sombrear(barca, ["#140c08", "#24160c", "#3a2414", "#5a3a20"], 3, (0.5, -0.7, 0.5))
+    lz.pintar(lz.trazo([(150, 222), (158, 224), (210, 224), (218, 220)], 0.8), "#7a5a3a")
+    # Mauti, de rodillas junto a la piedra, dejando la hoja (que brilla, de cobre)
+    m_lz = Lienzo(W, H, semilla=248)
+    _mauti_luz(m_lz, 262, 222, e=1.3, mira=1)
+    lz.img = 1 - (1 - lz.img) * (1 - np.clip(m_lz.img, 0, 1))
+    hoja = lz.elipse(282, 219, 4, 2, -25)
+    lz.sumar_luz(lz.desenfocar(hoja, 8), "#f4b470", 0.6)
+    lz.pintar(hoja, "#e0904e")
+    lz.pintar(lz.trazo([(279, 220.5), (285, 217.5)], 0.4), "#7a3418")
+    lz.sumar_luz(lz.desenfocar(lz.elipse(262, 222, 30, 8), 10) * isla, "#b8a8e0", 0.25)
+    # juncos a contraluz y luciérnagas
+    juncos = np.zeros((lz.H, lz.W))
+    for k in range(60):
+        x = 120 + rng.random() * 340
+        yb = 200 + rng.random() * 40 if 140 < x < 440 else 250
+        if 240 < x < 320 and yb < 230:
+            continue
+        alto = 12 + rng.random() * 24
+        juncos = np.maximum(juncos, lz.trazo([(x, yb), (x + (rng.random() - 0.5) * 6, yb - alto)], 0.6, 0.3))
+    lz.pintar(juncos * (lz.y > 170), "#060a08")
+    motas = np.zeros((lz.H, lz.W))
+    for k in range(30):
+        motas = np.maximum(motas, lz.circulo(rng.random() * 600, 120 + rng.random() * 120, 0.5 + rng.random() * 0.3))
+    lz.sumar_luz(motas, "#e8f0a0", 0.8)
+    lz.pintar(np.ones((lz.H, lz.W)), "#6db0b0", 0.05)
+    ci.marco_recuerdo(lz, color="#d8f0ec", semilla=249)
+    return lz
+
+
 def _sumar_con_reflejo(lz, otro, eje_y, agua, fuerza):
     """Como _pegar_con_reflejo, pero para lo que está hecho de luz (se suma: lo negro no tapa nada)."""
     lz.img = 1 - (1 - lz.img) * (1 - np.clip(otro.img, 0, 1))
@@ -816,4 +910,4 @@ def _pegar_con_reflejo(lz, otro, eje_y, agua, fuerza, solo_reflejo=False):
     lz.pintar(lz.desenfocar(alfa_r, 0.6) * agua * fuerza, img_r * 0.85 + np.array([0.02, 0.04, 0.08]))
 
 
-PIEZAS = {"18_eco_orilla": eco_orilla, "17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}
+PIEZAS = {"19_eco_travesia": eco_travesia, "18_eco_orilla": eco_orilla, "17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}

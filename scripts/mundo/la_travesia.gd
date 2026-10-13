@@ -11,3 +11,13 @@ func _ready() -> void:
 	var viaje: Node2D = VIAJE.new()
 	viaje.name = "Viaje"
 	$Entidades.add_child(viaje)
+	_maisha.caida.connect(_al_caer)
+
+
+## Si Maisha cae en el viaje, vuelve en la cubierta (y lo que había a bordo se va)
+func _al_caer() -> void:
+	_hud.fundido(func() -> void:
+		for e in get_tree().get_nodes_in_group("enemigos"):
+			e.queue_free()
+		var viaje: Node2D = $Entidades/Viaje
+		_maisha.revivir(viaje.position + Vector2(0, -6)))

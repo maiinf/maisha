@@ -70,3 +70,6 @@ se pasan.
 | Pelea contra Mamba | 2 contra 1: Bata en su barca sujeta a Mamba con la pértiga contra el borde |
 | Arreglar el transbordador | Con los poderes: semilla junto al boquete → juncos tejidos; Latido pegado al casco → la endereza. Sin recados |
 | La Travesía | Viaje en el transbordador: la barca sube sola, Maisha en la cubierta, Bata con la pértiga; atraca en el muelle de piedra de la Gruta. Faltan oleadas y el 7.º eco en la isla |
+| La Travesía, oleadas | Cangrejos que trepan por la borda; anguilas de óxido (nuevas) que saltan por encima de la cubierta (golpe en el aire las tumba) |
+| 7.º eco | En la isla: Mauti llega a la Gruta y deja su hoja de cobre bajo una piedra para Maisha (objeto clave «hoja_mauti») |
+

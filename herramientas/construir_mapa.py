@@ -2007,14 +2007,21 @@ def crear_travesia():
     for y in range(ALTO):
         cx = 24 + 5 * math.sin(y * 0.045) + 2 * math.sin(y * 0.11 + 1)
         ancho = 9 + 1.5 * math.sin(y * 0.07 + 2)
+        # junto a la isla, el río se ensancha hacia el este (la isla queda rodeada de agua)
+        b = max(0.0, 1 - abs(y - 84) / 19.0)
+        ancho_e = ancho + 12 * (b * b * (3 - 2 * b))
         for x in range(ANCHO):
-            if abs(x - cx) <= ancho:
+            if cx - ancho <= x <= cx + ancho_e:
                 poner(x, y, "~")
     # la isla del este, a media subida
-    for y in range(76, 92):
+    isla = set()
+    for y in range(76, 93):
         for x in range(ANCHO):
-            if ((x - 33) / 5.0) ** 2 + ((y - 84) / 7.0) ** 2 <= 1.0:
+            a = math.atan2(y - 84, x - 33)
+            r = 1.0 + 0.1 * math.sin(a * 3 + 1)
+            if ((x - 33) / 4.5) ** 2 + ((y - 84) / 7.0) ** 2 <= r * r:
                 poner(x, y, ".")
+                isla.add((x, y))
     poner(34, 84, "@")
     # el muelle de piedra de la Gruta, arriba a la izquierda, y su camino
     cx_m = int(24 + 5 * math.sin(12 * 0.045) + 2 * math.sin(12 * 0.11 + 1) - 9)
@@ -2028,7 +2035,7 @@ def crear_travesia():
     # orillas: juncos junto al agua; abajo sauces, en medio bosque cerrado, arriba rocas y peñas
     for y in range(ALTO):
         for x in range(ANCHO):
-            if m[y][x] != ".":
+            if m[y][x] != "." or (x, y) in isla:
                 continue
             junto = any(0 <= x + dx < ANCHO and m[y][x + dx] == "~" for dx in (-1, 1))
             r = azar.random()
@@ -2044,8 +2051,10 @@ def crear_travesia():
                 if r < 0.35:
                     poner(x, y, azar.choice("RrrT"))
     # (la isla, con sauces y juncos, y su eco libre)
-    for (x, y) in ((31, 80), (36, 82), (32, 89)):
+    for (x, y) in ((35, 79), (36, 88), (31, 90)):
         poner(x, y, "s")
+    for (x, y) in ((29, 83), (29, 86), (37, 84), (33, 78)):
+        poner(x, y, ";")
     # puertas: abajo, el Embarcadero (se llega en el transbordador); arriba, el camino de la Gruta (cerrado)
     for x in range(20, 28):
         poner(x, ALTO - 1, "_")

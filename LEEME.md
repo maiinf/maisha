@@ -339,10 +339,12 @@ Escena `escenas/mundo/embarcadero_junco.tscn` (mapa de 96×72 casillas, `constru
 
 Escena `escenas/mundo/la_travesia.tscn` (mapa de 48×170, de sur a norte, `construir_mapa.py la_travesia --crear`, `crear_travesia`). **No se anda: se viaja en el transbordador** (`scripts/mundo/travesia/viaje.gd`). Se sube en la punta del muelle del Embarcadero cuando el transbordador ya flota.
 - La barca (`cubierta.png`, vista desde arriba: tablas, borda con postes y cuerda, caseta con tejado de paja, campana, farol, cajas y sacos) sube sola por el centro del río, a 34 píxeles por segundo, con su estela. Maisha va en la cubierta: se puede mover por ella pero no salirse (en este mapa el agua no es sólida: `agua_solida = false` en el nodo Region). Bata, en la popa, clava la pértiga al ritmo de la barca.
-- Las orillas cambian por el camino: juncos y sauces abajo, bosque cerrado en medio, rocas arriba. A media subida, una isla en el lado este (para el séptimo eco).
+- Las orillas cambian por el camino: juncos y sauces abajo, bosque cerrado en medio, rocas arriba.
+- **Lo que sale del agua** (`OLEADAS` en `viaje.gd`, capturas `documentacion/travesia_oleada.png`): en cuatro momentos del viaje Bata grita y salen cangrejos de herrumbre que **trepan por la borda** (van encima de la barca, como Maisha) y, en la segunda mitad, **anguilas de óxido** (`scripts/enemigos/anguila.gd`, enemigo nuevo, `herramientas/pintar_travesia.py`): saltan de un lado al otro de la cubierta en arco (una sombra avisa); si caen encima de Maisha, daño; un golpe de cetro en el aire las tumba en la cubierta, aturdidas, y entonces el cetro les quita vida. Tras tres saltos se van. Si Maisha cae, vuelve en la cubierta.
+- **La isla del séptimo eco** (a media subida, rodeada de agua; `documentacion/travesia_isla.png`): la barca se arrima y se para, Bata tiende una **pasarela** y Maisha puede bajar (a la isla y a la cubierta; nunca al agua). El **séptimo eco** (ilustración `19_eco_travesia`): Mauti llega de noche en su barca sin remos y deja su **hoja de cobre** debajo de una piedra plana para Maisha («Si subes a buscarme, tráemela»). Tras el eco aparece la **hoja de Mauti** (objeto clave `hoja_mauti`, icono 25.º de `objetos.png`). Al volver a bordo, Bata sigue río arriba.
 - Arriba atraca junto al **muelle de piedra** de la Gruta de las Raíces: Bata lo anuncia, Maisha baja (marca `travesia_hecha`) y el agua vuelve a ser sólida. Desde la barca se puede volver al Embarcadero. El camino de la Gruta sigue cerrado (`gruta_abierta`).
 - Música: de momento la barcarola de la Orilla. Prueba: `pruebas/prueba_la_travesia.gd`.
-- Falta: lo que sale del agua durante el viaje (oleadas), la parada en la isla con el séptimo eco y la música propia.
+- Falta: la música propia del viaje y la Gruta de las Raíces.
 
 ### Los ecos perdidos (el misterio de Raíz)
 
@@ -353,6 +355,7 @@ Piedras altas con una espiral tallada (`scripts/mundo/objetos/eco_perdido.gd`). 
 - El cuarto (Senda de los Surcos): `15_eco_surcos.png`: la fiesta de la última siega, de noche, con farolillos, gavillas y una hoguera; Maisha y Mauti bailan de la mano. «Lo que se siembra, Maisha lo despierta. Lo que se siega, Mauti lo guarda.» Y una pregunta que da miedo: «¿Y si un día alguien quisiera que nada se segara nunca?»
 - El quinto (Cañada del Eco): `16_eco_canada.png`: un atardecer en la garganta. En la cornisa, Maisha y Mauti gritan sus nombres y la peña se los devuelve; **Kimya** flota sobre el arroyo quieto y no grita: «El Silencio no tiene eco. Por eso puedo oíros a los dos.» Solo el agua refleja a Kimya, y eso apunta al Lago Espejo.
 - El sexto (Orilla de Juncos): `18_eco_orilla.png`: **la despedida**. Una noche de luna en el río ancho: Mauti se aleja río arriba en una barca pequeña, con su luz lila, y Maisha se queda en la playa con una linterna encendida. «Déjala encendida aquí, en la orilla. Así sabré por dónde volver.» Mauti iba a hablar con quien no quería que nada se segara nunca, río arriba, hacia el norte. Nadie volvió a buscar la linterna.
+- El séptimo (La Travesía): `19_eco_travesia.png`: una noche de niebla junto a la Gruta de las Raíces (la peña con raíces enormes que abrazan su boca). Mauti, de rodillas en la isla del río, deja su hoja de cobre bajo una piedra plana: «Si subes a buscarme, tráemela. Y no te asustes de lo que oigas en la Gruta: las raíces hablan muy alto cuando duermen.»
 
 ## Bosque Cobrizo
 
