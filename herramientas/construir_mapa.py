@@ -1923,8 +1923,9 @@ def crear_embarcadero():
     camino([(42, 30), (rio[30][0] - 1, 30)], 2)
     camino([(43, 16), (rio[12][0] - 1, 12)], 2)
     # el pueblo de barqueros: casas de juncos en la orilla y sobre el agua, el almacén y la grúa rota
-    for (x, y) in ((rio[20][0] - 3, 20), (rio[25][0] - 3, 25), (rio[36][0] - 3, 37), (rio[30][0] + 2, 28),
-                   (rio[30][0] + 5, 33), (48, 22), (36, 30), (rio[42][0] - 3, 42)):
+    # (las casas, con los pilotes en el agua: en la primera casilla de río de la orilla)
+    for (x, y) in ((rio[19][0] + 1, 19), (rio[25][0] + 1, 25), (rio[37][0] + 1, 37), (rio[43][0] + 1, 43),
+                   (rio[30][0] + 8, 29), (rio[34][0] + 6, 35)):
         poner(x, y, "æ")
     poner(rio[16][0] - 2, 16, "å")
     poner(34, 20, "œ")
@@ -1942,7 +1943,7 @@ def crear_embarcadero():
                 poner(x, y, ";")
     for (x, y) in ((10, 48), (20, 8), (rio[60][0] - 3, 66)):
         poner(x, y, "$")
-    reservados = [(rio[12][0] - 2, 10, 3), (34, 20, 4), (5, 22, 2), (8, 64, 2), (22, 68, 3), (32, 3, 3)]
+    reservados = [(rio[12][0] - 2, 10, 3), (34, 19, 6), (31, 20, 5), (38, 20, 5), (5, 22, 2), (8, 64, 2), (22, 68, 3), (32, 3, 3)]
 
     def libre(x, y):
         if m[y][x] not in ".," or en_zona(x, y):

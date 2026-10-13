@@ -3,13 +3,15 @@
     python3 herramientas/pintar_embarcadero.py
 
 Genera (en arte/mundos/raiz/embarcadero/):
-  casa_juncos.png     2 × 56×64   las casas de los barqueros: paredes de juncos atados sobre una plataforma de
-                                  tablas subida en pilotes, tejado de juncos redondeado, una ventana redonda,
-                                  una escalerilla y cosas de barquero (nasas, una red, peces secándose, un remo)
+  casa_juncos.png     2 × 100×92  las casas de los barqueros, al nivel de detalle de la casa del castor: pilotes con
+                                  verdín, plataforma de tablas, paredes de esteras con armazón de troncos, tejado de
+                                  paja a capas, ventana con contraventanas y jardinera, porche, escalerilla, barquita
+                                  amarrada y cosas de barquero (redes, remos, nasa, peces, cántaros, farolillo)
   grua.png            48×76       la grúa del muelle, rota: un poste grueso con su pluma inclinada, la polea
                                   partida, la cuerda colgando y el gancho; un fardo caído al pie
-  almacen.png         88×64       el almacén: un cobertizo largo de tablas con tejado de juncos, el portón abierto
-                                  y, delante, barriles, cajas y sacos
+  almacen.png         132×108     el almacén, al nivel de la casa del castor: zócalo de piedra, troncos, tejado de
+                                  paja con buhardilla de carga y polea, portón abierto, letrero del pez, ventana,
+                                  barriles, cajas, sacos, tendedero de redes y carretilla
   poste.png           2 × 22×44   un poste de amarre de la dársena (alto, de madera clara, con anillo de cuerda): 0 entero,
                                   1 mordido por Mamba (con las marcas de los dientes y astillas)
   transbordador.png   2 × 120×60  el TRANSBORDADOR: una barcaza grande y plana con barandilla, una caseta para el
@@ -23,8 +25,9 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pintor import Lienzo, RAIZ  # noqa: E402
-from pintar_casa_shamba import vetas, rect  # noqa: E402
+from pintor import Lienzo, RAIZ, rampa  # noqa: E402
+from pintar_casa_shamba import vetas, rect, paja, flecos, ventana, troncos  # noqa: E402
+from cinematicas import piedras, flores, COBRE  # noqa: E402
 from pintar_pasarelas import tira, MADERA, CONTORNO, JUNCO  # noqa: E402
 
 SALIDA = os.path.join(RAIZ, "arte", "mundos", "raiz", "embarcadero")
@@ -51,64 +54,123 @@ def _juncos_atados(lz, mascara, semilla, rampa=JUNCO):
 
 
 def casa_juncos(k):
-    W, H = 56, 64
-    lz = Lienzo(W, H, s=6, semilla=301 + k)
-    abajo = 60
-    lz.pintar(lz.desenfocar(lz.elipse(28, abajo, 25, 3), 1.0), "#0e0c0a", 0.4)
-    _pilotes(lz, (9, 22, 35, 47), 40, abajo)
-    # la plataforma de tablas, con el borde claro
-    plat = lz.poligono([(3, 40), (53, 38), (54, 43), (4, 45)])
-    lz.sombrear(plat, MADERA[2:7], 2, LUZ, textura=((lz.x % 4) < 0.6) * 1.0, fuerza_tex=-0.5)
-    lz.pintar(lz.trazo([(3, 40), (53, 38)], 0.6), MADERA[7], 0.9)
-    # las paredes de juncos atados (frente y lado) con una banda de cuerda
-    frente = rect(lz, 9, 19, 40, 40)
-    _juncos_atados(lz, frente, 302 + k)
-    lado = lz.poligono([(40, 19), (48, 15), (48, 37), (40, 40)])
-    _juncos_atados(lz, lado, 303 + k, JUNCO[:6])
-    lz.pintar(lado, "#000000", 0.25)
-    for y in (24, 33):
-        lz.pintar(lz.trazo([(9, y), (40, y)], 0.5) + lz.trazo([(40, y), (48, y - 3.5)], 0.5), CUERDA, 0.9)
-    # la puerta (una cortina de esteras) y la ventana redonda
-    puerta = rect(lz, 15, 26, 23, 40)
-    lz.pintar(puerta, "#1a120c")
-    lz.pintar(rect(lz, 15, 26, 23, 29.5), JUNCO[3], 0.9)                       # la estera enrollada arriba
-    ventana = lz.circulo(32, 28, 3.4)
-    lz.pintar(ventana, "#140e0a")
-    lz.pintar(np.clip(lz.circulo(32, 28, 4.2) - ventana, 0, 1), MADERA[5])
-    if k == 0:
-        lz.brillo(lz.circulo(32, 28.6, 2.4), "#f9b947", 2.2, 0.5)
-    # el tejado de juncos redondeado (como una barca boca abajo), con el borde deshilachado
-    hilos = np.sin(lz.x * 3.1 + lz.y * 0.9) * 0.5 + 0.5
-    curva = 4 + 0.022 * (lz.x - 27) ** 2
-    techo = ((lz.y > curva) & (lz.y < 21 + 0.004 * (lz.x - 27) ** 2) & (lz.x > 4) & (lz.x < 52)).astype(float)
-    lz.sombrear(techo, JUNCO, 6, LUZ, textura=hilos * 0.6 + vetas(lz, 0.3, 7, False, 304 + k) * 0.4, fuerza_tex=0.5)
-    for x in range(8, 50, 7):
-        lz.pintar(lz.trazo([(x, 4.5 + 0.022 * (x - 27) ** 2), (x + 0.5, 20 + 0.004 * (x - 27) ** 2)], 0.45), JUNCO[1], 0.6)
-    flecos = np.zeros((lz.H, lz.W))
-    for j in range(26):
-        x0 = 5 + j * 1.8
-        y0 = 21 + 0.004 * (x0 - 27) ** 2
-        flecos = np.maximum(flecos, lz.trazo([(x0, y0 - 0.5), (x0 + 0.3, y0 + 1.8 + (j % 3))], 0.5))
-    lz.pintar(flecos, JUNCO[5], 0.9)
+    """Una casa de barqueros al nivel de detalle de la casa del castor: plataforma de tablas sobre pilotes (con
+    verdín y el agua al pie), paredes de esteras de junco tejido con un armazón de troncos, un tejado grueso de paja a
+    capas con caballete, una ventana con contraventanas y jardinera (encendida), la puerta con cortina de esteras, un
+    porche con barandilla y escalerilla al agua, y cosas de barquero: redes con flotadores, peces secándose, remos,
+    nasas, cántaros y una barquita amarrada debajo. k = 0 o 1: dos casas distintas (la 1, en espejo y con otras cosas)."""
+    W, H = 100, 92
+    lz = Lienzo(W, H, s=4, semilla=301 + k)
+    rng = np.random.default_rng(302 + k)
+    abajo = 88
+    plat_y = 62
+    # el agua al pie, con sombra de la casa y reflejos
+    agua = lz.poligono([(0, 78), (100, 74), (100, 92), (0, 92)])
+    lz.sombrear(agua, AGUA, 4, LUZ, textura=(np.sin(lz.y * 1.6 + lz.x * 0.25) * 0.5 + 0.5), fuerza_tex=0.35)
+    lz.pintar(lz.desenfocar(rect(lz, 8, 76, 92, 92), 3) * agua, "#0a1414", 0.45)
+    ondas = (np.abs(np.sin(lz.x * 0.45 + lz.y * 1.9)) < 0.08) * agua
+    lz.pintar(ondas, AGUA[5], 0.5)
+    # la barquita amarrada debajo, entre los pilotes
+    barca = lz.poligono([(18, 80), (52, 79), (48, 85), (22, 86)])
+    lz.sombrear(barca, MADERA[1:7], 2, LUZ, textura=vetas(lz, 0.5, 9, True, 303 + k), fuerza_tex=0.4)
+    lz.pintar(lz.poligono([(21, 80.4), (49, 79.6), (46.5, 81.6), (23, 82)]), "#1a120c")
+    lz.pintar(lz.trazo([(18, 80), (52, 79)], 0.6), MADERA[7])
+    lz.pintar(barca * (lz.y > 83) * (np.sin(lz.x * 0.8) > 0), "#4c8d8d", 0.5)          # pintura azul desconchada
+    lz.pintar(lz.trazo([(50, 79.5), (58, 68)], 0.4), CUERDA)
+    # los pilotes, con verdín y el agua al pie
+    for x in (10, 26, 42, 58, 74, 90):
+        p = rect(lz, x - 2.2, plat_y, x + 2.2, abajo)
+        lz.sombrear(p, ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33", "#9a6544"], 2.2, LUZ,
+                    textura=vetas(lz, 0.6, 11, False, int(x)), fuerza_tex=0.4)
+        lz.pintar(rect(lz, x - 2.2, 74, x + 2.2, 80) * (lz.ruido(0.6, 2, semilla=int(x)) > 0.35), "#2e4a2a", 0.75)
+        lz.pintar(lz.elipse(x, 78.5, 3.4, 0.9), AGUA[5], 0.7)
+        lz.pintar(lz.trazo([(x - 2.2, 70), (x + 2.2, 70.6)], 0.5), CUERDA, 0.9)       # la ligadura de cuerda
+    # tornapuntas en cruz entre los pilotes
+    for (a, b) in ((10, 26), (42, 58), (74, 90)):
+        lz.sombrear(lz.trazo([(a, 64), (b, 74)], 1.0) + lz.trazo([(b, 64), (a, 74)], 1.0), MADERA[2:6], 0.8, LUZ)
+    # la plataforma de tablas, con su canto
+    plat = lz.poligono([(2, plat_y - 3), (98, plat_y - 5), (98, plat_y), (2, plat_y + 2)])
+    tabl = (np.abs(np.sin(lz.x / 4.5 * np.pi)) < 0.1).astype(float)
+    lz.sombrear(plat, COBRE, 2, LUZ, textura=1 - tabl * 0.9 + vetas(lz, 0.5, 13) * 0.2, fuerza_tex=0.5)
+    canto = lz.poligono([(2, plat_y + 2), (98, plat_y), (98, plat_y + 3), (2, plat_y + 5)])
+    lz.sombrear(canto, MADERA[1:6], 1.2, LUZ, textura=vetas(lz, 0.5, 13), fuerza_tex=0.4)
+    # la casa: armazón de troncos y paredes de esteras tejidas
+    x0, x1, yt = 18, 74, 30
+    pared = rect(lz, x0, yt, x1, plat_y - 3)
+    tejido = (np.sin(lz.x * 1.9) * np.sin(lz.y * 1.9) > 0).astype(float)
+    hilos = vetas(lz, 0.4, 7, False, 304 + k)
+    lz.sombrear(pared, ["#3d3214", "#5c4a22", "#7a6431", "#958043", "#b09c5c", "#c9b77d"], 6, LUZ,
+                textura=tejido * 0.55 + hilos * 0.45, fuerza_tex=0.55)
+    lz.pintar(pared * (np.abs(np.sin(lz.y / 5.5 * np.pi)) < 0.06), "#3d3214", 0.7)       # las costuras de las esteras
+    lado = lz.poligono([(x1, yt), (86, yt - 5), (86, plat_y - 7), (x1, plat_y - 3)])
+    lz.sombrear(lado, ["#2a2210", "#3d3214", "#5c4a22", "#7a6431", "#958043"], 3, LUZ, textura=tejido * 0.5 + hilos * 0.5, fuerza_tex=0.5)
+    for (xa, xb) in ((x0 - 1.8, x0 + 1.8), (x1 - 1.8, x1 + 1.8), (85, 87.4)):
+        lz.sombrear(rect(lz, xa, yt - 2, xb, plat_y - 2), ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33", "#9a6544"], 1.8, LUZ,
+                    textura=vetas(lz, 0.6, 11, False, int(xa)), fuerza_tex=0.4)
+    lz.sombrear(rect(lz, x0 - 2, plat_y - 6, x1 + 2, plat_y - 3), MADERA[2:7], 1, LUZ, textura=vetas(lz, 0.6, 13), fuerza_tex=0.3)
+    # sombra del alero
+    lz.pintar(np.clip((yt + 9 - lz.y) / 9, 0, 1) * rect(lz, x0 - 2, yt, 88, plat_y), "#120b08", 0.5)
+    # la ventana (con contraventanas y jardinera) y la puerta con cortina de esteras
+    vx = 50 if k == 0 else 26
+    ventana(lz, vx, 37, vx + 12, 48, encendida=0.6, semilla=305 + k, luz=LUZ)
+    px = 26 if k == 0 else 56
+    puerta = rect(lz, px, 38, px + 12, plat_y - 3)
+    lz.pintar(puerta, "#120c08")
+    cortina = rect(lz, px + 0.5, 38, px + 11.5, 47) * (lz.y < 41 + np.sin((lz.x - px) * 0.9) * 0.6 + 4)
+    lz.sombrear(cortina, ["#5c4a22", "#958043", "#c9b77d"], 1, LUZ, textura=(np.abs(np.sin(lz.x * 2.2)) < 0.3).astype(float), fuerza_tex=0.4)
+    lz.sumar_luz(lz.desenfocar(rect(lz, px + 2, 48, px + 10, plat_y - 4), 2), "#ef8a26", 0.25)
+    lz.sombrear(rect(lz, px - 1.5, 36, px + 13.5, 38.2), MADERA[2:7], 0.8, LUZ)
+    # el tejado de paja, grueso, a dos aguas y con el caballete trenzado
+    tejado = lz.poligono([(4, yt + 4), (44, 2), (52, 2), (96, yt - 1), (96, yt + 2), (4, yt + 7)])
+    paja(lz, tejado, semilla=306 + k, capas=5.0, y0=2)
+    lz.pintar(tejado * np.clip((lz.x - 54) / 40, 0, 1), "#2a1a0a", 0.3)
+    cab = lz.elipse(48, 3, 9, 2.6)
+    lz.sombrear(cab, ["#3d2a10", "#704f25", "#a37036", "#d29a43", "#efc06a"], 1.6, LUZ, textura=vetas(lz, 0.5, 7, True), fuerza_tex=0.4)
+    for xx in (42, 48, 54):
+        lz.pintar(lz.trazo([(xx, 1), (xx + 0.5, 5)], 0.6), "#4a3012", 0.8)
+    flecos(lz, 4, 96, yt + 5.5, 3.0, semilla=307 + k)
+    # el porche: la barandilla de palos y la escalerilla que baja al agua
+    for x in range(4, 18, 3):
+        lz.sombrear(rect(lz, x, plat_y - 12, x + 1.1, plat_y - 3), MADERA[3:7], 0.6, LUZ)
+    lz.sombrear(rect(lz, 3, plat_y - 13, 18, plat_y - 11.5), MADERA[3:8], 0.8, LUZ)
+    for j_ in range(4):
+        lz.pintar(lz.trazo([(90, plat_y + 3 + j_ * 4), (96, plat_y + 3 + j_ * 4)], 0.9), MADERA[5])
+    lz.pintar(lz.trazo([(90, plat_y), (90, abajo - 2)], 0.7) + lz.trazo([(96, plat_y), (96, abajo - 2)], 0.7), MADERA[3])
     # cosas de barquero
     if k == 0:
-        # una nasa (cesta de pescar) y un remo apoyado
-        nasa = lz.elipse(45, 36, 3.2, 2.4)
-        lz.pintar(nasa * (((lz.x + lz.y) % 1.6) < 0.5), JUNCO[4])
-        lz.pintar(np.clip(nasa - lz.elipse(45, 36, 2.4, 1.6), 0, 1), JUNCO[2])
-        lz.sombrear(lz.trazo([(6, 39), (10, 20)], 0.7), MADERA[4:8], 0.6, LUZ)
-        lz.sombrear(lz.elipse(10.4, 18.5, 1.3, 3.0, -15), MADERA[4:8], 1, LUZ)
+        # una red tendida en el lado, con sus flotadores rojos
+        red = lz.poligono([(75, yt - 2), (85, yt - 6), (85, yt + 16), (75, yt + 20)])
+        malla = ((np.abs((lz.x + lz.y) % 2.6) < 0.35) | (np.abs((lz.x - lz.y) % 2.6) < 0.35)) * red
+        lz.pintar(malla, "#d8c8a0", 0.85)
+        for (fx, fy) in ((77, yt - 1.5), (80, yt - 3), (83, yt - 4.5)):
+            lz.sombrear(lz.circulo(fx, fy, 1.1), ["#8f2532", "#d5525e", "#f4b39a"], 0.8, LUZ)
+        # dos remos apoyados y una nasa
+        for (rx, ang) in ((8, 0), (12, 1.5)):
+            lz.sombrear(lz.trazo([(rx, plat_y - 3), (rx + 3 + ang, plat_y - 26)], 0.7), MADERA[4:8], 0.6, LUZ)
+            lz.sombrear(lz.elipse(rx + 3.4 + ang, plat_y - 28, 1.6, 3.6, -8), MADERA[4:8], 1, LUZ)
+        nasa = lz.elipse(66, plat_y - 7, 4.5, 3.6)
+        lz.pintar(nasa * (((lz.x + lz.y) % 1.6) < 0.55), JUNCO[4])
+        lz.pintar(np.clip(nasa - lz.elipse(66, plat_y - 7, 3.5, 2.6), 0, 1), JUNCO[2])
+        lz.pintar(lz.elipse(62, plat_y - 7, 1.2, 2.2), "#1a120c")
     else:
-        # peces secándose en una cuerda y una red colgada del lado
-        lz.pintar(lz.trazo([(10, 22), (24, 22.6)], 0.4), CUERDA)
-        for x in (12, 16, 20):
-            lz.sombrear(lz.elipse(x, 25, 1.0, 2.3), ["#346161", "#4c8d8d", "#9fd0d0"], 1, LUZ)
-        red = lz.poligono([(41, 20), (47, 17), (47, 30), (41, 33)])
-        lz.pintar(((np.abs((lz.x + lz.y) % 2.6) < 0.35) | (np.abs((lz.x - lz.y) % 2.6) < 0.35)) * red, "#c9b77d", 0.85)
-    # la escalerilla que baja al agua
-    for j in range(4):
-        lz.pintar(lz.trazo([(26, 46 + j * 3.4), (31, 46 + j * 3.4)], 0.8), MADERA[5])
-    lz.pintar(lz.trazo([(26, 44), (26, 58)], 0.6) + lz.trazo([(31, 44), (31, 58)], 0.6), MADERA[3])
+        # peces secándose en una cuerda bajo el alero y dos cántaros
+        lz.pintar(lz.trazo([(x0 + 2, yt + 6), (x0 + 22, yt + 7)], 0.4), CUERDA)
+        for x in range(x0 + 4, x0 + 22, 4):
+            lz.sombrear(lz.elipse(x, yt + 10, 1.2, 2.8), ["#1c3535", "#346161", "#4c8d8d", "#9fd0d0"], 1, LUZ)
+            lz.pintar(lz.poligono([(x - 1.4, yt + 13), (x + 1.4, yt + 13), (x, yt + 11.5)]), "#346161")
+        for (cx, h_) in ((80, 7), (86, 5.5)):
+            c_ = lz.elipse(cx, plat_y - 3 - h_ * 0.6, 3.2, h_ * 0.65)
+            lz.sombrear(c_, ["#5a2810", "#8a4418", "#b8662a", "#d88a48", "#f0b070"], 2, LUZ)
+            lz.pintar(lz.elipse(cx, plat_y - 3 - h_ * 1.2, 1.6, 0.6), "#2a1408")
+        # un farolillo de papel colgado
+        lz.pintar(lz.trazo([(88, yt + 1), (88, yt + 6)], 0.4), "#1a120c")
+        fz = lz.elipse(88, yt + 8.5, 2.2, 2.8)
+        lz.pintar(fz, rampa(["#ef8a26", "#f9b947", "#fde27e"], np.clip(1 - np.hypot(lz.x - 88, lz.y - yt - 8) / 3, 0, 1)))
+        lz.sumar_luz(lz.desenfocar(fz, 3), "#ef8a26", 0.35)
+    # una maceta con flores junto a la puerta
+    mx = px + 15 if k == 0 else px - 4
+    lz.sombrear(lz.poligono([(mx - 2.5, plat_y - 7), (mx + 2.5, plat_y - 7), (mx + 1.8, plat_y - 3), (mx - 1.8, plat_y - 3)]), COBRE, 1.2, LUZ)
+    flores(lz, 5, (mx - 3, plat_y - 10, mx + 3, plat_y - 7), [["#8f2532", "#d5525e", "#e98378"], ["#b2721a", "#df9022", "#f1c27a"]], semilla=308 + k, tam=0.7)
     return lz.sprite(contorno=CONTORNO)
 
 
@@ -148,55 +210,112 @@ def grua():
 
 
 def almacen():
-    W, H = 88, 64
-    lz = Lienzo(W, H, s=6, semilla=321)
-    suelo = 60
-    lz.pintar(lz.desenfocar(lz.elipse(44, suelo, 42, 4), 1.0), "#0e0c0a", 0.45)
-    # el cobertizo: frente de tablas verticales y el lado en sombra
-    frente = rect(lz, 6, 24, 70, suelo)
-    lz.sombrear(frente, MADERA[2:7], 6, LUZ, textura=vetas(lz, 0.45, 13, False, 322), fuerza_tex=0.4)
-    lz.pintar(frente * ((lz.x % 4.5) < 0.55), MADERA[0], 0.8)
-    lado = lz.poligono([(70, 24), (82, 18), (82, suelo - 6), (70, suelo)])
-    lz.sombrear(lado, MADERA[1:5], 3, LUZ, textura=vetas(lz, 0.45, 13, False, 323), fuerza_tex=0.4)
-    # el portón abierto: una hoja abierta hacia fuera, dentro oscuridad con sacos apilados
-    hueco = rect(lz, 28, 32, 52, suelo)
+    """El almacén del puerto, al nivel de la casa del castor: zócalo de piedra con musgo, paredes de troncos, un
+    tejado de paja a capas con una buhardilla de carga (con su viga y su polea, de la que cuelga un fardo), el portón
+    abierto (dentro, sacos y barriles en la penumbra), una ventana con contraventanas, el letrero del pez, y delante
+    barriles, cajas, sacos de grano, un tendedero de redes y una carretilla."""
+    W, H = 132, 108
+    lz = Lienzo(W, H, s=4, semilla=321)
+    rng = np.random.default_rng(322)
+    x0, x1 = 16, 112
+    suelo = 102
+    # el zócalo de piedra
+    zocalo = rect(lz, x0 - 3, 88, x1 + 3, suelo)
+    piedras(lz, zocalo, tam=4.6, semilla=323, luz=LUZ, mortero="#525449",
+            rampa_p=["#3a3b33", "#5a5d50", "#7a806d", "#9aa08c", "#b9bdaa", "#d6d8c8"])
+    musgo = (lz.ruido(2.5, 3, semilla=324) > 0.66) * zocalo * np.clip((lz.y - 92) / 8, 0, 1)
+    lz.pintar(lz.desenfocar(musgo, 0.3), rampa(["#24401f", "#3f5a2f", "#5d7a3c"], lz.ruido(0.7, 2)), 0.8)
+    # las paredes de troncos y la sombra del alero
+    troncos(lz, x0, x1, 46, 88, alto=6.0, semilla=325)
+    lz.pintar(np.clip((60 - lz.y) / 14, 0, 1) * rect(lz, x0 - 3, 46, x1 + 3, 88), "#120b08", 0.55)
+    # el tejado de paja, largo, a dos aguas (con el hastial a la derecha)
+    tejado = lz.poligono([(2, 50), (22, 10), (100, 10), (128, 50), (128, 53), (2, 53)])
+    paja(lz, tejado, semilla=326, capas=6.0, y0=10)
+    lz.pintar(tejado * np.clip((lz.x - 70) / 60, 0, 1), "#2a1a0a", 0.3)
+    cab = rect(lz, 22, 8, 100, 12)
+    lz.sombrear(cab, ["#3d2a10", "#704f25", "#a37036", "#d29a43", "#efc06a"], 1.6, LUZ, textura=vetas(lz, 0.5, 7, True), fuerza_tex=0.4)
+    flecos(lz, 2, 128, 52.5, 3.2, semilla=327)
+    # la buhardilla de carga: una puertecita, la viga que sale y la polea con un fardo colgando
+    bx = 64
+    troncos(lz, bx - 10, bx + 10, 22, 40, alto=4.5, semilla=328, esquinas=False)
+    techito = lz.poligono([(bx - 15, 25), (bx, 12), (bx + 15, 25), (bx + 13, 27), (bx, 16), (bx - 13, 27)])
+    techito = np.maximum(techito, lz.poligono([(bx - 13, 25), (bx, 14), (bx + 13, 25)]))
+    paja(lz, techito, semilla=329, capas=4.0, y0=12)
+    flecos(lz, bx - 14, bx + 14, 26.5, 2.0, semilla=330)
+    hueco = rect(lz, bx - 5, 28, bx + 5, 40)
+    lz.pintar(hueco, "#120c08")
+    lz.sombrear(rect(lz, bx - 6, 27, bx + 6, 28.5), MADERA[2:7], 0.8, LUZ)
+    viga = rect(lz, bx - 2, 15, bx + 2, 18) + rect(lz, bx, 15, bx + 2, 17)
+    lz.sombrear(lz.trazo([(bx, 16), (bx, 7)], 1.6), ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33", "#9a6544"], 1.2, LUZ)
+    lz.sombrear(lz.circulo(bx, 6.5, 1.8), ["#1b1c1f", "#3d3f43", "#6a6c6f", "#a3a4a6"], 1, LUZ)
+    lz.pintar(lz.trazo([(bx + 1.2, 7), (bx + 1.4, 33)], 0.45), CUERDA)
+    fardo = lz.elipse(bx + 1.4, 36, 4, 3.4)
+    lz.sombrear(fardo, ["#4a3a22", "#6a5232", "#8a6e46", "#a88a5e", "#c8aa7a"], 2.4, LUZ)
+    lz.pintar(((np.abs((lz.x + lz.y) % 2.4) < 0.3) | (np.abs((lz.x - lz.y) % 2.4) < 0.3)) * fardo, CUERDA, 0.8)
+    # el portón abierto: dentro, penumbra con sacos y barriles; una hoja abierta hacia fuera
+    px0, px1 = 30, 56
+    lz.sombrear(rect(lz, px0 - 2, 58, px1 + 2, 60), ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33"], 1, LUZ)
+    hueco = rect(lz, px0, 60, px1, 100)
     lz.pintar(hueco, "#0e0a08")
-    for (x, y) in ((33, 55), (39, 56), (36, 50)):
-        lz.sombrear(lz.elipse(x, y, 3.6, 2.6), ["#2a2014", "#3e3020", "#54422c"], 2, LUZ)
-    hoja = lz.poligono([(52, 32), (60, 34), (60, suelo + 1), (52, suelo)])
-    lz.sombrear(hoja, MADERA[3:8], 2, LUZ, textura=vetas(lz, 0.45, 13, False, 324), fuerza_tex=0.4)
-    lz.pintar(lz.trazo([(52, 40), (60, 42)], 0.6) + lz.trazo([(52, 52), (60, 54)], 0.6), HIERRO[2])
-    lz.pintar(rect(lz, 27, 31, 53, 32.4), MADERA[6])
-    # un letrero con un pez pintado encima del portón
-    lz.sombrear(rect(lz, 33, 26, 47, 30), MADERA[4:8], 1, LUZ)
-    lz.pintar(lz.elipse(40, 28, 3.6, 1.3), "#4c8d8d")
-    lz.pintar(lz.poligono([(43, 28), (45.5, 26.6), (45.5, 29.4)]), "#4c8d8d")
-    # el tejado de juncos, largo
-    hilos = np.sin(lz.x * 3.1 + lz.y * 0.9) * 0.5 + 0.5
-    faldon = lz.poligono([(10, 6), (74, 4), (86, 18), (68, 25)])
-    lz.sombrear(faldon, JUNCO[:5], 4, LUZ, textura=hilos * 0.6 + vetas(lz, 0.3, 7, False, 325) * 0.4, fuerza_tex=0.5)
-    tejado = lz.poligono([(2, 26), (10, 6), (74, 4), (72, 26)])
-    lz.sombrear(tejado, JUNCO, 6, LUZ, textura=hilos * 0.6 + vetas(lz, 0.3, 7, False, 326) * 0.4, fuerza_tex=0.5)
-    flecos = np.zeros((lz.H, lz.W))
-    for j in range(38):
-        x0 = 3 + j * 1.85
-        flecos = np.maximum(flecos, lz.trazo([(x0, 25.5), (x0 + 0.4, 28 + (j % 3))], 0.5))
-    lz.pintar(flecos, JUNCO[5], 0.9)
-    # un agujero en el tejado, con los juncos rotos
-    lz.pintar(lz.elipse(54, 14, 5, 2.4), "#1a120c")
-    for x in (50, 53, 56, 58):
-        lz.pintar(lz.trazo([(x, 12.5), (x + 1, 15.5)], 0.4), JUNCO[3])
-    # delante: barriles, cajas y un saco
-    for (x, y) in ((12, 58), (18, 59)):
-        barril = rect(lz, x - 3, y - 8, x + 3, y)
-        lz.sombrear(barril, MADERA[2:7], 3, LUZ, textura=((lz.x % 1.5) < 0.3) * 1.0, fuerza_tex=-0.3)
-        for yy in (y - 6.5, y - 1.5):
-            lz.pintar(rect(lz, x - 3, yy, x + 3, yy + 0.7), HIERRO[2])
-        lz.pintar(lz.elipse(x, y - 8, 3, 0.9), MADERA[1])
-    caja = rect(lz, 62, 50, 72, 60)
-    lz.sombrear(caja, MADERA[3:8], 2, LUZ, textura=vetas(lz, 0.4, 9, True, 327), fuerza_tex=0.4)
-    lz.pintar(lz.trazo([(62, 50), (72, 60)], 0.5) + lz.trazo([(72, 50), (62, 60)], 0.5), MADERA[1])
-    lz.sombrear(lz.elipse(77, 58, 4, 3), ["#4a3a22", "#6a5232", "#8a6e46", "#a88a5e"], 2, LUZ)
+    lz.sumar_luz(lz.desenfocar(rect(lz, px0 + 3, 66, px1 - 3, 96), 4), "#5a3a1a", 0.35)
+    for (sx, sy) in ((36, 96), (43, 97), (39, 90), (50, 96)):
+        lz.sombrear(lz.elipse(sx, sy, 3.8, 3), ["#2a2014", "#3e3020", "#54422c", "#6a5638"], 2, LUZ)
+    lz.sombrear(rect(lz, 47, 84, 54, 94), ["#1a0f0b", "#2a1a12", "#47291c", "#643a26"], 2, LUZ)
+    hoja = lz.poligono([(px1, 60), (px1 + 9, 62), (px1 + 9, 102), (px1, 100)])
+    tabl = (np.abs(np.sin((lz.x - px1) / 3 * np.pi)) < 0.12).astype(float)
+    lz.sombrear(hoja, ["#251812", "#3d2418", "#5a3826", "#7a4e35", "#9a6847"], 3, LUZ, textura=vetas(lz, 0.5, 15, False) * (1 - tabl * 0.8), fuerza_tex=0.45)
+    for by_ in (68, 92):
+        lz.sombrear(lz.poligono([(px1 + 0.5, by_ - 1), (px1 + 8, by_), (px1 + 8, by_ + 1.2), (px1 + 0.5, by_ + 1)]), ["#1b1c1f", "#3d3f43", "#6a6c6f"], 0.6, LUZ)
+    # el letrero del pez, sobre el portón
+    letrero = rect(lz, 34, 49, 52, 56)
+    lz.sombrear(letrero, COBRE, 1.2, LUZ, textura=vetas(lz, 0.5, 9), fuerza_tex=0.3)
+    lz.pintar(lz.elipse(42, 52.5, 4.6, 1.8), "#4c8d8d")
+    lz.pintar(lz.poligono([(46, 52.5), (49, 50.5), (49, 54.5)]), "#4c8d8d")
+    lz.pintar(lz.circulo(39.5, 52, 0.5), "#1a1418")
+    for (cx, cy) in ((35.5, 49.5), (50.5, 49.5)):
+        lz.pintar(lz.trazo([(cx, cy), (cx, 46)], 0.4), "#1a120c")
+    # la ventana con contraventanas y jardinera
+    ventana(lz, 80, 62, 96, 76, encendida=0.4, semilla=331, luz=LUZ)
+    # delante: barriles, cajas, sacos, un tendedero de redes y una carretilla
+    for (bx2, by2) in ((10, 102), (19, 103)):
+        tonel = lz.elipse(bx2, by2 - 6, 5, 6.4)
+        duelas = (np.abs(np.sin((lz.x - bx2) / 2.2 * np.pi)) < 0.12).astype(float)
+        lz.sombrear(tonel, ["#1a0f0b", "#2a1a12", "#47291c", "#643a26", "#7f4d33", "#9a6544", "#b88259"], 3.5, LUZ, textura=1 - duelas * 0.7, fuerza_tex=0.4)
+        for yy in (by2 - 10, by2 - 2.5):
+            lz.pintar(np.clip(1 - np.abs(lz.y - yy - (np.abs(lz.x - bx2) / 5) ** 2 * 0.6) / 0.6, 0, 1) * tonel, "#3d3f43")
+        lz.sombrear(lz.elipse(bx2, by2 - 12, 4.4, 1.3), ["#5a3a22", "#8a6440", "#b38c5c", "#d2ac78"], 1, LUZ)
+    for (cx, cy, w, h_) in ((98, 92, 12, 10), (104, 82, 9, 9)):
+        caja = rect(lz, cx, cy, cx + w, cy + h_)
+        lz.sombrear(caja, COBRE, 2, LUZ, textura=vetas(lz, 0.5, 11), fuerza_tex=0.35)
+        lz.pintar(lz.trazo([(cx, cy), (cx + w, cy + h_)], 0.5) + lz.trazo([(cx + w, cy), (cx, cy + h_)], 0.5), "#47291c", 0.85)
+    for (sx, sy) in ((114, 100), (121, 101)):
+        saco = lz.poligono([(sx - 5, sy + 1), (sx - 5.5, sy - 5), (sx - 2.5, sy - 9), (sx + 2.5, sy - 9), (sx + 5.5, sy - 5), (sx + 5, sy + 1)])
+        lz.sombrear(saco, ["#5a4630", "#8a7454", "#b8a07a", "#d8c49c", "#efe0bf"], 3.5, LUZ, textura=(np.sin(lz.x * 4) * np.sin(lz.y * 4) > 0).astype(float), fuerza_tex=0.15)
+        lz.pintar(lz.trazo([(sx - 2.5, sy - 7.5), (sx + 2.5, sy - 7.5)], 0.8), "#47291c")
+    # el tendedero de redes (dos palos y la red colgando, con flotadores)
+    for x in (114, 127):
+        lz.sombrear(lz.trazo([(x, 92), (x, 60)], 0.9), MADERA[3:8], 0.7, LUZ)
+    red = lz.poligono([(114, 62), (127, 62), (126, 84), (115, 84)])
+    lz.pintar(((np.abs((lz.x + lz.y) % 2.4) < 0.35) | (np.abs((lz.x - lz.y) % 2.4) < 0.35)) * red, "#d8c8a0", 0.85)
+    for x in (116, 120.5, 125):
+        lz.sombrear(lz.circulo(x, 62.5, 1.1), ["#8f2532", "#d5525e", "#f4b39a"], 0.8, LUZ)
+    # la carretilla, con un par de peces encima
+    rueda = lz.circulo(76, 99, 3.6)
+    lz.sombrear(np.clip(rueda - lz.circulo(76, 99, 2.4), 0, 1), ["#1a0f0b", "#2a1a12", "#47291c", "#643a26"], 1, LUZ)
+    lz.sombrear(lz.poligono([(70, 90), (88, 89), (86, 96), (72, 97)]), COBRE, 1.6, LUZ, textura=vetas(lz, 0.5, 9), fuerza_tex=0.3)
+    lz.sombrear(lz.trazo([(86, 93), (94, 99)], 0.7), MADERA[3:7], 0.6, LUZ)
+    for fx in (76, 81):
+        lz.sombrear(lz.elipse(fx, 88.5, 3.2, 1.2, -10), ["#1c3535", "#346161", "#4c8d8d", "#9fd0d0"], 1, LUZ)
+    # hierba y florecitas al pie
+    hierba = np.zeros((lz.H, lz.W))
+    for kk in range(110):
+        hx = rng.random() * 132
+        if px0 - 2 < hx < px1 + 10:
+            continue
+        hy = 101 + rng.random() * 5
+        hierba = np.maximum(hierba, lz.trazo([(hx, hy), (hx + (rng.random() - 0.5) * 2.4, hy - 2 - rng.random() * 3)], 0.8, 0.3))
+    lz.sombrear(hierba, ["#1d2e18", "#2f4a22", "#3f5a2f", "#5d7a3c", "#7c9a4c", "#a8b866"], 0.5, LUZ)
+    flores(lz, 6, (60, 102, 72, 106), [["#8f2532", "#d5525e", "#e98378"], ["#b2721a", "#df9022", "#f1c27a"]], semilla=332, tam=0.7)
     return lz.sprite(contorno=CONTORNO)
 
 

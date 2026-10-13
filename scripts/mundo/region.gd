@@ -94,7 +94,7 @@ const FIJOS := {
 	# del Embarcadero Junco (el transbordador: 0 varado, 1 arreglado, según la marca «transbordador_listo»)
 	"æ": [EMBARCADERO + "casa_juncos.png", Vector2(40, 10), 0.0, 2, "embarcadero_casa", 30.0],
 	"å": [EMBARCADERO + "grua.png", Vector2(12, 6), 10.0, 1, "embarcadero_grua", 26.0],
-	"œ": [EMBARCADERO + "almacen.png", Vector2(72, 14), 0.0, 1, "embarcadero_almacen", 40.0],
+	"œ": [EMBARCADERO + "almacen.png", Vector2(100, 16), 0.0, 1, "embarcadero_almacen", 50.0],
 	"ß": [EMBARCADERO + "transbordador.png", Vector2(104, 14), 0.0, 2, "embarcadero_transbordador", 56.0],
 	"ł": [EMBARCADERO + "poste.png", Vector2(12, 7), 8.0, 2],
 }
