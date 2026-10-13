@@ -15,6 +15,10 @@ Genera en arte/interfaz/diario/:
   cuero.png          32×32     etiqueta de cuero cosida (nombres, pestañas pequeñas; márgenes de 8)
   noche.png          48×48     el panel del narrador: azul de noche con filigrana dorada (márgenes de 14)
   sello.png          16×16     sello de lacre (misiones de la historia)
+  bolsa_fondo.png    640×360   el diario a pantalla completa (como la bolsa de Pokémon Platino): cielo de noche y
+                               tres marcos con filigrana (la mochila, la lista y la descripción; BOLSA_R...)
+  bolsa_fondo_pleno.png        el mismo cielo, sin marcos (para el Mapa y las Habilidades)
+  mochila.png        5 × 160×160 la mochila grande de Maisha: el bolsillo elegido brilla y asoma lo que guarda
   arbol_ramas.png    640×360   el árbol de habilidades (pestaña Habilidades): el tronco de raíz dorada en el lomo y
                                las tres ramas (Raíz a la izquierda, Cetro hacia arriba, Aliento a la derecha), con
                                corteza, vetas de luz y hojitas; y dos ramitas dormidas, plateadas, hacia Runa y Tierra.
@@ -80,7 +84,8 @@ def _cielo(lz, mascara, lomo_x, semilla=0):
     cx, cy = xs.mean() / lz.s, ys.mean() / lz.s
     centro = np.clip(1 - np.hypot((lz.x - cx) / 170, (lz.y - cy) / 150), 0, 1)
     v = 0.3 + centro * 0.22 + (lz.ruido(120, 2, semilla=semilla) - 0.5) * 0.08
-    v = v - np.clip(1 - np.abs(lz.x - lomo_x) / 44, 0, 1) ** 1.5 * 0.35
+    if lomo_x is not None:
+        v = v - np.clip(1 - np.abs(lz.x - lomo_x) / 44, 0, 1) ** 1.5 * 0.35
     lz.pintar(mascara, rampa(NOCHE, np.clip(v, 0, 1)))
     neb = lz.desenfocar(np.clip((lz.ruido(90, 3, semilla=semilla + 1) - 0.48) * 1.6, 0, 1), 14) * mascara
     lz.sumar_luz(neb, "#4a3478", 0.2)
@@ -402,6 +407,116 @@ def nodos():
     return out
 
 
+## LA BOLSA (el diario a pantalla completa, como la bolsa de Pokémon Platino): dónde está cada marco.
+## (mochila.gd usa los mismos: BOLSA, LISTA, DESC)
+BOLSA_R = (8, 8, 236, 212)
+LISTA_R = (244, 8, 632, 212)
+DESC_R = (8, 218, 632, 352)
+
+
+def _rect_m(lz, r):
+    x0, y0, x1, y1 = r
+    return lz.poligono([(x0, y0), (x1, y0), (x1, y1), (x0, y1)])
+
+
+def bolsa_fondo(con_marcos=True):
+    """El fondo de la bolsa: el cielo de noche a pantalla completa y, encima, tres marcos con filigrana dorada (la
+    mochila, la lista y la descripción), con el interior oscuro y liso para que el texto se lea. Sin marcos, el fondo
+    del Mapa y de las Habilidades (solo un borde de filigrana alrededor de toda la pantalla)."""
+    W, H = 640, 360
+    lz = Lienzo(W, H, s=2, semilla=601)
+    todo = np.ones((lz.H, lz.W))
+    _cielo(lz, todo, None, semilla=602)
+    if con_marcos:
+        for r in (BOLSA_R, LISTA_R, DESC_R):
+            m = _rect_m(lz, r)
+            lz.pintar(lz.desenfocar(_rect_m(lz, (r[0] + 3, r[1] + 4, r[2] + 3, r[3] + 4)), 3), "#000000", 0.5)
+            dentro = lz.distancia(m)
+            v = 0.12 + np.clip(dentro / 60, 0, 1) * 0.1 + (lz.ruido(3, 2, semilla=r[0]) - 0.5) * 0.05
+            lz.pintar(m, rampa(["#05060f", "#090b1a", "#0e1124", "#13172e"], np.clip(v * 3, 0, 1)), 0.95)
+            _filigrana(lz, m, semilla=r[0] + r[1])
+    else:
+        _filigrana(lz, _rect_m(lz, (2, 2, 638, 358)), semilla=603)
+    return lz.sprite(tramado=0.004, contorno=0.0)
+
+
+def mochila(k):
+    """La mochila de Maisha, grande (la de la bolsa): de cuero, con la solapa de hojas, hebillas de latón, un farolito
+    colgado y cinco bolsillos. k (0-4) es el bolsillo elegido: brilla y asoma lo que guarda (0 misiones: un rollo de
+    papel con sello; 1 objetos: el cetro; 2 habilidades: un brote; 3 mapa: un mapa doblado; 4 lazos: un colgante de
+    corazón)."""
+    W, H = 160, 160
+    lz = Lienzo(W, H, s=4, semilla=611 + k)
+    CUERO = ["#1e0e06", "#341a0c", "#4e2a14", "#6e3e20", "#8e5630", "#ae7040", "#c98a54"]
+    HOJA = ["#14280e", "#1e3a16", "#2e5222", "#46702e", "#62903c", "#86b050", "#aed070"]
+    LATON = ["#4a3410", "#7a5a1e", "#a8822e", "#d4ac4a", "#f4d27a"]
+    lz.pintar(lz.desenfocar(lz.elipse(80, 150, 58, 7), 1.5), "#020205", 0.6)
+    # el asa y las correas de atrás
+    lz.sombrear(lz.trazo(lz.curva((52, 44), (80, 4), (108, 44), n=30), 3.2, 2.6), CUERO, 2, LUZ)
+    # el cuerpo de la mochila, abombado
+    cuerpo = lz.poligono([(30, 54), (130, 54), (138, 98), (134, 138), (124, 146), (36, 146), (26, 138), (22, 98)])
+    lz.sombrear(cuerpo, CUERO, 18, LUZ, textura=lz.ruido(1.0, 2, semilla=612) * 0.6 + lz.ruido(6, 2, semilla=613) * 0.4, fuerza_tex=0.4)
+    # costuras del cuerpo
+    for (a_, b_) in (((30, 58), (24, 140)), ((130, 58), (136, 140)), ((36, 142), (124, 142))):
+        pts = [(a_[0] + (b_[0] - a_[0]) * t, a_[1] + (b_[1] - a_[1]) * t) for t in np.linspace(0, 1, 30)]
+        for j, q in enumerate(pts):
+            if j % 2 == 0:
+                lz.pintar(lz.circulo(q[0], q[1], 0.6), "#d6b46e", 0.8)
+    # los cinco bolsillos: dos a los lados, uno grande delante, uno pequeño arriba, uno en la solapa
+    sitios = {0: (40, 112, 18, 24), 1: (80, 118, 26, 22), 2: (120, 112, 18, 24), 3: (60, 74, 0, 0), 4: (102, 76, 0, 0)}
+    for i, (x, y, rx, ry) in sitios.items():
+        if rx == 0:
+            continue
+        b = lz.poligono([(x - rx, y - ry), (x + rx, y - ry), (x + rx * 0.9, y + ry), (x - rx * 0.9, y + ry)])
+        lz.sombrear(b, CUERO[1:], 8, LUZ, textura=lz.ruido(0.8, 2, semilla=614 + i), fuerza_tex=0.35)
+        tapa_b = lz.poligono([(x - rx - 1, y - ry - 1), (x + rx + 1, y - ry - 1), (x + rx, y - ry + 8), (x, y - ry + 11), (x - rx, y - ry + 8)])
+        lz.sombrear(tapa_b, CUERO[2:], 4, LUZ)
+        lz.sombrear(lz.circulo(x, y - ry + 8, 2.2), LATON, 1.5, LUZ)
+        if i == k:
+            lz.sumar_luz(lz.desenfocar(b, 6), "#f9d77a", 0.35)
+    # la solapa de hojas (encima), con su hebilla
+    solapa = lz.poligono([(24, 56), (52, 34), (80, 28), (108, 34), (136, 56), (128, 90), (80, 98), (32, 90)])
+    lz.sombrear(solapa, HOJA, 14, LUZ, textura=lz.ruido(0.8, 2, semilla=615), fuerza_tex=0.4)
+    for j in range(11):
+        x0 = 30 + j * 10
+        lz.pintar(lz.trazo([(x0, 46 - abs(j - 5) * 2.4), (x0 + 1, 88 - abs(j - 5) * 1.2)], 0.6) * solapa, HOJA[1], 0.6)
+    lz.pintar(lz.trazo([(26, 57), (52, 36), (80, 30), (108, 36), (134, 57)], 1.0), HOJA[6], 0.7)
+    lz.sombrear(lz.trazo([(80, 88), (80, 108)], 3.0, 3.0), CUERO[2:], 2, LUZ)
+    hebilla = np.clip(lz.elipse(80, 104, 6, 5) - lz.elipse(80, 104, 3.8, 3), 0, 1)
+    lz.sombrear(hebilla, LATON, 2, LUZ)
+    # el farolito colgado a la derecha
+    lz.pintar(lz.trazo([(136, 70), (142, 92)], 0.7), "#2a1408")
+    farol = lz.elipse(143, 100, 6, 8)
+    lz.sumar_luz(lz.desenfocar(farol, 12), "#f9b947", 0.5)
+    lz.pintar(farol, rampa(["#e6a852", "#fde27e", "#fffbe8"], np.clip(1 - np.hypot(lz.x - 143, lz.y - 100) / 7, 0, 1)))
+    lz.pintar(lz.trazo([(137, 93), (149, 93)], 1.0) + lz.trazo([(137, 107), (149, 107)], 1.0), LATON[1])
+    # lo que asoma del bolsillo elegido
+    if k == 0:                                                   # un rollo de papel con su sello
+        lz.sombrear(lz.trazo([(34, 98), (44, 70)], 4.5, 4.5), ["#8a7a5a", "#c8b48a", "#efe0bf", "#fff8e8"], 2, LUZ)
+        lz.sombrear(lz.circulo(43, 76, 3), ["#5a1414", "#8c2028", "#d5525e"], 1.5, LUZ)
+    elif k == 1:                                                 # el cetro de Raíz
+        lz.sombrear(lz.trazo([(80, 102), (86, 60)], 1.6), CUERO[3:], 1, LUZ)
+        lz.sombrear(lz.circulo(87, 58, 5), ["#2e7a20", "#4ea83a", "#8fe06a", "#d8ffc0"], 3, LUZ)
+        lz.sumar_luz(lz.desenfocar(lz.circulo(87, 58, 5), 6), "#8fe06a", 0.4)
+    elif k == 2:                                                 # un brote
+        lz.pintar(lz.trazo([(120, 92), (122, 72)], 1.2), "#3e9a35")
+        lz.pintar(lz.elipse(116, 72, 5, 2.4, 30), "#6fcf4f")
+        lz.pintar(lz.elipse(127, 70, 5, 2.4, -30), "#8fe06a")
+        lz.sumar_luz(lz.desenfocar(lz.circulo(122, 72, 6), 6), "#6fcf4f", 0.35)
+    elif k == 3:                                                 # un mapa doblado
+        mapa = lz.poligono([(48, 46), (74, 42), (76, 64), (50, 68)])
+        lz.sombrear(mapa, ["#a08a5a", "#c8b080", "#e2cea0", "#f4e4c0"], 3, LUZ)
+        lz.pintar(lz.trazo([(54, 52), (62, 58), (70, 50)], 0.6) * mapa, "#8c281e", 0.8)
+        lz.pintar(lz.trazo([(62, 44), (63, 66)], 0.4), "#8a7450", 0.8)
+    else:                                                        # un colgante de corazón
+        lz.pintar(lz.trazo(lz.curva((92, 40), (102, 60), (112, 40), n=12), 0.5), "#d4ac4a")
+        corazon = np.maximum(lz.circulo(100, 62, 4), lz.circulo(106, 62, 4))
+        corazon = np.maximum(corazon, lz.poligono([(96, 63), (110, 63), (103, 72)]))
+        lz.sombrear(corazon, ["#7a1e2a", "#b03a4a", "#de6771", "#f4bcc4"], 3, LUZ)
+        lz.sumar_luz(lz.desenfocar(corazon, 5), "#de6771", 0.35)
+    return lz.sprite(contorno=0.45)
+
+
 def main():
     os.makedirs(SALIDA, exist_ok=True)
     Image.fromarray(libro(), "RGBA").save(os.path.join(SALIDA, "libro.png"))
@@ -411,6 +526,13 @@ def main():
         Image.fromarray(nueve(n), "RGBA").save(os.path.join(SALIDA, n + ".png"))
     Image.fromarray(sello(), "RGBA").save(os.path.join(SALIDA, "sello.png"))
     Image.fromarray(arbol_ramas(), "RGBA").save(os.path.join(SALIDA, "arbol_ramas.png"))
+    Image.fromarray(bolsa_fondo(True), "RGBA").save(os.path.join(SALIDA, "bolsa_fondo.png"))
+    Image.fromarray(bolsa_fondo(False), "RGBA").save(os.path.join(SALIDA, "bolsa_fondo_pleno.png"))
+    tiras = [mochila(k) for k in range(5)]
+    hoja = np.zeros((160, 800, 4), np.uint8)
+    for i, t in enumerate(tiras):
+        hoja[:, i * 160:(i + 1) * 160] = t
+    Image.fromarray(hoja, "RGBA").save(os.path.join(SALIDA, "mochila.png"))
     Image.fromarray(nodos(), "RGBA").save(os.path.join(SALIDA, "nodos.png"))
     print("Interfaz de diario en", SALIDA)
 

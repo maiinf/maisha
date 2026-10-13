@@ -18,12 +18,19 @@ const MAPA := preload("res://arte/interfaz/mapa_mundo.png")
 const MAPA_RAIZ := preload("res://arte/interfaz/mapa_raiz.png")
 ## El diario de cuero (herramientas/pintar_interfaz.py)
 const PIEL := preload("res://scripts/interfaz/piel.gd")
-const LIBRO := preload("res://arte/interfaz/diario/libro.png")
-const TAPA := preload("res://arte/interfaz/diario/tapa.png")
-const CINTAS := preload("res://arte/interfaz/diario/cintas.png")
 const SELLO := preload("res://arte/interfaz/diario/sello.png")
-const PAG_IZQ := Rect2(38, 48, 272, 282)
-const PAG_DER := Rect2(332, 48, 270, 282)
+## LA BOLSA (el diario a pantalla completa, como la bolsa de Pokémon Platino): la mochila con sus bolsillos a la
+## izquierda, la lista grande a la derecha y la descripción abajo, a lo ancho. (Los mismos marcos que pinta
+## herramientas/pintar_interfaz.py en bolsa_fondo.png.) El Mapa y las Habilidades ocupan la pantalla entera.
+const FONDO_BOLSA := preload("res://arte/interfaz/diario/bolsa_fondo.png")
+const FONDO_PLENO := preload("res://arte/interfaz/diario/bolsa_fondo_pleno.png")
+const MOCHILA := preload("res://arte/interfaz/diario/mochila.png")
+const BOLSA := Rect2(8, 8, 228, 204)
+const LISTA := Rect2(244, 8, 388, 204)
+const DESC := Rect2(8, 218, 624, 134)
+## (lo que sigue usando el mapa de Raíz, como si el libro siguiera abierto)
+const PAG_IZQ := Rect2(16, 30, 304, 300)
+const PAG_DER := Rect2(320, 30, 304, 300)
 const LOMO := 320.0
 const ABRIR_DURA := 0.5
 const PAGINA_DURA := 0.32
@@ -86,8 +93,8 @@ const TN_TITULO := Color("f0d89a")      # los títulos, en oro
 const TN_ELEGIDA := Color("1a1410")     # la fila elegida, sobre la banda dorada
 const ORO_CLARO := Color("f9d77a")
 const COLOR_TIPO := {"historia": Color("f2a07a"), "encargo": Color("7fd8d0"), "secreto": Color("c8a0f0"), "lazo": Color("f0a0c0")}
-const FILAS_VISIBLES := 9
-const ALTO_FILA := 24
+const FILAS_VISIBLES := 7
+const ALTO_FILA := 26
 
 ## EL ÁRBOL DE HABILIDADES (pestaña Habilidades): las ramas, de izquierda a derecha, y dónde está cada nodo en el
 ## libro (las mismas posiciones que RAMAS en herramientas/pintar_interfaz.py, que pinta las ramas)
@@ -535,72 +542,55 @@ func _dibujar() -> void:
 		_dibujar_rueda()
 		if rueda:
 			return
-	var a := _abre
-	_lienzo.draw_rect(Rect2(0, 0, 640, 360), Color(0.03, 0.02, 0.05, 0.55 * _ease(a * 2.0)))
-	# el libro sube desde abajo mientras se abre
-	var baja := (1.0 - _ease(a / 0.45)) * 50.0
-	_lienzo.draw_set_transform(Vector2(0, round(baja)))
-	var giro := clampf((a - 0.3) / 0.7, 0.0, 1.0)         # la tapa: 0 = cerrada, 1 = abierta del todo
-	giro = giro * giro * (3.0 - 2.0 * giro)
-	if giro < 0.5:
-		# cerrado: solo se ve la mitad derecha (la tapa), que se va levantando hacia el lomo
-		_lienzo.draw_texture_rect_region(LIBRO, Rect2(LOMO, 0, 320, 360), Rect2(LOMO, 0, 320, 360))
-		var w := (1.0 - giro * 2.0) * TAPA.get_width()
-		if w > 1.0:
-			_lienzo.draw_texture_rect(TAPA, Rect2(LOMO + 2, 30, w, TAPA.get_height()), false, Color(1, 1, 1).darkened(giro * 0.8))
-	else:
-		# la tapa ya ha pasado al otro lado: se ve la página de la izquierda, que se despliega desde el lomo
-		var w := (giro - 0.5) * 2.0 * LOMO
-		_lienzo.draw_texture_rect_region(LIBRO, Rect2(LOMO, 0, 320, 360), Rect2(LOMO, 0, 320, 360))
-		_lienzo.draw_texture_rect_region(LIBRO, Rect2(LOMO - w, 0, w, 360), Rect2(0, 0, LOMO, 360), Color(1, 1, 1).darkened((1.0 - giro) * 0.9))
-	_dibujar_cintas(giro)
-	var tinta := clampf((a - 0.8) / 0.2, 0.0, 1.0)
-	if tinta > 0.0 and not _cerrando or (_cerrando and a > 0.85):
-		_dibujar_paginas(tinta if not _cerrando else 1.0)
-	_dibujar_hoja_que_pasa()
+	var a := _ease(_abre)
+	_lienzo.draw_rect(Rect2(0, 0, 640, 360), Color(0.02, 0.02, 0.05, 0.6 * a))
+	# la bolsa sube desde abajo mientras se abre
+	_lienzo.draw_set_transform(Vector2(0, round((1.0 - a) * 30.0)))
+	var pleno := pestana in [P_MAPA, P_HABILIDADES]
+	_lienzo.draw_texture(FONDO_PLENO if pleno else FONDO_BOLSA, Vector2.ZERO, Color(1, 1, 1, a))
+	var tinta := clampf((_abre - 0.45) / 0.55, 0.0, 1.0)
+	if tinta > 0.0:
+		_dibujar_paginas(tinta)
 	_lienzo.draw_set_transform(Vector2.ZERO)
 
 
-## Las cintas de marcapáginas (las pestañas): asoman por arriba del libro; la elegida, más alta
-func _dibujar_cintas(giro: float) -> void:
-	for i in PESTANAS.size():
-		var x := 44.0 + i * 114.0
-		if giro < 0.5 and x < LOMO:
-			continue                      # con el libro cerrado, solo asoman las de la mitad derecha
-		var activa := i == pestana
-		var y := 0.0 if activa else 8.0
-		# cuelgan por encima del canto del libro hasta el borde de la página (y = 40)
-		var alto := 40.0 - y
-		_lienzo.draw_texture_rect_region(CINTAS, Rect2(x, y, 100, alto), Rect2(i * 100, 0, 100, alto))
-		_lienzo.draw_rect(Rect2(x + 2, 40, 96, 2), Color(0, 0, 0, 0.25))
-		var icono := Vector2(x + 8, y + 12)
-		_icono_pestana(i, icono, 1.0, Color(1, 1, 1, 1.0 if activa else 0.8))
-		if activa:
-			_texto(PESTANAS[i], Vector2(x + 28, y + 24), PIEL.CREMA)
-		else:
-			_texto(str(i + 1), Vector2(x + 28, y + 24), Color(PIEL.CREMA, 0.75))
+## La mochila grande (cambia de dibujo con el bolsillo: el elegido brilla y asoma lo que guarda), el nombre del
+## bolsillo encima y los cinco bolsillos debajo, para cambiar con ← →
+func _dibujar_bolsa(tinta: float) -> void:
+	var titulo: String = PESTANAS[pestana].to_upper()
+	_texto(titulo, Vector2(BOLSA.get_center().x - _fuente.get_string_size(titulo, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x / 2.0, BOLSA.position.y + 36), Color(TN_TITULO, tinta), -1, 22)
+	# la mochila: da un saltito al cambiar de bolsillo y respira despacio
+	var salto := sin(clampf(_pagina, 0.0, 1.0) * PI) * 8.0
+	var respira := sin(_tiempo * 1.6) * 1.0
+	var c := Vector2(BOLSA.get_center().x, BOLSA.position.y + 104) + Vector2(0, -salto + respira)
+	_lienzo.draw_texture_rect_region(MOCHILA, Rect2(c - Vector2(56, 56), Vector2(112, 112)), Rect2(pestana * 160, 0, 160, 160), Color(1, 1, 1, tinta))
+	# los bolsillos
+	var y := BOLSA.end.y - 38
+	for k in PESTANAS.size():
+		var r := Rect2(BOLSA.get_center().x - 83 + k * 34, y, 30, 26)
+		var elegido := k == pestana
+		_lienzo.draw_rect(r, Color(0.28, 0.2, 0.08, 0.95 * tinta) if elegido else Color(0.08, 0.08, 0.16, 0.9 * tinta))
+		_lienzo.draw_rect(r, Color(TN_TITULO if elegido else TN_APAGADA, (1.0 if elegido else 0.5) * tinta), false, 1.5 if elegido else 1.0)
+		_icono_pestana(k, r.position + Vector2(7, 5), 1.0, Color(1, 1, 1, tinta * (1.0 if elegido else 0.6)))
+	# las flechitas de los lados
+	for lado in [-1.0, 1.0]:
+		var p := Vector2(BOLSA.get_center().x + lado * 94, y + 13) + Vector2(lado * sin(_tiempo * 4.0) * 1.5, 0)
+		_lienzo.draw_colored_polygon(PackedVector2Array([p + Vector2(-lado * 4, -5), p + Vector2(lado * 4, 0), p + Vector2(-lado * 4, 5)]), Color(TN_TITULO, tinta))
 
 
-## La hoja que se pasa al cambiar de pestaña: se levanta de una página, se estrecha hacia el lomo y cae en la otra
-func _dibujar_hoja_que_pasa() -> void:
-	if _pagina >= 1.0:
-		return
-	var k := _pagina
-	var desde_der := _sentido > 0
-	if k < 0.5:
-		var w := (1.0 - k * 2.0) * 280.0
-		var x := LOMO if desde_der else LOMO - w
-		var origen := Rect2(LOMO, 0, 280, 360) if desde_der else Rect2(LOMO - 280, 0, 280, 360)
-		_lienzo.draw_texture_rect_region(LIBRO, Rect2(x, 40, w, 298), Rect2(origen.position + Vector2(0, 40), Vector2(280, 298)),
-			Color(1, 1, 1).darkened(k * 0.6))
-	else:
-		var w := (k - 0.5) * 2.0 * 280.0
-		var x := LOMO - w if desde_der else LOMO
-		var alfa := 1.0 - clampf((k - 0.75) / 0.25, 0.0, 1.0)
-		var origen := Rect2(LOMO - 280, 40, 280, 298) if desde_der else Rect2(LOMO, 40, 280, 298)
-		_lienzo.draw_texture_rect_region(LIBRO, Rect2(x, 40, w, 298), origen, Color(1, 1, 1, alfa).darkened((1.0 - k) * 0.6))
-	# la sombra que echa la hoja sobre el lomo
-	_lienzo.draw_rect(Rect2(LOMO - 6, 42, 12, 294), Color(0, 0, 0, 0.12 * sin(k * PI)))
+## En el Mapa y las Habilidades (a pantalla entera): los cinco bolsillos, pequeños, arriba en el centro
+func _dibujar_bolsillos_mini(tinta: float) -> void:
+	var ancho := PESTANAS.size() * 26.0
+	var x0 := 320.0 - ancho / 2.0
+	_lienzo.draw_rect(Rect2(x0 - 6, 4, ancho + 12, 24), Color(0.03, 0.03, 0.07, 0.85 * tinta))
+	_lienzo.draw_rect(Rect2(x0 - 6, 4, ancho + 12, 24), Color(TN_TITULO, 0.5 * tinta), false, 1.0)
+	for k in PESTANAS.size():
+		var elegido := k == pestana
+		var r := Rect2(x0 + k * 26, 6, 22, 20)
+		if elegido:
+			_lienzo.draw_rect(r, Color(0.28, 0.2, 0.08, 0.95 * tinta))
+		_icono_pestana(k, r.position + Vector2(3, 2), 1.0, Color(1, 1, 1, tinta * (1.0 if elegido else 0.55)))
+	_texto(PESTANAS[pestana], Vector2(x0 + ancho + 14, 22), Color(TN_TITULO, tinta))
 
 
 ## Lo que hay escrito en las dos páginas
@@ -612,25 +602,23 @@ func _dibujar_paginas(tinta: float) -> void:
 		ayuda = "↑↓ elegir · Acción usar o ponerse"
 	if pestana == P_MAPA:
 		_dibujar_mapa()
+		_dibujar_bolsillos_mini(tinta)
 		return
 	if pestana == P_HABILIDADES:
 		_dibujar_arbol(tinta)
+		_dibujar_bolsillos_mini(tinta)
 		return
-	_lamina(Rect2(PAG_IZQ.position + Vector2(2, 38), PAG_IZQ.size - Vector2(4, 44)), tinta)
-	_lamina(Rect2(PAG_DER.position + Vector2(8, 8), PAG_DER.size - Vector2(16, 36)), tinta)
-	_titulo(PESTANAS[pestana], PAG_IZQ.position + Vector2(6, 28), Color(TN_TITULO, tinta), 0.0)
-	# la ayuda, abajo, que quepa en la página (si no cabe, un poco más pequeña)
-	var ancho_ayuda := PAG_DER.size.x - 28
-	var tam_ayuda := 16
-	while tam_ayuda > 10 and _fuente.get_string_size(ayuda, HORIZONTAL_ALIGNMENT_LEFT, -1, tam_ayuda).x > ancho_ayuda:
-		tam_ayuda -= 1
-	_texto(ayuda, Vector2(PAG_DER.position.x + 14, PAG_DER.end.y - 10), Color(TN_SUAVE, tinta), -1, tam_ayuda)
+	_dibujar_bolsa(tinta)
+	# la ayuda, abajo a la derecha de la descripción
+	_texto(ayuda, Vector2(DESC.end.x - 34 - _fuente.get_string_size(ayuda, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x, DESC.end.y - 14), Color(TN_APAGADA, tinta), -1, 13)
 	var filas := _lista()
-	var area := Rect2(PAG_IZQ.position + Vector2(6, 42), Vector2(PAG_IZQ.size.x - 12, FILAS_VISIBLES * ALTO_FILA))
+	var area := Rect2(LISTA.position + Vector2(26, 10), Vector2(LISTA.size.x - 40, FILAS_VISIBLES * ALTO_FILA))
+	# (la lista entra deslizándose al cambiar de bolsillo)
+	area.position.x += (1.0 - _ease(_pagina)) * 24.0 * _sentido
 	if filas.is_empty():
 		var vacio: String = {P_MISIONES: "No hay nada apuntado en el diario.", P_OBJETOS: "La mochila está vacía.",
 			P_LAZOS: "Aún no conoces a nadie."}.get(pestana, "")
-		_texto(vacio, area.position + Vector2(4, 16), Color(TN_APAGADA, tinta))
+		_texto(vacio, area.position + Vector2(6, 26), Color(TN_APAGADA, tinta), -1, 18)
 		return
 	seleccion = clampi(seleccion, 0, filas.size() - 1)
 	# si hay más filas de las que caben, la lista se desplaza para que se vea la elegida
@@ -672,21 +660,21 @@ func _dibujar_paginas(tinta: float) -> void:
 				_rombo(Vector2(tx + 4, y + 12), 4.0, Color(ct, tinta))
 			tx += 14
 		if f.has("icono"):
-			_icono(f["icono"], Vector2(tx, y + 4))
-			tx += 22
+			_icono(f["icono"], Vector2(tx, y + 5))
+			tx += 24
 		if f.has("retrato"):
 			var t := _cargar_retrato(f["retrato"])
 			var ancho_t := t.get_width()
 			_lienzo.draw_texture_rect_region(t, Rect2(tx - 2, y, 18, 24), Rect2(ancho_t / 2 - 9, 2 + (t.get_height() - 32), 18, 24))
 			tx += 22
 		var nombre := String(f["nombre"])
-		_texto(nombre, Vector2(tx, y + 17), color)
+		_texto(nombre, Vector2(tx, y + 19), color, -1, 18)
 		if f.get("hecha", false):
 			PIEL.raya(_lienzo, Vector2(tx, y + 12), Vector2(tx + _ancho(nombre), y + 12), TN_APAGADA, 0.8 * tinta)
 		if f.has("cantidad"):
-			_texto("x%d" % f["cantidad"], Vector2(area.end.x - 30, y + 17), Color(TN_SUAVE, tinta))
+			_texto("x%d" % f["cantidad"], Vector2(area.end.x - 34, y + 19), Color(TN_ELEGIDA if elegida else TN_SUAVE, tinta), -1, 18)
 		if f.get("clave", false):
-			_texto("clave", Vector2(area.end.x - 40, y + 17), Color(TN_ROJO, 0.85 * tinta))
+			_texto("clave", Vector2(area.end.x - 46, y + 19), Color(TN_ELEGIDA if elegida else TN_ROJO, 0.9 * tinta), -1, 16)
 		if f.get("tecla", "") != "":
 			# la tecla, en una etiqueta de cuero
 			var tecla := String(f["tecla"])
@@ -706,25 +694,24 @@ func _dibujar_paginas(tinta: float) -> void:
 		_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(-4, -2), c + Vector2(0, 2), c + Vector2(4, -2)]), Color(TN_SUAVE, tinta))
 	# el detalle de lo elegido, en la página de la derecha
 	var f: Dictionary = filas[seleccion]
-	var detalle := Rect2(PAG_DER.position + Vector2(4, 4), PAG_DER.size - Vector2(8, 26))
+	var detalle := Rect2(DESC.position + Vector2(20, 12), DESC.size - Vector2(40, 30))
 	if f.has("mision"):
 		_detalle_mision(f["mision"], detalle, f.get("id", "") == seguida)
 		return
-	var dy := detalle.position.y + 8
+	var dx := detalle.position.x
 	if f.has("icono"):
-		# el dibujo, pegado en la página con cuatro esquinitas de papel
-		var r := Rect2(detalle.get_center().x - 30, dy, 60, 60)
+		# el dibujo, grande, pegado con cuatro esquinitas de papel
+		var r := Rect2(dx + 4, detalle.position.y + 6, 72, 72)
 		_lienzo.draw_rect(r, Color("efe0bc"))
 		_lienzo.draw_rect(r, Color(TN_APAGADA, 0.5), false, 1.0)
-		_icono(f["icono"], r.position + Vector2(6, 6), 3.0)
+		_icono(f["icono"], r.position + Vector2(4, 4), 4.0)
 		_esquinas_foto(r)
-		dy += 72
+		dx += 92
 	elif f.has("retrato"):
-		_retrato_pegado(f["retrato"], Vector2(detalle.get_center().x - 26, dy))
-		dy += 86
-	_texto(String(f["nombre"]), Vector2(detalle.position.x + 10, dy + 14), TN_TITULO, -1, 16)
-	PIEL.raya(_lienzo, Vector2(detalle.position.x + 10, dy + 19), Vector2(detalle.position.x + 10 + _ancho(String(f["nombre"])), dy + 19), TN_TITULO, 0.5)
-	_parrafo(String(f["texto"]), Vector2(detalle.position.x + 10, dy + 36), detalle.size.x - 20, TN_TINTA)
+		_retrato_pegado(f["retrato"], Vector2(dx + 4, detalle.position.y))
+		dx += 92
+	_texto(String(f["nombre"]), Vector2(dx, detalle.position.y + 22), TN_TITULO, -1, 20)
+	_parrafo(String(f["texto"]), Vector2(dx, detalle.position.y + 48), detalle.end.x - dx - 8, TN_TINTA, 19.0)
 
 
 ## Esquinitas de papel que sujetan una foto o un dibujo pegado en el diario
@@ -760,11 +747,14 @@ func _desplazamiento_libro() -> float:
 
 ## El detalle de una misión: de quién es, qué pasa, los pasos y lo que da
 func _detalle_mision(m: Dictionary, caja: Rect2, es_seguida: bool) -> void:
-	var x := caja.position.x + 10
-	var ancho := caja.size.x - 20
+	# a la izquierda, de qué va; a la derecha, los pasos y lo que da
+	var x := caja.position.x + 4
+	var ancho := caja.size.x * 0.56
+	var x2 := caja.position.x + ancho + 20
+	var ancho2 := caja.end.x - x2
 	var tipo := String(m.get("tipo", ""))
 	var ct: Color = COLOR_TIPO.get(tipo, TN_TINTA)
-	var y := caja.position.y + 14
+	var y := caja.position.y + 16
 	var cabecera := String(Misiones.TIPOS.get(tipo, ""))
 	var quien := String(m.get("quien", ""))
 	if quien != "":
@@ -777,30 +767,28 @@ func _detalle_mision(m: Dictionary, caja: Rect2, es_seguida: bool) -> void:
 		_rombo(Vector2(x + 4, y - 5), 4.0, ct)
 	_texto(cabecera, Vector2(x + 16, y), ct)
 	if es_seguida and Misiones.estado(m) == "activa":
-		# «en pantalla»: un sello de tinta
-		var r := Rect2(caja.end.x - 16 - _ancho("en pantalla"), y - 13, _ancho("en pantalla") + 10, 17)
+		var r := Rect2(x + ancho - _ancho("en pantalla") - 10, y - 13, _ancho("en pantalla") + 10, 17)
 		_lienzo.draw_rect(r, Color(TN_ROJO, 0.12))
 		_lienzo.draw_rect(r, Color(TN_ROJO, 0.7), false, 1.0)
-		_texto("en pantalla", r.position + Vector2(5, 13), Color(TN_ROJO, 0.85))
+		_texto("en pantalla", r.position + Vector2(5, 13), Color(TN_ROJO, 0.9))
 	y += 22
-	var titulo := String(m["titulo"])
-	_texto(titulo, Vector2(x, y), TN_TINTA)
-	_texto(titulo, Vector2(x + 1, y), TN_TINTA)                 # (en negrita)
-	PIEL.raya(_lienzo, Vector2(x, y + 6), Vector2(x + ancho, y + 5), TN_SUAVE, 0.5)
-	y = _parrafo(String(m.get("texto", "")), Vector2(x, y + 22), ancho, TN_SUAVE, 15.0) + 6
+	_texto(String(m["titulo"]), Vector2(x, y), TN_TITULO, -1, 18)
+	y = _parrafo(String(m.get("texto", "")), Vector2(x, y + 20), ancho, TN_SUAVE, 16.0)
+	# la línea que separa las dos columnas
+	_lienzo.draw_line(Vector2(x2 - 10, caja.position.y + 4), Vector2(x2 - 10, caja.end.y - 2), Color(TN_TITULO, 0.25), 1.0)
+	var y2 := caja.position.y + 16
 	for paso in Misiones.pasos_visibles(m):
 		var hecho: bool = paso["hecho"]
 		if hecho:
-			_palomita(Vector2(x + 4, y - 4), TN_VERDE)
+			_palomita(Vector2(x2 + 4, y2 - 4), TN_VERDE)
 		else:
-			_lienzo.draw_rect(Rect2(x, y - 10, 9, 9), Color(TN_TINTA, 0.8), false, 1.0)      # casilla por marcar
-		y = _parrafo(String(paso["texto"]), Vector2(x + 14, y + 1), ancho - 14, TN_APAGADA if hecho else TN_TINTA, 15.0) + 3
-		if y > caja.end.y - 26:
+			_lienzo.draw_rect(Rect2(x2, y2 - 10, 9, 9), Color(TN_TINTA, 0.8), false, 1.0)
+		y2 = _parrafo(String(paso["texto"]), Vector2(x2 + 14, y2 + 1), ancho2 - 14, TN_APAGADA if hecho else TN_TINTA, 16.0) + 2
+		if y2 > caja.end.y - 40:
 			break
 	var premio := String(m.get("premio", ""))
 	if premio != "":
-		var py := maxf(y + 8, caja.end.y - 26)
-		_parrafo("Recompensa: " + premio, Vector2(x, py), ancho, TN_VERDE if Misiones.estado(m) == "hecha" else TN_ROJO, 15.0)
+		_parrafo("Recompensa: " + premio, Vector2(x2, maxf(y2 + 4, caja.end.y - 26)), ancho2, TN_VERDE if Misiones.estado(m) == "hecha" else TN_ROJO, 15.0)
 
 
 func _cargar_retrato(id: String) -> Texture2D:
@@ -810,10 +798,9 @@ func _cargar_retrato(id: String) -> Texture2D:
 
 
 func _dibujar_mapa() -> void:
-	var area := Rect2(PAG_IZQ.position.x, PAG_IZQ.position.y + 4, PAG_DER.end.x - PAG_IZQ.position.x, PAG_IZQ.size.y - 4)
+	var area := Rect2(16, 30, 608, 320)
 	if not Estado.tiene("mapa_partido"):
-		_titulo("Mapa", PAG_IZQ.position + Vector2(6, 28), TN_TITULO)
-		_texto("Aún no tienes ningún mapa.", PAG_IZQ.position + Vector2(10, 64), TN_APAGADA)
+		_texto("Aún no tienes ningún mapa.", Vector2(250, 180), TN_APAGADA, -1, 18)
 		return
 	if _raiz_conocida() and not _mapa_mundo:
 		_dibujar_mapa_raiz(area)
@@ -900,7 +887,7 @@ func _dibujar_mapa_raiz(area: Rect2) -> void:
 			pie = "Estás en: %s · %s" % [cam[0], pie]
 	_texto(pie + " · ↑ ↓ mundo", Vector2(area.position.x + 16, area.end.y - 12), TN_SUAVE)
 	# el mapa está pegado sobre las dos páginas: el lomo lo dobla un poco
-	_lienzo.draw_rect(Rect2(LOMO - 4, pos.y, 8, MAPA_RAIZ.get_height()), Color(0.2, 0.12, 0.05, 0.18))
+	_lienzo.draw_rect(Rect2(pos.x + MAPA_RAIZ.get_width() / 2.0 - 4, pos.y, 8, MAPA_RAIZ.get_height()), Color(0.2, 0.12, 0.05, 0.18))
 
 
 ## Un camino trazado con tinta: rayitas, como lo dibujaría Maisha al andar

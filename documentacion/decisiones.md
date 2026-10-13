@@ -82,3 +82,11 @@ se pasan.
 | Elegido por Iam | Escudo con J mantenida; en el fondo, el Guardián de la Gruta con una pesadilla de Giza (se pelea contra la pesadilla); bastante oscuridad |
 | El Guardián | Ciervo de raíz con máscara de Giza (marioneta): embestida contra la pared, ola de raíces que para el escudo, 3 fases. Al despertar cuenta que Mauti siguió por el Sendero Olvidado (9 ecos) |
 
+
+### Diario a pantalla completa (13-10)
+| Qué | Decisión |
+| --- | --- |
+| Petición de Iam | Rehacer el diario a pantalla completa, al estilo de la bolsa de Pokémon Platino |
+| Bocetos | A «la bolsa» (mochila + lista + descripción), B libro de borde a borde, C casillas |
+| Elegido | ⭐ A: mochila grande con 5 bolsillos a la izquierda, lista grande a la derecha, descripción abajo; Mapa y Habilidades a pantalla entera |
+| Orden siguiente | Rangos y enemigos nuevos (mago, bruja) → Paso de Piedra (casa abandonada) → construcciones antiguas → diálogos antiguos |
