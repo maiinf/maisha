@@ -243,6 +243,33 @@ func _ready() -> void:
 	await _esperar(0.8)
 	_comprobar(Estado.tiene("kimya_conocida") and con_imagen, "habla con Maisha, con su ilustración (en el reflejo de Maisha está Mauti)")
 
+	print("El noveno eco, la voz del Silencio (solo en el reflejo):")
+	var eco_9: Node2D = null
+	for e in get_tree().get_nodes_in_group("ecos_perdidos"):
+		if e.get("id") == "lago_espejo":
+			eco_9 = e
+	_comprobar(eco_9 != null and eco_9.modulate.a > 0.9 and eco_9.is_in_group("interactuables"), "con el lago en espejo, la piedra del eco aparece en la isla")
+	for m in ["sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "orilla_juncos", "la_travesia", "cueva_setas"]:
+		Estado.marcar("eco/" + m)
+	maisha.global_position = eco_9.global_position + Vector2(0, 16)
+	await _esperar(0.3)
+	eco_9.interactuar()
+	await _esperar(1.6)
+	var musica := AudioServer.get_bus_index("Musica")
+	_comprobar(AudioServer.get_bus_volume_db(musica) < -40.0, "al escucharla, todo se calla (música a %.0f dB)" % AudioServer.get_bus_volume_db(musica))
+	var con_imagen_9 := false
+	for i in 120:
+		if dialogo.get("_ilustracion") != null and dialogo.get("_ilustracion_alfa") > 0.5:
+			con_imagen_9 = true
+		if not dialogo.hablando:
+			break
+		dialogo.pasar()
+		await _esperar(0.12)
+	await _esperar(2.6)
+	_comprobar(Estado.tiene("eco/lago_espejo") and con_imagen_9, "el noveno recuerdo, con su ilustración (21_eco_lago)")
+	_comprobar(Estado.tiene("nueve_ecos"), "con los nueve, se ponen las nueve voces")
+	_comprobar(AudioServer.get_bus_volume_db(musica) > -40.0, "y el sonido vuelve (%.0f dB)" % AudioServer.get_bus_volume_db(musica))
+
 	print("El agua tiembla:")
 	maisha.global_position = Vector2(46 * 16, 40 * 16)
 	await _esperar(0.2)
@@ -257,6 +284,7 @@ func _ready() -> void:
 	await _esperar(2.8)
 	_comprobar(not largo.cruzable(), "y el puente se apaga poco a poco")
 	_comprobar(not kimya.visible, "y Kimya se desvanece con el reflejo")
+	_comprobar(eco_9.modulate.a < 0.2 and not eco_9.is_in_group("interactuables"), "y la piedra del eco también")
 
 	print("De vuelta a la cañada:")
 	maisha.global_position = _puerta("canada").global_position + Vector2(-40, 0)

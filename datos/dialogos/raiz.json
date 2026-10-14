@@ -2570,6 +2570,20 @@
 		"conversaciones": [
 			{
 				"si": [
+					"nueve_ecos"
+				],
+				"no": [
+					"sendero_abierto"
+				],
+				"marca": "sendero_abierto",
+				"lineas": [
+					"...¿Lo oyes? El Primer Árbol se oye desde aquí. Nueve voces, lucecita. Las has juntado todas.",
+					"Entonces me toca cumplir lo prometido. Aparta un poco, que estas raíces son muy viejas y crujen.",
+					"Ya está. El Sendero Olvidado sube desde el fondo, hacia el norte. Ve con cuidado: allí arriba hace frío y la niebla engaña."
+				]
+			},
+			{
+				"si": [
 					"sendero_abierto"
 				],
 				"lineas": [
@@ -2805,6 +2819,35 @@
 			}
 		]
 	},
+	"eco_lago_espejo": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"marca": "eco/lago_espejo",
+				"lineas": [
+					"La espiral de la piedra se enciende... y todo se calla. El agua, el viento, hasta la música. Un silencio tan grande que se puede mirar."
+				],
+				"historia": [
+					{
+						"imagen": "21_eco_lago",
+						"lineas": [
+							"Arriba, en la colina del norte, no hay nada. Pero en el agua, del revés, el Primer Árbol brilla como si nunca hubiera enfermado.",
+							"«Esta es la novena voz, Maisha. La mía. No suena: por eso solo se ve en el agua quieta.»",
+							"«Cuando el Primer Árbol enfermó, guardó lo que recordaba en ocho piedras, por los caminos. Para que nadie lo olvidara.»",
+							"«La mía no cabía en una piedra. El Silencio no se puede guardar. Solo se puede mirar.»",
+							"«Arriba, en las Ruinas, vive quien no quiere que nada se acabe. No le odies. Quien no soporta que algo se acabe es porque lo quiso muchísimo.»",
+							"«Cuando tengas las nueve voces, el sendero te dejará pasar. No se abre con fuerza: se abre recordando.»"
+						]
+					}
+				],
+				"tras_historia": [
+					"El sonido vuelve poco a poco: el agua, el viento, la música.",
+					"En el reflejo, el Primer Árbol se apaga despacio. Pero Maisha ya sabe dónde está."
+				]
+			}
+		]
+	},
 	"nungu_libre": {
 		"nombre": "Nungu",
 		"conversaciones": [
@@ -2851,6 +2894,27 @@
 			{
 				"lineas": [
 					"Los hilos se rompen como telarañas. Al otro lado, la sala grande... y una seta enorme que me está esperando."
+				]
+			}
+		]
+	},
+	"paso_cerrado_sendero_olvidado": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"no": [
+					"sendero_abierto"
+				],
+				"lineas": [
+					"Raíces enormes, trenzadas como una puerta. Por las rendijas baja un aire frío del norte.",
+					"El Guardián dijo que solo se abre con las nueve voces."
+				]
+			},
+			{
+				"lineas": [
+					"Las raíces se han apartado, pero arriba la niebla del Sendero Olvidado es tan espesa que no se ve dónde pisar.",
+					"Mejor esperar a que se aclare un poco."
 				]
 			}
 		]

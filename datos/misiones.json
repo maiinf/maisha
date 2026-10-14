@@ -875,6 +875,16 @@
 						"escena": "sendero_del_puente",
 						"buscar": "grupo:ecos_perdidos"
 					}
+				},
+				{
+					"texto": "Las nueve voces: vuelve con el Guardián de la Gruta",
+					"hecho": [
+						"sendero_abierto"
+					],
+					"ir": {
+						"escena": "gruta_raices",
+						"buscar": "grupo:jefes"
+					}
 				}
 			]
 		},

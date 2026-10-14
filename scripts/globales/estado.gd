@@ -300,6 +300,14 @@ static func texto_tiempo(segundos: float) -> String:
 
 # --- Cambio de escena -----------------------------------------------------------------
 
+## ¿Existe ya esa escena? (sin avisar de error: para puertas a lugares que aún no se han hecho)
+func existe_escena(escena: String) -> bool:
+	for plantilla in CARPETAS:
+		if ResourceLoader.exists(plantilla % escena):
+			return true
+	return false
+
+
 func ruta_de(escena: String) -> String:
 	for plantilla in CARPETAS:
 		var ruta: String = plantilla % escena

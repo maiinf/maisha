@@ -34,6 +34,10 @@
                   brillan (verde-agua y violeta). En el centro, un corro de setas pequeñas se come un montón de hojas
                   caídas, y de la tierra que dejan brotan hojitas nuevas. Maisha (dorada), de rodillas, mira las setas
                   con cara de asco; KIMYA, el Silencio, flota a su lado, plateada, tranquila. Polvo de esporas en el aire.
+  21_eco_lago     EL NOVENO ECO (Lago Espejo, la voz del Silencio). Noche quieta sobre el lago: arriba, solo estrellas y
+                  colinas negras. Pero en el agua, del revés, se ve lo que arriba no está: el PRIMER ÁRBOL dorado en su
+                  colina, KIMYA flotando sobre su reflejo y nueve espirales de luz en arco (ocho verdes, una plateada).
+                  Maisha, en la orilla de la isla, mira el agua.
   15_eco_surcos   EL CUARTO ECO (Senda de los Surcos). La fiesta de la última siega, de noche: campos con gavillas,
                   guirnaldas de farolillos, una hoguera en el centro y los seres de Raíz bailando a contraluz. En la
                   colina, el Primer Árbol dorado. Junto al fuego, Maisha y Mauti bailan de la mano.
@@ -974,4 +978,93 @@ def eco_cueva():
     return lz
 
 
-PIEZAS = {"20_eco_cueva": eco_cueva, "19_eco_travesia": eco_travesia, "18_eco_orilla": eco_orilla, "17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}
+def _solo_reflejo_luz(lz, otro, eje_y, agua, fuerza):
+    """Solo el reflejo (del revés, bajo eje_y) de algo hecho de luz: se suma al agua; arriba no se pinta nada."""
+    eje = int(eje_y * lz.s)
+    img_r = np.zeros_like(otro.img)
+    alto = min(eje, lz.H - eje)
+    img_r[eje:eje + alto] = otro.img[eje - alto:eje][::-1]
+    img_r = img_r * (agua * fuerza)[..., None]
+    lz.img = 1 - (1 - lz.img) * (1 - np.clip(img_r, 0, 1))
+
+
+def eco_lago():
+    """El noveno eco, la voz que no suena: lo que importa solo está en el reflejo del lago quieto."""
+    lz = Lienzo(W, H, semilla=300)
+    rng = np.random.default_rng(301)
+    HZ = 96
+    # la noche: azul hondo, sin luna (la luz de esta noche está en el agua)
+    lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(["#04060e", "#0a1020", "#121a32", "#1c2644", "#26304e"], desde=0, hasta=HZ))
+    ci.estrellas(lz, 90, HZ - 20, semilla=302, color="#dce6f4")
+    # la orilla lejana: colinas negras y, al norte, una colina vacía (donde el agua dice que está el Primer Árbol)
+    colinas = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 10, 9, 60, 303))
+    lz.pintar(colinas * (lz.y < HZ + 1), "#070a14")
+    colina = lz.poligono([(330, HZ + 1), (380, HZ - 22), (430, HZ - 30), (480, HZ - 20), (530, HZ + 1)])
+    lz.pintar(colina, "#080b16")
+    # el lago, liso como un espejo: refleja el cielo del revés
+    agua = (lz.y >= HZ).astype(float)
+    filas = lz.img.shape[0]
+    eje = int(HZ * lz.s)
+    origen = np.clip(2 * eje - 1 - np.arange(filas), 0, filas - 1)
+    lz.pintar(agua, lz.img[origen] * 0.85)
+    # el agua de cerca refleja lo más alto del cielo, lo más oscuro (y así no se repite la fila de arriba)
+    lz.pintar(agua * np.clip((lz.y - 150) / 40, 0, 1), "#04060e")
+    vetas = (estirar_h(lz, lz.ruido(1.5, 2, semilla=304), 50) > 0.76) * agua
+    lz.pintar(vetas, "#a8c8e0", 0.08)
+    # SOLO EN EL REFLEJO: el Primer Árbol en su colina (su halo, recortado en suave)...
+    a_lz = Lienzo(W, H, semilla=305)
+    _primer_arbol(a_lz, 430, HZ - 8, 56)
+    # (el halo del árbol llena todo el cielo: fuera la luz débil, y lo que queda se apaga en suave hacia los lados)
+    cerca = np.clip(1.15 - np.hypot((a_lz.x - 430) / 120, (a_lz.y - (HZ - 36)) / 48), 0, 1) ** 1.5
+    a_lz.img = np.clip((a_lz.img - 0.16) / 0.84, 0, 1) * cerca[..., None]
+    _solo_reflejo_luz(lz, a_lz, HZ, agua, 0.8)
+    # ...nueve espirales de luz en arco sobre él (ocho verdes y la del Silencio, plateada, en el centro)...
+    e_lz = Lienzo(W, H, semilla=306)
+    for k in range(9):
+        a = math.pi * (0.12 + 0.76 * k / 8)
+        cx, cy = 430 - math.cos(a) * 130, HZ - 22 - math.sin(a) * 52
+        plateada = k == 4
+        r0 = 6.5 if plateada else 4.5
+        pts = [(cx + math.cos(t) * r0 * t / 12, cy + math.sin(t) * r0 * t / 12 * 0.9) for t in np.linspace(0.5, 12, 40)]
+        espiral = lz.trazo(pts, 0.9)
+        e_lz.sumar_luz(lz.desenfocar(lz.circulo(cx, cy, r0 + 2), 4), "#e8f0ff" if plateada else "#9ff0c0", 0.35)
+        e_lz.sumar_luz(espiral, "#ffffff" if plateada else "#c8ffd8", 0.95)
+    _solo_reflejo_luz(lz, e_lz, HZ, agua, 0.85)
+    # ...y Kimya, de pie sobre el agua (arriba no hay nadie)
+    kx, ky = 310, 170
+    k_lz = Lienzo(W, H, semilla=307)
+    _kimya_pie(k_lz, kx, ky, e=2.0)
+    _solo_reflejo_luz(lz, k_lz, ky + 3, agua, 0.75)
+    lz.sumar_luz(lz.desenfocar(lz.elipse(kx, ky + 3, 22, 3), 4) * agua, "#c0d0e8", 0.45)
+    # la orilla de la isla, abajo a la izquierda, con dos menhires del círculo
+    YO = 210
+    isla = lz.poligono([(0, 176), (80, 186), (160, 198), (214, YO - 2), (236, YO + 4), (210, YO + 14), (120, 236), (60, 256), (0, 256)])
+    lz.sombrear(isla, ["#070c0c", "#0e1814", "#16221c", "#203024", "#2a3c2c"], 6, (0.5, -0.8, 0.5),
+                textura=lz.ruido(1.5, 2, semilla=308), fuerza_tex=0.35)
+    filo = np.clip(isla - np.roll(isla, int(2 * lz.s), axis=0), 0, 1)
+    lz.sumar_luz(filo, "#8aa8c8", 0.3)
+    for (x, y, alto) in ((36, 190, 26), (92, 200, 20)):
+        menhir = lz.poligono([(x - 6, y), (x - 5, y - alto), (x, y - alto - 3), (x + 5, y - alto + 1), (x + 6, y)])
+        lz.sombrear(menhir, ["#0c0e16", "#1a1e2a", "#2c3242", "#40485a"], 4, (0.5, -0.8, 0.5))
+    hierba = np.zeros((lz.H, lz.W))
+    for k in range(120):
+        x = rng.random() * 220
+        yb = 178 + x * 0.14 + rng.random() * 40
+        hierba = np.maximum(hierba, lz.trazo([(x, yb), (x + (rng.random() - 0.5) * 3, yb - 3 - rng.random() * 4)], 0.5))
+    lz.pintar(hierba * isla, "#2a4030", 0.9)
+    # Maisha, sentada al borde, mirando el agua (su luz se refleja)
+    m_lz = Lienzo(W, H, semilla=309)
+    ci.maisha_luz(m_lz, 200, YO, e=1.5)
+    _pegar_con_reflejo(lz, m_lz, YO + 2, agua, 0.55)
+    lz.sumar_luz(lz.desenfocar(lz.elipse(200, YO + 18, 10, 14), 7) * agua, "#ffe0a0", 0.3)
+    # unas pocas motas plateadas sobre el agua
+    motas = np.zeros((lz.H, lz.W))
+    for k in range(30):
+        motas = np.maximum(motas, lz.circulo(230 + rng.random() * 330, HZ + 8 + rng.random() * 120, 0.4 + rng.random() * 0.4))
+    lz.sumar_luz(motas * agua, "#e8f0ff", 0.7)
+    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.05)
+    ci.marco_recuerdo(lz, color="#40506a", semilla=310)
+    return lz
+
+
+PIEZAS = {"21_eco_lago": eco_lago, "20_eco_cueva": eco_cueva, "19_eco_travesia": eco_travesia, "18_eco_orilla": eco_orilla, "17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}

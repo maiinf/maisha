@@ -265,6 +265,26 @@ func _ready() -> void:
 	_comprobar(get_tree().get_nodes_in_group("tapon_raices").is_empty(), "la maraña del atajo se aparta")
 	_comprobar(g.is_in_group("interactuables"), "y se queda en la sala, despierto, para hablar")
 
+	print("Las nueve voces abren el Sendero Olvidado:")
+	var olvidado: Node2D = _puerta("olvidado")
+	_maisha().global_position = olvidado.global_position
+	await _esperar(0.6)
+	await _leer_dialogo()
+	await _esperar(0.4)
+	_comprobar(_escena() == "GrutaRaices" and _maisha().get("puede_actuar"), "sin las nueve voces, las raíces no dejan pasar (%s %s)" % [_escena(), _maisha().get("puede_actuar")])
+	Estado.marcar("nueve_ecos")
+	_maisha().global_position = g.global_position + Vector2(0, 30)
+	await _esperar(0.3)
+	await _hablar_con(g)
+	_comprobar(Estado.tiene("sendero_abierto"), "con las nueve, el Guardián abre el sendero")
+	_maisha().global_position = olvidado.global_position + Vector2(0, 40)
+	await _esperar(0.4)
+	_maisha().global_position = olvidado.global_position
+	await _esperar(0.8)
+	await _leer_dialogo()
+	await _esperar(0.3)
+	_comprobar(_escena() == "GrutaRaices" and _maisha().get("puede_actuar"), "y, mientras el sendero no exista, Maisha no se queda atascada en la puerta")
+
 	print("De vuelta a La Travesía:")
 	_maisha().global_position = _puerta("travesia").global_position + Vector2(0, -30)
 	await _cruzar("mover_abajo", "LaTravesia")

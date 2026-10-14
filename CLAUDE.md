@@ -58,8 +58,8 @@ Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--h
 
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,
-Senda de los Surcos, Cañada del Eco y Orilla de Juncos hechos; faltan 3) y el misterio de los 9 ecos perdidos (8 hechos).
-El Embarcadero Junco está hecho (casa sellada de Bata, Mamba 2 contra 1, transbordador arreglado con poderes) y La Travesía es un viaje en barca con oleadas (cangrejos y anguilas) y la isla del 7.º eco. La Gruta de las Raíces está hecha (oscuridad, sigilo, escudo con J mantenida, espinos y el Guardián). El Paso de Piedra está hecho (el paso, la casa de Nungu, la llave de Corteza, la cueva de las setas con el 8.º eco y Kuvu, la seta que manda, con Nungu). Faltan el 9.º eco y el Sendero Olvidado / Ruinas. Hay Bestiario con rangos (bronce/plata/oro) y enemigos hechiceros (Bundi, Buibui). El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
+Senda de los Surcos, Cañada del Eco, Orilla de Juncos, Paso de Piedra y La Travesía hechos; falta el Sendero Olvidado) y el misterio de los 9 ecos perdidos (los 9 hechos).
+El Embarcadero Junco está hecho (casa sellada de Bata, Mamba 2 contra 1, transbordador arreglado con poderes) y La Travesía es un viaje en barca con oleadas (cangrejos y anguilas) y la isla del 7.º eco. La Gruta de las Raíces está hecha (oscuridad, sigilo, escudo con J mantenida, espinos y el Guardián). El Paso de Piedra está hecho (el paso, la casa de Nungu, la llave de Corteza, la cueva de las setas con el 8.º eco y Kuvu, la seta que manda, con Nungu). El 9.º eco está en el reflejo del Lago Espejo y el Guardián abre el sendero con las nueve voces. Faltan el Sendero Olvidado y las Ruinas del Primer Árbol. Hay luz 2.5D (relieve, día y noche). Hay Bestiario con rangos (bronce/plata/oro) y enemigos hechiceros (Bundi, Buibui). El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
 
 ## graphify
 

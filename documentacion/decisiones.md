@@ -156,3 +156,12 @@ se pasan.
 | Magia | Fogonazos de luz al estallar semillas, con el Latido y al golpear |
 | Suelos | Sin relieve (40 MB de ruido y apenas se notaba) |
 
+### El noveno eco (14-10)
+| Qué | Decisión |
+| --- | --- |
+| Dónde | Lago Espejo, como estaba previsto («algunas cosas solo existen en el reflejo… un eco»): en la isla de Kimya, solo con el lago quieto |
+| Idea | Es la voz del Silencio: no suena, se ve. Al escucharla se calla todo el sonido |
+| Recuerdo | Kimya cuenta por qué existen los ecos y avisa de quien vive en las Ruinas sin desvelar quién es («quien no soporta que algo se acabe es porque lo quiso muchísimo») |
+| Ilustración | `21_eco_lago`: el cielo vacío; en el reflejo, el Primer Árbol, Kimya y nueve espirales |
+| Abrir el sendero | Con las nueve voces, el Guardián aparta las raíces (`sendero_abierto`). Hasta que se haga el Sendero Olvidado, la niebla no deja pasar |
+

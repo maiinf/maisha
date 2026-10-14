@@ -51,7 +51,8 @@ func _al_entrar(cuerpo: Node) -> void:
 	if not _armada or destino == "" or not cuerpo.is_in_group("maisha"):
 		return
 	_armada = false
-	if cerrada_hasta != "" and not Estado.tiene(cerrada_hasta):
+	# (una puerta a una escena que aún no existe se porta como cerrada: si no, Maisha se quedaría sin poder moverse)
+	if (cerrada_hasta != "" and not Estado.tiene(cerrada_hasta)) or not Estado.existe_escena(destino):
 		# cerrada: Maisha da un paso atrás (la puerta vuelve a armarse cuando se aparta)
 		(cuerpo as Node2D).global_position = punto_llegada()
 		cerrada.emit()

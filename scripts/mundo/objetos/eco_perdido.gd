@@ -2,7 +2,10 @@ extends StaticBody2D
 ## ECO PERDIDO: una piedra alta con una espiral tallada que guarda la voz de quien vivía en Raíz antes de Giza.
 ## Al acercarse brilla y suelta motas de luz; al usarla (Acción), el mundo se tiñe de verde-agua y Maisha oye
 ## el recuerdo (la conversación «eco_<id>» de datos/dialogos/raiz.json, con su ilustración). Deja la marca
-## «eco/<id>» (la pone la conversación). Hay ECOS_TOTAL en todo Raíz: juntos abren el Sendero Olvidado.
+## «eco/<id>» (la pone la conversación). Hay ECOS_TOTAL en todo Raíz: juntos abren el Sendero Olvidado
+## (al oír el último se pone «nueve_ecos» y el Guardián de la Gruta abre el paso).
+## El noveno, el del Lago Espejo, es la voz del Silencio: la piedra SOLO EXISTE EN EL REFLEJO (aparece, plateada,
+## cuando el lago se queda quieto, como Kimya) y, al escucharla, todo se calla: la música, el ambiente y los efectos.
 
 const CHARLA := preload("res://scripts/mundo/charla.gd")
 const SOMBRA := preload("res://scripts/personajes/sombra.gd")
@@ -10,6 +13,8 @@ const TEXTURA := preload("res://arte/mundos/raiz/sendero/eco.png")
 const ECOS_TOTAL := 9
 const VERDE_AGUA := Color("6db0b0")
 const CLARO := Color("d8f0ec")
+const PLATA := Color("a8b8d8")
+const BUSES_SILENCIO := ["Musica", "Ambiente", "Efectos"]
 
 @export var id := ""
 @export var radio_interaccion := 28.0
@@ -21,10 +26,20 @@ var _tiempo := 0.0
 var _cerca := 0.0                  # 0..1: lo cerca que está Maisha (brilla más)
 var _motas: Array[Dictionary] = []
 var _escuchando := false
+var solo_reflejo := false          # la piedra del Silencio (Lago Espejo): solo existe con el lago quieto
+var _visible := 1.0
+var _forma: CollisionShape2D
+var _color := VERDE_AGUA
 
 
 func _ready() -> void:
-	add_to_group("interactuables")
+	solo_reflejo = id == "lago_espejo"
+	if solo_reflejo:
+		_color = PLATA
+		_visible = 0.0
+		modulate.a = 0.0
+	else:
+		add_to_group("interactuables")
 	add_to_group("ecos_perdidos")
 	var sombra := Node2D.new()
 	sombra.set_script(SOMBRA)
@@ -42,12 +57,16 @@ func _ready() -> void:
 	_sprite.centered = false
 	_sprite.offset = Vector2(-13, -39)
 	add_child(_sprite)
+	if solo_reflejo:
+		_sprite.self_modulate = Color(0.86, 0.92, 1.12)   # la piedra del Silencio, plateada
 	var forma := CollisionShape2D.new()
 	var caja := RectangleShape2D.new()
 	caja.size = Vector2(14, 6)
 	forma.shape = caja
 	forma.position = Vector2(0, -3)
+	forma.disabled = solo_reflejo
 	add_child(forma)
+	_forma = forma
 	var gestor := get_tree().get_first_node_in_group("corrupcion")
 	if gestor:
 		gestor.aplicar_a(_sprite)
@@ -68,6 +87,8 @@ static func cuantos_escuchados() -> int:
 
 func _process(delta: float) -> void:
 	_tiempo += delta
+	if solo_reflejo:
+		_seguir_al_espejo(delta)
 	var maisha := get_tree().get_first_node_in_group("maisha") as Node2D
 	var objetivo := 0.0
 	if maisha:
@@ -89,28 +110,31 @@ func _process(delta: float) -> void:
 func _dibujar_halo() -> void:
 	var pulso := 0.5 + 0.5 * sin(_tiempo * 2.2)
 	var fuerza := 0.45 + _cerca * 0.75 + (0.4 if _escuchando else 0.0)
-	_halo.draw_circle(Vector2(0, -20), 20.0 + pulso * 4.0, Color(VERDE_AGUA, 0.10 * fuerza))
-	_halo.draw_circle(Vector2(0, -20), 11.0 + pulso * 2.0, Color(VERDE_AGUA, 0.2 * fuerza))
+	_halo.draw_circle(Vector2(0, -20), 20.0 + pulso * 4.0, Color(_color, 0.10 * fuerza))
+	_halo.draw_circle(Vector2(0, -20), 11.0 + pulso * 2.0, Color(_color, 0.2 * fuerza))
 	_halo.draw_circle(Vector2(0, -21), 5.0, Color(CLARO, 0.35 * fuerza))
 	for m in _motas:
 		var f: float = m["t"] / m["dura"]
 		var a := sin(f * PI) * (0.5 + _cerca * 0.5)
-		_halo.draw_rect(Rect2((m["p"] as Vector2).round(), Vector2.ONE), Color(CLARO if f < 0.4 else VERDE_AGUA, a))
+		_halo.draw_rect(Rect2((m["p"] as Vector2).round(), Vector2.ONE), Color(CLARO if f < 0.4 else _color, a))
 
 
 func interactuar() -> void:
-	if _escuchando:
+	if _escuchando or (solo_reflejo and _visible < 0.9):
 		return
 	_escuchando = true
 	var nuevo := not escuchado()
-	Sonido.efecto("eco_voz", 0.0, global_position)
+	if solo_reflejo:
+		_silencio(true)              # la voz del Silencio no suena: se calla todo
+	else:
+		Sonido.efecto("eco_voz", 0.0, global_position)
 	# el mundo se tiñe de verde-agua mientras suena el recuerdo
 	var velo := CanvasLayer.new()
 	velo.layer = 12
 	var color := ColorRect.new()
 	color.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	color.set_anchors_preset(Control.PRESET_FULL_RECT)
-	color.color = Color(0.25, 0.6, 0.6, 0.0)
+	color.color = Color(0.25, 0.6, 0.6, 0.0) if not solo_reflejo else Color(0.45, 0.52, 0.7, 0.0)
 	velo.add_child(color)
 	get_tree().current_scene.add_child(velo)
 	var t := create_tween()
@@ -121,9 +145,59 @@ func interactuar() -> void:
 		var t2 := color.create_tween()
 		t2.tween_property(color, "color:a", 0.0, 0.8)
 		t2.tween_callback(velo.queue_free)
+	if solo_reflejo:
+		_silencio(false)
 	_escuchando = false
+	if nuevo and escuchado() and cuantos_escuchados() >= ECOS_TOTAL and not Estado.tiene("nueve_ecos"):
+		# el último: las nueve voces juntas
+		Estado.marcar("nueve_ecos")
+		Sonido.fanfarria("objeto")
+		var hud_9 := get_tree().get_first_node_in_group("hud")
+		if hud_9:
+			hud_9.mostrar_mensaje("¡Las nueve voces! El Guardián de la Gruta te abrirá el Sendero Olvidado")
+		return
 	if nuevo and escuchado():
 		Sonido.fanfarria("objeto")
 		var hud := get_tree().get_first_node_in_group("hud")
 		if hud:
 			hud.mostrar_mensaje("Eco perdido escuchado (%d/%d)" % [cuantos_escuchados(), ECOS_TOTAL])
+
+
+## La piedra del Silencio aparece y desaparece con el lago (como Kimya): solo se puede usar con el agua quieta
+func _seguir_al_espejo(delta: float) -> void:
+	var espejo := get_tree().get_first_node_in_group("espejo_lago")
+	var calma: float = espejo.get("calma") if espejo else 0.0
+	_visible = move_toward(_visible, 1.0 if calma > 0.9 else 0.0, delta * (0.6 if calma > 0.9 else 1.5))
+	if not _escuchando:
+		modulate.a = _visible
+	var se_puede := _visible > 0.9
+	if se_puede != is_in_group("interactuables"):
+		if se_puede:
+			add_to_group("interactuables")
+		else:
+			remove_from_group("interactuables")
+	if _forma:
+		_forma.set_deferred("disabled", _visible < 0.5)
+
+
+## Se callan (o vuelven) la música, el ambiente y los efectos, poco a poco
+func _silencio(callar: bool) -> void:
+	for bus in BUSES_SILENCIO:
+		var i := AudioServer.get_bus_index(bus)
+		if i == -1:
+			continue
+		var normal: float = Sonido.BUSES[bus] - (10 - int(Sonido.niveles.get(bus, 8))) * 3.0
+		var desde := AudioServer.get_bus_volume_db(i)
+		var hasta := -60.0 if callar else normal
+		var t := create_tween()
+		t.tween_method(func(v: float) -> void: AudioServer.set_bus_volume_db(i, v), desde, hasta, 1.2 if callar else 2.0)
+
+
+## Si se sale de la escena en pleno silencio, el sonido vuelve de golpe (no puede quedarse apagado)
+func _exit_tree() -> void:
+	if solo_reflejo and _escuchando:
+		for bus in BUSES_SILENCIO:
+			var i := AudioServer.get_bus_index(bus)
+			if i != -1:
+				AudioServer.set_bus_volume_db(i, Sonido.BUSES[bus] - (10 - int(Sonido.niveles.get(bus, 8))) * 3.0)
+
