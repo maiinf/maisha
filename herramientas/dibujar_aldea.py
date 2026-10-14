@@ -619,6 +619,14 @@ def estatua(nombre):
                 p[x, y] = tonos[0]
             x += azar.choice((-1, 0, 1))
             y += 1
+    # las vetas violetas de Giza, que la volvieron piedra (con un brillo)
+    for _ in range(2):
+        x, y = azar.randint(8, w - 9), azar.randint(12, h - 8)
+        for k in range(azar.randint(4, 7)):
+            if p[x, y][3]:
+                p[x, y] = (107, 42, 143, 255) if k % 2 else (168, 85, 214, 255)
+            x += azar.choice((-1, 0, 1))
+            y += 1
     # musgo en lo alto
     for x in range(w):
         for y in range(h):

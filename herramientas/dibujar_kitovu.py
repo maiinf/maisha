@@ -707,6 +707,29 @@ def shamba():
     return l.imagen()
 
 
+def shamba_anim(base):
+    """Los 4 fotogramas de Mzee Shamba (como los demás aldeanos): quieto, respira (todo baja un píxel menos los pies),
+    parpadea (los ojos se cierran tras las gafas) y su gesto (levanta el bastón de la hoja)."""
+    w, h = base.size
+    respira = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    respira.paste(base.crop((0, 0, w, h - 4)), (0, 1))
+    respira.paste(base.crop((0, h - 4, w, h)), (0, h - 4))
+    parpadea = base.copy()
+    for cx in (12, 20):
+        piel = base.getpixel((cx + 1, 14))
+        parpadea.putpixel((cx - 1, 14), piel)
+        parpadea.putpixel((cx, 14), piel)
+    gesto = base.copy()
+    lado = base.crop((0, 0, 8, h - 4))
+    vacio = Image.new("RGBA", (8, h - 4), (0, 0, 0, 0))
+    gesto.paste(vacio, (0, 0))
+    gesto.alpha_composite(lado, (0, -4))
+    tira = Image.new("RGBA", (w * 4, h), (0, 0, 0, 0))
+    for i, f in enumerate((base, respira, parpadea, gesto)):
+        tira.alpha_composite(f, (i * w, 0))
+    return tira
+
+
 def retrato_shamba(cara="normal"):
     """Retrato de Mzee Shamba para la caja de diálogo (64x64).
     cara: normal, sonrisa, sorpresa, triste o pensativo (en los diálogos: «[sonrisa] texto»)."""
@@ -985,7 +1008,9 @@ if __name__ == "__main__":
     pintar_ruinas.main()
     carro().save(os.path.join(destino, "carro.png"))
     pez().save(os.path.join(destino, "pez.png"))
-    shamba().save(os.path.join(RAIZ, "arte", "personajes", "aldeanos", "shamba_frente.png"))
+    base_s = shamba()
+    base_s.save(os.path.join(RAIZ, "arte", "personajes", "aldeanos", "shamba_frente.png"))
+    shamba_anim(base_s).save(os.path.join(RAIZ, "arte", "personajes", "aldeanos", "shamba_anim.png"))
     retratos = os.path.join(RAIZ, "arte", "retratos")
     os.makedirs(retratos, exist_ok=True)
     retrato_shamba().save(os.path.join(retratos, "shamba.png"))
