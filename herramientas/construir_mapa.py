@@ -1745,7 +1745,8 @@ def crear_olvidado():
     """EL SENDERO OLVIDADO (60x112, de sur a norte): de la Gruta de las Raíces a las Ruinas del Primer Árbol. Una subida de
     montaña en zigzag, con nieve, niebla y frío: cinco repisas de peña («0») obligan a ir de un lado a otro. Por el
     camino, BRASEROS («ŭ»: se encienden con el fuego de una semilla y quitan la escarcha), pinos nevados («ğ»), rocas
-    con nieve («ň») y, en el RELLANO DE LAS ESTATUAS, tres estatuas de quienes se quedaron quietos («ŝ»). Una zona
+    con nieve («ň») y, en el RELLANO DE LAS ESTATUAS, tres estatuas de quienes se quedaron quietos («ŝ»). Por todo el
+    camino, QUIETOS («ŧ»), las estatuas que solo se mueven cuando Maisha no las mira. Una zona
     corrupta entre las dos primeras repisas. Arriba, el ARCO DE LAS RUINAS («ŵ») y la puerta del norte («^»)."""
     ANCHO, ALTO = 60, 112
     azar = random.Random(381)
@@ -1801,6 +1802,9 @@ def crear_olvidado():
     # el rellano de las estatuas: un ensanche llano en medio
     for (x, y) in ((22, 50), (38, 50), (30, 57)):
         poner(x, y, "ŝ")
+    # los Quietos (dos, en el rellano, entre las estatuas de verdad: se confunden con ellas)
+    for (x, y) in ((16, 72), (40, 68), (17, 56), (43, 56), (34, 36), (22, 26), (36, 16)):
+        poner(x, y, "ŧ")
     # los braseros (el primero, encendido desde el principio, junto a la Gruta)
     for (x, y) in ((33, 105), (6, 92), (53, 74), (30, 52), (8, 30), (48, 15)):
         poner(x, y, "ŭ")
@@ -1831,7 +1835,7 @@ def crear_olvidado():
                 return False
         for dy in (-1, 0, 1):
             for dx in (-1, 0, 1):
-                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#ŝŭŵ^_XM":
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#ŝŭŵ^_XMŧ":
                     return False
         return True
 

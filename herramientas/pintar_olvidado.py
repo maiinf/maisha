@@ -11,6 +11,9 @@ Genera en arte/mundos/raiz/olvidado/:
                     y las vetas violetas de Giza: 0 una liebre abrazada a una gavilla (para que nunca la segaran) ·
                     1 un tejón que sostiene un farol apagado (para que la noche no acabara) · 2 una garza con las alas
                     abiertas (para no tener que irse nunca)
+  quieto.png        5 × 28×36 el QUIETO, el enemigo del sendero: una figurita de piedra con orejas cortas que juega a no
+                    moverse. 0 quieto (se tapa los ojos con las manos) · 1 y 2 quieto y agrietado (tras 1 y 2 golpes) ·
+                    3 moviéndose (baja las manos, abre los ojos violetas e inclina el cuerpo hacia delante) · 4 golpeado
   arco_ruinas.png   112×88 la puerta de las Ruinas del Primer Árbol, al final del sendero: dos pilares de piedra
                     clara rotos, raíces enormes del Primer Árbol abrazándolos, el arco con las nueve espirales de los
                     ecos talladas (la niebla de entre los pilares la dibuja el juego)
@@ -242,6 +245,67 @@ def arco_ruinas():
     return lz.sprite(contorno=0.4)
 
 
+def _contorno(lz, m, color, grosor=1.0):
+    """El contorno oscuro de una forma (para que se separe de lo que tiene detrás, aunque sea del mismo color)."""
+    g = grosor
+    fuera = np.zeros_like(m)
+    for dx, dy in ((g, 0), (-g, 0), (0, g), (0, -g)):
+        fuera = np.maximum(fuera, np.roll(np.roll(m, int(dy * lz.s), axis=0), int(dx * lz.s), axis=1))
+    lz.pintar(np.clip(fuera - m, 0, 1), color)
+
+
+def quieto(k):
+    """El Quieto (28×36). k: 0 tapándose los ojos · 1, 2 igual, con grietas · 3 moviéndose · 4 golpeado (claro)."""
+    W, H = 28, 36
+    lz = Lienzo(W, H, s=2, semilla=1600)
+    mueve = k == 3
+    inc = 1.5 if mueve else 0.0                       # se inclina hacia delante al moverse
+    cuerpo = lz.elipse(14, 25, 7.5, 9)
+    pies = np.maximum(lz.elipse(10, 34, 3.2, 1.6), lz.elipse(18, 34, 3.2, 1.6))
+    cabeza = lz.elipse(14 + inc * 0.3, 13 + inc, 8.5, 7.5)
+    orejas = np.maximum(lz.poligono([(8 + inc * 0.3, 9 + inc), (6.5, 2.5 + inc), (11, 7 + inc)]),
+                        lz.poligono([(20 + inc * 0.3, 9 + inc), (21.5, 2.5 + inc), (17, 7 + inc)]))
+    forma = np.clip(cuerpo + pies + cabeza + orejas, 0, 1)
+    lz.sombrear(forma, PIEDRA[1:], 5, LUZ)
+    _contorno(lz, np.clip(cabeza + orejas, 0, 1) * (lz.y > 15 + inc), PIEDRA[0], 0.8)   # la barbilla, sobre el cuerpo
+    lz.pintar(lz.trazo([(10, 34), (18, 34)], 0.5) * pies, PIEDRA[1])
+    lz.pintar(lz.elipse(14, 27, 4.5, 5.5), PIEDRA[4], 0.35)                           # la tripa, más clara
+    if mueve:
+        # los brazos, colgando hacia delante, y los ojos abiertos: dos ascuas violetas
+        brazos = np.maximum(lz.trazo([(7, 19), (5, 25), (6, 29)], 1.8, 1.4), lz.trazo([(21, 19), (23, 25), (22, 29)], 1.8, 1.4))
+        lz.sombrear(brazos, PIEDRA[2:], 1.2, LUZ)
+        _contorno(lz, brazos, PIEDRA[0], 0.6)
+        for ox in (10.8, 17.4):
+            ojo = lz.elipse(ox + inc * 0.3, 13.5 + inc, 1.9, 1.5)
+            lz.pintar(ojo, "#1e0832")
+            lz.pintar(lz.circulo(ox + inc * 0.3, 13.3 + inc, 0.9), "#d8a8ff")
+            lz.sumar_luz(lz.desenfocar(ojo, 1.8), "#a060ff", 0.8)
+        lz.pintar(lz.trazo([(12.3, 18.2 + inc), (14, 19 + inc), (15.7, 18.2 + inc)], 0.4), PIEDRA[0])
+    else:
+        # las manos tapando los ojos (como quien juega al escondite): más claras y con su contorno
+        brazos = np.maximum(lz.trazo([(7, 21), (7.2, 17), (8.6, 15.2)], 1.8), lz.trazo([(21, 21), (20.8, 17), (19.4, 15.2)], 1.8))
+        manos = np.maximum(lz.elipse(10.6, 13.6, 3.4, 2.7, -12), lz.elipse(17.4, 13.6, 3.4, 2.7, 12))
+        lz.sombrear(brazos, PIEDRA[2:], 1.2, LUZ)
+        lz.sombrear(manos, PIEDRA[4:], 1.2, LUZ)
+        _contorno(lz, np.clip(brazos + manos, 0, 1), PIEDRA[0], 0.6)
+        for x in (9.2, 10.6, 12.0, 16.0, 17.4, 18.8):          # los dedos
+            lz.pintar(lz.trazo([(x, 11.6), (x, 15.2)], 0.25) * manos, PIEDRA[1])
+        lz.pintar(lz.trazo([(12.8, 18.6), (15.2, 18.6)], 0.4), PIEDRA[0])
+    # las vetas de Giza que lo mueven
+    _venas(lz, forma, [[(15, 20), (13, 25), (15, 31)]])
+    # grietas (tras los golpes)
+    if k in (1, 2, 4):
+        lz.pintar(lz.trazo([(16, 6), (14, 9), (15.5, 11)], 0.45) * forma, PIEDRA[0])
+        lz.sumar_luz(lz.trazo([(16, 6), (14, 9), (15.5, 11)], 0.25) * forma, "#b080ff", 0.5)
+    if k == 2:
+        lz.pintar(lz.trazo([(9, 22), (11.5, 27), (10, 32)], 0.5) * forma, PIEDRA[0])
+        lz.pintar(lz.trazo([(18.5, 23), (20.5, 28)], 0.45) * forma, PIEDRA[0])
+        lz.sumar_luz(lz.trazo([(9, 22), (11.5, 27), (10, 32)], 0.25) * forma, "#b080ff", 0.5)
+    _nieve_encima(lz, np.clip(cabeza + orejas, 0, 1), 1.2, semilla=1605)
+    if k == 4:
+        lz.pintar(forma, "#ffffff", 0.75)
+    return lz.sprite(contorno=0.7)
+
 def main():
     from PIL import Image
     os.makedirs(SALIDA, exist_ok=True)
@@ -250,6 +314,7 @@ def main():
     Image.fromarray(np.concatenate([brasero(False), brasero(True)], axis=1), "RGBA").save(os.path.join(SALIDA, "brasero.png"))
     Image.fromarray(np.concatenate([estatua(k) for k in range(3)], axis=1), "RGBA").save(os.path.join(SALIDA, "estatua.png"))
     Image.fromarray(arco_ruinas(), "RGBA").save(os.path.join(SALIDA, "arco_ruinas.png"))
+    Image.fromarray(np.concatenate([quieto(k) for k in range(5)], axis=1), "RGBA").save(os.path.join(SALIDA, "quieto.png"))
     print("Sendero Olvidado pintado en", SALIDA)
 
 

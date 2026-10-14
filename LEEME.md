@@ -699,7 +699,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_combate.gd` recorre una pelea entera: aviso, cierre, golpe, mordisco y rebote, semillas contra el Corazón de Giza, purga, agotamiento, autodaño y vuelta al borde.
 - `pruebas/prueba_ropa.gd` comprueba que la ropa se pone y se quita, va delante o detrás según la dirección, sigue a la cabeza al respirar y se refleja bien.
 - `pruebas/prueba_misiones.gd` comprueba el diario (misiones que salen y se cumplen con las marcas, contadores, cuál se sigue y que se guarda), la flecha en el mundo y las acciones rápidas (tecla 4, la rueda de Tab).
-- `pruebas/prueba_sendero_olvidado.gd` comprueba los braseros (una semilla los enciende y se quedan encendidos), la escarcha (quieta se congela y pierde una hoja; andando o junto al fuego se le pasa), las estatuas, la misión y las puertas.
+- `pruebas/prueba_sendero_olvidado.gd` comprueba los Quietos (mirados no se mueven, de espaldas se acercan, tres golpes los rompen), los braseros (una semilla los enciende y se quedan encendidos), la escarcha (quieta se congela y pierde una hoja; andando o junto al fuego se le pasa), las estatuas, la misión y las puertas.
 - `pruebas/prueba_luz.gd` comprueba el reloj del día (no corre hasta Cuna de Musgo, el amanecer sin saltos), el relieve de los dibujos, las ventanas que se encienden de noche y que las cuevas mantienen su propia penumbra.
 - `pruebas/prueba_artes.gd` comprueba la Esencia, los costes y efectos de las Artes, que se guardan, y meditar en el Claro de Calma (curar, mantener Acción para despertar un nivel, rasgos).
 - `pruebas/prueba_bosque.gd` abre el camino del norte, recorre el Bosque Cobrizo, parte un tronco podrido, prueba al jabalí (embestida, choque, aturdido), rescata a Tawi, vence a Pembe y arregla el puesto (mapa de Raíz).
@@ -789,7 +789,7 @@ El jefe de la cueva de las setas (`scripts/enemigos/kuvu.gd`, dibujos en `herram
 Al vencerlo se marchita (`kuvu_vencido`); Nungu habla, da su **investigación** (objeto clave: Giza «crece hacia el norte, hacia las Ruinas, y se alimenta de lo que se queda quieto») y vuelve a su casa, donde se le puede visitar (`scripts/mundo/paso/nungu_casa.gd`). En el Bestiario, con su rescoldo para repetir la pelea. Números: `KUVU_*` y `NUNGU_*` en `reglas_combate.gd`. Prueba: `prueba_kuvu`.
 
 
-## Sendero Olvidado (parte 1: la subida)
+## Sendero Olvidado (partes 1 y 2: la subida y los Quietos)
 
 Escena `escenas/mundo/sendero_olvidado.tscn` (`scripts/mundo/sendero_olvidado.gd`): la subida de la Gruta de las Raíces (sur) a las Ruinas del Primer Árbol (norte). Se abre con las nueve voces (el Guardián aparta las raíces). No tiene viajero ni encargo: lo distinto es la montaña.
 
@@ -800,7 +800,8 @@ Escena `escenas/mundo/sendero_olvidado.tscn` (`scripts/mundo/sendero_olvidado.gd
 | **Braseros** | `olvidado/brasero.gd` (6; el de la entrada ya encendido): se encienden con el fuego de una semilla (`semilla.gd` enciende lo que está en el grupo «encendibles» dentro de la cruz) y se quedan encendidos (marca `brasero/sendero_olvidado/x,y`). Llamas de píxeles, chispas y luz. Si Maisha cae, vuelve al último brasero junto al que estuvo |
 | **Las estatuas** | `olvidado/estatua_quieta.gd`: una liebre abrazada a su gavilla, un tejón con un farol apagado y una garza con las alas abiertas; al mirarlas, Maisha entiende qué no querían perder |
 | El arco | `olvidado/arco_ruinas.gd`: pilares rotos de piedra clara con raíces del Primer Árbol y las nueve espirales; la niebla de entre los pilares se dibuja en el juego. Las Ruinas aún no existen: la niebla no deja pasar |
-| Zona y enemigos | Una zona corrupta entre las dos primeras repisas (petrinos y búhos-mago). Los Quietos, el enemigo propio, en la parte 2 |
+| **Los Quietos** (parte 2) | `scripts/enemigos/quieto.gd`, dibujo en `pintar_olvidado.py` (`quieto.png`, 5 fotogramas). Figuritas de piedra que juegan a no moverse: si Maisha las **mira** (están delante, hacia donde mira, a menos de 230 px), se tapan los ojos con las manos y no se mueven; si **no** las mira (de espaldas, de lado o congelada), bajan las manos, abren unos ojos violetas y se le echan encima muy deprisa (quitan una hoja). Se les golpea de frente: 3 golpes de cetro (se agrietan) o una semilla (2). La trampa: pararse a vigilarlas sube la escarcha, así que hay que ir hacia ellas sin pararse. Siete por el camino (dos en el rellano, entre las estatuas de verdad) y también salen de la zona. En el Bestiario, con rango |
+| Zona y enemigos | Una zona corrupta entre las dos primeras repisas: Quietos, petrinos y búhos-mago |
 | Música | «La montaña que no se mueve» (`olvidado` en `componer_musica.py`): acordes suspendidos que no resuelven, viento, campanillas de hielo y una flauta sola; al final, la frase de Kimya. Ambiente de viento fuerte |
 | Arte | `herramientas/pintar_olvidado.py`: pinos nevados, rocas con nieve, el brasero, las tres estatuas y el arco |
 | Misión | «El Sendero Olvidado» (historia): aparece al abrirse el sendero; se cumple al llegar a las Ruinas |

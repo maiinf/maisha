@@ -5,6 +5,7 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ##   - BRASEROS («ŭ», olvidado/brasero.gd): se encienden con el fuego de una semilla; calientan y, si Maisha cae,
 ##     vuelve al último junto al que estuvo. El primero, junto a la Gruta, ya está encendido.
 ##   - LAS ESTATUAS («ŝ», olvidado/estatua_quieta.gd): quienes se quedaron quietos para no perder algo.
+##   - LOS QUIETOS («ŧ», enemigos/quieto.gd): estatuas que solo se mueven cuando Maisha no las mira.
 ##   - Arriba, el ARCO DE LAS RUINAS («ŵ», olvidado/arco_ruinas.gd) con su niebla.
 ## Nieva (olvidado/nevada.gd) y hay niebla baja (la del Ambiente).
 
@@ -14,6 +15,7 @@ const ESTATUA := preload("res://scripts/mundo/olvidado/estatua_quieta.gd")
 const ARCO := preload("res://scripts/mundo/olvidado/arco_ruinas.gd")
 const ESCARCHA := preload("res://scripts/mundo/olvidado/escarcha.gd")
 const NEVADA := preload("res://scripts/mundo/olvidado/nevada.gd")
+const QUIETO := preload("res://scripts/enemigos/quieto.gd")
 
 var escarcha: Node2D
 
@@ -53,6 +55,10 @@ func _poner_cosas() -> void:
 				estatuas += 1
 				e.position = pos
 				$Entidades.add_child(e)
+			elif c == "ŧ":
+				var q: CharacterBody2D = QUIETO.new()
+				q.position = pos
+				$Entidades.add_child(q)
 			elif c == "ŵ":
 				var a: Node2D = ARCO.new()
 				a.position = pos

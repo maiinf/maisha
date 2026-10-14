@@ -174,4 +174,5 @@ se pasan.
 | El Sendero | Montaña con nieve, niebla y estatuas de quienes se quedaron quietos. Sin viajero ni encargo (rutas únicas) |
 | Mecánica | La escarcha de la quietud (quedarse quieta congela; lo contrario del Lago) y braseros que se encienden con semillas |
 | Partes | 1 la subida (hecha) · 2 los Quietos (estatuas que solo se mueven cuando Maisha no las mira) · 3 las Ruinas y el Primer Árbol |
+| Los Quietos (hecho) | Se tapan los ojos con las manos cuando Maisha los mira; de espaldas, se acercan muy deprisa. Encaja con la escarcha: vigilarlos parada congela |
 

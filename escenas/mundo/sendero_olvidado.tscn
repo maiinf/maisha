@@ -34,7 +34,7 @@ densidad_decorado = 0.0
 nombre_region = "Sendero Olvidado"
 entidades = NodePath("../Entidades")
 textos_carteles = Array[String](["↓ Gruta de las Raíces  ·  ↑ Ruinas del Primer Árbol", "↑ Ruinas del Primer Árbol"])
-tipos_enemigo = PackedStringArray("petrino", "bundi")
+tipos_enemigo = PackedStringArray("quieto", "petrino", "bundi")
 viajero = ""
 
 [node name="Ambiente" type="Node2D" parent="." groups=["ambiente"]]

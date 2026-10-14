@@ -65,6 +65,12 @@ func _ready() -> void:
 	_comprobar(braseros.size() == 6 and encendidos.size() == 1, "seis braseros, y solo el de la entrada encendido (%d, %d)" % [braseros.size(), encendidos.size()])
 	_comprobar(get_tree().get_nodes_in_group("estatuas_olvidado").size() == 3, "tres estatuas de quienes se quedaron quietos")
 
+	# (los Quietos, lejos mientras se prueba lo demás: si no, atacan a Maisha cuando se queda quieta)
+	var salida_quietos := {}
+	for n in get_tree().get_nodes_in_group("quietos"):
+		salida_quietos[n] = (n as Node2D).global_position
+		(n as Node2D).global_position += Vector2(0, 4000)
+
 	print("La escarcha de la quietud:")
 	var maisha := _maisha()
 	var escarcha: Node2D = get_tree().current_scene.get("escarcha")
@@ -76,7 +82,7 @@ func _ready() -> void:
 	await _esperar(5.0)
 	_comprobar(escarcha.esta_congelada() or maisha.vida < vida, "si no se mueve, se congela")
 	await _esperar(1.6)
-	_comprobar(maisha.vida == vida - 1 and maisha.get("puede_actuar") == false or maisha.vida == vida - 1, "y pierde una hoja de Vida (%d → %d)" % [vida, maisha.vida])
+	_comprobar(maisha.vida == vida - 1, "y pierde una hoja de Vida (%d → %d)" % [vida, maisha.vida])
 	await _esperar(0.5)
 	await _leer_dialogo()
 	_comprobar(Estado.tiene("olvidado_congelada"), "la primera vez, Maisha entiende lo que pasa")
@@ -103,6 +109,37 @@ func _ready() -> void:
 	escarcha.frio = 0.8
 	await _esperar(1.0)
 	_comprobar(escarcha.frio < 0.3 and escarcha.ultimo_brasero == rellano, "junto al fuego, el frío se va deprisa (%.2f)" % escarcha.frio)
+
+	print("Los Quietos:")
+	var quietos := get_tree().get_nodes_in_group("quietos")
+	_comprobar(quietos.size() == 7, "siete Quietos por el sendero (%d)" % quietos.size())
+	var q: CharacterBody2D = null
+	for n in quietos:
+		if (salida_quietos[n] as Vector2).distance_to(Vector2(17 * 16 + 8, 56 * 16 + 14)) < 4.0:
+			q = n
+	q.global_position = salida_quietos[q]                   # (los demás siguen lejos)
+	maisha.global_position = q.global_position + Vector2(70, 0)
+	maisha.call("mirar", Vector2.LEFT)
+	await _esperar(0.3)
+	var donde := q.global_position
+	await _esperar(1.0)
+	_comprobar(q.mirado and q.global_position.distance_to(donde) < 1.0, "mirándolo, no se mueve")
+	maisha.call("mirar", Vector2.RIGHT)
+	await _esperar(0.35)
+	_comprobar(not q.mirado and q.global_position.distance_to(maisha.global_position) < 60.0, "de espaldas, se acerca muy deprisa (%.0f)" % q.global_position.distance_to(maisha.global_position))
+	maisha.call("mirar", Vector2.LEFT)
+	await _esperar(0.2)
+	var vida_q: int = q.vida
+	q.global_position = maisha.global_position + Vector2(-16, 0)
+	await _esperar(0.1)
+	for i in 3:
+		if is_instance_valid(q):
+			q.global_position = maisha.global_position + Vector2(-16, 0)    # (como si Maisha diera un paso)
+		maisha.call("golpear")
+		await _esperar(0.6)
+	_comprobar(not is_instance_valid(q) or q.vida <= 0, "tres golpes de frente lo rompen (tenía %d)" % vida_q)
+	await _esperar(0.5)
+	_comprobar(Bestiario.cuantos("quieto") >= 1, "y queda en el Bestiario")
 
 	print("Las estatuas:")
 	var estatua: Node = get_tree().get_nodes_in_group("estatuas_olvidado")[0]
