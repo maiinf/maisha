@@ -17,7 +17,7 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pintor import Lienzo, RAIZ  # noqa: E402
+from pintor import Lienzo, RAIZ, rampa  # noqa: E402
 from pintar_casa_shamba import vetas, rect  # noqa: E402
 
 SALIDA = os.path.join(RAIZ, "arte", "mundos", "raiz", "sendero")
@@ -86,58 +86,93 @@ def eco(encendido):
 
 
 def campamento():
-    """El campamento de Msafiri: tienda canadiense de lona ocre con dos remiendos rojizos, la entrada abierta
-    (oscura, con una manta dentro), los vientos atados a estacas, la mochila enorme apoyada con mapas enrollados
-    y un trípode de palos con un cazo encima (el fuego lo pone el juego, animado)."""
-    W, H = 64, 44
-    lz = Lienzo(W, H, s=6, semilla=61)
-    suelo = 42
-    lz.pintar(lz.desenfocar(lz.elipse(30, suelo, 28, 3), 0.9), "#0e140c", 0.5)
-    # la tienda: dos faldones en escorzo (el de la derecha, en sombra) y la cumbrera
-    izq = lz.poligono([(4, suelo - 2), (22, 8), (26, 8), (18, suelo)])
-    der = lz.poligono([(26, 8), (22, 8), (18, suelo), (44, suelo - 1), (46, 12)])
-    pliegues = np.sin(lz.x * 0.9 - lz.y * 0.4) * 0.5 + 0.5
-    lz.sombrear(der, LONA[:5], 6, LUZ, textura=pliegues * 0.5 + vetas(lz, 0.5, 9, False, 62) * 0.5, fuerza_tex=0.35)
-    lz.sombrear(izq, LONA[1:], 5, LUZ, textura=vetas(lz, 0.5, 9, False, 63), fuerza_tex=0.3)
-    # la entrada abierta (en el faldón de la izquierda) con la manta dentro
-    puerta = lz.poligono([(10, suelo - 1), (21, 14), (18, suelo)])
-    lz.pintar(puerta, "#140e0a")
-    manta = lz.poligono([(12, suelo - 1), (17, 32), (18, suelo)])
-    lz.sombrear(manta, ["#1c3535", "#346161", "#4c8d8d"], 2, LUZ)
-    solapa = lz.poligono([(10, suelo - 1), (21, 14), (8, 30)])
-    lz.sombrear(solapa, LONA[2:], 3, LUZ)
-    # remiendos cosidos
-    for (x, y, w, h) in ((30, 22, 6, 5), (37, 31, 5, 4)):
-        rr = rect(lz, x, y, x + w, y + h)
-        lz.sombrear(rr, REMIENDO, 1.5, LUZ)
-        costura = np.clip(rr - lz.desenfocar(rr, 0.3) * 0.0, 0, 1) * ((lz.x * 2 + lz.y * 2) % 2 < 0.6)
-        lz.pintar(costura * (np.clip(lz.distancia(rr), 0, 1) < 0.6), "#e2cea0", 0.7)
-    # el palo de la cumbrera y los vientos
-    lz.pintar(lz.trazo([(24, 8), (24, 4)], 1.2), MADERA[3])
-    for (a, b) in (((22, 9), (2, 30)), ((46, 13), (58, 34))):
-        lz.pintar(lz.trazo([a, b], 0.4), "#c9b77d", 0.9)
-    for (x, y) in ((2, 31), (58, 35)):
-        lz.pintar(lz.trazo([(x, y - 2), (x, y + 2)], 1.0), MADERA[4])
-    # la mochila enorme apoyada a la derecha, con mapas enrollados
-    mochila = lz.elipse(51, 34, 7, 8)
-    lz.sombrear(mochila, MADERA[1:], 5, LUZ, textura=vetas(lz, 0.4, 7, True, 64), fuerza_tex=0.3)
-    correa = lz.trazo([(46, 30), (55, 31)], 0.9) * mochila
-    lz.pintar(correa, MADERA[0], 0.9)
-    for (x0, y0, x1, y1, c) in ((47, 25, 53, 22, "#e2cea0"), (50, 26, 58, 24, "#c9b77d")):
-        rollo = lz.trazo([(x0, y0), (x1, y1)], 2.4)
-        lz.sombrear(rollo, ["#5c3e26", "#a57559", c, "#fff8e8"], 1.2, LUZ)
-    # el trípode con el cazo (delante, a la izquierda de la mochila)
-    for (a, b) in (((36, 41), (40, 30)), ((44, 41), (40, 30)), ((40, 42), (40, 30))):
-        lz.pintar(lz.trazo([a, b], 0.9), MADERA[3])
-    cazo = lz.elipse(40, 34.5, 3.2, 2.4)
-    lz.sombrear(cazo, ["#16171a", "#2b2c30", "#45474c", "#65676c"], 2, LUZ)
-    lz.pintar(lz.trazo([(40, 30), (40, 32)], 0.4), "#2b2c30")
-    # piedras del fuego
-    for k in range(6):
-        a = k / 6 * 2 * np.pi
-        p = lz.elipse(40 + np.cos(a) * 4.2, 41.5 + np.sin(a) * 1.6, 1.4, 1.0)
-        lz.sombrear(p, PIEDRA[1:], 1.0, LUZ)
-    return lz.sprite(contorno=CONTORNO)
+    """El campamento de Msafiri, el pangolín viajero y cronista (120×94, la base en el centro de abajo): una tienda
+    canadiense grande de lona ocre con remiendos y la entrada abierta (dentro, una manta y una lucecita); un mapa
+    clavado en la lona; banderines de los sitios que ha visitado; un farol colgado del mástil; una mesita plegable
+    con su diario abierto, el tintero y la pluma; la mochila enorme con la manta enrollada y mapas; a la derecha, el
+    trípode con el cazo (el fuego lo pone el juego, animado, en la base + (26, -1))."""
+    import pintar_aldea as pa
+    from cinematicas import flores
+    W, H = 120, 84
+    lz = pa._lienzo(W, H, 10, 61)
+    suelo = 80
+    cx = 44
+    LUZ_ = (-0.6, -0.7, 0.5)
+    LONA = ["#3a2a14", "#5a4420", "#7e6230", "#a08044", "#c0a05c", "#dcc07c", "#f0dca0"]
+    lz.pintar(lz.desenfocar(lz.elipse(cx + 6, suelo, 56, 5), 2), "#0e0c0a", 0.45)
+    # los vientos de la tienda, atados a estacas
+    for (a, b) in (((cx - 30, 30), (cx - 46, suelo - 2)), ((cx + 30, 30), (cx + 44, suelo - 2)), ((cx - 4, 12), (cx - 30, 14))):
+        lz.pintar(lz.trazo([a, b], 0.7), "#c8b48a", 0.9)
+    for x in (cx - 46, cx + 44):
+        lz.sombrear(lz.trazo([(x, suelo), (x + 1, suelo - 5)], 0.9), pa.MADERA[2:], 0.4, LUZ_)
+    # la tienda: dos faldones de lona con caída, el canto de arriba y la entrada abierta
+    izq = lz.poligono([(cx - 36, suelo - 2), (cx, 14), (cx, suelo)])
+    der = lz.poligono([(cx, 14), (cx + 36, suelo - 2), (cx, suelo)])
+    tex = pa.vetas(lz, 0.5, 11, False, semilla=62)
+    lz.sombrear(izq, LONA, 8, LUZ_, textura=tex, fuerza_tex=0.25)
+    lz.sombrear(der, LONA, 8, LUZ_, textura=tex, fuerza_tex=0.25)
+    lz.pintar(der, "#1a1208", 0.25)
+    for k in range(5):                                                   # pliegues
+        lz.pintar(lz.trazo([(cx - 6 * k - 3, 22 + k * 10), (cx - 8 * k - 6, suelo - 2)], 0.4) * izq, LONA[1], 0.5)
+    for (x0, y0, w, h, col) in ((cx - 24, 52, 9, 7, ["#5a2a1a", "#8a4a2a", "#b06a3a"]), (cx + 14, 40, 7, 8, ["#3a4a2a", "#5a7a3a", "#7a9a4a"])):
+        rem = lz.poligono([(x0, y0), (x0 + w, y0 + 1), (x0 + w - 1, y0 + h), (x0 - 1, y0 + h - 1)])
+        lz.sombrear(rem * np.maximum(izq, der), col, 1, LUZ_)
+        for k in range(4):
+            lz.pintar(lz.circulo(x0 + 1 + k * (w - 2) / 3, y0 + 0.6, 0.3), "#efe0bf")
+    entrada = lz.poligono([(cx - 9, suelo), (cx, 38), (cx + 9, suelo)])
+    lz.pintar(entrada, "#140e08")
+    lz.sumar_luz(lz.desenfocar(lz.circulo(cx, 66, 4), 4) * entrada, "#ef8a26", 0.5)
+    lz.sombrear(lz.elipse(cx, suelo - 3, 7, 2.4), ["#5a2a2a", "#8a3a3a", "#b05a4a"], 0.8, LUZ_)
+    for lado in (-1, 1):                                              # las solapas recogidas
+        sol = lz.poligono([(cx, 38), (cx + lado * 9, suelo), (cx + lado * 13, suelo - 2), (cx + lado * 4, 40)])
+        lz.sombrear(sol, LONA[1:], 1.5, LUZ_)
+    lz.sombrear(lz.trazo([(cx, 8), (cx, 15)], 1.0), pa.MADERA[2:], 0.4, LUZ_)              # el mástil
+    # el farol colgado del mástil y los banderines de sitios visitados
+    lz.pintar(lz.trazo([(cx + 1, 10), (cx + 8, 12), (cx + 8, 16)], 0.6), "#2a1a12")
+    farol = pa.rect(lz, cx + 6, 16, cx + 10, 21)
+    lz.pintar(farol, rampa(["#ef8a26", "#f9b947", "#fde27e"], np.clip(1 - np.hypot(lz.x - cx - 8, lz.y - 18.5) / 3, 0, 1)))
+    lz.sumar_luz(lz.desenfocar(farol, 4), "#ef8a26", 0.35)
+    for k, col in enumerate(("#d84a4a", "#e8c040", "#4a9ad8", "#6ab04a", "#c070d0")):
+        x = cx - 30 + k * 6
+        y = 30 - k * 3.4
+        lz.pintar(lz.poligono([(x, y), (x + 4, y - 0.8), (x + 2, y + 4)]), col)
+    lz.pintar(lz.trazo([(cx - 32, 31), (cx - 1, 12)], 0.7), "#8a7454")
+    # un mapa clavado en la lona
+    mapa = lz.poligono([(cx + 16, 54), (cx + 26, 52), (cx + 27, 62), (cx + 17, 64)])
+    lz.sombrear(mapa, ["#a08a5a", "#c8b080", "#e2cea0", "#f4e4c0"], 1, LUZ_)
+    lz.pintar(lz.trazo([(cx + 18, 57), (cx + 21, 60), (cx + 25, 56)], 0.4) * mapa, "#8c281e", 0.8)
+    lz.pintar(lz.circulo(cx + 17.4, 55, 0.6), "#c89a44")
+    # la mesita plegable con el diario, el tintero y la pluma (a la izquierda, delante)
+    mx = 12
+    for (a, b) in (((mx - 6, suelo), (mx + 5, 66)), ((mx + 6, suelo), (mx - 5, 66))):
+        lz.sombrear(lz.trazo([a, b], 0.8), pa.MADERA[2:], 0.4, LUZ_)
+    lz.sombrear(pa.rect(lz, mx - 9, 63, mx + 9, 66), pa.MADERA[1:], 0.8, LUZ_, textura=pa.vetas(lz, 0.5, 9), fuerza_tex=0.3)
+    lib = lz.poligono([(mx - 7, 63), (mx, 61), (mx + 7, 63), (mx, 64.5)])
+    lz.sombrear(lib, ["#a8987a", "#d8c8a6", "#f4ecd8"], 0.5, LUZ_)
+    lz.pintar(lz.trazo([(mx, 61), (mx, 64.5)], 0.3), "#5a4a3a")
+    for k in range(2):
+        lz.pintar(lz.trazo([(mx - 5, 62.6 + k * 0.6), (mx - 1.5, 62 + k * 0.6)], 0.2), "#5a4a3a", 0.8)
+    lz.sombrear(lz.elipse(mx + 6, 62, 1.4, 1.2), ["#0a0a14", "#1e1e3a", "#3a3a6a"], 0.4, LUZ_)
+    lz.pintar(lz.trazo([(mx + 6, 61.5), (mx + 9, 56)], 0.4), "#efe0bf")
+    # la mochila enorme, apoyada a la derecha de la tienda, con la manta enrollada y mapas
+    mo = lz.poligono([(102, suelo), (101, 62), (104, 56), (114, 56), (117, 62), (116, suelo)])
+    lz.sombrear(mo, ["#3a2414", "#5a3a20", "#7e5430", "#a07040", "#c08a54"], 3, LUZ_)
+    lz.sombrear(pa.rect(lz, 103, 66, 115, 72), ["#3a2414", "#5a3a20", "#7e5430"], 1, LUZ_)
+    lz.sombrear(lz.elipse(109, 54, 9, 3), ["#2a3a5a", "#3a5a8a", "#5a7ab0", "#8aa8d0"], 1.2, LUZ_)
+    for k in range(3):
+        lz.sombrear(lz.trazo([(106 + k * 2.6, 56), (104 + k * 3, 46)], 1.2), ["#a08a5a", "#e2cea0", "#f4e4c0"], 0.5, LUZ_)
+    # el trípode con el cazo, a la derecha (el fuego lo pone el juego debajo)
+    tx = 86
+    for (a, b) in (((tx - 7, suelo), (tx, 62)), ((tx + 7, suelo), (tx, 62))):
+        lz.sombrear(lz.trazo([a, b], 0.9), pa.MADERA[2:], 0.4, LUZ_)
+    lz.pintar(lz.trazo([(tx, 62), (tx, 67)], 0.35), "#2a2a2a")
+    lz.sombrear(lz.elipse(tx, 70, 4, 3), ["#141416", "#2a2a2e", "#46464c", "#6e6e74"], 1, LUZ_)
+    for k in range(5):
+        a = k / 5 * 2 * np.pi
+        lz.sombrear(lz.elipse(tx + np.cos(a) * 6, suelo - 1 + np.sin(a) * 1.5, 1.8, 1.2), ["#3a3a3a", "#6a6a6a", "#9a9a9a"], 0.4, LUZ_)
+    flores(lz, 8, (2, suelo - 4, 30, suelo), [["#b2721a", "#df9022", "#fde27e"], ["#8f2532", "#d5525e", "#f4b39a"]], semilla=63, tam=0.6)
+    pa._hierba_pie(lz, 4, 116, suelo - 2, 64)
+    return lz.sprite(contorno=0.4)
 
 
 PAG_COL = {"b": "5c3e26", "n": "c9b77d", "N": "e2cea0", "B": "fff8e8", "t": "533b2d", "a": "4c8d8d"}

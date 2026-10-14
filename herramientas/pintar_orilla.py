@@ -34,67 +34,81 @@ CAPARAZON = ["#1e1a1a", "#2e2826", "#443a36", "#5a4e48", "#76665c"]
 
 
 def casa_barcas():
-    W, H = 96, 72
-    lz = Lienzo(W, H, s=6, semilla=261)
-    suelo = 66
-    # el agua de la orilla, debajo (la caseta está medio sobre el río)
-    agua = lz.poligono([(52, 56), (96, 50), (96, 72), (40, 72)])
-    lz.sombrear(agua, AGUA, 4, LUZ, textura=(np.sin(lz.y * 1.8 + lz.x * 0.2) * 0.5 + 0.5), fuerza_tex=0.3)
-    lz.pintar(lz.desenfocar(lz.elipse(40, suelo, 36, 4), 1.2), "#0e0c0a", 0.45)
+    """La casa de barcas de Kasia, la nutria barquera (136×108, la base en el centro de abajo): medio sobre el río, en
+    pilotes; la nave abierta con la piragua dentro y una rampa al agua; el soporte de los remos vacío (los perdió en
+    la crecida); una ventana con macetas; el tejado de juncos con una veleta en forma de pez; boyas y cuerdas
+    enrolladas; un farol; y una pizarra en la puerta: «SE ALQUILA BALSA»."""
+    import pintar_aldea as pa
+    W, H = 136, 100
+    lz = pa._lienzo(W, H, 8, 261)
+    suelo = 96
+    cx = 64
+    LUZ_ = (-0.6, -0.7, 0.5)
+    MAD = ["#1e140e", "#33231a", "#4a3424", "#634733", "#7d5c42", "#977452", "#b08c66"]
+    AGUA_ = ["#1c3a3a", "#285050", "#346161", "#4c8d8d", "#6db0b0", "#9fd0d0"]
+    # el río, a la derecha y debajo
+    rio = lz.poligono([(cx - 6, suelo - 14), (W, suelo - 18), (W, suelo + 2), (cx - 12, suelo + 2)])
+    lz.pintar(rio, pa.rampa(AGUA_, np.clip(0.45 + (lz.ruido(1.2, 2, semilla=262) - 0.5) * 0.8, 0, 1)))
+    for k in range(7):
+        x = cx + k * 10
+        lz.pintar(lz.trazo([(x, suelo - 6 + k % 3), (x + 6, suelo - 6 + k % 3)], 0.6), "#c8f0f0", 0.7)
     # los pilotes
-    for x in (14, 30, 46, 62, 78):
-        p = rect(lz, x - 2, 48, x + 2, suelo + 2)
-        lz.sombrear(p, MADERA[1:6], 2, LUZ, textura=vetas(lz, 0.4, 7, False, x), fuerza_tex=0.4)
-        lz.pintar(lz.elipse(x, suelo + 1, 3.2, 0.9) * (lz.x > 44), AGUA[4], 0.6)        # el agua al pie del pilote
-    # la plataforma de tablas
-    plat = lz.poligono([(4, 48), (86, 44), (88, 50), (6, 54)])
-    lz.sombrear(plat, MADERA[2:7], 3, LUZ, textura=vetas(lz, 0.4, 13, True, 262), fuerza_tex=0.4)
-    lz.pintar(plat * ((lz.x % 5) < 0.6), MADERA[0], 0.7)
-    # la caseta: tablas verticales, una puerta grande (abierta, se ve la oscuridad) y una ventana
-    frente = rect(lz, 10, 22, 66, 48)
-    lz.sombrear(frente, MADERA[2:7], 6, LUZ, textura=vetas(lz, 0.45, 13, False, 263), fuerza_tex=0.4)
-    lz.pintar(frente * ((lz.x % 4) < 0.5), MADERA[0], 0.75)
-    lado = lz.poligono([(66, 22), (76, 17), (76, 44), (66, 48)])
-    lz.sombrear(lado, MADERA[1:5], 3, LUZ, textura=vetas(lz, 0.45, 13, False, 264), fuerza_tex=0.4)
-    puerta = rect(lz, 38, 30, 58, 48)
-    lz.pintar(puerta, "#0c0a0a")
-    lz.pintar(rect(lz, 38, 30, 58, 31.2), MADERA[1])
-    lz.sombrear(lz.poligono([(40, 46), (56, 46), (54, 44), (42, 44)]), MADERA[3:7], 1, LUZ)   # la proa de la barca, dentro
-    ventana = rect(lz, 16, 30, 24, 37)
-    lz.pintar(ventana, "#0c0a0a")
-    lz.brillo(lz.elipse(20, 34, 2.4, 1.8), "#e6a852", 2.0, 0.55)
-    lz.pintar(rect(lz, 15.5, 33, 24.5, 33.8), MADERA[4])
-    # el tejado de juncos, a dos aguas, con el borde deshilachado
-    hilos = np.sin(lz.x * 3.1 + lz.y * 0.9) * 0.5 + 0.5
-    faldon = lz.poligono([(38, 3), (44, 2), (80, 17), (70, 23)])
-    lz.sombrear(faldon, JUNCO[:5], 4, LUZ, textura=hilos * 0.6 + vetas(lz, 0.3, 7, False, 266) * 0.4, fuerza_tex=0.5)
-    tejado = lz.poligono([(4, 24), (38, 3), (44, 2), (72, 24)])
-    lz.sombrear(tejado, JUNCO, 6, LUZ, textura=hilos * 0.6 + vetas(lz, 0.3, 7, False, 265) * 0.4, fuerza_tex=0.5)
-    flecos = np.zeros((lz.H, lz.W))
-    for k in range(36):
-        x0 = 5 + k * 1.9
-        flecos = np.maximum(flecos, lz.trazo([(x0, 23.5), (x0 + 0.4, 26 + (k % 3))], 0.5))
-    lz.pintar(flecos, JUNCO[4], 0.9)
-    # el soporte de los remos, en la pared: cinco huecos y solo dos remos (faltan tres)
-    lz.pintar(rect(lz, 26, 25, 36, 26), MADERA[1])
-    for k, x in enumerate((27, 29, 31, 33, 35)):
-        if k in (0, 3):
-            lz.sombrear(lz.trazo([(x, 25.5), (x, 44)], 0.8), MADERA[4:8], 0.6, LUZ)
-            lz.sombrear(lz.elipse(x, 42.5, 1.2, 2.4), MADERA[4:8], 1, LUZ)
-        else:
-            lz.pintar(lz.circulo(x, 25.6, 0.5), MADERA[0])                       # el hueco vacío
-    # una red tendida a secar entre dos palos, con sus flotadores rojos
-    for x in (78, 92):
-        lz.pintar(lz.trazo([(x, 50), (x, 28)], 0.8), MADERA[4])
-    red = lz.poligono([(78, 30), (92, 30), (91, 44), (79, 44)])
-    lz.pintar(red * (((lz.x + lz.y) % 2.2 < 0.45) | ((lz.x - lz.y) % 2.2 < 0.45)), RED[1], 0.9)
-    for x in (80, 84, 88):
-        lz.pintar(lz.circulo(x, 30.5, 0.9), "#de6771")
-    # una boya y una cuerda enrollada en la plataforma
-    lz.sombrear(lz.circulo(8, 48, 2.4), ["#8a2a2a", "#b04040", "#de6771", "#f4bcc4"], 2, LUZ)
-    for r in (2.2, 1.4):
-        lz.pintar(np.clip(lz.elipse(70, 49, r * 1.4, r * 0.6) - lz.elipse(70, 49, r * 1.4 - 0.4, r * 0.6 - 0.3), 0, 1), "#a48656")
-    return lz.sprite(contorno=CONTORNO)
+    for x in (cx - 40, cx - 18, cx + 4, cx + 26, cx + 48):
+        lz.sombrear(pa.rect(lz, x - 2, 62, x + 2, suelo), MAD, 1, LUZ_, textura=pa.vetas(lz, 0.5, 9, False, semilla=x), fuerza_tex=0.4)
+    # la plataforma
+    lz.sombrear(pa.rect(lz, cx - 46, 60, cx + 54, 65), MAD, 1.5, LUZ_, textura=pa.vetas(lz, 0.5, 13), fuerza_tex=0.4)
+    # la casa: tablas, con la nave abierta a la derecha
+    pared = pa.rect(lz, cx - 42, 30, cx + 46, 60)
+    tabv = (np.abs(np.sin((lz.x - cx) / 3.4 * np.pi)) < 0.1).astype(float)
+    lz.sombrear(pared, MAD, 6, LUZ_, textura=pa.vetas(lz, 0.5, 15, False, semilla=263) * (1 - tabv * 0.7), fuerza_tex=0.45)
+    nave = pa.rect(lz, cx + 2, 36, cx + 40, 60)
+    lz.pintar(nave, "#120c0a")
+    lz.sumar_luz(lz.desenfocar(lz.circulo(cx + 22, 46, 6), 6) * nave, "#ef8a26", 0.25)
+    piragua = lz.poligono([(cx + 6, 54), (cx + 12, 51), (cx + 34, 51), (cx + 40, 54), (cx + 34, 57), (cx + 12, 57)])
+    lz.sombrear(piragua, ["#3a1a0c", "#6a3418", "#9a4e24", "#c06a32", "#e0904e"], 1.5, LUZ_, textura=pa.vetas(lz, 0.5, 13), fuerza_tex=0.3)
+    lz.pintar(lz.trazo([(cx + 12, 52.5), (cx + 34, 52.5)], 0.4), "#e0904e")
+    rampa_ = lz.poligono([(cx + 2, 60), (cx + 40, 60), (cx + 46, suelo - 6), (cx + 8, suelo - 6)])
+    lz.sombrear(rampa_, MAD[1:], 1, LUZ_, textura=(np.abs(np.sin((lz.y - 60) / 3 * np.pi)) < 0.12) * 1.0, fuerza_tex=0.5)
+    # el soporte de los remos, vacío (con sus ganchos)
+    lz.sombrear(pa.rect(lz, cx - 38, 34, cx - 22, 36), MAD[2:], 0.4, LUZ_)
+    for x in (cx - 35, cx - 30, cx - 25):
+        lz.pintar(lz.trazo([(x, 36), (x, 39), (x + 1.4, 40)], 0.5), "#80838a")
+    # la ventana con macetas
+    pa.ventana(lz, cx - 20, 38, cx - 8, 48, encendida=0.6, contras=True, semilla=264, luz=LUZ_)
+    # la puerta y la pizarra
+    pu = pa.rect(lz, cx - 40, 42, cx - 28, 60)
+    lz.sombrear(pu, ["#251812", "#3d2418", "#5a3826", "#7a4e35"], 2, LUZ_, textura=pa.vetas(lz, 0.5, 11, False), fuerza_tex=0.4)
+    piz = pa.rect(lz, cx - 54, 46, cx - 44, 58)
+    lz.sombrear(piz, MAD[2:], 0.6, LUZ_)
+    lz.pintar(pa.rect(lz, cx - 53, 47, cx - 45, 57), "#1c2420")
+    for k in range(3):
+        lz.pintar(lz.trazo([(cx - 52, 49 + k * 2.6), (cx - 46.5 + (k % 2), 49 + k * 2.6)], 0.4), "#d8dcd0", 0.9)
+    for (a, b) in (((cx - 52, 58), (cx - 50, suelo - 2)), ((cx - 46, 58), (cx - 48, suelo - 2))):
+        lz.sombrear(lz.trazo([a, b], 0.6), MAD[2:], 0.3, LUZ_)
+    # el tejado de juncos y la veleta-pez
+    tej = lz.poligono([(cx - 50, 34), (cx - 30, 12), (cx + 34, 12), (cx + 54, 34), (cx + 50, 36), (cx - 46, 36)])
+    pa.paja(lz, tej, semilla=265, capas=4.5, y0=12)
+    pa.flecos(lz, cx - 50, cx + 54, 34.5, 3.0, semilla=266)
+    lz.sombrear(lz.trazo([(cx + 2, 12), (cx + 2, 2)], 0.8), HIERRO_ if "HIERRO_" in globals() else ["#2e2f33", "#5f626a", "#a5a8ae"], 0.4, LUZ_)
+    pez = lz.poligono([(cx - 5, 1), (cx + 5, -1), (cx + 9, 1), (cx + 5, 3), (cx - 5, 1)])
+    pez = np.maximum(pez, lz.poligono([(cx - 5, 1), (cx - 9, -2), (cx - 9, 4)]))
+    lz.sombrear(pez, ["#3a2a10", "#9a7430", "#e8c46a", "#fbe6a2"], 0.6, LUZ_)
+    # boyas, cuerdas y el farol
+    for (x, col) in ((cx - 4, ["#7a1a1a", "#c83a3a", "#f08a7a"]), (cx, ["#7a6a1a", "#d8b838", "#f8e890"])):
+        lz.pintar(lz.trazo([(x, 36), (x, 39)], 0.4), "#3a2a18")
+        lz.sombrear(lz.circulo(x, 41.5, 2.2), col, 0.6, LUZ_)
+    rollo = np.clip(lz.elipse(cx + 52, 58, 5, 2.4) - lz.elipse(cx + 52, 58, 2.4, 1), 0, 1)
+    lz.sombrear(rollo, ["#5c4428", "#a48656", "#c4a874"], 0.8, LUZ_, textura=(np.sin(np.arctan2(lz.y - 58, lz.x - cx - 52) * 10) > 0) * 1.0, fuerza_tex=0.4)
+    lz.pintar(lz.trazo([(cx + 46, 34), (cx + 50, 34), (cx + 50, 38)], 0.5), "#2a1a12")
+    far = pa.rect(lz, cx + 48, 38, cx + 52, 43)
+    lz.pintar(far, pa.rampa(["#ef8a26", "#f9b947", "#fde27e"], np.clip(1 - np.hypot(lz.x - cx - 50, lz.y - 40.5) / 3, 0, 1)))
+    lz.sumar_luz(lz.desenfocar(far, 4), "#ef8a26", 0.4)
+    # juncos en la orilla
+    for k in range(10):
+        x = cx - 60 + k * 5 + (k % 3)
+        lz.sombrear(lz.trazo([(x, suelo), (x + (k % 2) * 2 - 1, suelo - 8 - k % 4 * 3)], 0.7, 0.3), ["#3d3214", "#7a6431", "#b09c5c", "#e2cea0"], 0.3, LUZ_)
+    pa._hierba_pie(lz, 2, cx - 12, suelo - 2, 267)
+    return lz.sprite(contorno=0.4)
 
 
 def balsa(k):

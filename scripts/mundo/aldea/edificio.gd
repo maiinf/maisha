@@ -12,7 +12,7 @@ const POLVO := [Color("e2cea0"), Color("c9b07e"), Color("a57559")]
 ## Casas con interior: id -> [escena de dentro, dónde está la puerta respecto a la base]
 const INTERIORES := {
 	"casa_seta": ["casa_pino", Vector2(0, 4)],
-	"taller": ["taller_corteza", Vector2(-1, 4)],
+	"taller": ["taller_corteza", Vector2(-6, 4)],
 }
 
 @export var id := ""

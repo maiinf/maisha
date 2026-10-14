@@ -44,68 +44,87 @@ def tira(imgs):
 
 
 def palafito():
-    """La cabaña de Korongo: sobre cuatro pilotes que se meten en el agua, con plataforma de tablas, paredes de
-    tablas verticales, un tejado de juncos a dos aguas (con el borde deshilachado), una ventanita con luz,
-    una red de pesca colgada a secar, un farolillo y una escalerilla que baja al agua."""
-    W, H = 64, 60
-    lz = Lienzo(W, H, s=6, semilla=71)
-    agua = 56
-    # los pilotes y su reflejo en el agua
-    for x in (12, 26, 40, 52):
-        p = rect(lz, x - 1.6, 40, x + 1.6, agua + 1)
-        lz.sombrear(p, MADERA[1:6], 1.6, LUZ, textura=vetas(lz, 0.5, 9, False, x), fuerza_tex=0.3)
-        lz.pintar(rect(lz, x - 2.4, agua - 0.6, x + 2.4, agua + 1.4), "#9fd0d0", 0.7)          # ondita al pie
-    # la plataforma de tablas
-    plat = rect(lz, 6, 37, 58, 42)
-    lz.sombrear(plat, MADERA[2:], 2, LUZ, textura=((lz.x % 4) < 0.7) * 1.0, fuerza_tex=-0.5)
-    lz.pintar(rect(lz, 6, 41, 58, 42), MADERA[1], 0.9)
-    # paredes de tablas verticales (en escorzo: frente y lado)
-    frente = rect(lz, 12, 20, 46, 37.5)
-    lz.sombrear(frente, MADERA[2:7], 6, LUZ, textura=vetas(lz, 0.45, 13, False, 72), fuerza_tex=0.4)
-    lz.pintar(frente * ((lz.x % 4.5) < 0.6), MADERA[0], 0.8)
-    lado = lz.poligono([(46, 20), (54, 16), (54, 34), (46, 37.5)])
-    lz.sombrear(lado, MADERA[1:5], 3, LUZ, textura=vetas(lz, 0.45, 13, False, 73), fuerza_tex=0.4)
-    # la puerta (oscura, con una cortina de cuentas) y la ventanita con luz
-    puerta = rect(lz, 20, 25, 28, 37.5)
-    lz.pintar(puerta, "#140e0a")
-    for k in range(4):
-        lz.pintar(lz.trazo([(21.5 + k * 2, 25.5), (21.5 + k * 2, 34)], 0.4), ["#4c8d8d", "#e6a852", "#de6771", "#c9b77d"][k], 0.8)
-    ventana = rect(lz, 34, 25, 41, 30)
-    lz.pintar(ventana, "#f9b947")
-    lz.brillo(ventana, "#f9b947", 3, 0.5)
-    lz.pintar(rect(lz, 37.2, 25, 37.8, 30) + rect(lz, 34, 27.2, 41, 27.8), MADERA[1])
-    # el tejado de juncos a dos aguas, con el borde deshilachado
-    hilos = np.sin(lz.x * 3.1 + lz.y * 0.9) * 0.5 + 0.5
-    faldon = lz.poligono([(28, 5), (34, 2), (57, 18), (50, 22)])            # el faldón del lado (en sombra)
-    lz.sombrear(faldon, JUNCO[:5], 4, LUZ, textura=hilos * 0.6 + vetas(lz, 0.3, 7, False, 75) * 0.4, fuerza_tex=0.5)
-    tejado = lz.poligono([(5, 22.5), (28, 4.5), (51, 22.5)])                 # el hastial de delante
-    lz.sombrear(tejado, JUNCO, 6, LUZ, textura=hilos * 0.6 + vetas(lz, 0.3, 7, False, 74) * 0.4, fuerza_tex=0.5)
-    flecos = np.zeros((lz.H, lz.W))
-    for k in range(26):
-        x0 = 6 + k * 1.9
-        y0 = 22 - abs(x0 - 28) * 0 if x0 < 28 else 22
-        y0 = 22 - (28 - x0) * 0.77 if x0 < 28 else 5 + (x0 - 28) * 0.77
-        flecos = np.maximum(flecos, lz.trazo([(x0, y0), (x0 + 0.4, y0 + 2.5 + (k % 3))], 0.5))
-    lz.pintar(np.clip(flecos * (lz.y > 6), 0, 1), JUNCO[4], 0.9)
-    lz.pintar(lz.trazo([(28, 5), (34, 3)], 1.2), JUNCO[1])
-    # la red de pesca colgada en el lado (rombos) y unos peces secándose
-    red = lz.poligono([(47, 21), (53, 18), (53, 31), (47, 34)])
-    malla = ((np.abs((lz.x + lz.y) % 3) < 0.4) | (np.abs((lz.x - lz.y) % 3) < 0.4)) * red
-    lz.pintar(malla, "#c9b77d", 0.85)
-    for (x, y) in ((14, 18.5), (17, 19)):
-        pez = lz.elipse(x, y + 3, 1.0, 2.2)
-        lz.sombrear(pez, ["#346161", "#4c8d8d", "#9fd0d0"], 1, LUZ)
-    lz.pintar(lz.trazo([(12, 18), (20, 18.5)], 0.4), "#c9b77d")
-    # el farolillo en el poste de la esquina
-    lz.pintar(lz.trazo([(8, 37), (8, 26)], 1.1), MADERA[3])
-    farol = lz.elipse(8, 28, 1.8, 2.4)
-    lz.pintar(farol, "#f9b947")
-    lz.brillo(farol, "#fde27e", 3, 0.6)
+    """La cabaña de Korongo, la garza pescadora (120×108, la base en el centro de abajo): sobre pilotes que se meten en
+    el agua, con plataforma de tablas y barandilla; paredes de tablas verticales con una ventana encendida; tejado de
+    juncos a dos aguas, con el borde deshilachado y un nido en la cumbrera; la red de pesca y dos nasas secándose;
+    peces colgados ahumándose; una caña apoyada; un farolillo; y una escalerilla que baja al agua."""
+    import pintar_aldea as pa
+    W, H = 120, 100
+    lz = pa._lienzo(W, H, 8, 21)
+    suelo = 96
+    cx = 58
+    LUZ_ = (-0.6, -0.7, 0.5)
+    AGUA = ["#1c3a3a", "#285050", "#346161", "#4c8d8d", "#6db0b0"]
+    # el agua al pie (un charco que se funde con el suelo) y los reflejos
+    agua = lz.elipse(cx, suelo - 2, 50, 7)
+    lz.pintar(agua, pa.rampa(AGUA, np.clip(0.5 + (lz.ruido(1.2, 2, semilla=22) - 0.5), 0, 1)), 0.85)
+    for k in range(6):
+        lz.pintar(lz.trazo([(cx - 40 + k * 15, suelo - 3 + k % 2), (cx - 34 + k * 15, suelo - 3 + k % 2)], 0.4), "#c8f0f0", 0.6)
+    # los pilotes
+    for x in (cx - 30, cx - 10, cx + 10, cx + 30):
+        lz.sombrear(pa.rect(lz, x - 2, 66, x + 2, suelo - 1), MADERA, 1.2, LUZ_, textura=pa.vetas(lz, 0.5, 9, False, semilla=x), fuerza_tex=0.4)
+        lz.pintar(pa.rect(lz, x - 2.2, suelo - 6, x + 2.2, suelo - 1), MUSGO[2], 0.7)
+    for (a, b) in (((cx - 30, 70), (cx - 10, 86)), ((cx + 10, 86), (cx + 30, 70))):
+        lz.sombrear(lz.trazo([a, b], 1.0), MADERA[1:], 0.4, LUZ_)
+    # la plataforma y la barandilla
+    plat = pa.rect(lz, cx - 40, 64, cx + 40, 68)
+    tab = (np.abs(np.sin((lz.x - cx) / 4 * np.pi)) < 0.1).astype(float)
+    lz.sombrear(plat, MADERA, 1.5, LUZ_, textura=pa.vetas(lz, 0.5, 13) * (1 - tab * 0.6), fuerza_tex=0.4)
+    for x in range(int(cx - 39), int(cx + 40), 6):
+        if abs(x - cx - 30) > 4:
+            lz.sombrear(lz.trazo([(x, 64), (x, 57)], 0.7), MADERA[2:], 0.3, LUZ_)
+    lz.sombrear(lz.trazo([(cx - 40, 57), (cx + 26, 57)], 0.8), MADERA[2:], 0.4, LUZ_)
+    # la cabaña: tablas verticales, ventana encendida y puerta
+    pared = pa.rect(lz, cx - 26, 34, cx + 26, 64)
+    tabv = (np.abs(np.sin((lz.x - cx) / 3.2 * np.pi)) < 0.1).astype(float)
+    lz.sombrear(pared, MADERA, 5, LUZ_, textura=pa.vetas(lz, 0.5, 15, False, semilla=23) * (1 - tabv * 0.7), fuerza_tex=0.45)
+    pa.ventana(lz, cx - 18, 42, cx - 6, 52, encendida=0.65, contras=False, semilla=24, luz=LUZ_)
+    pu = pa.rect(lz, cx + 4, 44, cx + 16, 64)
+    lz.sombrear(pu, ["#251812", "#3d2418", "#5a3826", "#7a4e35"], 2, LUZ_, textura=pa.vetas(lz, 0.5, 11, False), fuerza_tex=0.4)
+    lz.pintar(lz.circulo(cx + 14, 55, 0.7), "#c89a44")
+    # el tejado de juncos, con el borde deshilachado y un nido de garza arriba
+    tej = lz.poligono([(cx - 34, 38), (cx, 12), (cx + 34, 38), (cx + 30, 40), (cx, 18), (cx - 30, 40)])
+    tej = np.maximum(tej, lz.poligono([(cx - 34, 38), (cx, 12), (cx + 34, 38)]))
+    pa.paja(lz, tej, semilla=25, capas=4.5, y0=12)
+    lz.pintar(tej, "#4a6a3a", 0.18)
+    pa.flecos(lz, cx - 34, cx + 34, 38.5, 3.0, semilla=26)
+    nido = lz.elipse(cx, 12, 8, 3.4)
+    lz.sombrear(nido, JUNCO[1:], 1.2, LUZ_, textura=pa.vetas(lz, 0.4, 7), fuerza_tex=0.6)
+    for k in range(6):
+        lz.pintar(lz.trazo([(cx - 8 + k * 3, 11), (cx - 9 + k * 3.4, 8)], 0.4), JUNCO[5])
+    # la red de pesca colgada de la barandilla, y dos nasas
+    red = pa.rect(lz, cx - 40, 57, cx - 28, 72)
+    malla = ((np.abs(np.sin((lz.x + lz.y) * 1.6)) < 0.2) | (np.abs(np.sin((lz.x - lz.y) * 1.6)) < 0.2)).astype(float)
+    lz.pintar(red * malla * np.clip(1 - np.abs(lz.x - (cx - 34)) / 8 + (lz.y - 57) / 30, 0, 1), "#c8b48a", 0.9)
+    for (x, y) in ((cx + 34, 60), (cx - 22, 60)):
+        nasa = lz.elipse(x, y, 3.6, 5)
+        lz.sombrear(nasa, JUNCO, 1, LUZ_, textura=((lz.y % 1.6) < 0.5) * 1.0, fuerza_tex=0.5)
+        lz.pintar(lz.circulo(x, y - 4, 1.2), "#2a1a12")
+    # peces colgados ahumándose bajo el alero
+    for x in (cx + 20, cx + 23, cx + 26):
+        lz.pintar(lz.trazo([(x, 40), (x, 43)], 0.4), "#3a2a18")
+        pez = lz.elipse(x, 46, 1.2, 3)
+        lz.sombrear(pez, ["#3a4a5a", "#6a8aa0", "#a8c8d8", "#e0f0f8"], 0.5, LUZ_)
+    # la caña de pescar y el farolillo
+    lz.sombrear(lz.trazo([(cx + 36, 64), (cx + 52, 26)], 0.7, 0.4), MADERA[3:], 0.3, LUZ_)
+    lz.pintar(lz.trazo(lz.curva((cx + 52, 26), (cx + 56, 50), (cx + 54, suelo - 4)), 0.35), "#e0e0d8", 0.9)
+    lz.pintar(lz.trazo([(cx - 26, 36), (cx - 30, 36), (cx - 30, 41)], 0.5), "#2a1a12")
+    far = pa.rect(lz, cx - 32, 41, cx - 28, 46)
+    lz.pintar(far, pa.rampa(["#ef8a26", "#f9b947", "#fde27e"], np.clip(1 - np.hypot(lz.x - cx + 30, lz.y - 43.5) / 3, 0, 1)))
+    lz.sumar_luz(lz.desenfocar(far, 4), "#ef8a26", 0.4)
     # la escalerilla que baja al agua
-    for k in range(4):
-        lz.pintar(lz.trazo([(31, 43 + k * 3.2), (37, 43 + k * 3.2)], 0.9), MADERA[4])
-    lz.pintar(lz.trazo([(31, 42), (31, 56)], 0.8) + lz.trazo([(37, 42), (37, 56)], 0.8), MADERA[2])
-    return lz.sprite(contorno=CONTORNO)
+    for x in (cx + 28, cx + 33):
+        lz.sombrear(lz.trazo([(x, 66), (x + 2, suelo - 2)], 0.8), MADERA[2:], 0.3, LUZ_)
+    for k in range(5):
+        y = 70 + k * 5
+        lz.sombrear(lz.trazo([(cx + 28 + k * 0.4, y), (cx + 33 + k * 0.4, y)], 0.7), MADERA[2:], 0.3, LUZ_)
+    # juncos en el agua
+    for k in range(14):
+        x = cx - 50 + k * 7.6 + (k % 3)
+        if abs(x - cx) < 34:
+            continue
+        lz.sombrear(lz.trazo([(x, suelo), (x + (k % 2) * 2 - 1, suelo - 10 - k % 4 * 3)], 0.7, 0.3), JUNCO[1:], 0.3, LUZ_)
+    return lz.sprite(contorno=0.4)
 
 
 def rana(estado):

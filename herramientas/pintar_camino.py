@@ -36,67 +36,100 @@ TOPO_P = ["#141416", "#222328", "#34363c", "#4a4c52", "#62646a", "#7c7e84", "#98
 
 
 def madriguera():
-    W, H = 72, 58
-    lz = Lienzo(W, H, s=6, semilla=91)
-    suelo = 54
-    # la loma: tierra cubierta de hierba y hojas, con la boca de la puerta
-    loma = lz.elipse(34, suelo + 8, 33, 38) * (lz.y < suelo + 1)
-    lz.pintar(lz.desenfocar(lz.elipse(36, suelo, 33, 4), 1.2), "#0e0c0a", 0.5)
-    lz.sombrear(loma, HIERBA[1:], 12, LUZ, textura=lz.ruido(1.2, 3, semilla=92), fuerza_tex=0.35)
-    hojas = (lz.ruido(0.8, 2, semilla=93) > 0.72) * loma
-    lz.pintar(hojas, "#a37036", 0.8)
-    lz.pintar((lz.ruido(0.8, 2, semilla=94) > 0.8) * loma, "#cc6351", 0.7)
-    # el marco de piedra de la puerta y la puerta redonda de tablas
-    marco = lz.elipse(34, 40, 12, 12) * (lz.y < suelo)
-    lz.sombrear(marco, PENA[1:], 3, LUZ, textura=lz.ruido(2, 2, semilla=95), fuerza_tex=0.4)
-    juntas = np.abs(np.sin(np.arctan2(lz.y - 40, lz.x - 34) * 6)) < 0.18
-    lz.pintar(juntas * marco, PENA[1], 0.8)
-    puerta = lz.elipse(34, 41, 9, 9.5) * (lz.y < suelo)
-    lz.sombrear(puerta, MADERA[1:7], 5, LUZ, textura=vetas(lz, 0.5, 11, False, 96), fuerza_tex=0.45)
-    lz.pintar(puerta * ((lz.x % 3.6) < 0.5), MADERA[0], 0.8)
-    for y in (36, 47):                                                      # bisagras de cobre
-        lz.sombrear(rect(lz, 25.5, y, 33, y + 1.6), COBRE[1:6], 0.8, LUZ)
-    pomo = lz.circulo(39, 43, 1.1)
-    lz.sombrear(pomo, COBRE[2:], 0.8, LUZ)
-    ventanuco = lz.circulo(34, 37, 2.6)
-    lz.pintar(ventanuco, "#f9b947")
-    lz.brillo(ventanuco, "#f9b947", 2.5, 0.45)
-    lz.pintar(lz.trazo([(31.4, 37), (36.6, 37)], 0.5) + lz.trazo([(34, 34.4), (34, 39.6)], 0.5), MADERA[1])
-    # la cuerda de las campanillas sobre la puerta, con tres ganchos vacíos
-    cuerda = lz.trazo(lz.curva((22, 28), (34, 33), (46, 28), n=30), 0.55)
-    lz.pintar(cuerda, "#c9b07e")
-    for x in (28, 34, 40):
-        lz.pintar(lz.trazo([(x, 30.5 + (1.6 if x == 34 else 0.6)), (x, 32.5 + (1.6 if x == 34 else 0.6))], 0.5), HIERRO[4])
-    # el farol de mina en su poste, a la izquierda
-    lz.sombrear(rect(lz, 9, 30, 10.6, suelo), MADERA[1:6], 0.9, LUZ, textura=vetas(lz, 0.5, 9, False, 97), fuerza_tex=0.3)
-    lz.pintar(lz.trazo([(10, 31), (14, 31)], 0.8), MADERA[3])
-    farol = rect(lz, 12.4, 32, 15.6, 37)
-    lz.pintar(farol, "#f9b947")
-    lz.brillo(farol, "#fde27e", 3, 0.6)
-    lz.pintar(rect(lz, 12, 31.4, 16, 32.4) + rect(lz, 12, 36.6, 16, 37.6), HIERRO[2])
-    # la vagoneta con mineral de cobre, a la derecha, sobre dos tramos de raíl
-    for y in (suelo - 1.4, suelo - 0.2):
-        lz.pintar(rect(lz, 48, y, 70, y + 0.7), HIERRO[3])
-    caja = lz.poligono([(50, 41), (68, 41), (66.5, 51), (51.5, 51)])
-    lz.sombrear(caja, HIERRO, 3, LUZ, textura=lz.ruido(1, 2, semilla=98), fuerza_tex=0.3)
-    lz.pintar(rect(lz, 50, 41, 68, 42.3), HIERRO[5], 0.8)
-    for x in (52.5, 65.5):
-        lz.pintar(lz.circulo(x, 46, 0.6), HIERRO[5])
-    for (x, r) in ((54, 3.4), (59, 4.2), (64, 3.2), (56.5, 2.6), (62, 2.8)):
-        piedra = lz.circulo(x, 41 - r * 0.4, r) * (lz.y < 42)
-        lz.sombrear(piedra, COBRE[:6], r, LUZ, textura=lz.ruido(0.8, 2, semilla=int(x)), fuerza_tex=0.4)
-        lz.pintar((lz.ruido(0.5, 1, semilla=int(x) + 3) > 0.8) * piedra, "#3e8f7a", 0.8)
-    for x in (54, 64):
-        rueda = lz.circulo(x, 52.2, 2.4)
-        lz.sombrear(rueda, HIERRO, 1.4, LUZ)
-        lz.pintar(lz.circulo(x, 52.2, 0.7), HIERRO[5])
-    # el pico, apoyado en la loma a la izquierda de la puerta
-    lz.pintar(lz.trazo([(18, suelo - 1), (21.5, 38)], 0.9), MADERA[4])
-    lz.sombrear(lz.trazo(lz.curva((17, 39.5), (21.5, 36.5), (26, 39.5), n=12), 1.2, 0.5), HIERRO[1:], 0.8, LUZ)
-    # unas setitas y piedras al pie
-    for (x, y) in ((4, suelo - 0.5), (27, suelo - 0.2), (45, suelo)):
-        lz.sombrear(lz.elipse(x, y - 1, 2.2, 1.4), PENA[2:], 1, LUZ)
-    return lz.sprite(contorno=CONTORNO)
+    """La madriguera de Fuko, el topo de las gafas (128×100, la base en el centro de abajo): una loma de tierra con
+    hierba y hojas de cobre; la puerta redonda de tablas con herrajes de cobre; una ventanita redonda encendida; el
+    tubo de la chimenea que asoma de la loma echando humo; el farol de mina; la cuerda con los tres ganchos (para las
+    campanillas); la vagoneta en sus raíles con piedras de cobre que brillan; el pico y la pala; raíces y setas."""
+    import pintar_aldea as pa
+    W, H = 128, 92
+    lz = pa._lienzo(W, H, 8, 91)
+    suelo = 88
+    cx = 58
+    LUZ_ = (-0.6, -0.7, 0.5)
+    lz.pintar(lz.desenfocar(lz.elipse(cx + 6, suelo, 60, 5), 2), "#0e0c0a", 0.45)
+    # la loma: tierra con volumen, hierba encima y hojas de cobre caídas
+    loma = lz.poligono([(cx - 52, suelo), (cx - 44, 50), (cx - 28, 26), (cx - 6, 16), (cx + 16, 18), (cx + 36, 30), (cx + 50, 54), (cx + 56, suelo)])
+    lz.sombrear(loma, TIERRA, 14, LUZ_, textura=lz.ruido(1.0, 3, semilla=92), fuerza_tex=0.35)
+    borde_h = 70 + (lz.ruido(3, 2, semilla=98) - 0.5) * 16
+    hierba = loma * (lz.y < borde_h) * (1 - np.clip(1.25 - np.hypot(lz.x - cx, lz.y - 66) / 19, 0, 1) * 1.5).clip(0, 1)
+    hierba = lz.desenfocar(hierba, 0.6)
+    lz.sombrear(hierba, HIERBA, 6, LUZ_, textura=pa.vetas(lz, 0.4, 7, False, semilla=93), fuerza_tex=0.5)
+    rng = np.random.default_rng(94)
+    for k in range(40):
+        x, y = cx - 46 + rng.random() * 98, 22 + rng.random() * 60
+        if loma[int(y * lz.s), int(x * lz.s)] > 0.5:
+            lz.sombrear(lz.elipse(x, y, 1.8, 1.0, rng.uniform(0, 180)), COBRE[1:5], 0.5, LUZ_)
+    for k in range(5):                                                   # raíces que asoman de la loma
+        x0 = cx - 40 + k * 18
+        lz.sombrear(lz.trazo(lz.curva((x0, 60 + k % 2 * 8), (x0 + 5, 56), (x0 + 9, 64)), 1.2, 0.5), TIERRA[3:], 0.5, LUZ_)
+    # el tubo de la chimenea, con humo
+    lz.sombrear(pa.rect(lz, cx + 18, 4, cx + 23, 22), HIERRO, 1.2, LUZ_)
+    lz.sombrear(pa.rect(lz, cx + 16.5, 2, cx + 24.5, 5), HIERRO[2:], 0.6, LUZ_)
+    humo = np.zeros((lz.H, lz.W))
+    for k in range(5):
+        humo = np.maximum(humo, lz.circulo(cx + 21 + k * 2.4, -1 - k * 2.6, 2.4 + k * 0.7))
+    lz.pintar(np.clip(lz.desenfocar(humo, 1.0) * 1.4, 0, 1), "#c8c4c0", 0.7)
+    # el arco de piedra de la entrada y la puerta redonda de tablas
+    arco = np.clip(lz.circulo(cx, 66, 17) - lz.circulo(cx, 66, 13), 0, 1) * (lz.y < suelo)
+    dovelas = (np.abs(np.sin(np.arctan2(lz.y - 66, lz.x - cx) * 9)) < 0.15) * 1.0
+    lz.sombrear(arco, PENA[2:], 1.5, LUZ_, textura=1 - dovelas * 0.7, fuerza_tex=0.6)
+    pu = lz.circulo(cx, 66, 13) * (lz.y < suelo)
+    tablas = (np.abs(np.sin((lz.x - cx) / 3.4 * np.pi)) < 0.1).astype(float)
+    lz.sombrear(pu, ["#251812", "#3d2418", "#5a3826", "#7a4e35", "#9a6847"], 6, LUZ_, textura=pa.vetas(lz, 0.5, 13, False) * (1 - tablas * 0.8), fuerza_tex=0.45)
+    for y in (60, 74):
+        lz.sombrear(pa.rect(lz, cx - 12, y - 0.8, cx - 2, y + 0.8), COBRE[2:], 0.5, LUZ_)
+    pomo = lz.circulo(cx + 6, 70, 1.6)
+    lz.sombrear(pomo, COBRE[2:], 0.6, LUZ_)
+    mirilla = lz.circulo(cx, 60, 2.6)
+    lz.pintar(np.clip(lz.circulo(cx, 60, 3.4) - mirilla, 0, 1), COBRE[2])
+    lz.pintar(mirilla, pa.rampa(["#ef8a26", "#f9b947", "#fde27e"], np.clip(1 - np.hypot(lz.x - cx, lz.y - 60) / 2.6, 0, 1)))
+    # la ventanita redonda a la izquierda
+    vx, vy = cx - 28, 58
+    lz.sombrear(np.clip(lz.circulo(vx, vy, 6) - lz.circulo(vx, vy, 4.6), 0, 1), COBRE[1:], 0.8, LUZ_)
+    vid = lz.circulo(vx, vy, 4.6)
+    lz.pintar(vid, pa.rampa(["#a8380f", "#ef8a26", "#f9b947", "#fde27e"], np.clip(1 - np.hypot(lz.x - vx + 1, lz.y - vy + 1) / 4.6, 0, 1)))
+    lz.pintar(np.maximum(pa.rect(lz, vx - 4.6, vy - 0.4, vx + 4.6, vy + 0.4), pa.rect(lz, vx - 0.4, vy - 4.6, vx + 0.4, vy + 4.6)) * vid, "#2a1a12")
+    lz.sumar_luz(lz.desenfocar(vid, 3), "#ef8a26", 0.3)
+    # la cuerda con los tres ganchos sobre la puerta
+    lz.pintar(lz.trazo(lz.curva((cx - 16, 48), (cx, 52), (cx + 16, 48)), 0.6), "#80643c")
+    for x in (cx - 8, cx, cx + 8):
+        y = 50 + (2 if x == cx else 1)
+        lz.pintar(lz.trazo([(x, y), (x, y + 3)], 0.4) + lz.trazo(lz.curva((x, y + 3), (x + 1.5, y + 5), (x - 0.5, y + 4.6)), 0.4), "#80838a")
+    # el farol de mina, colgado de un poste a la derecha de la puerta
+    lz.sombrear(lz.trazo([(cx + 22, suelo), (cx + 22, 52)], 1.2), MADERA[2:], 0.5, LUZ_)
+    lz.sombrear(lz.trazo([(cx + 22, 53), (cx + 27, 53)], 0.9), MADERA[2:], 0.4, LUZ_)
+    far = pa.rect(lz, cx + 25, 56, cx + 30, 63)
+    lz.pintar(lz.trazo([(cx + 27.5, 53), (cx + 27.5, 56)], 0.4), "#2a2a2a")
+    lz.pintar(far, pa.rampa(["#ef8a26", "#f9b947", "#fde27e"], np.clip(1 - np.hypot(lz.x - cx - 27.5, lz.y - 59.5) / 3.5, 0, 1)))
+    lz.sombrear(pa.rect(lz, cx + 24.5, 55, cx + 30.5, 56.5) + pa.rect(lz, cx + 24.5, 62.5, cx + 30.5, 64), HIERRO, 0.4, LUZ_)
+    lz.sumar_luz(lz.desenfocar(far, 5), "#ef8a26", 0.45)
+    # la vagoneta en sus raíles, llena de piedras de cobre que brillan
+    for y in (suelo - 1, suelo + 2):
+        lz.pintar(lz.trazo([(cx + 32, y), (cx + 70, y)], 0.6), "#5f626a")
+    for x in range(int(cx + 34), int(cx + 70), 5):
+        lz.sombrear(pa.rect(lz, x, suelo - 2, x + 2, suelo + 3), MADERA[1:], 0.3, LUZ_)
+    vag = lz.poligono([(cx + 38, 72), (cx + 60, 72), (cx + 57, 84), (cx + 41, 84)])
+    lz.sombrear(vag, HIERRO, 2, LUZ_, textura=(lz.ruido(0.5, 2, semilla=96) > 0.6) * 1.0, fuerza_tex=0.3)
+    lz.pintar(pa.rect(lz, cx + 38, 72, cx + 60, 73.2), HIERRO[4])
+    for k in range(9):
+        x = cx + 41 + (k % 5) * 4
+        y = 70 - (k // 5) * 2.6 - (k % 2)
+        p_ = lz.elipse(x, y, 2.4, 1.8, k * 30)
+        lz.sombrear(p_, COBRE, 0.8, LUZ_)
+        lz.brillo(p_, COBRE[5], 1.4, 0.4)
+    for x in (cx + 43, cx + 55):
+        lz.sombrear(lz.circulo(x, 85, 2.6), HIERRO, 0.6, LUZ_)
+    # el pico y la pala apoyados en la loma, a la izquierda
+    lz.sombrear(lz.trazo([(cx - 40, suelo), (cx - 34, 66)], 1.0), MADERA[2:], 0.4, LUZ_)
+    lz.sombrear(lz.trazo(lz.curva((cx - 39, 66), (cx - 34, 63), (cx - 29, 66)), 1.2, 0.6), HIERRO, 0.4, LUZ_)
+    lz.sombrear(lz.trazo([(cx - 46, suelo), (cx - 44, 68)], 1.0), MADERA[2:], 0.4, LUZ_)
+    lz.sombrear(lz.elipse(cx - 46, suelo - 3, 2.4, 3.6), HIERRO, 0.6, LUZ_)
+    # setas y hierba al pie
+    for (x, r) in ((cx - 18, 2.4), (cx - 22, 1.6), (cx + 14, 2.0)):
+        lz.sombrear(lz.trazo([(x, suelo), (x, suelo - r * 1.4)], r * 0.35), ["#8a7658", "#dcc8a0", "#f0e2c0"], 0.4, LUZ_)
+        lz.sombrear(lz.elipse(x, suelo - r * 1.5, r, r * 0.6), COBRE[2:], 0.6, LUZ_)
+    pa._hierba_pie(lz, cx - 54, cx + 68, suelo - 2, 97)
+    return lz.sprite(contorno=0.4)
 
 
 def topo(estado):

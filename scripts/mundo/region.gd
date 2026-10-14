@@ -81,8 +81,8 @@ const FIJOS := {
 	"s": [CIENAGA + "sauce.png", Vector2(10, 5), 15.0, 2],
 	"x": [CIENAGA + "arbol_muerto.png", Vector2(8, 5), 9.0, 2],
 	# del Campo Segado
-	"[": [CAMPO + "granero.png", Vector2(60, 12), 0.0, 1, "campo_granero", 40.0],
-	"]": [CAMPO + "molino.png", Vector2(24, 10), 16.0, 1, "campo_molino", 28.0],
+	"[": [CAMPO + "granero.png", Vector2(100, 14), 0.0, 1, "campo_granero", 54.0],
+	"]": [CAMPO + "molino.png", Vector2(40, 12), 22.0, 1, "campo_molino", 36.0],
 	"&": [CAMPO + "maquina.png", Vector2(38, 8), 20.0, 2, "campo_maquina", 28.0],
 	"+": [CAMPO + "paca.png", Vector2(14, 6), 8.0, 2],
 	# de la Cañada del Eco
@@ -104,20 +104,20 @@ const FIJOS := {
 }
 ## La casa del viajero de cada camino («{»): [dibujo, colisión, charla al usarla, radio, hoguera]
 const CAMPAMENTOS := {
-	"msafiri": [SENDERO + "campamento.png", Vector2(48, 10), "sendero_campamento", 30.0, true],
-	"korongo": ["res://arte/mundos/raiz/pasarelas/palafito.png", Vector2(52, 10), "pasarelas_palafito", 34.0, false],
-	"fuko": ["res://arte/mundos/raiz/camino/madriguera.png", Vector2(60, 12), "camino_madriguera", 38.0, false],
-	"sungura": ["res://arte/mundos/raiz/senda/horreo.png", Vector2(52, 10), "senda_horreo", 36.0, false],
-	"mbuzi": ["res://arte/mundos/raiz/canada/aprisco.png", Vector2(92, 22), "canada_aprisco", 46.0, false],
-	"kasia": ["res://arte/mundos/raiz/orilla/casa_barcas.png", Vector2(64, 14), "orilla_casa_barcas", 44.0, false],
+	"msafiri": [SENDERO + "campamento.png", Vector2(72, 10), "sendero_campamento", 40.0, true],
+	"korongo": ["res://arte/mundos/raiz/pasarelas/palafito.png", Vector2(88, 12), "pasarelas_palafito", 46.0, false],
+	"fuko": ["res://arte/mundos/raiz/camino/madriguera.png", Vector2(96, 14), "camino_madriguera", 50.0, false],
+	"sungura": ["res://arte/mundos/raiz/senda/horreo.png", Vector2(84, 12), "senda_horreo", 46.0, false],
+	"mbuzi": ["res://arte/mundos/raiz/canada/aprisco.png", Vector2(124, 20), "canada_aprisco", 56.0, false],
+	"kasia": ["res://arte/mundos/raiz/orilla/casa_barcas.png", Vector2(100, 14), "orilla_casa_barcas", 54.0, false],
 	"bata": ["res://arte/mundos/raiz/embarcadero/casa_bata.png", Vector2(60, 12), "embarcadero_casa_bata", 46.0, false],
 }
 ## Edificios de la aldea: letra -> [id, dibujo, tamaño de la colisión]
 const EDIFICIOS := {
-	"h": ["casa_seta", ALDEA + "casa_seta.png", Vector2(34, 12)],
-	"f": ["taller", ALDEA + "taller.png", Vector2(54, 14)],
-	"k": ["cocina", ALDEA + "cocina.png", Vector2(42, 10)],
-	"n": ["puesto", ALDEA + "puesto.png", Vector2(44, 8)],
+	"h": ["casa_seta", ALDEA + "casa_seta.png", Vector2(60, 14)],
+	"f": ["taller", ALDEA + "taller.png", Vector2(100, 16)],
+	"k": ["cocina", ALDEA + "cocina.png", Vector2(76, 14)],
+	"n": ["puesto", ALDEA + "puesto.png", Vector2(84, 10)],
 }
 ## Aldeanos: letra -> [id, marca que hace falta para que esté, marca que lo hace irse, edificio al que se va]
 const ALDEANOS := {
@@ -316,7 +316,7 @@ func _crear_objetos(zonas: Dictionary) -> void:
 				_fijo([casa[0], casa[1], 0.0, 1, casa[2], casa[3]], pos, 0)
 				if casa[4]:
 					# la hoguera del campamento, delante de la tienda (bajo el trípode del cazo)
-					_poner(FOGATA.new(), pos + Vector2(8, -1))
+					_poner(FOGATA.new(), pos + Vector2(26, -1))
 			elif c == "}":
 				var viaj: StaticBody2D = ALDEANO.new()
 				viaj.id = viajero

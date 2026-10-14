@@ -28,8 +28,9 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from pintor import Lienzo, RAIZ  # noqa: E402
+from pintor import Lienzo, RAIZ, rampa  # noqa: E402
 from pintar_casa_shamba import vetas, rect  # noqa: E402
+from cinematicas import flores  # noqa: E402
 from pintar_pasarelas import tira, pixeles, MADERA, CONTORNO, GIZA  # noqa: E402
 
 SALIDA = os.path.join(RAIZ, "arte", "mundos", "raiz", "canada")
@@ -42,114 +43,86 @@ CUERDA = ["#3a2a18", "#5c4428", "#80643c", "#a48656", "#c4a874"]
 
 
 def aprisco():
-    W, H = 96, 80
-    lz = Lienzo(W, H, s=6, semilla=161)
-    suelo = 61
-    lz.pintar(lz.desenfocar(lz.elipse(32, suelo, 30, 3.5), 1.2), "#0e0c0a", 0.5)
-    # la cabaña: paredes de piedra seca (piedras planas apiladas, cada una con su luz)
-    frente = rect(lz, 4, 24, 34, 50)
-    lado = lz.poligono([(34, 24), (42, 19), (42, 45), (34, 50)])
-    piedras = np.zeros((lz.H, lz.W))
-    tono = np.zeros((lz.H, lz.W))
-    rng = np.random.default_rng(162)
-    for fila in range(10):
-        y = 25 + fila * 2.6
-        x = 3 + (fila % 2) * 2.2
-        while x < 44:
-            largo = 3 + rng.random() * 3
-            p = lz.elipse(x + largo / 2, y + 1.1, largo / 2, 1.2)
-            piedras = np.maximum(piedras, p)
-            tono = np.where(p > 0.5, rng.random(), tono)
-            x += largo + 0.4
-    pared = np.clip(frente + lado, 0, 1)
-    lz.pintar(pared, "#14161a")
-    lz.sombrear(piedras * pared, GRIS[1:8], 1.2, LUZ, textura=tono, fuerza_tex=0.45)
-    lz.pintar(lado * piedras, "#0b0c0e", 0.35)                    # el lado, en sombra
-    # la puerta de tablas y un ventanuco
-    puerta = rect(lz, 14, 33, 22, 50)
-    lz.sombrear(puerta, MADERA[1:6], 2, LUZ, textura=vetas(lz, 0.4, 9, False, 163), fuerza_tex=0.45)
-    lz.pintar(puerta * ((lz.x % 2.7) < 0.45), MADERA[0], 0.8)
-    for y in (36, 46):
-        lz.pintar(rect(lz, 14, y, 22, y + 0.9), MADERA[1], 0.9)
-    lz.pintar(lz.circulo(20.5, 42, 0.6), "#c9b07e")
-    ventana = rect(lz, 26, 31, 31, 36)
-    lz.pintar(ventana, "#0c0a0a")
-    lz.brillo(lz.elipse(28.5, 34, 1.6, 1.2), "#e6a852", 2.0, 0.6)    # un candil dentro
-    # el cayado colgado junto a la puerta
-    lz.pintar(lz.trazo([(10, 49), (10, 30)], 0.7), MADERA[5])
-    lz.pintar(lz.trazo([tuple(p) for p in lz.curva((10, 30), (10, 27), (12.6, 26.5), (12.8, 29), n=20)], 0.7), MADERA[5])
-    # el tejado de lajas, a dos aguas, con las lajas solapadas
-    tejado = lz.poligono([(1, 25), (22, 9), (26, 9), (37, 25)])
-    faldon = lz.poligono([(26, 9), (45, 5), (44, 20), (37, 25)])
-    filas_l = ((lz.y + (lz.x * 0.15)) % 3.2) / 3.2
-    juntas = np.abs(((lz.x + np.floor(lz.y / 3.2) * 2.3) % 5.0) - 2.5) < 0.35
-    lz.sombrear(faldon, LAJA, 3, LUZ, textura=filas_l, fuerza_tex=0.4)
-    lz.sombrear(tejado, LAJA[1:] + ["#888e96"], 5, LUZ, textura=filas_l, fuerza_tex=0.55)
-    lz.pintar(np.clip(tejado + faldon, 0, 1) * (filas_l > 0.86), LAJA[0], 0.8)
-    lz.pintar(np.clip(tejado + faldon, 0, 1) * juntas, LAJA[1], 0.6)
-    musgo = np.clip((lz.ruido(1.5, 2, semilla=164) - 0.62) * 4, 0, 1) * np.clip(tejado + faldon, 0, 1)
-    lz.pintar(musgo, "#4d6436", 0.8)
-    lz.pintar(lz.trazo([(22, 9), (26, 9), (45, 5)], 1.2), LAJA[5])
-    # dentro del corral: el pesebre de heno (de palos, lleno hasta arriba) y el abrevadero de piedra
-    lz.pintar(lz.desenfocar(lz.elipse(53, 54, 9, 1.8), 0.8), "#0e0c0a", 0.6)
-    pesebre = rect(lz, 46, 45, 60, 54)
-    lz.sombrear(pesebre, MADERA[1:6], 2, LUZ, textura=vetas(lz, 0.4, 9, True, 167), fuerza_tex=0.4)
-    lz.pintar(pesebre * ((lz.x % 3.5) < 0.6), MADERA[0], 0.7)
-    heno = lz.elipse(53, 44.5, 8, 3.6)
-    lz.sombrear(heno, HENO, 3, LUZ, textura=vetas(lz, 0.3, 7, True, 166), fuerza_tex=0.5)
-    pajas = np.zeros((lz.H, lz.W))
-    for k in range(9):
-        x0 = 46.5 + k * 1.6
-        pajas = np.maximum(pajas, lz.trazo([(x0, 43), (x0 + (k % 3 - 1) * 1.2, 40 + (k % 2))], 0.4))
-    lz.pintar(pajas, HENO[5], 0.9)
-    # el corral grande, a la derecha: hierba pisada y un murete de piedra seca irregular, con postes de madera
-    borde = [(46, 54), (58, 49), (72, 47), (86, 46), (93, 49), (94, 60), (93, 70), (90, 76), (70, 78), (48, 77)]
-    patio = lz.poligono(borde)
-    lz.sombrear(patio, ["#3a4228", "#4a5432", "#5a663c", "#6c7646"], 4, LUZ, textura=lz.ruido(0.8, 2, semilla=169), fuerza_tex=0.35)
-    lz.pintar(patio * (lz.ruido(1.2, 1, semilla=170) > 0.72), "#5c4a30", 0.6)          # tierra pisada
-    rng_c = np.random.default_rng(172)
-    piedras_c = np.zeros((lz.H, lz.W))
-    for (a_, b_) in zip(borde[1:7], borde[2:8]):                                       # la parte de atrás y la derecha
-        largo_t = float(np.hypot(b_[0] - a_[0], b_[1] - a_[1]))
-        t = 0.0
-        while t < largo_t:
-            r = 1.0 + rng_c.random() * 1.0
-            f = t / largo_t
-            cx, cy = a_[0] + (b_[0] - a_[0]) * f, a_[1] + (b_[1] - a_[1]) * f + rng_c.random() - 0.5
-            piedras_c = np.maximum(piedras_c, lz.elipse(cx, cy, r * 1.2, r * 0.85))
-            if rng_c.random() < 0.5:
-                piedras_c = np.maximum(piedras_c, lz.elipse(cx + 0.5, cy - 1.6, r, r * 0.7))
-            t += r * 1.9
-    lz.pintar(lz.desenfocar(np.clip(piedras_c, 0, 1), 0.5), "#14161a", 0.9)
-    lz.sombrear(piedras_c, GRIS[2:9], 0.9, LUZ, textura=lz.ruido(0.5, 1, semilla=171), fuerza_tex=0.4)
-    for (x, y) in ((72, 47), (93, 60), (90, 76)):                                       # postes de madera
-        lz.pintar(lz.trazo([(x, y + 1), (x, y - 6)], 0.9), MADERA[5])
-        lz.pintar(lz.circulo(x, y - 6, 0.6), MADERA[6])
-    # un abrevadero de piedra en el corral y un poco de heno tirado
-    pila = lz.poligono([(76, 64), (88, 62), (88, 66), (76, 68)])
-    lz.sombrear(pila, GRIS[2:8], 2, LUZ)
-    lz.pintar(lz.poligono([(77, 64.4), (87, 62.6), (87, 64), (77, 65.6)]), "#346161")
+    """El aprisco de Mbuzi (144×112, la base en el centro de abajo): una cabaña de piedra seca con tejado de lajas,
+    la chimenea con humo, una ventana con un candil, el cayado y los cencerros junto a la puerta y un queso curándose
+    en un estante; a la derecha, el corral: murete de piedra, el pesebre lleno de heno, el abrevadero y el portillo."""
+    import pintar_aldea as pa
+    W, H = 144, 112
+    lz = pa._lienzo(W, H, 18, 161)
+    suelo = 108
+    LUZ_ = (-0.6, -0.7, 0.5)
+    PIEDRA_S = ["#2a2c30", "#3f434a", "#565b63", "#70767e", "#8b9198", "#a8adb2", "#c4c8cb"]
+    lz.pintar(lz.desenfocar(lz.elipse(66, suelo, 66, 5), 2), "#0e0c0a", 0.45)
+    # el corral, detrás a la derecha: el suelo pisado y el murete de piedra seca
+    corral = lz.elipse(108, 92, 34, 14)
+    lz.pintar(corral, rampa(["#4a4030", "#6a5a40", "#8a7a58"], lz.ruido(2, 2, semilla=163)))
+    muro = np.clip(lz.elipse(108, 92, 36, 16) - lz.elipse(108, 92, 32, 12.5), 0, 1) * (lz.y > 80)
+    muro = np.maximum(muro, np.clip(lz.elipse(108, 92, 36, 16) - lz.elipse(108, 92, 32, 12.5), 0, 1) * (lz.x > 130))
+    lz.pintar(lz.desenfocar(muro, 0.8) * (1 - muro), "#14120e", 0.5)
+    lz.sombrear(muro, PIEDRA_S[1:], 1.5, LUZ_, textura=(lz.ruido(0.6, 2, semilla=164) > 0.45) * 1.0, fuerza_tex=0.45)
+    # el portillo de palos (abierto)
+    for k in range(4):
+        lz.sombrear(lz.trazo([(80 + k * 3, 100 - k * 1.5), (80 + k * 3, 91 - k * 1.5)], 0.9), MADERA[2:], 0.4, LUZ_)
+    lz.sombrear(lz.trazo([(79, 93), (90, 88)], 0.8) + lz.trazo([(79, 99), (90, 94)], 0.8), MADERA[2:], 0.4, LUZ_)
+    # el pesebre con heno y el abrevadero
+    pes = lz.poligono([(100, 84), (126, 84), (124, 92), (102, 92)])
+    lz.sombrear(pes, MADERA[1:], 1.5, LUZ_, textura=pa.vetas(lz, 0.5, 9), fuerza_tex=0.4)
+    heno = lz.elipse(113, 83, 13, 4)
+    lz.sombrear(heno, HENO, 2, LUZ_, textura=pa.vetas(lz, 0.4, 9, False), fuerza_tex=0.5)
     for k in range(8):
-        x0_, y0_ = 60 + k * 2.3, 70 + (k % 3)
-        lz.pintar(lz.trazo([(x0_, y0_), (x0_ + 2, y0_ - 0.6)], 0.4), HENO[4], 0.9)
-    # el murete del corral, delante: piedra seca irregular, con un portillo de palos a la izquierda
-    piedras_m = np.zeros((lz.H, lz.W))
-    x = 45.0
-    while x < 91:
-        r = 1.1 + rng_c.random() * 1.1
-        y = 77.5 - (x - 45) * 0.02 + rng_c.random() * 0.8
-        piedras_m = np.maximum(piedras_m, lz.elipse(x, y, r * 1.25, r * 0.9))
-        if rng_c.random() < 0.6:
-            piedras_m = np.maximum(piedras_m, lz.elipse(x + 0.8, y - 1.8, r * 0.9, r * 0.7))
-        x += r * 2.0
-    lz.pintar(lz.desenfocar(lz.elipse(70, 79, 26, 1.4), 0.8), "#0e0c0a", 0.6)
-    lz.pintar(lz.desenfocar(np.clip(piedras_m, 0, 1), 0.5), "#14161a", 0.9)
-    lz.sombrear(piedras_m, GRIS[2:9], 1.0, LUZ, textura=lz.ruido(0.5, 1, semilla=165), fuerza_tex=0.4)
-    for xx in (39, 43.5):                                     # el portillo
-        lz.pintar(lz.trazo([(xx, 78), (xx, 69)], 0.8), MADERA[5])
-    for yy in (71, 74):
-        lz.pintar(lz.trazo([(38.5, yy), (44, yy - 0.4)], 0.55), MADERA[4])
-    return lz.sprite(contorno=CONTORNO)
+        lz.pintar(lz.trazo([(102 + k * 3, 82), (101 + k * 3.2, 78 - k % 3)], 0.3), HENO[5])
+    abr = lz.poligono([(112, 100), (132, 100), (130, 106), (114, 106)])
+    lz.sombrear(abr, PIEDRA_S[1:], 1.2, LUZ_)
+    lz.pintar(lz.elipse(122, 100.6, 9, 1.4), "#4a8a9a")
+    lz.pintar(lz.elipse(119, 100.4, 3, 0.5), "#c8f0f0")
+    # la cabaña de piedra seca (a la izquierda)
+    frente = pa.rect(lz, 16, 56, 70, suelo)
+    pa.piedras(lz, frente, tam=4.4, semilla=165, luz=LUZ_, mortero="#22201c", rampa_p=PIEDRA_S)
+    lado = lz.poligono([(70, 56), (80, 50), (80, suelo - 6), (70, suelo)])
+    pa.piedras(lz, lado, tam=4.0, semilla=166, luz=LUZ_, mortero="#22201c", rampa_p=PIEDRA_S)
+    lz.pintar(lado, "#0e0c0a", 0.35)
+    liquen = (lz.ruido(2.0, 3, semilla=167) > 0.7) * np.maximum(frente, lado)
+    lz.pintar(lz.desenfocar(liquen, 0.4), rampa(["#5e5a3a", "#7a7648", "#9a9658"], lz.ruido(0.7, 2)), 0.5)
+    # la chimenea con humo
+    chim = pa.rect(lz, 22, 14, 32, 46)
+    ladrillo = ((lz.y % 3.2) < 0.5) * 1.0 + ((lz.x + np.floor(lz.y / 3.2) * 2.5) % 5 < 0.5) * 1.0
+    lz.sombrear(chim, PIEDRA_S, 3, LUZ_, textura=1 - np.clip(ladrillo, 0, 1) * 0.6 + lz.ruido(0.6, 2, semilla=168) * 0.3, fuerza_tex=0.5)
+    lz.sombrear(pa.rect(lz, 20.5, 12, 33.5, 15), PIEDRA_S[3:], 0.6, LUZ_)
+    humo = np.zeros((lz.H, lz.W))
+    for k in range(6):
+        humo = np.maximum(humo, lz.circulo(27 + k * 2.6 + np.sin(k) * 2, 10 - k * 4, 3 + k * 0.8))
+    lz.pintar(np.clip(lz.desenfocar(humo, 1.0) * 1.4, 0, 1), "#d8d4d0", 0.7)
+    # el tejado de lajas (pizarra a capas, con musgo)
+    tej = lz.poligono([(8, 60), (40, 26), (54, 26), (86, 54), (80, 58), (46, 32), (16, 62)])
+    tej = np.maximum(tej, lz.poligono([(8, 60), (40, 26), (54, 26), (82, 56), (74, 60), (14, 62)]))
+    lajas = ((lz.y - 26) % 4.5 < 0.7) * 1.0 + (np.abs(np.sin((lz.x + np.floor((lz.y - 26) / 4.5) * 2.7) * 0.7)) < 0.08) * 1.0
+    lz.sombrear(tej, LAJA + ["#8a929a"], 5, LUZ_, textura=1 - np.clip(lajas, 0, 1) * 0.7 + lz.ruido(0.8, 2, semilla=169) * 0.3, fuerza_tex=0.5)
+    musgo = (lz.ruido(1.8, 3, semilla=170) > 0.64) * tej
+    lz.pintar(lz.desenfocar(musgo, 0.5), rampa(["#2a3a1e", "#3e5228", "#566c34", "#748a44"], lz.ruido(0.6, 2)), 0.7)
+    lz.sombrear(pa.rect(lz, 38, 25, 56, 28), PIEDRA_S[2:], 0.8, LUZ_)
+    # la ventana con el candil
+    pa.ventana(lz, 26, 70, 36, 80, encendida=0.7, contras=True, semilla=171, luz=LUZ_)
+    # la puerta de tablas, el cayado apoyado y los cencerros colgados
+    pu = pa.rect(lz, 46, 76, 60, suelo)
+    tablas = (np.abs(np.sin((lz.x - 46) / 3.5 * np.pi)) < 0.1).astype(float)
+    lz.sombrear(pu, ["#251812", "#3d2418", "#5a3826", "#7a4e35", "#9a6847"], 3, LUZ_, textura=pa.vetas(lz, 0.5, 13, False) * (1 - tablas * 0.8), fuerza_tex=0.45)
+    lz.sombrear(pa.rect(lz, 44, 74, 62, 76.5), MADERA[2:], 0.6, LUZ_)
+    lz.sombrear(lz.circulo(57.5, 92, 0.8), ["#3a2a10", "#c89a44", "#fbe6a2"], 0.4, LUZ_)
+    cay = lz.trazo([(64, suelo), (66, 76)], 0.9) + lz.trazo(lz.curva((66, 76), (66.5, 71), (63, 72)), 0.9)
+    lz.sombrear(np.clip(cay, 0, 1), MADERA[2:], 0.4, LUZ_)
+    for (x, y) in ((40, 66), (43, 68)):
+        lz.pintar(lz.trazo([(x, 62), (x, y - 2)], 0.3), "#3a2a18")
+        cen = lz.poligono([(x - 1.4, y - 2), (x + 1.4, y - 2), (x + 2, y + 1.6), (x - 2, y + 1.6)])
+        lz.sombrear(cen, ["#3a2a10", "#9a7430", "#e8c46a", "#fbe6a2"], 0.6, LUZ_)
+    # un estante con un queso curándose, bajo el alero de la derecha
+    lz.sombrear(pa.rect(lz, 72, 70, 80, 71.5), MADERA[2:], 0.4, LUZ_)
+    lz.sombrear(lz.elipse(76, 68.5, 3, 1.8), ["#8a6a2a", "#d8b058", "#f8e090"], 0.6, LUZ_)
+    # leña apilada y unas matas de tomillo
+    for k in range(5):
+        lz.sombrear(lz.elipse(9 + (k % 3) * 3.4, suelo - 2 - (k // 3) * 3, 2, 1.6), CUERDA[1:], 0.5, LUZ_)
+    flores(lz, 10, (2, suelo - 4, 30, suelo), [["#5a3a6a", "#9a6aa8", "#d0b0e0"]], semilla=172, tam=0.6)
+    pa._hierba_pie(lz, 4, 140, suelo - 2, 173)
+    return lz.sprite(contorno=0.4)
 
 
 def bloque(k):

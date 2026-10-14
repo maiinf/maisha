@@ -758,3 +758,25 @@ El jefe de la cueva de las setas (`scripts/enemigos/kuvu.gd`, dibujos en `herram
 | 3. Un tercio de vida | Además, un **hilo lento** va a por la cabeza de Nungu | Ponerse en medio con el escudo lo corta; si llega, Nungu vuelve a estar controlado |
 
 Al vencerlo se marchita (`kuvu_vencido`); Nungu habla, da su **investigación** (objeto clave: Giza «crece hacia el norte, hacia las Ruinas, y se alimenta de lo que se queda quieto») y vuelve a su casa, donde se le puede visitar (`scripts/mundo/paso/nungu_casa.gd`). En el Bestiario, con su rescoldo para repetir la pelea. Números: `KUVU_*` y `NUNGU_*` en `reglas_combate.gd`. Prueba: `prueba_kuvu`.
+
+
+## Las construcciones, al nivel de la casa del castor
+
+Todas las casas y construcciones antiguas se han repintado con el pintor de las cinemáticas (volumen, luz, materiales y objetos de su dueño), casi al doble de tamaño. Capturas: `documentacion/aldea_edificios.png` y `documentacion/casas_caminos.png`.
+
+| Construcción | Programa | Qué tiene |
+| --- | --- | --- |
+| Casa-seta de Pino | `pintar_aldea.py` | Sombrero rojo con lunares, ventanas redondas encendidas, puerta en arco con farol, puesto de vigía con banderín y catalejo, escalerita, buzón y setitas. En ruinas: gris y con un bocado |
+| Taller de Corteza | `pintar_aldea.py` | Piedra y entramado, tejado de tablillas, la chimenea con humo, chispas y la forja encendida, portalón con herrajes, el cartel con su marca, yunque, herraduras, muela y barril |
+| Cocina de Juncia | `pintar_aldea.py` | Cabaña de juncos con tejado redondo, mostrador con tarros, ollas colgadas, cestos de bayas, ristras, el caldero al fuego con vapor y un barreño con nenúfar |
+| Puesto de Tawi | `pintar_aldea.py` | Toldo a rayas con volante, farolillos, cristales del Nexo, frascos, balanza, telas, plumas, cartel con una pluma, cajas y saco |
+| Aprisco de Mbuzi | `pintar_canada.py` | Piedra seca, lajas con musgo, chimenea con humo, candil, cayado, cencerros, un queso; el corral con pesebre, abrevadero y portillo |
+| Campamento de Msafiri | `pintar_sendero.py` | Tienda remendada, mapa clavado, banderines de viaje, farol, mesita con el diario y el tintero, la mochila, el trípode del cazo (el fuego, en la base + (26, -1)) |
+| Madriguera de Fuko | `pintar_camino.py` | Loma con hierba y hojas de cobre, puerta redonda con mirilla, ventana redonda, tubo de chimenea, farol de mina, los tres ganchos, vagoneta con cobre en raíles, pico y pala |
+| Palafito de Korongo | `pintar_pasarelas.py` | Pilotes, barandilla, ventana encendida, tejado de juncos con nido de garza, nasas, peces ahumándose, caña, farolillo y escalerilla |
+| Hórreo de Sungura | `pintar_senda.py` | Pies de piedra con losas tornarratas, listones, ristras de mazorcas, escalera suelta, tarros de semillas, sacos y semillero |
+| Casa de barcas de Kasia | `pintar_orilla.py` | Nave con la piragua y rampa, el soporte de remos vacío, macetas, veleta-pez, boyas, cuerda, farol y la pizarra de alquiler |
+| Molino roto | `pintar_campo.py` | Torre encalada con el yeso caído, balcón, capuchón y veleta torcida, aspas con la lona en jirones, sacos y muela |
+| Granero en ruinas | `pintar_campo.py` | Hastial rojo desconchado, portón descolgado, pajar con polea, tejado hundido, gallo-veleta, carreta rota y cuervos |
+
+Los lienzos con algo que asoma por arriba (humo, banderines) usan `pintar_aldea._lienzo` (un lienzo alto: se dibuja con las coordenadas de siempre). Los choques de cada una están en `region.gd` (`EDIFICIOS`, `CAMPAMENTOS`, `FIJOS`).

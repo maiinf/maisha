@@ -109,3 +109,10 @@ se pasan.
 | Jefe | **Kuvu, la seta que manda** (controla mentes con hilos de esporas) tiene a Nungu controlado; con el escudo se corta su hilo y Nungu pasa a ayudar (2 contra 1) |
 | Partes | 1 el paso y la casa (hecha) · 2 la llave de Corteza · 3 el pasadizo, la cueva y el 8.º eco · 4 Kuvu y Nungu |
 | Parte 4 hecha | La cortina se corta con el cetro; Kuvu (3 fases) con Nungu controlado → libre; el hilo lento de la fase 3; Nungu regala su investigación y vuelve a casa |
+
+### Construcciones al nivel de la casa del castor (14-10)
+| Qué | Decisión |
+| --- | --- |
+| Petición de Iam | Que las construcciones y los personajes sean muy detallados: «quiero que sea muy bonito visualmente» |
+| Hecho | Las 4 de Cuna de Musgo (con ruina y reconstruida) y las 8 casas de los caminos, repintadas casi al doble de tamaño con objetos de su dueño |
+| Pendiente | Interiores antiguos (casa de Pino, taller), el Gran Árbol y los personajes (aldeanos) |

@@ -48,117 +48,154 @@ def tira(imgs):
 
 # ---------------------------------------------------------------- granero
 def granero():
-    """De frente (un poco desde arriba): fachada con el hastial, tablas verticales rojizas, la puerta
-    grande de dos hojas (una colgando torcida), el tejado de tablillas hundido con un agujero y paja dentro."""
-    W, H = 72, 60
-    lz = Lienzo(W, H, s=6, semilla=31)
-    suelo = 58
-    lz.pintar(lz.desenfocar(lz.elipse(36, suelo, 34, 2.2), 0.8), "#140e0a", 0.55)
-    # el lado del granero (en escorzo, a la derecha) y la fachada
-    lado = lz.poligono([(56, 26), (68, 20), (68, 48), (56, suelo)])
-    lz.sombrear(lado, ROJIZO[:5], 4, LUZ, textura=vetas(lz, 0.5, 15, False, 2), fuerza_tex=0.4)
-    fachada = lz.poligono([(8, suelo), (8, 28), (32, 10), (56, 28), (56, suelo)])
-    tablas = vetas(lz, 0.45, 19, False, 3)
-    junta = ((lz.x - 8) % 5.0 < 0.7)
-    lz.sombrear(fachada, ROJIZO, 14, LUZ, textura=tablas, fuerza_tex=0.45)
-    lz.pintar(fachada * junta, "#2a1210", 0.55)
-    # las vigas blancas en cruz (pintadas, desconchadas)
-    for (a, b) in (((10, 30), (54, 30)), ((32, 12), (32, 30))):
-        t = lz.trazo([a, b], 1.6, 1.6)
-        lz.pintar(t * (lz.ruido(0.6, 2, semilla=4) > 0.35), "#d8cdb4", 0.85)
-    # tejado: dos aguas de tablillas, hundido por la derecha (con un agujero oscuro)
-    for (pts, k) in (([(4, 30), (32, 6), (36, 9), (10, 33)], 0), ([(32, 6), (60, 30), (70, 22), (42, 2)], 1)):
-        agua = lz.poligono(pts)
-        filas = np.sin(lz.y * 1.6 + lz.x * (0.6 if k == 0 else -0.6))
-        lz.sombrear(agua, TEJA, 3, LUZ, textura=(filas * 0.5 + 0.5) * 0.7 + vetas(lz, 0.4, 7, True, 5 + k) * 0.3, fuerza_tex=0.55)
-    agujero = lz.poligono([(48, 14), (58, 22), (54, 25), (46, 19)])
-    lz.pintar(agujero, "#120b08")
-    for (x0, y0, x1, y1) in ((47, 15, 52, 22), (52, 17, 56, 24)):           # tablillas rotas que cuelgan
-        tablon(lz, [(x0, y0), (x1, y1)], 1.0, TEJA + ["#93745a"])
-    # la puerta grande: el hueco oscuro con paja dentro, una hoja abierta y otra torcida colgando
-    hueco = rect(lz, 20, 36, 44, suelo)
-    lz.pintar(hueco, "#120b08")
-    paja_d = lz.poligono([(21, suelo), (24, 48), (32, 44), (40, 47), (43, suelo)])
-    lz.sombrear(paja_d, PAJA[:5], 4, LUZ, textura=vetas(lz, 0.3, 5, False, 9), fuerza_tex=0.6)
-    lz.pintar(paja_d, "#000000", 0.35)
-    hoja_i = lz.poligono([(12, 37), (20, 36), (20, suelo), (12, suelo - 1)])
-    lz.sombrear(hoja_i, TABLA, 4, LUZ, textura=vetas(lz, 0.4, 13, False, 10), fuerza_tex=0.45)
-    hoja_d = lz.poligono([(44, 40), (52, 43), (51, suelo + 0.5), (43, suelo)])
-    lz.sombrear(hoja_d, TABLA, 4, LUZ, textura=vetas(lz, 0.4, 13, False, 11), fuerza_tex=0.45)
-    for (a, b) in (((12, 41), (20, 52)), ((44, 44), (51, 54))):              # cruces de refuerzo de las hojas
-        tablon(lz, [a, b], 1.1, TABLA)
-    # el ventanuco del pajar
-    lz.pintar(rect(lz, 29, 18, 35, 25), "#120b08")
-    tablon(lz, [(29, 18), (35, 18)], 1.0, TABLA)
-    # matojos secos al pie
-    rng = np.random.default_rng(12)
-    for k in range(26):
-        x = 6 + rng.random() * 62
-        alto = 2 + rng.random() * 4
-        lz.pintar(lz.trazo([(x, suelo), (x + rng.random() * 2 - 1, suelo - alto)], 0.8, 0.3), PAJA[rng.integers(2, 5)])
-    return lz.sprite(contorno=CONTORNO)
-
+    """El granero en ruinas del Campo Segado (128×112, la base en el centro de abajo), de frente y un poco desde arriba:
+    el hastial alto de tablas rojizas con la pintura desconchada; el portón grande de dos hojas (una colgando torcida)
+    con el heno viejo dentro; el pajar de arriba con su trampilla abierta y la polea; el tejado de tablillas hundido
+    por un lado (se ven las vigas); la veleta de gallo oxidada y torcida; una carreta rota y dos cuervos de óxido."""
+    import pintar_aldea as pa
+    W, H = 128, 104
+    lz = pa._lienzo(W, H, 10, 31)
+    suelo = 100
+    cx = 62
+    LUZ_ = (-0.6, -0.7, 0.5)
+    ROJO_ = ["#2a0e0a", "#4a1810", "#6e2418", "#8e3420", "#a8482c", "#c0603e"]
+    MAD = ["#1e140e", "#33231a", "#4a3424", "#634733", "#7d5c42", "#977452"]
+    lz.pintar(lz.desenfocar(lz.elipse(cx, suelo, 58, 5), 2), "#0e0c0a", 0.45)
+    # la fachada: hastial de tablas verticales rojizas, con la pintura desconchada
+    fach = lz.poligono([(cx - 40, suelo), (cx - 40, 44), (cx, 16), (cx + 40, 44), (cx + 40, suelo)])
+    tabv = (np.abs(np.sin((lz.x - cx) / 3.6 * np.pi)) < 0.1).astype(float)
+    lz.sombrear(fach, ROJO_, 8, LUZ_, textura=pa.vetas(lz, 0.5, 15, False, semilla=32) * (1 - tabv * 0.7), fuerza_tex=0.45)
+    desconchon = fach * (lz.ruido(2.4, 3, semilla=33) > 0.66)
+    lz.sombrear(desconchon, MAD[2:], 1, LUZ_, textura=pa.vetas(lz, 0.5, 11, False), fuerza_tex=0.4)
+    for (a, b) in (((cx - 40, 44), (cx, 16)), ((cx, 16), (cx + 40, 44))):         # el canto blanco del hastial
+        lz.sombrear(lz.trazo([a, b], 1.6), ["#8a8270", "#b4ac98", "#d8d0bc"], 0.5, LUZ_)
+    # el tejado de tablillas de lado (a la izquierda) hundido, con vigas a la vista
+    tej = lz.poligono([(cx - 40, 44), (cx - 58, 64), (cx - 58, 70), (cx - 40, 52)])
+    lz.sombrear(tej, ["#2a160e", "#47291c", "#643a26", "#7f4d33"], 2, LUZ_, textura=pa.vetas(lz, 0.5, 7), fuerza_tex=0.5)
+    lz.sombrear(pa.rect(lz, cx - 58, 64, cx - 40, suelo), ROJO_, 3, LUZ_, textura=pa.vetas(lz, 0.5, 15, False, semilla=34), fuerza_tex=0.4)
+    lz.pintar(pa.rect(lz, cx - 58, 64, cx - 40, suelo), "#0e0a08", 0.4)
+    hueco = lz.poligono([(cx + 10, 30), (cx + 22, 34), (cx + 28, 46), (cx + 18, 50), (cx + 8, 42)])
+    lz.pintar(hueco, "#0a0806")
+    for (a, b) in (((cx + 8, 34), (cx + 28, 46)), ((cx + 14, 30), (cx + 18, 50))):
+        lz.sombrear(lz.trazo([a, b], 1.4), MAD[1:], 0.5, LUZ_)
+    # el pajar: la trampilla abierta con heno asomando y la polea
+    pajar = pa.rect(lz, cx - 8, 30, cx + 6, 42)
+    lz.pintar(pajar, "#120c08")
+    heno = lz.poligono([(cx - 8, 42), (cx - 6, 36), (cx, 34), (cx + 4, 37), (cx + 6, 42)])
+    lz.sombrear(heno, ["#3d3214", "#5c4a22", "#7a6431", "#958043", "#b09c5c"], 1, LUZ_, textura=pa.vetas(lz, 0.4, 7, False), fuerza_tex=0.6)
+    lz.sombrear(lz.trazo([(cx - 1, 22), (cx - 1, 28)], 1.0), MAD[2:], 0.4, LUZ_)
+    lz.sombrear(lz.circulo(cx - 1, 29, 1.6), HIERRO, 0.5, LUZ_)
+    lz.pintar(lz.trazo([(cx - 1, 30), (cx - 1, 50)], 0.4), "#a48656")
+    # el portón: una hoja cerrada y la otra colgando torcida; dentro, heno viejo
+    vano = pa.rect(lz, cx - 22, 58, cx + 22, suelo)
+    lz.pintar(vano, "#0e0a08")
+    lz.sombrear(lz.elipse(cx + 6, suelo - 3, 14, 5), ["#3d3214", "#5c4a22", "#7a6431", "#958043"], 2, LUZ_, textura=pa.vetas(lz, 0.4, 7, False), fuerza_tex=0.6)
+    hoja1 = pa.rect(lz, cx - 22, 58, cx - 1, suelo)
+    lz.sombrear(hoja1, ROJO_, 2, LUZ_, textura=pa.vetas(lz, 0.5, 13, False) * (1 - tabv * 0.6), fuerza_tex=0.45)
+    for (a, b) in (((cx - 22, 60), (cx - 1, suelo - 2)), ((cx - 22, suelo - 2), (cx - 1, 60))):
+        lz.sombrear(lz.trazo([a, b], 1.6), ["#8a8270", "#b4ac98", "#d8d0bc"], 0.4, LUZ_)
+    hoja2 = lz.poligono([(cx + 2, 60), (cx + 20, 64), (cx + 26, suelo + 1), (cx + 6, suelo - 1)])
+    lz.sombrear(hoja2, ROJO_, 2, LUZ_, textura=pa.vetas(lz, 0.5, 13, False), fuerza_tex=0.4)
+    lz.pintar(lz.trazo([(cx + 2, 64), (cx + 6, 66)], 0.8), "#2e2f33")
+    # la veleta de gallo oxidada y torcida
+    lz.sombrear(lz.trazo([(cx, 16), (cx + 2, 4)], 0.8), OXIDO_ if "OXIDO_" in globals() else ["#4a1e0e", "#7a3418", "#a84e24"], 0.4, LUZ_)
+    gallo = lz.poligono([(cx - 3, 3), (cx + 2, -2), (cx + 4, -6), (cx + 6, -3), (cx + 8, 0), (cx + 6, 3)])
+    lz.sombrear(gallo, ["#4a1e0e", "#7a3418", "#a84e24", "#d07a3a"], 0.6, LUZ_)
+    # la carreta rota, a la derecha
+    car = lz.poligono([(cx + 44, 86), (cx + 64, 84), (cx + 64, 92), (cx + 46, 94)])
+    lz.sombrear(car, MAD, 1, LUZ_, textura=pa.vetas(lz, 0.5, 9), fuerza_tex=0.4)
+    rueda = np.clip(lz.circulo(cx + 50, 95, 5) - lz.circulo(cx + 50, 95, 3.6), 0, 1)
+    lz.sombrear(rueda, MAD, 0.6, LUZ_)
+    for a in np.linspace(0, np.pi, 4):
+        lz.pintar(lz.trazo([(cx + 50 - np.cos(a) * 4, 95 - np.sin(a) * 4), (cx + 50 + np.cos(a) * 4, 95 + np.sin(a) * 4)], 0.5), MAD[3])
+    lz.sombrear(lz.elipse(cx + 60, suelo, 4.5, 1.6, 20), MAD[1:], 0.4, LUZ_)             # la otra rueda, caída
+    # dos cuervos de óxido: uno en el tejado, otro en la carreta
+    for (x, y, m) in ((cx - 30, 52, 1), (cx + 58, 82, -1)):
+        cuerpo = lz.elipse(x, y, 3.4, 2.2)
+        lz.sombrear(cuerpo, ["#141418", "#22222a", "#3a3a46", "#5a5a6a"], 0.8, LUZ_)
+        lz.sombrear(lz.circulo(x + m * 3, y - 2, 1.6), ["#141418", "#3a3a46"], 0.5, LUZ_)
+        lz.pintar(lz.poligono([(x + m * 4.4, y - 2.4), (x + m * 6.4, y - 1.8), (x + m * 4.4, y - 1.4)]), "#c87a40")
+        lz.pintar(lz.circulo(x + m * 3.4, y - 2.4, 0.5), "#a855d6")
+    pa._hierba_pie(lz, 2, 126, suelo - 2, 35, seco=True)
+    return lz.sprite(contorno=0.4)
 
 # ---------------------------------------------------------------- molino
 def molino():
-    """Torre de piedra que se estrecha hacia arriba, puerta de madera, ventanuco, capuchón de madera
-    y las aspas de celosía en X: dos enteras y dos partidas (una colgando)."""
-    W, H = 52, 88
-    lz = Lienzo(W, H, s=6, semilla=41)
-    suelo = 86
-    cx = 26
-    lz.pintar(lz.desenfocar(lz.elipse(cx, suelo, 16, 2), 0.8), "#140e0a", 0.55)
-    torre = lz.poligono([(cx - 13, suelo), (cx - 9, 36), (cx + 9, 36), (cx + 13, suelo)])
-    # piedras: hiladas con juntas
-    hilada = np.abs(((lz.y - suelo) % 5.0) - 2.5) < 0.5
-    desf = ((lz.y // 5) % 2) * 3.5
-    junta_v = np.abs(((lz.x + desf) % 7.0) - 3.5) < 0.45
-    tex = lz.ruido(1.2, 3, semilla=42)
-    lz.sombrear(torre, PIEDRA, 10, LUZ, textura=tex, fuerza_tex=0.35)
-    lz.pintar(torre * np.maximum(hilada, junta_v), "#2a2b26", 0.5)
-    # musgo y grietas
-    lz.pintar(torre * (lz.ruido(3, 3, semilla=43) > 0.68) * (lz.y > 60), "#4d6436", 0.6)
-    lz.pintar(lz.trazo([(cx + 4, 44), (cx + 6, 52), (cx + 4, 58), (cx + 7, 66)], 0.8, 0.4), "#1b1c1a", 0.9)
-    # puerta y ventanuco
-    puerta = np.maximum(rect(lz, cx - 4, 72, cx + 4, suelo), lz.elipse(cx, 72, 4, 3))
-    lz.sombrear(puerta, TABLA, 3, LUZ, textura=vetas(lz, 0.4, 11, False, 44), fuerza_tex=0.45)
-    lz.pintar(lz.trazo([(cx - 4, 73), (cx + 4, 73)], 0.6, 0.6), "#1a0f0b")
-    lz.sombrear(lz.circulo(cx + 2.5, 79, 0.6), HIERRO, 0.4, LUZ)
-    lz.pintar(np.maximum(rect(lz, cx - 2, 50, cx + 2, 56), lz.elipse(cx, 50, 2, 1.6)), "#120b08")
-    # el capuchón de madera (cúpula) sobre la torre
-    cap = np.maximum(lz.elipse(cx, 36, 12, 9) * (lz.y < 37), rect(lz, cx - 11, 34, cx + 11, 38))
-    lz.sombrear(cap, TABLA, 7, LUZ, textura=vetas(lz, 0.5, 5, False, 45), fuerza_tex=0.4)
-    for k in range(-2, 3):
-        lz.pintar(lz.trazo([(cx + k * 4.5, 28 + abs(k) * 1.6), (cx + k * 5.2, 37)], 0.5, 0.5), "#2a1a12", 0.8)
-    # el eje de las aspas
-    eje = (cx - 1, 30)
-    lz.sombrear(lz.circulo(eje[0], eje[1], 2.6), TABLA, 1.5, LUZ)
-    # las aspas: celosía de madera (dos largas, una partida, una colgando)
-    aspas = [(-40, 31, False), (50, 28, False), (140, 15, True), (230, 27, False)]
-    for (ang, largo, rota) in aspas:
-        a = math.radians(ang)
-        fin = (eje[0] + math.cos(a) * largo, eje[1] + math.sin(a) * largo)
-        brazo = lz.trazo([eje, fin], 1.3, 1.0)
-        lz.sombrear(brazo, TABLA, 0.8, LUZ)
-        # la celosía (rejilla a un lado del brazo)
-        n = (math.cos(a + math.pi / 2), math.sin(a + math.pi / 2))
-        ancho = 5.5
-        ini = 5.0
-        p0 = (eje[0] + math.cos(a) * ini, eje[1] + math.sin(a) * ini)
-        borde = [(p0[0] + n[0] * ancho, p0[1] + n[1] * ancho), (fin[0] + n[0] * ancho, fin[1] + n[1] * ancho)]
-        lz.pintar(lz.trazo(borde, 0.7, 0.7), TABLA[3])
-        pasos = int((largo - ini) / 3.2)
-        for k in range(pasos + 1):
-            t = ini + k * 3.2
-            q = (eje[0] + math.cos(a) * t, eje[1] + math.sin(a) * t)
-            lz.pintar(lz.trazo([q, (q[0] + n[0] * ancho, q[1] + n[1] * ancho)], 0.6, 0.6), TABLA[4])
-        if rota:
-            # la punta partida: astillas
-            lz.pintar(lz.trazo([fin, (fin[0] + 2, fin[1] + 3)], 0.7, 0.3), TABLA[2])
-    # un trozo de aspa caído al pie de la torre
-    tablon(lz, [(cx + 10, suelo - 1), (cx + 22, suelo - 3)], 1.2, TABLA)
-    return lz.sprite(contorno=CONTORNO)
-
+    """El molino roto del Campo Segado (96×150, la base en el centro de abajo): una torre de piedra encalada que se
+    estrecha hacia arriba, con grietas y el yeso caído a trozos; la puerta de tablas entornada, un ventanuco y un
+    balcón de madera; el capuchón de tablas con la veleta torcida; las aspas de celosía: dos enteras con la lona hecha
+    jirones y dos partidas (una colgando); al pie, sacos de harina viejos y una muela de piedra caída."""
+    import pintar_aldea as pa
+    W, H = 96, 150
+    lz = Lienzo(W, H, s=4, semilla=41)
+    suelo = 146
+    cx = 48
+    LUZ_ = (-0.6, -0.7, 0.5)
+    CAL = ["#3a3630", "#5e5850", "#868070", "#aaa392", "#c8c0ac", "#e0d8c4", "#f0ead8"]
+    MAD = ["#1e140e", "#33231a", "#4a3424", "#634733", "#7d5c42", "#977452"]
+    lz.pintar(lz.desenfocar(lz.elipse(cx, suelo, 40, 4), 2), "#0e0c0a", 0.45)
+    # la torre
+    torre = lz.poligono([(cx - 22, suelo), (cx - 15, 52), (cx + 15, 52), (cx + 22, suelo)])
+    lz.sombrear(torre, CAL, 10, LUZ_, textura=lz.ruido(0.8, 3, semilla=42), fuerza_tex=0.25)
+    caido = torre * (lz.ruido(3.5, 3, semilla=43) > 0.72)
+    pa.piedras(lz, caido, tam=2.6, semilla=44, luz=LUZ_, mortero="#3a3428", rampa_p=pa.PIEDRA_C)
+    for g in ([(cx - 6, 60), (cx - 2, 78), (cx - 7, 96)], [(cx + 10, 110), (cx + 6, 126), (cx + 12, 140)]):
+        lz.pintar(lz.trazo(g, 0.6) * torre, "#2a2620", 0.85)
+    musgo = (lz.ruido(2, 3, semilla=45) > 0.68) * torre * np.clip((lz.y - 120) / 20, 0, 1)
+    lz.pintar(lz.desenfocar(musgo, 0.4), pa.rampa(["#24401f", "#3f5a2f", "#5d7a3c"], lz.ruido(0.7, 2)), 0.7)
+    # la puerta entornada, el ventanuco y el balconcito
+    pu = pa.rect(lz, cx - 8, 122, cx + 8, suelo - 1) * np.clip(1 - np.maximum(0, 128 - lz.y) * 0, 0, 1)
+    pu = np.maximum(pu * (lz.y > 126), lz.elipse(cx, 126, 8, 5) * (lz.y <= 126))
+    lz.pintar(pu, "#0e0a08")
+    hoja = lz.poligono([(cx - 8, 124), (cx - 2, 126), (cx - 2, suelo - 1), (cx - 8, suelo - 1)])
+    lz.sombrear(hoja, MAD, 1.5, LUZ_, textura=pa.vetas(lz, 0.5, 11, False), fuerza_tex=0.4)
+    lz.sombrear(pa.rect(lz, cx - 4, 84, cx + 4, 94), ["#0e0a08", "#1a1410", "#2a2018"], 0.5, LUZ_)
+    lz.sombrear(pa.rect(lz, cx - 5, 83, cx + 5, 84.5), MAD[2:], 0.4, LUZ_)
+    bal = pa.rect(lz, cx - 20, 100, cx + 20, 103)
+    lz.sombrear(bal, MAD, 1, LUZ_, textura=pa.vetas(lz, 0.5, 9), fuerza_tex=0.4)
+    for x in range(int(cx - 19), int(cx + 20), 5):
+        if abs(x - cx) > 3 or True:
+            lz.sombrear(lz.trazo([(x, 100), (x, 94)], 0.7), MAD[2:], 0.3, LUZ_)
+    lz.sombrear(lz.trazo([(cx - 20, 94), (cx + 4, 94)], 0.7) + lz.trazo([(cx + 9, 95.5), (cx + 20, 94)], 0.7), MAD[2:], 0.3, LUZ_)
+    # el capuchón de tablas y la veleta torcida
+    cap = lz.poligono([(cx - 18, 54), (cx - 14, 40), (cx, 32), (cx + 14, 40), (cx + 18, 54)])
+    tab = (np.abs(np.sin((lz.x - cx) / 3 * np.pi)) < 0.1).astype(float)
+    lz.sombrear(cap, MAD, 5, LUZ_, textura=pa.vetas(lz, 0.5, 9, False) * (1 - tab * 0.7), fuerza_tex=0.45)
+    lz.sombrear(pa.rect(lz, cx - 19, 52, cx + 19, 55), MAD[1:], 0.6, LUZ_)
+    lz.sombrear(lz.trazo([(cx, 32), (cx + 2, 20)], 0.8), HIERRO, 0.4, LUZ_)
+    lz.sombrear(lz.poligono([(cx + 2, 20), (cx + 10, 18), (cx + 3, 23)]), HIERRO, 0.5, LUZ_)
+    # el eje y las aspas (delante de la torre): dos enteras con lona en jirones, una partida y otra colgando
+    ex, ey = cx, 48
+    def aspa(angulo, largo, lona=True, rota=0.0):
+        d = np.array([math.cos(angulo), math.sin(angulo)])
+        n = np.array([-d[1], d[0]])
+        base = np.array([ex, ey])
+        punta = base + d * largo
+        lz.sombrear(lz.trazo([tuple(base), tuple(punta)], 1.6, 1.2), MAD[1:], 0.5, LUZ_)
+        for k in range(1, int(largo / 5)):
+            p0 = base + d * k * 5
+            lz.sombrear(lz.trazo([tuple(p0), tuple(p0 + n * 6)], 0.6), MAD[2:], 0.3, LUZ_)
+        lz.sombrear(lz.trazo([tuple(base + d * 8 + n * 6), tuple(punta + n * 6)], 0.6), MAD[2:], 0.3, LUZ_)
+        if lona:
+            q = [tuple(base + d * 10), tuple(punta - d * 2), tuple(punta - d * 2 + n * 5), tuple(base + d * 10 + n * 5)]
+            tela = lz.poligono(q) * (lz.ruido(1.2, 2, semilla=int(abs(angulo) * 10)) > 0.3 + rota)
+            lz.sombrear(tela, ["#5a5040", "#8a7e64", "#b8aa88", "#d8ccaa"], 0.8, LUZ_)
+    aspa(-0.62, 54, True, 0.0)
+    aspa(2.52, 54, True, 0.12)
+    aspa(0.95, 20, False)                           # la partida
+    aspa(1.72, 44, False)                           # la que cuelga, casi vertical
+    lz.sombrear(lz.circulo(ex, ey, 3.2), HIERRO, 1, LUZ_)
+    lz.pintar(lz.circulo(ex, ey, 1), HIERRO[0])
+    # al pie: sacos de harina viejos y la muela caída
+    for (x, y) in ((cx - 30, suelo), (cx - 24, suelo + 1), (cx - 27, suelo - 7)):
+        saco = lz.poligono([(x - 4, y), (x - 4.5, y - 7), (x - 2, y - 10), (x + 2, y - 10), (x + 4.5, y - 7), (x + 4, y)])
+        lz.sombrear(saco, ["#5a4630", "#8a7454", "#b8a07a", "#d8c49c", "#efe0bf"], 1.5, LUZ_)
+        lz.pintar(lz.trazo([(x - 2, y - 8.6), (x + 2, y - 8.6)], 0.5), "#47291c")
+    muela = lz.elipse(cx + 30, suelo - 2, 10, 4.5)
+    lz.sombrear(muela, ["#3a3630", "#5e5850", "#868070", "#aaa392", "#c8c0ac"], 2, LUZ_)
+    lz.pintar(lz.elipse(cx + 30, suelo - 3, 2.4, 1.1), "#1e1a14")
+    pa._hierba_pie(lz, cx - 44, cx + 44, suelo - 2, 46, seco=True)
+    return lz.sprite(contorno=0.4)
 
 # ---------------------------------------------------------------- máquinas viejas
 def maquina(variante):
