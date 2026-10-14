@@ -1741,6 +1741,78 @@ def crear_paso():
     return ["".join(f) for f in m], textos
 
 
+def crear_cueva():
+    """La cueva de las setas (56x64, de norte a sur), bajo la casa de Nungu: se baja por la escalera del armario.
+    A oscuras: alumbran las SETAS que brillan («ů»). Salas: la de la escalera (arriba), un pasillo con NUBES DE ESPORAS
+    («ǯ», marean: los controles al revés un rato), la sala de las páginas (tres PÁGINAS del diario de Nungu, «ǹ»), una
+    cámara al este con el OCTAVO ECO («@») y, al sur, una CORTINA DE MICELIO («ǫ») que tapa la sala de Kuvu."""
+    ANCHO, ALTO = 56, 64
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+    azar = random.Random(271)
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    def sala(cx, cy, rx, ry, semilla):
+        az = random.Random(semilla)
+        fase = az.random() * 6
+        for y in range(ALTO):
+            for x in range(ANCHO):
+                a = math.atan2(y - cy, x - cx)
+                r = 1.0 + 0.12 * math.sin(a * 3 + fase) + 0.07 * math.sin(a * 7 + fase * 2)
+                if ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= r * r:
+                    poner(x, y, ".")
+
+    def tunel(puntos, ancho):
+        for (a_, b_) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b_[0] - a_[0]), abs(b_[1] - a_[1])) * 2) + 1
+            for i in range(pasos + 1):
+                t_ = i / pasos
+                x = a_[0] + (b_[0] - a_[0]) * t_
+                y = a_[1] + (b_[1] - a_[1]) * t_
+                w = ancho + math.sin(t_ * 5 + a_[0]) * 0.6
+                for dx in range(-int(w), int(w) + 1):
+                    for dy in range(-int(w), int(w) + 1):
+                        if dx * dx + dy * dy <= w * w:
+                            poner(int(x) + dx, int(y) + dy, ".")
+
+    sala(26, 8, 8, 5, 1)             # la sala de la escalera
+    sala(22, 30, 11, 6, 2)           # la sala de las páginas
+    sala(47, 28, 5, 4, 3)            # la cámara del eco
+    sala(28, 53, 13, 7, 4)           # la sala de Kuvu (al sur)
+    sala(8, 40, 4, 3, 5)             # un nicho escondido (la tercera página)
+    tunel([(26, 12), (27, 17), (25, 22), (23, 26)], 1.4)          # el pasillo de las esporas
+    tunel([(32, 29), (38, 29), (43, 28)], 1.1)                    # a la cámara del eco
+    tunel([(14, 33), (10, 37), (8, 40)], 0.9)                     # al nicho
+    tunel([(24, 35), (26, 40), (28, 46)], 1.3)                    # a la sala de Kuvu
+    # la escalera (arriba): sube al armario de Nungu (puerta «^» en datos/mapas/cueva_setas.puertas)
+    for x in range(25, 28):
+        for y in range(0, 4):
+            poner(x, y, "^" if y == 0 else ".")
+    # la cortina de micelio, en el paso a la sala de Kuvu
+    for x in range(24, 33):
+        if m[45][x] == ".":
+            poner(x, 45, "ǫ")
+    # las nubes de esporas: en el pasillo y a la entrada de la sala de las páginas
+    for (x, y) in ((27, 16), (25, 21), (18, 28)):
+        poner(x, y, "ǯ")
+    # las páginas de Nungu: junto a la escalera, en la sala grande y en el nicho
+    for (x, y) in ((31, 7), (16, 31), (8, 40)):
+        poner(x, y, "ǹ")
+    poner(48, 27, "@")
+    # setas que brillan, junto a las paredes de las salas
+    for _ in range(900):
+        x, y = azar.randrange(1, ANCHO - 1), azar.randrange(1, ALTO - 1)
+        if m[y][x] != ".":
+            continue
+        pared = sum(1 for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)) if m[y + dy][x + dx] == "0")
+        if pared >= 1 and azar.random() < 0.5 and not any(m[y + dy][x + dx] in "ǯǹ@ǫ^" for dx in (-1, 0, 1) for dy in (-1, 0, 1)):
+            poner(x, y, "ů")
+    poner(26, 5, "S")
+    return ["".join(f) for f in m], {"1": "11, 6, 4, 0, , jefe:kuvu"}
+
+
 def crear_lago():
     """El Lago Espejo (96x64): un lugar al oeste de la Cañada del Eco (puerta al este). Un lago grande y quieto con
     una ISLA en el centro, donde aparecerá KIMYA, el Silencio. Lo que solo existe en el reflejo («\\»: un puente de
@@ -2410,7 +2482,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra"}
+                  "paso_piedra", "cueva_setas"}
 
 
 def construir_suelo(nombre):
@@ -2559,7 +2631,7 @@ if __name__ == "__main__":
                         "camino_cobrizo": crear_camino, "senda_surcos": crear_senda,
                         "canada_eco": crear_canada, "lago_espejo": crear_lago,
                         "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta,
-                        "paso_piedra": crear_paso}.get(nombre, crear_prados)()
+                        "paso_piedra": crear_paso, "cueva_setas": crear_cueva}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

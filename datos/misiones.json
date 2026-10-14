@@ -96,7 +96,11 @@
 			"casa_nungu"
 		],
 		"casa_nungu": [
-			"paso_piedra"
+			"paso_piedra",
+			"cueva_setas"
+		],
+		"cueva_setas": [
+			"casa_nungu"
 		]
 	},
 	"misiones": [
@@ -1133,6 +1137,52 @@
 					"ir": {
 						"escena": "casa_nungu",
 						"buscar": "casilla:10,4"
+					}
+				}
+			]
+		},
+		{
+			"id": "bajo_la_casa",
+			"tipo": "historia",
+			"titulo": "Bajo la casa",
+			"texto": "Dentro del armario de Nungu, una escalera baja a una cueva llena de setas que brillan. Nungu bajó y no volvió a subir.",
+			"aparece": [
+				"armario_abierto"
+			],
+			"hecha": [
+				"nungu_libre"
+			],
+			"premio": "",
+			"pasos": [
+				{
+					"texto": "Baja por la escalera del armario",
+					"hecho": [
+						"visto/cueva_setas"
+					],
+					"ir": {
+						"escena": "casa_nungu",
+						"buscar": "grupo:armario"
+					}
+				},
+				{
+					"texto": "Lee las páginas de Nungu ({n}/{total})",
+					"cuenta": {
+						"prefijo": "nungu_pagina/",
+						"total": 3
+					},
+					"ir": {
+						"escena": "cueva_setas",
+						"buscar": "grupo:paginas"
+					}
+				},
+				{
+					"texto": "Busca a Nungu al fondo de la cueva",
+					"hecho": [
+						"nungu_libre"
+					],
+					"ir": {
+						"escena": "cueva_setas",
+						"buscar": "grupo:cortina"
 					}
 				}
 			]

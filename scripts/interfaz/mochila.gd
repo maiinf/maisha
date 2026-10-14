@@ -60,7 +60,7 @@ const CAMINOS_RAIZ := [
 	["Sendero Olvidado", "sendero_olvidado", [Vector2(338, 52), Vector2(358, 40), Vector2(370, 34)]],
 ]
 ## Dónde está Maisha en el mapa de Raíz según la escena (en un camino: en medio de su trazo)
-const PUNTO_RAIZ := {"paso_piedra": Vector2(278, 50), "casa_nungu": Vector2(272, 44), "prados_del_eco": Vector2(110, 178), "bosque_cobrizo": Vector2(118, 72), "cuna_de_musgo": Vector2(208, 146),
+const PUNTO_RAIZ := {"paso_piedra": Vector2(278, 50), "casa_nungu": Vector2(272, 44), "cueva_setas": Vector2(272, 46), "prados_del_eco": Vector2(110, 178), "bosque_cobrizo": Vector2(118, 72), "cuna_de_musgo": Vector2(208, 146),
 	"claro_de_calma": Vector2(206, 142), "casa_pino": Vector2(200, 148), "taller_corteza": Vector2(214, 148), "kitovu": Vector2(53, 196),
 	"casa_shamba": Vector2(53, 196), "cienaga_quieta": Vector2(322, 182), "campo_segado": Vector2(208, 44),
 	"sendero_del_puente": Vector2(160, 166), "las_pasarelas": Vector2(268, 166),

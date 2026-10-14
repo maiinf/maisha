@@ -30,6 +30,10 @@
                   la boca oscura de la Gruta de las Raíces y raíces enormes que bajan por la roca. Delante, la isla:
                   la barca de Mauti, sin remos, varada entre los juncos; Mauti, de rodillas junto a una piedra plana,
                   deja debajo su hoja de cobre, que brilla. Luciérnagas y la luna tapada por la niebla.
+  20_eco_cueva    EL OCTAVO ECO (la cueva de las setas, bajo el Paso de Piedra). Una cueva oscura llena de setas que
+                  brillan (verde-agua y violeta). En el centro, un corro de setas pequeñas se come un montón de hojas
+                  caídas, y de la tierra que dejan brotan hojitas nuevas. Maisha (dorada), de rodillas, mira las setas
+                  con cara de asco; KIMYA, el Silencio, flota a su lado, plateada, tranquila. Polvo de esporas en el aire.
   15_eco_surcos   EL CUARTO ECO (Senda de los Surcos). La fiesta de la última siega, de noche: campos con gavillas,
                   guirnaldas de farolillos, una hoguera en el centro y los seres de Raíz bailando a contraluz. En la
                   colina, el Primer Árbol dorado. Junto al fuego, Maisha y Mauti bailan de la mano.
@@ -910,4 +914,64 @@ def _pegar_con_reflejo(lz, otro, eje_y, agua, fuerza, solo_reflejo=False):
     lz.pintar(lz.desenfocar(alfa_r, 0.6) * agua * fuerza, img_r * 0.85 + np.array([0.02, 0.04, 0.08]))
 
 
-PIEZAS = {"19_eco_travesia": eco_travesia, "18_eco_orilla": eco_orilla, "17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}
+def eco_cueva():
+    """«¿Son tuyas?» — «Son mías. Se comen lo que cae y se lo devuelven a la tierra.» — «Son un poco feas.»
+    — «Lo necesario casi nunca es bonito.» — «Una seta que mandara en vez de servir... eso sí sería feo.»"""
+    lz = Lienzo(W, H, semilla=200)
+    rng = np.random.default_rng(201)
+    # la cueva: roca oscura, más clara en el centro, con estalactitas arriba
+    fondo = np.clip(1 - np.hypot((lz.x - 300) / 330, (lz.y - 150) / 200), 0, 1)
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#050408", "#0c0a12", "#16121e", "#221c2c", "#30283c"],
+                                           np.clip(fondo * 0.8 + (lz.ruido(30, 3, semilla=202) - 0.5) * 0.25, 0, 1)))
+    for k in range(12):
+        x = rng.random() * W
+        largo = 14 + rng.random() * 36
+        est = lz.poligono([(x - 6 - rng.random() * 6, 0), (x + 6 + rng.random() * 6, 0), (x + rng.random() * 2, largo)])
+        lz.sombrear(est, ["#08060c", "#141018", "#221c28", "#342a3a"], 4, LUZ)
+    suelo = lz.poligono([(0, 176), (120, 166), (300, 170), (480, 164), (600, 172), (600, 256), (0, 256)])
+    lz.pintar(suelo, rampa(["#0e0a12", "#1a141e", "#261e2a", "#342a38"], np.clip((lz.y - 166) / 90 + (lz.ruido(8, 2, semilla=203) - 0.5) * 0.3, 0, 1)))
+    # las setas que brillan, por todas partes (más grandes delante)
+    def seta(x, y, r, col):
+        lz.sumar_luz(lz.desenfocar(lz.circulo(x, y - r * 1.4, r * 2.2), r * 1.6), col[2], 0.35)
+        lz.sombrear(lz.trazo([(x, y), (x + r * 0.15, y - r * 1.4)], r * 0.32, r * 0.24), ["#5a5262", "#8a8094", "#c8c0d0", "#eee8f4"], r * 0.2, LUZ)
+        som = lz.elipse(x + r * 0.15, y - r * 1.5, r, r * 0.55)
+        lz.sombrear(som, col, r * 0.4, LUZ)
+        lz.sumar_luz(som, col[3], 0.25)
+    VERDE = ["#0e3a3a", "#1e7a6e", "#5ae0c0", "#c8fff0"]
+    VIOLETA = ["#2a1040", "#6a2a9a", "#b070e0", "#f0d8ff"]
+    for k in range(70):
+        x = rng.random() * W
+        y = 150 + rng.random() * 100
+        if 210 < x < 400 and y > 180:
+            continue
+        seta(x, y, 2 + (y - 150) / 100 * 7 * rng.uniform(0.6, 1.2), VERDE if k % 3 else VIOLETA)
+    # en el centro: el montón de hojas caídas y el corro de setas pequeñas que se las come; de la tierra brotan hojitas
+    YM = 222
+    for k in range(40):
+        hx, hy = 300 + rng.normal(0, 30), YM + rng.normal(0, 6)
+        lz.sombrear(lz.elipse(hx, hy, 4.5, 2.2, rng.uniform(0, 180)),
+                    [["#3a1e0a", "#7a4a1a", "#c47a2a", "#e0a050"], ["#3a2a0a", "#6a5a1a", "#a08a30", "#c8b050"]][k % 2], 1.2, LUZ)
+    for k in range(12):
+        a = k / 12 * 2 * np.pi
+        seta(300 + np.cos(a) * 54, YM + 6 + np.sin(a) * 12, 5.0, VERDE if k % 2 else VIOLETA)
+    for (bx, by) in ((292, YM - 4), (308, YM - 2), (300, YM - 8)):
+        lz.pintar(lz.trazo([(bx, by + 4), (bx, by - 4)], 0.8), "#3e9a35")
+        lz.pintar(lz.elipse(bx - 2.5, by - 4, 2.6, 1.2, 25), "#8fe06a")
+        lz.pintar(lz.elipse(bx + 2.5, by - 5, 2.6, 1.2, -25), "#6fcf4f")
+    lz.sumar_luz(lz.desenfocar(lz.circulo(300, YM - 6, 10), 8), "#8fe06a", 0.4)
+    # Maisha, de rodillas a la izquierda (mirando las setas), y Kimya, flotando a la derecha
+    lz.sumar_luz(lz.desenfocar(lz.elipse(300, 200, 150, 60), 30), "#5ae0c0", 0.18)
+    lz.pintar(lz.desenfocar(lz.elipse(226, YM + 8, 22, 3), 2), "#050308", 0.5)
+    ci.maisha_luz(lz, 226, YM + 6, e=1.9)
+    _kimya_pie(lz, 380, 196, e=1.8)
+    # esporas flotando
+    motas = np.zeros((lz.H, lz.W))
+    for k in range(80):
+        motas = np.maximum(motas, lz.circulo(rng.random() * W, 60 + rng.random() * 150, 0.4 + rng.random() * 0.4))
+    lz.sumar_luz(motas, "#e6d0ff", 0.7)
+    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.06)
+    ci.marco_recuerdo(lz, color="#4a4058", semilla=204)
+    return lz
+
+
+PIEZAS = {"20_eco_cueva": eco_cueva, "19_eco_travesia": eco_travesia, "18_eco_orilla": eco_orilla, "17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}

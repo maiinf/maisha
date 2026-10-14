@@ -38,6 +38,7 @@ var _tiempo_agotada := 0.0
 var _desde_ultima_semilla := 99.0
 var _empuje := Vector2.ZERO
 var _ultimo_danio := -100000.0
+var mareo := 0.0                 # mareada por las esporas de Kuvu: los controles van al revés mientras dura
 var escudo := false            # con el Escudo de corteza: J mantenida (para lo que viene de frente)
 var _j_mantenida := 0.0
 var _escudo_dibujo: Sprite2D
@@ -67,6 +68,7 @@ func _physics_process(delta: float) -> void:
 	_espera_latido = maxf(0.0, _espera_latido - delta)
 	_invulnerable = maxf(0.0, _invulnerable - delta)
 	pegajoso = maxf(0.0, pegajoso - delta)
+	mareo = maxf(0.0, mareo - delta)
 	_desde_ultima_semilla += delta
 	if _emocion > 0.0:
 		_emocion -= delta
@@ -81,6 +83,8 @@ func _physics_process(delta: float) -> void:
 	var direccion := Input.get_vector("mover_izquierda", "mover_derecha", "mover_arriba", "mover_abajo")
 	if direccion.length() < ZONA_MUERTA:
 		direccion = Vector2.ZERO
+	if mareo > 0.0:
+		direccion = -direccion                  # (las esporas: arriba es abajo y la izquierda es la derecha)
 
 	_actualizar_aliento(delta, direccion)
 
@@ -263,6 +267,7 @@ func es_invulnerable() -> bool:
 
 func revivir(posicion: Vector2) -> void:
 	global_position = posicion
+	mareo = 0.0
 	vida = vida_maxima()
 	aliento = aliento_maximo()
 	agotada = false

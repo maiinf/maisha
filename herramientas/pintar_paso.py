@@ -11,6 +11,9 @@ Genera en arte/mundos/raiz/paso/:
                         taller de un científico abandonado: estanterías con piedras etiquetadas, la mesa con papeles
                         y un microscopio de latón, una pizarra con dibujos de la piedra de Giza, telarañas, hojas
                         secas por el suelo y, al fondo, el ARMARIO grande cerrado con una cerradura de hierro
+  seta_luz.png          4 × 16×18 matas de setas que brillan (cueva de las setas): 2 verde-agua, 2 violeta
+  pagina.png            12×10     una página del diario de Nungu
+  cortina.png           2 × 64×44 la cortina de micelio que tapa la sala de Kuvu (quieta / latiendo)
   bloque.png            2 × 28×24 bloques de piedra cortados en la cantera (con marcas de cincel y cuñas)
   y el icono de la LLAVE del armario (16×16), el 26.º de arte/interfaz/objetos.png
   armario.png           2 × 56×64 el armario: 0 cerrado (cerradura de Corteza) · 1 abierto (dentro, una escalera
@@ -384,12 +387,67 @@ def llave():
     return lz.sprite(contorno=0.6)
 
 
+def seta_luz(k):
+    """Una mata de setas que brillan en la cueva (16×18): k 0-1 verde-agua (dos tamaños), 2-3 violeta."""
+    lz = Lienzo(16, 18, s=8, semilla=961 + k)
+    col = [["#0e3a3a", "#1e7a6e", "#5ae0c0", "#c8fff0"], ["#2a1040", "#6a2a9a", "#b070e0", "#f0d8ff"]][k // 2]
+    grande = k % 2 == 0
+    for (x, y, r) in (((8, 16, 4.2), (4, 17, 2.4), (12.5, 17, 2.0)) if grande else ((7, 16.5, 3.0), (11, 17, 2.2))):
+        lz.sombrear(lz.trazo([(x, y), (x + 0.3, y - r * 1.5)], r * 0.3, r * 0.22), ["#5a5262", "#8a8094", "#c8c0d0", "#eee8f4"], 0.6, LUZ)
+        som = lz.elipse(x + 0.3, y - r * 1.6, r, r * 0.55)
+        lz.sombrear(som, col, r * 0.4, LUZ)
+        lz.brillo(som, col[2], 1.5, 0.6)
+        for j in range(3):
+            lz.pintar(lz.circulo(x - r * 0.5 + j * r * 0.5, y - r * 1.75, 0.35), col[3])
+    return lz.sprite(contorno=0.4)
+
+
+def pagina():
+    """Una página del diario de Nungu en el suelo (12×10): papel arrugado, con letra apretada y un dibujo de una seta."""
+    lz = Lienzo(12, 10, s=8, semilla=971)
+    hoja = lz.poligono([(1, 2), (10, 1), (11, 8), (2, 9)])
+    lz.sombrear(hoja, ["#8a7a5a", "#c8b48a", "#efe0bf", "#fff8e8"], 1.5, LUZ, textura=lz.ruido(0.6, 2, semilla=972), fuerza_tex=0.3)
+    for k in range(3):
+        lz.pintar(lz.trazo([(2.5, 3.2 + k * 1.6), (7.4, 3 + k * 1.6)], 0.25), "#5a4a3a", 0.8)
+    lz.pintar(lz.elipse(9, 4.4, 1.2, 0.7), "#8a4ab0")
+    lz.pintar(lz.trazo([(9, 4.8), (9, 6.4)], 0.3), "#8a4ab0")
+    return lz.sprite(contorno=0.5)
+
+
+def cortina():
+    """La cortina de micelio que tapa la sala de Kuvu (64×44): hilos blancos y violetas colgando del techo, enredados,
+    con setitas que brillan y un latido violeta por dentro. 0 quieta · 1 latiendo (más luz)."""
+    hojas = []
+    for f in range(2):
+        lz = Lienzo(64, 44, s=6, semilla=981)
+        rng = np.random.default_rng(982)
+        hilos = np.zeros((lz.H, lz.W))
+        for k in range(46):
+            x = 2 + rng.random() * 60
+            pts = [(x + np.sin(t * 4 + k) * 2.5, t * (38 + rng.random() * 6)) for t in np.linspace(0, 1, 14)]
+            hilos = np.maximum(hilos, lz.trazo(pts, 0.9 + rng.random() * 0.8, 0.4))
+        for k in range(12):                                            # hilos de lado a lado (la maraña)
+            y = 6 + rng.random() * 30
+            hilos = np.maximum(hilos, lz.trazo(lz.curva((0, y), (32, y + rng.uniform(-6, 6)), (64, y + rng.uniform(-4, 4)), n=20), 0.6))
+        lz.sombrear(hilos, ["#2a2038", "#5a4a78", "#a898c0", "#e0d8f0"], 1.0, LUZ)
+        lz.sumar_luz(lz.desenfocar(hilos, 3), "#a855d6", 0.25 + 0.25 * f)
+        for k in range(9):
+            x, y = 4 + rng.random() * 56, 8 + rng.random() * 30
+            lz.sombrear(lz.elipse(x, y, 1.6, 1.0), ["#2a1040", "#6a2a9a", "#b070e0", "#f0d8ff"], 0.6, LUZ)
+            lz.brillo(lz.circulo(x, y, 1.2), "#b070e0", 2, 0.5 + 0.3 * f)
+        hojas.append(lz.sprite(contorno=0.0))
+    return np.concatenate(hojas, axis=1)
+
+
 def main():
     from PIL import Image
     os.makedirs(SALIDA, exist_ok=True)
     casa = casa_nungu()
     Image.fromarray(casa.sprite(contorno=0.4), "RGBA").save(os.path.join(SALIDA, "casa_nungu.png"))
     Image.fromarray(np.concatenate([bloque(0), bloque(1)], axis=1), "RGBA").save(os.path.join(SALIDA, "bloque.png"))
+    Image.fromarray(np.concatenate([seta_luz(k) for k in range(4)], axis=1), "RGBA").save(os.path.join(SALIDA, "seta_luz.png"))
+    Image.fromarray(pagina(), "RGBA").save(os.path.join(SALIDA, "pagina.png"))
+    Image.fromarray(cortina(), "RGBA").save(os.path.join(SALIDA, "cortina.png"))
     hoja = np.concatenate([armario(0), armario(1)], axis=1)
     Image.fromarray(hoja, "RGBA").save(os.path.join(SALIDA, "armario.png"))
     Image.fromarray(interior().sprite(contorno=0.0), "RGBA").save(os.path.join(SALIDA, "interior_nungu.png"))

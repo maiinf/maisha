@@ -735,3 +735,14 @@ Escena `escenas/mundo/paso_piedra.tscn` (mapa de 150×48 casillas, de oeste a es
 - **La llave** (parte 2): Corteza se acuerda de Nungu («me tuvo tres semanas con la cerradura») pero no de dónde guardó la llave (`corteza_busca_llave`). En su taller, las herramientas no la tienen; en el banco hay un cajón vacío con la etiqueta «LLAVE DE NUNGU. NO PERDER» y polvo de carbón; y en el **barril del carbón** está, negra de hollín (`llave_nungu`, objeto clave con icono, el 26.º de `objetos.png`). Al enseñársela, Corteza avisa de que Nungu hablaba de «cosas que crecían bajo tierra».
 - Al este, una **maraña de raíces** tapa el paso a la Gruta (puerta `cerrada:gruta_guardian`, espinas `!`). Por dentro de la Gruta, el santuario tiene un túnel al oeste tapado por la misma maraña que el atajo: las dos se apartan al despertar al Guardián (un atajo de vuelta). Cada puerta cerrada puede tener su propio texto: `paso_cerrado_<destino>_desde_<mapa>`.
 - Prueba: `prueba_paso_piedra`.
+
+### La cueva de las setas (Paso de Piedra, parte 3)
+
+Escena `escenas/mundo/cueva_setas.tscn` (mapa de 56×64, de norte a sur: `construir_mapa.py cueva_setas --crear`, `crear_cueva`; suelo de cueva con **micelio** blanco y violeta en vez de raíces, `pintar_gruta(..., setas=True)`). Se baja por la **escalera del armario** de Nungu (con el armario abierto, la puerta `armario` de la casa) y se sube por la escalera `^`. Capturas: `documentacion/cueva_setas_capturas.png`. Música provisional: la del lago.
+
+- **A oscuras** (`scripts/mundo/cueva_setas.gd`): alumbran Maisha y las **setas que brillan** (`ů`, verde-agua y violetas, `seta_luz.png`), que respiran despacio.
+- **Nubes de esporas** (`ǯ`, `scripts/mundo/cueva/nube_esporas.gd`): laten (3 s hinchadas, 1,8 s encogidas). Si Maisha las respira se **marea**: los controles van al revés 3 s (`maisha.mareo`, se quita al revivir). El **Latido** las deshace 4 s. La primera vez, Maisha lo piensa en voz alta.
+- **Las tres páginas del diario de Nungu** (`ǹ`, `pagina_nungu.gd`): día 1 (las setas se comen la piedra de Giza), día 9 (una seta grande que «mira») y la última («ella decidirá por mí... traed algo que corte hilos»). Marcas `nungu_pagina/1..3`.
+- **El octavo eco** (`eco_cueva_setas`, ilustración `20_eco_cueva`): Kimya enseña a Maisha que las setas «se comen lo que cae y se lo devuelven a la tierra»; «¿y si una seta quisiera mandar, en vez de servir?».
+- Al sur, la **cortina de micelio** (`ǫ`, `cortina.png`) tapa la sala de Kuvu: late, y detrás una voz cansada dice «...descansar...» (parte 4).
+- Misión de historia **«Bajo la casa»**: bajar por la escalera → leer las páginas (n/3) → buscar a Nungu al fondo (`nungu_libre`, parte 4).

@@ -403,7 +403,7 @@ def _mesetas(lz, tipos, fina, media, pared):
     lz.pintar(piedras, rampa(PENA[4:8], fina), 0.9)
 
 
-def pintar_gruta(nombre, salida=None):
+def pintar_gruta(nombre, salida=None, setas=False):
     """El suelo de una cueva (la Gruta de las Raíces): tierra oscura con guijarros, raíces finas que corren por el
     suelo y algún charco; las paredes («0») son roca maciza, con la cara iluminada donde se juntan con el suelo y raíces
     que bajan por ella. Se verá a oscuras en el juego (scripts/mundo/gruta/oscuridad.gd)."""
@@ -434,7 +434,12 @@ def pintar_gruta(nombre, salida=None):
             ang += (rng.random() - 0.5) * 0.7
         raices = np.maximum(raices, lz.trazo(pts, 0.9 + rng.random() * 0.8, 0.3).astype(np.float32))
     lz.pintar(np.clip(desplazar(lz, raices, 0.5, 0.8) - raices, 0, 1), "#070504", 0.6)
-    lz.pintar(raices, rampa(["#3e2a1a", "#563a24", "#74502e", "#94683c"], fina), 0.95)
+    if setas:
+        # en la cueva de las setas no son raíces: es MICELIO, hilos blancos y violetas que lo cubren todo
+        lz.pintar(raices, rampa(["#3a2a48", "#6a5a80", "#a898c0", "#e0d8f0"], fina), 0.8)
+        lz.sumar_luz(lz.desenfocar(raices, 1.5), "#a855d6", 0.12)
+    else:
+        lz.pintar(raices, rampa(["#3e2a1a", "#563a24", "#74502e", "#94683c"], fina), 0.95)
     # charcos donde gotea
     charcos = (lz.ruido(18, 2, semilla=176) > 0.95).astype(np.float32) * (1 - roca)
     lz.pintar(charcos, "#18262a", 0.85)
@@ -449,7 +454,7 @@ def pintar_gruta(nombre, salida=None):
     lz.pintar(cara, rampa(["#2a2624", "#3e3834", "#57504a", "#6e665e"], tono), 0.95)
     lz.pintar(np.clip(desplazar(lz, roca, 0, -1.5) - roca, 0, 1), "#080606", 0.7)   # la sombra al pie de la pared
     musgo = (lz.ruido(2, 2, semilla=178) > 0.7) * cara
-    lz.pintar(musgo, "#2f4a2a", 0.6)
+    lz.pintar(musgo, "#4a2f5a" if setas else "#2f4a2a", 0.6)
     destino = salida or os.path.join(RAIZ, "arte", "mundos", "raiz", "suelos", nombre + "_suelo.png")
     os.makedirs(os.path.dirname(destino), exist_ok=True)
     lz.guardar(destino, tramado=0.012)
@@ -457,8 +462,8 @@ def pintar_gruta(nombre, salida=None):
 
 
 def pintar(nombre, salida=None):
-    if nombre == "gruta_raices":
-        return pintar_gruta(nombre, salida)
+    if nombre in ("gruta_raices", "cueva_setas"):
+        return pintar_gruta(nombre, salida, setas=nombre == "cueva_setas")
     filas = leer(nombre)
     cobrizo = nombre == "camino_cobrizo"
     senda = nombre == "senda_surcos"

@@ -2694,5 +2694,106 @@
 				]
 			}
 		]
+	},
+	"cueva_llegada": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La escalera acaba en una cueva... y la cueva brilla. Setas. Cientos de setas que dan luz.",
+					"Huele a tierra mojada y a algo dulce. Demasiado dulce."
+				]
+			}
+		]
+	},
+	"cueva_esporas": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Uf! Todo da vueltas... Mis pies van justo adonde no quiero.",
+					"Esas nubes violetas... mejor no respirarlas. O deshacerlas con un buen Latido."
+				]
+			}
+		]
+	},
+	"nungu_pagina_1": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una página arrugada, con letra apretada:",
+					"«Día 1. ¡Bajo la casa hay una cueva! Las setas brillan y se comen la piedra de Giza. ¡SE LA COMEN! Si entiendo cómo lo hacen, a lo mejor puedo curar el valle entero.»"
+				],
+				"marca": "nungu_pagina/1"
+			}
+		]
+	},
+	"nungu_pagina_2": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Otra página. La letra es más pequeña, como si escribiera deprisa:",
+					"«Día 9. Al fondo hay una seta mucho más grande que las demás. Cuando paso, las pequeñas se giran hacia ella. Me mira. Ya sé que las setas no miran. Pero me mira.»"
+				],
+				"marca": "nungu_pagina/2"
+			}
+		]
+	},
+	"nungu_pagina_3": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La última página. Casi no se lee:",
+					"«Ya no sé qué día es. La seta grande me habla sin voz. Dice que puedo descansar, que ella decidirá por mí. Es tan cómodo no tener que decidir nada...»",
+					"«Si alguien lee esto: no respiréis sus esporas. Y traed algo que corte hilos.»"
+				],
+				"marca": "nungu_pagina/3"
+			}
+		]
+	},
+	"cueva_cortina": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una cortina de hilos blancos tapa el paso. Late despacio, como si respirara.",
+					"Al otro lado se mueve algo enorme. Y una voz cansada murmura: «...sí... descansar... sí...»"
+				]
+			}
+		]
+	},
+	"eco_cueva_setas": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"marca": "eco/cueva_setas",
+				"lineas": [
+					"La espiral de la piedra se enciende. Las setas de la cueva se apagan y se encienden, una tras otra, como si respiraran a la vez..."
+				],
+				"historia": [
+					{
+						"imagen": "20_eco_cueva",
+						"lineas": [
+							"«Kimya, ¿esto es tuyo?»",
+							"«Son mías, sí. Se comen lo que cae y se lo devuelven a la tierra. Sin ellas, tus bosques se ahogarían en hojas.»",
+							"«Son un poco feas.»",
+							"«Lo necesario casi nunca es bonito.»",
+							"«¿Y si una seta quisiera mandar, en vez de servir?»",
+							"«Entonces ya no sería mía. Sería de otra cosa.»"
+						]
+					}
+				],
+				"tras_historia": [
+					"Las setas vuelven a brillar, tranquilas. Una seta que manda en vez de servir...",
+					"Al fondo de la cueva, algo late."
+				]
+			}
+		]
 	}
 }

@@ -34,6 +34,16 @@ func _preparar() -> void:
 	var armario: Node2D = ARMARIO.new()
 	armario.position = Vector2(160, 78)
 	$Entidades.add_child(armario)
+	# la escalera del armario: con el armario abierto, al meterse en él se baja a la cueva de las setas
+	var escalera: Area2D = PUERTA.new()
+	escalera.id = "armario"
+	escalera.destino = "cueva_setas"
+	escalera.destino_puerta = "escalera"
+	escalera.salida = Vector2.DOWN
+	escalera.cerrada_hasta = "armario_abierto"
+	escalera.tam = Vector2(24, 8)
+	escalera.position = Vector2(160, 84)
+	add_child(escalera)
 	if not Estado.tiene("nungu_entrar"):
 		_pensar_al_entrar.call_deferred()
 
