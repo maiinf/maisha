@@ -13,6 +13,8 @@ Genera en arte/mundos/raiz/aldea/ (la base de la puerta, en el centro de abajo d
                                colgadas, el caldero al fuego, ristras de hierbas y cestos de bayas
   puesto.png      2 × 116×104  el puesto de TAWI, el pájaro comerciante: toldo a rayas, cajas de mercancía, cristales
                                del Nexo en un expositor, una balanza, farolillos y un cartel con una pluma
+  interior_casa_pino.png  320×208  la casa de Pino por dentro (los muebles, donde dice casa_pino.gd)
+  interior_taller.png     320×208  el taller de Corteza por dentro (los muebles, donde dice taller_corteza.gd)
 """
 import os
 import sys
@@ -488,6 +490,195 @@ def puesto(reconstruido):
     return lz.sprite(contorno=0.4)
 
 
+def _suelo_tablas(lz, y0, y1, x0=32, x1=288, tonos=None, semilla=0):
+    tonos = tonos or ["#1e140e", "#2e2016", "#45301f", "#5a3f28", "#6e4e32", "#845e3c", "#9a7048"]
+    suelo = rect(lz, x0, y0, x1, y1)
+    fila = np.floor((lz.y - y0) / 9)
+    junta_h = ((lz.y - y0) % 9) < 0.9
+    junta_v = ((lz.x + fila * 37) % 64) < 0.9
+    tono = (np.sin(fila * 12.9898 + np.floor((lz.x + fila * 37) / 64) * 78.233) * 43758.5453) % 1.0
+    v = 0.45 + (tono - 0.5) * 0.25 + (vetas(lz, 0.5, 21, semilla=semilla) - 0.5) * 0.35 - junta_h * 0.4 - junta_v * 0.3
+    lz.pintar(suelo, rampa(tonos, np.clip(v, 0, 1)))
+    return suelo
+
+
+def interior_casa_pino():
+    """La casa de Pino por dentro (320×208): una seta por dentro. Paredes curvas color crema con vetas, el techo de
+    láminas de seta, la cama con colcha de retales, el mapa de sus «exploraciones» con chinchetas y una ruta roja,
+    tarros de luciérnagas que brillan en un estante, la ventana redonda, el catalejo en su trípode, la escalera a la
+    trampilla del tejado, el baúl, macetas con brotes y una alfombra redonda. (Los muebles, donde dice casa_pino.gd.)"""
+    lz = Lienzo(320, 208, s=2, semilla=1401)
+    lz.pintar(rect(lz, 0, 0, 320, 208), "#0a0808")
+    # la pared del fondo: crema con vetas verticales, y las láminas del sombrero arriba
+    pared = rect(lz, 24, 0, 296, 74)
+    lz.sombrear(pared, CREMA, 30, LUZ, textura=vetas(lz, 0.6, 21, False, semilla=1402), fuerza_tex=0.35)
+    lam = rect(lz, 24, 0, 296, 16)
+    lz.pintar(lam, "#b42a2c")
+    for k in range(-30, 31):
+        lz.pintar(lz.trazo([(160, -40), (160 + k * 6, 16)], 0.8) * lam, "#5e1218", 0.7)
+    lz.pintar(rect(lz, 24, 15, 296, 17), "#3a0a0e")
+    # las paredes de los lados, curvas y en sombra
+    for (a, b, sx) in ((24, 34, 1), (286, 296, -1)):
+        lat = rect(lz, a, 0, b, 190)
+        lz.sombrear(lat, CREMA[:4], 4, LUZ)
+        lz.pintar(lat, "#1a1208", 0.4)
+    # el suelo de tablas y la alfombra redonda
+    _suelo_tablas(lz, 74, 190, semilla=1403)
+    alf = lz.elipse(160, 142, 40, 15)
+    lz.sombrear(alf, ["#5a2a1a", "#8a3a2a", "#c05a3a", "#e08a5a"], 4, LUZ)
+    for r in (0.7, 0.4):
+        lz.pintar(np.clip(lz.elipse(160, 142, 40 * r, 15 * r) - lz.elipse(160, 142, 40 * r - 3, 15 * r - 1.2), 0, 1), "#f0d8a0", 0.8)
+    # el mapa de las exploraciones (118, 40) con chinchetas y la ruta roja
+    mapa = lz.poligono([(96, 24), (140, 22), (142, 58), (98, 60)])
+    lz.sombrear(mapa, ["#a08a5a", "#c8b080", "#e2cea0", "#f4e4c0"], 2, LUZ)
+    lz.pintar(lz.trazo([(102, 52), (112, 40), (120, 46), (130, 32), (137, 36)], 0.8) * mapa, "#b42a2c")
+    lz.pintar(lz.trazo([(130, 30), (134, 34)], 0.8) + lz.trazo([(134, 30), (130, 34)], 0.8), "#b42a2c")
+    for (x, y) in ((98, 25), (139, 23), (140, 57), (100, 58)):
+        lz.pintar(lz.circulo(x, y, 1.2), "#e8c46a")
+    # el estante con los tarros de luciérnagas (176, 42)
+    lz.sombrear(rect(lz, 154, 48, 198, 51), MADERA[2:], 1, LUZ)
+    for k in range(4):
+        x = 159 + k * 11
+        tarro = rect(lz, x - 3.6, 38, x + 3.6, 48)
+        lz.pintar(tarro, "#2a4a4a", 0.7)
+        lz.sumar_luz(lz.desenfocar(lz.circulo(x, 43, 3), 3), "#8af0d0", 0.6)
+        for j in range(3):
+            lz.pintar(lz.circulo(x - 2 + j * 2, 41 + (j + k) % 3 * 2, 0.6), "#e8ffc0")
+        lz.sombrear(rect(lz, x - 3.8, 36, x + 3.8, 38.5), MADERA[2:], 0.5, LUZ)
+    # la ventana redonda (224, 44)
+    aro = np.clip(lz.circulo(224, 44, 12) - lz.circulo(224, 44, 9.5), 0, 1)
+    lz.sombrear(aro, MADERA, 2, LUZ)
+    vid = lz.circulo(224, 44, 9.5)
+    lz.pintar(vid, rampa(["#4a7a93", "#97c1bf", "#e8f0dc"], np.clip(1 - (lz.y - 34) / 20, 0, 1)))
+    lz.pintar(np.maximum(rect(lz, 214, 43.4, 234, 44.6), rect(lz, 223.4, 34, 224.6, 54)) * vid, "#3a2418")
+    lz.sumar_luz(lz.desenfocar(lz.poligono([(214, 50), (234, 50), (240, 110), (208, 110)]), 6), "#e8f0dc", 0.12)
+    # la cama (38-87, 64-106) con colcha de retales y almohada
+    cama = rect(lz, 38, 64, 87, 106)
+    lz.sombrear(cama, MADERA, 2, LUZ)
+    colcha = rect(lz, 40, 76, 85, 104)
+    ret = (np.floor((lz.x - 40) / 7) + np.floor((lz.y - 76) / 7)) % 4
+    col = np.zeros((lz.H, lz.W, 3))
+    for k, c in enumerate(("#b42a2c", "#e8c46a", "#3e7a3a", "#4a82b8")):
+        h = c.lstrip("#")
+        col[ret == k] = [int(h[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+    lz.pintar(colcha, col)
+    lz.pintar(colcha * (((lz.x - 40) % 7 < 0.5) | ((lz.y - 76) % 7 < 0.5)), "#2a1a12", 0.6)
+    almo = lz.elipse(62, 70, 18, 5)
+    lz.sombrear(almo, CREMA[2:], 2, LUZ)
+    # el baúl (40-65, 108-129)
+    baul = rect(lz, 40, 110, 65, 129)
+    lz.sombrear(baul, MADERA, 2, LUZ, textura=vetas(lz, 0.5, 11), fuerza_tex=0.4)
+    lz.sombrear(rect(lz, 40, 116, 65, 118), LATON, 0.6, LUZ)
+    lz.pintar(lz.circulo(52.5, 120, 1.4), "#e8c46a")
+    # el catalejo en su trípode (212-234, 80-98)
+    for (a, b) in (((214, 104), (222, 84)), ((230, 104), (222, 84)), ((222, 106), (222, 84))):
+        lz.sombrear(lz.trazo([a, b], 1.2), MADERA[2:], 0.5, LUZ)
+    lz.sombrear(lz.trazo([(210, 90), (236, 78)], 3.0, 2.2), LATON, 1, LUZ)
+    lz.pintar(lz.circulo(236, 78, 1.4), "#1a1a24")
+    # la escalera a la trampilla (256-278, 4-84) y la trampilla con luz
+    for x in (258, 276):
+        lz.sombrear(lz.trazo([(x, 84), (x, 2)], 1.6), MADERA[1:], 0.6, LUZ)
+    for y in range(8, 84, 9):
+        lz.sombrear(lz.trazo([(258, y), (276, y)], 1.2), MADERA[2:], 0.5, LUZ)
+    lz.pintar(rect(lz, 256, 0, 278, 4), "#fff4d0")
+    lz.sumar_luz(lz.desenfocar(rect(lz, 256, 0, 278, 6), 6), "#fff4d0", 0.4)
+    # las macetas con brotes (260-282, 156-178)
+    for (x, y, r) in ((266, 172, 6), (278, 166, 5)):
+        lz.sombrear(lz.poligono([(x - r, y - r), (x + r, y - r), (x + r * 0.7, y + r), (x - r * 0.7, y + r)]), ["#5a2a1a", "#8a4a2a", "#b06a3a", "#d08a50"], 1, LUZ)
+        for k in range(3):
+            lz.pintar(lz.trazo([(x - 2 + k * 2, y - r), (x - 3 + k * 3, y - r - 7)], 0.8), "#3e9a35")
+            lz.pintar(lz.elipse(x - 3 + k * 3, y - r - 7, 2, 1, 30), "#8fe06a")
+    # setitas en las esquinas y un farolillo de seta encima de la cama
+    for (x, y) in ((44, 186), (276, 186), (36, 80)):
+        lz.sombrear(lz.elipse(x, y - 3, 3, 1.8), ["#5e1218", "#b42a2c", "#ec6a58"], 0.6, LUZ)
+        lz.pintar(lz.trazo([(x, y), (x, y - 3)], 1.0), "#dcc8a0")
+    # el hueco de la puerta, abajo, y una viñeta suave en los rincones
+    lz.pintar(rect(lz, 148, 186, 172, 208), "#050404")
+    vineta = np.clip((np.abs(lz.x - 160) / 160) ** 2 + (np.abs(lz.y - 110) / 120) ** 2, 0, 1)
+    lz.pintar(vineta * rect(lz, 24, 0, 296, 190), "#050404", 0.3)
+    return lz
+
+
+def interior_taller():
+    """El taller de Corteza por dentro (320×208): piedra y vigas; la forja grande con su campana, el fuelle y las brasas
+    (58-126, 40-76); el montón de carbón; el banco con herramientas, limas y dibujos de cetros (224-286, 70-100); la
+    pared de herramientas colgadas; el barril con agua y tenazas (38-62, 142-168); suelo de losas con hollín. (El
+    yunque es un sprite aparte, delante.)"""
+    lz = Lienzo(320, 208, s=2, semilla=1501)
+    lz.pintar(rect(lz, 0, 0, 320, 208), "#0a0808")
+    pared = rect(lz, 24, 0, 296, 74)
+    _piedras(lz, pared, tam=8.0, semilla=1502, luz=LUZ, mortero="#1e1a16", rampa_p=PIEDRA_C)
+    lz.pintar(np.clip((74 - lz.y) / 74, 0, 1) * pared, "#0a0808", 0.3)
+    for y in (6, 30):
+        lz.sombrear(rect(lz, 24, y, 296, y + 5), TRONCO, 1.5, LUZ, textura=vetas(lz, 0.5, 21), fuerza_tex=0.4)
+    for (a, b) in ((24, 34), (286, 296)):
+        lat = rect(lz, a, 0, b, 190)
+        _piedras(lz, lat, tam=5.0, semilla=1503 + a, luz=LUZ, mortero="#1e1a16", rampa_p=PIEDRA_C)
+        lz.pintar(lat, "#0a0808", 0.45)
+    # el suelo de losas, con hollín cerca de la forja
+    suelo = rect(lz, 32, 74, 288, 190)
+    fila = np.floor((lz.y - 74) / 16)
+    junta = (((lz.y - 74) % 16) < 1.0) | (((lz.x + fila * 13) % 28) < 1.0)
+    tono = (np.sin(fila * 7.3 + np.floor((lz.x + fila * 13) / 28) * 31.7) * 9431.1) % 1.0
+    v = 0.5 + (tono - 0.5) * 0.3 + (lz.ruido(1.2, 2, semilla=1504) - 0.5) * 0.25 - junta * 0.45
+    lz.pintar(suelo, rampa(["#2a2420", "#4a4038", "#665a4e", "#807264", "#988a7a"], np.clip(v, 0, 1)))
+    lz.pintar(lz.desenfocar(lz.elipse(92, 90, 60, 20), 8) * suelo, "#0a0806", 0.5)
+    # la forja: el hogar de piedra, la campana de la chimenea, las brasas y el fuelle
+    hogar = rect(lz, 58, 52, 126, 78)
+    _piedras(lz, hogar, tam=4.6, semilla=1505, luz=LUZ, mortero="#1a1612", rampa_p=PIEDRA_C)
+    campana = lz.poligono([(52, 52), (132, 52), (110, 14), (74, 14)])
+    lz.sombrear(campana, ["#1b1c1f", "#2e3034", "#4a4c50", "#6a6c6f"], 6, LUZ)
+    lz.sombrear(rect(lz, 80, 0, 104, 14), ["#1b1c1f", "#2e3034", "#4a4c50"], 2, LUZ)
+    boca = rect(lz, 70, 56, 114, 70)
+    lz.pintar(boca, "#1a0804")
+    fuego = lz.poligono([(72, 70), (78, 60), (84, 66), (90, 56), (96, 64), (102, 58), (108, 66), (112, 70)])
+    lz.pintar(fuego, rampa(["#a8380f", "#ef8a26", "#f9b947", "#fde27e"], np.clip((70 - lz.y) / 14, 0, 1)))
+    lz.sumar_luz(lz.desenfocar(fuego, 10), "#ef8a26", 0.7)
+    lz.sumar_luz(lz.desenfocar(lz.elipse(92, 95, 70, 30), 14), "#ef8a26", 0.2)
+    for k in range(12):
+        rng = np.random.default_rng(1506 + k)
+        lz.pintar(lz.circulo(rng.uniform(72, 112), rng.uniform(40, 56), 0.6), "#ffc060")
+    fuelle = lz.poligono([(126, 62), (146, 56), (150, 66), (130, 70)])
+    lz.sombrear(fuelle, ["#2a1608", "#4a2a12", "#6e4220", "#946032"], 1.5, LUZ, textura=((lz.x - 126) % 4 < 0.8) * 1.0, fuerza_tex=0.4)
+    lz.sombrear(lz.trazo([(146, 60), (158, 54)], 1.2), MADERA[2:], 0.5, LUZ)
+    # el carbón (128-148, 74-84)
+    for k in range(14):
+        rng = np.random.default_rng(1507 + k)
+        lz.sombrear(lz.elipse(rng.uniform(130, 146), rng.uniform(74, 83), 3, 2, rng.uniform(0, 180)), ["#0a0a0c", "#1a1a1e", "#2e2e34", "#4a4a52"], 0.8, LUZ)
+    # la pared de herramientas colgadas (sobre el banco)
+    lz.sombrear(rect(lz, 200, 34, 288, 37), MADERA[2:], 0.8, LUZ)
+    herr = [((206, 37), (206, 60), "martillo"), ((218, 37), (218, 62), "tenazas"), ((230, 37), (230, 58), "lima"),
+            ((242, 37), (242, 64), "martillo"), ((256, 37), (256, 60), "sierra"), ((270, 37), (270, 62), "tenazas")]
+    for (a, b, tipo) in herr:
+        lz.sombrear(lz.trazo([a, b], 1.4), MADERA[2:] if tipo != "tenazas" else ["#2e3034", "#6a6c6f", "#a3a4a6"], 0.5, LUZ)
+        if tipo == "martillo":
+            lz.sombrear(rect(lz, b[0] - 5, b[1] - 2, b[0] + 5, b[1] + 2), ["#1b1c1f", "#4a4c50", "#8a8c8f", "#c8cacd"], 0.6, LUZ)
+        elif tipo == "sierra":
+            lz.sombrear(rect(lz, b[0] - 2, a[1] + 6, b[0] + 6, b[1]), ["#4a4c50", "#8a8c8f", "#c8cacd"], 0.5, LUZ)
+    # el banco de trabajo (224-286, 70-100) con dibujos de cetros y una lima
+    banco = rect(lz, 224, 70, 286, 82)
+    lz.sombrear(banco, MADERA, 2, LUZ, textura=vetas(lz, 0.5, 15), fuerza_tex=0.4)
+    for x in (228, 282):
+        lz.sombrear(rect(lz, x - 2, 82, x + 2, 100), MADERA[1:], 0.8, LUZ)
+    for (x, y) in ((236, 72), (252, 71)):
+        hoja = lz.poligono([(x, y), (x + 12, y - 1), (x + 13, y + 6), (x + 1, y + 7)])
+        lz.sombrear(hoja, ["#a8987a", "#d8c8a6", "#efe0bf"], 0.5, LUZ)
+        lz.pintar(lz.trazo([(x + 6, y + 6), (x + 7, y)], 0.5) + lz.circulo(x + 7, y + 0.5, 1.2), "#5a4a3a", 0.8)
+    lz.sombrear(lz.trazo([(268, 74), (280, 72)], 1.0), ["#4a4c50", "#8a8c8f", "#c8cacd"], 0.4, LUZ)
+    # el barril con agua y las tenazas (38-62, 142-168)
+    bar = lz.elipse(50, 156, 12, 14)
+    duelas = (np.abs(np.sin((lz.x - 50) / 3 * np.pi)) < 0.12).astype(float)
+    lz.sombrear(bar, TRONCO, 4, LUZ, textura=1 - duelas * 0.7, fuerza_tex=0.4)
+    lz.pintar(lz.elipse(50, 144, 10, 3.6), "#1e3a48")
+    lz.pintar(lz.elipse(48, 143.4, 4, 1.2), "#6a9ab0")
+    lz.sombrear(lz.trazo([(54, 138), (60, 152)], 1.2) + lz.trazo([(57, 138), (62, 152)], 1.2), ["#1b1c1f", "#3d3f43", "#6a6c6f"], 0.4, LUZ)
+    # el hueco de la puerta y la viñeta
+    lz.pintar(rect(lz, 148, 186, 172, 208), "#050404")
+    vineta = np.clip((np.abs(lz.x - 160) / 160) ** 2 + (np.abs(lz.y - 110) / 120) ** 2, 0, 1)
+    lz.pintar(vineta * rect(lz, 24, 0, 296, 190), "#050404", 0.35)
+    return lz
+
+
 def main():
     os.makedirs(SALIDA, exist_ok=True)
     tira = lambda fotos: Image.fromarray(np.concatenate(fotos, axis=1), "RGBA")
@@ -495,6 +686,8 @@ def main():
     tira([taller(False), taller(True)]).save(os.path.join(SALIDA, "taller.png"))
     tira([cocina(False), cocina(True)]).save(os.path.join(SALIDA, "cocina.png"))
     tira([puesto(False), puesto(True)]).save(os.path.join(SALIDA, "puesto.png"))
+    Image.fromarray(interior_casa_pino().sprite(contorno=0.0), "RGBA").save(os.path.join(SALIDA, "interior_casa_pino.png"))
+    Image.fromarray(interior_taller().sprite(contorno=0.0), "RGBA").save(os.path.join(SALIDA, "interior_taller.png"))
     print("Cuna de Musgo pintada en", SALIDA)
 
 

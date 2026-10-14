@@ -5,7 +5,8 @@ Cada aldeano se monta con formas sencillas (óvalos sombreados con luz arriba a 
 y un contorno selectivo: cada material se contornea con su tono más oscuro.
 
 Uso:  python3 herramientas/dibujar_aldeanos.py
-Genera arte/personajes/aldeanos/<nombre>_frente.png (24x32, los pies abajo en el centro)
+Genera arte/personajes/aldeanos/<nombre>_frente.png (24x32, los pies abajo en el centro) y <nombre>_anim.png
+(4 fotogramas: quieto, respira, parpadea y su gesto; los usa scripts/mundo/aldea/aldeano.gd)
 """
 import math
 import os
@@ -51,6 +52,14 @@ MATERIALES = {
     "gris_c":   ["292C25", "525649", "7A806D", "A0A596"],   # manchas grises de la cabra
     "cuerno":   ["5C3E26", "A57559", "C9B07E", "E2CEA0"],   # cuernos curvos, color hueso
     "rojo":     ["5A1418", "8C2028", "B02531", "D53946"],   # pañuelo rojo
+    "lente":    ["1E3A2A", "3A8A5A", "8AE0B0", "C8FFE0"],   # cristal verdoso (gafas de forja)
+    "laton":    ["3A2A10", "9A7430", "E8C46A", "FBE6A2"],   # latón
+    "hollin":   ["1A1A1A", "1A1A1A", "1A1A1A", "1A1A1A"],
+    "ceja":     ["0A1418", "0A1418", "0A1418", "0A1418"],
+    "brasa":    ["A8380F", "EF8A26", "F9B947", "FDE27E"],
+    "vapor":    ["C8C4C0", "D8D4D0", "E8E4E0", "F8F4F0"],
+    "flor":     ["8F2532", "D5525E", "F4B39A", "FFE0D8"],
+    "azul":     ["1E3A5A", "2E5A8A", "4A82B8", "8AB8E0"],
 }
 ANCHO, ALTO = 24, 32
 
@@ -142,7 +151,12 @@ def bibi():
         l.px(21, y, "concha", 2 if y % 3 else 3)
     l.px(20, 12, "musgo", 3); l.px(22, 11, "musgo", 3)
     l.ovalo(20.5, 21, 1.7, 1.7, "tortuga")                  # mano en el bastón
-    return l.imagen()
+    # detalle: el dibujo de la concha, una florecita en el musgo y arrugas de abuela
+    for (x, y) in [(5, 20), (6, 23), (18, 20), (19, 23), (6, 26), (18, 26)]:
+        l.px(x, y, "concha", 1)
+    l.px(15, 12, "flor", 2); l.px(16, 12, "flor", 3); l.px(15, 11, "flor", 1); l.px(16, 11, "punto")
+    l.px(9, 15, "tortuga", 1); l.px(14, 15, "tortuga", 1)
+    return l
 
 
 def pino():
@@ -157,26 +171,47 @@ def pino():
     ojos(l, 16, 9, 13, alto=3)
     l.px(9, 19, "rubor"); l.px(15, 19, "rubor")
     l.ovalo(6.5, 24, 1.6, 2.2, "pie_seta"); l.ovalo(17.5, 24, 1.6, 2.2, "pie_seta")   # brazos
-    return l.imagen()
+    # detalle: pecas, la mochilita de explorador (correas) y una hoja en la mano
+    l.px(10, 18, "pie_seta", 1); l.px(14, 18, "pie_seta", 1)
+    l.px(9, 21, "delantal", 1); l.px(15, 21, "delantal", 1); l.px(9, 22, "delantal", 2); l.px(15, 22, "delantal", 2)
+    l.px(5, 25, "musgo", 3); l.px(5, 26, "musgo", 2); l.px(4, 26, "musgo", 1)
+    l.px(12, 26, "delantal", 3)
+    return l
 
 
 def corteza():
-    """CORTEZA: escarabaja herrera. Caparazón brillante, delantal de cuero y martillo."""
+    """CORTEZA: escarabaja herrera, gruñona y orgullosa. Caparazón brillante, gafas de forja en la frente, cejas
+    fruncidas, hollín en las mejillas, delantal de cuero con bolsillo (asoman unas tenazas) y cinto, y el martillo."""
     l = Lienzo()
     l.ovalo(12, 22, 7.5, 8, "escarabajo")                    # cuerpo
-    l.rect(8, 21, 15, 28, "delantal", 2)                     # delantal
-    for y in range(21, 29): l.px(15, y, "delantal", 1)
-    l.rect(8, 21, 15, 21, "delantal", 3)
+    l.px(7, 17, "escarabajo", 3); l.px(8, 16, "escarabajo", 3)   # brillo del caparazón
+    l.rect(8, 20, 15, 28, "delantal", 2)                     # delantal
+    for y in range(20, 29): l.px(15, y, "delantal", 1)
+    l.rect(8, 20, 15, 20, "delantal", 3)
+    l.rect(9, 24, 12, 26, "delantal", 1)                     # bolsillo
+    l.px(10, 23, "metal", 3); l.px(11, 23, "metal", 2)       # tenazas asomando
+    l.px(13, 26, "hollin"); l.px(14, 22, "hollin")           # quemaduras
+    l.rect(8, 27, 15, 27, "concha", 1)                       # cinto
+    l.px(12, 27, "laton", 2)
     l.ovalo(12, 12, 6, 5, "escarabajo")                      # cabeza
     for (x, y) in [(9, 7), (8, 6), (15, 7), (16, 6)]:        # antenas
         l.px(x, y, "escarabajo", 1)
-    ojos(l, 10, 9, 13)
+    l.px(7, 5, "escarabajo", 3); l.px(17, 5, "escarabajo", 3)
+    for x in (9, 13):                                        # las gafas de forja en la frente
+        l.rect(x, 8, x + 2, 9, "laton", 2)
+        l.px(x + 1, 8, "lente", 3); l.px(x + 1, 9, "lente", 2)
+    l.px(12, 8, "laton", 1)
+    ojos(l, 11, 9, 13, alto=2)
+    l.px(8, 10, "ceja"); l.px(9, 10, "ceja"); l.px(10, 11, "ceja")   # cejas fruncidas
+    l.px(15, 10, "ceja"); l.px(14, 10, "ceja"); l.px(13, 11, "ceja")
+    l.px(11, 14, "ceja"); l.px(12, 14, "ceja")               # boca seria
+    l.px(8, 13, "hollin"); l.px(16, 12, "hollin")            # hollín en las mejillas
     l.rect(9, 29, 10, 30, "escarabajo", 1); l.rect(14, 29, 15, 30, "escarabajo", 1)
     l.ovalo(4.5, 22, 1.8, 2.5, "escarabajo")                 # brazo
     l.ovalo(19.5, 21, 1.8, 2.5, "escarabajo")
     for y in range(14, 23): l.px(20, y, "concha", 2)          # mango del martillo
     l.rect(18, 12, 22, 14, "metal", 2); l.rect(18, 12, 22, 12, "metal", 3)
-    return l.imagen()
+    return l
 
 
 def juncia():
@@ -196,7 +231,13 @@ def juncia():
     for y in range(16, 26): l.px(20, y, "concha", 3)          # cuchara
     l.ovalo(20, 15, 1.6, 2, "concha")
     l.ovalo(19.5, 23, 1.8, 2.4, "rana")
-    return l.imagen()
+    # detalle: el delantal blanco con manchas de sopa, rubor, lunares del pañuelo y una gota en la cuchara
+    l.rect(9, 21, 15, 27, "panuelo", 2); l.rect(9, 21, 15, 21, "panuelo", 3)
+    l.px(10, 24, "musgo", 2); l.px(13, 26, "pajaro", 2)
+    l.px(8, 16, "rubor"); l.px(16, 16, "rubor")
+    for x in (8, 11, 14, 17): l.px(x, 9, "seta", 2)
+    l.px(20, 13, "musgo", 3)
+    return l
 
 
 def tawi():
@@ -215,7 +256,11 @@ def tawi():
     l.ovalo(4, 23, 1.8, 3.2, "pajaro")                       # ala
     l.rect(15, 17, 15, 22, "delantal", 1)                    # correa
     for x in (8, 9, 12, 13): l.px(x, 29, "delantal", 2); l.px(x, 30, "delantal", 1)   # patas
-    return l.imagen()
+    # detalle: plumas de colores en la mochila, la bolsa de monedas y una gorrita de viaje
+    l.px(13, 5, "azul", 3); l.px(13, 4, "azul", 2); l.px(17, 4, "flor", 2); l.px(17, 3, "flor", 3)
+    l.ovalo(15.5, 26, 1.6, 1.8, "delantal"); l.px(15, 25, "laton", 3)
+    l.px(9, 11, "rojo", 2); l.px(10, 11, "rojo", 3); l.px(11, 11, "rojo", 2)
+    return l
 
 
 def shamba():
@@ -264,7 +309,7 @@ def shamba():
     l.px(4, 11, "musgo", 3); l.px(5, 10, "musgo", 3)
     l.ovalo(4.5, 21, 1.8, 2.2, "pelo")                          # mano en el bastón
     l.ovalo(18.5, 21.5, 1.8, 2.4, "pelo")                       # otra mano
-    return l.imagen()
+    return l
 
 
 # (Mzee Shamba, más grande, lo dibuja herramientas/dibujar_kitovu.py)
@@ -308,7 +353,10 @@ def msafiri():
     for (x, y) in ((3, 28), (2, 27), (2, 26), (3, 25)):        # cola de escamas que se enrosca
         l.px(x, y, "escama", 2)
     l.px(2, 26, "escama", 3)
-    return l.imagen()
+    # detalle: una brújula colgada y la bufanda con rayas
+    l.px(8, 22, "laton", 3); l.px(8, 23, "laton", 2)
+    l.px(15, 23, "bufanda", 3); l.px(15, 24, "bufanda", 1)
+    return l
 
 
 def korongo():
@@ -338,7 +386,9 @@ def korongo():
     for y in range(5, 14): l.px(23, y, "cana", 3)                    # el sedal
     l.px(23, 14, "seta", 2); l.px(23, 15, "punto")                   # el corcho
     l.ovalo(18.5, 19, 1.4, 1.6, "garza")                      # la punta del ala sujetando la caña
-    return l.imagen()
+    # detalle: un pececillo colgando del cinto
+    l.px(9, 22, "metal", 3); l.px(9, 23, "metal", 2); l.px(9, 24, "azul", 3)
+    return l
 
 
 def fuko():
@@ -379,7 +429,10 @@ def fuko():
     for x in (19, 21):
         l.px(x, 23, "rosa", 3)
     l.rect(8, 29, 10, 30, "rosa", 1); l.rect(14, 29, 16, 30, "rosa", 1)   # pies
-    return l.imagen()
+    # detalle: más destello en las gafas y hollín de mina en la cara
+    l.px(14, 13, "brillo"); l.px(9, 13, "brillo")
+    l.px(7, 15, "hollin"); l.px(17, 16, "hollin")
+    return l
 
 
 def sungura():
@@ -415,7 +468,9 @@ def sungura():
     l.px(20, 17, "musgo", 3); l.px(21, 16, "musgo", 2); l.px(19, 17, "musgo", 2)
     l.ovalo(9, 30, 2.4, 1.2, "liebre"); l.ovalo(15, 30, 2.4, 1.2, "liebre")   # patas largas
     l.px(18, 28, "hocico", 3); l.px(19, 29, "hocico", 3)      # el rabito blanco
-    return l.imagen()
+    # detalle: unas flores en el bolsillo
+    l.px(14, 22, "flor", 3); l.px(15, 22, "flor", 2)
+    return l
 
 
 def mbuzi():
@@ -462,7 +517,9 @@ def mbuzi():
     l.px(20, 21, "gris_c", 1)
     for x in (8, 15):                                         # pezuñas
         l.rect(x - 1, 29, x + 1, 30, "gris_c", 1); l.px(x, 30, "nariz")
-    return l.imagen()
+    # detalle: un cencerro de latón colgado del pañuelo
+    l.px(9, 21, "laton", 3); l.px(9, 22, "laton", 2); l.px(8, 22, "laton", 1); l.px(10, 22, "laton", 1)
+    return l
 
 
 def mdiria():
@@ -496,7 +553,7 @@ def mdiria():
     l.px(17, 17, "seta", 2); l.px(19, 22, "seta", 2)          # flotadores rojos
     for x in (10, 14):                                        # patitas rojas
         l.px(x, 29, "seta", 2); l.px(x - 1, 30, "seta", 1); l.px(x + 1, 30, "seta", 1)
-    return l.imagen()
+    return l
 
 
 def bata():
@@ -527,7 +584,7 @@ def bata():
     l.px(19, 21, "cabra", 3); l.px(19, 22, "cabra", 2)        # el ala que la sujeta
     for x in (9, 15):                                         # patas naranjas, palmeadas
         l.px(x, 29, "pico", 2); l.px(x - 1, 30, "pico", 1); l.px(x, 30, "pico", 2); l.px(x + 1, 30, "pico", 1)
-    return l.imagen()
+    return l
 
 
 def kasia():
@@ -558,7 +615,126 @@ def kasia():
     l.rect(8, 5, 16, 5, "bufanda", 2)                         # la cinta azul
     for x in (9, 15):                                         # patas
         l.rect(x - 1, 29, x + 1, 30, "pelo", 1)
-    return l.imagen()
+    # detalle: un pez asomando del bolsillo y una flor en el sombrero
+    l.px(10, 25, "azul", 3); l.px(10, 26, "azul", 2); l.px(9, 25, "azul", 2)
+    l.px(15, 4, "flor", 3); l.px(16, 4, "flor", 2)
+    return l
+
+
+# --- Los fotogramas de cada aldeano (para que estén vivos) -----------------------------------------
+# 0 quieto · 1 respira (todo lo de arriba baja un píxel; los pies, no) · 2 parpadea (los ojos se cierran) · 3 su gesto
+
+def _copia(l):
+    n = Lienzo()
+    n.m = [fila[:] for fila in l.m]
+    return n
+
+
+def respira(l):
+    n = _copia(l)
+    for y in range(27, 0, -1):
+        n.m[y] = l.m[y - 1][:]
+    n.m[0] = [None] * ANCHO
+    return n
+
+
+def parpadea(l):
+    """Los ojos se cierran: de cada ojo queda solo la fila de abajo (las pestañas); lo de encima, del color de la piel."""
+    n = _copia(l)
+    for y in range(ALTO - 1):
+        for x in range(ANCHO):
+            c = l.m[y][x]
+            if c and c[0] in ("ojo", "brillo"):
+                abajo = l.m[y + 1][x]
+                if abajo and abajo[0] in ("ojo", "brillo"):
+                    piel = None
+                    for yy in range(y - 1, -1, -1):
+                        cc = l.m[yy][x]
+                        if cc and cc[0] not in ("ojo", "brillo"):
+                            piel = cc
+                            break
+                    n.m[y][x] = piel
+                elif c[0] == "brillo":
+                    n.m[y][x] = ("ojo", 2)
+    return n
+
+
+def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
+    """Gesto por defecto: levanta lo que lleva en la mano derecha (lo que hay a la derecha de «desde_x» y por debajo de
+    «desde_y», menos los pies)."""
+    n = _copia(l)
+    for x in range(desde_x, ANCHO):
+        for y in range(desde_y, 28):
+            n.m[y][x] = l.m[y + filas][x] if y + filas < 28 else None
+    return n
+
+
+## Desde qué columna (y fila) se levanta lo de la mano derecha en el gesto por defecto (para no mover picos ni orejas)
+ALZA = {"bibi": (19, 0), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
+        "kasia": (17, 0), "sungura": (19, 0)}
+
+
+def _gesto_corteza():
+    """Corteza alza el martillo por encima del hombro, y saltan chispas."""
+    l = alza_derecha(corteza(), filas=8)
+    l.px(23, 2, "brasa", 3); l.px(17, 1, "brasa", 2); l.px(22, 0, "brasa", 2)
+    return l
+
+
+def _gesto_pino():
+    """Pino saluda con la mano, muy alto."""
+    l = pino()
+    for y in range(20, 27):
+        for x in range(15, 20):
+            if l.m[y][x] and l.m[y][x][0] == "pie_seta" and x >= 16:
+                l.m[y][x] = None
+    l.ovalo(18.5, 16, 1.6, 2.4, "pie_seta")
+    l.px(19, 13, "pie_seta", 3); l.px(18, 13, "pie_seta", 2)
+    return l
+
+
+def _gesto_juncia():
+    """Juncia levanta el cucharón y sale vapor."""
+    l = alza_derecha(juncia(), filas=4)
+    for (x, y) in ((20, 7), (21, 6), (19, 5), (20, 4)):
+        l.px(x, y, "vapor", 2 + (x + y) % 2)
+    return l
+
+
+def _gesto_tawi():
+    """Tawi agita el ala."""
+    l = tawi()
+    for y in range(19, 28):
+        for x in range(1, 7):
+            if l.m[y][x] and l.m[y][x][0] == "pajaro":
+                l.m[y][x] = None
+    l.ovalo(4, 17, 2.4, 3.2, "pajaro")
+    l.px(2, 14, "pajaro", 3); l.px(3, 14, "pajaro", 3)
+    return l
+
+
+def _gesto_fuko():
+    """Fuko se sube las gafas con las dos manos (casi no ve)."""
+    l = fuko()
+    for y in range(18, 25):
+        for x in list(range(1, 8)) + list(range(17, 24)):
+            if l.m[y][x] and l.m[y][x][0] == "rosa":
+                l.m[y][x] = None
+    l.ovalo(7, 15, 2.2, 2.2, "rosa")
+    l.ovalo(17, 15, 2.2, 2.2, "rosa")
+    return l
+
+
+GESTOS = {"corteza": _gesto_corteza, "pino": _gesto_pino, "juncia": _gesto_juncia, "tawi": _gesto_tawi, "fuko": _gesto_fuko}
+
+
+def fotogramas(nombre):
+    fn = ALDEANOS[nombre]
+    base = fn()
+    gesto = GESTOS.get(nombre)
+    dx, dy = ALZA.get(nombre, (17, 0))
+    g = gesto() if gesto else alza_derecha(base, desde_x=dx, desde_y=dy)
+    return [base, respira(base), parpadea(base), g]
 
 
 ALDEANOS = {"bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
@@ -567,6 +743,11 @@ if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     destino = os.path.join(raiz, "arte", "personajes", "aldeanos")
     os.makedirs(destino, exist_ok=True)
-    for nombre, fn in ALDEANOS.items():
-        fn().save(os.path.join(destino, f"{nombre}_frente.png"))
+    for nombre in ALDEANOS:
+        fotos = fotogramas(nombre)
+        fotos[0].imagen().save(os.path.join(destino, f"{nombre}_frente.png"))
+        tira = Image.new("RGBA", (ANCHO * len(fotos), ALTO), (0, 0, 0, 0))
+        for i, f in enumerate(fotos):
+            tira.paste(f.imagen(), (i * ANCHO, 0))
+        tira.save(os.path.join(destino, f"{nombre}_anim.png"))
     print("Aldeanos dibujados en", destino)

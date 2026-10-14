@@ -116,3 +116,4 @@ se pasan.
 | Petición de Iam | Que las construcciones y los personajes sean muy detallados: «quiero que sea muy bonito visualmente» |
 | Hecho | Las 4 de Cuna de Musgo (con ruina y reconstruida) y las 8 casas de los caminos, repintadas casi al doble de tamaño con objetos de su dueño |
 | Pendiente | Interiores antiguos (casa de Pino, taller), el Gran Árbol y los personajes (aldeanos) |
+| Personajes | Pixel art mejorado (no pintados: a 24×32 salían borrosos) y animados: respiran, parpadean y tienen un gesto propio |

@@ -779,4 +779,13 @@ Todas las casas y construcciones antiguas se han repintado con el pintor de las 
 | Molino roto | `pintar_campo.py` | Torre encalada con el yeso caído, balcón, capuchón y veleta torcida, aspas con la lona en jirones, sacos y muela |
 | Granero en ruinas | `pintar_campo.py` | Hastial rojo desconchado, portón descolgado, pajar con polea, tejado hundido, gallo-veleta, carreta rota y cuervos |
 
+Los **interiores** de la casa de Pino (una seta por dentro: paredes curvas, láminas en el techo, cama de retales, el mapa de sus exploraciones, tarros de luciérnagas, la ventana redonda, el catalejo, la escalera a la trampilla, baúl y macetas) y del taller de Corteza (piedra y vigas, la forja con campana, brasas y fuelle, el carbón, el banco con dibujos de cetros, las herramientas colgadas, el barril y el suelo de losas) también están en `pintar_aldea.py`, con los muebles en el mismo sitio que antes. El Gran Árbol se queda como estaba (la prueba de repintarlo salió peor que el original).
+
 Los lienzos con algo que asoma por arriba (humo, banderines) usan `pintar_aldea._lienzo` (un lienzo alto: se dibuja con las coordenadas de siempre). Los choques de cada una están en `region.gd` (`EDIFICIOS`, `CAMPAMENTOS`, `FIJOS`).
+
+
+## Los aldeanos, con más detalle y animados
+
+Los aldeanos siguen en pixel art (24×32, el estilo de Maisha), pero con más detalle (`herramientas/dibujar_aldeanos.py`): Corteza con gafas de forja, cejas fruncidas, hollín, bolsillo con tenazas y cinto; Bibi con una flor en el musgo y el dibujo de la concha; Pino con pecas, mochilita y una hoja; Juncia con delantal manchado y pañuelo de lunares; Tawi con plumas de colores y bolsa de monedas; y retoques en los demás. Hoja con todos: `documentacion/aldeanos_animados.png`.
+
+Cada uno tiene ahora **4 fotogramas** (`<id>_anim.png`): quieto, respira (todo baja un píxel menos los pies), parpadea (los ojos se cierran solos) y **su gesto** (Corteza alza el martillo con chispas, Pino saluda, Juncia levanta el cucharón humeante, Tawi agita el ala, Fuko se sube las gafas; los demás levantan lo que llevan: el bastón, la caña, el cayado, la red, la pértiga, el remo o la mazorca). En el juego (`aldeano.gd`) respiran, parpadean cada 2,5-5 s, hacen su gesto cada 7-12 s y al empezar a hablar. `<id>_frente.png` (el primer fotograma) se sigue usando para los retratos y las estatuas. Mzee Shamba (más grande) sigue como estaba.

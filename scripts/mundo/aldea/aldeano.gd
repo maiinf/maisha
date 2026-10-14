@@ -19,6 +19,13 @@ const OSCURO := Color("140e18")
 
 var _sprite: Sprite2D
 var _tiempo := 0.0
+## Con animación (arte/personajes/aldeanos/<id>_anim.png: quieto, respira, parpadea y su gesto, de
+## herramientas/dibujar_aldeanos.py): respira, parpadea de vez en cuando y hace su gesto cada poco y al hablar
+var _animado := false
+var _parpadeo := 0.0
+var _gesto := 0.0
+var _proximo_parpadeo := 3.0
+var _proximo_gesto := 7.0
 
 
 func _ready() -> void:
@@ -33,9 +40,16 @@ func _ready() -> void:
 	sombra.set("ancho", 8.0)
 	add_child(sombra)
 	_sprite = Sprite2D.new()
-	_sprite.texture = load("res://arte/personajes/aldeanos/%s_frente.png" % id)
+	var anim := "res://arte/personajes/aldeanos/%s_anim.png" % id
+	if ResourceLoader.exists(anim):
+		_animado = true
+		_sprite.texture = load(anim)
+		_sprite.hframes = 4
+	else:
+		_sprite.texture = load("res://arte/personajes/aldeanos/%s_frente.png" % id)
 	_sprite.centered = false
-	_sprite.offset = Vector2(-_sprite.texture.get_width() / 2, -_sprite.texture.get_height())
+	var ancho := _sprite.texture.get_width() / _sprite.hframes
+	_sprite.offset = Vector2(-ancho / 2, -_sprite.texture.get_height())
 	add_child(_sprite)
 	var forma := CollisionShape2D.new()
 	forma.name = "CollisionShape2D"
@@ -49,12 +63,36 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_tiempo += delta
-	# respiración: el cuerpo se estira un píxel de vez en cuando
-	_sprite.scale.y = 1.0 + (1.0 / _sprite.texture.get_height() if fmod(_tiempo, 1.6) < 0.8 else 0.0)
+	if _animado:
+		_animar(delta)
+	else:
+		# respiración: el cuerpo se estira un píxel de vez en cuando
+		_sprite.scale.y = 1.0 + (1.0 / _sprite.texture.get_height() if fmod(_tiempo, 1.6) < 0.8 else 0.0)
 	queue_redraw()
 
 
+func _animar(delta: float) -> void:
+	_parpadeo = maxf(0.0, _parpadeo - delta)
+	_gesto = maxf(0.0, _gesto - delta)
+	_proximo_parpadeo -= delta
+	_proximo_gesto -= delta
+	if _proximo_parpadeo <= 0.0:
+		_proximo_parpadeo = randf_range(2.5, 5.0)
+		_parpadeo = 0.14
+	if _proximo_gesto <= 0.0:
+		_proximo_gesto = randf_range(7.0, 12.0)
+		_gesto = 0.9
+	if _gesto > 0.0:
+		_sprite.frame = 3
+	elif _parpadeo > 0.0:
+		_sprite.frame = 2
+	else:
+		_sprite.frame = 1 if fmod(_tiempo, 1.6) < 0.8 else 0
+
+
 func interactuar() -> void:
+	if _animado:
+		_gesto = 1.0                           # al empezar a hablar, su gesto
 	await CHARLA.hablar(self, id)
 
 
