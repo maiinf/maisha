@@ -235,6 +235,20 @@ Escena `escenas/mundo/prados_del_eco.tscn`: la primera región jugable de Raíz.
   - Los **puentes** (`=`) con agua (`~`) encima o debajo llevan barandillas de madera automáticamente.
 - Probé a pintar los árboles y rocas con el pintor (`herramientas/pintar_prados.py`), pero quedaban peor que el pixel art a mano, así que siguen los de antes. El script se queda por si sirve más adelante.
 
+## La luz: relieve, día y noche (el «2.5D»)
+
+Todo es visual: las colisiones y el movimiento siguen siendo 2D planos y no saben nada de esto (`documentacion/luz_2_5d.png`).
+
+| Qué | Cómo |
+| --- | --- |
+| Relieve | `herramientas/relieve.py --todo` calcula el «mapa de normales» de cada dibujo del mundo (`<dibujo>_n.png`: hacia dónde mira cada píxel) con un abombado a varias escalas más la claridad del pixel art. Los suelos no (su relieve es ruido y ocupaba 40 MB). Hay que relanzarlo al repintar un dibujo del mundo |
+| En el juego | `scripts/mundo/relieve.gd` (lo pone `escena_mundo.gd` en todas las escenas): cambia cada dibujo con relieve por una CanvasTexture y pone la luz |
+| Hora del día | El autoload **Reloj** (`scripts/globales/reloj.gd`): un día dura 16 minutos (día, atardecer, noche y amanecer) y se guarda con la partida. No corre hasta llegar a Cuna de Musgo (el Kitovu del principio es de día) |
+| Exteriores | De día, un sol bajo desde arriba a la izquierda; al atardecer, luz rosada; de noche, luna azulada y todo oscuro. Los rayos de sol (`luz_sol.gd`) se vuelven naranjas y se apagan de noche |
+| Luces de noche | Ventanas, faroles y fuegos de 14 edificios (tabla `LUCES`, en píxeles del dibujo; las ruinas no se encienden), los faroles de la aldea y las hogueras. Alrededor de Maisha, una luz suave para jugar de noche. Las casas abandonadas (Nungu, granero, molino) quedan a oscuras |
+| Escenas con su penumbra | Cuevas, Gruta, el amanecer del Kitovu y la casa de Shamba: el ciclo se aparta mientras dure y mandan sus luces (que también ven el relieve) |
+| Magia | `Relieve.destello(...)`: fogonazo naranja al estallar una semilla, ámbar con el Latido y verde con el golpe; se notan más cuanto más oscuro está (`Reloj.oscuridad`) |
+
 ## Raíz, mundo libre: los caminos
 
 Raíz ya no es una fila de regiones: es un mundo libre con **Cuna de Musgo** en el centro y **caminos con nombre propio** entre los lugares (sección 43 del GDD). Hechos de momento: el **Sendero del Puente**, **Las Pasarelas**, el **Camino Cobrizo** y la **Senda de los Surcos**. Los demás caminos están en el mapa, bajo la niebla, y se irán construyendo.
@@ -682,6 +696,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_combate.gd` recorre una pelea entera: aviso, cierre, golpe, mordisco y rebote, semillas contra el Corazón de Giza, purga, agotamiento, autodaño y vuelta al borde.
 - `pruebas/prueba_ropa.gd` comprueba que la ropa se pone y se quita, va delante o detrás según la dirección, sigue a la cabeza al respirar y se refleja bien.
 - `pruebas/prueba_misiones.gd` comprueba el diario (misiones que salen y se cumplen con las marcas, contadores, cuál se sigue y que se guarda), la flecha en el mundo y las acciones rápidas (tecla 4, la rueda de Tab).
+- `pruebas/prueba_luz.gd` comprueba el reloj del día (no corre hasta Cuna de Musgo, el amanecer sin saltos), el relieve de los dibujos, las ventanas que se encienden de noche y que las cuevas mantienen su propia penumbra.
 - `pruebas/prueba_artes.gd` comprueba la Esencia, los costes y efectos de las Artes, que se guardan, y meditar en el Claro de Calma (curar, mantener Acción para despertar un nivel, rasgos).
 - `pruebas/prueba_bosque.gd` abre el camino del norte, recorre el Bosque Cobrizo, parte un tronco podrido, prueba al jabalí (embestida, choque, aturdido), rescata a Tawi, vence a Pembe y arregla el puesto (mapa de Raíz).
 - `pruebas/prueba_campo.gd` abre las grandes espinas del norte (solo con los dos minijefes libres), recorre el Campo Segado, purga una zona y pelea contra la Cosechadora (capas animadas, rebota, se atasca, cada parte y lo que pasa al romperla, la Ira por etapas, el acelerón, el corazón y sus anillos) hasta que Raíz queda libre y Bibi lo nota.

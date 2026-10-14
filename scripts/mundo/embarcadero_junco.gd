@@ -73,7 +73,7 @@ func _crear_arreglo() -> void:
 	arreglo.name = "ArregloTransbordador"
 	for cuerpo in $Entidades.get_children():
 		for h in cuerpo.get_children():
-			if h is Sprite2D and (h as Sprite2D).texture and (h as Sprite2D).texture.resource_path.ends_with("transbordador.png"):
+			if h is Sprite2D and (h as Sprite2D).texture and _ruta_dibujo((h as Sprite2D).texture).ends_with("transbordador.png"):
 				arreglo.sprite = h
 				arreglo.base = (cuerpo as Node2D).global_position
 	if arreglo.sprite:
@@ -99,3 +99,10 @@ func _al_caer_fuera_de_zona() -> void:
 func _al_purgar_region() -> void:
 	await get_tree().create_timer(2.5).timeout
 	_hud.mostrar_mensaje("¡El Embarcadero Junco vuelve a oler a río y a madera mojada!")
+
+
+## La ruta del dibujo de una textura (con relieve, el dibujo va dentro de una CanvasTexture: relieve.gd)
+func _ruta_dibujo(t: Texture2D) -> String:
+	if t is CanvasTexture and (t as CanvasTexture).diffuse_texture:
+		return (t as CanvasTexture).diffuse_texture.resource_path
+	return t.resource_path

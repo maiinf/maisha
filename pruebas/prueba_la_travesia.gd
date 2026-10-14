@@ -164,7 +164,10 @@ func _ready() -> void:
 	var hoja: Node2D = null
 	for n in get_tree().get_nodes_in_group("interactuables"):
 		for h in n.get_children():
-			if h is Sprite2D and (h as Sprite2D).texture and (h as Sprite2D).texture.resource_path.ends_with("hoja_mauti.png"):
+			var t: Texture2D = (h as Sprite2D).texture if h is Sprite2D else null
+			if t is CanvasTexture:
+				t = (t as CanvasTexture).diffuse_texture   # (con relieve: scripts/mundo/relieve.gd)
+			if t and t.resource_path.ends_with("hoja_mauti.png"):
 				hoja = n
 	_comprobar(hoja != null, "debajo de la piedra plana aparece la hoja de Mauti")
 	_maisha().global_position = hoja.global_position + Vector2(-10, 4)

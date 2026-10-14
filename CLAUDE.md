@@ -36,6 +36,7 @@ Godot está en `/Applications/Godot.app/Contents/MacOS/Godot` (versión 4.7).
 | Efectos y ambientes | `crear_sonidos.py [nombres]` |
 | Música | `componer_musica.py [nombres]` |
 | Interfaz de diario | `pintar_interfaz.py`, `pintar_inicio_mesa.py` |
+| Relieve de los dibujos (luz 2.5D) | `relieve.py --todo` (relanzar al repintar un dibujo del mundo) |
 
 Para comprobar el arte, mira los PNG que salen (abrirlos con la herramienta de leer imágenes).
 
@@ -51,7 +52,7 @@ El grafo de caminos para la flecha de misiones está en `datos/misiones.json` �
 /Applications/Godot.app/Contents/MacOS/Godot --headless --import --path .
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_senda_surcos
 ```
-Hay 28 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
+Hay 29 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
 Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--headless`
 (guarda `get_viewport().get_texture().get_image()`); bórralo después.
 

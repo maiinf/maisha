@@ -77,7 +77,11 @@ func _fijos_con(dibujo: String) -> Array:
 	var r: Array = []
 	for n in get_tree().get_nodes_in_group("entidades_fijas") + get_tree().current_scene.get_node("Entidades").get_children():
 		for h in n.get_children():
-			if h is Sprite2D and h.texture and h.texture.resource_path.ends_with(dibujo):
+			# (con relieve, el dibujo va dentro de una CanvasTexture: scripts/mundo/relieve.gd)
+			var t: Texture2D = h.texture if h is Sprite2D else null
+			if t is CanvasTexture:
+				t = (t as CanvasTexture).diffuse_texture
+			if t and t.resource_path.ends_with(dibujo):
 				r.append(h)
 	return r
 

@@ -16,6 +16,7 @@ const MARGEN_GIRO := 0.15      # en diagonal, evita que el dibujo cambie de dire
 const ESCENA_SEMILLA := preload("res://scripts/combate/semilla.gd")
 const ESCENA_GOLPE := preload("res://scripts/combate/golpe_efecto.gd")
 const ESCENA_LATIDO := preload("res://scripts/combate/latido_efecto.gd")
+const RELIEVE := preload("res://scripts/mundo/relieve.gd")
 const RASGOS := preload("res://scripts/personajes/rasgos_maisha.gd")
 
 ## Hacia dónde mira: "abajo", "arriba" o "lado"
@@ -149,6 +150,7 @@ func golpear() -> void:
 	add_child(efecto)
 	if mirando == "arriba":
 		move_child(efecto, _sprite.get_index())   # de espaldas, el cetro pasa por detrás
+	RELIEVE.destello(self, direccion_mirada() * 10.0 + Vector2(0, -12), Color(0.75, 1.0, 0.6), 0.5, 0.6, 0.18)
 	# el golpe acierta en el segundo fotograma
 	get_tree().create_timer(0.07).timeout.connect(_comprobar_golpe)
 
@@ -222,6 +224,7 @@ func latido() -> bool:
 	var efecto: Node2D = ESCENA_LATIDO.new()
 	efecto.position = Vector2(0, -12)
 	add_child(efecto)
+	RELIEVE.destello(self, Vector2(0, -12), Color("e6a852"), 1.2, 0.9, 0.35)
 	if aliento < 1.0:
 		_agotarse()
 	return true

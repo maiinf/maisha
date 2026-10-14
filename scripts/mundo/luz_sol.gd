@@ -56,6 +56,11 @@ func _dibujar() -> void:
 	var frio := Color(0.55, 0.6, 0.75)
 	var color := frio.lerp(caliente, _calidez)
 	var fuerza := lerpf(0.05, 0.12, _calidez)
+	# la hora del día (Reloj): al atardecer los rayos se vuelven naranjas; de noche no hay
+	color = color.lerp(Color(1.0, 0.6, 0.35), Reloj.calidez() * 0.8)
+	fuerza *= Reloj.luz_dia()
+	if fuerza < 0.004:
+		return
 	var inclina := Vector2(150, tam.y + 40)          # los rayos bajan hacia la derecha
 	for i in RAYOS:
 		var fase := i * 1.7

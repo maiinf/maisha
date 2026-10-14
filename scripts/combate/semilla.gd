@@ -6,6 +6,7 @@ extends Node2D
 const R := preload("res://scripts/combate/reglas_combate.gd")
 const TEXTURA := preload("res://arte/efectos/semilla.png")
 const EXPLOSION := preload("res://scripts/combate/explosion.gd")
+const RELIEVE := preload("res://scripts/mundo/relieve.gd")
 
 var casilla := Vector2i.ZERO
 var _mecha: float = Artes.semilla_mecha()
@@ -98,6 +99,8 @@ func estallar() -> void:
 	Impacto.temblar(2.5, 0.22)
 	var cruz := casillas_de_la_cruz()
 	var padre := get_parent()
+	# un fogonazo naranja que ilumina alrededor (de noche y en las cuevas se nota mucho más)
+	RELIEVE.destello(padre, position + Vector2(0, -4), Color(1.0, 0.7, 0.35), 1.7, 1.3, 0.45)
 	for c in cruz:
 		var fx: Node2D = EXPLOSION.new()
 		fx.position = R.centro_de(c) + Vector2(0, 8)

@@ -144,3 +144,15 @@ se pasan.
 | Cetro por mundo | El Cetro-rama vale para los mundos 1 y 2; al acabar el 2, un cetro nuevo más poderoso que se sube desde 0 (se diseña más adelante; el boceto de piedra y runas gusta) |
 | Precios | 2, 3, 5, 7, 10 y 14 de Esencia por nivel (`COSTES`): llenar las tres ramas solo completando y explorando los mundos 1 y 2 al 100 %. Se ajustarán al acabar el juego, según la Esencia total |
 | Retoque (Iam) | Se veía cargado: cetro fino en todas las fases, fuera chispas del cetro, luciérnagas, el anillo de la cabeza y las motitas del aura y del remolino |
+
+### La luz: relieve, día y noche (14-10)
+| Qué | Decisión |
+| --- | --- |
+| Enfoque | El A: luces 2D con mapas de normales, sin tocar colisiones ni movimiento (el 3D se descartó por coste) |
+| Prueba | De día casi no se nota (el arte ya lleva su luz pintada); al atardecer y de noche sí: por eso se usa con un ciclo de día y noche |
+| Día y noche | 16 minutos por día, en todos los exteriores, guardado con la partida; empieza al llegar a Cuna de Musgo |
+| Noche | Oscura y azulada, con ventanas, faroles y hogueras encendidas y una luz suave alrededor de Maisha para poder jugar |
+| Cuevas | Mantienen su penumbra; el ciclo se aparta |
+| Magia | Fogonazos de luz al estallar semillas, con el Latido y al golpear |
+| Suelos | Sin relieve (40 MB de ruido y apenas se notaba) |
+

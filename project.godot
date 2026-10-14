@@ -28,6 +28,7 @@ Misiones="*res://scripts/globales/misiones.gd"
 Artes="*res://scripts/globales/artes.gd"
 Tienda="*res://scripts/globales/tienda.gd"
 Bestiario="*res://scripts/globales/bestiario.gd"
+Reloj="*res://scripts/globales/reloj.gd"
 
 [display]
 
