@@ -26,6 +26,10 @@ const ABRIR_DURA := 1.3                   # lo que tarda el diario en abrirse
 const LINEA_DURA := 2.6                   # cada línea de la introducción
 const LETRAS_SEG := 26.0                  # letras por segundo de la pluma
 const INTRO := ["Silencio.", "Bajo la tierra gris, algo sigue latiendo.", "Despierta."]
+## La tinta de la introducción: clara (las páginas son de cielo de noche), como en el diario del juego
+const TINTA_CLARA := Color("efe6cf")
+const TINTA_SUAVE := Color("e2e2f6")
+const TINTA_ROJA := Color("f2a07a")
 const PAG_IZQ := Rect2(38, 48, 272, 282)
 const PAG_DER := Rect2(332, 48, 270, 282)
 
@@ -370,9 +374,9 @@ func _dibujar_brillo() -> void:
 func _dibujar_intro() -> void:
 	var izq := PAG_IZQ
 	var titulo := "Lo primero que recuerdo"
-	_lienzo.draw_string(_fuente, izq.position + Vector2(22, 34), titulo, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PIEL.ROJO)
+	_letra(titulo, izq.position + Vector2(22, 34), TINTA_ROJA)
 	var ancho_t := _fuente.get_string_size(titulo, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-	PIEL.raya(_lienzo, izq.position + Vector2(20, 40), izq.position + Vector2(24 + ancho_t, 40), PIEL.ROJO, 0.5)
+	PIEL.raya(_lienzo, izq.position + Vector2(20, 40), izq.position + Vector2(24 + ancho_t, 40), TINTA_ROJA, 0.7)
 	var y := izq.position.y + 74
 	var hechas := INTRO.size() if _intro == -2 else _intro
 	for i in mini(hechas + 1, INTRO.size()):
@@ -387,20 +391,20 @@ func _dibujar_intro() -> void:
 	# la tierra: unas rayas cortas a mano
 	for k in 7:
 		var x := -70.0 + k * 22.0
-		PIEL.raya(_lienzo, s + Vector2(x, 16 + (k % 2) * 2), s + Vector2(x + 14, 16 + (k % 2) * 2), PIEL.TINTA_SUAVE, 0.45)
+		PIEL.raya(_lienzo, s + Vector2(x, 16 + (k % 2) * 2), s + Vector2(x + 14, 16 + (k % 2) * 2), TINTA_SUAVE, 0.6)
 	# la semilla, con su sombreado de rayitas
 	var semilla := PackedVector2Array()
 	for i in 21:
 		var a := TAU * i / 20.0
 		semilla.append(s + Vector2(cos(a) * 22.0, sin(a) * 13.0))
-	_lienzo.draw_polyline(semilla, Color(PIEL.TINTA, 0.85), 2.0)
+	_lienzo.draw_polyline(semilla, Color(TINTA_CLARA, 0.9), 2.0)
 	for k in 5:
 		var x := 2.0 + k * 3.5
-		_lienzo.draw_line(s + Vector2(x, -10 + k * 1.5), s + Vector2(x - 6, 10 - k * 0.5), Color(PIEL.TINTA_SUAVE, 0.5), 1.0)
+		_lienzo.draw_line(s + Vector2(x, -10 + k * 1.5), s + Vector2(x - 6, 10 - k * 0.5), Color(TINTA_SUAVE, 0.6), 1.0)
 	# las raíces, que bajan primero
 	var raiz := clampf(avance / 0.35, 0.0, 1.0)
 	for r: Vector2 in [Vector2(-14, 34), Vector2(2, 42), Vector2(16, 30)]:
-		_trazo_tinta(s + Vector2(r.x * 0.3, 11), s + Vector2(r.x * 0.3, 11) + (r - Vector2(r.x * 0.3, 11)) * raiz, PIEL.TINTA_SUAVE, 1.0)
+		_trazo_tinta(s + Vector2(r.x * 0.3, 11), s + Vector2(r.x * 0.3, 11) + (r - Vector2(r.x * 0.3, 11)) * raiz, TINTA_SUAVE, 1.0)
 	# el tallo y las dos primeras hojas
 	if avance > 0.2:
 		var tallo := clampf((avance - 0.2) / 0.45, 0.0, 1.0)
@@ -422,9 +426,9 @@ func _dibujar_intro() -> void:
 	if avance >= 1.0:
 		var nota := "lo que encontré al despertar"
 		var w := _fuente.get_string_size(nota, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-		_lienzo.draw_string(_fuente, Vector2(round(PAG_DER.get_center().x - w / 2.0), s.y + 62), nota, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(PIEL.TINTA_APAGADA, 0.9))
+		_letra(nota, Vector2(round(PAG_DER.get_center().x - w / 2.0), s.y + 62), TINTA_SUAVE)
 	# la fecha, como en un diario
-	_lienzo.draw_string(_fuente, PAG_DER.position + Vector2(PAG_DER.size.x - 70, 34), "día uno", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PIEL.TINTA_SUAVE)
+	_letra("día uno", PAG_DER.position + Vector2(PAG_DER.size.x - 70, 34), TINTA_SUAVE)
 
 
 ## Una raya de tinta gruesa entre dos puntos
@@ -441,13 +445,20 @@ func _escribir(texto: String, pos: Vector2, ancho: float) -> float:
 	for palabra in texto.split(" "):
 		var prueba := palabra if renglon == "" else renglon + " " + palabra
 		if renglon != "" and _fuente.get_string_size(prueba, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x > ancho:
-			_lienzo.draw_string(_fuente, Vector2(pos.x, y), renglon, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PIEL.TINTA)
+			_letra(renglon, Vector2(pos.x, y), TINTA_CLARA)
 			y += 20
 			renglon = palabra
 		else:
 			renglon = prueba
-	_lienzo.draw_string(_fuente, Vector2(pos.x, y), renglon, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PIEL.TINTA)
+	_letra(renglon, Vector2(pos.x, y), TINTA_CLARA)
 	return y - pos.y + 20
+
+
+## Letra clara con contorno oscuro (las páginas del diario son de cielo de noche: la tinta oscura no se vería)
+func _letra(texto: String, pos: Vector2, color: Color) -> void:
+	_lienzo.draw_string_outline(_fuente, pos, texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, 4, Color(0.04, 0.02, 0.07, 0.95 * color.a))
+	_lienzo.draw_string(_fuente, pos + Vector2(1, 1), texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0, 0, 0, 0.7 * color.a))
+	_lienzo.draw_string(_fuente, pos, texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, color)
 
 
 func _texto(texto: String, pos: Vector2, color: Color) -> void:
