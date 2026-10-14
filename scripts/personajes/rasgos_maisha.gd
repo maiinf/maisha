@@ -3,8 +3,11 @@ extends Node2D
 ##   brote   (Raíz 3)    le crece una tercera hoja en el brote de la cabeza, con un capullo
 ##   flores  (Raíz 6)    florecillas por el cuerpo
 ##   aura    (Aliento 3) una luz suave que la rodea y respira
+##   motas   (Aliento 4) más motas de luz que suben alrededor
+##   brillo  (Aliento 5) destellos de cuatro puntas que se encienden en el aura
 ##   brisa   (Aliento 6) el cuerpo se vuelve un poco transparente y deja una estela al moverse
 ## La hoja se coloca sola encima de la cabeza en cualquier animación: busca el píxel más alto del dibujo.
+## Qué rasgos se ven lo decide Artes.aspecto(). Con «niveles» se pueden enseñar otros (la vista previa del diario).
 
 const HOJA := Color("6fbf4a")
 const HOJA_CLARA := Color("b8e08a")
@@ -19,6 +22,7 @@ var _tiempo := 0.0
 var _rasgos: Array = []
 var _estela: Array[Dictionary] = []
 var _ultima := Vector2.ZERO
+var niveles: Dictionary = {}     # vacío = los niveles de verdad de Maisha
 
 
 func _ready() -> void:
@@ -39,7 +43,7 @@ func _ready() -> void:
 
 
 func _actualizar() -> void:
-	_rasgos = Artes.rasgos()
+	_rasgos = Artes.aspecto(niveles)["rasgos"]
 	if _sprite:
 		_sprite.self_modulate.a = 0.78 if "brisa" in _rasgos else 1.0
 
@@ -128,7 +132,7 @@ func _dibujar_brote() -> void:
 	# capullo que late
 	var brillo := 0.6 + 0.4 * sin(_tiempo * 3.0)
 	_pixel(h + Vector2(0, -2), Color(CENTRO_FLOR, brillo))
-	draw_circle(h + Vector2(0.5, -1.5), 2.5, Color(1.0, 0.95, 0.6, 0.12 * brillo))
+	draw_circle(h + Vector2(0.5, -1.5), 1.6, Color(1.0, 0.95, 0.6, 0.1 * brillo))
 
 
 ## Florecillas por el cuerpo (siguen el lado hacia el que mira)
@@ -154,8 +158,23 @@ func _dibujar_aura() -> void:
 	var c := Vector2(0, -15)
 	for i in 4:
 		_aura.draw_circle(c, 9.0 + i * 4.0 + pulso * 2.0, Color(0.55, 0.8, 1.0, 0.05 + 0.02 * pulso))
-	# motitas que suben alrededor
-	for i in 5:
-		var a := _tiempo * 0.9 + i * TAU / 5.0
+	# motitas que suben alrededor (con «motas», el doble y más lejos)
+	var motas := 10 if "motas" in _rasgos else 5
+	for i in motas:
+		var a := _tiempo * 0.9 + i * TAU / motas
 		var y := -fposmod(_tiempo * 9.0 + i * 7.0, 26.0)
-		_aura.draw_circle(Vector2(cos(a) * 10.0, y), 0.8, Color(0.8, 0.95, 1.0, 0.5 * (1.0 + y / 26.0)))
+		var ancho := 13.0 if i % 2 else 10.0
+		_aura.draw_circle(Vector2(cos(a) * ancho, y), 0.8 if i % 3 else 1.1, Color(0.8, 0.95, 1.0, 0.5 * (1.0 + y / 26.0)))
+	# destellos de cuatro puntas que se encienden y se apagan
+	if "brillo" in _rasgos:
+		for i in 3:
+			var vida := fposmod(_tiempo * 0.8 + i / 3.0, 1.0)
+			var ronda := floori(_tiempo * 0.8 + i / 3.0)
+			var semilla := float((ronda * 7 + i * 13) % 17) / 17.0
+			var p := Vector2(-12.0 + 24.0 * semilla, -26.0 + 22.0 * fposmod(semilla * 3.7, 1.0))
+			var luz := sin(vida * PI)
+			var largo := 0.5 + 1.5 * luz
+			var col := Color(1.0, 0.97, 0.8, 0.85 * luz)
+			_aura.draw_line(p - Vector2(largo, 0), p + Vector2(largo, 0), col, 1.0)
+			_aura.draw_line(p - Vector2(0, largo), p + Vector2(0, largo), col, 1.0)
+			_aura.draw_rect(Rect2(p - Vector2(0.5, 0.5), Vector2.ONE), Color(1, 1, 1, luz))

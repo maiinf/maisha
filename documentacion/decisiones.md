@@ -124,3 +124,13 @@ se pasan.
 | Lo robótico | Explicaciones de manual (Esencia, zonas corruptas), recuentos de recado («Tienes X de Y») e indicaciones de mapa |
 | Hecho | 28 frases reescritas con la voz de cada personaje (Bibi, Pino, Corteza, Tawi, Shamba, Msafiri, Korongo, Fuko, Sungura); las teclas solo se nombran en el tutorial de Shamba |
 | Sin género | Fuera los «pequeño brote» de Bibi (ahora «brotecito») y el «pequeña» del segundo eco (ahora «lucecita») |
+
+### Artes visuales y Maisha en grande (14-10)
+| Qué | Decisión |
+| --- | --- |
+| Petición de Iam | Que las habilidades mejoren a Maisha por fuera (ropa, cetro, magia) y verlo antes de comprarlo, con el personaje entero |
+| Cada nivel | Un cambio visible por nivel en las 3 ramas (brazaletes → flores; cinta → Cetro del Primer Árbol; bufanda → cuerpo de brisa) |
+| El cetro | 6 versiones nuevas, algo más grandes (12×20) y con más detalle; también en el golpe |
+| La tienda | La ropa elegida en la mochila manda en su zona; las Artes rellenan las zonas libres |
+| Pantalla | Maisha ×4 sobre un tocón a la izquierda, árbol algo más pequeño a la derecha; vista previa sobre los nodos sin despertar y F para ver antes/después |
+| 2.5D (idea) | Más adelante, probar luces 2D con mapas de normales en una zona (sin tocar colisiones ni movimiento) |

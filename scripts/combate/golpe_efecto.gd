@@ -2,14 +2,16 @@ extends Node2D
 ## Efecto del GOLPE: el cetro describe un arco delante de Maisha y deja una estela de hojas.
 ## Se dibuja píxel a píxel para que la estela quede nítida.
 
-const CETRO := preload("res://arte/personajes/maisha/prendas/cetro_raiz.png")
-const AGARRE := Vector2(3, 13)   # punto del dibujo del cetro que sujeta la mano
+const AGARRE := Vector2(3, 13)   # punto del dibujo del cetro-rama que sujeta la mano
+const AGARRE_ARTES := Vector2(5, 15)   # el mismo punto en los cetros del Arte del Cetro (cetro_1 ... cetro_6)
 const DURACION := 0.2
 const RADIO := 16.0
 const ARCO := 140.0              # grados que recorre el golpe
 
 var direccion := Vector2.RIGHT
 var con_cetro := true
+var cetro := "cetro_raiz"        # qué cetro lleva (la prenda de la zona «arma»)
+var _textura: Texture2D
 var _tiempo := 0.0
 var _inicio := 0.0
 var _giro := 1.0
@@ -20,6 +22,7 @@ const LUZ := Color("fff3c4")
 
 
 func _ready() -> void:
+	_textura = load("res://arte/personajes/maisha/prendas/%s.png" % cetro)
 	position = Vector2(0, -12)
 	var base := rad_to_deg(direccion.angle())
 	# hacia la izquierda el arco gira al revés para que el golpe sea simétrico
@@ -61,5 +64,5 @@ func _draw() -> void:
 	if con_cetro:
 		var a := _angulo(avance)
 		draw_set_transform(Vector2.ZERO, a + PI / 2.0, Vector2.ONE)
-		draw_texture(CETRO, -AGARRE)
+		draw_texture(_textura, -(AGARRE if cetro == "cetro_raiz" else AGARRE_ARTES))
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

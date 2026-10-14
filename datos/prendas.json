@@ -167,5 +167,441 @@
     }
    ]
   }
+ },
+ "cetro_1": {
+  "nombre": "Cetro (Arte del Cetro 1)",
+  "zona": "arma",
+  "arte": "cetro",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_1.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_1.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_1.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "cetro_2": {
+  "nombre": "Cetro (Arte del Cetro 2)",
+  "zona": "arma",
+  "arte": "cetro",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_2.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_2.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_2.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "cetro_3": {
+  "nombre": "Cetro (Arte del Cetro 3)",
+  "zona": "arma",
+  "arte": "cetro",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_3.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_3.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_3.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "cetro_4": {
+  "nombre": "Cetro (Arte del Cetro 4)",
+  "zona": "arma",
+  "arte": "cetro",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_4.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_4.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_4.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "cetro_5": {
+  "nombre": "Cetro (Arte del Cetro 5)",
+  "zona": "arma",
+  "arte": "cetro",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_5.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_5.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_5.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "cetro_6": {
+  "nombre": "Cetro (Arte del Cetro 6)",
+  "zona": "arma",
+  "arte": "cetro",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_6.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_6.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/cetro_6.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -11
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "brazaletes_raiz": {
+  "nombre": "Brazaletes de raíz",
+  "zona": "brazos",
+  "arte": "raiz",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/brazalete_raiz.png",
+     "ancla": "brazo_izq",
+     "desplazamiento": [
+      0,
+      3
+     ],
+     "delante": true
+    },
+    {
+     "textura": "res://arte/personajes/maisha/prendas/brazalete_raiz.png",
+     "ancla": "brazo_der",
+     "desplazamiento": [
+      -1,
+      3
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/brazalete_raiz.png",
+     "ancla": "brazo_izq",
+     "desplazamiento": [
+      0,
+      3
+     ],
+     "delante": true
+    },
+    {
+     "textura": "res://arte/personajes/maisha/prendas/brazalete_raiz.png",
+     "ancla": "brazo_der",
+     "desplazamiento": [
+      -1,
+      3
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/brazalete_raiz.png",
+     "ancla": "brazo",
+     "desplazamiento": [
+      -1,
+      2
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "brazaletes_hoja": {
+  "nombre": "Brazaletes de raíz con hoja",
+  "zona": "brazos",
+  "arte": "raiz",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/brazalete_hoja.png",
+     "ancla": "brazo_izq",
+     "desplazamiento": [
+      0,
+      2
+     ],
+     "delante": true
+    },
+    {
+     "textura": "res://arte/personajes/maisha/prendas/brazalete_hoja.png",
+     "ancla": "brazo_der",
+     "desplazamiento": [
+      -1,
+      2
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/brazalete_hoja.png",
+     "ancla": "brazo_izq",
+     "desplazamiento": [
+      0,
+      2
+     ],
+     "delante": true
+    },
+    {
+     "textura": "res://arte/personajes/maisha/prendas/brazalete_hoja.png",
+     "ancla": "brazo_der",
+     "desplazamiento": [
+      -1,
+      2
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/brazalete_hoja.png",
+     "ancla": "brazo",
+     "desplazamiento": [
+      -1,
+      1
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "bufanda_brisa": {
+  "nombre": "Bufanda de brisa",
+  "zona": "torso",
+  "arte": "aliento",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/bufanda_brisa_abajo.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -1,
+      -1
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/bufanda_brisa_arriba.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -1,
+      -1
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/bufanda_brisa_lado.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -2,
+      -1
+     ],
+     "delante": true
+    }
+   ]
+  }
+ },
+ "bufanda_viento": {
+  "nombre": "Bufanda de viento",
+  "zona": "torso",
+  "arte": "aliento",
+  "piezas": {
+   "abajo": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/bufanda_viento_abajo.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -1,
+      -1
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/bufanda_viento_arriba.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -1,
+      -1
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "textura": "res://arte/personajes/maisha/prendas/bufanda_viento_lado.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -8,
+      -1
+     ],
+     "delante": true
+    }
+   ]
+  }
  }
 }

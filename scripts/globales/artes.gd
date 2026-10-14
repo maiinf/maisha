@@ -11,6 +11,7 @@ extends Node
 ##   Artes.subir("raiz")        sube un nivel si hay Esencia (true si ha subido)
 ##   Artes.valor("semilla_coste")   suma de ese efecto en los niveles conseguidos
 ##   Artes.semilla_coste() ...  los números del combate ya con las Artes aplicadas
+##   Artes.aspecto()            lo que se le VE a Maisha con sus niveles (o con otros: la vista previa del diario)
 
 signal esencia_ganada(cantidad: int, motivo: String)
 signal arte_subida(id: String, nivel: int)
@@ -160,6 +161,47 @@ func rasgos() -> Array:
 
 func tiene_rasgo(rasgo: String) -> bool:
 	return rasgo in rasgos()
+
+
+# --- Lo que se le ve a Maisha ----------------------------------------------------------
+
+## Lo que cambia por fuera cada nivel de cada rama (para la vista previa del diario)
+const CAMBIO_VISIBLE := {
+	"raiz": ["Brazaletes de raíz", "A los brazaletes les brota una hoja", "Una hoja nueva con capullo",
+		"Corona de hojas", "Capa de musgo", "Flores por todo el cuerpo"],
+	"cetro": ["Una cinta verde en el cetro", "Una gema más grande", "Cetro de corteza de roble",
+		"Hojas de cobre", "Gema dorada con chispas", "El Cetro del Primer Árbol"],
+	"aliento": ["Bufanda de brisa", "La bufanda se alarga y vuela", "Un aura de luz",
+		"Motas de luz alrededor", "Destellos en el aura", "Cuerpo de brisa"],
+}
+
+
+## Lo que se le ve a Maisha con unos niveles (los que falten, los suyos):
+##   "prendas": ropa por capas que dan las Artes (brazaletes, corona, capa, bufanda)
+##   "cetro":   el dibujo del cetro que lleva en la mano
+##   "rasgos":  lo que pinta rasgos_maisha.gd (brote, flores, aura, motas, brillo, brisa)
+func aspecto(niveles: Dictionary = {}) -> Dictionary:
+	var r := int(niveles.get("raiz", nivel("raiz")))
+	var c := int(niveles.get("cetro", nivel("cetro")))
+	var a := int(niveles.get("aliento", nivel("aliento")))
+	var prendas := []
+	if r >= 2:
+		prendas.append("brazaletes_hoja")
+	elif r >= 1:
+		prendas.append("brazaletes_raiz")
+	if r >= 4:
+		prendas.append("corona_hojas")
+	if r >= 5:
+		prendas.append("capa_musgo")
+	if a >= 2:
+		prendas.append("bufanda_viento")
+	elif a >= 1:
+		prendas.append("bufanda_brisa")
+	var visibles := []
+	for d in [["brote", r >= 3], ["flores", r >= 6], ["aura", a >= 3], ["motas", a >= 4], ["brillo", a >= 5], ["brisa", a >= 6]]:
+		if d[1]:
+			visibles.append(d[0])
+	return {"prendas": prendas, "cetro": "cetro_%d" % c if c >= 1 else "cetro_raiz", "rasgos": visibles}
 
 
 # --- Los números del combate, con las Artes ------------------------------------------

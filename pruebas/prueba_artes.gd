@@ -134,5 +134,47 @@ func _ready() -> void:
 		_comprobar(not Artes.subir("cetro") and Artes.nivel("cetro") == antes, "…un nodo grande no se despierta")
 	Estado.extra["cristales_gastados"] = 0
 
+	print("Lo que se le ve a Maisha (las Artes visuales):")
+	var asp := Artes.aspecto({"raiz": 5, "cetro": 3, "aliento": 2})
+	_comprobar(asp["prendas"] == ["brazaletes_hoja", "corona_hojas", "capa_musgo", "bufanda_viento"], "Raíz 5 y Aliento 2: brazaletes con hoja, corona, capa y bufanda larga (%s)" % [asp["prendas"]])
+	_comprobar(asp["cetro"] == "cetro_3" and "brote" in asp["rasgos"], "Cetro 3: el cetro de roble; Raíz 3+: el brote")
+	asp = Artes.aspecto({"raiz": 0, "cetro": 0, "aliento": 6})
+	_comprobar(asp["cetro"] == "cetro_raiz" and asp["rasgos"] == ["aura", "motas", "brillo", "brisa"], "Aliento 6: aura, motas, destellos y cuerpo de brisa (%s)" % [asp["rasgos"]])
+	var ropa := maisha.get_node("Ropa")
+	var puestas: Dictionary = ropa.puestas()
+	_comprobar(puestas.get("arma", "") == "cetro_%d" % Artes.nivel("cetro"), "en la mano, el cetro de su nivel (%s)" % puestas.get("arma", ""))
+	_comprobar(puestas.get("torso", "") == "bufanda_viento", "y la bufanda de viento del Aliento 3 (%s)" % puestas.get("torso", ""))
+	var niveles: Dictionary = Estado.extra.get("artes", {}).duplicate()
+	niveles["raiz"] = 4
+	Estado.extra["artes"] = niveles
+	Artes.arte_subida.emit("raiz", 4)
+	_comprobar(ropa.puestas().get("cabeza", "") == "corona_hojas", "Raíz 4: la corona de hojas")
+	var compradas: Dictionary = Estado.extra.get("comprado", {}).duplicate()
+	compradas["sombrero_paja"] = 1
+	Estado.extra["comprado"] = compradas
+	Tienda.poner_prenda("sombrero_paja", true)
+	_comprobar(ropa.puestas().get("cabeza", "") == "sombrero_paja", "lo que se pone desde la mochila manda en su zona")
+	Tienda.poner_prenda("sombrero_paja", false)
+	_comprobar(ropa.puestas().get("cabeza", "") == "corona_hojas", "y al quitárselo vuelve la corona de la Raíz")
+	var golpe: Node2D = load("res://scripts/combate/golpe_efecto.gd").new()
+	golpe.cetro = "cetro_6"
+	maisha.add_child(golpe)
+	_comprobar(golpe.get("_textura") != null, "el golpe gira el cetro que se lleva (también el del Primer Árbol)")
+	var diario := get_tree().get_first_node_in_group("mochila")
+	diario.abrir(diario.P_HABILIDADES)
+	await _esperar(0.6)
+	diario.set("_rama", 0)
+	diario.set("_nodo", 6)
+	await _esperar(0.2)
+	var muneco_ropa: Node = diario.get("_muneco_ropa")
+	_comprobar(diario.get("_muneco").visible and muneco_ropa.puestas().get("espalda", "") == "capa_musgo", "en Habilidades, sobre Raíz VI, Maisha en grande se ve con la capa de musgo")
+	_comprobar("flores" in Artes.aspecto(diario.get("_muneco_rasgos").get("niveles"))["rasgos"], "y con las flores")
+	diario.set("_ver_antes", true)
+	await _esperar(0.2)
+	_comprobar(not muneco_ropa.puestas().has("espalda"), "con F se ve otra vez cómo es ahora (sin capa)")
+	diario.cerrar()
+	await _esperar(0.5)
+	_comprobar(not diario.get("_muneco").visible, "al cerrar el diario, Maisha en grande desaparece")
+
 	print("RESULTADO: ", "todo correcto" if _fallos == 0 else "%d fallos" % _fallos)
 	get_tree().quit(_fallos)

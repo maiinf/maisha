@@ -201,7 +201,16 @@ Así mejora Maisha (el GDD ya lo tenía pensado: reparto libre de Esencia, sin n
 | **Aliento** (Vida, Aliento, Latido) | Pulmón de brisa (110) · Respirar hondo (+15 %) · **Aura suave** (+1 hoja de Vida) · Latido amplio · Golpe que respira · **Cuerpo de brisa** (+1 hoja, 125) |
 | Runa · Tierra | Dormidas: despiertan en Sigilia y en Asterhaul |
 
-- Los niveles en **negrita** cambian a Maisha por fuera (`scripts/personajes/rasgos_maisha.gd`): una tercera hoja con un capullo en el brote, florecillas, un aura que respira, cuerpo casi transparente con estela.
+- **Cada nivel cambia a Maisha por fuera** (`Artes.aspecto()` decide qué se ve; `documentacion/boceto_artes_visuales.png`):
+
+| Rama | 1 | 2 | 3 | 4 | 5 | 6 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Raíz | Brazaletes de raíz | Les brota una hoja | Hoja nueva con capullo | Corona de hojas | Capa de musgo | Flores por el cuerpo |
+| Cetro | Cinta verde | Gema más grande | Cetro de corteza de roble | Hojas de cobre | Gema dorada con chispas | Cetro del Primer Árbol (dorado) |
+| Aliento | Bufanda de brisa | Bufanda larga que vuela | Aura de luz | Más motas de luz | Destellos | Cuerpo de brisa con estela |
+
+  Las prendas (brazaletes, bufandas y los 6 cetros, `cetro_1`…`cetro_6` de 12×20) las dibuja `herramientas/dibujar_prendas.py` y se ponen con la ropa por capas (`ropa_maisha.vestir_artes`): solo ocupan las zonas libres, **lo que Maisha se pone desde la mochila manda** (con el sombrero de paja puesto no se ve la corona de la Raíz). El golpe gira el cetro que se lleva. Lo dibujado (brote, flores, aura, motas, destellos, brisa) está en `rasgos_maisha.gd`.
+- **Maisha en grande en Habilidades**: a la izquierda del árbol, sobre un tocón, Maisha a tamaño ×4 se da la vuelta despacio (frente, lado, espalda). Sobre un nivel **sin despertar** se ve **cómo quedaría** («Con Cetro III», halo del color de la rama y lo que cambia debajo); **F** alterna entre ahora y después. Es la misma Maisha del juego (sus animaciones, `ropa_maisha.gd` y `rasgos_maisha.gd` con `niveles` de prueba).
 - En todo Raíz se consiguen 43 de Esencia (y 2 más en las islas de la ciénaga, más adelante); antes del jefe final, unas 36. Llevar las dos Artes al máximo cuesta 42: durante el mundo hay que elegir, y al vencer a la Cosechadora se llega casi a todo. Las Artes de Runa y Tierra despiertan en otros mundos.
 - Para cambiar números o añadir niveles: `datos/artes.json` (dentro explica cada efecto).
 

@@ -102,6 +102,17 @@ const ALTO_FILA := 26
 const ARBOL_RAMAS := preload("res://arte/interfaz/diario/arbol_ramas.png")
 const NODOS_ICONOS := preload("res://arte/interfaz/diario/nodos.png")
 const RAMAS_ARBOL := ["raiz", "cetro", "aliento"]
+## El árbol se dibuja algo más pequeño y a la derecha, para dejar sitio a Maisha (NODOS_ARBOL va en las medidas del dibujo)
+const ARBOL_ESCALA := 0.8
+const ARBOL_DESPL := Vector2(142, 34)
+## MAISHA EN GRANDE (a la izquierda del árbol): cómo se ve ahora y, sobre un nodo sin despertar, cómo se vería
+const PANEL_MAISHA := Rect2(10, 34, 158, 296)
+const MUNECO_PIE := Vector2(86, 236)  # dónde pisa Maisha (en el pedestal)
+const MUNECO_ESCALA := 4.0
+const MUNECO_GIRO := 2.6              # segundos mirando a cada lado
+const ANIMACIONES_MAISHA := "res://arte/personajes/maisha/maisha_animaciones.tres"
+const ROPA_MAISHA := preload("res://scripts/personajes/ropa_maisha.gd")
+const RASGOS_MAISHA := preload("res://scripts/personajes/rasgos_maisha.gd")
 const NODOS_ARBOL := {
 	"raiz": [Vector2(262, 236), Vector2(220, 222), Vector2(182, 204), Vector2(150, 180), Vector2(124, 152), Vector2(104, 120), Vector2(92, 84)],
 	"cetro": [Vector2(320, 214), Vector2(320, 186), Vector2(320, 160), Vector2(320, 134), Vector2(320, 108), Vector2(320, 84), Vector2(320, 60)],
@@ -159,6 +170,14 @@ var _nodo := 0                   # y el nodo de esa rama (0 = la habilidad bási
 var _mantenido := 0.0            # cuánto se lleva manteniendo Acción sobre el nodo
 var _soltar := false             # tras despertar un nodo, hay que soltar Acción antes de otro
 var _destello_nodo := 0.0
+var _muneco: Node2D               # Maisha en grande (con su ropa por capas y sus rasgos)
+var _muneco_sprite: AnimatedSprite2D
+var _muneco_ropa: Node2D
+var _muneco_rasgos: Node2D
+var _muneco_clave := ""           # lo que lleva puesto ahora el muñeco (para no rehacerlo cada fotograma)
+var _muneco_giro := 0.0
+var _ver_antes := false           # con F: alterna entre cómo es ahora y cómo sería
+var _destello_muneco := 0.0
 var _lienzo: Control
 var _fuente: FontFile
 var _tiempo := 0.0
@@ -191,6 +210,7 @@ func _ready() -> void:
 	_lienzo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_lienzo.draw.connect(_dibujar)
 	add_child(_lienzo)
+	_crear_muneco()
 	visible = false
 
 
@@ -217,6 +237,9 @@ func _process(delta: float) -> void:
 	_tiempo += delta
 	_rueda_alfa = move_toward(_rueda_alfa, 1.0 if rueda else 0.0, delta * 8.0)
 	_pagina = minf(1.0, _pagina + delta / PAGINA_DURA)
+	_muneco.visible = (abierta or _cerrando) and pestana == P_HABILIDADES and not rueda
+	_muneco.position = MUNECO_PIE + Vector2(0, _desplaz_y())   # sube con la bolsa al abrirse
+	_muneco.modulate.a = clampf((_abre - 0.45) / 0.55, 0.0, 1.0)
 	if _cerrando:
 		_abre = maxf(0.0, _abre - delta / (ABRIR_DURA * 0.6))
 		_lienzo.queue_redraw()
@@ -254,6 +277,7 @@ func _process(delta: float) -> void:
 		return
 	if pestana == P_HABILIDADES:
 		_mover_arbol(delta)
+		_actualizar_muneco(delta)
 		return
 	if Input.is_action_just_pressed("mover_derecha") or Input.is_action_just_pressed("ui_right"):
 		_ir_a_pestana((pestana + 1) % PESTANAS.size())
@@ -495,8 +519,8 @@ func _titulo(texto: String, pos: Vector2, color: Color, ancho_raya := 0.0) -> vo
 	PIEL.raya(_lienzo, pos + Vector2(0, 6), pos + Vector2(ancho, 5), color, 0.5)
 
 
-func _ancho(texto: String) -> float:
-	return _fuente.get_string_size(texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+func _ancho(texto: String, tam := 16) -> float:
+	return _fuente.get_string_size(texto, HORIZONTAL_ALIGNMENT_LEFT, -1, tam).x
 
 
 ## Texto en varias líneas dentro de un ancho. Devuelve la y de debajo de la última línea.
@@ -1100,6 +1124,10 @@ func _mover_arbol(delta: float) -> void:
 	if Vector2i(_rama, _nodo) != antes:
 		Sonido.efecto("menu_mover")
 		_mantenido = 0.0
+		_ver_antes = false
+	if Input.is_action_just_pressed("usar") and _hay_vista_previa():
+		_ver_antes = not _ver_antes
+		Sonido.efecto("menu_mover")
 	# mantener Acción sobre el siguiente nodo (si se puede pagar) lo despierta
 	var id: String = RAMAS_ARBOL[_rama]
 	if _soltar:
@@ -1130,7 +1158,7 @@ func _estado_nodo(id: String, i: int) -> String:
 
 
 func _dibujar_arbol(tinta: float) -> void:
-	_lienzo.draw_texture(ARBOL_RAMAS, Vector2.ZERO, Color(1, 1, 1, tinta))
+	_lienzo.draw_texture_rect(ARBOL_RAMAS, Rect2(ARBOL_DESPL, ARBOL_RAMAS.get_size() * ARBOL_ESCALA), false, Color(1, 1, 1, tinta))
 	# lo despierto de cada rama brilla por encima de la madera
 	for id in RAMAS_ARBOL:
 		var pts: Array = NODOS_ARBOL[id]
@@ -1138,11 +1166,11 @@ func _dibujar_arbol(tinta: float) -> void:
 		var col: Color = COLOR_RAMA[id]
 		for i in range(0, mini(n, pts.size() - 1)):
 			var pulso := 0.55 + 0.25 * sin(_tiempo * 3.0 - i * 0.6)
-			_lienzo.draw_line(pts[i], pts[i + 1], Color(col, 0.35 * tinta), 5.0)
-			_lienzo.draw_line(pts[i], pts[i + 1], Color(col.lightened(0.4), pulso * tinta), 2.0)
+			_lienzo.draw_line(_en_arbol(pts[i]), _en_arbol(pts[i + 1]), Color(col, 0.35 * tinta), 4.0)
+			_lienzo.draw_line(_en_arbol(pts[i]), _en_arbol(pts[i + 1]), Color(col.lightened(0.4), pulso * tinta), 2.0)
 	# las ramas dormidas: Runa y Tierra, en la niebla
 	for d in [[Vector2(64, 236), "Runa"], [Vector2(576, 236), "Tierra"]]:
-		var c: Vector2 = d[0]
+		var c: Vector2 = _en_arbol(d[0])
 		_lienzo.draw_circle(c, 11.0, Color(0.05, 0.06, 0.12, 0.85 * tinta))
 		_lienzo.draw_arc(c, 11.0, 0, TAU, 24, Color(0.45, 0.5, 0.7, 0.6 * tinta), 1.5)
 		_texto("?", c + Vector2(-3, 6), Color(0.6, 0.65, 0.85, 0.8 * tinta))
@@ -1152,21 +1180,26 @@ func _dibujar_arbol(tinta: float) -> void:
 		var id: String = RAMAS_ARBOL[r]
 		var pts: Array = NODOS_ARBOL[id]
 		for i in pts.size():
-			_dibujar_nodo(id, i, pts[i], tinta, r == _rama and i == _nodo)
+			_dibujar_nodo(id, i, _en_arbol(pts[i]), tinta, r == _rama and i == _nodo)
 		# el nombre de la rama, encima de su último nodo, con lo que lleva despierto
-		var arriba: Vector2 = pts[pts.size() - 1]
+		var arriba: Vector2 = _en_arbol(pts[pts.size() - 1])
 		var nombre: String = NOMBRE_RAMA[id] + "  %d/%d" % [Artes.nivel(id), Artes.nivel_maximo(id)]
 		# (al lado del último nodo: Raíz y Cetro a su derecha, Aliento a su izquierda)
-		var x_n := arriba.x - 20.0 - _ancho(nombre) if id == "aliento" else arriba.x + 20.0
+		var x_n := arriba.x - 18.0 - _ancho(nombre) if id == "aliento" else arriba.x + 18.0
 		var y_n := arriba.y + (12.0 if id == "cetro" else 5.0)
 		_texto(nombre, Vector2(x_n, y_n), Color(COLOR_RAMA[id], tinta))
 	_dibujar_panel_nodo(tinta)
+	_dibujar_maisha(tinta)
+
+
+func _en_arbol(p: Vector2) -> Vector2:
+	return ARBOL_DESPL + p * ARBOL_ESCALA
 
 
 func _dibujar_nodo(id: String, i: int, p: Vector2, tinta: float, elegido: bool) -> void:
 	var estado := _estado_nodo(id, i)
 	var grande := Artes.es_grande(id, i)
-	var r := 12.0 if grande else (10.0 if i == 0 else 9.0)
+	var r := 11.0 if grande else (10.0 if i == 0 else 9.0)
 	var col: Color = COLOR_RAMA[id]
 	match estado:
 		"basica", "despierto":
@@ -1215,7 +1248,7 @@ func _dibujar_nodo(id: String, i: int, p: Vector2, tinta: float, elegido: bool) 
 
 
 func _dibujar_panel_nodo(tinta: float) -> void:
-	var caja := Rect2(46, 262, 548, 66)
+	var caja := Rect2(PANEL_MAISHA.end.x + 6, 248, 618 - PANEL_MAISHA.end.x - 6, 82)
 	_lienzo.draw_rect(caja, Color(0.04, 0.04, 0.09, 0.88 * tinta))
 	_lienzo.draw_rect(caja, Color(TN_TITULO, 0.8 * tinta), false, 1.0)
 	_lienzo.draw_rect(caja.grow(-3), Color(TN_TITULO, 0.3 * tinta), false, 1.0)
@@ -1237,7 +1270,7 @@ func _dibujar_panel_nodo(tinta: float) -> void:
 	if bool(nivel_d.get("grande", false)):
 		titulo += "  ✦"
 	_texto(titulo, Vector2(x, y), Color(col, tinta))
-	_parrafo(String(nivel_d["texto"]), Vector2(x, y + 18), caja.size.x - 200, Color(TN_TINTA, tinta), 15.0)
+	_parrafo(String(nivel_d["texto"]), Vector2(x, y + 18), caja.size.x - 196, Color(TN_TINTA, tinta), 15.0)
 	# a la derecha: lo que cuesta y si se puede
 	var estado := _estado_nodo(id, _nodo)
 	var xd := caja.end.x - 176
@@ -1270,3 +1303,140 @@ func _dibujar_panel_nodo(tinta: float) -> void:
 func _romano(n: int) -> String:
 	return ["", "I", "II", "III", "IV", "V", "VI"][clampi(n, 0, 6)]
 
+
+
+# --- Maisha en grande, con la vista previa de las Artes --------------------------------------------------
+
+## Un Maisha de muestra: el mismo dibujo animado, con su ropa por capas y sus rasgos, a tamaño grande
+func _crear_muneco() -> void:
+	_muneco = Node2D.new()
+	_muneco.name = "Muneco"
+	_muneco.scale = Vector2.ONE * MUNECO_ESCALA
+	_muneco.position = MUNECO_PIE
+	_muneco.z_index = 1
+	_muneco.visible = false
+	_muneco_sprite = AnimatedSprite2D.new()
+	_muneco_sprite.name = "Sprite"
+	_muneco_sprite.sprite_frames = load(ANIMACIONES_MAISHA)
+	_muneco_sprite.position = Vector2(0, -16)
+	_muneco.add_child(_muneco_sprite)
+	_muneco_ropa = ROPA_MAISHA.new()
+	_muneco_ropa.name = "Ropa"
+	_muneco.add_child(_muneco_ropa)
+	_muneco_rasgos = RASGOS_MAISHA.new()
+	_muneco_rasgos.name = "Rasgos"
+	_muneco.add_child(_muneco_rasgos)
+	add_child(_muneco)
+	_muneco_sprite.play("reposo_abajo")
+
+
+## ¿El nodo elegido está sin despertar? (entonces se puede ver cómo quedaría Maisha)
+func _hay_vista_previa() -> bool:
+	return _nodo > Artes.nivel(RAMAS_ARBOL[_rama])
+
+
+## Los niveles con los que se enseña a Maisha: los suyos o, en la vista previa, los del nodo elegido
+func _niveles_muneco() -> Dictionary:
+	if _hay_vista_previa() and not _ver_antes:
+		return {RAMAS_ARBOL[_rama]: _nodo}
+	return {}
+
+
+func _actualizar_muneco(delta: float) -> void:
+	_destello_muneco = maxf(0.0, _destello_muneco - delta)
+	# se da la vuelta despacio: de frente, de lado, de espaldas y del otro lado
+	_muneco_giro += delta
+	var vuelta := [["reposo_abajo", false], ["reposo_lado", false], ["reposo_arriba", false], ["reposo_lado", true]]
+	var toca: Array = vuelta[int(_muneco_giro / MUNECO_GIRO) % vuelta.size()]
+	if _muneco_sprite.animation != StringName(toca[0]):
+		_muneco_sprite.play(toca[0])
+	_muneco_sprite.flip_h = toca[1]
+	# se viste solo cuando cambia algo
+	var niveles := _niveles_muneco()
+	var previa := _hay_vista_previa() and not _ver_antes
+	var con_cetro: bool = Estado.tiene("cetro_recibido") or (previa and RAMAS_ARBOL[_rama] == "cetro")
+	var clave := "%s|%s|%s|%s|%s" % [niveles, Estado.extra.get("ropa", []), Estado.extra.get("artes", {}), con_cetro, previa]
+	if clave == _muneco_clave:
+		return
+	if _muneco_clave != "":
+		_destello_muneco = 0.45
+	_muneco_clave = clave
+	Tienda.vestir(_muneco_ropa, niveles)
+	if con_cetro:
+		_muneco_ropa.poner(String(Artes.aspecto(niveles)["cetro"]))
+	else:
+		_muneco_ropa.quitar_zona("arma")
+	_muneco_rasgos.set("niveles", niveles)
+	_muneco_rasgos.call("_actualizar")
+
+
+## El marco de Maisha: el pedestal, el muñeco (que es un nodo aparte) y lo que cambiaría
+func _dibujar_maisha(tinta: float) -> void:
+	var caja := PANEL_MAISHA
+	var id: String = RAMAS_ARBOL[_rama]
+	var col: Color = COLOR_RAMA[id]
+	var previa := _hay_vista_previa()
+	_lienzo.draw_rect(caja, Color(0.04, 0.04, 0.09, 0.88 * tinta))
+	_lienzo.draw_rect(caja, Color(TN_TITULO, 0.8 * tinta), false, 1.0)
+	_lienzo.draw_rect(caja.grow(-3), Color(TN_TITULO, 0.3 * tinta), false, 1.0)
+	var cx := caja.get_center().x
+	var titulo := "MAISHA"
+	_texto(titulo, Vector2(round(cx - _ancho(titulo) / 2.0), caja.position.y + 20), Color(TN_TITULO, tinta))
+	# lo que se está viendo: ahora o (en la vista previa) cómo sería
+	var etiqueta := "Ahora"
+	var col_etiqueta := Color(TN_SUAVE)
+	if previa and not _ver_antes:
+		etiqueta = "Con %s %s" % [NOMBRE_RAMA[id].capitalize(), _romano(_nodo)]
+		col_etiqueta = col
+	_texto(etiqueta, Vector2(round(cx - _ancho(etiqueta, 14) / 2.0), caja.position.y + 38), Color(col_etiqueta, tinta), -1, 14)
+	# el pedestal: un tocón con anillos, y un halo del color de la rama en la vista previa
+	var pie := MUNECO_PIE + Vector2(0, 4)
+	if previa and not _ver_antes:
+		var late := 0.5 + 0.5 * sin(_tiempo * 3.0)
+		for k in 3:
+			_lienzo.draw_circle(pie + Vector2(0, -60), 40.0 + k * 8.0 + late * 3.0, Color(col, (0.05 - k * 0.012) * tinta))
+	_dibujar_tocon(pie, tinta)
+	if _destello_muneco > 0.0:
+		var t := _destello_muneco / 0.45
+		_lienzo.draw_circle(pie + Vector2(0, -60), 30.0 + 40.0 * (1.0 - t), Color(col.lightened(0.6), 0.35 * t * tinta))
+	# lo que cambia por fuera, debajo
+	var y := pie.y + 30
+	if previa:
+		var cambio: String = Artes.CAMBIO_VISIBLE[id][_nodo - 1]
+		_parrafo(cambio, Vector2(caja.position.x + 10, y), caja.size.x - 20, Color(col if not _ver_antes else TN_TINTA, tinta))
+		var pista := "F  ver " + ("después" if _ver_antes else "ahora")
+		_texto(pista, Vector2(round(cx - _ancho(pista, 13) / 2.0), caja.end.y - 8), Color(TN_SUAVE, tinta), -1, 13)
+	elif _nodo > 0:
+		_parrafo("Ya lo tienes: " + String(Artes.CAMBIO_VISIBLE[id][_nodo - 1]).to_lower(), Vector2(caja.position.x + 10, y), caja.size.x - 20, Color(TN_VERDE, tinta))
+
+
+## Un tocón con anillos donde se sube Maisha
+func _dibujar_tocon(pie: Vector2, tinta: float) -> void:
+	var ancho := 46.0
+	var alto := 14.0
+	var madera := Color("5a3a20")
+	var corteza := Color("3a2414")
+	# el lado del tocón
+	_lienzo.draw_rect(Rect2(pie.x - ancho, pie.y, ancho * 2.0, alto), Color(corteza, tinta))
+	for k in 9:
+		var x := pie.x - ancho + 6 + k * 10.5
+		_lienzo.draw_line(Vector2(x, pie.y + 2), Vector2(x - 1, pie.y + alto - 1), Color(0.14, 0.08, 0.04, tinta), 1.0)
+	_dibujar_elipse(pie + Vector2(0, alto), ancho, 7.0, Color(corteza, tinta))
+	# la cara de arriba, con anillos
+	_dibujar_elipse(pie, ancho, 9.0, Color(madera, tinta))
+	_dibujar_elipse(pie, ancho * 0.72, 6.5, Color(Color("7e5430"), tinta), false)
+	_dibujar_elipse(pie, ancho * 0.45, 4.0, Color(Color("7e5430"), tinta), false)
+	_dibujar_elipse(pie, ancho, 9.0, Color(Color("a87a48"), tinta), false)
+	# la sombra de Maisha
+	_dibujar_elipse(pie + Vector2(0, -1), 22.0, 4.0, Color(0, 0, 0, 0.35 * tinta))
+
+
+func _dibujar_elipse(c: Vector2, rx: float, ry: float, color: Color, lleno := true) -> void:
+	var puntos := PackedVector2Array()
+	for k in 33:
+		var a := TAU * k / 32.0
+		puntos.append(c + Vector2(cos(a) * rx, sin(a) * ry))
+	if lleno:
+		_lienzo.draw_colored_polygon(puntos, color)
+	else:
+		_lienzo.draw_polyline(puntos, color, 1.0)

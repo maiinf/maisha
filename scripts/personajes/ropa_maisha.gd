@@ -27,6 +27,7 @@ var _capas: Array[Sprite2D] = []
 var _direccion := ""
 var _detras: Node2D               # contenedor de las piezas que van detrás de Maisha
 var _ocultas: Dictionary = {}     # zonas ocultadas un momento (p. ej. el cetro mientras se golpea)
+var _de_artes: Array = []         # prendas puestas por las Artes (no por la mochila)
 
 @onready var _sprite: AnimatedSprite2D = get_parent().get_node("Sprite")
 
@@ -88,6 +89,25 @@ func siguiente_en_zona(zona: String) -> void:
 		quitar_zona(zona)
 	else:
 		poner(opciones[i + 1])
+
+
+## Las prendas que dan las Artes (Artes.aspecto()). Solo ocupan las zonas libres:
+## lo que Maisha se ha puesto desde la mochila manda.
+func vestir_artes(lista: Array) -> void:
+	for clave in _de_artes:
+		var zona: String = _catalogo.get(clave, {}).get("zona", "")
+		if _puestas.get(zona, "") == clave:
+			_puestas.erase(zona)
+	_de_artes = []
+	for clave in lista:
+		if not _catalogo.has(clave):
+			continue
+		var zona: String = _catalogo[clave]["zona"]
+		if _puestas.has(zona):
+			continue
+		_puestas[zona] = clave
+		_de_artes.append(clave)
+	_reconstruir()
 
 
 func lleva(clave: String) -> bool:

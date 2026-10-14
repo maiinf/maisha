@@ -139,11 +139,13 @@ func golpear() -> void:
 	_espera_golpe = Artes.golpe_espera()
 	Sonido.efecto("cetro_golpe")
 	_sprite.play("golpe_" + mirando)
-	if _ropa.lleva("cetro_raiz"):
+	var cetro: String = _ropa.puestas().get("arma", "")
+	if cetro != "":
 		_ropa.ocultar_zona("arma", true)
 	var efecto: Node2D = ESCENA_GOLPE.new()
 	efecto.direccion = direccion_mirada()
-	efecto.con_cetro = _ropa.lleva("cetro_raiz")
+	efecto.con_cetro = cetro != ""
+	efecto.cetro = cetro if cetro != "" else "cetro_raiz"
 	add_child(efecto)
 	if mirando == "arriba":
 		move_child(efecto, _sprite.get_index())   # de espaldas, el cetro pasa por detrás

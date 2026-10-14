@@ -70,6 +70,7 @@ func _ready() -> void:
 	_preparar_cetro()
 	Tienda.vestir(_maisha.get_node("Ropa"))
 	Estado.marca_puesta.connect(_al_poner_marca)
+	Artes.arte_subida.connect(_al_subir_arte)
 	_hud.set("texto_ayuda", ayuda)
 	var continuando: bool = Estado.posicion_carga != null
 	_colocar_maisha()
@@ -112,7 +113,13 @@ func _preparar_cetro() -> void:
 	var tiene := Estado.tiene("cetro_recibido")
 	_maisha.set("combate_activo", combate and tiene)
 	if tiene:
-		_maisha.get_node("Ropa").poner("cetro_raiz")
+		_maisha.get_node("Ropa").poner(String(Artes.aspecto()["cetro"]))
+
+
+## Al despertar un Arte (o al olvidarlas) cambia lo que se le ve: el cetro, la ropa de las Artes...
+func _al_subir_arte(_id: String, _nivel: int) -> void:
+	_preparar_cetro()
+	Tienda.vestir(_maisha.get_node("Ropa"))
 
 
 func _al_poner_marca(marca: String) -> void:

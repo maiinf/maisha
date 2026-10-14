@@ -175,11 +175,13 @@ func zona_de(id: String) -> String:
 	return String(_prendas.get(id, {}).get("zona", id))
 
 
-## Viste a Maisha con lo que lleva puesto (se llama al empezar cada escena)
-func vestir(ropa: Node) -> void:
+## Viste a Maisha: la ropa elegida en la mochila y, en las zonas que quedan libres, lo que dan las Artes
+## (con otros niveles si se pasan: la vista previa del diario)
+func vestir(ropa: Node, niveles: Dictionary = {}) -> void:
 	for a in prendas_compradas():
 		var id := String(a["id"])
 		if lleva(id):
 			ropa.call("poner", id)
 		elif ropa.call("lleva", id):
 			ropa.call("quitar_zona", zona_de(id))
+	ropa.call("vestir_artes", Artes.aspecto(niveles)["prendas"])
