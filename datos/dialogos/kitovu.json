@@ -105,7 +105,7 @@
 				"lineas": [
 					"[sonrisa] ¡Buenos días! Has dormido como un tronco. Kuku no se ha separado de la puerta en toda la noche.",
 					"Oye, estoy viejo y el huerto no se cuida solo. ¿Me echas una pata?",
-					"Arranca cinco zanahorias del huerto. Acércate a cada una y pulsa Acción."
+					"¿Me arrancas cinco zanahorias del huerto? Ponte al lado de cada una, pulsa Acción y tira con ganas."
 				],
 				"aviso": "Tarea: arranca 5 zanahorias · Tab abre la mochila"
 			},
@@ -139,8 +139,8 @@
 				],
 				"lineas": [
 					"[sonrisa] ¡Cinco zanahorias, y ninguna rota! Tienes buenas manos.",
-					"Ahora, la cena. En el estanque aún quedan peces. Acércate a la orilla, pulsa Acción y espera a que piquen.",
-					"Cuando el pez esté dentro de la zona verde, ¡tira! Pulsa Acción en el momento justo."
+					"Ahora, la cena. En el estanque aún quedan peces. Ponte en la orilla, echa el sedal con Acción y ten paciencia: los peces de aquí son muy desconfiados.",
+					"Cuando el pez esté en lo verde, ¡tira! Acción, ni antes ni después. Es como sembrar: todo es cuestión de momento."
 				],
 				"aviso": "Tarea: pesca un pez en el estanque"
 			},
@@ -152,7 +152,7 @@
 					"hecha_cosecha"
 				],
 				"lineas": [
-					"Tienes {zanahoria} de las cinco zanahorias. El huerto está ahí fuera, junto a la casa."
+					"[sonrisa] Llevas {zanahoria} de cinco. Las demás siguen en el huerto, esperando a que alguien tire de ellas."
 				]
 			},
 			{

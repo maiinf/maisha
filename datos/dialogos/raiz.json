@@ -15,7 +15,7 @@
 					"[sonrisa] Lo noto en las raíces, en las hojas, hasta en el caparazón: Raíz entera respira.",
 					"Hace siglos que no veía el Gran Árbol así de verde. Y todo empezó con una chispa que cayó en el Kitovu.",
 					"Pero el mapa de Mzee Shamba sigue partido. El trozo del norte... está en Sigilia, ¿verdad?",
-					"Cuando llegue el momento, el Arco te llevará más lejos. Y aquí siempre tendrás una casa, pequeño brote."
+					"Cuando llegue el momento, el Arco te llevará más lejos. Y aquí siempre tendrás una casa, brotecito."
 				]
 			},
 			{
@@ -30,7 +30,7 @@
 					"Al despertar, el prado estaba gris... y mis vecinos, convertidos en piedra.",
 					"Fue Giza. Esa sombra se lo come todo: el color, la vida... hasta los recuerdos.",
 					"Pero el Gran Árbol te ha dejado llegar hasta aquí. Eso solo lo hace con quien trae vida.",
-					"En los Prados del Eco hay estatuas junto a las zonas corruptas. Si purgas esas zonas, quizá despierten.",
+					"En los prados hay vecinos míos convertidos en piedra, junto a esas manchas grises. Si limpias las manchas... a lo mejor despiertan. Ojalá.",
 					"Y cuando necesites calma, entra en el árbol. Dentro está el Claro de Calma."
 				]
 			},
@@ -72,10 +72,10 @@
 				],
 				"marca": "bibi_meditar",
 				"lineas": [
-					"Ya hueles a prado vivo. Cada zona que limpias te deja algo dentro: Esencia, la llamamos.",
-					"La Esencia es vida que vuelve a ti. Pero sola no hace nada: hay que dejarla crecer.",
+					"Hueles a prado vivo, ¿lo sabías? Cada mancha que limpias te deja algo dentro. Nosotros lo llamamos Esencia.",
+					"Es la vida, que te da las gracias. Pero si la guardas en un bolsillo, se queda dormida. Hay que dejarla crecer.",
 					"Entra en el Gran Árbol. En el Claro de Calma hay un brote: siéntate a su lado y medita.",
-					"Verás el Árbol de la Vida. Cada rama es un Arte. Tú decides cuál despierta tu Esencia.",
+					"Verás el Árbol de la Vida, con sus ramas de luz. Cada una es un Arte. Elige la que te pida el corazón; yo no me meto.",
 					"Y si te duele algo, meditar también cura. A mi edad, es lo único que funciona."
 				],
 				"aviso": "Medita junto al brote del Claro de Calma"
@@ -92,7 +92,7 @@
 					"camino_cienaga"
 				],
 				"lineas": [
-					"Escucha, pequeño brote. Desde que despertaste, el Gran Árbol respira mejor... y sus raíces llegan más lejos.",
+					"Escucha, brotecito. Desde que despertaste, el Gran Árbol respira mejor... y sus raíces llegan más lejos.",
 					"Acabo de sentir cómo han secado dos murallas de espinas de Giza. Hay dos caminos abiertos.",
 					"Al norte de los prados, un bosque de hojas cobrizas. Allí vivía Tawi, un pájaro mercader. Y un ciervo guardián... no sé en qué lo habrá convertido Giza.",
 					"Al este de la aldea, la Ciénaga Quieta. Antes croaban las ranas toda la noche. Juncia, nuestra cocinera, vivía en la orilla.",
@@ -129,7 +129,7 @@
 					"Las grandes espinas que cerraban el camino del norte de la aldea han caído. Por ahí se va al Campo Segado.",
 					"Antes eran los campos de trigo de todo Raíz. Ahora solo queda una máquina que los siega una y otra vez, aunque ya no crece nada.",
 					"La Cosechadora... Giza la ha despertado. Su chapa no la rompe nada, pero dicen que la caldera de atrás es su punto débil.",
-					"Si se enreda en algo, quizá deje la espalda al descubierto. Ve con cuidado, pequeño brote. Es lo más fuerte que Giza tiene aquí."
+					"Si se enreda en algo, quizá deje la espalda al descubierto. Ve con cuidado, brotecito. Es lo más fuerte que Giza tiene aquí."
 				]
 			},
 			{
@@ -195,8 +195,8 @@
 			},
 			{
 				"lineas": [
-					"Las estatuas están junto a las zonas corruptas de los prados. Purga las zonas y quizá despierten.",
-					"El Claro de Calma te espera dentro del árbol cuando lo necesites."
+					"¿Has visto a alguien de piedra por ahí? Mira cerca de las manchas grises. Limpia una y ven a contármelo.",
+					"Y si un día se te apaga un poco la luz, entra en el árbol. El Claro de Calma siempre está tranquilo."
 				]
 			}
 		]
@@ -253,7 +253,7 @@
 					"construido_casa_seta"
 				],
 				"lineas": [
-					"Tienes {seta_luminosa} de las tres setas luminosas. ¡Aún faltan!",
+					"¿Llevas {seta_luminosa}? ¡Tres! ¡Hacen falta tres! Bueno, perdona, es que me hace mucha ilusión.",
 					"Crecen a la sombra de los árboles y brillan un poco. ¡No tienen pérdida!"
 				]
 			},
@@ -317,7 +317,7 @@
 					"construido_taller"
 				],
 				"lineas": [
-					"Tienes {mineral} de los dos trozos de mineral que necesito.",
+					"Hmpf. {mineral} de dos. Las matemáticas no fallan: falta mineral.",
 					"Asoma en algunas rocas de los prados. El cetro no puede con ellas... prueba con una semilla."
 				]
 			},
@@ -745,7 +745,7 @@
 				"lineas": [
 					"¡Mi puesto! ¡Mi precioso puesto! El toldo hecho jirones, el mostrador partido...",
 					"Un mercader sin puesto es como un pájaro sin alas. Bueno, yo tengo alas. Pero ya me entiendes.",
-					"En el Bosque Cobrizo hay troncos caídos, blandos y podridos por dentro. Una semilla los parte.",
+					"En el Bosque Cobrizo hay troncos caídos, blanditos por dentro. Una de esas semillas tuyas que explotan... ¡y madera a montones!",
 					"Si me traes tres trozos de madera, lo arreglo en un periquete. Y te daré algo que vale su peso en semillas.",
 					"No, no es una estafa. ¡Palabra de Tawi!"
 				]
@@ -787,8 +787,8 @@
 					"construido_puesto"
 				],
 				"lineas": [
-					"Tienes {madera} de los tres trozos de madera. Los troncos podridos están en el Bosque Cobrizo.",
-					"Recuerda: el cetro rebota en ellos. ¡Semilla y a correr!"
+					"¿{madera} de tres? ¡Casi, casi! Los troncos blanditos están en el Bosque Cobrizo, no tienen pérdida.",
+					"Ah, y no les pegues con el palo ese, que rebota. ¡Semilla y a correr!"
 				]
 			},
 			{
@@ -817,7 +817,7 @@
 			},
 			{
 				"lineas": [
-					"Cuando arregle mi puesto, abriré la tienda. ¡Ya verás qué rarezas!"
+					"En cuanto tenga puesto, abro la tienda. Rarezas de otros mundos, ¿eh? Y a buen precio. Bueno... a un precio."
 				]
 			}
 		]
@@ -1171,8 +1171,8 @@
 			},
 			{
 				"lineas": [
-					"El eco está en el islote, bajo el puente. Baja a la orilla oeste y cruza por las piedras del vado.",
-					"Acércate y escucha. Las piedras hablan bajito."
+					"El eco duerme en el islote, bajo el puente. Yo bajaría por la orilla del oeste y cruzaría por las piedras del vado. Despacio, que resbalan.",
+					"Y cuando llegues, no hables. Las piedras viejas hablan bajito, como yo cuando escribo de noche."
 				]
 			}
 		]
@@ -1301,8 +1301,8 @@
 			},
 			{
 				"lineas": [
-					"El islote del sureste está al final de la pasarela nueva. De noche canta; de día, susurra.",
-					"Y si ves una rana agazaparse, apártate de la sombra que marca dónde va a caer."
+					"¿El islote del sureste? Al final de la pasarela nueva, la que me arreglaste. De noche canta; de día, susurra. Como yo, que de día pesco callado.",
+					"Y si una rana de piedra se agacha... mira dónde cae su sombra y quítate de ahí. Hazme caso, que yo tengo las patas muy finas."
 				]
 			}
 		]
@@ -1320,7 +1320,7 @@
 					{
 						"imagen": "13_eco_pasarelas",
 						"lineas": [
-							"«Mira abajo, pequeña. Esas luces son las raíces del Primer Árbol. Llegan hasta aquí a beber.»",
+							"«Mira abajo, lucecita. Esas luces son las raíces del Primer Árbol. Llegan hasta aquí a beber.»",
 							"«¿Y esa sombra plateada que se mueve entre ellas?»",
 							"«Es Kimya. El Silencio. Cuida de que nada crezca demasiado deprisa, ni se pudra demasiado pronto.»",
 							"«¿Kimya es buena?»  «Kimya es necesaria. Como la noche. Como el invierno.»"
@@ -1430,8 +1430,8 @@
 			},
 			{
 				"lineas": [
-					"La galería está tras la peña, al noreste. Sigue el ramal del camino y entra por donde estaba el derrumbe.",
-					"Las piedras que cantan, cantan bajito. Acércate mucho."
+					"La galería está tras la peña del noreste. Por donde estaba el derrumbe, ¿te acuerdas? Ahora suena hueco, se oye desde aquí.",
+					"Las piedras que cantan, cantan bajito. Yo las oigo porque no veo; tú acércate mucho."
 				]
 			}
 		]
@@ -1559,8 +1559,8 @@
 			},
 			{
 				"lineas": [
-					"El huerto viejo está al noreste, rodeado por la acequia. Sigue el ramal del camino.",
-					"Dicen que allí la tierra recuerda. Escucha bien."
+					"¡El huerto viejo! Al noreste, donde la acequia hace la vuelta. Ahora que corre el agua, ¡se oye cantar desde aquí!",
+					"Mi abuela decía que allí la tierra se acuerda de todo. Yo nunca me quedé el rato suficiente para comprobarlo. Las liebres no esperamos bien."
 				]
 			}
 		]

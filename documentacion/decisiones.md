@@ -117,3 +117,10 @@ se pasan.
 | Hecho | Las 4 de Cuna de Musgo (con ruina y reconstruida) y las 8 casas de los caminos, repintadas casi al doble de tamaño con objetos de su dueño |
 | Pendiente | Interiores antiguos (casa de Pino, taller), el Gran Árbol y los personajes (aldeanos) |
 | Personajes | Pixel art mejorado (no pintados: a 24×32 salían borrosos) y animados: respiran, parpadean y tienen un gesto propio |
+
+### Diálogos antiguos más naturales (14-10)
+| Qué | Decisión |
+| --- | --- |
+| Lo robótico | Explicaciones de manual (Esencia, zonas corruptas), recuentos de recado («Tienes X de Y») e indicaciones de mapa |
+| Hecho | 28 frases reescritas con la voz de cada personaje (Bibi, Pino, Corteza, Tawi, Shamba, Msafiri, Korongo, Fuko, Sungura); las teclas solo se nombran en el tutorial de Shamba |
+| Sin género | Fuera los «pequeño brote» de Bibi (ahora «brotecito») y el «pequeña» del segundo eco (ahora «lucecita») |
