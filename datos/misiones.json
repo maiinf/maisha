@@ -1105,11 +1105,24 @@
 				{
 					"texto": "Pregunta a Corteza por la llave del armario",
 					"hecho": [
+						"corteza_busca_llave"
+					],
+					"hecho_tambien": [
 						"llave_nungu"
 					],
 					"ir": {
 						"escena": "taller_corteza",
 						"buscar": "aldeano:corteza"
+					}
+				},
+				{
+					"texto": "Busca la llave en el taller de Corteza",
+					"hecho": [
+						"llave_nungu"
+					],
+					"ir": {
+						"escena": "taller_corteza",
+						"buscar": "casilla:10,7"
 					}
 				},
 				{

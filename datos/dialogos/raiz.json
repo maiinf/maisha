@@ -322,6 +322,49 @@
 				]
 			},
 			{
+				"si": [
+					"nungu_nota"
+				],
+				"no": [
+					"corteza_busca_llave"
+				],
+				"marca": "corteza_busca_llave",
+				"lineas": [
+					"¿Nungu? ¿El erizo de las gafas?",
+					"Ese pesado me tuvo tres semanas con la cerradura de su armario. «Que no la abra ni el viento, Corteza.» Hmpf. Me quedó preciosa.",
+					"¿La llave de repuesto? Claro que me la dejó. La guardé en un sitio seguro.",
+					"...Tan seguro que no me acuerdo de cuál. Búscala por el taller. Y no toques la forja."
+				],
+				"despues": [
+					"Puede que en el banco. O con las herramientas. O... yo qué sé. ¡Busca!"
+				]
+			},
+			{
+				"si": [
+					"corteza_busca_llave"
+				],
+				"no": [
+					"llave_nungu"
+				],
+				"lineas": [
+					"¿La has encontrado? ¿No? Pues sigue, que yo tengo trabajo."
+				]
+			},
+			{
+				"si": [
+					"llave_nungu"
+				],
+				"no": [
+					"corteza_llave_hablado"
+				],
+				"marca": "corteza_llave_hablado",
+				"lineas": [
+					"¡Esa es! Negra de hollín... Ya decía yo que el barril del carbón era un buen escondite.",
+					"Si encuentras a Nungu, dile que me debe tres semanas de trabajo.",
+					"...Y ten cuidado. Aquel erizo hablaba de cosas que crecían bajo tierra. No me gustó nada cómo lo decía."
+				]
+			},
+			{
 				"lineas": [
 					"Pasa, pasa. Mi forja vuelve a rugir.",
 					"Si encuentras materiales raros, tráemelos: a ese cetro aún le caben muchas formas."
@@ -548,6 +591,18 @@
 		"nombre": "",
 		"conversaciones": [
 			{
+				"si": [
+					"corteza_busca_llave"
+				],
+				"no": [
+					"llave_nungu"
+				],
+				"lineas": [
+					"Cajones llenos de clavos y de dibujos de cetros. En uno pone, con letra torcida: «LLAVE DE NUNGU. NO PERDER».",
+					"Está vacío. Debajo hay un poco de polvo negro... como de carbón."
+				]
+			},
+			{
 				"lineas": [
 					"Dibujos de cetros: uno con hojas, otro con hielo, otro con cristales...",
 					"Corteza tiene muchas ideas."
@@ -559,6 +614,17 @@
 		"nombre": "",
 		"conversaciones": [
 			{
+				"si": [
+					"corteza_busca_llave"
+				],
+				"no": [
+					"llave_nungu"
+				],
+				"lineas": [
+					"Martillos, tenazas, limas... y una llave inglesa enorme. Pero no es una llave de abrir cerraduras."
+				]
+			},
+			{
 				"lineas": [
 					"Martillos y tenazas, muy bien ordenados. Ay de quien los cambie de sitio."
 				]
@@ -568,6 +634,20 @@
 	"taller_barril": {
 		"nombre": "",
 		"conversaciones": [
+			{
+				"si": [
+					"corteza_busca_llave"
+				],
+				"no": [
+					"llave_nungu"
+				],
+				"marca": "llave_nungu",
+				"aviso": "¡La llave del armario de Nungu!",
+				"lineas": [
+					"El barril del carbón. Al remover, algo tintinea en el fondo.",
+					"¡Una llave de hierro, negra de hollín! Lleva grabado el mismo martillo que la cerradura del armario."
+				]
+			},
 			{
 				"lineas": [
 					"Agua para templar el metal. Está fría como la nieve."

@@ -70,7 +70,7 @@ func _ready() -> void:
 	Estado.olvidar_todo()
 	for m in ["kitovu_despierta", "kuku_devuelta", "cetro_recibido", "mapa_partido", "portal_raiz", "visto/prados_del_eco",
 			"visto/cuna_de_musgo", "bibi_conocida", "bibi_aldea_viva", "camino_campo", "visto/campo_segado", "campo_llegada",
-			"rescatado_corteza", "construido_taller"]:
+			"rescatado_corteza", "encargo_corteza", "construido_taller"]:
 		Estado.marcar(m)
 	Estado.jugando = true
 
@@ -132,7 +132,51 @@ func _ready() -> void:
 	await _usar(mesa)
 	_comprobar(Estado.tiene("nungu_nota"), "una carta de Nungu: le dejó la llave de repuesto a Corteza")
 	_comprobar(Misiones.paso_actual(Misiones.buscar("casa_nungu")).get("texto", "") == "Pregunta a Corteza por la llave del armario", "la misión dice que se pregunte a Corteza")
-	Estado.marcar("llave_nungu")                    # (la llave: parte 2)
+
+	print("La llave, en el taller de Corteza:")
+	Estado.llegada = ""
+	get_tree().change_scene_to_file("res://escenas/interiores/taller_corteza.tscn")
+	await _esperar(1.2)
+	var corteza: Node2D = null
+	for n in get_tree().get_nodes_in_group("aldeanos"):
+		if n.id == "corteza":
+			corteza = n
+	_comprobar(corteza != null, "Corteza está en su taller")
+	_maisha().global_position = corteza.global_position + Vector2(-16, 6)
+	corteza.interactuar()
+	await _esperar(0.2)
+	await _leer_dialogo()
+	await _esperar(2.4)
+	await _leer_dialogo()
+	_comprobar(Estado.tiene("corteza_busca_llave") and not Estado.tiene("llave_nungu"), "Corteza se acuerda de Nungu... pero no de dónde guardó la llave")
+	var sitios := {}
+	for n in get_tree().get_nodes_in_group("interactuables"):
+		if str(n.get("charla")).begins_with("taller_"):
+			sitios[str(n.get("charla"))] = n
+	for c in ["taller_herramientas", "taller_banco"]:
+		_maisha().global_position = sitios[c].global_position + Vector2(0, 12)
+		await _usar(sitios[c])
+	_comprobar(not Estado.tiene("llave_nungu"), "ni con las herramientas ni en el banco (allí solo hay polvo de carbón)")
+	_maisha().global_position = sitios["taller_barril"].global_position + Vector2(0, -12)
+	await _usar(sitios["taller_barril"])
+	_comprobar(Estado.tiene("llave_nungu"), "¡en el barril del carbón! La llave, negra de hollín")
+	var mochila := get_tree().get_first_node_in_group("mochila")
+	mochila.abrir(1)
+	await _esperar(0.3)
+	_comprobar(mochila._lista().any(func(f: Dictionary) -> bool: return f["nombre"] == "Llave del armario"), "la llave sale en la mochila, con los objetos clave")
+	mochila.cerrar()
+	await _esperar(1.0)
+	_maisha().global_position = corteza.global_position + Vector2(-16, 6)
+	await _esperar(0.3)
+	corteza.interactuar()
+	await _esperar(0.3)
+	await _leer_dialogo()
+	await _esperar(0.4)
+	_comprobar(Estado.tiene("corteza_llave_hablado"), "y Corteza avisa: Nungu hablaba de cosas que crecen bajo tierra")
+	get_tree().change_scene_to_file("res://escenas/interiores/casa_nungu.tscn")
+	await _esperar(1.2)
+	armario = get_tree().get_first_node_in_group("armario")
+	_maisha().global_position = armario.global_position + Vector2(0, 24)
 	await _usar(armario)
 	_comprobar(Estado.tiene("armario_abierto") and armario._sprite.frame == 1, "con la llave, el armario se abre: dentro, una escalera")
 	_comprobar(Misiones.estado(Misiones.buscar("casa_nungu")) == "hecha", "y la misión se cumple")

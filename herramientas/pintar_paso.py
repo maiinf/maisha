@@ -12,6 +12,7 @@ Genera en arte/mundos/raiz/paso/:
                         y un microscopio de latón, una pizarra con dibujos de la piedra de Giza, telarañas, hojas
                         secas por el suelo y, al fondo, el ARMARIO grande cerrado con una cerradura de hierro
   bloque.png            2 × 28×24 bloques de piedra cortados en la cantera (con marcas de cincel y cuñas)
+  y el icono de la LLAVE del armario (16×16), el 26.º de arte/interfaz/objetos.png
   armario.png           2 × 56×64 el armario: 0 cerrado (cerradura de Corteza) · 1 abierto (dentro, una escalera
                         que baja a oscuras)
 """
@@ -370,6 +371,19 @@ def interior():
     return lz
 
 
+def llave():
+    """El icono de la llave del armario (16×16): hierro con hollín, con el martillo de Corteza grabado en el ojo."""
+    lz = Lienzo(16, 16, s=8, semilla=951)
+    aro = np.clip(lz.circulo(5, 5, 4.2) - lz.circulo(5, 5, 1.9), 0, 1)
+    cana = lz.trazo([(7.6, 7.6), (14, 14)], 1.8)
+    dientes = np.maximum(lz.trazo([(11.2, 11.2), (9.2, 13.2)], 1.4), lz.trazo([(13.2, 13.2), (11.4, 15)], 1.4))
+    hierro = np.clip(aro + cana + dientes, 0, 1)
+    lz.sombrear(hierro, ["#2a2a30", "#4a4a52", "#6e6e78", "#9a9aa4", "#cfcfd8"], 1.2, LUZ)
+    lz.pintar(hierro * (lz.ruido(0.6, 1, semilla=952) > 0.6), "#1e1a18", 0.5)             # hollín
+    lz.pintar(lz.circulo(5, 5, 1.0), "#e6a852")                                          # el martillito, en oro
+    return lz.sprite(contorno=0.6)
+
+
 def main():
     from PIL import Image
     os.makedirs(SALIDA, exist_ok=True)
@@ -379,6 +393,16 @@ def main():
     hoja = np.concatenate([armario(0), armario(1)], axis=1)
     Image.fromarray(hoja, "RGBA").save(os.path.join(SALIDA, "armario.png"))
     Image.fromarray(interior().sprite(contorno=0.0), "RGBA").save(os.path.join(SALIDA, "interior_nungu.png"))
+    # el icono de la llave en la mochila: el 26.º de objetos.png (índice 25)
+    ruta = os.path.join(RAIZ, "arte", "interfaz", "objetos.png")
+    viejos = Image.open(ruta).convert("RGBA")
+    n = max(26, viejos.width // 16)
+    iconos = Image.new("RGBA", (16 * n, 16), (0, 0, 0, 0))
+    iconos.alpha_composite(viejos.crop((0, 0, min(viejos.width, 16 * 25), 16)), (0, 0))
+    if viejos.width > 16 * 26:
+        iconos.alpha_composite(viejos.crop((16 * 26, 0, viejos.width, 16)), (16 * 26, 0))
+    iconos.alpha_composite(Image.fromarray(llave(), "RGBA"), (16 * 25, 0))
+    iconos.save(ruta)
     print("Paso de Piedra pintado en", SALIDA)
 
 
