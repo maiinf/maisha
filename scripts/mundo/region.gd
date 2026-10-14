@@ -64,6 +64,9 @@ const FIJOS := {
 	"W": [OBJ + "muro.png", Vector2(22, 6), 12.0],
 	"v": [ALDEA + "valla.png", Vector2(16, 4), 0.0],
 	"d": [KITOVU + "arbol_seco.png", Vector2(6, 4), 7.0],
+	# del Sendero Olvidado: pinos nevados y rocas con nieve (dos formas cada uno)
+	"ğ": ["res://arte/mundos/raiz/olvidado/pino_nevado.png", Vector2(8, 5), 12.0, 2],
+	"ň": ["res://arte/mundos/raiz/olvidado/roca_nevada.png", Vector2(16, 7), 11.0, 2],
 	# del Kitovu, con [fotogramas (variantes), charla al usarlo, radio]
 	"A": [KITOVU + "ruina_casa.png", Vector2(50, 12), 0.0, 2, "kitovu_ruina", 34.0],
 	"B": [KITOVU + "pozo.png", Vector2(24, 10), 13.0, 1, "kitovu_pozo", 24.0],

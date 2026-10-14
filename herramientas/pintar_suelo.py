@@ -321,6 +321,56 @@ def _riscos(lz, tipos, fina, media, cara=1.0):
     return pared
 
 
+NIEVE_S = ["#4a5672", "#61708e", "#7a89a6", "#95a3bd", "#adbbd1", "#c4cfe0", "#d9e1ed", "#eef2f8"]
+PISADA = ["#4a5468", "#5e6a80", "#76829a", "#8e9ab0", "#a8b2c4", "#c0c9d8"]
+
+
+def _nevar(lz, tipos, fina, media, pared):
+    """El SENDERO OLVIDADO: todo nevado. Donde había hierba, nieve con ondas del viento y sombras azuladas; el camino,
+    nieve pisada (más gris, con huellas); encima de las peñas, nieve; en sus paredes, escarcha."""
+    import cv2 as _cv
+    S = lz.s
+    ri = mascara(lz, tipos, ("risco",), 4.0, 0.5, semilla=50)
+    pared = pared if pared is not None else np.zeros_like(ri)
+    suelo = np.clip(1 - ri, 0, 1)
+    grande = lz.ruido(40, 3, semilla=901)
+    ondas = estirar(lz.ruido(2.5, 2, semilla=902), int(14 * S), vertical=False)
+    # (más oscura y azulada que el blanco puro: si no, deslumbra y no se ve nada encima)
+    v = 0.56 + (grande - 0.5) * 0.2 + (ondas - 0.5) * 0.42 + (fina - 0.5) * 0.08
+    lz.pintar(suelo, rampa(NIEVE_S, np.clip(v, 0, 1)))
+    # las crestas de las ondas, con luz, y su sombra azulada debajo
+    cresta = np.clip((ondas - 0.62) * 6, 0, 1) * suelo
+    lz.pintar(np.clip(desplazar(lz, cresta, 0, 1.2) - cresta, 0, 1), NIEVE_S[2], 0.5)
+    lz.pintar(cresta, NIEVE_S[7], 0.5)
+    # destellos del hielo
+    lz.pintar((fina > 0.93) * suelo, "#ffffff", 0.8)
+    # el camino: nieve pisada, con huellas pequeñas
+    cam = mascara(lz, tipos, ("camino",), 6, 0.25, semilla=903)
+    if cam.max() > 0:
+        vp = 0.5 + (lz.ruido(8, 3, semilla=904) - 0.5) * 0.3 + (fina - 0.5) * 0.15
+        lz.pintar(cam * suelo, rampa(PISADA, np.clip(vp, 0, 1)), 0.9)
+        huellas = np.clip((lz.ruido(0.9, 1, semilla=905) - 0.78) * 8, 0, 1) * cam * suelo
+        lz.pintar(huellas, PISADA[0], 0.6)
+        lz.pintar(np.clip(desplazar(lz, huellas, 0, -0.8) - huellas, 0, 1) * cam, NIEVE_S[6], 0.5)
+    # sombra azulada al pie de las peñas
+    lz.pintar(np.clip(lz.desenfocar(desplazar(lz, ri, 3, 8), 4.0) - ri, 0, 1) * suelo, "#2a3450", 0.45)
+    # encima de las peñas, nieve (deja asomar la roca en los bordes y en algunas manchas)
+    encima = np.clip(ri - pared, 0, 1)
+    dentro = _cv.distanceTransform((encima > 0.5).astype(np.uint8), _cv.DIST_L2, 5) / S
+    # (una capa compacta: solo asoma la roca en el borde y en alguna mancha grande, no a motas)
+    manchas = lz.desenfocar((lz.ruido(18, 2, semilla=906) > 0.22).astype(float), 3.0) > 0.5
+    capa = encima * (dentro > 1.6) * manchas
+    vn = 0.62 + (lz.ruido(10, 2, semilla=907) - 0.5) * 0.3 + (fina - 0.5) * 0.1
+    lz.pintar(capa, rampa(NIEVE_S, np.clip(vn, 0, 1)))
+    lz.pintar(np.clip(capa - desplazar(lz, capa, 0, 1.0), 0, 1), NIEVE_S[7], 0.7)
+    # escarcha en la pared y carámbanos que cuelgan del canto
+    lz.pintar((lz.ruido(0.6, 1, semilla=908) > 0.86) * pared, NIEVE_S[5], 0.4)
+    filo = np.clip(pared - desplazar(lz, pared, 0, 1.5), 0, 1)
+    caramb = filo * (estirar(fina, 4) > 0.62)
+    for k in (1.0, 2.0, 3.0):
+        lz.pintar(np.clip(desplazar(lz, caramb, 0, k), 0, 1) * pared * (fina > 0.25 * k), NIEVE_S[6 - int(k)], 0.85)
+
+
 def _agua_espejo(lz, agua, prof, fina):
     """El agua del LAGO ESPEJO, quieta como un cristal: clara y lisa, con el cielo reflejado (vetas largas de luz),
     la orilla del norte reflejada en oscuro justo debajo (los árboles se ven del revés en el agua) y casi sin ondas.
@@ -672,7 +722,10 @@ def pintar(nombre, salida=None):
         lz.pintar(postes * (lz.ruido(0.5, 1, semilla=21) > 0.6), "#a8735a", 0.6)
 
     _puente_piedra(lz, tipos, alto, ancho, fina, media)
-    pared = _riscos(lz, tipos, fina, media, cara=2.0 if (canada or paso) else 1.0)
+    olvidado = nombre == "sendero_olvidado"
+    pared = _riscos(lz, tipos, fina, media, cara=2.0 if (canada or paso or olvidado) else 1.0)
+    if olvidado:
+        _nevar(lz, tipos, fina, media, pared)
     if canada or paso:
         _mesetas(lz, tipos, fina, media, pared)
 
@@ -685,7 +738,7 @@ def pintar(nombre, salida=None):
 
     # sombra muy suave de las nubes (da volumen al terreno)
     nubes = np.clip((lz.ruido(90, 3, semilla=20) - 0.6) * 3, 0, 1)
-    lz.pintar(nubes, "#1d2e18", 0.12)
+    lz.pintar(nubes, "#1d2e18" if nombre != "sendero_olvidado" else "#1a2236", 0.12)
 
     destino = salida or os.path.join(RAIZ, "arte", "mundos", "raiz", "suelos", nombre + "_suelo.png")
     os.makedirs(os.path.dirname(destino), exist_ok=True)

@@ -889,6 +889,40 @@
 			]
 		},
 		{
+			"id": "sendero_olvidado",
+			"tipo": "historia",
+			"titulo": "El Sendero Olvidado",
+			"texto": "El Guardián ha apartado las raíces del fondo de la Gruta. Por ahí subió Mauti, hacia las Ruinas del Primer Árbol, a hablar con quien no quería que nada se acabara.",
+			"aparece": [
+				"sendero_abierto"
+			],
+			"hecha": [
+				"visto/ruinas_primer_arbol"
+			],
+			"pasos": [
+				{
+					"texto": "Sube por el Sendero Olvidado",
+					"hecho": [
+						"sendero_olvidado"
+					],
+					"ir": {
+						"escena": "gruta_raices",
+						"buscar": "puerta:sendero_olvidado"
+					}
+				},
+				{
+					"texto": "Llega a las Ruinas del Primer Árbol sin pararte en el frío",
+					"hecho": [
+						"visto/ruinas_primer_arbol"
+					],
+					"ir": {
+						"escena": "sendero_olvidado",
+						"buscar": "puerta:ruinas_primer_arbol"
+					}
+				}
+			]
+		},
+		{
 			"id": "nasas_korongo",
 			"tipo": "encargo",
 			"titulo": "Las nasas de Korongo",

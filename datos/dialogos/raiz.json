@@ -2918,5 +2918,82 @@
 				]
 			}
 		]
+	},
+	"olvidado_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Qué frío... Aquí arriba hasta el viento suena cansado.",
+					"Nieve por todas partes, y nadie la ha pisado en mucho tiempo. Solo unas huellas pequeñas, muy viejas, que suben... ¿Mauti?",
+					"Mejor no pararme mucho. En esta montaña, lo que se queda quieto parece quedarse quieto para siempre."
+				]
+			}
+		]
+	},
+	"olvidado_congelada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Brr... Por un momento no podía mover ni las hojas.",
+					"Si me paro, el frío me sube por los pies. Tengo que seguir moviéndome... o buscar algo de fuego.",
+					"Esos cuencos de piedra del camino tienen ceniza dentro. ¿Y si les echo una semilla?"
+				]
+			}
+		]
+	},
+	"estatua_olvidado_0": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una liebre de piedra, abrazada a una gavilla de trigo. La aprieta como si alguien se la fuera a quitar.",
+					"Tiene los ojos cerrados. Parece que no quería que esa cosecha se acabara, que nadie la segara nunca...",
+					"Y por no soltarla, se quedó aquí. Quieta. Con su trigo de piedra."
+				]
+			}
+		]
+	},
+	"estatua_olvidado_1": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un tejón de piedra que levanta un farol apagado, muy alto, hacia el cielo.",
+					"Como si quisiera que la noche no terminara. A lo mejor era una noche muy bonita.",
+					"El farol está helado. Hace mucho que no alumbra a nadie."
+				]
+			}
+		]
+	},
+	"estatua_olvidado_2": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una garza con las alas abiertas, a punto de echar a volar.",
+					"Pero no voló. Se quedó así, a medio despedirse, para no tener que irse nunca.",
+					"Mauti decía que lo más bonito de una hoja es cómo cae. Esta garza no quiso ni caer ni volar."
+				]
+			}
+		]
+	},
+	"paso_cerrado_ruinas_primer_arbol": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Detrás del arco, la niebla es una pared blanca. No se ve ni el suelo.",
+					"Al otro lado respira algo muy grande y muy viejo. Todavía no... aún no puedo pasar."
+				]
+			}
+		]
 	}
 }

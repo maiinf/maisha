@@ -567,6 +567,7 @@ TITULOS = {
     "jefe_guardian": "La pesadilla del Guardián",
     "paso": "La casa del observatorio",
     "jefe_kuvu": "La seta que manda",
+    "olvidado": "La montaña que no se mueve",
 }
 
 # =============================================================================
@@ -1375,6 +1376,55 @@ PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": 
           "orilla": orilla, "jefe_mamba": jefe_mamba,
           "embarcadero": embarcadero, "jefe_guardian": jefe_guardian, "paso": paso,
           "jefe_kuvu": jefe_kuvu}
+
+# =============================================================================
+# EL SENDERO OLVIDADO: «La montaña que no se mueve» (si menor sin resolver: frío, viento y silencio)
+# =============================================================================
+
+## La flauta sola: frases cortas que se quedan colgando (casi nunca vuelven a casa), con silencios largos entre ellas
+FRASES_MONTANA = [
+    [("F#5", 0, 2), ("E5", 2, 1), ("D5", 3, 1), ("B4", 4, 4)],
+    [("D5", 0, 1.5), ("E5", 1.5, 0.5), ("F#5", 2, 2), ("A5", 4, 1), ("G5", 5, 3)],
+    [("B5", 0, 2), ("A5", 2, 1), ("F#5", 3, 1), ("E5", 4, 2), ("D5", 6, 2)],
+    [("E5", 0, 1), ("F#5", 1, 1), ("D5", 2, 2), ("C#5", 4, 4)],
+]
+
+
+def olvidado():
+    tempo = Tempo(60)
+    pulsos = 64
+    p = Pista(tempo.s(pulsos))
+    # acordes suspendidos que no terminan de resolver (como algo que no quiere acabar)
+    progresion = [("B1", "sus"), ("G1", "M7"), ("E2", "m7"), ("F#1", "sus"), ("B1", "sus"), ("D2", "M7"), ("G1", "M7"), ("F#1", "sus")] * 2
+    colchones(p, tempo, progresion, compas=4, brillo=520, volumen=0.18, octava_bajo=1, fuerza_bajo=0.3)
+    rng = np.random.default_rng(91)
+    # el viento de la montaña: ráfagas largas que suben y bajan, alguna con un silbido
+    for k in range(9):
+        d = 5.0 + rng.random() * 4
+        n = int(d * SR)
+        viento = ruido_rosa(d) * np.sin(np.linspace(0, np.pi, n)) ** 2
+        p.poner(paso_banda(viento, 220 + rng.random() * 160, 1100) * 0.26, k * tempo.s(pulsos) / 9, pan=rng.random() - 0.5)
+        if k % 3 == 1:
+            p.poner(paso_banda(viento, 1800, 2600) * 0.05, k * tempo.s(pulsos) / 9 + 1.0, pan=rng.random() - 0.5)
+    # campanillas de hielo, sueltas y muy agudas (cristales que chocan)
+    for k in range(22):
+        b = rng.random() * pulsos
+        nota = ["B6", "F#6", "D7", "C#7", "A6"][rng.integers(5)]
+        p.poner(campanita(nota, 1.4, 0.07), tempo.s(b), pan=rng.random() - 0.5)
+    # la flauta sola, con silencios largos entre frase y frase
+    flauta_ = lambda n, d: flauta(n, d, 0.4, vibrato=3.8)
+    for k, frase in enumerate(FRASES_MONTANA):
+        melodia(p, tempo, frase, desde=4 + k * 14, instrumento=flauta_, volumen=0.3, sostener=0.92, pan=-0.15)
+    # voces sin palabras, muy lejos (lo que se quedó quieto en la montaña)
+    p.poner(coro(["B2", "F#3", "D4"], tempo.s(16)), tempo.s(20), 0.05)
+    p.poner(coro(["G2", "D3", "B3"], tempo.s(16)), tempo.s(44), 0.05)
+    # y la frase de Kimya, sin eco, al final
+    tocar(p, tempo, FRASE_QUIETA, desde=56, fuerza=0.22, pan=0.0)
+    return final(p, sala=3.8, mezcla=0.4, brillo=4200)
+
+
+PIEZAS["olvidado"] = olvidado
+
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

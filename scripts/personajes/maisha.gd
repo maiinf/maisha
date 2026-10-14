@@ -266,6 +266,22 @@ func recibir_danio(cantidad: int, desde: Vector2, tipo: String) -> bool:
 	return true
 
 
+## Pierde una hoja de Vida sin golpe (el frío del Sendero Olvidado): ni el escudo la para ni la empuja
+func perder_hoja() -> void:
+	if esta_caida:
+		return
+	vida = maxi(0, vida - 1)
+	_invulnerable = R.INVULNERABLE_TRAS_DANIO
+	_ultimo_danio = Time.get_ticks_msec()
+	herida.emit(vida)
+	Sonido.efecto("maisha_cae" if vida <= 0 else "maisha_herida")
+	Impacto.temblar(2.0, 0.18)
+	if vida <= 0:
+		esta_caida = true
+		_sprite.play("reposo_" + mirando)
+		caida.emit()
+
+
 func es_invulnerable() -> bool:
 	return _invulnerable > 0.0
 

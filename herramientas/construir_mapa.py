@@ -1741,6 +1741,117 @@ def crear_paso():
     return ["".join(f) for f in m], textos
 
 
+def crear_olvidado():
+    """EL SENDERO OLVIDADO (60x112, de sur a norte): de la Gruta de las Raíces a las Ruinas del Primer Árbol. Una subida de
+    montaña en zigzag, con nieve, niebla y frío: cinco repisas de peña («0») obligan a ir de un lado a otro. Por el
+    camino, BRASEROS («ŭ»: se encienden con el fuego de una semilla y quitan la escarcha), pinos nevados («ğ»), rocas
+    con nieve («ň») y, en el RELLANO DE LAS ESTATUAS, tres estatuas de quienes se quedaron quietos («ŝ»). Una zona
+    corrupta entre las dos primeras repisas. Arriba, el ARCO DE LAS RUINAS («ŵ») y la puerta del norte («^»)."""
+    ANCHO, ALTO = 60, 112
+    azar = random.Random(381)
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    zonas = {"1": (44, 87, 9, 5)}
+
+    def en_zona(x, y, margen=2):
+        for (zx, zy, rx, ry) in zonas.values():
+            if ((x - zx) / (rx + margen)) ** 2 + ((y - zy) / (ry + margen)) ** 2 <= 1.0:
+                return True
+        return False
+
+    # las paredes de la montaña, a los lados (irregulares)
+    for y in range(ALTO):
+        izq = int(2 + 2.2 * (1 + math.sin(y * 0.17)) + math.sin(y * 0.53 + 1))
+        der = int(ANCHO - 3 - 2.2 * (1 + math.sin(y * 0.13 + 2)) - math.sin(y * 0.47))
+        for x in range(0, izq + 1):
+            poner(x, y, "0")
+        for x in range(der, ANCHO):
+            poner(x, y, "0")
+    # las repisas: bandas de peña que cruzan la subida y dejan un paso a un lado (así se sube en zigzag)
+    repisas = [(95, 16, 59), (79, 1, 42), (41, 1, 21), (41, 39, 59), (31, 20, 59), (21, 1, 37)]
+    for (yb, x0, x1) in repisas:
+        for x in range(x0, x1 + 1):
+            grosor = 2 + int(1.2 * (1 + math.sin(x * 0.41 + yb)))
+            for y in range(yb - grosor // 2, yb + grosor - grosor // 2 + 1):
+                poner(x, y, "0")
+        # la punta de la repisa, redondeada
+        punta = x0 if x0 > 2 else x1
+        for y in range(yb - 2, yb + 3):
+            poner(punta, y, "0")
+
+    def camino(puntos, ancho=2):
+        for (a, b) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b[0] - a[0]), abs(b[1] - a[1])) * 2) + 1
+            for i in range(pasos + 1):
+                t = i / pasos
+                x = a[0] + (b[0] - a[0]) * t + math.sin(t * 3 + a[1]) * 0.4
+                y = a[1] + (b[1] - a[1]) * t
+                for dx in range(ancho):
+                    for dy in range(ancho):
+                        xx, yy = int(x) + dx, int(y) + dy
+                        if 0 <= xx < ANCHO and 0 <= yy < ALTO and m[yy][xx] in ".,":
+                            poner(xx, yy, "#")
+
+    camino([(29, 110), (30, 102), (24, 99), (10, 97), (9, 90), (22, 86), (40, 84), (49, 80), (50, 72), (46, 66),
+            (34, 62), (30, 56), (29, 46), (30, 40), (22, 36), (12, 34), (10, 28), (18, 25), (40, 23), (45, 18), (40, 12), (30, 9), (29, 3)])
+    # el rellano de las estatuas: un ensanche llano en medio
+    for (x, y) in ((22, 50), (38, 50), (30, 57)):
+        poner(x, y, "ŝ")
+    # los braseros (el primero, encendido desde el principio, junto a la Gruta)
+    for (x, y) in ((33, 105), (6, 92), (53, 74), (30, 52), (8, 30), (48, 15)):
+        poner(x, y, "ŭ")
+    # el arco de las Ruinas y la puerta del norte, por debajo de él
+    poner(30, 6, "ŵ")
+    for x in range(26, 34):
+        for y in range(0, 4):
+            poner(x, y, "#")
+    for x in range(27, 33):
+        poner(x, 0, "^")
+    # la puerta del sur, a la Gruta
+    for x in range(26, 34):
+        for y in range(ALTO - 4, ALTO):
+            poner(x, y, "#")
+    for x in range(27, 33):
+        poner(x, ALTO - 1, "_")
+    # el secreto, en un rincón al este del rellano, tras un matorral
+    poner(52, 47, "X")
+    for (x, y) in ((50, 48), (50, 47), (50, 46)):
+        poner(x, y, "M")
+    reservados = [(30, 6, 7), (52, 47, 3), (29, 108, 3), (30, 52, 4)]
+
+    def libre(x, y):
+        if m[y][x] not in ".," or en_zona(x, y):
+            return False
+        for (rx_, ry_, rr) in reservados:
+            if (x - rx_) ** 2 + (y - ry_) ** 2 <= rr * rr:
+                return False
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#ŝŭŵ^_XM":
+                    return False
+        return True
+
+    for _ in range(3000):
+        x, y = azar.randrange(1, ANCHO - 1), azar.randrange(1, ALTO - 1)
+        if libre(x, y):
+            junto_pena = any(m[y + d][x] == "0" or m[y][min(ANCHO - 1, max(0, x + d))] == "0" for d in (-2, -1, 1, 2) if 0 <= y + d < ALTO)
+            r = azar.random()
+            if r < (0.16 if junto_pena else 0.035):
+                poner(x, y, "ğ")
+            elif r < (0.22 if junto_pena else 0.05):
+                poner(x, y, "ň")
+    poner(25, 107, "L")
+    poner(26, 9, "L")
+    for k, (zx_, zy_, rx_, ry_) in zonas.items():
+        poner(zx_, zy_, k)
+    textos = {"1": "9, 5, 4, 3"}
+    return ["".join(f) for f in m], textos
+
+
 def crear_cueva():
     """La cueva de las setas (56x64, de norte a sur), bajo la casa de Nungu: se baja por la escalera del armario.
     A oscuras: alumbran las SETAS que brillan («ů»). Salas: la de la escalera (arriba), un pasillo con NUBES DE ESPORAS
@@ -2483,7 +2594,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado"}
 
 
 def construir_suelo(nombre):
@@ -2632,7 +2743,7 @@ if __name__ == "__main__":
                         "camino_cobrizo": crear_camino, "senda_surcos": crear_senda,
                         "canada_eco": crear_canada, "lago_espejo": crear_lago,
                         "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta,
-                        "paso_piedra": crear_paso, "cueva_setas": crear_cueva}.get(nombre, crear_prados)()
+                        "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

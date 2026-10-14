@@ -165,3 +165,13 @@ se pasan.
 | Ilustración | `21_eco_lago`: el cielo vacío; en el reflejo, el Primer Árbol, Kimya y nueve espirales |
 | Abrir el sendero | Con las nueve voces, el Guardián aparta las raíces (`sendero_abierto`). Hasta que se haga el Sendero Olvidado, la niebla no deja pasar |
 
+### El final de Raíz y el Sendero Olvidado (15-10)
+| Qué | Decisión |
+| --- | --- |
+| Cómo se decidió | Iam respondió «vale sigue»: se toman las opciones recomendadas; se pueden cambiar |
+| Quien vive en las Ruinas | El propio Primer Árbol, enfermo de miedo a morir: Giza es su miedo (deja todo gris y quieto para que nada se acabe). Mauti fue a hablar con él y quedó atrapado en piedra |
+| El final de Raíz | Maisha libera a Mauti; el Primer Árbol acepta morir y deja una semilla. De esa semilla saldrá el cetro nuevo al acabar el mundo 2 |
+| El Sendero | Montaña con nieve, niebla y estatuas de quienes se quedaron quietos. Sin viajero ni encargo (rutas únicas) |
+| Mecánica | La escarcha de la quietud (quedarse quieta congela; lo contrario del Lago) y braseros que se encienden con semillas |
+| Partes | 1 la subida (hecha) · 2 los Quietos (estatuas que solo se mueven cuando Maisha no las mira) · 3 las Ruinas y el Primer Árbol |
+

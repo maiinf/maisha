@@ -14,13 +14,14 @@ extends Node2D
 
 ## Música y ambiente de cada escena (por el nombre de su archivo)
 const RELIEVE := preload("res://scripts/mundo/relieve.gd")
-const MUSICA_DE := {"kitovu": "kitovu", "prados_del_eco": "prados", "cuna_de_musgo": "aldea", "bosque_cobrizo": "bosque", "cienaga_quieta": "cienaga", "campo_segado": "campo", "sendero_del_puente": "sendero", "las_pasarelas": "pasarelas", "camino_cobrizo": "cobrizo", "senda_surcos": "surcos", "canada_eco": "canada", "lago_espejo": "lago", "orilla_juncos": "orilla", "embarcadero_junco": "embarcadero", "la_travesia": "orilla", "gruta_raices": "lago", "paso_piedra": "paso", "casa_nungu": "paso", "cueva_setas": "lago", "casa_shamba": "interior",
+const MUSICA_DE := {"kitovu": "kitovu", "prados_del_eco": "prados", "cuna_de_musgo": "aldea", "bosque_cobrizo": "bosque", "cienaga_quieta": "cienaga", "campo_segado": "campo", "sendero_del_puente": "sendero", "las_pasarelas": "pasarelas", "camino_cobrizo": "cobrizo", "senda_surcos": "surcos", "canada_eco": "canada", "lago_espejo": "lago", "orilla_juncos": "orilla", "embarcadero_junco": "embarcadero", "la_travesia": "orilla", "gruta_raices": "lago", "paso_piedra": "paso", "sendero_olvidado": "olvidado", "casa_nungu": "paso", "cueva_setas": "lago", "casa_shamba": "interior",
 	"casa_pino": "interior", "taller_corteza": "interior", "claro_de_calma": "interior"}
 ## (los pájaros no se usan aquí: quedan guardados para un bioma de selva)
 const AMBIENTE_DE := {
 	"kitovu": {"brisa": 0.3, "viento": 0.55},
 	"prados_del_eco": {"brisa": 0.65, "viento": 0.2},
 	"cuna_de_musgo": {"brisa": 0.5},
+	"sendero_olvidado": {"viento": 0.85},
 	"bosque_cobrizo": {"viento": 0.45, "brisa": 0.4},
 	"cienaga_quieta": {"cienaga": 0.7, "brisa": 0.2},
 	"campo_segado": {"viento": 0.6, "brisa": 0.35},

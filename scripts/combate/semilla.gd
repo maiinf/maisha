@@ -112,6 +112,10 @@ func estallar() -> void:
 		var objetivo := nodo as Node2D
 		if objetivo and (_toca_la_cruz(objetivo.global_position, cruz) or objetivo in _atrapados):
 			objetivo.call("recibir_danio", R.EXPLOSION_DANIO, global_position, "explosion")
+	# el fuego enciende lo que se puede encender (los braseros del Sendero Olvidado)
+	for nodo in get_tree().get_nodes_in_group("encendibles"):
+		if _toca_la_cruz((nodo as Node2D).global_position, cruz):
+			nodo.call("encender")
 	# reacción en cadena: otras semillas en la cruz estallan justo después
 	for s in get_tree().get_nodes_in_group("semillas"):
 		if s != self and s.casilla in cruz:
