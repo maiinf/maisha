@@ -116,6 +116,7 @@ const MANTENER := 0.8            # segundos manteniendo Acción para despertar u
 const CLAVE := {
 	"cetro_recibido": ["Cetro de Raíz", 4, "El cetro de la familia de Mzee Shamba. Despierta en manos de quien trae la vida de vuelta."],
 	"mapa_partido": ["Mapa partido", 3, "Un mapa de todas las tierras. Le falta el trozo del norte: Mzee Shamba cree que está en Sigilia."],
+	"investigacion_nungu": ["Investigación de Nungu", 18, "Un cuaderno gordo lleno de dibujos de vetas violetas. Según Nungu, Giza no es piedra: es algo que crece hacia el norte, hacia las Ruinas del Primer Árbol, y se alimenta de lo que se queda quieto."],
 	"llave_nungu": ["Llave del armario", 25, "Una llave de hierro con un martillo grabado: la de repuesto del armario de Nungu. Estaba en el barril del carbón de Corteza, claro."],
 	"hoja_mauti": ["Hoja de Mauti", 24, "Una hoja seca de cobre, todavía tibia. Mauti la dejó bajo una piedra de la isla del río, para Maisha: «Si subes a buscarme, tráemela»."],
 	"cuaderno_ecos": ["Cuaderno de ecos", 18, "El regalo de Msafiri. Cada eco perdido que escuchas queda apuntado aquí. Juntos cuentan qué le pasó al Primer Árbol."],

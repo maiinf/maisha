@@ -240,3 +240,16 @@ const BUIBUI_ANDA := 14.0               # se recoloca muy despacio
 const MENDE_VIDA := 1
 const MENDE_VELOCIDAD := 66.0
 const MENDE_VE := 160.0
+
+# --- Kuvu, la seta que manda (la cueva de las setas) ---------------------------------
+const KUVU_VIDA := 10
+const KUVU_ABIERTO := 3.0               # lo que tiene el sombrero levantado tras el golpe de Nungu (ahí se le puede dar)
+const KUVU_DANIO_SEMILLA := 2
+const KUVU_ESPORAS_CADA := 6.0          # una nube de esporas cerca de Maisha
+const KUVU_LATIGO_CADA := 4.0           # (con Nungu libre) un latigazo de hilo hacia Maisha
+const KUVU_LATIGO_AVISO := 0.7
+const KUVU_HILO_LENTO := 38.0           # (fase 3) el hilo que va a por Nungu, despacito
+const NUNGU_RUEDA := 175.0              # Nungu hecho bola, rodando
+const NUNGU_RUEDA_CADA := 2.6           # controlado: entre bola y bola
+const NUNGU_MAREADO := 3.2              # tras rebotar en el escudo: ahí se le corta el hilo
+const NUNGU_AYUDA_CADA := 5.0           # libre: cada cuánto embiste a Kuvu

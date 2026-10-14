@@ -51,14 +51,14 @@ El grafo de caminos para la flecha de misiones está en `datos/misiones.json` �
 /Applications/Godot.app/Contents/MacOS/Godot --headless --import --path .
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_senda_surcos
 ```
-Hay 27 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
+Hay 28 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
 Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--headless`
 (guarda `get_viewport().get_texture().get_image()`); bórralo después.
 
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,
 Senda de los Surcos, Cañada del Eco y Orilla de Juncos hechos; faltan 3) y el misterio de los 9 ecos perdidos (8 hechos).
-El Embarcadero Junco está hecho (casa sellada de Bata, Mamba 2 contra 1, transbordador arreglado con poderes) y La Travesía es un viaje en barca con oleadas (cangrejos y anguilas) y la isla del 7.º eco. La Gruta de las Raíces está hecha (oscuridad, sigilo, escudo con J mantenida, espinos y el Guardián). El Paso de Piedra tiene hechas sus partes 1-3 (el paso, la casa de Nungu, la llave de Corteza y la cueva de las setas con las esporas, las páginas y el 8.º eco); faltan Kuvu y Nungu (parte 4), el 9.º eco y el Sendero Olvidado. Hay Bestiario con rangos (bronce/plata/oro) y enemigos hechiceros (Bundi, Buibui). El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
+El Embarcadero Junco está hecho (casa sellada de Bata, Mamba 2 contra 1, transbordador arreglado con poderes) y La Travesía es un viaje en barca con oleadas (cangrejos y anguilas) y la isla del 7.º eco. La Gruta de las Raíces está hecha (oscuridad, sigilo, escudo con J mantenida, espinos y el Guardián). El Paso de Piedra está hecho (el paso, la casa de Nungu, la llave de Corteza, la cueva de las setas con el 8.º eco y Kuvu, la seta que manda, con Nungu). Faltan el 9.º eco y el Sendero Olvidado / Ruinas. Hay Bestiario con rangos (bronce/plata/oro) y enemigos hechiceros (Bundi, Buibui). El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
 
 ## graphify
 

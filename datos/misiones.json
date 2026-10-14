@@ -1152,7 +1152,7 @@
 			"hecha": [
 				"nungu_libre"
 			],
-			"premio": "",
+			"premio": "La investigación de Nungu",
 			"pasos": [
 				{
 					"texto": "Baja por la escalera del armario",
@@ -1176,13 +1176,23 @@
 					}
 				},
 				{
-					"texto": "Busca a Nungu al fondo de la cueva",
+					"texto": "Corta la cortina de micelio con el cetro",
+					"hecho": [
+						"cortina_abierta"
+					],
+					"ir": {
+						"escena": "cueva_setas",
+						"buscar": "grupo:cortina"
+					}
+				},
+				{
+					"texto": "Libera a Nungu de Kuvu",
 					"hecho": [
 						"nungu_libre"
 					],
 					"ir": {
 						"escena": "cueva_setas",
-						"buscar": "grupo:cortina"
+						"buscar": "casilla:28,52"
 					}
 				}
 			]

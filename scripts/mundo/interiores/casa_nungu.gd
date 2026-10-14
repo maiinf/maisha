@@ -44,6 +44,12 @@ func _preparar() -> void:
 	escalera.tam = Vector2(24, 8)
 	escalera.position = Vector2(160, 84)
 	add_child(escalera)
+	if Estado.tiene("nungu_libre"):
+		# Nungu ha vuelto: junto a su mesa, apuntando cosas
+		var nungu := StaticBody2D.new()
+		nungu.set_script(load("res://scripts/mundo/paso/nungu_casa.gd"))
+		nungu.position = Vector2(232, 132)
+		$Entidades.add_child(nungu)
 	if not Estado.tiene("nungu_entrar"):
 		_pensar_al_entrar.call_deferred()
 

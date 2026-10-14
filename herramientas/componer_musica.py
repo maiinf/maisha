@@ -14,6 +14,7 @@ Genera en audio/musica/:
   purga.ogg, victoria.ogg, objeto.ogg   fanfarrias cortas
   canada.ogg      la Cañada del Eco: la flauta y su eco en la peña (en bucle)
   lago.ogg        el Lago Espejo: el piano y su reflejo (la misma frase al revés) (en bucle)
+  jefe_kuvu.ogg   Kuvu, la seta que manda: la caja de música desafinada en bucle, tambores en tres y la flauta que lo rompe
   paso.ogg        el Paso de Piedra: una caja de música que pregunta, un reloj y la flauta que contesta (en bucle)
 
 El tema de Maisha (la melodía que vuelve en todas): D5 A4 E5 F#5 | E5 D5 A4 (B4) D5
@@ -565,6 +566,7 @@ TITULOS = {
     "embarcadero": "Canción de barqueros",
     "jefe_guardian": "La pesadilla del Guardián",
     "paso": "La casa del observatorio",
+    "jefe_kuvu": "La seta que manda",
 }
 
 # =============================================================================
@@ -1275,6 +1277,42 @@ def jefe_guardian():
     return final(p, sala=3.0, mezcla=0.35, brillo=4400)
 
 
+def jefe_kuvu():
+    """Hipnótica: la caja de música del Paso de Piedra, pero lenta y desafinada, que gira sin parar (lo que Kuvu le
+    canta a Nungu: «descansa»); por debajo, tambores graves en tres, un zumbido de esporas que sube y baja y, en la
+    segunda mitad, la flauta de Maisha que rompe el bucle."""
+    tempo = Tempo(96)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    acords = [["D2", "A2", "F3"], ["C#2", "G#2", "E3"], ["D2", "A2", "F3"], ["A#1", "F2", "D3"]] * 2
+    for i in range(6):
+        a = acords[i]
+        p.poner(coro(a, tempo.s(16) + 1.2, "u", 0.6), tempo.s(i * 16), 0.45)
+        p.poner(bajo(a[0][:-1] + "1", tempo.s(16)), tempo.s(i * 16), 0.55)
+    # tambores en tres (como un vaivén que adormece)
+    for b in range(0, pulsos, 3):
+        p.poner(tambor("D2", 0.45, 0.5, golpe=0.3), tempo.s(b))
+        p.poner(tambor("A2", 0.25, 0.25, golpe=0.2), tempo.s(b + 2))
+        if b % 12 == 9:
+            p.poner(taiko(1.4, 0.7), tempo.s(b))
+    # la caja de música desafinada: la pregunta del Paso, en bucle, un poco más grave cada vuelta
+    caja = lambda n, d: campanita(n, max(d * 1.4, 1.0), 0.45)
+    for k, desde in enumerate(range(0, pulsos, 8)):
+        notas = transportar(PREGUNTA, -1 if k % 2 else 0)
+        melodia(p, tempo, notas, desde=desde, instrumento=caja, volumen=0.22, pan=-0.3 + 0.6 * (k % 2))
+    # el zumbido de las esporas
+    d = tempo.s(pulsos)
+    n = int(d * SR)
+    u = np.linspace(0, 1, n)
+    zumbido = ruido_rosa(d) * (0.5 + 0.5 * np.sin(u * 2 * np.pi * 6)) ** 2
+    p.poner(paso_banda(zumbido, 500, 1600) * 0.08, 0.0)
+    # la flauta de Maisha, que rompe el bucle
+    frase = [("D5", 0, 1), ("F5", 1, 1), ("A5", 2, 2), ("C6", 4, 1), ("A5", 5, 1), ("G5", 6, 2), ("F5", 8, 1), ("E5", 9, 1), ("D5", 10, 2)]
+    for vuelta in (48, 72):
+        melodia(p, tempo, frase, desde=vuelta, instrumento=lambda n_, d_: flauta(n_, d_, 0.46, vibrato=5.0), volumen=0.38, pan=0.2, sostener=0.95)
+    return final(p, sala=3.2, mezcla=0.35, brillo=4600)
+
+
 NO_SE_REPITEN = ("raiz_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
 # =============================================================================
 # PASO DE PIEDRA: misterio y curiosidad (re menor con la sexta mayor, dórico): una caja de música que se pregunta
@@ -1335,7 +1373,8 @@ PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": 
           "tienda": tienda, "raiz_libre": raiz_libre, "sendero": sendero, "pasarelas": pasarelas,
           "cobrizo": cobrizo, "surcos": surcos, "canada": canada, "jefe_kambare": jefe_kambare, "lago": lago,
           "orilla": orilla, "jefe_mamba": jefe_mamba,
-          "embarcadero": embarcadero, "jefe_guardian": jefe_guardian, "paso": paso}
+          "embarcadero": embarcadero, "jefe_guardian": jefe_guardian, "paso": paso,
+          "jefe_kuvu": jefe_kuvu}
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

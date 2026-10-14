@@ -9,11 +9,11 @@ const OSCURIDAD := preload("res://scripts/mundo/gruta/oscuridad.gd")
 const NUBE := preload("res://scripts/mundo/cueva/nube_esporas.gd")
 const PAGINA := preload("res://scripts/mundo/cueva/pagina_nungu.gd")
 const SETA := preload("res://arte/mundos/raiz/paso/seta_luz.png")
-const CORTINA := preload("res://arte/mundos/raiz/paso/cortina.png")
+const CORTINA_S := preload("res://scripts/mundo/cueva/cortina.gd")
 const PENUMBRA := Color(0.11, 0.09, 0.15)
 
 var _setas: Array[PointLight2D] = []
-var _cortina: Sprite2D
+var _cortina: Node2D
 var _tiempo := 0.0
 
 
@@ -22,6 +22,7 @@ func _ready() -> void:
 	_oscurecer()
 	_poner_cosas()
 	_maisha.caida.connect(_al_caer)
+	Estado.marca_puesta.connect(_al_poner_marca_cueva)
 	if not Estado.tiene("cueva_llegada"):
 		_pensar_al_llegar.call_deferred()
 
@@ -80,41 +81,34 @@ func _poner_cosas() -> void:
 				_crear_cortina(filas, y)
 
 
-## La cortina de micelio: tapa todo el paso (las «ǫ» de su fila y el hueco de en medio)
+## La cortina de micelio (cortina.gd): tapa todo el paso (las «ǫ» de su fila y el hueco de en medio)
 func _crear_cortina(filas: PackedStringArray, y: int) -> void:
+	if Estado.tiene("cortina_abierta"):
+		return
 	var xs: Array[int] = []
 	for x in filas[y].length():
 		if filas[y][x] == "ǫ":
 			xs.append(x)
-	var centro := Vector2((xs.min() + xs.max() + 1) * 8.0, y * 16.0 + 14)
-	var cuerpo := StaticBody2D.new()
-	cuerpo.add_to_group("cortina")
-	cuerpo.position = centro
-	var forma := CollisionShape2D.new()
-	var caja := RectangleShape2D.new()
-	caja.size = Vector2((xs.max() - xs.min() + 1) * 16.0, 14)
-	forma.shape = caja
-	forma.position = Vector2(0, -6)
-	cuerpo.add_child(forma)
-	_cortina = Sprite2D.new()
-	_cortina.texture = CORTINA
-	_cortina.hframes = 2
-	_cortina.offset = Vector2(0, -20)
-	_cortina.modulate = Color(0.75, 0.7, 0.8)
-	cuerpo.add_child(_cortina)
-	var luz := PointLight2D.new()
-	luz.texture = OSCURIDAD.textura_luz()
-	luz.texture_scale = 0.6
-	luz.color = Color(0.7, 0.4, 0.95)
-	luz.energy = 0.35
-	luz.position = Vector2(0, -20)
-	cuerpo.add_child(luz)
-	var cosa := Node2D.new()
-	cosa.set_script(load("res://scripts/mundo/objetos/cosa.gd"))
-	cosa.set("charla", "cueva_cortina")
-	cosa.set("radio_interaccion", 36.0)
-	cuerpo.add_child(cosa)
-	$Entidades.add_child(cuerpo)
+	var c: StaticBody2D = CORTINA_S.new()
+	c.ancho = (xs.max() - xs.min() + 1) * 16.0
+	c.position = Vector2((xs.min() + xs.max() + 1) * 8.0, y * 16.0 + 14)
+	$Entidades.add_child(c)
+	_cortina = c
+
+
+## Al vencer a Kuvu: Nungu, libre, habla; luego se va a casa
+func _al_poner_marca_cueva(marca: String) -> void:
+	if marca != "kuvu_vencido" or Estado.tiene("nungu_libre"):
+		return
+	await get_tree().create_timer(2.6).timeout
+	var nungu := get_tree().get_first_node_in_group("nungu")
+	if not is_inside_tree() or nungu == null:
+		return
+	_maisha.global_position = nungu.global_position + Vector2(-26, 6)
+	await nungu.interactuar()
+	var t := nungu.create_tween()
+	t.tween_property(nungu, "modulate:a", 0.0, 1.2)
+	t.tween_callback(nungu.queue_free)
 
 
 func _process(delta: float) -> void:
@@ -122,8 +116,6 @@ func _process(delta: float) -> void:
 	# las setas respiran despacio, cada una a su ritmo
 	for luz in _setas:
 		luz.energy = 0.85 + 0.3 * sin(_tiempo * 1.4 + float(luz.get_meta("fase")))
-	if _cortina:
-		_cortina.frame = 1 if fmod(_tiempo, 2.4) < 0.6 else 0
 
 
 func _pensar_al_llegar() -> void:
@@ -135,5 +127,8 @@ func _pensar_al_llegar() -> void:
 
 
 func _al_caer() -> void:
+	for zona in get_tree().get_nodes_in_group("zonas"):
+		if zona.estado == zona.Estado.CERRADA:
+			return
 	var punto := _maisha.global_position
 	_hud.fundido(func() -> void: _maisha.revivir(punto))

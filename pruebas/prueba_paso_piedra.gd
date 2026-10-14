@@ -207,7 +207,7 @@ func _ready() -> void:
 		_maisha().global_position = p.global_position + Vector2(0, 10)
 		await _usar(p)
 	_comprobar(Estado.tiene("nungu_pagina/1") and Estado.tiene("nungu_pagina/2") and Estado.tiene("nungu_pagina/3"), "las tres páginas del diario de Nungu")
-	_comprobar(Misiones.paso_actual(Misiones.buscar("bajo_la_casa")).get("texto", "") == "Busca a Nungu al fondo de la cueva", "la misión pide buscar a Nungu al fondo")
+	_comprobar(Misiones.paso_actual(Misiones.buscar("bajo_la_casa")).get("texto", "") == "Corta la cortina de micelio con el cetro", "la misión pide cortar la cortina del fondo")
 	var eco: Node2D = get_tree().get_first_node_in_group("ecos_perdidos")
 	_comprobar(eco != null, "en la cámara del este, el octavo eco")
 	_maisha().global_position = eco.global_position + Vector2(0, 16)

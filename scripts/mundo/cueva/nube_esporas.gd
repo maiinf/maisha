@@ -9,6 +9,7 @@ const MAREO := 3.0
 const RADIO := 20.0
 const TEX_LUZ := preload("res://scripts/mundo/gruta/oscuridad.gd")
 
+var dura := -1.0                # si es más de 0, la nube se deshace sola pasado ese rato (las que lanza Kuvu)
 var _t := 0.0
 var _apagada := 0.0             # tras el Latido, este rato no hay nube
 var _fuerza := 0.0              # 0..1: lo hinchada que está
@@ -35,6 +36,14 @@ func activa() -> bool:
 
 
 func _process(delta: float) -> void:
+	if dura > 0.0:
+		dura -= delta
+		if dura <= 0.0:
+			remove_from_group("ondas")
+			remove_from_group("esporas")
+			var t := create_tween()
+			t.tween_property(self, "modulate:a", 0.0, 0.6)
+			t.tween_callback(queue_free)
 	_apagada = maxf(0.0, _apagada - delta)
 	_t = fmod(_t + delta, ACTIVA + PAUSA)
 	var quiere := 1.0 if _t < ACTIVA and _apagada <= 0.0 else 0.0

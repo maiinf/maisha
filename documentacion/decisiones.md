@@ -108,3 +108,4 @@ se pasan.
 | Historia | Casa abandonada de **Nungu**, un erizo científico que estudiaba la piedra de Giza → armario cerrado con cerradura de Corteza → la llave la tiene **Corteza** en Cuna de Musgo → pasadizo a una cueva de setas |
 | Jefe | **Kuvu, la seta que manda** (controla mentes con hilos de esporas) tiene a Nungu controlado; con el escudo se corta su hilo y Nungu pasa a ayudar (2 contra 1) |
 | Partes | 1 el paso y la casa (hecha) · 2 la llave de Corteza · 3 el pasadizo, la cueva y el 8.º eco · 4 Kuvu y Nungu |
+| Parte 4 hecha | La cortina se corta con el cetro; Kuvu (3 fases) con Nungu controlado → libre; el hilo lento de la fase 3; Nungu regala su investigación y vuelve a casa |

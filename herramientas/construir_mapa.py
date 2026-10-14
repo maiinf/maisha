@@ -1810,6 +1810,7 @@ def crear_cueva():
         if pared >= 1 and azar.random() < 0.5 and not any(m[y + dy][x + dx] in "ǯǹ@ǫ^" for dx in (-1, 0, 1) for dy in (-1, 0, 1)):
             poner(x, y, "ů")
     poner(26, 5, "S")
+    poner(28, 53, "1")               # la sala de Kuvu: su zona (el jefe)
     return ["".join(f) for f in m], {"1": "11, 6, 4, 0, , jefe:kuvu"}
 
 

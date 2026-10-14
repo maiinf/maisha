@@ -2761,6 +2761,15 @@
 		"estilo": "pensamiento",
 		"conversaciones": [
 			{
+				"si": [
+					"nungu_pagina/3"
+				],
+				"lineas": [
+					"Una cortina de hilos blancos. Late despacio, como si respirara. Detrás, una voz cansada: «...sí... descansar...»",
+					"«Traed algo que corte hilos», escribió Nungu. El cetro corta. Vamos allá."
+				]
+			},
+			{
 				"lineas": [
 					"Una cortina de hilos blancos tapa el paso. Late despacio, como si respirara.",
 					"Al otro lado se mueve algo enorme. Y una voz cansada murmura: «...sí... descansar... sí...»"
@@ -2792,6 +2801,56 @@
 				"tras_historia": [
 					"Las setas vuelven a brillar, tranquilas. Una seta que manda en vez de servir...",
 					"Al fondo de la cueva, algo late."
+				]
+			}
+		]
+	},
+	"nungu_libre": {
+		"nombre": "Nungu",
+		"conversaciones": [
+			{
+				"no": [
+					"nungu_libre"
+				],
+				"marca": [
+					"nungu_libre",
+					"investigacion_nungu"
+				],
+				"aviso": "¡Investigación de Nungu!",
+				"lineas": [
+					"Uf... uf. ¿Ya? ¿Se ha callado? Llevaba no sé cuánto tiempo oyéndola dentro de la cabeza.",
+					"«Descansa, Nungu. Yo decido.» Y era tan cómodo... Qué vergüenza. Un científico que deja de hacerse preguntas.",
+					"Gracias, lucecita. Y gracias por leer mis páginas: alguien tenía que hacer caso a lo de cortar hilos.",
+					"Toma, mi cuaderno. Ahí está todo lo que sé de la piedra violeta. No es piedra: CRECE. Y crece hacia el norte, hacia las Ruinas del Primer Árbol.",
+					"Se alimenta de lo que se queda quieto. Por eso Kuvu quería que nadie decidiera nada... Bueno. Me vuelvo a casa. Tengo un armario que arreglar."
+				]
+			},
+			{
+				"lineas": [
+					"Si encuentras más vetas violetas, apúntalas en el cuaderno. Y no respires esporas, ¿eh?"
+				]
+			}
+		]
+	},
+	"nungu_casa": {
+		"nombre": "Nungu",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Lucecita! Pasa, pasa, perdona el desorden. Bueno, el desorden era así antes también.",
+					"Estoy apuntando todo lo que recuerdo de abajo. Al norte, Giza crece más deprisa. Si vas hacia las Ruinas, ve con cuidado.",
+					"Y dile a Corteza que le pagaré las tres semanas. Algún día."
+				]
+			}
+		]
+	},
+	"cueva_cortina_rota": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Los hilos se rompen como telarañas. Al otro lado, la sala grande... y una seta enorme que me está esperando."
 				]
 			}
 		]

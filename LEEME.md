@@ -744,5 +744,17 @@ Escena `escenas/mundo/cueva_setas.tscn` (mapa de 56×64, de norte a sur: `constr
 - **Nubes de esporas** (`ǯ`, `scripts/mundo/cueva/nube_esporas.gd`): laten (3 s hinchadas, 1,8 s encogidas). Si Maisha las respira se **marea**: los controles van al revés 3 s (`maisha.mareo`, se quita al revivir). El **Latido** las deshace 4 s. La primera vez, Maisha lo piensa en voz alta.
 - **Las tres páginas del diario de Nungu** (`ǹ`, `pagina_nungu.gd`): día 1 (las setas se comen la piedra de Giza), día 9 (una seta grande que «mira») y la última («ella decidirá por mí... traed algo que corte hilos»). Marcas `nungu_pagina/1..3`.
 - **El octavo eco** (`eco_cueva_setas`, ilustración `20_eco_cueva`): Kimya enseña a Maisha que las setas «se comen lo que cae y se lo devuelven a la tierra»; «¿y si una seta quisiera mandar, en vez de servir?».
-- Al sur, la **cortina de micelio** (`ǫ`, `cortina.png`) tapa la sala de Kuvu: late, y detrás una voz cansada dice «...descansar...» (parte 4).
-- Misión de historia **«Bajo la casa»**: bajar por la escalera → leer las páginas (n/3) → buscar a Nungu al fondo (`nungu_libre`, parte 4).
+- Al sur, la **cortina de micelio** (`ǫ`, `scripts/mundo/cueva/cortina.gd`) tapa la sala de Kuvu: late, y detrás una voz cansada dice «...descansar...». Se **corta con el cetro** (tres golpes, `cortina_abierta`): «traed algo que corte hilos», escribió Nungu.
+- Misión de historia **«Bajo la casa»**: bajar por la escalera → leer las páginas (n/3) → cortar la cortina → liberar a Nungu de Kuvu (`nungu_libre`). Premio: la investigación de Nungu.
+
+### Kuvu, la seta que manda (Paso de Piedra, parte 4)
+
+El jefe de la cueva de las setas (`scripts/enemigos/kuvu.gd`, dibujos en `herramientas/dibujar_kuvu.py`, capturas `documentacion/kuvu_capturas.png`): una seta enorme de Giza que, en vez de comerse lo que cae como las setas de Kimya, **manda**. Tiene a **Nungu** colgado de un hilo de esporas (`scripts/enemigos/nungu_jefe.gd`). Música «La seta que manda» (`jefe_kuvu`): la caja de música del Paso, desafinada y en bucle, con tambores en tres y la flauta de Maisha que rompe el bucle.
+
+| Fase | Qué pasa | Cómo se gana |
+| --- | --- | --- |
+| 1. Nungu controlado | Kuvu, cerrado (el cetro no le hace nada), suelta nubes de esporas cerca de Maisha. Nungu anda como una marioneta, se hace **bola de púas** y rueda hacia ella | Parar la bola con el **escudo de frente**: rebota y se marea; un golpe de cetro le **corta el hilo** (sin marear, el cetro rebota en las púas) |
+| 2. Dos contra uno | Nungu, libre, se pone del lado de Maisha y cada 5 s embiste el pie de Kuvu. Kuvu lanza **latigazos de hilo** (aviso: una raya violeta) | Cuando Nungu lo golpea, Kuvu **levanta el sombrero** 3 s: cetro 1, semilla 2. El escudo, de frente, para los latigazos (si pillan: 1 de daño y mareo) |
+| 3. Un tercio de vida | Además, un **hilo lento** va a por la cabeza de Nungu | Ponerse en medio con el escudo lo corta; si llega, Nungu vuelve a estar controlado |
+
+Al vencerlo se marchita (`kuvu_vencido`); Nungu habla, da su **investigación** (objeto clave: Giza «crece hacia el norte, hacia las Ruinas, y se alimenta de lo que se queda quieto») y vuelve a su casa, donde se le puede visitar (`scripts/mundo/paso/nungu_casa.gd`). En el Bestiario, con su rescoldo para repetir la pelea. Números: `KUVU_*` y `NUNGU_*` en `reglas_combate.gd`. Prueba: `prueba_kuvu`.
