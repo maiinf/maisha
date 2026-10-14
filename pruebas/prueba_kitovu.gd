@@ -182,7 +182,7 @@ func _ready() -> void:
 	await _atender(3.0)
 	_comprobar(Estado.tiene("kitovu_despierta"), "Maisha despierta y se pregunta dónde está")
 	var maisha := _maisha()
-	_comprobar(not maisha.get_node("Ropa").lleva("cetro_raiz") and not maisha.combate_activo, "empieza sin cetro y sin poder luchar")
+	_comprobar(not maisha.get_node("Ropa").puestas().has("arma") and not maisha.combate_activo, "empieza sin cetro y sin poder luchar")
 	Input.action_press("explosivo")
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -354,7 +354,7 @@ func _ready() -> void:
 	_comprobar(Estado.tiene("cetro_recibido") and Estado.tiene("mapa_partido"), "Mzee Shamba da el Cetro de Raíz y el mapa partido")
 	var ilustracion: Texture2D = _dialogo().get("_ilustracion")
 	_comprobar(ilustracion != null and ilustracion.resource_path.ends_with("6_hoy.png"), "cuenta la historia con ilustraciones, hasta la última")
-	_comprobar(_maisha().get_node("Ropa").lleva("cetro_raiz"), "Maisha lleva el cetro")
+	_comprobar(_maisha().get_node("Ropa").puestas().has("arma"), "Maisha lleva el cetro")
 	_comprobar(not get_tree().current_scene._cetro.visible, "el cetro ya no está en la pared")
 	await _salir_de_casa()
 	await _atender(2.0)
@@ -497,7 +497,7 @@ func _ready() -> void:
 	await _cruzar("mover_arriba", "PradosDelEco")
 	_comprobar(_escena() == "PradosDelEco", "el arco lleva a los Prados del Eco")
 	_comprobar(_maisha().global_position.distance_to(_puerta("kitovu").punto_llegada()) < 4.0, "Maisha llega por el arco del claro de columnas")
-	_comprobar(_maisha().get_node("Ropa").lleva("cetro_raiz") and _maisha().combate_activo, "con su cetro")
+	_comprobar(_maisha().get_node("Ropa").puestas().has("arma") and _maisha().combate_activo, "con su cetro")
 	_maisha().global_position = _puerta("kitovu").punto_llegada()
 	await _cruzar("mover_arriba", "Kitovu")
 	_comprobar(_escena() == "Kitovu" and _maisha().global_position.distance_to(_puerta("raiz").punto_llegada()) < 4.0, "y se puede volver al Kitovu")

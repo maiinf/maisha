@@ -3,7 +3,7 @@ extends Node2D
 ## Se dibuja píxel a píxel para que la estela quede nítida.
 
 const AGARRE := Vector2(3, 13)   # punto del dibujo del cetro-rama que sujeta la mano
-const AGARRE_ARTES := Vector2(5, 15)   # el mismo punto en los cetros del Arte del Cetro (cetro_1 ... cetro_6)
+const AGARRE_ARTES := Vector2(7, 16)   # el mismo punto en los cetros del Arte del Cetro (cetro_0 ... cetro_6)
 const DURACION := 0.2
 const RADIO := 16.0
 const ARCO := 140.0              # grados que recorre el golpe

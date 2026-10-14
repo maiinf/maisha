@@ -18,6 +18,9 @@ signal arte_subida(id: String, nivel: int)
 
 const R := preload("res://scripts/combate/reglas_combate.gd")
 const ARCHIVO := "res://datos/artes.json"
+## Lo que cuesta en Esencia subir a cada nivel (1 a 6). Caro a propósito: llenar las tres ramas solo se consigue
+## completando y explorando del todo los mundos 1 y 2. (Se ajustará al final, con la Esencia total del juego.)
+const COSTES := [2, 3, 5, 7, 10, 14]
 
 var lista: Array = []
 var _reglas: Array = []
@@ -55,13 +58,18 @@ func esencia_ganada_total() -> int:
 	return total
 
 
-## La que ya se ha gastado en niveles (subir al nivel N cuesta N)
+## La que ya se ha gastado en niveles (COSTES)
 func esencia_gastada() -> int:
 	var total := 0
 	for arte in lista:
-		var n := nivel(String(arte["id"]))
-		total += n * (n + 1) / 2
+		for i in nivel(String(arte["id"])):
+			total += coste_nivel(i + 1)
 	return total
+
+
+## Lo que cuesta subir al nivel n
+func coste_nivel(n: int) -> int:
+	return int(COSTES[clampi(n - 1, 0, COSTES.size() - 1)])
 
 
 func esencia() -> int:
@@ -87,7 +95,7 @@ func nivel_maximo(id: String) -> int:
 
 
 func coste_siguiente(id: String) -> int:
-	return nivel(id) + 1
+	return coste_nivel(nivel(id) + 1)
 
 
 ## Los nodos grandes (los niveles 3 y 6) cuestan también Cristales del Nexo
@@ -167,41 +175,44 @@ func tiene_rasgo(rasgo: String) -> bool:
 
 ## Lo que cambia por fuera cada nivel de cada rama (para la vista previa del diario)
 const CAMBIO_VISIBLE := {
-	"raiz": ["Brazaletes de raíz", "A los brazaletes les brota una hoja", "Una hoja nueva con capullo",
-		"Corona de hojas", "Capa de musgo", "Flores por todo el cuerpo"],
-	"cetro": ["Una cinta verde en el cetro", "Una gema más grande", "Cetro de corteza de roble",
-		"Hojas de cobre", "Gema dorada con chispas", "El Cetro del Primer Árbol"],
-	"aliento": ["Bufanda de brisa", "La bufanda se alarga y vuela", "Un aura de luz",
-		"Motas de luz alrededor", "Destellos en el aura", "Cuerpo de brisa"],
+	"raiz": ["Raíces enroscadas en las piernas", "Les brotan hojas, también en las muñecas", "Un brote de dos hojas grandes con capullo",
+		"Hombreras de corteza", "Capa de hojas", "La corona del bosque y flores"],
+	"cetro": ["Una cinta verde en el cetro", "Una gema más grande", "Cetro de corteza de roble con aro de cobre",
+		"Hojas de cobre", "Gema dorada", "El Cetro del Primer Árbol"],
+	"aliento": ["Bufanda de brisa", "La bufanda se alarga y vuela", "Anillos de viento y un aura de luz",
+		"Un remolino bajo los pies", "Alitas de brisa", "Cuerpo y alas de brisa"],
 }
 
 
 ## Lo que se le ve a Maisha con unos niveles (los que falten, los suyos):
-##   "prendas": ropa por capas que dan las Artes (brazaletes, corona, capa, bufanda)
-##   "cetro":   el dibujo del cetro que lleva en la mano
-##   "rasgos":  lo que pinta rasgos_maisha.gd (brote, flores, aura, motas, brillo, brisa)
+##   "prendas": ropa por capas que dan las Artes (raíces, brazaletes, hombreras, capa, corona, bufanda)
+##   "cetro":   el dibujo del cetro que lleva en la mano (cetro_0 ... cetro_6)
+##   "rasgos":  lo que pinta rasgos_maisha.gd (brote, flores, aura, anillos, remolino, alitas, alas, brisa)
 func aspecto(niveles: Dictionary = {}) -> Dictionary:
 	var r := int(niveles.get("raiz", nivel("raiz")))
 	var c := int(niveles.get("cetro", nivel("cetro")))
 	var a := int(niveles.get("aliento", nivel("aliento")))
 	var prendas := []
 	if r >= 2:
-		prendas.append("brazaletes_hoja")
+		prendas.append_array(["raices_piernas_hoja", "brazaletes_hoja"])
 	elif r >= 1:
-		prendas.append("brazaletes_raiz")
+		prendas.append("raices_piernas")
 	if r >= 4:
-		prendas.append("corona_hojas")
+		prendas.append("hombreras_corteza")
 	if r >= 5:
-		prendas.append("capa_musgo")
+		prendas.append("capa_hojas")
+	if r >= 6:
+		prendas.append("corona_bosque")
 	if a >= 2:
 		prendas.append("bufanda_viento")
 	elif a >= 1:
 		prendas.append("bufanda_brisa")
 	var visibles := []
-	for d in [["brote", r >= 3], ["flores", r >= 6], ["aura", a >= 3], ["motas", a >= 4], ["brillo", a >= 5], ["brisa", a >= 6]]:
+	for d in [["brote", r >= 3], ["flores", r >= 6], ["aura", a >= 3], ["anillos", a >= 3],
+			["remolino", a >= 4], ["alitas", a == 5], ["alas", a >= 6], ["brisa", a >= 6]]:
 		if d[1]:
 			visibles.append(d[0])
-	return {"prendas": prendas, "cetro": "cetro_%d" % c if c >= 1 else "cetro_raiz", "rasgos": visibles}
+	return {"prendas": prendas, "cetro": "cetro_%d" % clampi(c, 0, 6), "rasgos": visibles}
 
 
 # --- Los números del combate, con las Artes ------------------------------------------

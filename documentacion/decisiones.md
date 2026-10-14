@@ -134,3 +134,13 @@ se pasan.
 | La tienda | La ropa elegida en la mochila manda en su zona; las Artes rellenan las zonas libres |
 | Pantalla | Maisha ×4 sobre un tocón a la izquierda, árbol algo más pequeño a la derecha; vista previa sobre los nodos sin despertar y F para ver antes/después |
 | 2.5D (idea) | Más adelante, probar luces 2D con mapas de normales en una zona (sin tocar colisiones ni movimiento) |
+
+### Artes visuales grandes y precios (14-10)
+| Qué | Decisión |
+| --- | --- |
+| Opinión de Iam | Los primeros cambios eran muy simples: ahora cada rama cambia la silueta en los niveles 3 y 6 (boceto `boceto_artes_grandes.png`) |
+| Capa | Más pequeña que en el boceto (no más ancha que los brazos) y se mece |
+| Efectos | Muy sutiles: fuera las estrellitas grandes; anillos, alas, aura y luciérnagas casi transparentes |
+| Cetro por mundo | El Cetro-rama vale para los mundos 1 y 2; al acabar el 2, un cetro nuevo más poderoso que se sube desde 0 (se diseña más adelante; el boceto de piedra y runas gusta) |
+| Precios | 2, 3, 5, 7, 10 y 14 de Esencia por nivel (`COSTES`): llenar las tres ramas solo completando y explorando los mundos 1 y 2 al 100 %. Se ajustarán al acabar el juego, según la Esencia total |
+| Retoque (Iam) | Se veía cargado: cetro fino en todas las fases, fuera chispas del cetro, luciérnagas, el anillo de la cabeza y las motitas del aura y del remolino |

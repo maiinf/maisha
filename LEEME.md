@@ -193,7 +193,7 @@ Así mejora Maisha (el GDD ya lo tenía pensado: reparto libre de Esencia, sin n
 
 1. **La Esencia se gana sola**: cada mancha del Kitovu 1, Mzizi 3, cada zona de una región 1, Pembe 4, Konokono 4, la Cosechadora 5, cada secreto 1 y cada casa que se levanta en la aldea 1. Sale un aviso arriba a la izquierda («+1 Esencia · Zona purgada»). No se guarda aparte: se cuenta a partir de las marcas.
 2. **Se gasta meditando**: Bibi enseña a meditar (después de conocerla, la siguiente vez que se habla con ella). En el Claro de Calma, junto al brote, Acción → Maisha medita: **recupera la Vida y el Aliento**, se guarda la partida y se abre el **Árbol de la Vida**.
-3. En el árbol: ← → eligen el Arte, ↑ ↓ miran sus niveles y **mantener Acción** despierta el siguiente nivel (para no gastar Esencia sin querer). Subir al nivel N cuesta N de Esencia.
+3. En el árbol: ← → eligen el Arte, ↑ ↓ miran sus niveles y **mantener Acción** despierta el siguiente nivel (para no gastar Esencia sin querer). Cada nivel cuesta **2, 3, 5, 7, 10 y 14** de Esencia (`COSTES` en `artes.gd`): 41 por rama y 123 las tres. Es caro a propósito: llenarlo todo solo se podrá completando y explorando del todo los mundos 1 y 2 (los precios se ajustarán al final, con la Esencia total del juego).
 
 | Arte | Niveles (1 → 6) |
 | --- | --- |
@@ -201,17 +201,18 @@ Así mejora Maisha (el GDD ya lo tenía pensado: reparto libre de Esencia, sin n
 | **Aliento** (Vida, Aliento, Latido) | Pulmón de brisa (110) · Respirar hondo (+15 %) · **Aura suave** (+1 hoja de Vida) · Latido amplio · Golpe que respira · **Cuerpo de brisa** (+1 hoja, 125) |
 | Runa · Tierra | Dormidas: despiertan en Sigilia y en Asterhaul |
 
-- **Cada nivel cambia a Maisha por fuera** (`Artes.aspecto()` decide qué se ve; `documentacion/boceto_artes_visuales.png`):
+- **Cada nivel cambia a Maisha por fuera** (`Artes.aspecto()` decide qué se ve; boceto en `documentacion/boceto_artes_grandes.png`). Los niveles 3 y 6 (✦) cambian la silueta:
 
-| Rama | 1 | 2 | 3 | 4 | 5 | 6 |
+| Rama | 1 | 2 | 3 ✦ | 4 | 5 | 6 ✦ |
 | --- | --- | --- | --- | --- | --- | --- |
-| Raíz | Brazaletes de raíz | Les brota una hoja | Hoja nueva con capullo | Corona de hojas | Capa de musgo | Flores por el cuerpo |
-| Cetro | Cinta verde | Gema más grande | Cetro de corteza de roble | Hojas de cobre | Gema dorada con chispas | Cetro del Primer Árbol (dorado) |
-| Aliento | Bufanda de brisa | Bufanda larga que vuela | Aura de luz | Más motas de luz | Destellos | Cuerpo de brisa con estela |
+| Raíz | Raíces en las piernas | Les brotan hojas (y en las muñecas) | Brote de dos hojas grandes con capullo | Hombreras de corteza | Capa de hojas (se mece) | Corona del bosque y flores |
+| Cetro | Cinta verde | Gema más grande | Corteza de roble con aro de cobre | Hojas de cobre | Gema dorada | Cetro del Primer Árbol (dorado, con dos florecillas) |
+| Aliento | Bufanda de brisa | Bufanda larga que vuela | Anillo de viento que gira y aura | Remolino bajo los pies | Alitas de brisa | Cuerpo y alas de brisa |
 
-  Las prendas (brazaletes, bufandas y los 6 cetros, `cetro_1`…`cetro_6` de 12×20) las dibuja `herramientas/dibujar_prendas.py` y se ponen con la ropa por capas (`ropa_maisha.vestir_artes`): solo ocupan las zonas libres, **lo que Maisha se pone desde la mochila manda** (con el sombrero de paja puesto no se ve la corona de la Raíz). El golpe gira el cetro que se lleva. Lo dibujado (brote, flores, aura, motas, destellos, brisa) está en `rasgos_maisha.gd`.
+  Las prendas (raíces, brazaletes, hombreras, capa animada, corona, bufandas y los cetros `cetro_0`…`cetro_6` de 16×21) las dibuja `herramientas/dibujar_prendas.py` y se ponen con la ropa por capas (`ropa_maisha.vestir_artes`; una prenda con `"fotogramas"` se anima sola). Solo ocupan las zonas libres: **lo que Maisha se pone desde la mochila manda** (con el sombrero de paja no se ve la corona del bosque). El golpe gira el cetro que se lleva. Lo vivo (brote, flores, aura, anillo, remolino, alas, brisa) está en `rasgos_maisha.gd`, sutil y sin brillitos sueltos (con todo despierto, Maisha no debe verse cargada); el cetro es fino en todas las fases; lo de detrás (aura, mitad de atrás de los anillos, alas) va en un nodo por debajo de Maisha.
+- **Un cetro por mundo**: el Cetro-rama sirve para los mundos 1 y 2; al acabar el 2 Maisha recibirá un cetro nuevo y más poderoso (de piedra, runas y cristal en el boceto; se diseñará más adelante) que se vuelve a subir desde 0.
 - **Maisha en grande en Habilidades**: a la izquierda del árbol, sobre un tocón, Maisha a tamaño ×4 se da la vuelta despacio (frente, lado, espalda). Sobre un nivel **sin despertar** se ve **cómo quedaría** («Con Cetro III», halo del color de la rama y lo que cambia debajo); **F** alterna entre ahora y después. Es la misma Maisha del juego (sus animaciones, `ropa_maisha.gd` y `rasgos_maisha.gd` con `niveles` de prueba).
-- En todo Raíz se consiguen 43 de Esencia (y 2 más en las islas de la ciénaga, más adelante); antes del jefe final, unas 36. Llevar las dos Artes al máximo cuesta 42: durante el mundo hay que elegir, y al vencer a la Cosechadora se llega casi a todo. Las Artes de Runa y Tierra despiertan en otros mundos.
+- En todo Raíz se consiguen 43 de Esencia (y 2 más en las islas de la ciénaga, más adelante); antes del jefe final, unas 36. Con los precios nuevos, el mundo 1 completo llega a mitad de camino (unos 3 niveles por rama): hay que elegir. Las Artes de Runa y Tierra despiertan en otros mundos.
 - Para cambiar números o añadir niveles: `datos/artes.json` (dentro explica cada efecto).
 
 ## El Arco de Raíz (rediseñado)

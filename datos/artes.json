@@ -2,7 +2,7 @@
 	"_ayuda": [
 		"EL ÁRBOL DE LA VIDA: las Artes de Maisha y lo que da cada nivel.",
 		"La Esencia se gana sola al poner ciertas marcas (esencia_por_marca: vale la primera regla cuyo prefijo encaje).",
-		"Se gasta meditando en un Claro de Calma: subir al nivel N cuesta N de Esencia.",
+		"Se gasta meditando en un Claro de Calma: lo que cuesta cada nivel está en COSTES (scripts/globales/artes.gd): 2, 3, 5, 7, 10 y 14.",
 		"Cada nivel puede cambiar números del combate (efectos) y algunos añaden un rasgo visual a Maisha (rasgo).",
 		"Efectos: vida_maxima (+hojas), aliento_maximo (+), ritmo_aliento (multiplica), semilla_coste (-), semilla_alcance (+casillas),",
 		"  semilla_raices (+píxeles), semilla_mecha (-segundos), latido_coste (-), latido_radio (+píxeles), golpe_recarga (+Aliento por golpe)."
@@ -72,7 +72,7 @@
 				},
 				{
 					"nombre": "Brote en la cabeza",
-					"texto": "La cruz de la explosión llega una casilla más lejos. Y a Maisha le brota una hoja nueva.",
+					"texto": "La cruz de la explosión llega una casilla más lejos.",
 					"efectos": {
 						"semilla_alcance": 1
 					},
@@ -89,14 +89,14 @@
 				},
 				{
 					"nombre": "Mecha corta",
-					"texto": "La Semilla estalla antes (1,2 s en vez de 1,5): a los enemigos les da menos tiempo para escapar.",
+					"texto": "La Semilla estalla antes (1,2 s en vez de 1,5): los enemigos tienen menos tiempo para huir.",
 					"efectos": {
 						"semilla_mecha": 0.3
 					}
 				},
 				{
 					"nombre": "Hojas y flores",
-					"texto": "Las hojas florecen por todo el cuerpo de Maisha y la cruz llega aún más lejos.",
+					"texto": "La cruz de la explosión llega aún más lejos.",
 					"efectos": {
 						"semilla_alcance": 1
 					},
@@ -183,7 +183,7 @@
 				},
 				{
 					"nombre": "Aura suave",
-					"texto": "Una hoja más de Vida. Y una luz suave rodea a Maisha.",
+					"texto": "Una hoja más de Vida.",
 					"efectos": {
 						"vida_maxima": 1
 					},
@@ -208,7 +208,7 @@
 				},
 				{
 					"nombre": "Cuerpo de brisa",
-					"texto": "Otra hoja de Vida y más Aliento (125). El cuerpo de Maisha se vuelve casi transparente.",
+					"texto": "Otra hoja de Vida y más Aliento (125).",
 					"efectos": {
 						"vida_maxima": 1,
 						"aliento_maximo": 15

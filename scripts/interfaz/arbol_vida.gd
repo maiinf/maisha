@@ -408,7 +408,7 @@ func _dibujar_detalle(a: float) -> void:
 	var arte := _arte()
 	var id := String(arte["id"])
 	var color := Color(String(arte["color"]))
-	var caja := Rect2(14, 226, 204, 112)
+	var caja := Rect2(14, 200, 204, 138)
 	_lienzo.draw_rect(caja, Color(PANEL, a))
 	_lienzo.draw_rect(caja, Color(color, 0.7 * a), false, 1.0)
 	var x := caja.position.x + 8
@@ -424,6 +424,11 @@ func _dibujar_detalle(a: float) -> void:
 		var estado := "despierto" if n < nivel_actual else ("siguiente" if n == nivel_actual else "dormido")
 		_texto("Nivel %d · %s" % [n + 1, datos["nombre"]], Vector2(x, caja.position.y + 34), Color(TEXTO, a))
 		var y := _parrafo(String(datos["texto"]), Vector2(x, caja.position.y + 51), caja.size.x - 16, Color(APAGADO, a))
+		# lo que cambia por fuera (se ve en grande en la pestaña Habilidades del diario)
+		var cambios: Array = Artes.CAMBIO_VISIBLE.get(id, [])
+		if n < cambios.size() and y < caja.end.y - 42:
+			var cambio := String(cambios[n])
+			_parrafo("Se verá: " + cambio.left(1).to_lower() + cambio.substr(1), Vector2(x, y + 2), caja.size.x - 16, Color(color, 0.85 * a))
 		var pie := ""
 		var color_pie := AMBAR
 		if estado == "despierto":
@@ -435,7 +440,7 @@ func _dibujar_detalle(a: float) -> void:
 				if Artes.cristales_siguiente(id) > 0:
 					pie += " y %d Cristales" % Artes.cristales_siguiente(id)
 			elif Artes.esencia() < Artes.coste_siguiente(id):
-				pie = "Cuesta %d de Esencia (tienes %d)" % [Artes.coste_siguiente(id), Artes.esencia()]
+				pie = "Cuesta %d Esencia (hay %d)" % [Artes.coste_siguiente(id), Artes.esencia()]
 				color_pie = Color(APAGADO, 0.8)
 			else:
 				pie = "Pide %d Cristales (tienes %d)" % [Artes.cristales_siguiente(id), Tienda.cristales()]

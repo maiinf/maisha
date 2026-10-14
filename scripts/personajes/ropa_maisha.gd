@@ -13,7 +13,8 @@ extends Node2D
 
 signal ropa_cambiada
 
-const ZONAS := ["cabeza", "cara", "espalda", "torso", "brazos", "piernas", "aura", "arma"]
+const ZONAS := ["cabeza", "cara", "espalda", "piernas", "torso", "brazos", "hombros", "aura", "arma"]
+const RITMO_PRENDAS := 2.5        # fotogramas por segundo de las prendas animadas (la capa de hojas se mece)
 const ANCHO_FOTOGRAMA := 24
 const ALTO_FOTOGRAMA := 32
 
@@ -28,6 +29,8 @@ var _direccion := ""
 var _detras: Node2D               # contenedor de las piezas que van detrás de Maisha
 var _ocultas: Dictionary = {}     # zonas ocultadas un momento (p. ej. el cetro mientras se golpea)
 var _de_artes: Array = []         # prendas puestas por las Artes (no por la mochila)
+var _animadas: Array[Sprite2D] = []
+var _tiempo := 0.0
 
 @onready var _sprite: AnimatedSprite2D = get_parent().get_node("Sprite")
 
@@ -78,7 +81,7 @@ func alternar(clave: String) -> void:
 func siguiente_en_zona(zona: String) -> void:
 	var opciones: Array[String] = []
 	for clave in _catalogo:
-		if _catalogo[clave]["zona"] == zona:
+		if _catalogo[clave]["zona"] == zona and not _catalogo[clave].get("de_artes", false):
 			opciones.append(clave)
 	if opciones.is_empty():
 		return
@@ -129,6 +132,15 @@ func ocultar_zona(zona: String, ocultar: bool) -> void:
 
 # --- Funcionamiento interno ----------------------------------------------------
 
+func _process(delta: float) -> void:
+	if _animadas.is_empty():
+		return
+	_tiempo += delta
+	var f := int(_tiempo * RITMO_PRENDAS)
+	for capa in _animadas:
+		capa.frame = f % capa.hframes
+
+
 func _colocar_detras() -> void:
 	get_parent().move_child(_detras, _sprite.get_index())
 
@@ -150,6 +162,7 @@ func _reconstruir() -> void:
 	for capa in _capas:
 		capa.queue_free()
 	_capas.clear()
+	_animadas.clear()
 	_direccion = _direccion_de(_sprite.animation)
 	for zona in ZONAS:   # el orden de las zonas decide quién queda encima si dos se tocan
 		if not _puestas.has(zona):
@@ -159,6 +172,9 @@ func _reconstruir() -> void:
 			var capa := Sprite2D.new()
 			capa.texture = load(pieza["textura"])
 			capa.centered = false
+			capa.hframes = int(pieza.get("fotogramas", 1))
+			if capa.hframes > 1:
+				_animadas.append(capa)
 			capa.set_meta("ancla", pieza["ancla"])
 			capa.set_meta("zona", zona)
 			capa.set_meta("desplazamiento", Vector2(pieza["desplazamiento"][0], pieza["desplazamiento"][1]))
@@ -191,6 +207,6 @@ func _actualizar() -> void:
 		var punto := Vector2(anclas[ancla][0], anclas[ancla][1]) + desplazamiento
 		if _sprite.flip_h:
 			# mirando a la izquierda: se refleja la prenda igual que el dibujo de Maisha
-			punto.x = ANCHO_FOTOGRAMA - punto.x - capa.texture.get_width()
+			punto.x = ANCHO_FOTOGRAMA - punto.x - capa.texture.get_width() / capa.hframes
 		capa.flip_h = _sprite.flip_h
 		capa.position = esquina + punto

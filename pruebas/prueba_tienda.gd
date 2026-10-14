@@ -108,7 +108,7 @@ func _ready() -> void:
 	var art: Dictionary = Tienda.buscar("semilla_olvido")
 	var precio := Tienda.precio(art)
 	tienda.seleccion = ids.find("semilla_olvido")
-	_comprobar(tienda.comprar_elegido() == "ok" and Artes.nivel("raiz") == 0 and Artes.esencia() == esencia + 4,
+	_comprobar(tienda.comprar_elegido() == "ok" and Artes.nivel("raiz") == 0 and Artes.esencia() == esencia + 7,
 		"la semilla del olvido devuelve toda la Esencia gastada (+%d)" % (Artes.esencia() - esencia))
 	_comprobar(Tienda.precio(art) == precio + 2, "y la siguiente cuesta 2 más")
 	_comprobar(tienda.comprar_elegido() == "nada_que_olvidar", "sin niveles, no hay nada que olvidar")

@@ -51,18 +51,21 @@ func _ready() -> void:
 
 	print("Subir Artes:")
 	_comprobar(not Artes.puede_subir("runa"), "la Runa duerme hasta Sigilia")
-	_comprobar(Artes.subir("raiz") and Artes.nivel("raiz") == 1 and Artes.esencia() == 9, "subir la Raíz al 1 cuesta 1")
-	_comprobar(Artes.subir("raiz") and Artes.esencia() == 7, "al 2 cuesta 2")
-	_comprobar(Artes.subir("raiz") and Artes.esencia() == 4, "al 3 cuesta 3")
+	_comprobar(Artes.subir("raiz") and Artes.nivel("raiz") == 1 and Artes.esencia() == 8, "subir la Raíz al 1 cuesta 2")
+	_comprobar(Artes.subir("raiz") and Artes.esencia() == 5, "al 2 cuesta 3")
+	_comprobar(Artes.subir("raiz") and Artes.esencia() == 0, "al 3 cuesta 5")
 	_comprobar(Artes.semilla_coste() == R.SEMILLA_COSTE - 3.0 and Artes.semilla_alcance() == R.SEMILLA_ALCANCE + 1, "la semilla cuesta menos y su cruz llega más lejos")
 	_comprobar(Artes.tiene_rasgo("brote"), "Raíz 3: a Maisha le sale el brote")
-	_comprobar(Artes.esencia() == 4, "quedan 4 de Esencia")
-	_comprobar(Artes.subir("aliento") and Artes.subir("aliento") and Artes.esencia() == 1, "dos niveles de Aliento (1 + 2)")
-	_comprobar(not Artes.subir("raiz"), "al 4 hace falta más Esencia (cuesta 4, hay %d)" % Artes.esencia())
+	_comprobar(Artes.esencia() == 0, "no queda Esencia")
+	for i in range(1, 7):
+		Estado.marcar("zona/senda_surcos/%d" % i)
+	_comprobar(Artes.subir("aliento") and Artes.subir("aliento") and Artes.esencia() == 1, "dos niveles de Aliento (2 + 3)")
+	_comprobar(not Artes.subir("raiz"), "al 4 hace falta más Esencia (cuesta 7, hay %d)" % Artes.esencia())
 	_comprobar(Artes.aliento_maximo() == R.ALIENTO_MAXIMO + 10.0 and is_equal_approx(Artes.ritmo_aliento(), 1.15), "más Aliento y respira más rápido")
 	Estado.guardar()
 	Estado.cargar()
 	_comprobar(Artes.nivel("raiz") == 3 and Artes.nivel("aliento") == 2 and Artes.esencia() == 1, "los niveles se guardan con la partida")
+	Estado.marcar("zona/senda_surcos/7")
 
 	print("Meditar en el Claro de Calma:")
 	for m in ["cetro_recibido", "visto/prados_del_eco", "visto/cuna_de_musgo", "bibi_conocida", "zona/prados_del_eco/4", "zona/prados_del_eco/5", "secreto/prados_del_eco/8,9"]:
@@ -98,7 +101,7 @@ func _ready() -> void:
 	await _esperar(1.0)
 	Input.action_release("accion")
 	await _esperar(0.1)
-	_comprobar(Artes.nivel("aliento") == 3 and Artes.esencia() == esencia - 3, "mantener Acción despierta el nivel 3 del Aliento")
+	_comprobar(Artes.nivel("aliento") == 3 and Artes.esencia() == esencia - 5, "mantener Acción despierta el nivel 3 del Aliento")
 	_comprobar(maisha.vida_maxima() == R.VIDA_MAXIMA + 1 and maisha.vida == maisha.vida_maxima(), "una hoja más de Vida (%d)" % maisha.vida_maxima())
 	_comprobar(Artes.tiene_rasgo("aura"), "y el aura")
 	var tab := InputEventAction.new()
@@ -118,7 +121,7 @@ func _ready() -> void:
 	print("El árbol de habilidades del diario (rama Cetro, Cristales en los nodos grandes):")
 	_comprobar(Artes.cristales_gastados() == 4, "los nodos grandes Raíz III y Aliento III gastaron 2 + 2 Cristales (%d)" % Artes.cristales_gastados())
 	var cristales := Tienda.cristales()
-	for m in ["zona/prados_del_eco/4", "zona/prados_del_eco/5", "zona/prados_del_eco/6", "secreto/prados_del_eco/1,1", "secreto/prados_del_eco/2,2", "secreto/prados_del_eco/5,5"]:
+	for m in ["zona/senda_surcos/8", "zona/senda_surcos/9", "zona/prados_del_eco/4", "zona/prados_del_eco/5", "zona/prados_del_eco/6", "secreto/prados_del_eco/1,1", "secreto/prados_del_eco/2,2", "secreto/prados_del_eco/5,5"]:
 		Estado.marcar(m)
 	_comprobar(Artes.subir("cetro") and Artes.golpe_alcance() == R.GOLPE_ALCANCE + 4.0, "Cetro I: el golpe llega más lejos")
 	_comprobar(Artes.subir("cetro") and Artes.golpe_angulo() == R.GOLPE_ANGULO + 20.0, "Cetro II: barre más ancho")
@@ -136,26 +139,29 @@ func _ready() -> void:
 
 	print("Lo que se le ve a Maisha (las Artes visuales):")
 	var asp := Artes.aspecto({"raiz": 5, "cetro": 3, "aliento": 2})
-	_comprobar(asp["prendas"] == ["brazaletes_hoja", "corona_hojas", "capa_musgo", "bufanda_viento"], "Raíz 5 y Aliento 2: brazaletes con hoja, corona, capa y bufanda larga (%s)" % [asp["prendas"]])
+	_comprobar(asp["prendas"] == ["raices_piernas_hoja", "brazaletes_hoja", "hombreras_corteza", "capa_hojas", "bufanda_viento"], "Raíz 5 y Aliento 2: raíces y brazaletes con hojas, hombreras, capa de hojas y bufanda larga (%s)" % [asp["prendas"]])
 	_comprobar(asp["cetro"] == "cetro_3" and "brote" in asp["rasgos"], "Cetro 3: el cetro de roble; Raíz 3+: el brote")
 	asp = Artes.aspecto({"raiz": 0, "cetro": 0, "aliento": 6})
-	_comprobar(asp["cetro"] == "cetro_raiz" and asp["rasgos"] == ["aura", "motas", "brillo", "brisa"], "Aliento 6: aura, motas, destellos y cuerpo de brisa (%s)" % [asp["rasgos"]])
+	_comprobar(asp["cetro"] == "cetro_0" and asp["rasgos"] == ["aura", "anillos", "remolino", "alas", "brisa"], "Aliento 6: aura, anillos, remolino, alas y cuerpo de brisa (%s)" % [asp["rasgos"]])
 	var ropa := maisha.get_node("Ropa")
 	var puestas: Dictionary = ropa.puestas()
 	_comprobar(puestas.get("arma", "") == "cetro_%d" % Artes.nivel("cetro"), "en la mano, el cetro de su nivel (%s)" % puestas.get("arma", ""))
 	_comprobar(puestas.get("torso", "") == "bufanda_viento", "y la bufanda de viento del Aliento 3 (%s)" % puestas.get("torso", ""))
 	var niveles: Dictionary = Estado.extra.get("artes", {}).duplicate()
-	niveles["raiz"] = 4
+	niveles["raiz"] = 6
 	Estado.extra["artes"] = niveles
-	Artes.arte_subida.emit("raiz", 4)
-	_comprobar(ropa.puestas().get("cabeza", "") == "corona_hojas", "Raíz 4: la corona de hojas")
+	Artes.arte_subida.emit("raiz", 6)
+	_comprobar(ropa.puestas().get("cabeza", "") == "corona_bosque" and ropa.puestas().get("hombros", "") == "hombreras_corteza", "Raíz 6: la corona del bosque y las hombreras")
 	var compradas: Dictionary = Estado.extra.get("comprado", {}).duplicate()
 	compradas["sombrero_paja"] = 1
 	Estado.extra["comprado"] = compradas
 	Tienda.poner_prenda("sombrero_paja", true)
 	_comprobar(ropa.puestas().get("cabeza", "") == "sombrero_paja", "lo que se pone desde la mochila manda en su zona")
 	Tienda.poner_prenda("sombrero_paja", false)
-	_comprobar(ropa.puestas().get("cabeza", "") == "corona_hojas", "y al quitárselo vuelve la corona de la Raíz")
+	_comprobar(ropa.puestas().get("cabeza", "") == "corona_bosque", "y al quitárselo vuelve la corona de la Raíz")
+	niveles["raiz"] = 4
+	Estado.extra["artes"] = niveles
+	Artes.arte_subida.emit("raiz", 4)
 	var golpe: Node2D = load("res://scripts/combate/golpe_efecto.gd").new()
 	golpe.cetro = "cetro_6"
 	maisha.add_child(golpe)
@@ -167,7 +173,7 @@ func _ready() -> void:
 	diario.set("_nodo", 6)
 	await _esperar(0.2)
 	var muneco_ropa: Node = diario.get("_muneco_ropa")
-	_comprobar(diario.get("_muneco").visible and muneco_ropa.puestas().get("espalda", "") == "capa_musgo", "en Habilidades, sobre Raíz VI, Maisha en grande se ve con la capa de musgo")
+	_comprobar(diario.get("_muneco").visible and muneco_ropa.puestas().get("espalda", "") == "capa_hojas", "en Habilidades, sobre Raíz VI, Maisha en grande se ve con la capa de hojas")
 	_comprobar("flores" in Artes.aspecto(diario.get("_muneco_rasgos").get("niveles"))["rasgos"], "y con las flores")
 	diario.set("_ver_antes", true)
 	await _esperar(0.2)

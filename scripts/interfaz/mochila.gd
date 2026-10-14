@@ -1274,13 +1274,14 @@ func _dibujar_panel_nodo(tinta: float) -> void:
 	# a la derecha: lo que cuesta y si se puede
 	var estado := _estado_nodo(id, _nodo)
 	var xd := caja.end.x - 176
+	var yd := y + 18                 # (el título va solo en su línea; lo de la derecha, debajo)
 	if estado == "despierto":
-		_texto("Despierto", Vector2(xd + 50, y + 22), Color(TN_VERDE, tinta))
+		_texto("Despierto", Vector2(xd + 50, yd + 10), Color(TN_VERDE, tinta))
 		return
-	var esencia := _nodo
+	var esencia := Artes.coste_nivel(_nodo)
 	var cristales := int(nivel_d.get("cristales", 0))
 	var coste := "◆ %d Esencia" % esencia + ("   ✧ %d" % cristales if cristales > 0 else "")
-	_texto(coste, Vector2(xd, y), Color(TN_TITULO, tinta))
+	_texto(coste, Vector2(xd, yd), Color(TN_TITULO, tinta))
 	var aviso := ""
 	var color_aviso := TN_APAGADA
 	if estado == "dormido":
@@ -1294,10 +1295,10 @@ func _dibujar_panel_nodo(tinta: float) -> void:
 	else:
 		aviso = "Mantén Acción"
 		color_aviso = col
-		var barra := Rect2(xd, y + 26, 160, 4)
+		var barra := Rect2(xd, yd + 26, 160, 4)
 		_lienzo.draw_rect(barra, Color(0.1, 0.1, 0.2, tinta))
 		_lienzo.draw_rect(Rect2(barra.position, Vector2(barra.size.x * (_mantenido / MANTENER), barra.size.y)), Color(col, tinta))
-	_texto(aviso, Vector2(xd, y + 22), Color(color_aviso, tinta))
+	_texto(aviso, Vector2(xd, yd + 20), Color(color_aviso, tinta))
 
 
 func _romano(n: int) -> String:
@@ -1407,7 +1408,7 @@ func _dibujar_maisha(tinta: float) -> void:
 		var pista := "F  ver " + ("después" if _ver_antes else "ahora")
 		_texto(pista, Vector2(round(cx - _ancho(pista, 13) / 2.0), caja.end.y - 8), Color(TN_SUAVE, tinta), -1, 13)
 	elif _nodo > 0:
-		_parrafo("Ya lo tienes: " + String(Artes.CAMBIO_VISIBLE[id][_nodo - 1]).to_lower(), Vector2(caja.position.x + 10, y), caja.size.x - 20, Color(TN_VERDE, tinta))
+		_parrafo(String(Artes.CAMBIO_VISIBLE[id][_nodo - 1]), Vector2(caja.position.x + 10, y), caja.size.x - 20, Color(TN_VERDE, tinta))
 
 
 ## Un tocón con anillos donde se sube Maisha

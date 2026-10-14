@@ -39,6 +39,7 @@ COLORES = {
     "w": "3A2414",  # raíz oscura (contorno)
     "W": "7E5430",  # raíz
     "X": "A87A48",  # raíz con luz
+    "Y": "D0A060",  # corteza con mucha luz
     # Brisa (la bufanda del Aliento)
     "b": "1E5A6E",  # brisa oscura (contorno)
     "B": "5AB0C8",  # brisa
@@ -244,72 +245,265 @@ SOMBRERO_LADO = [    # de perfil (mirando a la derecha): el ala se alarga hacia 
 # justo bajo el adorno (columna 3, fila 9) y el palo baja hasta el suelo por fuera del brazo.
 # Así no tapa la cara y apenas se mueve al andar (como mucho 1 píxel, con el paso).
 AGARRE_CETRO = (-3, -9)
-## Los cetros de los niveles del Arte del Cetro (12×20): la mano agarra en la columna 5, fila 11
-AGARRE_CETRO_N = (-5, -11)
+## Los cetros del Arte del Cetro (cetro_0 ... cetro_6, 16×21): la mano agarra en la columna 7, fila 13.
+## Dos ramas abrazan la gema; las hojas de arriba se vuelven de cobre y, en el 6, todo se dora.
+AGARRE_CETRO_N = {"abajo": (-5, -13), "arriba": (-5, -13), "lado": (3, -13)}   # de lado, por delante de la cara
 
 
 def cetro_nivel(n):
-    """El cetro en el nivel n (1-6) del Arte del Cetro (12×20, la mano en la fila 11): 1 cinta verde · 2 gema más grande · 3 de CORTEZA DE ROBLE (más
-    grueso, con nudos tallados) · 4 hojas de cobre · 5 gema dorada con chispas · 6 el CETRO DEL PRIMER ÁRBOL (dorado, con
-    una corona de hojas y flores)."""
-    img = Image.new("RGBA", (12, 20), (0, 0, 0, 0))
+    """El cetro en el nivel n (0-6) del Arte del Cetro: 0 la rama · 1 cinta verde · 2 gema grande · 3 ✦ CORTEZA DE ROBLE
+    (corteza oscura con vetas y aro de cobre) · 4 hojas de cobre · 5 gema dorada · 6 ✦ CETRO DEL PRIMER ÁRBOL (dorado,
+    con dos florecillas). Siempre fino: el personaje no debe verse cargado."""
+    img = Image.new("RGBA", (16, 21), (0, 0, 0, 0))
     def px(x, y, c):
-        if 0 <= x < 12 and 0 <= y < 20:
+        if 0 <= x < 16 and 0 <= y < 21:
             img.putpixel((x, y), tuple(int(c[i:i + 2], 16) for i in (0, 2, 4)) + (255,))
     roble = n >= 3
-    madera = ["3A2414", "5A3A20", "7E5430", "A07040"]
+    oro = n >= 6
+    m = ["3A2414", "5A3A20", "7E5430", "A07040"]
     if roble:
-        madera = ["2A1608", "5A3418", "8A5A2A", "B07A3A"]
-    if n >= 6:
-        madera = ["5A3A08", "B08A2A", "F2D27A", "FFF0B0"]
-    # el palo (más grueso desde el roble)
-    for y in range(9, 20):
-        px(4, y, madera[0]); px(5, y, madera[2] if y % 4 else madera[1]); px(6, y, madera[1])
-        px(7, y, madera[0])
-        if roble:
-            px(3, y, madera[0]); px(4, y, madera[1])
-    if roble:
-        for y in (12, 16):
-            px(5, y, madera[3]); px(4, y + 1, madera[0])                     # nudos tallados
-    px(5, 19, madera[0]); px(6, 19, madera[0])
-    if n >= 1:                                                               # la cinta verde, enroscada
-        for (x, y, c) in ((4, 10, "3E9A35"), (5, 11, "6FCF4F"), (6, 11, "6FCF4F"), (7, 12, "3E9A35"), (8, 13, "6FCF4F"), (8, 14, "3E9A35")):
+        m = ["24130A", "4E2C14", "86542A", "B8844A"]
+    if oro:
+        m = ["4A3008", "9A7420", "E8C060", "FFF0B0"]
+    # el palo: siempre fino (2 de madera y el contorno); el roble se nota por la corteza y el aro, no por el grosor
+    for y in range(9, 21):
+        cx = 7 + (1 if (y // 6) % 2 and not roble else 0)       # la rama de madera tiene un quiebro
+        px(cx - 1, y, m[0])
+        px(cx, y, m[3] if y % 4 == 1 else m[2])
+        px(cx + 1, y, m[1] if (roble and y % 3 == 0) else (m[2] if y % 5 else m[1]))
+        px(cx + 2, y, m[0])
+        if roble and y % 5 == 2:
+            px(cx, y, m[0])                                          # vetas de la corteza
+    px(7, 20, m[0]); px(8, 20, m[0])
+    if roble:                                                         # el aro de cobre (de oro en el 6)
+        aro = ("F2D27A", "8A6A10") if oro else ("C06A2A", "7A3A14")
+        for x in range(6, 10):
+            px(x, 12, aro[0]); px(x, 13, aro[1])
+        px(7, 12, "FFE0A0")
+    if n >= 1 and not oro:                                            # la cinta verde, enroscada
+        for (x, y, c) in ((6, 15, "3E9A35"), (7, 16, "6FCF4F"), (8, 16, "6FCF4F"), (9, 17, "3E9A35"), (10, 18, "6FCF4F"), (10, 19, "3E9A35")):
             px(x, y, c)
-    # la gema (más grande desde el 2; dorada desde el 5)
-    gema = ["8A3A0F", "EF8A26", "FDE27E"] if n < 5 else ["8A6A10", "F9D77A", "FFF8D0"]
-    if n >= 2:
-        for (x, y) in ((4, 5), (5, 4), (6, 4), (7, 5), (4, 6), (7, 6), (5, 7), (6, 7)):
-            px(x, y, gema[0])
-        for (x, y) in ((5, 5), (6, 5), (5, 6), (6, 6)):
-            px(x, y, gema[1])
-        px(5, 5, gema[2])
-    else:
-        for (x, y) in ((5, 5), (6, 5), (5, 6), (6, 6)):
-            px(x, y, gema[1])
-        px(5, 5, gema[2])
-    for (x, y) in ((5, 8), (6, 8)):
-        px(x, y, madera[1])
-    # las hojitas de arriba (de cobre desde el 4)
-    hoja = ["2F5A20", "6FCF4F"] if n < 4 else ["6A3418", "E0904E"]
-    for (x, y, k) in ((3, 3, 1), (2, 2, 1), (4, 4, 0), (8, 3, 1), (9, 2, 1), (7, 4, 0)):
+    # la cabeza: dos ramas que abrazan la gema
+    for (x, y) in ((4, 6), (4, 7), (5, 8), (6, 9), (11, 6), (11, 7), (10, 8), (9, 9)):
+        px(x, y, m[1])
+    for (x, y) in ((4, 5), (11, 5), (3, 4), (12, 4)):
+        px(x, y, m[2])
+    g = ["8A3A0F", "EF8A26", "FDE27E"] if n < 5 else ["8A6A10", "F9D77A", "FFFFFF"]
+    if n >= 2:      # gema grande: un rombo de 6×6
+        for (x, y) in ((7, 3), (8, 3), (6, 4), (9, 4), (5, 5), (10, 5), (5, 6), (10, 6), (6, 7), (9, 7), (7, 8), (8, 8)):
+            px(x, y, g[0])
+        for x in range(6, 10):
+            for y in range(4, 8):
+                if not ((x, y) in ((6, 4), (9, 4), (6, 7), (9, 7))):
+                    px(x, y, g[1])
+        px(6, 5, g[2]); px(7, 4, g[2])
+    else:           # gema pequeña: 4×4
+        for (x, y) in ((7, 4), (8, 4), (6, 5), (9, 5), (6, 6), (9, 6), (7, 7), (8, 7)):
+            px(x, y, g[0])
+        for (x, y) in ((7, 5), (8, 5), (7, 6), (8, 6)):
+            px(x, y, g[1])
+        px(7, 5, g[2])
+    hoja = ["2F5A20", "6FCF4F", "B8E08A"] if n < 4 else ["6A3418", "E0904E", "FFC08A"]
+    for (x, y, k) in ((2, 3, 1), (1, 2, 2), (2, 2, 1), (3, 3, 0), (13, 3, 1), (14, 2, 2), (13, 2, 1), (12, 3, 0),
+                      (7, 1, 1), (8, 1, 2), (7, 2, 0), (8, 2, 0)):
         px(x, y, hoja[k])
-    if n >= 5:
-        for (x, y) in ((1, 6), (10, 5), (9, 9), (2, 9)):
-            px(x, y, "FDE27E")
-    if n >= 6:
-        for (x, y, c) in ((2, 1, "6FCF4F"), (3, 0, "8FE06A"), (5, 0, "6FCF4F"), (6, 0, "8FE06A"), (8, 0, "6FCF4F"), (9, 1, "8FE06A"),
-                          (1, 3, "6FCF4F"), (10, 3, "6FCF4F"), (4, 0, "FFD7E0"), (7, 1, "FFD7E0"), (4, 1, "F9D36A")):
+    if oro:                                                           # dos florecillas entre las hojas
+        for (x, y, c) in ((4, 0, "FFD7E0"), (11, 0, "FFD7E0"), (4, 1, "F9D36A"), (11, 1, "F9D36A")):
             px(x, y, c)
     return img
+
+
+# ---------------------------------------------------------------------------
+# PRENDAS GRANDES DE LA RAÍZ (las da el Arte de la Raíz)
+# ---------------------------------------------------------------------------
+# RAÍCES EN LAS PIERNAS (zona: piernas · Raíz 1; con hojas, Raíz 2). Una raíz enroscada en cada pierna.
+RAICES_PIERNA = [
+    "Xw...",
+    ".wXw.",
+    "...wX",
+    ".Xw..",
+]
+RAICES_PIERNA_HOJA = [
+    "g....",
+    "GXw..",
+    ".wXwg",
+    "...wX",
+    ".Xw..",
+]
+RAICES_LADO = [
+    "Xw......",
+    ".wXw.Xw.",
+    "...wX.wX",
+    ".Xw..Xw.",
+]
+RAICES_LADO_HOJA = [
+    "g.....g.",
+    "GXw..XwG",
+    ".wXw.Xw.",
+    "...wX.wX",
+    ".Xw..Xw.",
+]
+# HOMBRERAS DE CORTEZA (zona: hombros · Raíz 4), con una hoja de roble encima
+HOMBRERA_IZQ = [
+    "..gg..",
+    ".gGhg.",
+    "wwGwww",
+    "wYXXWw",
+    "wXWXXw",
+    ".wWww.",
+]
+HOMBRERA_DER = [f[::-1] for f in HOMBRERA_IZQ]
+HOMBRERA_LADO = [
+    "..gg...",
+    ".gGhg..",
+    "wwGwwww",
+    "wYXXXWw",
+    "wXWXWXw",
+    ".wWwww.",
+]
+# CORONA DEL BOSQUE (zona: cabeza · Raíz 6): astas de rama con flores, a los lados del brote
+CORONA_BOSQUE_ABAJO = [
+    ".f......................f.",
+    "fFf.Xw..............wX.fFf",
+    ".fXw.Xw............wX.wXf.",
+    "...Xw.Xw..........wX.wX...",
+    "....XwwXw........wXwwX....",
+    "......wXXwwwwwwwwXXw......",
+    "........wwwwwwwwww........",
+]
+CORONA_BOSQUE_ARRIBA = [
+    "........................",
+    "..Xw................wX..",
+    "Xw.Xw..............wX.wX",
+    ".Xw.Xw............wX.wX.",
+    "...XwwXw........wXwwX...",
+    ".....wXXwwwwwwwwXXw.....",
+    ".......wwwwwwwwww.......",
+]
+CORONA_BOSQUE_LADO = [
+    ".f..............",
+    "fFf.Xw......f...",
+    ".fXw.Xw....fFf..",
+    "...Xw.Xw...wXf..",
+    "....XwwXw.wX....",
+    "......wXXwX.....",
+    "........ww......",
+]
+
+
+def capa_hojas(direccion, fotograma):
+    """CAPA DE HOJAS (zona: espalda · Raíz 5): escamas de hoja que se mecen (2 fotogramas). Pequeña: no más ancha que
+    los brazos. abajo y lado van detrás de Maisha; arriba (de espaldas) va delante y se ve entera."""
+    if direccion == "abajo":
+        ancho_arriba, ancho_abajo, alto = 14, 16, 10
+    elif direccion == "arriba":
+        ancho_arriba, ancho_abajo, alto = 12, 14, 10
+    else:
+        ancho_arriba, ancho_abajo, alto = 5, 7, 10
+    w = ancho_abajo + 2
+    img = Image.new("RGBA", (w, alto + 2), (0, 0, 0, 0))
+    def px(x, y, c):
+        if 0 <= x < w and 0 <= y < alto + 2:
+            img.putpixel((x, y), tuple(int(c[i:i + 2], 16) for i in (0, 2, 4)) + (255,))
+    for y in range(alto):
+        a = ancho_arriba + (ancho_abajo - ancho_arriba) * y / (alto - 1)
+        # en el lado la capa cuelga hacia atrás (a la izquierda) y se mece con el paso
+        x0 = round((w - a) / 2) if direccion != "lado" else round(w - a - 1 - (y / alto) * (1 + fotograma))
+        x0 += (fotograma if direccion != "lado" and y >= alto - 3 else 0)
+        for x in range(x0, x0 + round(a)):
+            borde = x == x0 or x == x0 + round(a) - 1
+            fila, col = y % 3, (x - x0 + (y // 3) * 2) % 4
+            if borde:
+                px(x, y, "152814")
+            elif fila == 0 and col == 0:
+                px(x, y, "355029")
+            elif col in (1, 2) and fila != 2:
+                px(x, y, "90D060" if fila == 0 else "3E9A35")
+            else:
+                px(x, y, "3E9A35" if (x + y) % 3 else "2E7A2A")
+    # las puntas de las hojas, abajo
+    y = alto
+    a = ancho_abajo
+    x0 = round((w - a) / 2) + fotograma if direccion != "lado" else round(w - a - 1 - (1 + fotograma))
+    for x in range(x0, x0 + a, 3):
+        px(x, y, "152814"); px(x + 1, y, "3E9A35"); px(x + 1, y + 1, "152814")
+    return img
+
+
+def tira(funcion, direccion, n=2):
+    """Pone los fotogramas de una prenda animada en una tira horizontal"""
+    marcos = [funcion(direccion, k) for k in range(n)]
+    img = Image.new("RGBA", (marcos[0].width * n, marcos[0].height), (0, 0, 0, 0))
+    for k, m in enumerate(marcos):
+        img.alpha_composite(m, (k * m.width, 0))
+    return img
+
 
 PRENDAS = {
     **{f"cetro_{n}": {
         "nombre": f"Cetro (Arte del Cetro {n})",
         "zona": "arma",
         "arte": "cetro",
-        "piezas": {d: [(f"cetro_{n}", None, "mano", AGARRE_CETRO_N, True)] for d in ("abajo", "arriba", "lado")},
-    } for n in range(1, 7)},
+        "piezas": {d: [(f"cetro_{n}", None, "mano", AGARRE_CETRO_N[d], True)] for d in ("abajo", "arriba", "lado")},
+        "de_artes": True,
+    } for n in range(0, 7)},
+    "raices_piernas": {
+        "de_artes": True,
+        "nombre": "Raíces en las piernas",
+        "zona": "piernas",
+        "arte": "raiz",
+        "piezas": {
+            "abajo": [("raices_pierna", RAICES_PIERNA, "pie_izq", (-1, -4), True), ("raices_pierna", RAICES_PIERNA, "pie_der", (-1, -4), True)],
+            "arriba": [("raices_pierna", RAICES_PIERNA, "pie_izq", (-1, -4), True), ("raices_pierna", RAICES_PIERNA, "pie_der", (-1, -4), True)],
+            "lado": [("raices_lado", RAICES_LADO, "piernas", (-1, 0), True)],
+        },
+    },
+    "raices_piernas_hoja": {
+        "de_artes": True,
+        "nombre": "Raíces con hojas en las piernas",
+        "zona": "piernas",
+        "arte": "raiz",
+        "piezas": {
+            "abajo": [("raices_pierna_hoja", RAICES_PIERNA_HOJA, "pie_izq", (-1, -5), True), ("raices_pierna_hoja", RAICES_PIERNA_HOJA, "pie_der", (-1, -5), True)],
+            "arriba": [("raices_pierna_hoja", RAICES_PIERNA_HOJA, "pie_izq", (-1, -5), True), ("raices_pierna_hoja", RAICES_PIERNA_HOJA, "pie_der", (-1, -5), True)],
+            "lado": [("raices_lado_hoja", RAICES_LADO_HOJA, "piernas", (-1, -1), True)],
+        },
+    },
+    "hombreras_corteza": {
+        "de_artes": True,
+        "nombre": "Hombreras de corteza",
+        "zona": "hombros",
+        "arte": "raiz",
+        "piezas": {
+            "abajo": [("hombrera_izq", HOMBRERA_IZQ, "brazo_izq", (-2, -3), True), ("hombrera_der", HOMBRERA_DER, "brazo_der", (0, -3), True)],
+            "arriba": [("hombrera_der", HOMBRERA_DER, "brazo_izq", (-2, -3), True), ("hombrera_izq", HOMBRERA_IZQ, "brazo_der", (0, -3), True)],
+            "lado": [("hombrera_lado", HOMBRERA_LADO, "brazo", (-3, -3), True)],
+        },
+    },
+    "capa_hojas": {
+        "de_artes": True,
+        "nombre": "Capa de hojas",
+        "zona": "espalda",
+        "arte": "raiz",
+        "piezas": {
+            "abajo": [("capa_hojas_abajo", "tira:abajo", "cuerpo", (-4, -1), False)],
+            "arriba": [("capa_hojas_arriba", "tira:arriba", "cuerpo", (-3, -1), True)],
+            "lado": [("capa_hojas_lado", "tira:lado", "cuerpo", (-6, 0), False)],
+        },
+    },
+    "corona_bosque": {
+        "de_artes": True,
+        "nombre": "Corona del bosque",
+        "zona": "cabeza",
+        "arte": "raiz",
+        "piezas": {
+            "abajo": [("corona_bosque_abajo", CORONA_BOSQUE_ABAJO, "cabeza", (-5, -5), True)],
+            "arriba": [("corona_bosque_arriba", CORONA_BOSQUE_ARRIBA, "cabeza", (-4, -5), True)],
+            "lado": [("corona_bosque_lado", CORONA_BOSQUE_LADO, "cabeza", (-1, -5), True)],
+        },
+    },
     "brazaletes_raiz": {
+        "de_artes": True,
         "nombre": "Brazaletes de raíz",
         "zona": "brazos",
         "arte": "raiz",
@@ -320,6 +514,7 @@ PRENDAS = {
         },
     },
     "brazaletes_hoja": {
+        "de_artes": True,
         "nombre": "Brazaletes de raíz con hoja",
         "zona": "brazos",
         "arte": "raiz",
@@ -330,6 +525,7 @@ PRENDAS = {
         },
     },
     "bufanda_brisa": {
+        "de_artes": True,
         "nombre": "Bufanda de brisa",
         "zona": "torso",
         "arte": "aliento",
@@ -340,6 +536,7 @@ PRENDAS = {
         },
     },
     "bufanda_viento": {
+        "de_artes": True,
         "nombre": "Bufanda de viento",
         "zona": "torso",
         "arte": "aliento",
@@ -419,14 +616,21 @@ if __name__ == "__main__":
             catalogo = json.load(f)
     for clave, p in PRENDAS.items():
         entrada = {"nombre": p["nombre"], "zona": p["zona"], "arte": p["arte"], "piezas": {}}
+        if p.get("de_artes"):
+            entrada["de_artes"] = True   # la dan las Artes (no se compra ni se elige en la mochila)
         for direccion, piezas in p["piezas"].items():
             lista = []
             for archivo, filas, ancla, (dx, dy), delante in piezas:
-                if filas is not None:   # None = el dibujo lo genera otro programa (p. ej. el cetro)
+                fotogramas = 1
+                if isinstance(filas, str) and filas.startswith("tira:"):   # prenda animada (fotogramas en tira)
+                    fotogramas = 2
+                    tira(capa_hojas, filas[5:], fotogramas).save(os.path.join(carpeta, archivo + ".png"))
+                elif filas is not None:   # None = el dibujo lo genera otro programa (p. ej. el cetro)
                     a_imagen(filas).save(os.path.join(carpeta, archivo + ".png"))
                 elif archivo.startswith("cetro_") and archivo[6:].isdigit():
                     cetro_nivel(int(archivo[6:])).save(os.path.join(carpeta, archivo + ".png"))
                 lista.append({
+                    "fotogramas": fotogramas,
                     "textura": f"res://arte/personajes/maisha/prendas/{archivo}.png",
                     "ancla": ancla,
                     "desplazamiento": [dx, dy],
