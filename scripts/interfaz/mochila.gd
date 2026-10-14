@@ -16,6 +16,7 @@ const FUENTE := preload("res://fuentes/pixelify_sans.woff")
 const ICONOS := preload("res://arte/interfaz/objetos.png")
 const MAPA := preload("res://arte/interfaz/mapa_mundo.png")
 const MAPA_RAIZ := preload("res://arte/interfaz/mapa_raiz.png")
+const MAPA_ESCALA := 1.32                 # el mapa de Raíz se ve ampliado (los nombres no: se escriben aparte)
 ## El diario de cuero (herramientas/pintar_interfaz.py)
 const PIEL := preload("res://scripts/interfaz/piel.gd")
 const SELLO := preload("res://arte/interfaz/diario/sello.png")
@@ -557,13 +558,18 @@ func _dibujar() -> void:
 	var a := _ease(_abre)
 	_lienzo.draw_rect(Rect2(0, 0, 640, 360), Color(0.02, 0.02, 0.05, 0.6 * a))
 	# la bolsa sube desde abajo mientras se abre
-	_lienzo.draw_set_transform(Vector2(0, round((1.0 - a) * 30.0)))
+	_lienzo.draw_set_transform(Vector2(0, _desplaz_y()))
 	var pleno := pestana in [P_MAPA, P_HABILIDADES]
 	_lienzo.draw_texture(FONDO_PLENO if pleno else FONDO_BOLSA, Vector2.ZERO, Color(1, 1, 1, a))
 	var tinta := clampf((_abre - 0.45) / 0.55, 0.0, 1.0)
 	if tinta > 0.0:
 		_dibujar_paginas(tinta)
 	_lienzo.draw_set_transform(Vector2.ZERO)
+
+
+## Lo que sube la bolsa mientras se abre (todo lo del diario se dibuja con este desplazamiento)
+func _desplaz_y() -> float:
+	return round((1.0 - _ease(_abre)) * 30.0)
 
 
 ## La mochila grande (cambia de dibujo con el bolsillo: el elegido brilla y asoma lo que guarda), el nombre del
@@ -622,7 +628,7 @@ func _dibujar_paginas(tinta: float) -> void:
 		return
 	_dibujar_bolsa(tinta)
 	# la ayuda, abajo a la derecha de la descripción
-	_texto(ayuda, Vector2(DESC.end.x - 34 - _fuente.get_string_size(ayuda, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x, DESC.end.y - 14), Color(TN_APAGADA, tinta), -1, 13)
+	_texto(ayuda, Vector2(DESC.end.x - 34 - _fuente.get_string_size(ayuda, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x, DESC.end.y - 13), Color(TN_SUAVE, tinta), -1, 15)
 	var filas := _lista()
 	var area := Rect2(LISTA.position + Vector2(26, 10), Vector2(LISTA.size.x - 40, FILAS_VISIBLES * ALTO_FILA))
 	# (la lista entra deslizándose al cambiar de bolsillo)
@@ -856,11 +862,11 @@ func _detalle_bestia(tipo: String, caja: Rect2) -> void:
 		var cuenta := "%d vencidos" % n
 		if rango < 3:
 			cuenta += " · %s con %d" % [String(Bestiario.NOMBRE_RANGO[rango + 1]), int(u[rango])]
-		_texto(cuenta, Vector2(caja.end.x - 4 - _fuente.get_string_size(cuenta, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x, caja.position.y + 18), TN_SUAVE, -1, 13)
+		_texto(cuenta, Vector2(caja.end.x - 4 - _fuente.get_string_size(cuenta, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x, caja.position.y + 18), TN_TINTA, -1, 15)
 	var linea := String(ficha["donde"])
 	if rango > 0:
 		linea += " · rango de " + String(Bestiario.NOMBRE_RANGO[rango])
-	_texto(linea, Vector2(x, caja.position.y + 34), Bestiario.COLOR_RANGO[rango] if rango > 0 else TN_SUAVE, -1, 14)
+	_texto(linea, Vector2(x, caja.position.y + 35), Bestiario.COLOR_RANGO[rango] if rango > 0 else TN_SUAVE, -1, 15)
 	var y := _parrafo(String(ficha["texto"]), Vector2(x, caja.position.y + 52), ancho, TN_TINTA, 15.0)
 	if rango >= 2:
 		_parrafo("Secreto: " + String(ficha["secreto"]), Vector2(x, y + 2), ancho, TN_VERDE, 15.0)
@@ -911,8 +917,12 @@ func _raiz_conocida() -> bool:
 ## El mapa de Raíz: los caminos que ya ha pisado (con tinta), niebla sobre lo que no conoce, los nombres de los
 ## lugares (con el mapa de Tawi se ven todos) y dónde está Maisha
 func _dibujar_mapa_raiz(area: Rect2) -> void:
-	var pos := (area.position + (area.size - Vector2(MAPA_RAIZ.get_size())) / 2.0 - Vector2(0, 8)).round()
-	_lienzo.draw_texture(MAPA_RAIZ, pos)
+	# el dibujo, los caminos y la niebla, ampliados (MAPA_ESCALA); los nombres y el alfiler, aparte y nítidos
+	var tam := Vector2(MAPA_RAIZ.get_size()) * MAPA_ESCALA
+	var pos := (area.position + (area.size - tam) / 2.0 - Vector2(0, 8)).round()
+	var m := func(v: Vector2) -> Vector2: return pos + v * MAPA_ESCALA
+	_lienzo.draw_set_transform(pos + Vector2(0, _desplaz_y()), 0.0, Vector2(MAPA_ESCALA, MAPA_ESCALA))
+	_lienzo.draw_texture(MAPA_RAIZ, Vector2.ZERO)
 	var con_tawi := Estado.tiene("mapa_raiz")
 	var caminos_vistos := 0
 	for k in CAMINOS_RAIZ.size():
@@ -920,55 +930,63 @@ func _dibujar_mapa_raiz(area: Rect2) -> void:
 		var puntos: Array = cam[2]
 		if Estado.tiene("visto/" + String(cam[1])):
 			caminos_vistos += 1
-			_trazo_tinta(pos, puntos)
+			_trazo_tinta(Vector2.ZERO, puntos)
 		else:
 			# niebla sobre el tramo de en medio (los extremos tocan los lugares, que tienen la suya)
 			var medio: Array = puntos.slice(1, puntos.size() - 1) if puntos.size() > 2 else [(Vector2(puntos[0]) + Vector2(puntos[-1])) / 2.0]
 			for j in medio.size():
-				_nube(pos + Vector2(medio[j]), Vector2(13, 9), k * 7 + j)
+				_nube(Vector2(medio[j]), Vector2(13, 9), k * 7 + j)
 	for k in LUGARES_RAIZ.size():
 		var r: Array = LUGARES_RAIZ[k]
 		if not Estado.tiene(String(r[2])) and not con_tawi:
-			_nube(pos + Vector2(r[1]), Vector2(40, 22), k * 13 + 100)
-			_texto("?", (pos + Vector2(r[1]) + Vector2(-2, 5)).round(), Color(NIEBLA_SOMBRA, 0.9))
+			_nube(Vector2(r[1]), Vector2(40, 22), k * 13 + 100)
+	_lienzo.draw_set_transform(Vector2(0, _desplaz_y()))
+	for k in LUGARES_RAIZ.size():
+		var r: Array = LUGARES_RAIZ[k]
+		if not Estado.tiene(String(r[2])) and not con_tawi:
+			_texto("?", (m.call(Vector2(r[1])) + Vector2(-3, 6)).round(), Color(NIEBLA_SOMBRA, 1.0), -1, 18)
 	for r in LUGARES_RAIZ:
 		var conocida := Estado.tiene(String(r[2]))
 		if not conocida and not con_tawi:
 			continue
-		var tinta := TINTA if conocida else Color(TINTA, 0.6)
-		# el nombre en dos líneas («Bosque / Cobrizo»), centrado: así no se pisan los rótulos vecinos
+		# el nombre en una etiqueta de pergamino (dos líneas: «Bosque / Cobrizo»), que se lee sobre cualquier color
 		var nombre: String = r[0]
 		var partes: PackedStringArray = nombre.split(" ", false, 1)
+		var ancho := 0.0
+		for linea in partes:
+			ancho = maxf(ancho, _ancho(linea))
+		var c: Vector2 = m.call(Vector2(r[1])) + Vector2(0, 16)
+		var caja := Rect2(round(c.x - ancho / 2.0 - 4), round(c.y - 2), round(ancho + 8), partes.size() * 13 + 5)
+		caja.position.x = clampf(caja.position.x, pos.x + 2, pos.x + tam.x - caja.size.x - 2)
+		_lienzo.draw_rect(Rect2(caja.position + Vector2(1, 2), caja.size), Color(0.1, 0.06, 0.03, 0.45))
+		_lienzo.draw_rect(caja, Color("f4e4c0") if conocida else Color("e2cea0"))
+		_lienzo.draw_rect(caja, Color(TINTA, 0.8 if conocida else 0.45), false, 1.0)
 		for k in partes.size():
 			var linea := partes[k]
-			var x_txt := clampf(Vector2(r[1]).x - _ancho(linea) / 2.0, 6.0, MAPA_RAIZ.get_width() - 6.0 - _ancho(linea))
-			var p: Vector2 = pos + Vector2(x_txt, Vector2(r[1]).y + 8 + k * 11)
-			_lienzo.draw_string(_fuente, p.round() + Vector2(1, 1), linea, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color("e2cea0"))
-			_lienzo.draw_string(_fuente, p.round(), linea, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, tinta)
+			var p := Vector2(caja.get_center().x - _ancho(linea) / 2.0, caja.position.y + 13 + k * 13)
+			_lienzo.draw_string(_fuente, p.round(), linea, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TINTA if conocida else Color(TINTA, 0.65))
 		# con el mapa de los secretos (tienda de Tawi): cuántos se han encontrado en cada sitio
 		if conocida and Estado.tiene("mapa_secretos"):
 			var mapa := String(r[2]).trim_prefix("visto/")
 			var total := _secretos_total(mapa)
 			if total > 0:
 				var hallados := 0
-				for m in Estado.marcas:
-					if String(m).begins_with("secreto/%s/" % mapa):
+				for mm in Estado.marcas:
+					if String(mm).begins_with("secreto/%s/" % mapa):
 						hallados += 1
 				var txt := "%d/%d" % [hallados, total]
-				var q: Vector2 = pos + Vector2(r[1]) + Vector2(-(_ancho(txt) + 10) / 2.0, 33)
-				_lienzo.draw_colored_polygon(PackedVector2Array([q + Vector2(3, -9), q + Vector2(6, -6), q + Vector2(3, -3), q + Vector2(0, -6)]),
-					Color("6b2a8f") if hallados < total else Color("3e7a2a"))
-				_lienzo.draw_string(_fuente, q.round() + Vector2(10, 0), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 16,
-					Color("6b2a8f") if hallados < total else Color("3e7a2a"))
+				var q: Vector2 = Vector2(caja.get_center().x - (_ancho(txt) + 10) / 2.0, caja.end.y + 13)
+				var col := Color("6b2a8f") if hallados < total else Color("3e7a2a")
+				_lienzo.draw_rect(Rect2(q + Vector2(-3, -12), Vector2(_ancho(txt) + 16, 15)), Color("f4e4c0"))
+				_lienzo.draw_colored_polygon(PackedVector2Array([q + Vector2(3, -9), q + Vector2(6, -6), q + Vector2(3, -3), q + Vector2(0, -6)]), col)
+				_lienzo.draw_string(_fuente, q.round() + Vector2(10, 0), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, col)
 	if PUNTO_RAIZ.has(Estado.escena_actual):
-		_aqui(pos + PUNTO_RAIZ[Estado.escena_actual])
+		_aqui(m.call(PUNTO_RAIZ[Estado.escena_actual]))
 	var pie := "Caminos descubiertos: %d/%d" % [caminos_vistos, CAMINOS_RAIZ.size()]
 	for cam in CAMINOS_RAIZ:
 		if cam[1] == Estado.escena_actual:
 			pie = "Estás en: %s · %s" % [cam[0], pie]
-	_texto(pie + " · ↑ ↓ mundo", Vector2(area.position.x + 16, area.end.y - 12), TN_SUAVE)
-	# el mapa está pegado sobre las dos páginas: el lomo lo dobla un poco
-	_lienzo.draw_rect(Rect2(pos.x + MAPA_RAIZ.get_width() / 2.0 - 4, pos.y, 8, MAPA_RAIZ.get_height()), Color(0.2, 0.12, 0.05, 0.18))
+	_texto(pie + " · ↑ ↓ mundo", Vector2(area.position.x + 8, area.end.y - 2), TN_TINTA)
 
 
 ## Un camino trazado con tinta: rayitas, como lo dibujaría Maisha al andar
