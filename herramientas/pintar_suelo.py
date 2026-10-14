@@ -472,7 +472,8 @@ def pintar(nombre, salida=None):
 
     bosque = nombre.startswith("bosque")
     cienaga = nombre.startswith("cienaga")
-    campo = nombre.startswith("campo")
+    paso = nombre == "paso_piedra"
+    campo = nombre.startswith("campo") or paso
     hierba_r = HIERBA_BOSQUE if bosque else (HIERBA_CIENAGA if cienaga else (HIERBA_CAMPO if campo else HIERBA_R))
     agua_r = AGUA_CIENAGA if cienaga else AGUA_R
     # ---- hierba: base con manchas grandes, matas medianas y briznas finas
@@ -488,6 +489,11 @@ def pintar(nombre, salida=None):
         desde, largo, rampa_n = (66, 40, HIERBA_BOSQUE) if cobrizo else (60, 45, HIERBA_CAMPO)
         hacia = np.clip((desde * CASILLA - lz.y) / (largo * CASILLA) + (grande - 0.5) * 0.5, 0, 1)
         lz.pintar(hacia, rampa(rampa_n, np.clip(v, 0, 1)))
+    if paso:
+        # el Paso de Piedra: la hierba seca del campo se va volviendo gravilla gris hacia la cantera (este)
+        hacia = np.clip((lz.x - 60 * CASILLA) / (60 * CASILLA) + (grande - 0.5) * 0.6, 0, 0.85)
+        grava = np.clip(0.45 + (media - 0.5) * 0.5 + (fina - 0.5) * 0.5, 0, 1)
+        lz.pintar(hacia, rampa(["#3a3630", "#57524a", "#76705f", "#958e7c", "#b3ab98"], grava))
     if canada:
         # la Cañada va de este a oeste: junto al Bosque Cobrizo (este) la hierba es la del bosque
         hacia = np.clip((lz.x - 96 * CASILLA) / (34 * CASILLA) + (grande - 0.5) * 0.5, 0, 1)
@@ -661,8 +667,8 @@ def pintar(nombre, salida=None):
         lz.pintar(postes * (lz.ruido(0.5, 1, semilla=21) > 0.6), "#a8735a", 0.6)
 
     _puente_piedra(lz, tipos, alto, ancho, fina, media)
-    pared = _riscos(lz, tipos, fina, media, cara=2.0 if canada else 1.0)
-    if canada:
+    pared = _riscos(lz, tipos, fina, media, cara=2.0 if (canada or paso) else 1.0)
+    if canada or paso:
         _mesetas(lz, tipos, fina, media, pared)
 
     if bosque:

@@ -2503,5 +2503,116 @@
 				]
 			}
 		]
+	},
+	"paso_llegada": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El suelo cruje de gravilla. Por aquí arrastraban piedras: se ven los surcos de las ruedas.",
+					"Y allí arriba, en la ladera... una casa. Con una cúpula en el tejado, como un ojo mirando al cielo."
+				]
+			}
+		]
+	},
+	"gruta_tapon_oeste": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Esta maraña tapa un túnel. Por las rendijas entra luz de día y olor a hierba seca.",
+					"Ahí fuera debe de haber un camino. Las raíces no se mueven... todavía."
+				]
+			}
+		]
+	},
+	"nungu_entrar": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Huele a polvo y a papel viejo. La luz entra por el agujero del tejado.",
+					"Aquí vivía alguien que estudiaba piedras. Y se fue con prisa: la silla sigue en el suelo."
+				]
+			}
+		]
+	},
+	"nungu_estanteria": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Estantes llenos de piedras, cada una con su etiqueta escrita a mano: «Granito del paso». «Pizarra del río». «Muestra 14: ¿VIVA?».",
+					"La muestra 14 tiene una veta violeta, como las grietas de Giza. Pero esta está aquí, quietecita, en un estante."
+				]
+			}
+		]
+	},
+	"nungu_pizarra": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una pizarra llena de dibujos de tiza: montañas, flechas y una veta que se ramifica como una raíz.",
+					"Abajo, con letra apretada: «No es piedra. CRECE.»"
+				]
+			}
+		]
+	},
+	"nungu_mesa": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Papeles por todas partes, un microscopio de latón y una taza con algo seco en el fondo.",
+					"Hay una carta a medio escribir: «Querida Corteza: la cerradura del armario es una maravilla, no la abre ni el viento. Te dejo la llave de repuesto, por si un día no vuelvo de abajo.»",
+					"Firma: Nungu. ¿«De abajo»? ¿Abajo dónde?"
+				],
+				"marca": "nungu_nota"
+			}
+		]
+	},
+	"nungu_armario": {
+		"nombre": "",
+		"conversaciones": [
+			{
+				"si": [
+					"armario_abierto"
+				],
+				"lineas": [
+					"La escalera de piedra baja a oscuras. De abajo sube un olor a setas y a tierra mojada... y una luz violeta."
+				]
+			},
+			{
+				"no": [
+					"nungu_cerradura"
+				],
+				"lineas": [
+					"Un armario enorme, más alto que la puerta, cerrado con una cerradura de hierro y una cadena.",
+					"En la cerradura hay grabado un martillo pequeñito sobre un yunque. Esa marca... la he visto en el taller de Corteza."
+				],
+				"marca": "nungu_cerradura"
+			},
+			{
+				"lineas": [
+					"Cerrado. La cerradura lleva la marca de Corteza."
+				]
+			}
+		]
+	},
+	"paso_cerrado_gruta_raices_desde_paso_piedra": {
+		"nombre": "Maisha",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Raíces de piedra, enredadas como un ovillo. Por las rendijas sale aire frío y huele a cueva.",
+					"No ceden. Es como si alguien, desde dentro, las estuviera sujetando."
+				]
+			}
+		]
 	}
 }

@@ -14,6 +14,7 @@ Genera en audio/musica/:
   purga.ogg, victoria.ogg, objeto.ogg   fanfarrias cortas
   canada.ogg      la Cañada del Eco: la flauta y su eco en la peña (en bucle)
   lago.ogg        el Lago Espejo: el piano y su reflejo (la misma frase al revés) (en bucle)
+  paso.ogg        el Paso de Piedra: una caja de música que pregunta, un reloj y la flauta que contesta (en bucle)
 
 El tema de Maisha (la melodía que vuelve en todas): D5 A4 E5 F#5 | E5 D5 A4 (B4) D5
 Instrumentos: kalimba y balafón (por las raíces suajilis del mundo), flauta, voces y tambores de mano.
@@ -563,6 +564,7 @@ TITULOS = {
     "jefe_mamba": "Mamba, el cocodrilo de herrumbre",
     "embarcadero": "Canción de barqueros",
     "jefe_guardian": "La pesadilla del Guardián",
+    "paso": "La casa del observatorio",
 }
 
 # =============================================================================
@@ -1274,6 +1276,58 @@ def jefe_guardian():
 
 
 NO_SE_REPITEN = ("raiz_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
+# =============================================================================
+# PASO DE PIEDRA: misterio y curiosidad (re menor con la sexta mayor, dórico): una caja de música que se pregunta
+# cosas, el tic-tac de un reloj que nadie ha parado, el viento del paso y la flauta que contesta
+# =============================================================================
+
+## «La casa del observatorio»: la pregunta (sube y se queda en el aire) y la respuesta (baja a casa)
+PREGUNTA = [("D5", 0, 0.5), ("F5", 0.5, 0.5), ("E5", 1, 1), ("A5", 2, 1.5), ("G5", 3.5, 0.5),
+            ("F5", 4, 0.5), ("E5", 4.5, 0.5), ("B4", 5, 1), ("C#5", 6, 2)]
+RESPUESTA = [("A5", 0, 0.5), ("G5", 0.5, 0.5), ("F5", 1, 1), ("E5", 2, 1), ("C5", 3, 1),
+             ("D5", 4, 1.5), ("A4", 5.5, 0.5), ("D5", 6, 2)]
+
+
+def paso():
+    tempo = Tempo(84)
+    pulsos = 64
+    p = Pista(tempo.s(pulsos))
+    progresion = [("D2", "m"), ("G2", "M"), ("D2", "m"), ("A1", "M"), ("B1", "M"), ("G2", "M"), ("E2", "m7"), ("A1", "M")] * 2
+    colchones(p, tempo, progresion, compas=4, brillo=700, volumen=0.2, octava_bajo=1, fuerza_bajo=0.25)
+    # el tic-tac del reloj del observatorio: un clic agudo en cada pulso, más suave en los pares
+    for b in range(pulsos):
+        d = 0.02
+        clic = paso_banda(ruido_rosa(d), 3000, 9000) * np.linspace(1, 0, int(d * SR)) ** 3
+        p.poner(clic * (0.12 if b % 2 == 0 else 0.07), tempo.s(b), pan=0.25 if b % 2 else -0.25)
+    # la caja de música: la pregunta, dos veces, y la respuesta
+    caja = lambda n, d: campanita(n, max(d * 1.6, 1.2), 0.5)
+    for vuelta in (0, 32):
+        melodia(p, tempo, PREGUNTA, desde=vuelta, instrumento=caja, volumen=0.3, pan=-0.15)
+        melodia(p, tempo, PREGUNTA, desde=vuelta + 8, instrumento=caja, volumen=0.26, pan=0.1)
+        melodia(p, tempo, RESPUESTA, desde=vuelta + 16, instrumento=caja, volumen=0.3, pan=-0.1)
+    # en la segunda mitad, la flauta contesta a la caja de música (una octava más abajo, con aire)
+    flauta_ = lambda n, d: flauta(n, d, 0.4, vibrato=4.2)
+    melodia(p, tempo, transportar(RESPUESTA, -12), desde=40, instrumento=flauta_, volumen=0.3, sostener=0.95, pan=0.2)
+    melodia(p, tempo, transportar(PREGUNTA, -12), desde=56, instrumento=flauta_, volumen=0.22, sostener=0.95, pan=0.25)
+    # la kalimba, abajo, en arpegios lentos
+    for i, (raiz, tipo) in enumerate(progresion):
+        if i % 2 == 1:
+            arpegio(p, tempo, raiz[:-1] + "3", tipo, i * 4, 4, cada=1.0, volumen=0.12, pan=0.35, patron=(0, 1, 2, 1))
+    # el viento del paso, a ráfagas, y alguna piedrecita que rueda
+    rng = np.random.default_rng(71)
+    for k in range(6):
+        d = 4.0 + rng.random() * 3
+        n = int(d * SR)
+        viento = ruido_rosa(d) * np.sin(np.linspace(0, np.pi, n)) ** 2
+        p.poner(paso_banda(viento, 250 + rng.random() * 200, 1200) * 0.2, k * tempo.s(pulsos) / 6, pan=rng.random() - 0.5)
+    for k in range(4):
+        t0 = tempo.s(6 + k * 15 + rng.random() * 4)
+        for j in range(3):
+            d = 0.03
+            p.poner(paso_banda(ruido_rosa(d), 1200, 4000) * np.linspace(1, 0, int(d * SR)) * (0.1 - j * 0.03), t0 + j * 0.09, pan=0.4)
+    return final(p, sala=2.8, mezcla=0.3, brillo=5200)
+
+
 PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": prados, "aldea": aldea,
           "interior": interior, "combate": combate, "jefe": jefe, "purga": purga, "victoria": victoria, "objeto": objeto, "tarea": tarea,
           "recuerdo": recuerdo, "noche": noche, "amanece": amanece, "bosque": bosque, "jefe_pembe": jefe_pembe,
@@ -1281,7 +1335,7 @@ PIEZAS = {"despertar": despertar, "kitovu": kitovu, "inicio": inicio, "prados": 
           "tienda": tienda, "raiz_libre": raiz_libre, "sendero": sendero, "pasarelas": pasarelas,
           "cobrizo": cobrizo, "surcos": surcos, "canada": canada, "jefe_kambare": jefe_kambare, "lago": lago,
           "orilla": orilla, "jefe_mamba": jefe_mamba,
-          "embarcadero": embarcadero, "jefe_guardian": jefe_guardian}
+          "embarcadero": embarcadero, "jefe_guardian": jefe_guardian, "paso": paso}
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

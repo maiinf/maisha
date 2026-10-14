@@ -128,7 +128,7 @@ func _ready() -> void:
 	print("El pasillo de las raíces dormidas:")
 	var raices := get_tree().get_nodes_in_group("raices_dormidas")
 	_comprobar(raices.size() == 3, "tres raíces enormes duermen atravesadas en el pasillo")
-	_comprobar(get_tree().get_nodes_in_group("tapon_raices").size() == 1, "y una maraña de raíces tapa el atajo al fondo")
+	_comprobar(get_tree().get_nodes_in_group("tapon_raices").size() == 2, "y dos marañas de raíces tapan el atajo al fondo y el túnel al Paso de Piedra")
 	var raiz: Node2D = raices[0]
 	for r in raices:
 		if (r as Node2D).global_position.y > raiz.global_position.y:

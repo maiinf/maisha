@@ -716,7 +716,7 @@ def crear_cienaga():
 
 def crear_campo():
     """El Campo Segado (96x64): los campos de cultivo abandonados del norte de Raíz.
-    Sur: la entrada desde Cuna de Musgo. Un camino central con un molino roto en el cruce; al oeste y al este,
+    Sur: la entrada desde Cuna de Musgo; al este, la salida al Paso de Piedra. Un camino central con un molino roto en el cruce; al oeste y al este,
     dos zonas corruptas entre campos labrados (surcos, trigo seco, espantapájaros, vallas, pacas y máquinas
     oxidadas); un granero en ruinas; un secreto tras un matorral. Al norte, el gran campo donde espera
     la Cosechadora Oxidada (el jefe de Raíz): una arena enorme de surcos."""
@@ -768,6 +768,7 @@ def crear_campo():
     camino([(47, 40), (34, 40), (30, 40)])                     # → zona 1
     camino([(48, 40), (62, 40), (66, 40)])                     # → zona 2
     camino([(20, 46), (24, 50), (30, 56)])                     # entre los campos del oeste
+    camino([(49, 31), (58, 28), (68, 22), (82, 20), (95, 20)])   # → el Paso de Piedra (este)
     # vallas alrededor de los campos (con huecos)
     for (x0, y0, x1, y1) in campos[:2]:
         for x in range(x0, x1 + 1):
@@ -811,6 +812,10 @@ def crear_campo():
         for y in range(ALTO - 3, ALTO - 1):
             if m[y][x] not in "#":
                 poner(x, y, ".")
+    # la salida al Paso de Piedra (puerta «>»)
+    for y in range(19, 23):
+        for x in range(ANCHO - 3, ANCHO):
+            poner(x, y, ">" if x == ANCHO - 1 else "#")
     poner(51, 59, "L")
     poner(47, 59, "S")
     for k, (zx_, zy_, rx_, ry_) in zonas.items():
@@ -1581,6 +1586,161 @@ def crear_canada():
     return ["".join(f) for f in m], textos
 
 
+def crear_paso():
+    """El Paso de Piedra (150x48, de oeste a este): el camino del Campo Segado (oeste) a la Gruta de las Raíces (este).
+    Un paso de montaña entre dos paredes de peña («0»). Al oeste, el borde del campo (árboles secos, pacas); en un
+    rellano del norte, la CASA DE NUNGU («ĥ»), el erizo científico, abandonada, con su huerto seco y un pozo; dentro,
+    el armario cerrado (la puerta «ď»). En el ensanche del sur, una zona corrupta. Al este, la CANTERA vieja (bloques
+    de piedra cortados «ĉ» y rocas caídas «ñ») y, al final, la maraña de raíces que tapa el paso a la Gruta (espinas
+    «!», puerta «>» cerrada hasta vencer al Guardián). Al noreste, un secreto tras un matorral."""
+    ANCHO, ALTO = 150, 48
+    azar = random.Random(171)
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    zonas = {"1": (88, 33, 9, 5)}
+
+    def en_zona(x, y, margen=2):
+        for (zx, zy, rx, ry) in zonas.values():
+            if ((x - zx) / (rx + margen)) ** 2 + ((y - zy) / (ry + margen)) ** 2 <= 1.0:
+                return True
+        return False
+
+    # las paredes de peña: abiertas al oeste (el campo), cerradas en el paso y en la cantera
+    norte, sur = {}, {}
+    for x in range(ANCHO):
+        cierre = min(1.0, max(0.0, (x - 16) / 24.0))
+        norte[x] = int(2 + 14 * cierre + 1.4 * math.sin(x * 0.23) + math.sin(x * 0.61 + 2))
+        sur[x] = int(46 - 13 * cierre + 1.4 * math.sin(x * 0.19 + 1) + math.sin(x * 0.53))
+    # el rellano de la casa de Nungu, al norte
+    for x in range(42, 74):
+        norte[x] = min(norte[x], int(4 + 6 * (1 - math.sin((x - 42) / 32 * math.pi)) + math.sin(x * 0.7)))
+    # el ensanche del sur, con la zona
+    for x in range(74, 104):
+        sur[x] = max(sur[x], int(44 - 1.5 * math.sin((x - 74) / 30 * math.pi) + math.sin(x * 0.8)))
+    # la cantera, al este: más ancha, con escalones cortados en la peña del norte
+    for x in range(112, 140):
+        norte[x] = min(norte[x], int(9 + ((x - 112) // 6) % 2 * 2))
+    for x in range(ANCHO):
+        for y in range(0, max(0, norte[x]) + 1):
+            poner(x, y, "0")
+        for y in range(sur[x], ALTO):
+            poner(x, y, "0")
+    # el rincón del secreto, al noreste de la cantera, tras un matorral
+    for x in range(141, 147):
+        for y in range(4, 10):
+            if ((x - 144) / 3.2) ** 2 + ((y - 7) / 2.6) ** 2 <= 1.0:
+                poner(x, y, ".")
+
+    def camino(puntos, ancho=2):
+        for (a, b) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b[0] - a[0]), abs(b[1] - a[1])) * 2) + 1
+            for i in range(pasos + 1):
+                t = i / pasos
+                x = a[0] + (b[0] - a[0]) * t
+                y = a[1] + (b[1] - a[1]) * t + math.sin(t * 3 + a[0]) * 0.35
+                for dx in range(ancho):
+                    for dy in range(ancho):
+                        xx, yy = int(x) + dx, int(y) + dy
+                        if 0 <= xx < ANCHO and 0 <= yy < ALTO and m[yy][xx] in ".,":
+                            poner(xx, yy, "#")
+
+    camino([(0, 26), (14, 26), (28, 25), (44, 24), (60, 23), (76, 24), (92, 23), (108, 22), (122, 23), (136, 24), (149, 24)])
+    camino([(58, 23), (58, 15)], 1)                                   # → la puerta de la casa de Nungu
+    camino([(88, 24), (88, 29)], 1)                                   # → el ensanche de la zona
+    # la casa de Nungu (la letra marca la base, en el centro: deja sitio alrededor), su puerta justo delante
+    poner(58, 13, "ĥ")
+    poner(58, 14, "ď")
+    # el huerto seco (surcos y valla rota) a la izquierda de la casa, y el pozo a la derecha
+    for x in range(44, 52):
+        for y in range(9, 14):
+            if m[y][x] == ".":
+                poner(x, y, "/")
+    for x in range(43, 53):
+        if x not in (47, 48):
+            poner(x, 15, "v")
+    # la cantera: bloques de piedra cortados («ĉ»), rocas caídas («ñ») y un carro volcado
+    for (x, y) in ((114, 11), (119, 9), (124, 12), (130, 10), (116, 32), (127, 31), (134, 33), (122, 15)):
+        if m[y][x] == ".":
+            poner(x, y, "ĉ")
+    # rocas caídas al pie de la peña, sobre todo en el paso
+    caidas = 0
+    for _ in range(400):
+        x = azar.randrange(20, ANCHO - 4)
+        for y in (norte[x] + 1, sur[x] - 1):
+            if caidas >= 20 or not (0 < y < ALTO - 1) or m[y][x] != ".":
+                continue
+            if any(m[y + dy][x + dx] in "#~=ĥďv/ĉ!>" for dx in (-2, -1, 0, 1, 2) for dy in (-1, 0, 1)):
+                continue
+            if azar.random() < 0.45:
+                poner(x, y, "ñ")
+                caidas += 1
+    # la maraña que tapa el paso a la Gruta (al este)
+    for y in range(20, 29):
+        for x in range(ANCHO - 6, ANCHO - 3):
+            if m[y][x] in ".,#":
+                poner(x, y, "!")
+    for y in range(21, 28):
+        for x in range(ANCHO - 3, ANCHO):
+            if m[y][x] != "0":
+                poner(x, y, ">" if x == ANCHO - 1 else "#")
+    # puerta oeste, al Campo Segado
+    for y in range(23, 30):
+        for x in range(0, 3):
+            poner(x, y, "<" if x == 0 else "#")
+    # el secreto, tras un matorral (los huecos de la boca del rincón, todos con matorral)
+    poner(144, 6, "X")
+    for x in range(138, ANCHO):
+        if m[9][x] == ".":
+            poner(x, 9, "M")
+    # el borde del mapa, cerrado (salvo las puertas)
+    for y in range(ALTO):
+        for x in (0, ANCHO - 1):
+            if m[y][x] not in "<>":
+                poner(x, y, "0")
+    for x in range(ANCHO):
+        for y in (0, ALTO - 1):
+            poner(x, y, "0")
+    reservados = [(58, 11, 7), (144, 6, 2), (6, 26, 3)]
+
+    def libre(x, y):
+        if m[y][x] not in ".," or en_zona(x, y):
+            return False
+        for (rx_, ry_, rr) in reservados:
+            if (x - rx_) ** 2 + (y - ry_) ** 2 <= rr * rr:
+                return False
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#~=ĥďv/ĉ!>X<M":
+                    return False
+        return True
+
+    for _ in range(2600):
+        x, y = azar.randrange(1, ANCHO - 1), azar.randrange(1, ALTO - 1)
+        if libre(x, y):
+            r = azar.random()
+            junto_pena = any(m[y + d][x] == "0" for d in (-2, -1, 1, 2) if 0 <= y + d < ALTO)
+            if r < (0.13 if junto_pena else 0.04):
+                poner(x, y, azar.choice("rrR"))
+            elif r < 0.12 and x < 30:
+                poner(x, y, azar.choice("ddT+"))
+            elif r < 0.09 and 30 <= x < 110:
+                poner(x, y, azar.choice("dd"))
+            elif r < 0.22 and x < 40:
+                poner(x, y, ",")
+    poner(8, 22, "L")
+    poner(55, 18, "L")
+    poner(140, 21, "L")
+    poner(6, 26, "S")
+    for k, (zx_, zy_, rx_, ry_) in zonas.items():
+        poner(zx_, zy_, k)
+    textos = {"1": "9, 5, 4, 3"}
+    return ["".join(f) for f in m], textos
+
+
 def crear_lago():
     """El Lago Espejo (96x64): un lugar al oeste de la Cañada del Eco (puerta al este). Un lago grande y quieto con
     una ISLA en el centro, donde aparecerá KIMYA, el Silencio. Lo que solo existe en el reflejo («\\»: un puente de
@@ -2141,6 +2301,15 @@ def crear_gruta():
     poner(61, 52, "X")
     tunel([(59, 48), (61, 52)], 0.8)
     textos = {"1": "12, 7, 4, 0, , jefe:guardian"}
+    # el túnel del oeste, del santuario al Paso de Piedra: lo tapa la misma maraña que el atajo (se aparta al
+    # despertar el Guardián); la puerta «<» está en datos/mapas/gruta_raices.puertas
+    tunel([(8, 38), (1, 38)], 1.2)
+    for y in range(36, 41):
+        if m[y][1] == ".":
+            poner(0, y, "<")
+    for x in range(1, 6):                                           # (estrecho: la maraña lo tapa entero)
+        poner(x, 37, "0"); poner(x, 39, "0")
+    poner(2, 38, "ř"); poner(3, 38, "ř")
     return ["".join(f) for f in m], textos
 
 
@@ -2240,7 +2409,8 @@ def exportar_json(nombre):
 # mapas cuyo suelo se pinta con detalle (herramientas/pintar_suelo.py); los demás, con el dibujo sencillo
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
-                  "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices"}
+                  "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
+                  "paso_piedra"}
 
 
 def construir_suelo(nombre):
@@ -2388,7 +2558,8 @@ if __name__ == "__main__":
                         "sendero_del_puente": crear_sendero, "las_pasarelas": crear_pasarelas,
                         "camino_cobrizo": crear_camino, "senda_surcos": crear_senda,
                         "canada_eco": crear_canada, "lago_espejo": crear_lago,
-                        "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta}.get(nombre, crear_prados)()
+                        "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta,
+                        "paso_piedra": crear_paso}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

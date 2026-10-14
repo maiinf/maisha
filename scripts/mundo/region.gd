@@ -44,6 +44,7 @@ const CAMPO := "res://arte/mundos/raiz/campo/"
 const CANADA := "res://arte/mundos/raiz/canada/"
 const LAGO := "res://arte/mundos/raiz/lago/"
 const EMBARCADERO := "res://arte/mundos/raiz/embarcadero/"
+const PASO := "res://arte/mundos/raiz/paso/"
 const MECERSE := preload("res://scripts/mundo/objetos/mecerse.gd")
 const GALLINA := preload("res://scripts/mundo/kitovu/gallina.gd")
 const OBJ := "res://arte/mundos/raiz/objetos/"
@@ -97,6 +98,9 @@ const FIJOS := {
 	"œ": [EMBARCADERO + "almacen.png", Vector2(100, 16), 0.0, 1, "embarcadero_almacen", 50.0],
 	"ß": [EMBARCADERO + "transbordador.png", Vector2(140, 16), 0.0, 3, "embarcadero_transbordador", 70.0],
 	"ł": [EMBARCADERO + "poste.png", Vector2(12, 7), 8.0, 2],
+	# del Paso de Piedra (la casa de Nungu: su puerta, «ď», lleva dentro)
+	"ĥ": [PASO + "casa_nungu.png", Vector2(124, 14), 0.0, 1],
+	"ĉ": [PASO + "bloque.png", Vector2(22, 8), 14.0, 2],
 }
 ## La casa del viajero de cada camino («{»): [dibujo, colisión, charla al usarla, radio, hoguera]
 const CAMPAMENTOS := {
@@ -540,7 +544,10 @@ func _crear_puertas(puertas: Dictionary) -> void:
 			_marca_espinas = puerta.cerrada_hasta
 			puerta.cerrada.connect(func() -> void:
 				var dialogo := get_tree().get_first_node_in_group("dialogo")
+				# (si hay un texto para esta puerta en concreto, «..._desde_<mapa>», va ese)
 				var charla := "paso_cerrado_" + String(p["destino"])
+				if CHARLA.datos().has(charla + "_desde_" + mapa):
+					charla += "_desde_" + mapa
 				if dialogo and CHARLA.datos().has(charla):
 					CHARLA.hablar(self, charla))
 		add_child(puerta)

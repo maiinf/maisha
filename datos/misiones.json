@@ -48,7 +48,8 @@
 			"orilla_juncos"
 		],
 		"campo_segado": [
-			"senda_surcos"
+			"senda_surcos",
+			"paso_piedra"
 		],
 		"sendero_del_puente": [
 			"prados_del_eco",
@@ -86,7 +87,16 @@
 			"gruta_raices"
 		],
 		"gruta_raices": [
-			"la_travesia"
+			"la_travesia",
+			"paso_piedra"
+		],
+		"paso_piedra": [
+			"campo_segado",
+			"gruta_raices",
+			"casa_nungu"
+		],
+		"casa_nungu": [
+			"paso_piedra"
 		]
 	},
 	"misiones": [
@@ -1055,6 +1065,61 @@
 					"ir": {
 						"escena": "senda_surcos",
 						"buscar": "aldeano:sungura"
+					}
+				}
+			]
+		},
+		{
+			"id": "casa_nungu",
+			"tipo": "historia",
+			"titulo": "La casa del Paso de Piedra",
+			"texto": "En el Paso de Piedra hay una casa abandonada con un observatorio en el tejado. Quien vivía allí se fue con prisa.",
+			"aparece": [
+				"paso_llegada"
+			],
+			"hecha": [
+				"armario_abierto"
+			],
+			"premio": "",
+			"pasos": [
+				{
+					"texto": "Entra en la casa abandonada",
+					"hecho": [
+						"visto/casa_nungu"
+					],
+					"ir": {
+						"escena": "paso_piedra",
+						"buscar": "puerta:casa_nungu"
+					}
+				},
+				{
+					"texto": "Busca pistas en la casa",
+					"hecho": [
+						"nungu_nota"
+					],
+					"ir": {
+						"escena": "casa_nungu",
+						"buscar": "casilla:15,6"
+					}
+				},
+				{
+					"texto": "Pregunta a Corteza por la llave del armario",
+					"hecho": [
+						"llave_nungu"
+					],
+					"ir": {
+						"escena": "taller_corteza",
+						"buscar": "aldeano:corteza"
+					}
+				},
+				{
+					"texto": "Abre el armario de Nungu",
+					"hecho": [
+						"armario_abierto"
+					],
+					"ir": {
+						"escena": "casa_nungu",
+						"buscar": "casilla:10,4"
 					}
 				}
 			]

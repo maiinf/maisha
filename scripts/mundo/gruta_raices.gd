@@ -70,7 +70,7 @@ func _crear_raices() -> void:
 					tapon.add_child(sprite)
 					var cosa := Node2D.new()
 					cosa.set_script(load("res://scripts/mundo/objetos/cosa.gd"))
-					cosa.set("charla", "gruta_tapon")
+					cosa.set("charla", "gruta_tapon_oeste" if x < 10 else "gruta_tapon")       # (el del oeste da al Paso de Piedra)
 					cosa.set("radio_interaccion", 34.0)
 					tapon.add_child(cosa)
 					$Entidades.add_child(tapon)

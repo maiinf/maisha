@@ -1,0 +1,4 @@
+; puerta = nombre, escena a la que lleva, puerta por la que se aparece allí, hacia dónde sale Maisha al llegar aquí
+< = campo, campo_segado, paso, derecha
+> = gruta, gruta_raices, paso, izquierda, cerrada:gruta_guardian
+ď = casa, casa_nungu, salida, abajo

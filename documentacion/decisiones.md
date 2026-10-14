@@ -100,3 +100,11 @@ se pasan.
 | Rango | Bronce/plata/oro por cuántos vences (10/30/60); jefes por golpes encajados (cualquiera/≤3/0). Plata da 2 cristales y el secreto; oro, 4 |
 | Bestiario | 6.º bolsillo del diario, con medallas, fichas y «???» para los que no has vencido |
 | Oro de los jefes | Se puede repetir la pelea: en cada arena de jefe vencido queda un **rescoldo de Giza** que revive su eco (sin consecuencias para la historia) hasta tener el oro |
+
+### Paso de Piedra (14-10)
+| Qué | Decisión |
+| --- | --- |
+| Dónde | Del Campo Segado (oeste) a la Gruta (este); el paso a la Gruta se abre al despertar al Guardián (atajo) |
+| Historia | Casa abandonada de **Nungu**, un erizo científico que estudiaba la piedra de Giza → armario cerrado con cerradura de Corteza → la llave la tiene **Corteza** en Cuna de Musgo → pasadizo a una cueva de setas |
+| Jefe | **Kuvu, la seta que manda** (controla mentes con hilos de esporas) tiene a Nungu controlado; con el escudo se corta su hilo y Nungu pasa a ayudar (2 contra 1) |
+| Partes | 1 el paso y la casa (hecha) · 2 la llave de Corteza · 3 el pasadizo, la cueva y el 8.º eco · 4 Kuvu y Nungu |

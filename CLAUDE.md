@@ -31,7 +31,7 @@ Godot está en `/Applications/Godot.app/Contents/MacOS/Godot` (versión 4.7).
 | Mapas (texto → JSON + suelo + zonas) | `construir_mapa.py <mapa> [--crear]` (con `--crear` se rehace el mapa y **se sobrescribe**) |
 | Aldeanos (24×32, frente) | `dibujar_aldeanos.py` |
 | Enemigos hechiceros (búho-mago, araña-bruja) | `pintar_hechiceros.py` |
-| Objetos y enemigos de cada camino | `pintar_sendero.py`, `pintar_pasarelas.py`, `pintar_camino.py`, `pintar_senda.py`, `pintar_canada.py`, `pintar_orilla.py`, `pintar_lago.py`, `pintar_embarcadero.py`, `pintar_travesia.py`, `pintar_gruta.py` |
+| Objetos y enemigos de cada camino | `pintar_sendero.py`, `pintar_pasarelas.py`, `pintar_camino.py`, `pintar_senda.py`, `pintar_canada.py`, `pintar_orilla.py`, `pintar_lago.py`, `pintar_embarcadero.py`, `pintar_travesia.py`, `pintar_gruta.py`, `pintar_paso.py` |
 | Ilustraciones de la historia (600×256) | `cinematicas.py <nombre>` (y `cinematicas_*.py`) |
 | Efectos y ambientes | `crear_sonidos.py [nombres]` |
 | Música | `componer_musica.py [nombres]` |
@@ -51,14 +51,14 @@ El grafo de caminos para la flecha de misiones está en `datos/misiones.json` �
 /Applications/Godot.app/Contents/MacOS/Godot --headless --import --path .
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_senda_surcos
 ```
-Hay 26 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
+Hay 27 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
 Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--headless`
 (guarda `get_viewport().get_texture().get_image()`); bórralo después.
 
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,
 Senda de los Surcos, Cañada del Eco y Orilla de Juncos hechos; faltan 3) y el misterio de los 9 ecos perdidos (7 hechos).
-El Embarcadero Junco está hecho (casa sellada de Bata, Mamba 2 contra 1, transbordador arreglado con poderes) y La Travesía es un viaje en barca con oleadas (cangrejos y anguilas) y la isla del 7.º eco. La Gruta de las Raíces está hecha (oscuridad, sigilo, escudo con J mantenida, espinos y el Guardián). Faltan el Paso de Piedra, los ecos 8 y 9 y el Sendero Olvidado. El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
+El Embarcadero Junco está hecho (casa sellada de Bata, Mamba 2 contra 1, transbordador arreglado con poderes) y La Travesía es un viaje en barca con oleadas (cangrejos y anguilas) y la isla del 7.º eco. La Gruta de las Raíces está hecha (oscuridad, sigilo, escudo con J mantenida, espinos y el Guardián). El Paso de Piedra tiene hecha su parte 1 (el paso y la casa abandonada de Nungu con el armario cerrado); faltan la llave de Corteza, la cueva de las setas con Kuvu y el 8.º eco, el 9.º eco y el Sendero Olvidado. Hay Bestiario con rangos (bronce/plata/oro) y enemigos hechiceros (Bundi, Buibui). El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
 
 ## graphify
 
