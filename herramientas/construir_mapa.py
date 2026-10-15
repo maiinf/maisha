@@ -1936,7 +1936,8 @@ def crear_paso_escarcha():
     y va despacio) y barrido por RACHAS DE VIENTO del oeste que traen páginas sueltas: empujan a Maisha hacia el este si
     no se cobija detrás de algo (rocas «ň», pinos «ğ» y las ESTELAS RÚNICAS «ȩ», piedras viejas con letras talladas).
     El sendero sube en eses de una estela a otra; arriba, la puerta del norte («^») hacia la ciudad. A media subida,
-    TAA el farolero en blanco («ţ»); su FICHA DEL ÍNDICE («ǩ»), en la nieve honda del este; y los FAROLES RÚNICOS («ƒ»)."""
+    TAA el farolero en blanco («ţ»); su FICHA DEL ÍNDICE («ǩ»), en la nieve honda del este; los FAROLES RÚNICOS («ƒ»)
+    y las PÁGINAS SUELTAS («ƥ»). La Puerta Sellada la pone la escena delante de la puerta del norte."""
     ANCHO, ALTO = 60, 110
     azar = random.Random(611)
     m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
@@ -1982,10 +1983,16 @@ def crear_paso_escarcha():
     estelas = [(19, 96), (13, 86), (37, 76), (41, 64), (19, 52), (15, 42), (32, 32), (23, 20)]
     for (x, y) in estelas:
         poner(x, y, "ȩ")
+    # arriba, la peña se cierra: solo se pasa por el hueco de la Puerta Sellada (x 27-32), que pone la escena
+    for y in range(0, 6):
+        for x in range(ANCHO):
+            if not 27 <= x <= 32:
+                poner(x, y, "0")
     # la puerta del norte y la del sur
-    for x in range(26, 34):
-        for y in range(0, 3):
+    for x in range(27, 33):
+        for y in range(0, 6):
             poner(x, y, "#")
+    for x in range(26, 34):
         for y in range(ALTO - 3, ALTO):
             poner(x, y, "#")
     for x in range(27, 33):
@@ -2005,6 +2012,11 @@ def crear_paso_escarcha():
         poner(x, y, "ƒ")
         puestos.append((x, y))
     faroles = puestos
+    # las PÁGINAS SUELTAS («ƥ»): dos abajo (se vencen con el cetro) y el resto arriba (allí ya se tiene el fuego)
+    paginas = [(44, 84), (14, 70), (40, 50), (14, 47), (40, 38), (18, 30), (40, 24), (20, 16), (37, 9)]
+    for (x, y) in paginas:
+        if m[y][x] == ".":
+            poner(x, y, "ƥ")
     reservados = [(29, 107, 3), (29, 3, 4), (taa[0], taa[1], 3), (ficha[0], ficha[1], 2)] + [(x, y, 2) for (x, y) in estelas + faroles]
 
     def libre(x, y):

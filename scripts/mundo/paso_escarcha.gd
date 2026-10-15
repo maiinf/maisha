@@ -9,6 +9,9 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ##     Al devolvérsela recupera el nombre y enseña el SIGILO DE FUEGO (marca «sigilo_fuego»).
 ##   - LOS FAROLES RÚNICOS («ƒ», sigilia/farol_runico.gd): se encienden con el sigilo; a su lado no empuja el viento
 ##     y la nieve no es honda.
+##   - LAS PÁGINAS SUELTAS («ƥ», enemigos/pagina_suelta.gd): el sigilo de fuego las quema de un trazo.
+##   - LA PUERTA SELLADA (sigilia/puerta_sellada.gd), arriba: Tinta Quieta que se derrite con tres sigilos de fuego
+##     («puerta_sellada_abierta»); detrás, Maandiko.
 ## Nieva (la nevada del Sendero Olvidado).
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
@@ -18,6 +21,8 @@ const NIEVE_HONDA := preload("res://scripts/mundo/sigilia/nieve_honda.gd")
 const TAA := preload("res://scripts/mundo/sigilia/taa.gd")
 const FAROL := preload("res://scripts/mundo/sigilia/farol_runico.gd")
 const RECOGIBLE := preload("res://scripts/mundo/objetos/recogible.gd")
+const PAGINA := preload("res://scripts/enemigos/pagina_suelta.gd")
+const PUERTA_SELLADA := preload("res://scripts/mundo/sigilia/puerta_sellada.gd")
 
 var ventisca: Node2D
 var nieve: Node2D
@@ -57,6 +62,10 @@ func _poner_cosas() -> void:
 				f.marca = "farol/paso_escarcha/%d,%d" % [x, y]
 				f.position = pos
 				$Entidades.add_child(f)
+			elif c == "ƥ":
+				var pg: CharacterBody2D = PAGINA.new()
+				pg.position = pos + Vector2(0, -4)
+				$Entidades.add_child(pg)
 			elif c == "ǩ":
 				var ficha: Node2D = RECOGIBLE.new()
 				ficha.objeto = "ficha_taa"
@@ -65,6 +74,19 @@ func _poner_cosas() -> void:
 				ficha.color_halo = Color(0.85, 0.7, 1.0)
 				ficha.position = pos
 				$Entidades.add_child(ficha)
+
+
+	# la Puerta Sellada, delante de la puerta del norte (en medio del sendero, al final de la subida)
+	var puerta: StaticBody2D = PUERTA_SELLADA.new()
+	puerta.position = Vector2(30 * 16, 5 * 16)
+	$Entidades.add_child(puerta)
+	puerta.abierta.connect(_al_abrir_puerta)
+
+
+func _al_abrir_puerta() -> void:
+	await get_tree().create_timer(1.2).timeout
+	if is_inside_tree():
+		await CHARLA_SCRIPT.hablar(self, "escarcha_puerta_abierta")
 
 
 func _pensar_al_llegar() -> void:

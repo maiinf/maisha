@@ -88,7 +88,8 @@
 		],
 		"gruta_raices": [
 			"la_travesia",
-			"paso_piedra"
+			"paso_piedra",
+			"sendero_olvidado"
 		],
 		"paso_piedra": [
 			"campo_segado",
@@ -101,6 +102,17 @@
 		],
 		"cueva_setas": [
 			"casa_nungu"
+		],
+		"sendero_olvidado": [
+			"gruta_raices",
+			"ruinas_primer_arbol"
+		],
+		"ruinas_primer_arbol": [
+			"sendero_olvidado",
+			"paso_escarcha"
+		],
+		"paso_escarcha": [
+			"ruinas_primer_arbol"
 		]
 	},
 	"misiones": [
@@ -1261,6 +1273,70 @@
 					"ir": {
 						"escena": "cueva_setas",
 						"buscar": "casilla:28,52"
+					}
+				}
+			]
+		},
+		{
+			"id": "paso_escarcha",
+			"tipo": "historia",
+			"titulo": "El Paso de la Escarcha",
+			"texto": "Detrás del Primer Árbol, ya curado, se abre un paso hacia el norte. Arriba, entre la nieve y la tinta, está Sigilia y el trozo del mapa de Mzee Shamba que falta.",
+			"aparece": [
+				"primer_arbol_libre"
+			],
+			"hecha": [
+				"puerta_sellada_abierta"
+			],
+			"pasos": [
+				{
+					"texto": "Sube al Paso de la Escarcha, detrás del Primer Árbol",
+					"hecho": [
+						"paso_escarcha"
+					],
+					"ir": {
+						"escena": "ruinas_primer_arbol",
+						"buscar": "puerta:paso_escarcha"
+					}
+				},
+				{
+					"texto": "Mira qué le pasa al armiño en blanco",
+					"hecho": [
+						"taa_visto"
+					],
+					"ir": {
+						"escena": "paso_escarcha",
+						"buscar": "aldeano:taa_blanco"
+					}
+				},
+				{
+					"texto": "Busca lo que se llevó el viento, hacia el este",
+					"hecho": [
+						"ficha/taa"
+					],
+					"ir": {
+						"escena": "paso_escarcha",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Devuélvele al armiño lo que es suyo",
+					"hecho": [
+						"taa_nombre"
+					],
+					"ir": {
+						"escena": "paso_escarcha",
+						"buscar": "aldeano:taa_blanco"
+					}
+				},
+				{
+					"texto": "Derrite la Puerta Sellada con el sigilo de fuego (U)",
+					"hecho": [
+						"puerta_sellada_abierta"
+					],
+					"ir": {
+						"escena": "paso_escarcha",
+						"buscar": "grupo:puerta_sellada"
 					}
 				}
 			]

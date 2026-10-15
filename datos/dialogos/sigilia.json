@@ -86,5 +86,46 @@
 				]
 			}
 		]
+	},
+	"puerta_sellada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"puerta_sellada_abierta"
+				],
+				"lineas": [
+					"La puerta de Maandiko, abierta. Del otro lado huele a papel y a estufa."
+				]
+			},
+			{
+				"si": [
+					"sigilo_fuego"
+				],
+				"lineas": [
+					"Tinta helada, dura como el hielo, tapando la puerta entera.",
+					"Taa dijo que mi fuego la derrite «si no es mucha»... Esto es mucha. Habrá que insistir."
+				]
+			},
+			{
+				"lineas": [
+					"Una puerta enorme, tapada por algo negro y brillante... ¿tinta? Está helada, dura como una piedra.",
+					"Por mucho que empuje, no se mueve. Necesito algo que la derrita."
+				]
+			}
+		]
+	},
+	"escarcha_puerta_abierta": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Se ha derretido! La puerta cede...",
+					"Al otro lado está Maandiko. Y en algún sitio de esa ciudad, el trozo de mapa que le falta a Mzee Shamba."
+				]
+			}
+		]
 	}
 }

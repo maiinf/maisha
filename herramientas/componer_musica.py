@@ -1586,6 +1586,62 @@ PIEZAS["travesia"] = travesia
 PIEZAS["gruta"] = gruta
 PIEZAS["setas"] = setas
 
+
+# =============================================================================
+# SIGILIA (mundo 2): una caja de música que se ha quedado fría. Vals lento en si menor; campanitas como de caja de
+# música, el roce del papel y el viento. «El tema de Sigilia» servirá para la ciudad y para el Grimorio.
+# =============================================================================
+
+## «El tema de Sigilia»: un vals (3/4) en si menor que sube como quien busca una palabra y baja al recordarla
+TEMA_SIGILIA = [("F#5", 0, 2), ("E5", 2, 1), ("D5", 3, 1.5), ("E5", 4.5, 0.5), ("F#5", 5, 1),
+                ("A5", 6, 2), ("G5", 8, 1), ("F#5", 9, 3),
+                ("E5", 12, 1), ("F#5", 13, 1), ("G5", 14, 1), ("A5", 15, 1.5), ("B5", 16.5, 0.5), ("A5", 17, 1),
+                ("F#5", 18, 1), ("E5", 19, 1), ("C#5", 20, 1), ("D5", 21, 3)]
+
+
+def escarcha():
+    """«La nieve que escribe»: el Paso de la Escarcha. Una caja de música (campanitas en vals) que suena helada, con el
+    viento que sube y baja, el roce de páginas que pasan volando y, por encima, el tema de Sigilia en la flauta; en la
+    segunda vuelta lo recoge el piano, más cálido (como un farol que se enciende)."""
+    tempo = Tempo(84)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [("B1", "m"), ("G1", "M"), ("D2", "M"), ("A1", "M"), ("B1", "m"), ("E2", "m"), ("G1", "M"), ("A1", "sus"),
+                  ("B1", "m"), ("G1", "M"), ("D2", "M"), ("F#1", "m"), ("B1", "m"), ("E2", "m"), ("A1", "sus"), ("B1", "m")] * 2
+    colchones(p, tempo, progresion, compas=3, brillo=600, volumen=0.16, octava_bajo=1, fuerza_bajo=0.26)
+    # la caja de música: en cada compás, la raíz abajo y dos campanitas del acorde (un-dos-tres)
+    for i, (raiz, tipo) in enumerate(progresion):
+        notas = acorde(raiz[:-1] + "5", tipo)
+        p.poner(campanita(raiz[:-1] + "4", 1.6, 0.11), tempo.s(i * 3), pan=-0.2)
+        p.poner(campanita(notas[1], 1.0, 0.07), tempo.s(i * 3 + 1), pan=0.15)
+        p.poner(campanita(notas[2 % len(notas)], 1.0, 0.07), tempo.s(i * 3 + 2), pan=0.25)
+    rng = np.random.default_rng(141)
+    # el viento: ráfagas largas que suben y bajan
+    for k in range(8):
+        d = 5.0 + rng.random() * 3
+        n = int(d * SR)
+        viento = ruido_rosa(d) * np.sin(np.linspace(0, np.pi, n)) ** 2
+        p.poner(paso_banda(viento, 260 + rng.random() * 140, 1200) * 0.2, k * tempo.s(pulsos) / 8, pan=rng.random() - 0.5)
+    # el roce de las páginas: soplos cortos y agudos, de dos en dos (aleteo)
+    for k in range(14):
+        b = rng.random() * (pulsos - 1)
+        for j in range(2):
+            d = 0.12
+            n = int(d * SR)
+            roce = paso_banda(ruido_rosa(d), 2500, 6000) * np.sin(np.linspace(0, np.pi, n))
+            p.poner(roce * 0.06, tempo.s(b) + j * 0.14, pan=rng.random() - 0.5)
+    # el tema: primero la flauta (fría), luego el piano (como un farol que se enciende)
+    flauta_ = lambda n, d: flauta(n, d, 0.38, vibrato=4.2)
+    melodia(p, tempo, TEMA_SIGILIA, desde=6, instrumento=flauta_, volumen=0.28, sostener=0.9, pan=-0.1)
+    tocar(p, tempo, transportar(TEMA_SIGILIA, -12), desde=54, fuerza=0.22, pan=0.1)
+    p.poner(coro(["B2", "F#3", "D4"], tempo.s(12)), tempo.s(36), 0.04)
+    p.poner(coro(["G2", "D3", "B3"], tempo.s(12)), tempo.s(84), 0.04)
+    return final(p, sala=3.4, mezcla=0.36, brillo=5200)
+
+
+PIEZAS["escarcha"] = escarcha
+TITULOS["escarcha"] = "La nieve que escribe"
+
 if __name__ == "__main__":
     solo = sys.argv[1:]
     for nombre, funcion in PIEZAS.items():
