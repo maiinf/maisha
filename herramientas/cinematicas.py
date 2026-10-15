@@ -1424,9 +1424,12 @@ def hoy():
 def marco_recuerdo(lz, color="#efe6cf", semilla=90):
     """Los recuerdos se ven como a través de una niebla clara que se come los bordes."""
     d = np.maximum(np.abs(lz.x - 300) / 300, np.abs(lz.y - 128) / 128) * 0.55 + np.hypot((lz.x - 300) / 300, (lz.y - 128) / 128) * 0.45
-    borde = np.clip((d - 0.7 + (lz.ruido(12, 3, semilla=semilla) - 0.5) * 0.18) * 2.2, 0, 1)
-    borde = lz.desenfocar(borde, 6)
-    lz.sumar_luz(borde ** 1.5, color, 0.55)
+    # un velo suave y estrecho (sin manchas): los bordes de la propia escena, desenfocados y aclarados hacia el color
+    ondas = lz.desenfocar(lz.ruido(20, 2, semilla=semilla), 12)
+    borde = lz.desenfocar(np.clip((d - 0.76 + (ondas - 0.5) * 0.08) * 2.4, 0, 1), 14) ** 1.6
+    velo = np.clip(cv2.GaussianBlur(lz.img.astype(np.float32), (0, 0), 6 * lz.s) * 0.7 + 0.22, 0, 1)
+    lz.pintar(borde, velo, 0.75)
+    lz.pintar(borde, color, 0.35)
     # motas de luz flotando
     rng = np.random.default_rng(semilla)
     motas = np.zeros((lz.H, lz.W))

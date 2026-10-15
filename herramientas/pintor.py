@@ -77,6 +77,12 @@ EXTRA = {
     "Fuego": ["#3c1208", "#6e200c", "#a8380f", "#d45a17", "#ef8a26", "#f9b947", "#fde27e", "#fff8d2"],
     "Giza luz": ["#2a0f3d", "#4d1a6b", "#7a2fa0", "#a24fd0", "#c27ce6", "#dcaaf2", "#f1d8fb"],
     "Gris": ["#1b1c1f", "#2b2c30", "#3d3f43", "#525458", "#6a6c6f", "#85878a", "#a3a4a6", "#c5c6c7"],
+    # para los recuerdos y las escenas de noche, agua y nieve (sin ellas, los degradados saltaban a gris en manchas)
+    "Agua honda": ["#03080c", "#081218", "#0e1c24", "#142834", "#1d3a44", "#2a5058", "#3e6c70", "#5a8a88"],
+    "Verde agua": ["#2e5e5c", "#3e8a86", "#62a8a2", "#8cc4bc", "#b4dcd4", "#d8f0ec"],
+    "Bruma": ["#353943", "#4a4e5a", "#5e6472", "#767c8a", "#9096a2", "#aab0b8", "#c8ccd2", "#e2e4e8"],
+    "Malva": ["#1c1420", "#2a1e2e", "#3e2a3e", "#5a3a50", "#7a4e62"],
+    "Nieve": ["#5e6a80", "#7c8aa0", "#a0aec0", "#c4d0dc", "#e2eaf0", "#f6f8fa"],
 }
 
 
