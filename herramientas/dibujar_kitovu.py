@@ -911,8 +911,9 @@ def iconos():
 
 # --- El mapa del mundo, roto ------------------------------------------------------------
 
-def mapa_mundo():
-    """Pergamino con los mundos alrededor del Kitovu. El trozo de Sigilia está arrancado."""
+def mapa_mundo(rotulos=False):
+    """Pergamino con los mundos alrededor del Kitovu. El trozo de Sigilia está arrancado.
+    Sin rótulos: el diario (mochila.gd) escribe los nombres aparte, en etiquetas que se leen bien con el mapa ampliado."""
     W, H = 300, 190
     img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     px = img.load()
@@ -964,7 +965,7 @@ def mapa_mundo():
     # rótulos
     fuente = ImageFont.truetype(os.path.join(RAIZ, "fuentes", "pixelify_sans.woff"), 12)
     d.fontmode = "1"
-    for (x, y, rx, ry, col, bor, nombre) in mundos + [(centro[0], centro[1] + 14, 0, 0, "", "", "Kitovu")]:
+    for (x, y, rx, ry, col, bor, nombre) in (mundos + [(centro[0], centro[1] + 14, 0, 0, "", "", "Kitovu")] if rotulos else []):
         w = d.textlength(nombre, font=fuente)
         pos = (x - w / 2, y - 6 if nombre != "Kitovu" else y - 1)
         d.text(pos, nombre, font=fuente, fill=c("Pergamino 1"), stroke_width=1, stroke_fill=c("Pergamino 3"))

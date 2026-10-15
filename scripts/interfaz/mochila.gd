@@ -17,6 +17,9 @@ const ICONOS := preload("res://arte/interfaz/objetos.png")
 const MAPA := preload("res://arte/interfaz/mapa_mundo.png")
 const MAPA_RAIZ := preload("res://arte/interfaz/mapa_raiz.png")
 const MAPA_ESCALA := 1.32                 # el mapa de Raíz se ve ampliado (los nombres no: se escriben aparte)
+const MAPA_MUNDO_ESCALA := 1.6            # y el del mundo, igual
+## Los nombres del mapa del mundo: [nombre, dónde (en píxeles del dibujo)]. Sigilia no: es el trozo que falta.
+const LUGARES_MUNDO := [["Raíz", Vector2(78, 120)], ["Asterhaul", Vector2(232, 110)], ["Valle del Ocaso", Vector2(170, 160)], ["Kitovu", Vector2(152, 122)]]
 ## El diario de cuero (herramientas/pintar_interfaz.py)
 const PIEL := preload("res://scripts/interfaz/piel.gd")
 const SELLO := preload("res://arte/interfaz/diario/sello.png")
@@ -917,11 +920,27 @@ func _dibujar_mapa() -> void:
 	if _raiz_conocida() and not _mapa_mundo:
 		_dibujar_mapa_raiz(area)
 		return
-	var pos := (area.position + (area.size - Vector2(MAPA.get_size())) / 2.0 - Vector2(0, 10)).round()
-	_lienzo.draw_texture(MAPA, pos)
+	# el mapa del mundo, ampliado (MAPA_MUNDO_ESCALA); los nombres, aparte, en etiquetas de pergamino
+	var tam := Vector2(MAPA.get_size()) * MAPA_MUNDO_ESCALA
+	var pos := (area.position + (area.size - tam) / 2.0 - Vector2(0, 6)).round()
+	_lienzo.draw_texture_rect(MAPA, Rect2(pos, tam), false)
+	for lugar in LUGARES_MUNDO:
+		var c: Vector2 = pos + Vector2(lugar[1]) * MAPA_MUNDO_ESCALA
+		var nombre: String = lugar[0]
+		var ancho := _ancho(nombre)
+		var caja := Rect2(round(c.x - ancho / 2.0 - 4), round(c.y - 9), round(ancho + 8), 18)
+		_lienzo.draw_rect(Rect2(caja.position + Vector2(1, 2), caja.size), Color(0.1, 0.06, 0.03, 0.45))
+		_lienzo.draw_rect(caja, Color("f4e4c0"))
+		_lienzo.draw_rect(caja, Color(TINTA, 0.8), false, 1.0)
+		_lienzo.draw_string(_fuente, Vector2(caja.position.x + 4, caja.position.y + 13).round(), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TINTA)
+	# Raíz libre (el Primer Árbol curado): una hojita dorada junto a su nombre
+	if Estado.tiene("primer_arbol_libre"):
+		var r: Vector2 = pos + Vector2(LUGARES_MUNDO[0][1]) * MAPA_MUNDO_ESCALA + Vector2(_ancho("Raíz") / 2.0 + 10, 0)
+		_lienzo.draw_circle(r, 4.0, Color("f0cc60"))
+		_lienzo.draw_circle(r + Vector2(-1, -1), 1.5, Color("fff6d0"))
 	# Maisha está en el Kitovu (o en Raíz): un punto que late
-	var aqui := pos + (Vector2(78, 120) if PUNTO_RAIZ.has(Estado.escena_actual) and not Estado.escena_actual in ["kitovu", "casa_shamba"] else Vector2(152, 108))
-	_punto(aqui)
+	var punto := Vector2(78, 132) if PUNTO_RAIZ.has(Estado.escena_actual) and not Estado.escena_actual in ["kitovu", "casa_shamba"] else Vector2(152, 100)
+	_punto(pos + punto * MAPA_MUNDO_ESCALA)
 	var pie := "Falta el trozo del norte. Mzee Shamba cree que está en Sigilia."
 	if _raiz_conocida():
 		pie = "↑ ↓ ver el mapa de Raíz · " + "Falta el trozo de Sigilia."
