@@ -143,55 +143,66 @@ def _castor_carga(lz, x, y, e, mira, luz, sem=0, piedra=True, **kw):
 
 
 def _arbol_dorado(lz, x, y, rng, escala=1.0):
-    """El PRIMER ÁRBOL, grande, pintado con volumen: un tronco ancho y retorcido con raíces, ramas que se meten en la
-    copa, y la copa hecha de RACIMOS de hojas doradas (cada uno con su luz y su sombra, los de delante tapando a los de
-    detrás), con un halo de luz alrededor como un sol de amanecer."""
+    """El PRIMER ÁRBOL, grande, pintado con volumen: un tronco ancho y retorcido con raíces, ramas gruesas que suben y
+    se meten en la copa (y se ven entre los racimos), y la copa hecha de RACIMOS de hojas doradas (cada uno con su luz
+    y su sombra, los de delante tapando a los de detrás), con un halo de luz alrededor como un sol de amanecer."""
+    import cv2
     e = escala
-    copa_y = y - 112 * e
-    # el halo que da (detrás de todo)
-    lz.sumar_luz(np.clip(1 - np.hypot((lz.x - x) / (190 * e), (lz.y - copa_y) / (120 * e)), 0, 1) ** 1.5, "#ffe9a8", 0.7)
-    # el tronco y las raíces
-    tronco = lz.poligono([(x - 30 * e, y), (x - 16 * e, y - 30 * e), (x - 14 * e, y - 60 * e), (x - 9 * e, y - 82 * e),
-                          (x + 10 * e, y - 82 * e), (x + 15 * e, y - 58 * e), (x + 17 * e, y - 30 * e), (x + 32 * e, y)])
-    for (dx, lx, g) in ((-1, 46, 6), (1, 50, 6), (-1, 28, 4), (1, 30, 4)):
+    copa_y = y - 94 * e                      # el centro de la copa
+    lz.sumar_luz(np.clip(1 - np.hypot((lz.x - x) / (200 * e), (lz.y - copa_y) / (125 * e)), 0, 1) ** 1.5, "#ffe9a8", 0.7)
+    # el tronco (ancho abajo, se abre en ramas) y las raíces
+    tronco = lz.poligono([(x - 30 * e, y), (x - 17 * e, y - 26 * e), (x - 15 * e, y - 50 * e), (x - 20 * e, y - 66 * e),
+                          (x + 20 * e, y - 66 * e), (x + 16 * e, y - 50 * e), (x + 18 * e, y - 26 * e), (x + 32 * e, y)])
+    for (dx, lx, g) in ((-1, 50, 7), (1, 54, 7), (-1, 30, 4.5), (1, 32, 4.5)):
         tronco = np.maximum(tronco, lz.trazo(lz.curva((x + dx * 12 * e, y - 6 * e), (x + dx * lx * 0.5 * e, y - 3 * e), (x + dx * lx * e, y + 1), n=24), g * e, 1.2 * e))
     ramas = np.zeros((lz.H, lz.W))
-    for (b0, b1, b2, g) in (((x - 6, y - 78), (x - 40, y - 100), (x - 70, y - 118), 7), ((x + 6, y - 78), (x + 42, y - 102), (x + 76, y - 116), 7),
-                            ((x, y - 80), (x - 4, y - 112), (x + 6, y - 140), 6), ((x - 20, y - 92), (x - 30, y - 128), (x - 22, y - 150), 4)):
-        ramas = np.maximum(ramas, lz.trazo(lz.curva(b0, b1, b2, n=30), g * e, g * 0.4 * e))
+    puntas = []
+    for (b0, b1, b2, g) in (((x - 12, y - 62), (x - 46, y - 82), (x - 88, y - 96), 9), ((x + 12, y - 62), (x + 50, y - 84), (x + 92, y - 94), 9),
+                            ((x - 4, y - 64), (x - 10, y - 96), (x - 4, y - 128), 8), ((x + 6, y - 64), (x + 24, y - 98), (x + 40, y - 124), 6),
+                            ((x - 20, y - 70), (x - 50, y - 108), (x - 56, y - 126), 5)):
+        b0 = (x + (b0[0] - x) * e, y + (b0[1] - y) * e)
+        b1 = (x + (b1[0] - x) * e, y + (b1[1] - y) * e)
+        b2 = (x + (b2[0] - x) * e, y + (b2[1] - y) * e)
+        ramas = np.maximum(ramas, lz.trazo(lz.curva(b0, b1, b2, n=30), g * e, g * 0.35 * e))
+        puntas.append((b1, b2, g))
     madera = np.clip(tronco + ramas, 0, 1)
     estrias = (np.abs(np.sin((lz.x - x) / (2.2 * e) + lz.ruido(6, 2, semilla=401) * 3)) > 0.86) * 1.0
-    lz.sombrear(madera, ["#1e1a14", "#33302a", "#4a4a3e", "#666a56", "#8a8e72", "#b0ae8a"], 9 * e, (0.4, -0.8, 0.5),
-                textura=1 - estrias * 0.5, fuerza_tex=0.45)
-    lz.sumar_luz(lz.desenfocar(madera * (lz.x > x + 6 * e), 2) * madera, "#ffd890", 0.25)      # el filo de luz
-    # la copa: racimos de hojas, de atrás adelante
+    corteza = ["#1e1a14", "#33302a", "#4a4a3e", "#666a56", "#8a8e72", "#b0ae8a"]
+    lz.sombrear(madera, corteza, 9 * e, (0.4, -0.8, 0.5), textura=1 - estrias * 0.5, fuerza_tex=0.45)
+    lz.sumar_luz(lz.desenfocar(madera * (lz.x > x + 6 * e), 2) * madera, "#ffd890", 0.25)
+    # la copa: racimos de hojas, de atrás adelante (más anchos que altos)
     racimos = []
-    for k in range(46):
+    for k in range(54):
         a = rng.random() * np.pi
-        r = rng.random() ** 0.6
-        cx = x + np.cos(a) * r * 118 * e
-        cy = copa_y - np.sin(a) * r * 62 * e + rng.normal(0, 6 * e)
-        racimos.append((cy, cx, (12 + rng.random() * 12) * e))
+        r = rng.random() ** 0.55
+        cx = x + np.cos(a) * r * 124 * e
+        cy = copa_y - np.sin(a) * r * 48 * e + 18 * e + rng.normal(0, 5 * e)
+        racimos.append((cy, cx, (13 + rng.random() * 12) * e))
     racimos.sort()
     oro = ["#5a4214", "#8a6420", "#b8862a", "#dca83e", "#f2c95a", "#fbe08a", "#fff4c8"]
-    for (cy, cx, rr) in racimos:
+    copa = np.zeros((lz.H, lz.W))
+    for n, (cy, cx, rr) in enumerate(racimos):
         forma = lz.elipse(cx, cy, rr * 1.15, rr * 0.82, rng.uniform(-15, 15))
-        # el borde del racimo, hecho de hojas (no una elipse lisa)
         hojitas = lz.desenfocar((lz.ruido(0.9, 2, semilla=int(cx * 7 + cy)) > 0.42).astype(float), 0.8) > 0.5
         borde = np.clip(lz.elipse(cx, cy, rr * 1.3, rr * 0.98) - forma, 0, 1) * hojitas
         racimo = np.clip(forma + borde, 0, 1)
-        lz.sombrear(racimo, oro, rr * 0.7, (0.35, -0.85, 0.55), textura=lz.ruido(1.4, 2, semilla=int(cx + cy)), fuerza_tex=0.18)
-        lz.pintar(np.clip(racimo - np.roll(racimo, int(-1.6 * lz.s), axis=0), 0, 1) * (lz.y > cy), "#3a2a0c", 0.35)   # sombra bajo cada racimo
-    copa = np.zeros((lz.H, lz.W))
-    for (cy, cx, rr) in racimos:
-        copa = np.maximum(copa, lz.elipse(cx, cy, rr * 1.2, rr * 0.9))
+        lz.sombrear(racimo, oro, rr * 0.7, (0.35, -0.85, 0.55), textura=lz.ruido(1.4, 2, semilla=int(cx + cy)), fuerza_tex=0.15)
+        lz.pintar(np.clip(racimo - np.roll(racimo, int(-1.6 * lz.s), axis=0), 0, 1) * (lz.y > cy), "#3a2a0c", 0.35)
+        copa = np.maximum(copa, racimo)
+        # a media copa, las ramas vuelven a verse por delante de los racimos de atrás (así se unen tronco y copa)
+        if n == len(racimos) // 2:
+            delante = np.zeros((lz.H, lz.W))
+            for (b1, b2, g) in puntas:
+                delante = np.maximum(delante, lz.trazo(lz.curva(b1, ((b1[0] + b2[0]) / 2, (b1[1] + b2[1]) / 2 + 4), b2, n=20), g * 0.55 * e, g * 0.25 * e))
+            delante = delante * (lz.y > copa_y - 6 * e)
+            lz.sombrear(delante, corteza, 3 * e, (0.4, -0.8, 0.5))
+    # el hueco de luz bajo la copa (donde se ve el cielo entre las ramas) y el halo de encima
     lz.sumar_luz(lz.desenfocar(copa, 10 * e) * (lz.y < copa_y), "#ffe39a", 0.3)
-    # destellos de hojas que brillan y hojas que caen
-    brillos = copa * (lz.ruido(0.5, 1, semilla=402) > 0.88) * (lz.y < copa_y + 10 * e)
+    brillos = copa * (lz.ruido(0.5, 1, semilla=402) > 0.88) * (lz.y < copa_y + 12 * e)
     lz.sumar_luz(brillos, "#fff8d8", 0.8)
     hojas = np.zeros((lz.H, lz.W))
-    for k in range(50):
-        hx, hy = x + rng.normal(0, 110 * e), copa_y + rng.random() * 120 * e
+    for k in range(60):
+        hx, hy = x + rng.normal(0, 115 * e), copa_y + 10 * e + rng.random() * 110 * e
         hojas = np.maximum(hojas, lz.elipse(hx, hy, 1.5 * e, 0.7 * e, rng.uniform(0, 180)) * rng.uniform(0.5, 1))
     lz.sumar_luz(hojas, "#fff1c0", 0.9)
 
@@ -221,7 +232,7 @@ def eco_puente():
     colina = lz.elipse(450, HZ + 14, 170, 40) * (lz.y < HZ + 16)
     lz.sombrear(colina, ["#3e5a44", "#5a7a52", "#7e9a66", "#a8b884"], 26, LUZ_A, textura=lz.ruido(4, 3, semilla=144), fuerza_tex=0.2)
     # el PRIMER ÁRBOL: enorme y viejo, con la copa dorada que brilla
-    _arbol_dorado(lz, 450, HZ + 4, rng, escala=0.68)
+    _arbol_dorado(lz, 450, HZ + 4, rng, escala=0.84)
     # los rayos de luz que salen del árbol y atraviesan la bruma
     fuente = (np.clip(1 - np.hypot((lz.x - 450) / 70, (lz.y - 40) / 40), 0, 1) ** 2).astype(np.float32)
     rayos = lz.rayos(fuente, (450, 40), largo=0.965, pasos=56)
@@ -323,13 +334,14 @@ def eco_puente():
     eje_fondo = int(Y_AGUA0 * lz.s)
     lejos_r = ondular(antes[np.clip(2 * eje_fondo - 1 - yy, 0, filas - 1)].copy(), Y_AGUA0, 2.0)
     hondo = np.clip((lz.y - Y_AGUA0) / (Y_AGUA1 - Y_AGUA0), 0, 1)
-    tinte = np.array([0.05, 0.15, 0.15])
-    lz.pintar(agua, np.clip(lejos_r * (0.6 - hondo[..., None] * 0.2) + tinte * (0.7 + hondo[..., None] * 0.3), 0, 1))
+    tinte = np.array([0.06, 0.19, 0.19])
+    lz.pintar(agua, np.clip(lejos_r * (0.56 - hondo[..., None] * 0.26) + tinte * (0.85 + hondo[..., None] * 0.55), 0, 1))
     # 2) el puente (y lo que hay encima) reflejado desde su base, solo por debajo de ella
     eje_p = int(base * lz.s)
     origen_p = np.clip(2 * eje_p - 1 - yy, 0, filas - 1)
     puente_m = np.clip(hecho + pretil + np.clip(cimbra, 0, 1), 0, 1)
-    puente_r = ondular(antes[origen_p].copy(), base, 2.5)
+    import cv2
+    puente_r = cv2.blur(ondular(antes[origen_p].copy(), base, 2.5).astype(np.float32), (int(3 * lz.s), 1))
     mascara_r = puente_m[origen_p] * (lz.y >= base) * agua * np.clip(1 - (lz.y - base) / 40, 0.2, 1)
     lz.pintar(mascara_r, np.clip(puente_r * 0.5 + tinte * 0.6, 0, 1), 0.85)
     # el agua bajo el puente (donde no llega el reflejo del cielo) y la línea de espuma en los pilares
@@ -338,11 +350,11 @@ def eco_puente():
         espuma = lz.elipse(xp, base + 1, 14, 2.2) * (lz.ruido(0.8, 2, semilla=xp) > 0.45)
         lz.pintar(espuma, "#e6f4f0", 0.75)
     # el camino de oro del árbol sobre el agua y destellos que bailan
-    camino = agua * np.clip(1 - np.abs(lz.x - 450) / (40 + (lz.y - Y_AGUA0) * 0.9), 0, 1)
-    vetas = (np.abs(np.sin(lz.y * 2.6 + lz.ruido(2.5, 2, semilla=145) * 5)) > 0.82)
-    lz.sumar_luz(camino * vetas, "#ffe39a", 0.85)
-    destellos = agua * (lz.ruido(0.5, 1, semilla=146) > 0.9) * (np.abs(lz.x - 450) < 120)
-    lz.sumar_luz(destellos, "#fff8e0", 0.9)
+    # (reflejos alargados y horizontales, como la luz sobre el agua de verdad; no puntitos sueltos)
+    camino = agua * np.clip(1 - np.abs(lz.x - 450) / (36 + (lz.y - Y_AGUA0) * 0.9), 0, 1) * (lz.y > base + 1)
+    vetas = estirar_h(lz, lz.ruido(0.9, 2, semilla=145), 26) > 0.66
+    lz.sumar_luz(camino * vetas, "#ffe39a", 0.75)
+    lz.sumar_luz(lz.desenfocar(camino, 3) * 0.5, "#ffd890", 0.25)
     lineas = agua * (np.abs(np.sin(lz.y * 1.9 + lz.ruido(6, 2, semilla=147) * 4)) > 0.96)
     lz.pintar(lineas, "#cfe6e0", 0.18)
     # ---- LA ORILLA DE AQUÍ: hierba con briznas y flores, juncos, bloques de piedra cortados y dos castores tirando
@@ -384,7 +396,7 @@ def eco_puente():
     lz.sumar_luz(motas, "#fff1c0", 0.8)
     # viñeta suave y el tono de los ecos (verde-agua, la niebla clara de los recuerdos)
     lz.pintar(np.clip((np.hypot((lz.x - 300) / 330, (lz.y - 128) / 170) - 0.78) * 2.2, 0, 1), "#0a1210", 0.5)
-    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.1)
+    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.06)
     ci.marco_recuerdo(lz, color="#d8f0ec", semilla=128)
     return lz
 
