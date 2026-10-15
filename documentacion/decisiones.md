@@ -208,3 +208,12 @@ se pasan.
 | Mauti en Sigilia | Va con Maisha pero se queda en la ciudad ayudando a los escribas en blanco; aparece en momentos clave (Iam: «vale sigue») |
 | Paso de la Escarcha, parte 2 | Taa (armiño farolero) está en blanco a media subida; su ficha del Índice se la llevó el viento al este. Al devolvérsela recupera el color y enseña el SIGILO DE FUEGO: tecla nueva U (RB en el mando; RB deja de ser «cambiar de semilla», que no se usaba), 20 de Aliento. Los faroles rúnicos solo los enciende el sigilo y, encendidos, abrigan del viento y ablandan la nieve |
 | Paso de la Escarcha, parte 3 | Páginas sueltas (enemigo: 2 golpes, el fuego las quema de un trazo). La Puerta Sellada se derrite con 3 sigilos; arriba la peña se cierra para que no se rodee. Misión «El Paso de la Escarcha». Música «La nieve que escribe» con el tema de Sigilia (vals de caja de música en si menor) |
+
+### Revisión de ilustraciones · Cinemáticas y ecos (16-10)
+| Qué | Decisión |
+| --- | --- |
+| Horizontes periódicos (`linea_horizonte`) | `linea_horizonte()` en `herramientas/cinematicas.py` usaba frecuencias armónicas exactas (`(2 ** o) / escala`), lo que en escalas cortas como `17_kimya_lago` producía una repetición exacta de dientes de sierra cada 34 px. Reemplazado por frecuencias incommensurables (`2.17 ** o` con variación aleatoria y onda base de baja frecuencia). |
+| Reflejo de `17_kimya_lago` (`cinematicas_sendero.py`) | Por debajo de `y = 2 * HZ` (`196 px`), el espejo del agua saturaba `origen = 0` y repetía verticalmente la fila 0 del cielo, estirando dos estrellas del borde superior como dos rayas verticales en el agua. Ahora el tramo inferior del reflejo se funde suavemente hacia azul noche profundo (`#0b1122`), como en `21_eco_lago`. |
+| El Primer Árbol en las Ruinas (`22_ruinas_mauti`) | `_arbol_gris()` tenía un tronco trapezoidal recto sin raíces ni corteza, en contraste con `_arbol_dorado()` en `23_arbol_libre`. Se igualó su anatomía con raíces extendidas en la nieve, corteza estriada con relieve, ramas nudosas y tres grandes vetas violetas de Giza. |
+| La granja y la leyenda (`2_familia_shamba`, `3_leyenda`) | En `casa_troncos()` se pintó la acequia de piedra con agua y espuma al pie de la rueda del molino; en `leyenda()` se sombreó el brazo de la mecedora (`brazo_m`, que se calculaba pero no se pintaba) y se reemplazó el árbol de 3 trazos rectos dentro de la visión del cetro por un árbol viejo con raíces y primeros brotes verdes. |
+

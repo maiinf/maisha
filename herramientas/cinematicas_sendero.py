@@ -843,6 +843,8 @@ def kimya_lago():
     origen = np.clip(2 * eje - 1 - np.arange(filas), 0, filas - 1)
     reflejo = lz.img[origen]
     lz.pintar(agua, reflejo * 0.82)
+    # más abajo de 2 * HZ se agota el cielo reflejado: fundir a azul noche hondo para no repetir la fila 0 con sus estrellas
+    lz.pintar(agua * np.clip((lz.y - (2 * HZ - 20)) / 24, 0, 1), "#0b1122")
     lz.pintar(agua * np.clip((lz.y - HZ) / 160, 0, 1), "#0a1424", 0.25)
     vetas = (estirar_h(lz, lz.ruido(1.5, 2, semilla=204), 40) > 0.72) * agua
     lz.pintar(vetas, "#c8e0e8", 0.12)
@@ -1335,29 +1337,37 @@ def _corro(lz, encendidas):
 
 
 def _arbol_gris(lz, x, y, alto, rng):
-    tronco = lz.poligono([(x - 26, y), (x - 17, y - alto * 0.35), (x - 13, y - alto * 0.6), (x + 13, y - alto * 0.6), (x + 18, y - alto * 0.35), (x + 27, y)])
+    e = alto / 150.0
+    tronco = lz.poligono([(x - 30 * e, y), (x - 17 * e, y - 26 * e), (x - 15 * e, y - 50 * e), (x - 20 * e, y - 66 * e),
+                          (x + 20 * e, y - 66 * e), (x + 16 * e, y - 50 * e), (x + 18 * e, y - 26 * e), (x + 32 * e, y)])
+    for (dx, lx, g) in ((-1, 50, 7), (1, 54, 7), (-1, 30, 4.5), (1, 32, 4.5)):
+        tronco = np.maximum(tronco, lz.trazo(lz.curva((x + dx * 12 * e, y - 6 * e), (x + dx * lx * 0.5 * e, y - 3 * e), (x + dx * lx * e, y + 1), n=24), g * e, 1.2 * e))
     ramas = np.zeros((lz.H, lz.W))
     def rama(a, ang, largo, g, n):
         nonlocal ramas
         b = (a[0] + np.cos(ang) * largo, a[1] + np.sin(ang) * largo)
         m = (a[0] + np.cos(ang) * largo * 0.5 + rng.normal(0, 3), a[1] + np.sin(ang) * largo * 0.5)
-        ramas = np.maximum(ramas, lz.trazo(lz.curva(a, m, b, n=20), g, g * 0.6))
+        ramas = np.maximum(ramas, lz.trazo(lz.curva(a, m, b, n=20), g, g * 0.58))
         if n < 3:
-            for d in (-0.5, 0.45):
-                rama(b, ang + d + rng.normal(0, 0.15), largo * 0.68, g * 0.6, n + 1)
-    for ang in (-2.5, -1.9, -1.25, -0.65):
-        rama((x, y - alto * 0.58), ang, alto * 0.32, 5.0, 0)
+            for d in (-0.48, 0.44):
+                rama(b, ang + d + rng.normal(0, 0.12), largo * 0.68, g * 0.62, n + 1)
+    for (ox_r, ang, l0, g0) in ((x - 13 * e, -2.45, 50 * e, 7.5 * e), (x - 5 * e, -1.85, 54 * e, 7.0 * e),
+                                (x + 5 * e, -1.25, 54 * e, 7.0 * e), (x + 13 * e, -0.68, 50 * e, 7.5 * e)):
+        rama((ox_r, y - 62 * e), ang, l0, g0, 0)
     madera = np.clip(tronco + ramas, 0, 1)
-    lz.sombrear(madera, ["#1e1e22", "#36363c", "#55555c", "#77777e", "#9a9aa0"], 7, (-0.6, -0.7, 0.5),
-                textura=lz.ruido(1.5, 3, semilla=421), fuerza_tex=0.35)
-    for pts in ([(x - 18, y), (x - 12, y - alto * 0.3), (x - 14, y - alto * 0.55)], [(x + 20, y), (x + 13, y - alto * 0.35), (x + 15, y - alto * 0.58)]):
-        v = lz.trazo(lz.curva(*pts, n=30), 1.0) * madera
+    estrias = (np.abs(np.sin((lz.x - x) / (2.2 * e) + lz.ruido(6, 2, semilla=401) * 3)) > 0.84) * 1.0
+    lz.sombrear(madera, ["#18181e", "#2c2c34", "#464650", "#686874", "#8e8e9a", "#b4b4c0"], 8 * e, (-0.6, -0.7, 0.5),
+                textura=1 - estrias * 0.45 + (lz.ruido(1.5, 3, semilla=421) - 0.5) * 0.3, fuerza_tex=0.42)
+    for pts in ([(x - 24 * e, y), (x - 12 * e, y - 34 * e), (x - 16 * e, y - 64 * e), (x - 36 * e, y - 86 * e)],
+                [(x + 26 * e, y), (x + 13 * e, y - 36 * e), (x + 15 * e, y - 64 * e), (x + 34 * e, y - 88 * e)],
+                [(x - 2 * e, y - 14 * e), (x + 3 * e, y - 44 * e), (x - 5 * e, y - 68 * e)]):
+        v = lz.trazo(lz.curva(*pts, n=36), 1.1) * madera
         lz.pintar(v, "#8a4ad0")
-        lz.sumar_luz(lz.desenfocar(v, 2), "#b080ff", 0.4)
+        lz.sumar_luz(lz.desenfocar(v, 2.2), "#b080ff", 0.45)
     nieve = madera * (1 - np.roll(madera, int(2 * lz.s), axis=0))
     lz.pintar(nieve, "#dfe6f0")
-    for k in range(30):
-        hx, hy = x + rng.normal(0, 70), y - alto * 0.8 - abs(rng.normal(0, 26))
+    for k in range(36):
+        hx, hy = x + rng.normal(0, 74), y - alto * 0.78 - abs(rng.normal(0, 26))
         lz.pintar(lz.elipse(hx, hy, 2.2, 1.1, rng.uniform(0, 180)), "#6e6044")
 
 
