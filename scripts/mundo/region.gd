@@ -104,6 +104,8 @@ const FIJOS := {
 	# del Paso de Piedra (la casa de Nungu: su puerta, «ď», lleva dentro)
 	"ĥ": [PASO + "casa_nungu.png", Vector2(124, 14), 0.0, 1],
 	"ĉ": [PASO + "bloque.png", Vector2(22, 8), 14.0, 2],
+	# SIGILIA · del Paso de la Escarcha: las estelas rúnicas (cobijan del viento)
+	"ȩ": ["res://arte/mundos/sigilia/paso/estela.png", Vector2(14, 6), 10.0, 2],
 }
 ## La casa del viajero de cada camino («{»): [dibujo, colisión, charla al usarla, radio, hoguera]
 const CAMPAMENTOS := {
@@ -133,6 +135,8 @@ const ALDEANOS := {
 const DIRECCIONES := {"arriba": Vector2.UP, "abajo": Vector2.DOWN, "izquierda": Vector2.LEFT, "derecha": Vector2.RIGHT}
 
 @export var mapa := "prados_del_eco"
+## El mundo al que pertenece el mapa: su suelo está en res://arte/mundos/<mundo>/suelos/
+@export var mundo := "raiz"
 ## Cuánto decorado hay por la hierba (0 = nada)
 @export var densidad_decorado := 0.3
 @export var nombre_region := "Prados del Eco"
@@ -216,7 +220,7 @@ func _ready() -> void:
 func _crear_suelo() -> void:
 	var suelo := Sprite2D.new()
 	suelo.name = "Suelo"
-	suelo.texture = load("res://arte/mundos/raiz/suelos/%s_suelo.png" % mapa)
+	suelo.texture = load("res://arte/mundos/%s/suelos/%s_suelo.png" % [mundo, mapa])
 	suelo.centered = false
 	suelo.z_index = -10
 	add_child(suelo)

@@ -17,7 +17,7 @@ extends RefCounted
 ##   "abre"          al terminar abre algo: "tienda" (el puesto de Tawi)
 ##   "tras_historia" líneas que se dicen al acabar la historia, antes de poner las marcas
 
-const ARCHIVOS := ["res://datos/dialogos/kitovu.json", "res://datos/dialogos/raiz.json"]
+const ARCHIVOS := ["res://datos/dialogos/kitovu.json", "res://datos/dialogos/raiz.json", "res://datos/dialogos/sigilia.json"]
 
 static var _datos: Dictionary = {}
 

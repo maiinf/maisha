@@ -83,6 +83,8 @@ EXTRA = {
     "Bruma": ["#353943", "#4a4e5a", "#5e6472", "#767c8a", "#9096a2", "#aab0b8", "#c8ccd2", "#e2e4e8"],
     "Malva": ["#1c1420", "#2a1e2e", "#3e2a3e", "#5a3a50", "#7a4e62"],
     "Nieve": ["#5e6a80", "#7c8aa0", "#a0aec0", "#c4d0dc", "#e2eaf0", "#f6f8fa"],
+    # la nieve lila de Sigilia
+    "Nieve lila": ["#4e4870", "#655e8a", "#7e76a2", "#9890ba", "#b0a9cd", "#c8c2de", "#dddaec", "#f0eef8"],
 }
 
 

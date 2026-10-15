@@ -205,3 +205,4 @@ se pasan.
 | Llegada | Por el Paso de la Escarcha, que sale de las Ruinas del Primer Árbol |
 | Ficha (propuesta) | Ciudad Maandiko; caminos: Paso de la Escarcha, Estanterías Colgantes, Canal de Tinta, Observatorio de la Aurora y Sección Prohibida. Sigilos Fuego, Hielo y Rayo (arte Runa). Jefes: Bibliotecario Hueco, Pweza, Kengele y el Grimorio de Tinta. Misterio: 12 fichas del Índice que devuelven nombres. Detalle en el GDD, sección «Sigilia: ficha del mundo 2» |
 | Bocetos | Ambiente: `documentacion/boceto_sigilia.png` (`herramientas/boceto_sigilia.py`). Mapa de regiones: `documentacion/boceto_mapa_sigilia.png` (`herramientas/boceto_mapa_sigilia.py`) |
+| Mauti en Sigilia | Va con Maisha pero se queda en la ciudad ayudando a los escribas en blanco; aparece en momentos clave (Iam: «vale sigue») |

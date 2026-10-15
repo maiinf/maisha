@@ -689,6 +689,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_kitovu.gd` juega el comienzo entero: el despertar lento, la chispa y sus 3 recuerdos, Kuku y la puerta, la noche y el amanecer, el despertar sin cetro, la zona dormida, el susurro del castor, las tres tareas (con la pesca), el cetro y el mapa, el espantapájaros, la mochila, las 3 manchas de práctica con el narrador, la pelea contra Mzizi y el arco hasta los prados y vuelta.
 - `pruebas/prueba_guardado.gd` empieza una partida desde el inicio (el diario se abre y la introducción se escribe en él), guarda, pausa, vuelve al inicio, continúa donde lo dejó, comprueba que en plena pelea se guarda el último sitio seguro, que «Nueva partida» pregunta antes de borrar y que un archivo estropeado no rompe nada.
 - `pruebas/prueba_encargos.gd` recoge setas y mineral, comprueba que el cetro rebota en la roca y la semilla la rompe, entrega los encargos, ve levantarse las casas, entra en ellas y prueba las recompensas (haces del vigía y cetro templado).
+- `pruebas/prueba_paso_escarcha.gd` comprueba el paso del norte de las Ruinas (cerrado hasta curar al árbol), llega al Paso de la Escarcha, prueba la nieve honda (frena, no deja correr, deja surcos que ya no frenan), la ventisca (empuja en medio del valle, no detrás de una estela, y se apaga al pasar la racha), que revivir lo quita todo y que la puerta a Maandiko aún no deja pasar.
 - `pruebas/prueba_sendero.gd` va de los Prados al Sendero del Puente y a la aldea y vuelta, prueba los pretiles y el vado, el eco perdido (con su ilustración), el encargo de Msafiri y el cuaderno de ecos.
 - `pruebas/prueba_pasarelas.gd` va de la aldea a Las Pasarelas y a la ciénaga y vuelta, prueba el agua y las tablas, el tramo roto, la rana de piedra (aviso, salto, onda, atontada), el encargo de Korongo (que arregla la pasarela) y el segundo eco.
 - `pruebas/prueba_camino_cobrizo.gd` sube de los Prados al Camino Cobrizo y al bosque y vuelta, prueba la peña y el derrumbe, el topo de piedra (bajo tierra, aviso, mordisco, atontado, las raíces que lo sacan), el encargo de Fuko (que despeja la galería) y el tercer eco.
@@ -826,6 +827,25 @@ Escena `escenas/mundo/ruinas_primer_arbol.tscn` (`scripts/mundo/ruinas_primer_ar
 | Música | «Las Ruinas» (solemne, coro lejano) y «El miedo del Primer Árbol» (un latido grave que no para y, por encima, las frases de los ecos) |
 | Misión | «El Primer Árbol» (historia) |
 | Bestiario | «El miedo del Primer Árbol», como jefe (rango por los golpes recibidos) |
+
+# SIGILIA (mundo 2)
+
+Maandiko, el Archivo Infinito: una ciudad-biblioteca de **armiños escribas** en el norte nevado, donde Giza es el **miedo a olvidar** (la Tinta Quieta deja a la gente «en blanco», sin nombre). Ficha completa en el GDD («Sigilia: ficha del mundo 2») y en `documentacion/decisiones.md`; bocetos en `documentacion/boceto_sigilia.png` y `documentacion/boceto_mapa_sigilia.png`. Su arte va en `arte/mundos/sigilia/` (la región tiene `mundo = "sigilia"`) y sus diálogos en `datos/dialogos/sigilia.json`.
+
+## Paso de la Escarcha (parte 1: la nieve honda y la ventisca)
+
+Escena `escenas/mundo/paso_escarcha.tscn` (`scripts/mundo/paso_escarcha.gd`). Se llega por el **paso del norte de las Ruinas del Primer Árbol**, que se abre al curar al árbol (`primer_arbol_libre`). Mapa de 60×110 (`crear_paso_escarcha`): un valle de montaña ancho, todo nevado de **nieve lila**, que sube en eses hasta la puerta del norte (a Maandiko, que aún no existe: no deja pasar).
+
+| Qué | Cómo |
+| --- | --- |
+| La nieve honda | `sigilia/nieve_honda.gd`. Fuera del sendero pisado Maisha se hunde: anda al 55 % y no puede correr (`maisha.hundirse`, se apaga sola). Por donde pasa deja un **surco** que dura 90 s: por él ya no se hunde |
+| La ventisca de páginas | `sigilia/ventisca.gd`. Calma (5,5-8 s) → aviso (1,3 s: empiezan a volar páginas y sube el viento) → racha (2,6 s) que **empuja** a Maisha a favor del viento (casi siempre del oeste), hacia la nieve honda. Si tiene algo sólido al lado del viento (una estela, una roca, un pino, la peña) está **cobijada** y no la mueve. El empuje es `maisha.viento`, que se apaga solo |
+| Las estelas rúnicas | `ȩ`, `herramientas/pintar_escarcha.py`: losas de piedra morada con renglones tallados, nieve encima y una runa dorada. Están junto al sendero, en el lado del oeste, para cobijarse |
+| Suelo | `pintar_suelo.py` (nieve lila: `NIEVE_LILA`, en `arte/mundos/sigilia/suelos/`) |
+| Pensamientos | Al llegar (`escarcha_llegada`) y tras la primera racha (`escarcha_racha`) |
+| Música | Por ahora la del Sendero Olvidado |
+
+Falta: Taa el farolero y el sigilo de fuego, los faroles, la Puerta Sellada de Tinta Quieta, los enemigos (páginas sueltas), la primera ficha del Índice, la misión y su música.
 
 ## Las construcciones, al nivel de la casa del castor
 

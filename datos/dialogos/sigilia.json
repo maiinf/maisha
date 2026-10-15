@@ -1,0 +1,27 @@
+{
+	"escarcha_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Detrás del Primer Árbol había un camino. Nadie lo ha pisado en años... salvo unas huellas de patitas, muy pequeñas.",
+					"La nieve aquí es lila. Y está blandísima: en cuanto me salgo de las huellas, me hundo hasta la tripa.",
+					"¿Y ese ruido de papel? Huele a tinta... Arriba, en algún sitio, tiene que estar el trozo que le falta al mapa."
+				]
+			}
+		]
+	},
+	"escarcha_racha": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Uf! Casi me lleva. El viento baja del oeste cargado de páginas.",
+					"Detrás de una piedra no me toca. Iré de cobijo en cobijo."
+				]
+			}
+		]
+	}
+}

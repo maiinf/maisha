@@ -321,14 +321,21 @@ def _riscos(lz, tipos, fina, media, cara=1.0):
     return pared
 
 
-NIEVE_S = ["#4a5672", "#61708e", "#7a89a6", "#95a3bd", "#adbbd1", "#c4cfe0", "#d9e1ed", "#eef2f8"]
-PISADA = ["#4a5468", "#5e6a80", "#76829a", "#8e9ab0", "#a8b2c4", "#c0c9d8"]
+NIEVE_N = ["#4a5672", "#61708e", "#7a89a6", "#95a3bd", "#adbbd1", "#c4cfe0", "#d9e1ed", "#eef2f8"]
+PISADA_N = ["#4a5468", "#5e6a80", "#76829a", "#8e9ab0", "#a8b2c4", "#c0c9d8"]
+# la nieve de Sigilia: lila (los morados de Sigilia), con el sendero pisado más gris
+NIEVE_LILA = ["#4e4870", "#655e8a", "#7e76a2", "#9890ba", "#b0a9cd", "#c8c2de", "#dddaec", "#f0eef8"]
+PISADA_LILA = ["#4c4664", "#605a7a", "#787292", "#908aa8", "#a8a2bc", "#c0bbd0"]
+# los mapas de Sigilia guardan su suelo en arte/mundos/sigilia/suelos
+SIGILIA = {"paso_escarcha"}
 
 
-def _nevar(lz, tipos, fina, media, pared, conservar=()):
+def _nevar(lz, tipos, fina, media, pared, conservar=(), lila=False):
     """El SENDERO OLVIDADO: todo nevado. Donde había hierba, nieve con ondas del viento y sombras azuladas; el camino,
     nieve pisada (más gris, con huellas); encima de las peñas, nieve; en sus paredes, escarcha."""
     import cv2 as _cv
+    NIEVE_S = NIEVE_LILA if lila else NIEVE_N
+    PISADA = PISADA_LILA if lila else PISADA_N
     S = lz.s
     ri = mascara(lz, tipos, ("risco",), 4.0, 0.5, semilla=50)
     pared = pared if pared is not None else np.zeros_like(ri)
@@ -342,7 +349,7 @@ def _nevar(lz, tipos, fina, media, pared, conservar=()):
     grande = lz.ruido(40, 3, semilla=901)
     ondas = estirar(lz.ruido(2.5, 2, semilla=902), int(14 * S), vertical=False)
     # (más oscura y azulada que el blanco puro: si no, deslumbra y no se ve nada encima)
-    v = 0.56 + (grande - 0.5) * 0.2 + (ondas - 0.5) * 0.42 + (fina - 0.5) * 0.08
+    v = (0.4 if lila else 0.56) + (grande - 0.5) * 0.2 + (ondas - 0.5) * 0.42 + (fina - 0.5) * 0.08
     lz.pintar(suelo, rampa(NIEVE_S, np.clip(v, 0, 1)))
     # las crestas de las ondas, con luz, y su sombra azulada debajo
     cresta = np.clip((ondas - 0.62) * 6, 0, 1) * suelo
@@ -365,8 +372,8 @@ def _nevar(lz, tipos, fina, media, pared, conservar=()):
     dentro = _cv.distanceTransform((encima > 0.5).astype(np.uint8), _cv.DIST_L2, 5) / S
     # (una capa compacta: solo asoma la roca en el borde y en alguna mancha grande, no a motas)
     manchas = lz.desenfocar((lz.ruido(18 if not conservar else 34, 2, semilla=906) > (0.22 if not conservar else 0.08)).astype(float), 3.0) > 0.5
-    capa = encima * (dentro > 1.6) * manchas
-    vn = 0.62 + (lz.ruido(10, 2, semilla=907) - 0.5) * 0.3 + (fina - 0.5) * 0.1
+    capa = encima * (dentro > 1.6) * (manchas if not lila else 1.0)
+    vn = (0.5 if lila else 0.62) + (lz.ruido(10, 2, semilla=907) - 0.5) * (0.1 if lila else 0.3) + (fina - 0.5) * 0.1
     lz.pintar(capa, rampa(NIEVE_S, np.clip(vn, 0, 1)))
     lz.pintar(np.clip(capa - desplazar(lz, capa, 0, 1.0), 0, 1), NIEVE_S[7], 0.7)
     # escarcha en la pared y carámbanos que cuelgan del canto
@@ -728,11 +735,11 @@ def pintar(nombre, salida=None):
         lz.pintar(postes * (lz.ruido(0.5, 1, semilla=21) > 0.6), "#a8735a", 0.6)
 
     _puente_piedra(lz, tipos, alto, ancho, fina, media)
-    olvidado = nombre == "sendero_olvidado"
+    olvidado = nombre in ("sendero_olvidado", "paso_escarcha")
     ruinas = nombre == "ruinas_primer_arbol"
     pared = _riscos(lz, tipos, fina, media, cara=2.0 if (canada or paso or olvidado or ruinas) else 1.0)
     if olvidado or ruinas:
-        _nevar(lz, tipos, fina, media, pared, conservar=("losas",) if ruinas else ())
+        _nevar(lz, tipos, fina, media, pared, conservar=("losas",) if ruinas else (), lila=nombre in SIGILIA)
     if canada or paso:
         _mesetas(lz, tipos, fina, media, pared)
 
@@ -745,9 +752,9 @@ def pintar(nombre, salida=None):
 
     # sombra muy suave de las nubes (da volumen al terreno)
     nubes = np.clip((lz.ruido(90, 3, semilla=20) - 0.6) * 3, 0, 1)
-    lz.pintar(nubes, "#1d2e18" if nombre not in ("sendero_olvidado", "ruinas_primer_arbol") else "#1a2236", 0.12)
+    lz.pintar(nubes, "#1d2e18" if nombre not in ("sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha") else "#1a2236", 0.12)
 
-    destino = salida or os.path.join(RAIZ, "arte", "mundos", "raiz", "suelos", nombre + "_suelo.png")
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "sigilia" if nombre in SIGILIA else "raiz", "suelos", nombre + "_suelo.png")
     os.makedirs(os.path.dirname(destino), exist_ok=True)
     lz.guardar(destino, tramado=0.016)
     print("Suelo pintado:", destino, (lz.w, lz.h))

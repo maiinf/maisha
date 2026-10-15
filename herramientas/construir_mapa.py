@@ -1912,6 +1912,12 @@ def crear_ruinas():
             poner(x, y, "%")
     for x in range(30, 35):
         poner(x, ALTO - 1, "_")
+    # el paso del norte, hacia Sigilia: una brecha en la peña, detrás del árbol (se abre al curarlo)
+    for y in range(0, CY - R + 2):
+        for x in range(30 - (1 if y > 3 else 0), 35 + (1 if y > 3 else 0)):
+            poner(x, y, "#")
+    for x in range(31, 34):
+        poner(x, 0, "^")
     # nieve: rocas y pinos sueltos fuera de la plaza
     for _ in range(600):
         x, y = azar.randrange(2, ANCHO - 2), azar.randrange(2, ALTO - 2)
@@ -1921,6 +1927,94 @@ def crear_ruinas():
                 poner(x, y, "ğ")
             elif r < 0.08:
                 poner(x, y, "ň")
+    return ["".join(f) for f in m], {}
+
+
+def crear_paso_escarcha():
+    """EL PASO DE LA ESCARCHA (Sigilia, 60x110, de sur a norte): de las Ruinas del Primer Árbol a la Puerta Sellada de
+    Maandiko. Un valle de montaña ancho y abierto, todo de NIEVE HONDA (fuera del sendero pisado, «#», Maisha se hunde
+    y va despacio) y barrido por RACHAS DE VIENTO del oeste que traen páginas sueltas: empujan a Maisha hacia el este si
+    no se cobija detrás de algo (rocas «ň», pinos «ğ» y las ESTELAS RÚNICAS «ȩ», piedras viejas con letras talladas).
+    El sendero sube en eses de una estela a otra; arriba, la puerta del norte («^») hacia la ciudad."""
+    ANCHO, ALTO = 60, 110
+    azar = random.Random(611)
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    # las laderas del valle, a los lados (más estrecho arriba, donde está la puerta)
+    for y in range(ALTO):
+        estrecha = max(0.0, (30 - y) / 30) * 9
+        izq = int(3 + 2.5 * (1 + math.sin(y * 0.11)) + math.sin(y * 0.37 + 2) + estrecha)
+        der = int(ANCHO - 4 - 2.5 * (1 + math.sin(y * 0.09 + 1)) - math.sin(y * 0.41) - estrecha)
+        for x in range(0, izq + 1):
+            poner(x, y, "0")
+        for x in range(der, ANCHO):
+            poner(x, y, "0")
+    # dos lenguas de peña que salen de las laderas (obligan a rodear)
+    for (yb, x0, x1) in ((74, 1, 24), (40, 38, 59)):
+        for x in range(x0, x1 + 1):
+            grosor = 2 + int(1.3 * (1 + math.sin(x * 0.37 + yb)))
+            for y in range(yb - grosor // 2, yb + grosor - grosor // 2 + 1):
+                poner(x, y, "0")
+
+    def camino(puntos, ancho=2):
+        for (a, b) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b[0] - a[0]), abs(b[1] - a[1])) * 2) + 1
+            for i in range(pasos + 1):
+                t = i / pasos
+                x = a[0] + (b[0] - a[0]) * t + math.sin(t * 3 + a[1]) * 0.4
+                y = a[1] + (b[1] - a[1]) * t
+                for dx in range(ancho):
+                    for dy in range(ancho):
+                        xx, yy = int(x) + dx, int(y) + dy
+                        if 0 <= xx < ANCHO and 0 <= yy < ALTO and m[yy][xx] == ".":
+                            poner(xx, yy, "#")
+
+    # el sendero pisado: sube en eses, de estela en estela
+    ruta = [(29, 109), (29, 100), (22, 94), (16, 86), (30, 80), (40, 74), (44, 64), (34, 58), (22, 52), (18, 44),
+            (26, 36), (36, 32), (30, 22), (26, 14), (29, 6), (29, 0)]
+    camino(ruta)
+    # las estelas rúnicas, junto al sendero, en el lado del oeste (de donde viene el viento: cobijan)
+    estelas = [(19, 96), (13, 86), (37, 76), (41, 64), (19, 52), (15, 42), (32, 32), (23, 20)]
+    for (x, y) in estelas:
+        poner(x, y, "ȩ")
+    # la puerta del norte y la del sur
+    for x in range(26, 34):
+        for y in range(0, 3):
+            poner(x, y, "#")
+        for y in range(ALTO - 3, ALTO):
+            poner(x, y, "#")
+    for x in range(27, 33):
+        poner(x, 0, "^")
+        poner(x, ALTO - 1, "_")
+    reservados = [(29, 107, 3), (29, 3, 4)] + [(x, y, 2) for (x, y) in estelas]
+
+    def libre(x, y):
+        if m[y][x] != ".":
+            return False
+        for (rx_, ry_, rr) in reservados:
+            if (x - rx_) ** 2 + (y - ry_) ** 2 <= rr * rr:
+                return False
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] in "#ȩ^_":
+                    return False
+        return True
+
+    # pinos y rocas: grupos en las laderas y alguno suelto en medio del valle (cobijo para cruzar la nieve honda)
+    for _ in range(2600):
+        x, y = azar.randrange(1, ANCHO - 1), azar.randrange(4, ALTO - 4)
+        if libre(x, y):
+            junto_pena = any(m[y + d][x] == "0" or m[y][min(ANCHO - 1, max(0, x + d))] == "0" for d in (-2, -1, 1, 2) if 0 <= y + d < ALTO)
+            r = azar.random()
+            if r < (0.13 if junto_pena else 0.022):
+                poner(x, y, "ğ")
+            elif r < (0.18 if junto_pena else 0.04):
+                poner(x, y, "ň")
+    poner(26, 104, "L")
     return ["".join(f) for f in m], {}
 
 
@@ -2666,7 +2760,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha"}
 
 
 def construir_suelo(nombre):
@@ -2815,7 +2909,8 @@ if __name__ == "__main__":
                         "camino_cobrizo": crear_camino, "senda_surcos": crear_senda,
                         "canada_eco": crear_canada, "lago_espejo": crear_lago,
                         "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta,
-                        "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas}.get(nombre, crear_prados)()
+                        "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
+                        "paso_escarcha": crear_paso_escarcha}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

@@ -1,2 +1,3 @@
 ; puerta = nombre, escena a la que lleva, puerta por la que se aparece allí, hacia dónde sale Maisha al llegar aquí
 _ = sendero, sendero_olvidado, ruinas, arriba
+^ = escarcha, paso_escarcha, sur, abajo, cerrada:primer_arbol_libre

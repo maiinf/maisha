@@ -8,6 +8,7 @@ extends CharacterBody2D
 signal herida(vida: int)
 signal caida
 
+const HUNDIDA_FRENA := 0.55     # en la nieve honda anda a poco más de la mitad
 const R := preload("res://scripts/combate/reglas_combate.gd")
 const VELOCIDAD := 70.0        # píxeles por segundo
 const CORRER := 1.65           # al correr (C o LB), va así de rápido
@@ -32,6 +33,8 @@ var _lentitud_vuelve := 0.0    # cuánto se recupera por segundo (recuperar_lent
 var _lenta_sin_motivo := 0.0
 var corriendo := false
 var pegajoso := 0.0            # segundos que le queda pisando óxido de babosa (anda más despacio)
+var hundida := 0.0             # segundos que le queda en la nieve honda (Sigilia): anda más despacio y no corre
+var viento := Vector2.ZERO     # el empuje del viento (lo pone la ventisca cada fotograma; si no, se apaga solo)
 
 var _invulnerable := 0.0
 var _espera_golpe := 0.0
@@ -71,6 +74,7 @@ func _physics_process(delta: float) -> void:
 	_espera_latido = maxf(0.0, _espera_latido - delta)
 	_invulnerable = maxf(0.0, _invulnerable - delta)
 	pegajoso = maxf(0.0, pegajoso - delta)
+	hundida = maxf(0.0, hundida - delta)
 	mareo = maxf(0.0, mareo - delta)
 	_desde_ultima_semilla += delta
 	_recuperar_entumecimiento(delta)
@@ -93,7 +97,7 @@ func _physics_process(delta: float) -> void:
 	_actualizar_aliento(delta, direccion)
 
 	var rapidez := VELOCIDAD * lentitud
-	corriendo = Input.is_action_pressed("correr") and direccion != Vector2.ZERO and not agotada and lentitud > 0.95
+	corriendo = Input.is_action_pressed("correr") and direccion != Vector2.ZERO and not agotada and lentitud > 0.95 and hundida <= 0.0
 	if corriendo:
 		rapidez *= CORRER
 	if agotada:
@@ -102,10 +106,13 @@ func _physics_process(delta: float) -> void:
 		rapidez *= R.GOLPE_FRENA
 	if pegajoso > 0.0:
 		rapidez *= 0.55
+	if hundida > 0.0:
+		rapidez *= HUNDIDA_FRENA
 	if escudo:
 		rapidez *= 0.5
-	velocity = direccion * rapidez + _empuje
+	velocity = direccion * rapidez + _empuje + viento
 	_empuje = _empuje.move_toward(Vector2.ZERO, 600.0 * delta)
+	viento = viento.move_toward(Vector2.ZERO, 900.0 * delta)
 	move_and_slide()
 
 	if combate_activo:
@@ -301,6 +308,8 @@ func revivir(posicion: Vector2) -> void:
 	# (y todo lo que frena, por si algo se quedó a medias)
 	lentitud = 1.0
 	pegajoso = 0.0
+	hundida = 0.0
+	viento = Vector2.ZERO
 	_golpeando = false
 	_poner_escudo(false)
 	Impacto.restablecer_velocidad()
@@ -381,6 +390,11 @@ func tomar_sopa() -> bool:
 ## Pisa óxido de babosa: anda más despacio un rato
 func pisar_oxido(segundos := 0.4) -> void:
 	pegajoso = maxf(pegajoso, segundos)
+
+
+## Está en nieve honda (fuera del sendero pisado): anda más despacio y no puede correr mientras dure
+func hundirse(segundos := 0.15) -> void:
+	hundida = maxf(hundida, segundos)
 
 
 ## Con las Artes del Árbol de la Vida aplicadas
