@@ -61,7 +61,7 @@ const CAMINOS_RAIZ := [
 	["Sendero Olvidado", "sendero_olvidado", [Vector2(338, 52), Vector2(358, 40), Vector2(370, 34)]],
 ]
 ## Dónde está Maisha en el mapa de Raíz según la escena (en un camino: en medio de su trazo)
-const PUNTO_RAIZ := {"sendero_olvidado": Vector2(358, 40), "paso_piedra": Vector2(278, 50), "casa_nungu": Vector2(272, 44), "cueva_setas": Vector2(272, 46), "prados_del_eco": Vector2(110, 178), "bosque_cobrizo": Vector2(118, 72), "cuna_de_musgo": Vector2(208, 146),
+const PUNTO_RAIZ := {"ruinas_primer_arbol": Vector2(384, 30), "sendero_olvidado": Vector2(358, 40), "paso_piedra": Vector2(278, 50), "casa_nungu": Vector2(272, 44), "cueva_setas": Vector2(272, 46), "prados_del_eco": Vector2(110, 178), "bosque_cobrizo": Vector2(118, 72), "cuna_de_musgo": Vector2(208, 146),
 	"claro_de_calma": Vector2(206, 142), "casa_pino": Vector2(200, 148), "taller_corteza": Vector2(214, 148), "kitovu": Vector2(53, 196),
 	"casa_shamba": Vector2(53, 196), "cienaga_quieta": Vector2(322, 182), "campo_segado": Vector2(208, 44),
 	"sendero_del_puente": Vector2(160, 166), "las_pasarelas": Vector2(268, 166),
@@ -131,6 +131,7 @@ const CLAVE := {
 	"investigacion_nungu": ["Investigación de Nungu", 18, "Un cuaderno gordo lleno de dibujos de vetas violetas. Según Nungu, Giza no es piedra: es algo que crece hacia el norte, hacia las Ruinas del Primer Árbol, y se alimenta de lo que se queda quieto."],
 	"llave_nungu": ["Llave del armario", 25, "Una llave de hierro con un martillo grabado: la de repuesto del armario de Nungu. Estaba en el barril del carbón de Corteza, claro."],
 	"hoja_mauti": ["Hoja de Mauti", 24, "Una hoja seca de cobre, todavía tibia. Mauti la dejó bajo una piedra de la isla del río, para Maisha: «Si subes a buscarme, tráemela»."],
+	"semilla_primer_arbol": ["Semilla del Primer Árbol", 26, "Una semilla grande y tibia que cayó de la copa dorada del Primer Árbol. «Plántala cuando llegue el momento: de ella saldrá algo que te hará falta.»"],
 	"cuaderno_ecos": ["Cuaderno de ecos", 18, "El regalo de Msafiri. Cada eco perdido que escuchas queda apuntado aquí. Juntos cuentan qué le pasó al Primer Árbol."],
 	"mapa_raiz": ["Mapa de Tawi", 3, "Tawi lo dibujó volando por encima de Raíz: en tu mapa ya se ven todos los lugares (los caminos hay que andarlos)."],
 }

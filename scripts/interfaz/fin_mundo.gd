@@ -18,6 +18,12 @@ const MAPAS := ["kitovu", "prados_del_eco", "bosque_cobrizo", "cienaga_quieta", 
 const ALDEANOS := ["pino", "corteza", "tawi", "juncia"]
 const COLORES_HOJA := [Color("e6a852"), Color("f1c27a"), Color("c68756"), Color("8fd06a"), Color("fff3c4")]
 
+## Lo que se puede cambiar antes de abrir() (la Cosechadora y el Primer Árbol enseñan cada uno el suyo)
+var ilustracion: Texture2D = ILUSTRACION
+var titulo := "Raíz es libre"
+var subtitulo := "Fin del primer mundo"
+var pie := "Continuará en Sigilia..."
+var mapas: Array = MAPAS
 var abierto := false
 var _lienzo: Control
 var _fuente: FontFile
@@ -66,14 +72,14 @@ func _calcular() -> Array:
 	var zonas_total := 0
 	var secretos := 0
 	var secretos_total := 0
-	for mapa in MAPAS:
+	for mapa in mapas:
 		var datos: Dictionary = (load("res://datos/mapas/%s.json" % mapa) as JSON).data
 		zonas_total += datos.get("zonas", {}).size()
 		for fila in datos.get("filas", []):
 			secretos_total += String(fila).count("X")
 	for m in Estado.marcas:
 		var marca := String(m)
-		for mapa in MAPAS:
+		for mapa in mapas:
 			if marca.begins_with("zona/%s/" % mapa):
 				zonas += 1
 			if marca.begins_with("secreto/%s/" % mapa):
@@ -161,14 +167,13 @@ func _dibujar() -> void:
 	# la ilustración, arriba, que se acerca muy despacio
 	var zoom := 1.0 + minf(_t, 30.0) * 0.002
 	var tam := Vector2(600, 256) * zoom
-	_lienzo.draw_texture_rect(ILUSTRACION, Rect2(Vector2(320, 128) - tam / 2.0, tam), false, Color(1, 1, 1, a * 0.9))
+	_lienzo.draw_texture_rect(ilustracion, Rect2(Vector2(320, 128) - tam / 2.0, tam), false, Color(1, 1, 1, a * 0.9))
 	_lienzo.draw_rect(Rect2(0, 200, 640, 160), Color(0.06, 0.04, 0.03, a * 0.55))
 	# el título
 	var ta := clampf((_t - 0.6) / 0.8, 0.0, 1.0) * a
-	var titulo := "Raíz es libre"
 	var tam_t := 32
 	_texto(titulo, Vector2(320 - _ancho(titulo, tam_t) / 2.0, 44).round(), Color(TEXTO, ta), tam_t)
-	var sub := "Fin del primer mundo"
+	var sub := subtitulo
 	_texto(sub, Vector2(320 - _ancho(sub) / 2.0, 66).round(), Color(AMBAR, ta))
 	# lo conseguido, en dos columnas a los lados de Maisha
 	var vistas := lineas_vistas()
@@ -190,9 +195,9 @@ func _dibujar() -> void:
 		var completo := int(l[2]) >= 0 and int(l[1]) >= int(l[2])
 		_texto(valor, Vector2(caja.end.x - 8 - _ancho(valor), y), Color(VERDE if completo else TEXTO, a * aparece))
 	if _t > 3.0 and vistas >= _lineas.size():
-		var pie := "Continuará en Sigilia...   ·   Acción para seguir"
+		var linea := pie + "   ·   Acción para seguir"
 		var pa := (0.6 + 0.4 * sin(_t * 3.0)) * a
-		_texto(pie, Vector2(320 - _ancho(pie) / 2.0, 350).round(), Color(APAGADO, pa))
+		_texto(linea, Vector2(320 - _ancho(linea) / 2.0, 350).round(), Color(APAGADO, pa))
 	# hojas que caen por delante
 	for h in _hojas:
 		var p: Vector2 = h["p"].round()

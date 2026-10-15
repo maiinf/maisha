@@ -492,7 +492,9 @@ Escena `escenas/mundo/campo_segado.tscn`: la última región de Raíz, al norte 
 
 ## Fin de Raíz
 
-Al vencer a la Cosechadora y acabar el narrador sale la pantalla del **final del mundo** (`scripts/interfaz/fin_mundo.gd`): la ilustración `11_cosecha_libre`, hojas doradas que caen, Maisha celebrándolo y lo conseguido, línea a línea (tiempo de juego, zonas purgadas, aldeanos de vuelta, secretos, misiones, Esencia y Cristales). Suena «Raíz respira». «Continuará en Sigilia...» · Acción para seguir jugando (no se cierra el juego: se puede seguir por Raíz).
+La pantalla del **final del mundo** (`scripts/interfaz/fin_mundo.gd`; se le cambian la ilustración, el título, el subtítulo, el pie y los mapas que cuenta) sale dos veces:
+- Al vencer a la **Cosechadora**: «Raíz respira · Pero en el norte, algo sigue enfermo · Sigue los ecos hacia el norte...» (Giza ya no lo cubre todo, pero el Primer Árbol sigue enfermo).
+- Al curar al **Primer Árbol** (el final de verdad): la ilustración `23_arbol_libre`, «Raíz es libre · Fin del primer mundo · Continuará en Sigilia...», con lo conseguido en todo Raíz (tiempo, zonas, aldeanos, secretos, misiones, Esencia y Cristales). Acción para seguir jugando.
 
 ## Cuna de Musgo (la aldea)
 
@@ -699,6 +701,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_combate.gd` recorre una pelea entera: aviso, cierre, golpe, mordisco y rebote, semillas contra el Corazón de Giza, purga, agotamiento, autodaño y vuelta al borde.
 - `pruebas/prueba_ropa.gd` comprueba que la ropa se pone y se quita, va delante o detrás según la dirección, sigue a la cabeza al respirar y se refleja bien.
 - `pruebas/prueba_misiones.gd` comprueba el diario (misiones que salen y se cumplen con las marcas, contadores, cuál se sigue y que se guarda), la flecha en el mundo y las acciones rápidas (tecla 4, la rueda de Tab).
+- `pruebas/prueba_ruinas.gd` comprueba el final de Raíz: la llegada, la pelea (despertar las piedras manteniendo Acción, el corazón de Giza a golpes), el final (Mauti libre, la semilla, la pantalla del final), volver después y la salida.
 - `pruebas/prueba_sendero_olvidado.gd` comprueba los Quietos (mirados no se mueven, de espaldas se acercan, tres golpes los rompen), los braseros (una semilla los enciende y se quedan encendidos), la escarcha (quieta se congela y pierde una hoja; andando o junto al fuego se le pasa), las estatuas, la misión y las puertas.
 - `pruebas/prueba_luz.gd` comprueba el reloj del día (no corre hasta Cuna de Musgo, el amanecer sin saltos), el relieve de los dibujos, las ventanas que se encienden de noche y que las cuevas mantienen su propia penumbra.
 - `pruebas/prueba_artes.gd` comprueba la Esencia, los costes y efectos de las Artes, que se guardan, y meditar en el Claro de Calma (curar, mantener Acción para despertar un nivel, rasgos).
@@ -805,6 +808,21 @@ Escena `escenas/mundo/sendero_olvidado.tscn` (`scripts/mundo/sendero_olvidado.gd
 | Música | «La montaña que no se mueve» (`olvidado` en `componer_musica.py`): acordes suspendidos que no resuelven, viento, campanillas de hielo y una flauta sola; al final, la frase de Kimya. Ambiente de viento fuerte |
 | Arte | `herramientas/pintar_olvidado.py`: pinos nevados, rocas con nieve, el brasero, las tres estatuas y el arco |
 | Misión | «El Sendero Olvidado» (historia): aparece al abrirse el sendero; se cumple al llegar a las Ruinas |
+
+## Las Ruinas del Primer Árbol (el final de Raíz)
+
+Escena `escenas/mundo/ruinas_primer_arbol.tscn` (`scripts/mundo/ruinas_primer_arbol.gd`), al final del Sendero Olvidado. Mapa de 64×60 (`crear_ruinas`): una columnata rota de piedra clara lleva a una plaza redonda de losas en la cima nevada.
+
+| Qué | Cómo |
+| --- | --- |
+| El Primer Árbol | `ruinas/primer_arbol.gd`, dibujo en `herramientas/pintar_primer_arbol.py` (3 estados: enfermo, gris y medio de piedra con vetas de Giza · con el hueco del tronco abierto · curado, con la copa dorada). No se le pelea a él: se pelea contra su **miedo** a acabarse (Giza es su miedo) |
+| Mauti | A sus pies, de piedra (`mauti.png`: la forma de Maisha, porque son hermanos, recoloreada; en lo alto, una hoja seca de cobre). Al final queda libre, plateada y lila, y se puede hablar con Mauti |
+| La pelea | `ruinas/miedo.gd`. Al pisar la plaza: lo que dice el árbol (ilustración `22_ruinas_mauti`) y la columnata se cierra. Se gana **recordando**: las nueve piedras del recuerdo (`ruinas/piedra_recuerdo.gd`) se despiertan **manteniendo Acción** a su lado 1,6 s (y mientras tanto hiela: la escarcha del Sendero también está aquí). Cada una trae una frase de un eco y, despierta, da calor. El miedo ataca más deprisa con cada tres: **raíces de piedra** (una grieta violeta corre hacia Maisha y luego brotan pinchos; quitan una hoja), **anillos de escarcha** con dos huecos que giran (suben mucho el frío; se pasan por un hueco o con el Latido) y, desde la segunda fase, **Quietos** |
+| El corazón | Con las nueve despiertas se abre el hueco del tronco: el **corazón de Giza** late dentro. 4 golpes de cetro (una semilla, 2) lo rompen |
+| El final | El árbol se cura y suelta hojas doradas, Mauti queda libre y cae la **Semilla del Primer Árbol** (objeto clave; de ella saldrá el cetro nuevo del mundo 3). Ilustración `23_arbol_libre` y la pantalla del final del mundo: «Raíz es libre · Fin del primer mundo · Continuará en Sigilia...», contando todos los mapas |
+| Música | «Las Ruinas» (solemne, coro lejano) y «El miedo del Primer Árbol» (un latido grave que no para y, por encima, las frases de los ecos) |
+| Misión | «El Primer Árbol» (historia) |
+| Bestiario | «El miedo del Primer Árbol», como jefe (rango por los golpes recibidos) |
 
 ## Las construcciones, al nivel de la casa del castor
 

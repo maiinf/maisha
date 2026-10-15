@@ -175,4 +175,5 @@ se pasan.
 | Mecánica | La escarcha de la quietud (quedarse quieta congela; lo contrario del Lago) y braseros que se encienden con semillas |
 | Partes | 1 la subida (hecha) · 2 los Quietos (estatuas que solo se mueven cuando Maisha no las mira) · 3 las Ruinas y el Primer Árbol |
 | Los Quietos (hecho) | Se tapan los ojos con las manos cuando Maisha los mira; de espaldas, se acercan muy deprisa. Encaja con la escarcha: vigilarlos parada congela |
+| Las Ruinas (hecho) | Se gana recordando: nueve piedras que se despiertan manteniendo Acción (eso es estar quieta, y hiela); el miedo ataca con raíces, anillos de escarcha y Quietos; al final, el corazón de Giza. El final de verdad pasa a las Ruinas; la Cosechadora enseña un final a medias («algo sigue enfermo en el norte») |
 

@@ -43,6 +43,20 @@ func _puerta(id: String) -> Area2D:
 	return null
 
 
+func _cruzar(accion: String, nombre: String) -> void:
+	Input.action_press(accion)
+	for i in 400:
+		if Estado.cambiando:
+			break
+		await get_tree().process_frame
+	Input.action_release(accion)
+	for i in 300:
+		if _escena() == nombre and not Estado.cambiando:
+			break
+		await get_tree().process_frame
+	await _esperar(0.3)
+
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	Estado.olvidar_todo()
@@ -154,12 +168,15 @@ func _ready() -> void:
 	print("Las puertas:")
 	var ruinas: Area2D = _puerta("ruinas")
 	maisha.global_position = ruinas.global_position + Vector2(0, 30)
-	await _esperar(0.4)
-	maisha.global_position = ruinas.global_position
-	await _esperar(0.8)
-	await _leer_dialogo()
-	await _esperar(0.4)
-	_comprobar(_escena() == "SenderoOlvidado" and maisha.get("puede_actuar"), "las Ruinas aún no se abren, y Maisha no se queda atascada")
+	await _esperar(0.3)
+	await _cruzar("mover_arriba", "RuinasPrimerArbol")
+	_comprobar(_escena() == "RuinasPrimerArbol", "por el arco del norte se llega a las Ruinas del Primer Árbol")
+	var de_vuelta: Area2D = _puerta("sendero")
+	_maisha().global_position = de_vuelta.global_position + Vector2(0, -30)
+	await _esperar(0.3)
+	await _cruzar("mover_abajo", "SenderoOlvidado")
+	_comprobar(_escena() == "SenderoOlvidado", "y se vuelve a bajar")
+	maisha = _maisha()
 	var gruta: Area2D = _puerta("gruta")
 	maisha.global_position = gruta.global_position + Vector2(0, -30)
 	await _esperar(0.3)

@@ -923,6 +923,30 @@
 			]
 		},
 		{
+			"id": "primer_arbol",
+			"tipo": "historia",
+			"titulo": "El Primer Árbol",
+			"texto": "En lo alto de las Ruinas, el Primer Árbol tiene tanto miedo de acabarse que lo ha dejado todo quieto. Mauti está a sus pies, de piedra.",
+			"aparece": [
+				"ruinas_llegada"
+			],
+			"hecha": [
+				"primer_arbol_libre"
+			],
+			"pasos": [
+				{
+					"texto": "Despierta las nueve piedras del recuerdo y rompe el corazón de Giza",
+					"hecho": [
+						"primer_arbol_libre"
+					],
+					"ir": {
+						"escena": "ruinas_primer_arbol",
+						"buscar": "grupo:piedras_recuerdo"
+					}
+				}
+			]
+		},
+		{
 			"id": "nasas_korongo",
 			"tipo": "encargo",
 			"titulo": "Las nasas de Korongo",

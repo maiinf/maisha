@@ -568,6 +568,8 @@ TITULOS = {
     "paso": "La casa del observatorio",
     "jefe_kuvu": "La seta que manda",
     "olvidado": "La montaña que no se mueve",
+    "ruinas": "Las Ruinas",
+    "jefe_arbol": "El miedo del Primer Árbol",
 }
 
 # =============================================================================
@@ -1425,6 +1427,65 @@ def olvidado():
 
 PIEZAS["olvidado"] = olvidado
 
+
+
+# =============================================================================
+# LAS RUINAS DEL PRIMER ÁRBOL: «Las Ruinas» (solemne, re menor, coro lejano) y «El miedo del Primer Árbol» (el jefe
+# final: un pulso grave que no para, y por encima vuelven, una a una, las frases de los ecos)
+# =============================================================================
+
+def ruinas():
+    tempo = Tempo(56)
+    pulsos = 64
+    p = Pista(tempo.s(pulsos))
+    progresion = [("D2", "m"), ("A#1", "M7"), ("G1", "m7"), ("A1", "sus")] * 4
+    colchones(p, tempo, progresion, compas=4, brillo=600, volumen=0.2, octava_bajo=1, fuerza_bajo=0.32)
+    p.poner(coro(["D3", "A3", "F4"], tempo.s(16)), tempo.s(0), 0.07)
+    p.poner(coro(["A#2", "F3", "D4"], tempo.s(16)), tempo.s(16), 0.07)
+    p.poner(coro(["G2", "D3", "A#3"], tempo.s(16)), tempo.s(32), 0.07)
+    p.poner(coro(["A2", "E3", "C#4"], tempo.s(16)), tempo.s(48), 0.07)
+    rng = np.random.default_rng(97)
+    for k in range(7):
+        d = 6.0 + rng.random() * 3
+        n = int(d * SR)
+        viento = ruido_rosa(d) * np.sin(np.linspace(0, np.pi, n)) ** 2
+        p.poner(paso_banda(viento, 200, 900) * 0.16, k * tempo.s(pulsos) / 7, pan=rng.random() - 0.5)
+    # el piano, muy despacio: la frase de la orilla, grave, como un recuerdo lejano
+    tocar(p, tempo, transportar(FRASE_ORILLA, -12), desde=8, fuerza=0.24, pan=-0.1)
+    tocar(p, tempo, FRASE_QUIETA, desde=40, fuerza=0.22, pan=0.1)
+    return final(p, sala=4.0, mezcla=0.42, brillo=4000)
+
+
+def jefe_arbol():
+    tempo = Tempo(100)
+    pulsos = 128
+    p = Pista(tempo.s(pulsos))
+    progresion = [("D2", "m"), ("D2", "m"), ("A#1", "M"), ("C2", "M"), ("D2", "m"), ("D2", "m"), ("G1", "m"), ("A1", "M")] * 4
+    colchones(p, tempo, progresion, compas=4, brillo=900, volumen=0.24, octava_bajo=1, fuerza_bajo=0.42)
+    # el pulso grave: un latido que no para (el miedo)
+    def latido_(fuerza):
+        d = 0.32
+        t = np.linspace(0, d, int(d * SR), endpoint=False)
+        f = 42 + 60 * np.exp(-t * 28)                      # el tono cae, como un golpe de corazón
+        return np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 9) * fuerza
+    for b in range(0, pulsos, 2):
+        p.poner(latido_(0.55), tempo.s(b))
+        p.poner(latido_(0.32), tempo.s(b + 0.5))
+    # las campanillas de hielo, nerviosas
+    rng = np.random.default_rng(103)
+    for k in range(40):
+        b = rng.random() * pulsos
+        p.poner(campanita(["D7", "A6", "F6", "E7"][rng.integers(4)], 0.8, 0.06), tempo.s(b), pan=rng.random() - 0.5)
+    # por encima, una a una, las frases de los ecos (la flauta y la kalimba), cada vez más claras
+    flauta_ = lambda n, d: flauta(n, d, 0.4, vibrato=4.4)
+    for k, frase in enumerate(FRASES_MONTANA):
+        melodia(p, tempo, frase, desde=8 + k * 28, instrumento=flauta_, volumen=0.22 + k * 0.04, sostener=0.9, pan=-0.2 + k * 0.1)
+    tocar(p, tempo, FRASE_QUIETA, desde=112, fuerza=0.3, pan=0.0)
+    return final(p, sala=2.8, mezcla=0.3, brillo=6000)
+
+
+PIEZAS["ruinas"] = ruinas
+PIEZAS["jefe_arbol"] = jefe_arbol
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

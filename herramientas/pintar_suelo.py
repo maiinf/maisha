@@ -325,7 +325,7 @@ NIEVE_S = ["#4a5672", "#61708e", "#7a89a6", "#95a3bd", "#adbbd1", "#c4cfe0", "#d
 PISADA = ["#4a5468", "#5e6a80", "#76829a", "#8e9ab0", "#a8b2c4", "#c0c9d8"]
 
 
-def _nevar(lz, tipos, fina, media, pared):
+def _nevar(lz, tipos, fina, media, pared, conservar=()):
     """El SENDERO OLVIDADO: todo nevado. Donde había hierba, nieve con ondas del viento y sombras azuladas; el camino,
     nieve pisada (más gris, con huellas); encima de las peñas, nieve; en sus paredes, escarcha."""
     import cv2 as _cv
@@ -333,6 +333,12 @@ def _nevar(lz, tipos, fina, media, pared):
     ri = mascara(lz, tipos, ("risco",), 4.0, 0.5, semilla=50)
     pared = pared if pared is not None else np.zeros_like(ri)
     suelo = np.clip(1 - ri, 0, 1)
+    if conservar:
+        # (lo que se conserva, p. ej. las losas de las Ruinas, solo lleva un poco de nieve en las juntas)
+        guardar = mascara(lz, tipos, conservar, 5, 0.2, semilla=909)
+        suelo = suelo * np.clip(1 - guardar * 0.92, 0, 1)
+        # las losas de las Ruinas: piedra vieja y clara (no el gris verdoso de las de los caminos)
+        lz.pintar(guardar * (1 - ri), "#a8a596", 0.35)
     grande = lz.ruido(40, 3, semilla=901)
     ondas = estirar(lz.ruido(2.5, 2, semilla=902), int(14 * S), vertical=False)
     # (más oscura y azulada que el blanco puro: si no, deslumbra y no se ve nada encima)
@@ -358,7 +364,7 @@ def _nevar(lz, tipos, fina, media, pared):
     encima = np.clip(ri - pared, 0, 1)
     dentro = _cv.distanceTransform((encima > 0.5).astype(np.uint8), _cv.DIST_L2, 5) / S
     # (una capa compacta: solo asoma la roca en el borde y en alguna mancha grande, no a motas)
-    manchas = lz.desenfocar((lz.ruido(18, 2, semilla=906) > 0.22).astype(float), 3.0) > 0.5
+    manchas = lz.desenfocar((lz.ruido(18 if not conservar else 34, 2, semilla=906) > (0.22 if not conservar else 0.08)).astype(float), 3.0) > 0.5
     capa = encima * (dentro > 1.6) * manchas
     vn = 0.62 + (lz.ruido(10, 2, semilla=907) - 0.5) * 0.3 + (fina - 0.5) * 0.1
     lz.pintar(capa, rampa(NIEVE_S, np.clip(vn, 0, 1)))
@@ -723,9 +729,10 @@ def pintar(nombre, salida=None):
 
     _puente_piedra(lz, tipos, alto, ancho, fina, media)
     olvidado = nombre == "sendero_olvidado"
-    pared = _riscos(lz, tipos, fina, media, cara=2.0 if (canada or paso or olvidado) else 1.0)
-    if olvidado:
-        _nevar(lz, tipos, fina, media, pared)
+    ruinas = nombre == "ruinas_primer_arbol"
+    pared = _riscos(lz, tipos, fina, media, cara=2.0 if (canada or paso or olvidado or ruinas) else 1.0)
+    if olvidado or ruinas:
+        _nevar(lz, tipos, fina, media, pared, conservar=("losas",) if ruinas else ())
     if canada or paso:
         _mesetas(lz, tipos, fina, media, pared)
 
@@ -738,7 +745,7 @@ def pintar(nombre, salida=None):
 
     # sombra muy suave de las nubes (da volumen al terreno)
     nubes = np.clip((lz.ruido(90, 3, semilla=20) - 0.6) * 3, 0, 1)
-    lz.pintar(nubes, "#1d2e18" if nombre != "sendero_olvidado" else "#1a2236", 0.12)
+    lz.pintar(nubes, "#1d2e18" if nombre not in ("sendero_olvidado", "ruinas_primer_arbol") else "#1a2236", 0.12)
 
     destino = salida or os.path.join(RAIZ, "arte", "mundos", "raiz", "suelos", nombre + "_suelo.png")
     os.makedirs(os.path.dirname(destino), exist_ok=True)

@@ -38,6 +38,13 @@
                   colinas negras. Pero en el agua, del revés, se ve lo que arriba no está: el PRIMER ÁRBOL dorado en su
                   colina, KIMYA flotando sobre su reflejo y nueve espirales de luz en arco (ocho verdes, una plateada).
                   Maisha, en la orilla de la isla, mira el agua.
+  22_ruinas_mauti LAS RUINAS DEL PRIMER ÁRBOL (no es un recuerdo: pasa ahora). Anochecer nevado en la cima: columnas
+                  rotas de piedra clara; en el centro, el Primer Árbol enorme, gris y medio de piedra, con vetas violetas
+                  y unas pocas hojas secas. A sus pies, MAUTI, hecha piedra, con su hoja de cobre en lo alto. Alrededor,
+                  nueve piedras apagadas en corro. Maisha, pequeña, de espaldas en primer término, mira hacia arriba.
+  23_arbol_libre  EL FINAL DE RAÍZ. La misma cima: la copa del Primer Árbol vuelve a ser de oro y brilla como un sol; las
+                  hojas doradas caen despacio. Las nueve piedras están encendidas (la del Silencio, plateada). Mauti, libre
+                  (plateada y lila), junto a Maisha, que sostiene entre las manos una semilla grande que brilla.
   15_eco_surcos   EL CUARTO ECO (Senda de los Surcos). La fiesta de la última siega, de noche: campos con gavillas,
                   guirnaldas de farolillos, una hoguera en el centro y los seres de Raíz bailando a contraluz. En la
                   colina, el Primer Árbol dorado. Junto al fuego, Maisha y Mauti bailan de la mano.
@@ -1067,4 +1074,116 @@ def eco_lago():
     return lz
 
 
-PIEZAS = {"21_eco_lago": eco_lago, "20_eco_cueva": eco_cueva, "19_eco_travesia": eco_travesia, "18_eco_orilla": eco_orilla, "17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}
+def _cima_ruinas(lz, rng, nevada=True):
+    """El fondo de las dos ilustraciones de las Ruinas: el cielo, la cima nevada, las columnas rotas y el corro de piedras."""
+    HZ = 150
+    suelo = lz.poligono([(0, 168), (120, 158), (300, 154), (480, 158), (600, 166), (600, 256), (0, 256)])
+    lz.sombrear(suelo, ["#3a4458", "#5a6680", "#8a96ae", "#b8c2d4", "#dde4ee"], 30, (0.4, -0.9, 0.6),
+                textura=lz.ruido(28, 2, semilla=411), fuerza_tex=0.0)
+    ondas = (estirar_h(lz, lz.ruido(0.7, 2, semilla=412), 22) > 0.62) * suelo
+    lz.pintar(ondas, "#e6ecf4", 0.25)
+    for (x, alto, roto) in ((70, 70, 12), (130, 54, 30), (470, 64, 18), (536, 76, 8), (30, 40, 40)):
+        col = lz.poligono([(x - 9, 168), (x - 8, 168 - alto), (x - 3, 168 - alto - roto * 0.2), (x + 6, 168 - alto + 4), (x + 9, 168)])
+        lz.sombrear(col, ["#4a4840", "#77736a", "#a8a499", "#d4d0c6", "#ece9e1"], 5, (-0.6, -0.7, 0.5),
+                    textura=((lz.y % 12) < 1.2) * 1.0 + lz.ruido(1, 2, semilla=x) * 0.3, fuerza_tex=0.3)
+        tapa = col * (1 - np.roll(col, int(2 * lz.s), axis=0))
+        lz.pintar(tapa, "#eef2f8")
+    return HZ
+
+
+def _corro(lz, encendidas):
+    for k in range(9):
+        a = np.pi * (0.08 + k * 0.105)
+        x = 300 - np.cos(a) * 210
+        y = 176 + np.sin(a) * 34
+        piedra = lz.poligono([(x - 5, y), (x - 4, y - 18), (x, y - 21), (x + 4, y - 17), (x + 5, y)])
+        lz.sombrear(piedra, ["#2a2c34", "#4a4e5a", "#6e7482", "#9aa0ac"], 3, (-0.6, -0.7, 0.5))
+        if encendidas:
+            col = "#c8d4f0" if k == 4 else "#8ff0d0"
+            pts = [(x + np.cos(t) * t * 0.35, y - 11 + np.sin(t) * t * 0.33) for t in np.linspace(0.3, 9, 22)]
+            lz.sumar_luz(lz.trazo(pts, 0.5), col, 0.9)
+            lz.sumar_luz(lz.desenfocar(lz.circulo(x, y - 11, 6), 4), col, 0.35)
+
+
+def _arbol_gris(lz, x, y, alto, rng):
+    tronco = lz.poligono([(x - 26, y), (x - 17, y - alto * 0.35), (x - 13, y - alto * 0.6), (x + 13, y - alto * 0.6), (x + 18, y - alto * 0.35), (x + 27, y)])
+    ramas = np.zeros((lz.H, lz.W))
+    def rama(a, ang, largo, g, n):
+        nonlocal ramas
+        b = (a[0] + np.cos(ang) * largo, a[1] + np.sin(ang) * largo)
+        m = (a[0] + np.cos(ang) * largo * 0.5 + rng.normal(0, 3), a[1] + np.sin(ang) * largo * 0.5)
+        ramas = np.maximum(ramas, lz.trazo(lz.curva(a, m, b, n=20), g, g * 0.6))
+        if n < 3:
+            for d in (-0.5, 0.45):
+                rama(b, ang + d + rng.normal(0, 0.15), largo * 0.68, g * 0.6, n + 1)
+    for ang in (-2.5, -1.9, -1.25, -0.65):
+        rama((x, y - alto * 0.58), ang, alto * 0.32, 5.0, 0)
+    madera = np.clip(tronco + ramas, 0, 1)
+    lz.sombrear(madera, ["#1e1e22", "#36363c", "#55555c", "#77777e", "#9a9aa0"], 7, (-0.6, -0.7, 0.5),
+                textura=lz.ruido(1.5, 3, semilla=421), fuerza_tex=0.35)
+    for pts in ([(x - 18, y), (x - 12, y - alto * 0.3), (x - 14, y - alto * 0.55)], [(x + 20, y), (x + 13, y - alto * 0.35), (x + 15, y - alto * 0.58)]):
+        v = lz.trazo(lz.curva(*pts, n=30), 1.0) * madera
+        lz.pintar(v, "#8a4ad0")
+        lz.sumar_luz(lz.desenfocar(v, 2), "#b080ff", 0.4)
+    nieve = madera * (1 - np.roll(madera, int(2 * lz.s), axis=0))
+    lz.pintar(nieve, "#dfe6f0")
+    for k in range(30):
+        hx, hy = x + rng.normal(0, 70), y - alto * 0.8 - abs(rng.normal(0, 26))
+        lz.pintar(lz.elipse(hx, hy, 2.2, 1.1, rng.uniform(0, 180)), "#6e6044")
+
+
+def _mauti_piedra(lz, x, y, e=1.0):
+    figura = np.maximum.reduce([lz.elipse(x, y - 15 * e, 9 * e, 8.5 * e), lz.elipse(x, y - 4.5 * e, 5 * e, 5 * e),
+                                lz.trazo([(x - 2.2 * e, y - 1 * e), (x - 2.4 * e, y + 2 * e)], 2.2 * e),
+                                lz.trazo([(x + 2.2 * e, y - 1 * e), (x + 2.4 * e, y + 2 * e)], 2.2 * e)])
+    lz.sombrear(figura, ["#2a2c30", "#4a4e54", "#6e7378", "#989da2"], 4 * e, (-0.6, -0.7, 0.5))
+    lz.pintar(lz.trazo([(x - 3 * e, y - 12 * e), (x + 1 * e, y - 6 * e), (x - 1 * e, y)], 0.5 * e) * figura, "#8a4ad0")
+    hoja = lz.elipse(x + 1.5 * e, y - 29 * e, 3.6 * e, 1.7 * e, -35)
+    lz.pintar(np.maximum(lz.trazo([(x, y - 23 * e), (x - 1 * e, y - 27.5 * e)], 0.9 * e), hoja), "#7a7064")
+    lz.pintar(figura * (1 - np.roll(figura, int(1.5 * lz.s), axis=0)), "#dfe6f0")
+
+
+def ruinas_mauti():
+    lz = Lienzo(W, H, semilla=400)
+    rng = np.random.default_rng(401)
+    lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(["#0c1020", "#1c2238", "#3a3c58", "#6a5a78", "#a07a88"], desde=0, hasta=170))
+    ci.estrellas(lz, 50, 90, semilla=402, color="#dce6f4")
+    _cima_ruinas(lz, rng)
+    _arbol_gris(lz, 300, 166, 150, rng)
+    _corro(lz, False)
+    # Mauti, de piedra, sentada al pie del tronco (un poco a la izquierda, para que se vea entera)
+    lz.sumar_luz(lz.desenfocar(lz.circulo(262, 160, 16), 10), "#b8a8e0", 0.18)
+    _mauti_piedra(lz, 262, 178, e=1.5)
+    # Maisha, de espaldas en primer término, mirando arriba
+    ci.maisha_luz(lz, 330, 246, e=2.2)
+    motas = np.zeros((lz.H, lz.W))
+    for k in range(160):
+        motas = np.maximum(motas, lz.circulo(rng.random() * W, rng.random() * H, 0.4 + rng.random() * 0.6))
+    lz.sumar_luz(motas, "#eef2f8", 0.7)
+    lz.pintar(np.clip((np.hypot((lz.x - 300) / 330, (lz.y - 140) / 170) - 0.75) * 2.0, 0, 1), "#05070c", 0.55)
+    return lz
+
+
+def arbol_libre():
+    lz = Lienzo(W, H, semilla=500)
+    rng = np.random.default_rng(501)
+    lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(["#2a2a50", "#5a4a70", "#b07a70", "#f0b878", "#ffe0a0"], desde=0, hasta=170))
+    _cima_ruinas(lz, rng)
+    _primer_arbol(lz, 300, 166, 150)
+    _corro(lz, True)
+    # Mauti, libre, y Maisha con la semilla
+    _mauti_luz(lz, 268, 222, e=1.7, mira=1)
+    ci.maisha_luz(lz, 330, 224, e=1.7)
+    semilla = lz.elipse(318, 206, 3.2, 4.0, 20)
+    lz.sumar_luz(lz.desenfocar(semilla, 6), "#ffe39a", 0.8)
+    lz.pintar(semilla, "#f0cc60")
+    hojas = np.zeros((lz.H, lz.W))
+    for k in range(90):
+        hojas = np.maximum(hojas, lz.elipse(rng.random() * W, rng.random() * 200, 1.6, 0.8, rng.uniform(0, 180)))
+    lz.sumar_luz(hojas, "#ffe39a", 0.9)
+    ci.marco_recuerdo(lz, color="#f0d8a0", semilla=502) if False else None
+    lz.pintar(np.clip((np.hypot((lz.x - 300) / 330, (lz.y - 140) / 170) - 0.8) * 2.0, 0, 1), "#140a06", 0.45)
+    return lz
+
+
+PIEZAS = {"22_ruinas_mauti": ruinas_mauti, "23_arbol_libre": arbol_libre, "21_eco_lago": eco_lago, "20_eco_cueva": eco_cueva, "19_eco_travesia": eco_travesia, "18_eco_orilla": eco_orilla, "17_kimya_lago": kimya_lago, "16_eco_canada": eco_canada, "12_eco_puente": eco_puente, "13_eco_pasarelas": eco_pasarelas, "14_eco_cobrizo": eco_cobrizo, "15_eco_surcos": eco_surcos}

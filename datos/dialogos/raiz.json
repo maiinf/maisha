@@ -2990,8 +2990,80 @@
 		"conversaciones": [
 			{
 				"lineas": [
-					"Detrás del arco, la niebla es una pared blanca. No se ve ni el suelo.",
-					"Al otro lado respira algo muy grande y muy viejo. Todavía no... aún no puedo pasar."
+					"Detrás del arco, la niebla es una pared blanca."
+				]
+			}
+		]
+	},
+	"ruinas_llegada": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"lineas": [
+					"En lo alto de la montaña, entre columnas rotas, hay un árbol enorme. Gris. Medio de piedra. Le cuelgan unas pocas hojas secas que no terminan de caer."
+				],
+				"historia": [
+					{
+						"imagen": "22_ruinas_mauti",
+						"lineas": [
+							"A sus pies, de piedra, con una hoja de cobre en lo alto... está Mauti.",
+							"La voz del árbol suena por todas partes a la vez, como el viento entre las ramas:",
+							"«No te acerques. Si te acercas, también te acabarás. Todo se acaba: las hojas, las cosechas, las noches bonitas...»",
+							"«Yo lo arreglé. Lo dejé todo quieto. Así nada se pierde.»",
+							"«Mauti quería que me dejara caer. Ahora ya no quiere nada. Está a salvo. Sin moverse.»"
+						]
+					}
+				],
+				"tras_historia": [
+					"Alrededor del árbol hay nueve piedras apagadas, como las de los ecos. Si recuerdo lo que dijeron...",
+					"(Mantén Acción junto a cada piedra para despertarla. Sin pararte demasiado: aquí también hiela.)"
+				]
+			}
+		]
+	},
+	"primer_arbol_final": {
+		"nombre": "",
+		"estilo": "narrador",
+		"conversaciones": [
+			{
+				"marca": [
+					"primer_arbol_libre",
+					"mauti_libre",
+					"semilla_primer_arbol"
+				],
+				"lineas": [
+					"El corazón de Giza se rompe como hielo fino. El árbol tiembla de las raíces a la última rama... y suspira."
+				],
+				"historia": [
+					{
+						"imagen": "23_arbol_libre",
+						"lineas": [
+							"«...Las nueve voces. Se me había olvidado que sonaban así.»",
+							"«Tenía tanto miedo de acabarme que dejé de vivir. Y para no perder a nadie, no dejé que nadie se moviera.»",
+							"La piedra de Mauti se agrieta y se cae a trozos. Debajo hay una luz lila, cansada pero entera.",
+							"«¿Maisha? ...Has subido hasta aquí. Con mi hoja y todo.»",
+							"«Lo que tú siembras, yo lo guardo. Y lo que yo guardo, un día vuelve a brotar. Por eso no da miedo que se acabe.»",
+							"«Ya no tengo miedo», dice el árbol. «Dejadme caer despacio. Y guardad esto.»",
+							"De la copa, que ahora brilla dorada, cae una semilla grande y tibia, y se posa en las manos de Maisha."
+						]
+					}
+				],
+				"tras_historia": [
+					"«Plántala cuando llegue el momento. De ella saldrá algo que te hará falta más adelante.»",
+					"Las hojas doradas empiezan a caer, una a una, muy despacio. Por primera vez en mucho tiempo, en Raíz algo se acaba... y está bien."
+				]
+			}
+		]
+	},
+	"mauti": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Gracias por subir. Hacía tanto frío ahí dentro que ya no me acordaba de mi nombre.",
+					"Me quedo un rato con el árbol: alguien tiene que acompañarle mientras se le caen las hojas.",
+					"Luego bajaré. Tengo muchas cosas que guardar... y tú muchas que despertar."
 				]
 			}
 		]

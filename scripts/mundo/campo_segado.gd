@@ -30,6 +30,10 @@ func _marca_de_region(marca: String) -> void:
 func mostrar_fin_de_raiz() -> void:
 	Estado.marcar("fin_raiz_visto")
 	var fin: CanvasLayer = load("res://scripts/interfaz/fin_mundo.gd").new()
+	# (no es el final de Raíz: Giza ya no lo cubre todo, pero en el norte el Primer Árbol sigue enfermo)
+	fin.titulo = "Raíz respira"
+	fin.subtitulo = "Pero en el norte, algo sigue enfermo"
+	fin.pie = "Sigue los ecos hacia el norte..."
 	add_child(fin)
 	fin.abrir()
 
