@@ -196,3 +196,12 @@ se pasan.
 | Las paredes de la Cañada (16) | Eran una masa oscura borrosa; ahora son capas de roca apiladas con juntas onduladas, el canto de cada capa con luz y hierba, sombra debajo, algunas grietas y la cara del hueco encendida por el sol |
 | La cueva de las setas (20) | Era un fondo negro con setas; ahora tiene una bóveda de rocas que iluminan las setas desde abajo, estalactitas con gotas que brillan, suelo con piedras y charcos de luz, setas con láminas, motitas y racimos, y dos setas enormes delante |
 | El eco del lago (21) | El árbol del reflejo usa el árbol nuevo, más grande y con más brillo; las nueve espirales forman un arco alrededor de la copa que cabe en el reflejo; más hierba en la isla |
+
+### Sigilia (mundo 2) — decidido con Iam el 2026-10-15 («vale sigue me gusta»)
+| Qué | Decisión |
+| --- | --- |
+| Escribas | Armiños (blancos en invierno, con lentes y plumas) |
+| Giza en Sigilia | El miedo a olvidar: lo escribieron todo, la tinta se heló (Tinta Quieta) y quien la toca pierde su nombre («en blanco») |
+| Llegada | Por el Paso de la Escarcha, que sale de las Ruinas del Primer Árbol |
+| Ficha (propuesta) | Ciudad Maandiko; caminos: Paso de la Escarcha, Estanterías Colgantes, Canal de Tinta, Observatorio de la Aurora y Sección Prohibida. Sigilos Fuego, Hielo y Rayo (arte Runa). Jefes: Bibliotecario Hueco, Pweza, Kengele y el Grimorio de Tinta. Misterio: 12 fichas del Índice que devuelven nombres. Detalle en el GDD, sección «Sigilia: ficha del mundo 2» |
+| Boceto | `documentacion/boceto_sigilia.png` (`herramientas/boceto_sigilia.py`) |
