@@ -111,117 +111,280 @@ def _constructor(lz, x, y, e, mira, carga=False, tortuga=False, sem=0):
         lz.sumar_luz(lz.desenfocar(p, 3), "#f9d77a", 0.35)
 
 
+def _tortuga(lz, x, y, e, mira, luz, carga=False, sem=0):
+    """Una tortuga constructora de tres cuartos: el caparazón de placas con su borde, la cabeza y las patas."""
+    m = mira
+    patas = np.zeros((lz.H, lz.W))
+    for dx in (-7, -2, 4, 8):
+        patas = np.maximum(patas, lz.elipse(x + dx * e * m, y - 1.5 * e, 2.6 * e, 2.4 * e))
+    lz.sombrear(patas, ["#2a3a24", "#40583a", "#5e7a50", "#86a070"], 1.5 * e, luz)
+    cabeza = np.maximum(lz.elipse(x + 13 * e * m, y - 8 * e, 4 * e, 3.2 * e), lz.trazo([(x + 8 * e * m, y - 6 * e), (x + 12 * e * m, y - 8 * e)], 2.4 * e))
+    lz.sombrear(cabeza, ["#2a3a24", "#40583a", "#5e7a50", "#86a070", "#a8bf90"], 2.5 * e, luz)
+    lz.pintar(lz.circulo(x + 14.5 * e * m, y - 9 * e, 0.8 * e), "#120b0a")
+    lz.pintar(lz.circulo(x + 14.2 * e * m, y - 9.4 * e, 0.3 * e), "#ffffff")
+    concha = lz.elipse(x, y - 8 * e, 11 * e, 7.5 * e) * (lz.y < y - 3.5 * e)
+    placas = np.clip(1 - np.minimum(np.abs(np.sin((lz.x - x) / (3.2 * e))), np.abs(np.sin((lz.y - y) / (2.6 * e) + (lz.x - x) / (6 * e)))) * 3, 0, 1)
+    lz.sombrear(concha, ["#2a2014", "#4a3a20", "#6e5a30", "#947a44", "#bca060", "#d8c080"], 6 * e, luz, textura=1 - placas * 0.6, fuerza_tex=0.45)
+    lz.pintar(lz.trazo([(x - 11 * e, y - 4 * e), (x + 11 * e, y - 4 * e)], 1.2 * e), "#3a2c18", 0.8)
+    if carga:
+        p_ = lz.elipse(x - 1 * e * m, y - 18 * e, 7 * e, 5 * e, sem * 13 % 30)
+        lz.sombrear(p_, PIEDRA_R[2:], 3 * e, luz, textura=lz.ruido(1.2, 2, semilla=sem), fuerza_tex=0.3)
+        lz.sumar_luz(lz.desenfocar(p_, 3), "#f9d77a", 0.35)
+
+
+def _castor_carga(lz, x, y, e, mira, luz, sem=0, piedra=True, **kw):
+    """Un castor detallado (el de la familia de Shamba) que lleva una piedra en alto, con el filo dorado de la luz del árbol."""
+    ci.castor(lz, x, y, e=e, mira=mira, luz=luz, recorte=("#ffe39a", 0.75), recorte_dir=(0.6, -1), brazo_alto=piedra, sem=sem, **kw)
+    if piedra:
+        px_, py_ = x + 15 * e * mira, y - 34 * e
+        p_ = lz.elipse(px_, py_, 7.5 * e, 5.5 * e, sem * 17 % 40)
+        lz.sombrear(p_, PIEDRA_R[2:], 3 * e, luz, textura=lz.ruido(1.2, 2, semilla=sem + 50), fuerza_tex=0.3)
+        lz.sumar_luz(lz.desenfocar(p_, 3), "#f9d77a", 0.4)
+
+
+def _arbol_dorado(lz, x, y, rng, escala=1.0):
+    """El PRIMER ÁRBOL, grande, pintado con volumen: un tronco ancho y retorcido con raíces, ramas que se meten en la
+    copa, y la copa hecha de RACIMOS de hojas doradas (cada uno con su luz y su sombra, los de delante tapando a los de
+    detrás), con un halo de luz alrededor como un sol de amanecer."""
+    e = escala
+    copa_y = y - 112 * e
+    # el halo que da (detrás de todo)
+    lz.sumar_luz(np.clip(1 - np.hypot((lz.x - x) / (190 * e), (lz.y - copa_y) / (120 * e)), 0, 1) ** 1.5, "#ffe9a8", 0.7)
+    # el tronco y las raíces
+    tronco = lz.poligono([(x - 30 * e, y), (x - 16 * e, y - 30 * e), (x - 14 * e, y - 60 * e), (x - 9 * e, y - 82 * e),
+                          (x + 10 * e, y - 82 * e), (x + 15 * e, y - 58 * e), (x + 17 * e, y - 30 * e), (x + 32 * e, y)])
+    for (dx, lx, g) in ((-1, 46, 6), (1, 50, 6), (-1, 28, 4), (1, 30, 4)):
+        tronco = np.maximum(tronco, lz.trazo(lz.curva((x + dx * 12 * e, y - 6 * e), (x + dx * lx * 0.5 * e, y - 3 * e), (x + dx * lx * e, y + 1), n=24), g * e, 1.2 * e))
+    ramas = np.zeros((lz.H, lz.W))
+    for (b0, b1, b2, g) in (((x - 6, y - 78), (x - 40, y - 100), (x - 70, y - 118), 7), ((x + 6, y - 78), (x + 42, y - 102), (x + 76, y - 116), 7),
+                            ((x, y - 80), (x - 4, y - 112), (x + 6, y - 140), 6), ((x - 20, y - 92), (x - 30, y - 128), (x - 22, y - 150), 4)):
+        ramas = np.maximum(ramas, lz.trazo(lz.curva(b0, b1, b2, n=30), g * e, g * 0.4 * e))
+    madera = np.clip(tronco + ramas, 0, 1)
+    estrias = (np.abs(np.sin((lz.x - x) / (2.2 * e) + lz.ruido(6, 2, semilla=401) * 3)) > 0.86) * 1.0
+    lz.sombrear(madera, ["#1e1a14", "#33302a", "#4a4a3e", "#666a56", "#8a8e72", "#b0ae8a"], 9 * e, (0.4, -0.8, 0.5),
+                textura=1 - estrias * 0.5, fuerza_tex=0.45)
+    lz.sumar_luz(lz.desenfocar(madera * (lz.x > x + 6 * e), 2) * madera, "#ffd890", 0.25)      # el filo de luz
+    # la copa: racimos de hojas, de atrás adelante
+    racimos = []
+    for k in range(46):
+        a = rng.random() * np.pi
+        r = rng.random() ** 0.6
+        cx = x + np.cos(a) * r * 118 * e
+        cy = copa_y - np.sin(a) * r * 62 * e + rng.normal(0, 6 * e)
+        racimos.append((cy, cx, (12 + rng.random() * 12) * e))
+    racimos.sort()
+    oro = ["#5a4214", "#8a6420", "#b8862a", "#dca83e", "#f2c95a", "#fbe08a", "#fff4c8"]
+    for (cy, cx, rr) in racimos:
+        forma = lz.elipse(cx, cy, rr * 1.15, rr * 0.82, rng.uniform(-15, 15))
+        # el borde del racimo, hecho de hojas (no una elipse lisa)
+        hojitas = lz.desenfocar((lz.ruido(0.9, 2, semilla=int(cx * 7 + cy)) > 0.42).astype(float), 0.8) > 0.5
+        borde = np.clip(lz.elipse(cx, cy, rr * 1.3, rr * 0.98) - forma, 0, 1) * hojitas
+        racimo = np.clip(forma + borde, 0, 1)
+        lz.sombrear(racimo, oro, rr * 0.7, (0.35, -0.85, 0.55), textura=lz.ruido(1.4, 2, semilla=int(cx + cy)), fuerza_tex=0.18)
+        lz.pintar(np.clip(racimo - np.roll(racimo, int(-1.6 * lz.s), axis=0), 0, 1) * (lz.y > cy), "#3a2a0c", 0.35)   # sombra bajo cada racimo
+    copa = np.zeros((lz.H, lz.W))
+    for (cy, cx, rr) in racimos:
+        copa = np.maximum(copa, lz.elipse(cx, cy, rr * 1.2, rr * 0.9))
+    lz.sumar_luz(lz.desenfocar(copa, 10 * e) * (lz.y < copa_y), "#ffe39a", 0.3)
+    # destellos de hojas que brillan y hojas que caen
+    brillos = copa * (lz.ruido(0.5, 1, semilla=402) > 0.88) * (lz.y < copa_y + 10 * e)
+    lz.sumar_luz(brillos, "#fff8d8", 0.8)
+    hojas = np.zeros((lz.H, lz.W))
+    for k in range(50):
+        hx, hy = x + rng.normal(0, 110 * e), copa_y + rng.random() * 120 * e
+        hojas = np.maximum(hojas, lz.elipse(hx, hy, 1.5 * e, 0.7 * e, rng.uniform(0, 180)) * rng.uniform(0.5, 1))
+    lz.sumar_luz(hojas, "#fff1c0", 0.9)
+
+
 def eco_puente():
     """«Esta piedra nos la dio el Primer Árbol. Para que nadie quedara solo en una orilla.»
-    Vista desde la orilla, de lado: el río cruza la imagen de izquierda a derecha y el puente lo salta con tres
-    arcos (el del medio, a medio hacer, con la cimbra de madera y la grúa subiendo una piedra). Detrás, en una
-    colina, el Primer Árbol, enorme y dorado, que da luz como un sol de amanecer."""
-    lz = Lienzo(W, H, semilla=120)
-    HZ = 112
-    # cielo del amanecer: verde-agua arriba, dorado alrededor del árbol
-    lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(["#24403f", "#3f6663", "#7d9c8c", "#c5c9a0", "#f0dcaa"], desde=0, hasta=HZ))
-    calido = np.clip(1 - np.hypot((lz.x - 440) / 260, (lz.y - 60) / 120), 0, 1)
-    lz.sumar_luz(calido ** 1.4, "#ffe2a0", 0.65)
-    ci.cumulos(lz, [(80, 34, 60, 8), (210, 22, 46, 6), (300, 48, 50, 7)], luz=(0.8, -0.5),
-               colores=("#56766f", "#8fa896", "#d2d4b0", "#fff4d6"), semilla=124, alfa=0.75, suave=1.2)
-    # colinas lejanas en la neblina y la colina del árbol
-    lejos = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 4, 8, 150, 125))
-    lz.pintar(lejos, "#7d9886")
-    colina = lz.elipse(440, HZ + 10, 150, 40) * (lz.y < HZ + 12)
-    lz.sombrear(colina, ["#4d6a55", "#66845f", "#86a072", "#a9bb8a"], 24, (0.2, -1, 0.5))
-    # el PRIMER ÁRBOL: grande, viejo, con la copa dorada que brilla
-    ci.arbol_grande(lz, 440, HZ + 2, 150, 210, luz=(0.0, -1.0, 0.6), semilla=129,
-                    rampa_copa=["#5a4a1a", "#8a6a22", "#b8862a", "#e6b54a", "#f9d77a", "#fff1c0", "#fffbe8"],
-                    rampa_tronco=["#26302a", "#36443a", "#4a5a4c", "#66785f", "#8a9a7a"])
-    copa = np.clip(1 - np.hypot((lz.x - 440) / 120, (lz.y - (HZ - 108)) / 60), 0, 1)
-    lz.sumar_luz(copa ** 1.2, "#ffeab0", 0.55)
+    Un amanecer de hace muchísimo tiempo sobre el Río Lento. De lado, el puente de piedra a medio hacer: tres arcos (el
+    del medio sin cerrar, con su cimbra de madera y una grúa de palos que sube una piedra que brilla). Castores y una
+    tortuga trabajan encima; en la orilla de aquí, dos castores tiran de la cuerda. Detrás, en su colina, el PRIMER
+    ÁRBOL dorado da luz como un sol: los rayos atraviesan la bruma. El río lo refleja todo, con su camino de oro."""
+    lz = Lienzo(W, H, s=3, semilla=120)
     rng = np.random.default_rng(130)
-    hojas = np.zeros((lz.H, lz.W))
-    for k in range(60):
-        hx, hy = 440 + (rng.random() - 0.5) * 300, 30 + rng.random() * 110
-        hojas = np.maximum(hojas, lz.elipse(hx, hy, 1.3, 0.6, rng.random() * 180) * (0.4 + rng.random() * 0.6))
-    lz.sumar_luz(hojas, "#fff1c0", 0.9)
-    # la orilla de enfrente (con juncos) y el agua
-    Y_AGUA0, Y_AGUA1 = 150, 214
-    otra = (lz.y > HZ + 8) * (lz.y < Y_AGUA0 + 2)
-    lz.pintar(otra, rampa(ci.HIERBA[2:7], np.clip(0.55 + (lz.ruido(6, 3, semilla=131) - 0.5) * 0.4, 0, 1)))
-    agua = (lz.y >= Y_AGUA0) * (lz.y < Y_AGUA1)
-    ondas = np.sin(lz.y * 1.4 + (lz.ruido(14, 3, semilla=127) - 0.5) * 12) * 0.5 + 0.5
-    lz.pintar(agua, rampa(AGUA, np.clip(0.35 + (ondas - 0.5) * 0.18 + (lz.y - Y_AGUA0) / 160, 0, 1)))
-    # el reflejo dorado del árbol en el agua
-    refl = agua * np.clip(1 - np.abs(lz.x - 440) / 110, 0, 1) * (ondas > 0.55)
-    lz.sumar_luz(refl, "#f9d77a", 0.5)
-    # el PUENTE, de lado: tablero, pretil, tres arcos (el del medio sin cerrar) y los pilares en el agua
-    X0, X1, YT = 40, 520, 130                       # extremos y altura del tablero
-    arcos = [(120, 54), (280, 64), (440, 54)]       # centro y semiancho de cada arco
-    base = Y_AGUA0 + 20                             # la línea del agua bajo el puente
-    muro = lz.poligono([(X0, YT), (X1, YT), (X1 + 4, base), (X0 - 4, base)])
+    HZ = 112
+    LUZ_A = (0.55, -0.75, 0.5)                    # la luz viene del árbol, al fondo a la derecha
+    # el cielo del amanecer: azul verdoso arriba, melocotón y oro alrededor del árbol
+    lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(["#1c3440", "#2e5058", "#5a7a78", "#a8a892", "#e8cfa0", "#fbe2b0"], desde=0, hasta=HZ))
+    calido = np.clip(1 - np.hypot((lz.x - 450) / 280, (lz.y - 70) / 130), 0, 1)
+    lz.sumar_luz(calido ** 1.6, "#ffd890", 0.7)
+    ci.cumulos(lz, [(70, 30, 70, 9), (190, 18, 52, 7), (300, 44, 60, 8), (560, 22, 50, 6)], luz=(0.9, -0.4),
+               colores=("#4a6670", "#7e9894", "#d8caa2", "#fff0cc"), semilla=124, alfa=0.8, suave=1.4)
+    # montañas en capas, cada vez más claras y azuladas con la distancia
+    for (base, amp, esc, sem, col) in ((HZ - 26, 12, 220, 141, "#8aa0a4"), (HZ - 14, 10, 160, 142, "#74908a"), (HZ - 4, 7, 110, 143, "#5f7e70")):
+        capa = ci.mascara_bajo(lz, ci.linea_horizonte(lz, base, amp, esc, sem))
+        lz.pintar(capa * (lz.y < HZ + 4), col)
+        lz.pintar(capa * (lz.y < HZ + 4), "#f4dcaa", 0.18)
+    # la colina del árbol y el PRIMER ÁRBOL (el mismo de los demás recuerdos)
+    colina = lz.elipse(450, HZ + 14, 170, 40) * (lz.y < HZ + 16)
+    lz.sombrear(colina, ["#3e5a44", "#5a7a52", "#7e9a66", "#a8b884"], 26, LUZ_A, textura=lz.ruido(4, 3, semilla=144), fuerza_tex=0.2)
+    # el PRIMER ÁRBOL: enorme y viejo, con la copa dorada que brilla
+    _arbol_dorado(lz, 450, HZ + 4, rng, escala=0.68)
+    # los rayos de luz que salen del árbol y atraviesan la bruma
+    fuente = (np.clip(1 - np.hypot((lz.x - 450) / 70, (lz.y - 40) / 40), 0, 1) ** 2).astype(np.float32)
+    rayos = lz.rayos(fuente, (450, 40), largo=0.965, pasos=56)
+    lz.sumar_luz(np.clip(rayos * 3.2, 0, 1) * (lz.y < 175), "#ffe2a0", 0.35)
+    # la orilla de enfrente, con juncos y árboles pequeños en la bruma
+    Y_AGUA0, Y_AGUA1 = 156, 214
+    otra = (lz.y > HZ + 6) * (lz.y < Y_AGUA0 + 2)
+    lz.pintar(otra, rampa(ci.HIERBA[2:7], np.clip(0.5 + (lz.ruido(6, 3, semilla=131) - 0.5) * 0.4, 0, 1)))
+    lz.pintar(otra * np.clip((Y_AGUA0 - lz.y) / 30, 0, 1), "#c8c8a0", 0.25)
+    juncos = np.zeros((lz.H, lz.W))
+    for k in range(160):
+        jx = rng.random() * W
+        juncos = np.maximum(juncos, lz.trazo([(jx, Y_AGUA0 + 1), (jx + rng.normal(0, 1.2), Y_AGUA0 - 4 - rng.random() * 7)], 0.45))
+    lz.pintar(juncos, "#4e6a3e", 0.9)
+    # ---- EL PUENTE, de lado: tres arcos (el del medio a medio hacer)
+    X0, X1, YT = 30, 540, 128
+    arcos = [(118, 56), (285, 66), (452, 56)]
+    base = Y_AGUA0 + 22
+    muro = lz.poligono([(X0, YT), (X1, YT), (X1 + 5, base), (X0 - 5, base)])
     huecos = np.zeros((lz.H, lz.W))
     for (cx, r) in arcos:
-        huecos = np.maximum(huecos, lz.elipse(cx, base, r, 34) * (lz.y > YT + 6))
-    # el tramo del medio aún no tiene tablero: solo las piedras del arco que suben desde cada lado
-    falta = lz.poligono([(232, YT - 2), (328, YT - 2), (328, base - 24), (232, base - 24)])
+        huecos = np.maximum(huecos, lz.elipse(cx, base, r, 36) * (lz.y > YT + 6))
+    falta = lz.poligono([(236, YT - 2), (334, YT - 2), (334, base - 26), (236, base - 26)])
     hecho = np.clip(muro - huecos - falta, 0, 1)
-    ci.piedras(lz, hecho, tam=9, semilla=132, rampa_p=PIEDRA_R[1:], luz=(0.2, -1, 0.5), mortero="#1a2420")
-    lz.pintar(np.clip(hecho * (1 - lz.desenfocar(hecho, 1.0)) * 3, 0, 1), "#1a2420", 0.6)
-    # dovelas de los arcos (claras, en abanico)
+    ci.piedras(lz, hecho, tam=8, semilla=132, rampa_p=["#2a2c26", "#41443a", "#5c6052", "#7a806d", "#9aa08a", "#c0c4ae", "#e6e2c8"],
+               luz=LUZ_A, mortero="#161a16")
+    # el interior de los arcos, en sombra (se ve el intradós, más oscuro hacia dentro)
     for (cx, r) in arcos:
-        anillo = np.clip(lz.elipse(cx, base, r + 5, 39) - lz.elipse(cx, base, r, 34), 0, 1) * (lz.y > YT + 2) * (lz.y < base)
-        if cx == 280:
-            anillo *= (np.abs(lz.x - 280) > 16)     # en el arco del medio faltan las de arriba
-        lz.pintar(anillo, rampa(PIEDRA_R[3:7], np.clip(0.4 + (lz.ruido(1, 2, semilla=cx) - 0.5) * 0.4, 0, 1)))
-        lz.pintar(anillo * ((np.floor(np.arctan2(lz.y - base, lz.x - cx) * 14) % 2) == 0), "#2e302a", 0.5)
-    # pretil encima del tablero (con albardilla clara)
-    pretil = lz.poligono([(X0, YT - 7), (232, YT - 7), (232, YT), (X0, YT)]) + lz.poligono([(328, YT - 7), (X1, YT - 7), (X1, YT), (328, YT)])
-    lz.pintar(np.clip(pretil, 0, 1), rampa(PIEDRA_R[2:6], np.clip(0.4 + (lz.ruido(1, 2, semilla=133) - 0.5) * 0.4, 0, 1)))
-    lz.pintar(np.clip(pretil, 0, 1) * (lz.y < YT - 5), PIEDRA_R[6], 0.9)
-    # la cimbra de madera bajo el arco del medio, con sus puntales
-    cimbra = lz.trazo(lz.curva((222, base), (280, base - 70), (338, base), n=60), 3, 3)
-    lz.sombrear(cimbra, ci.MADERA[1:6], 1.5, (0.2, -1, 0.5))
-    for k in range(7):
-        t = (k + 0.5) / 7
-        bx = (1 - t) ** 2 * 222 + 2 * (1 - t) * t * 280 + t ** 2 * 338
-        by = (1 - t) ** 2 * base + 2 * (1 - t) * t * (base - 70) + t ** 2 * base
-        lz.pintar(lz.trazo([(bx, by), (bx, base + 4)], 1.0), ci.MADERA[2], 0.9)
-    # la grúa de palos sobre el tramo ya hecho y la piedra del Primer Árbol que sube (brilla)
-    lz.pintar(lz.trazo([(214, YT - 6), (262, YT - 74)], 2.2), ci.MADERA[3])
-    lz.pintar(lz.trazo([(200, YT - 6), (214, YT - 6)], 1.6), ci.MADERA[2])
-    lz.pintar(lz.trazo([(262, YT - 74), (276, YT - 40)], 0.5), "#c9b77d")
-    piedra = lz.elipse(278, YT - 33, 8, 7)
-    lz.sombrear(piedra, PIEDRA_R[3:], 3, (0.2, -1, 0.5))
-    lz.sumar_luz(lz.desenfocar(piedra, 5), "#f9d77a", 0.7)
-    lz.sumar_luz(piedra, "#f9d77a", 0.35)
-    # piedras doradas ya puestas, aquí y allá
-    for (px_, py_) in ((150, YT + 10), (380, YT + 16), (470, YT + 8), (90, YT + 22)):
-        lz.sumar_luz(lz.desenfocar(lz.elipse(px_, py_, 4, 3), 3), "#f9d77a", 0.45)
-    # el reflejo del puente en el agua: el muro volteado bajo la línea del agua, oscuro y temblón
-    fila_base = int(base * lz.s)
-    alto_r = min(fila_base - int(YT * lz.s), lz.H - fila_base)
-    refl_p = np.zeros((lz.H, lz.W), np.float32)
-    refl_p[fila_base:fila_base + alto_r] = np.clip(hecho + np.clip(cimbra, 0, 1), 0, 1)[fila_base - 1:fila_base - 1 - alto_r:-1]
-    temblor = (np.sin(lz.y * 2.2 + lz.ruido(3, 2, semilla=135) * 6) > -0.3)
-    lz.pintar(refl_p * agua * temblor * np.clip(1 - (lz.y - base) / 50, 0, 1), "#162e2e", 0.55)
-    lz.pintar(agua * (np.abs(lz.y - base) < 1.0) * (lz.ruido(1, 2, semilla=136) > 0.4), "#9fd0d0", 0.6)
-    # los constructores sobre el puente y en la orilla, a contraluz (filo dorado)
-    for (x, y, e, m, kw) in ((150, YT - 7, 0.75, 1, dict(carga=True, sem=1)), (186, YT - 7, 0.6, 1, dict(sem=2)),
-                             (360, YT - 7, 0.72, -1, dict(tortuga=True)), (402, YT - 7, 0.7, -1, dict(carga=True, sem=5)),
-                             (300, YT - 46, 0.5, -1, dict(sem=7))):
-        _constructor(lz, x, y, e, m, **kw)
-    # la orilla de aquí (delante), con piedras esperando y dos constructores tirando de la cuerda
-    delante = (lz.y >= Y_AGUA1)
-    borde = lz.desenfocar(delante.astype(np.float32), 1.5)
-    lz.pintar(delante, rampa(ci.HIERBA[1:6], np.clip(0.45 + (lz.ruido(5, 3, semilla=134) - 0.5) * 0.45 - (lz.y - Y_AGUA1) / 160, 0, 1)))
-    lz.pintar(np.clip(borde - delante, 0, 1) * 2, "#9fd0d0", 0.5)
-    lz.pintar(lz.trazo([(262, YT - 74), (180, 226), (130, 236)], 0.5), "#c9b77d", 0.85)
-    for (x, y, e, m, kw) in ((118, 244, 1.5, 1, dict(sem=3)), (150, 248, 1.3, 1, dict(sem=4)), (520, 246, 1.6, -1, dict(carga=True, sem=6))):
-        _constructor(lz, x, y, e, m, **kw)
-    for k, (x, y) in enumerate(((40, 238), (62, 248), (560, 236), (586, 246), (470, 250))):
-        p = lz.elipse(x, y, 9, 6, k * 20)
-        lz.sombrear(p, PIEDRA_R[1:], 3, (0.2, -1, 0.5), textura=lz.ruido(1.4, 2, semilla=40 + k), fuerza_tex=0.3)
+        dentro = lz.elipse(cx, base, r, 36) * (lz.y > YT + 6) * (lz.y < base)
+        if cx == 285:
+            dentro = dentro * 0
+        lz.pintar(dentro, "#0c1414", 0.55)
+        intrados = np.clip(lz.elipse(cx, base, r, 36) - lz.elipse(cx - 4, base + 3, r - 3, 33), 0, 1) * (lz.y < base)
+        lz.pintar(intrados * (cx != 285), "#3a3c34", 0.8)
+    # dovelas claras en abanico
+    for (cx, r) in arcos:
+        anillo = np.clip(lz.elipse(cx, base, r + 5, 41) - lz.elipse(cx, base, r, 36), 0, 1) * (lz.y > YT + 2) * (lz.y < base)
+        if cx == 285:
+            anillo *= (np.abs(lz.x - 285) > 18)
+        lz.sombrear(anillo, ["#41443a", "#7a806d", "#9aa08a", "#c0c4ae", "#e6e2c8"], 2, LUZ_A,
+                    textura=((np.floor(np.arctan2(lz.y - base, lz.x - cx) * 16) % 2) == 0) * 1.0, fuerza_tex=0.35)
+    # la piedra mojada y el musgo junto al agua
+    mojado = hecho * np.clip(1 - (base - lz.y) / 10, 0, 1)
+    lz.pintar(mojado, "#1a2a28", 0.55)
+    musgo = hecho * (lz.ruido(1.6, 2, semilla=137) > 0.55) * np.clip(1 - (base - lz.y) / 16, 0, 1)
+    lz.pintar(musgo, "#4e7a3a", 0.75)
+    # el pretil, con su albardilla iluminada
+    pretil = np.clip(lz.poligono([(X0, YT - 8), (236, YT - 8), (236, YT), (X0, YT)]) + lz.poligono([(334, YT - 8), (X1, YT - 8), (X1, YT), (334, YT)]), 0, 1)
+    ci.piedras(lz, pretil, tam=6, semilla=133, rampa_p=["#41443a", "#5c6052", "#7a806d", "#9aa08a", "#c0c4ae", "#e6e2c8"], luz=LUZ_A, mortero="#161a16")
+    lz.pintar(pretil * (lz.y < YT - 6), "#f0e6c8", 0.8)
+    # la cimbra de madera bajo el arco del medio, con sus puntales y cuñas
+    cimbra = lz.trazo(lz.curva((222, base), (285, base - 76), (348, base), n=70), 3.2, 3.2)
+    lz.sombrear(cimbra, ci.MADERA[1:6], 1.5, LUZ_A, textura=lz.ruido(0.6, 2, semilla=138), fuerza_tex=0.4)
+    for k in range(8):
+        t = (k + 0.5) / 8
+        bx = (1 - t) ** 2 * 222 + 2 * (1 - t) * t * 285 + t ** 2 * 348
+        by = (1 - t) ** 2 * base + 2 * (1 - t) * t * (base - 76) + t ** 2 * base
+        lz.sombrear(lz.trazo([(bx, by), (bx + (t - 0.5) * 4, base + 4)], 1.2), ci.MADERA[1:5], 0.8, LUZ_A)
+    # las dovelas que ya suben desde cada lado del arco del medio
+    for lado in (-1, 1):
+        for k in range(5):
+            a = np.pi * (0.05 + k * 0.07)
+            dx = np.cos(a) * 66 * lado
+            dy = -np.sin(a) * 40
+            d_ = lz.elipse(285 + dx, base + dy, 5, 3.6, np.degrees(a) * lado)
+            lz.sombrear(d_, ["#41443a", "#7a806d", "#9aa08a", "#c0c4ae", "#e6e2c8"], 1.6, LUZ_A)
+    # la grúa de palos sobre el tramo hecho: dos patas, el brazo, la polea y la cuerda, y la piedra que sube (brilla)
+    for (a, b) in (((204, YT - 7), (246, YT - 86)), ((226, YT - 7), (246, YT - 86))):
+        lz.sombrear(lz.trazo([a, b], 2.4, 1.8), ci.MADERA[1:6], 1.2, LUZ_A)
+    lz.sombrear(lz.trazo([(236, YT - 66), (300, YT - 92)], 2.0, 1.6), ci.MADERA[1:6], 1.0, LUZ_A)
+    lz.sombrear(lz.circulo(300, YT - 92, 3.2), ci.MADERA[2:6], 1.0, LUZ_A)
+    lz.pintar(lz.trazo([(300, YT - 90), (300, YT - 46)], 0.55), "#d8c890")
+    piedra = lz.elipse(300, YT - 40, 9, 7.5)
+    lz.sombrear(piedra, ["#5c6052", "#9aa08a", "#c0c4ae", "#e6e2c8", "#fffbe8"], 3, LUZ_A, textura=lz.ruido(1.0, 2, semilla=139), fuerza_tex=0.25)
+    lz.sumar_luz(lz.desenfocar(piedra, 7), "#f9d77a", 0.75)
+    lz.sumar_luz(lz.trazo([(296, YT - 43), (303, YT - 37)], 0.6), "#fff1c0", 0.8)
+    # piedras doradas ya puestas, aquí y allá (las del Primer Árbol)
+    for (px_, py_) in ((150, YT + 12), (390, YT + 18), (480, YT + 10), (80, YT + 24), (205, YT + 30)):
+        lz.sumar_luz(lz.desenfocar(lz.elipse(px_, py_, 4, 3), 3), "#f9d77a", 0.5)
+    # los constructores sobre el puente (castores con piedras y una tortuga), iluminados por el árbol
+    _castor_carga(lz, 150, YT - 8, 0.62, 1, LUZ_A, sem=1)
+    _castor_carga(lz, 196, YT - 8, 0.5, 1, LUZ_A, sem=2, piedra=False)
+    _tortuga(lz, 372, YT - 8, 0.8, -1, LUZ_A, carga=True, sem=5)
+    _castor_carga(lz, 420, YT - 8, 0.6, -1, LUZ_A, sem=3)
+    _castor_carga(lz, 500, YT - 8, 0.52, -1, LUZ_A, sem=4, piedra=False, sombrero=True)
+    # ---- EL RÍO: refleja lo de encima en dos pasos, con una ondulación suave
+    agua = ((lz.y >= Y_AGUA0) * (lz.y < Y_AGUA1)).astype(float)
+    filas = lz.img.shape[0]
+    yy = np.arange(filas)
+    antes = lz.img.copy()
+
+    def ondular(img_r, desde, amplitud):
+        for f in range(int(desde * lz.s), min(filas, int(Y_AGUA1 * lz.s))):
+            d = (f / lz.s - desde) / max(1.0, Y_AGUA1 - desde)
+            desp = int(round(np.sin(f / lz.s * 0.55 + np.sin(f / lz.s * 0.13) * 1.5) * (0.6 + d * amplitud) * lz.s))
+            img_r[f] = np.roll(img_r[f], desp, axis=0)
+        return img_r
+    # 1) el cielo, las colinas y el árbol, reflejados desde la orilla del fondo
+    eje_fondo = int(Y_AGUA0 * lz.s)
+    lejos_r = ondular(antes[np.clip(2 * eje_fondo - 1 - yy, 0, filas - 1)].copy(), Y_AGUA0, 2.0)
+    hondo = np.clip((lz.y - Y_AGUA0) / (Y_AGUA1 - Y_AGUA0), 0, 1)
+    tinte = np.array([0.05, 0.15, 0.15])
+    lz.pintar(agua, np.clip(lejos_r * (0.6 - hondo[..., None] * 0.2) + tinte * (0.7 + hondo[..., None] * 0.3), 0, 1))
+    # 2) el puente (y lo que hay encima) reflejado desde su base, solo por debajo de ella
+    eje_p = int(base * lz.s)
+    origen_p = np.clip(2 * eje_p - 1 - yy, 0, filas - 1)
+    puente_m = np.clip(hecho + pretil + np.clip(cimbra, 0, 1), 0, 1)
+    puente_r = ondular(antes[origen_p].copy(), base, 2.5)
+    mascara_r = puente_m[origen_p] * (lz.y >= base) * agua * np.clip(1 - (lz.y - base) / 40, 0.2, 1)
+    lz.pintar(mascara_r, np.clip(puente_r * 0.5 + tinte * 0.6, 0, 1), 0.85)
+    # el agua bajo el puente (donde no llega el reflejo del cielo) y la línea de espuma en los pilares
+    lz.pintar(agua * (lz.y < base + 2) * (lz.y >= Y_AGUA0), "#14302e", 0.25)
+    for xp in (60, 200, 368, 535):
+        espuma = lz.elipse(xp, base + 1, 14, 2.2) * (lz.ruido(0.8, 2, semilla=xp) > 0.45)
+        lz.pintar(espuma, "#e6f4f0", 0.75)
+    # el camino de oro del árbol sobre el agua y destellos que bailan
+    camino = agua * np.clip(1 - np.abs(lz.x - 450) / (40 + (lz.y - Y_AGUA0) * 0.9), 0, 1)
+    vetas = (np.abs(np.sin(lz.y * 2.6 + lz.ruido(2.5, 2, semilla=145) * 5)) > 0.82)
+    lz.sumar_luz(camino * vetas, "#ffe39a", 0.85)
+    destellos = agua * (lz.ruido(0.5, 1, semilla=146) > 0.9) * (np.abs(lz.x - 450) < 120)
+    lz.sumar_luz(destellos, "#fff8e0", 0.9)
+    lineas = agua * (np.abs(np.sin(lz.y * 1.9 + lz.ruido(6, 2, semilla=147) * 4)) > 0.96)
+    lz.pintar(lineas, "#cfe6e0", 0.18)
+    # ---- LA ORILLA DE AQUÍ: hierba con briznas y flores, juncos, bloques de piedra cortados y dos castores tirando
+    delante = (lz.y >= Y_AGUA1).astype(float)
+    borde_tierra = lz.poligono([(0, Y_AGUA1 - 1), (600, Y_AGUA1 + 3), (600, 256), (0, 256)])
+    lz.sombrear(borde_tierra, ["#22301a", "#34482a", "#4a6436", "#6a8446", "#8aa05a"], 18, LUZ_A,
+                textura=lz.ruido(2, 3, semilla=134), fuerza_tex=0.3)
+    briznas = np.zeros((lz.H, lz.W))
+    for k in range(700):
+        bx, by = rng.random() * W, Y_AGUA1 + 2 + rng.random() * 44
+        briznas = np.maximum(briznas, lz.trazo([(bx, by), (bx + rng.normal(0, 1.5), by - 2 - rng.random() * 5)], 0.35) * rng.uniform(0.5, 1.0))
+    lz.pintar(briznas * borde_tierra, "#9ab866", 0.8)
+    for k in range(60):
+        fx, fy = rng.random() * W, Y_AGUA1 + 8 + rng.random() * 38
+        col = ["#f4e0a0", "#e8a0a8", "#fff4d6", "#c8a8e8"][k % 4]
+        lz.pintar(lz.circulo(fx, fy, 0.9), col)
+    juncos2 = np.zeros((lz.H, lz.W))
+    for k in range(70):
+        jx = rng.random() * W
+        juncos2 = np.maximum(juncos2, lz.trazo([(jx, Y_AGUA1 + 2), (jx + rng.normal(0, 2), Y_AGUA1 - 10 - rng.random() * 10)], 0.6, 0.3))
+    lz.pintar(juncos2, "#3e5a30", 0.95)
+    lz.pintar(juncos2 * (lz.ruido(0.5, 1, semilla=148) > 0.5), "#8ab060", 0.6)
+    # bloques de piedra cortados esperando, con marcas de cincel
+    for k, (bx, by, bw, bh) in enumerate(((30, 236, 22, 13), (58, 246, 18, 11), (548, 234, 24, 14), (574, 244, 20, 12))):
+        bloque = lz.poligono([(bx - bw / 2, by), (bx + bw / 2, by), (bx + bw / 2 + 2, by - bh), (bx - bw / 2 + 2, by - bh)])
+        marcas = ((lz.x * 1.2 + lz.y * 0.5) % 3.0 < 0.45) * 1.0
+        lz.sombrear(bloque, ["#2e302a", "#5c6052", "#9aa08a", "#c0c4ae", "#e6e2c8"], 3, LUZ_A, textura=1 - marcas * 0.4, fuerza_tex=0.4)
         if k % 2 == 0:
-            lz.sumar_luz(lz.desenfocar(p, 4), "#f9d77a", 0.4)
-    # el tono de los ecos: todo bañado en verde-agua, con la niebla clara de los recuerdos
-    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.14)
+            lz.sumar_luz(lz.desenfocar(bloque, 4), "#f9d77a", 0.3)
+    # la cuerda de la grúa baja hasta los dos castores de la orilla, que tiran de ella
+    lz.pintar(lz.trazo(lz.curva((246, YT - 86), (190, 170), (150, 222), n=40), 0.6), "#d8c890", 0.9)
+    ci.castor(lz, 128, 248, e=1.25, mira=1, luz=LUZ_A, recorte=("#ffe39a", 0.6), recorte_dir=(0.6, -1), brazo_alto=True, sem=11)
+    ci.castor(lz, 168, 250, e=1.05, mira=1, luz=LUZ_A, recorte=("#ffe39a", 0.6), recorte_dir=(0.6, -1), brazo_alto=True, sem=12, cria=True)
+    lz.pintar(lz.trazo([(150, 222), (148, 206), (180, 214)], 0.7), "#d8c890", 0.9)
+    # motas de luz flotando en la bruma dorada
+    motas = np.zeros((lz.H, lz.W))
+    for k in range(60):
+        motas = np.maximum(motas, lz.circulo(330 + rng.normal(0, 120), 40 + rng.random() * 140, 0.4 + rng.random() * 0.5))
+    lz.sumar_luz(motas, "#fff1c0", 0.8)
+    # viñeta suave y el tono de los ecos (verde-agua, la niebla clara de los recuerdos)
+    lz.pintar(np.clip((np.hypot((lz.x - 300) / 330, (lz.y - 128) / 170) - 0.78) * 2.2, 0, 1), "#0a1210", 0.5)
+    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.1)
     ci.marco_recuerdo(lz, color="#d8f0ec", semilla=128)
     return lz
 
