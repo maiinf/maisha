@@ -150,7 +150,9 @@ class Hoja:
         else:
             self.linea(puntos, "giza", 1, solo_encima=True)
             mitad = puntos[len(puntos) // 2]
-            self.px(mitad[0], mitad[1], "giza", brillo)
+            mx, my = int(round(mitad[0])), int(round(mitad[1]))
+            if 0 <= mx < self.w and 0 <= my < self.h and self.mat[my, mx] != "":
+                self.px(mx, my, "giza", brillo)
 
     def imagen(self, contorno=True):
         img = Image.new("RGBA", (self.w, self.h), (0, 0, 0, 0))
@@ -210,7 +212,7 @@ def corteza(h, mascara, azar, paso=3, inclinacion=0.15, desde=0):
             if mascara[y, x]:
                 u = x + math.sin(y * 0.35 + x * 0.1) * 0.8 + y * inclinacion
                 if (u + desde) % paso < 0.9 and azar.random() < 0.85:
-                    h.oscurecer(np.eye(1, dtype=bool) if False else _uno(h, x, y), 1, minimo=1)
+                    h.oscurecer(_uno(h, x, y), 1, minimo=1)
 
 
 def _uno(h, x, y):
@@ -254,18 +256,19 @@ def petrino(pose):
                 (cx + 1, arriba), (cx + 3, arriba - 2), (cx + 5, arriba + 1), (cx + 6, arriba + 2)]
     cuerpo = h.poligono(contorno + astillas[::-1])
     cuerpo |= h.poligono([(cx - 6, arriba + 2)] + astillas + [(cx + 6, arriba + 4), (cx - 6, arriba + 4)])
-    h.forma(cuerpo, "piedra", esfera=(cx - 1, arriba + 8, 9.5, 11))
+    h.forma(cuerpo, "piedra", esfera=(cx - 1.5, arriba + 7, 9.0, 10.5))
+    corteza(h, cuerpo & (h.yy >= arriba + 4), azar, paso=3, inclinacion=0.12)
     # el corte de arriba: anillos de la madera hechos piedra
     h.forma(h.elipse(cx, arriba + 2.2, 5.5, 1.6) & cuerpo, "piedra", plano=3, separar=False)
     h.px(cx - 1, arriba + 2, "piedra", 2)
     h.px(cx + 2, arriba + 2, "piedra", 2)
-    # surcos de corteza
+    # surcos de corteza y aristas iluminadas arriba a la izquierda
     for x in (cx - 5, cx - 2, cx + 3, cx + 6):
-        h.linea([(x, arriba + 5 + (x % 2)), (x + (1 if x > cx else -1) * 0.5, 18 - baja * 0.3)], "piedra", 1, solo_encima=True)
-    h.aclarar(h.elipse(cx - 4, arriba + 7, 1.2, 3) & cuerpo, 1)
+        h.linea([(x, arriba + 5 + (x % 2)), (x + (1 if x > cx else -1) * 0.5, 17 - baja * 0.3)], "piedra", 1, solo_encima=True)
+    h.aclarar(h.elipse(cx - 4.5, arriba + 6.5, 1.8, 3.5) & cuerpo, 1)
     # nudo como nariz
-    h.forma(h.elipse(cx + 0.5, arriba + 8.5, 1.6, 1.3), "piedra", maximo=3)
-    h.px(cx + 1, arriba + 9, "piedra", 0)
+    h.forma(h.elipse(cx + 0.5, arriba + 8.0, 1.6, 1.3), "piedra", maximo=3)
+    h.px(cx + 1, arriba + 8.5, "piedra", 0)
     # ojos de grieta
     ojo_y = arriba + 6
     for ox in (-3, 3):
@@ -287,15 +290,16 @@ def petrino(pose):
         for ox in (-3, 3):
             h.px(cx + ox - 1, ojo_y - 1, "giza", 3)
             h.px(cx + ox + 1, ojo_y - 1, "giza", 3)
-    # corazón violeta del pecho y sus venas
-    pecho = (cx - 1, arriba + 12)
-    h.grieta([(pecho[0] - 3, pecho[1] - 2), (pecho[0] - 1, pecho[1]), (pecho[0], pecho[1] + 2), (pecho[0] + 2, pecho[1] + 3)])
-    h.px(pecho[0], pecho[1] + 1, "giza", 3)
-    h.px(pecho[0] - 1, pecho[1], "giza", 2)
-    # líquen muerto y una piedrecita encima
-    for (x, y) in ((cx - 6, arriba + 10), (cx - 5, arriba + 11), (cx + 5, arriba + 13), (cx + 6, arriba + 12)):
+    # corazón violeta del pecho y sus venas (dentro del torso, sin salirse por abajo)
+    pecho = (cx - 1, arriba + 10)
+    h.grieta([(pecho[0] - 3, pecho[1] - 1), (pecho[0] - 1, pecho[1]), (pecho[0], pecho[1] + 1), (pecho[0] + 2, pecho[1] + 2)])
+    h.px(pecho[0], pecho[1], "giza", 3)
+    h.px(pecho[0] - 1, pecho[1] + 1, "giza", 2)
+    # líquen musgoso y una piedrecita encima
+    for (x, y) in ((cx - 6, arriba + 10), (cx - 5, arriba + 11), (cx + 5, arriba + 12), (cx + 6, arriba + 11)):
         h.px(x, y, "liquen", 2)
     h.px(cx - 5, arriba + 10, "liquen", 3)
+    h.px(cx + 5, arriba + 11, "liquen", 3)
     h.forma(h.elipse(cx + 3, arriba - 2.5, 1.6, 1.2), "piedra", maximo=3)
     # brazos de raicilla
     brazo = -2 if embiste else (1 if paso in (0, 2) else 0)

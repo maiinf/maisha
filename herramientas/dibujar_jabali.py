@@ -72,11 +72,14 @@ class Dibujo:
 
 
 def placas(d, xs, y, r=2.6):
-    """Placas de hierro solapadas por el lomo, con un filo de óxido."""
+    """Placas de hierro solapadas por el lomo, con remache, brillo y filo de óxido."""
     for i, x in enumerate(xs):
-        d.elipse(x, y + (i % 2) * 0.4, r, r * 0.8, HIERRO)
-        d.p(x + r * 0.6, y + r * 0.5, OXIDO[1])
-        d.p(x - r * 0.4, y - r * 0.5, HIERRO[4])
+        yy = y + (i % 2) * 0.4
+        d.elipse(x, yy, r, r * 0.8, HIERRO)
+        d.p(x + r * 0.5, yy + r * 0.4, OXIDO[1])
+        d.p(x, yy + r * 0.5, OXIDO[0])
+        d.p(x - r * 0.4, yy - r * 0.4, HIERRO[4])
+        d.p(x, yy, HIERRO[0])
 
 
 def lado(fot):
@@ -102,13 +105,15 @@ def lado(fot):
             d.p(xx + 1, y, PELO[0] if atras else PELO[1])
         d.p(x + dx, 19, "1a1210")
         d.p(x + dx + 1, 19, "1a1210")
-    # cuerpo: grupa pequeña detrás y hombros grandes delante
+    # cuerpo: grupa pequeña detrás y hombros grandes delante con textura de cerdas
     d.elipse(8.5, cy + 0.5, 5.2, 4.4, PELO)
     d.elipse(14.5, cy - 0.5, 6.4, 5.4, PELO)
+    for (cx, cy_p, col) in ((7, cy, PELO[3]), (11, cy + 1, PELO[1]), (14, cy, PELO[3]), (16, cy + 2, PELO[1])):
+        d.p(cx, cy_p, col)
     # tripa en sombra
     for x in range(5, 20):
         d.p(x, cy + 4 - (1 if x < 8 or x > 17 else 0), PELO[0])
-    # placas de hierro por el lomo y crin de cerdas
+    # placas de hierro por el lomo y crin de cerdas erizadas
     placas(d, [7.0, 10.0, 13.0, 16.0], cy - 4.0, 2.5)
     for x in range(17, 21):
         d.p(x, cy - 5 + (x % 2), PELO[4])
@@ -138,12 +143,15 @@ def lado(fot):
     d.p(24, hy + 3, COLMILLO[0])
     d.p(25, hy + 2, COLMILLO[1])
     d.p(25, hy + 1, COLMILLO[2])
-    # ojo de Giza (brilla más al embestir)
+    # ojo de Giza (brilla más al embestir, con estela violeta)
     d.p(22, hy - 2, OJO[2] if corre or prep else OJO[1])
-    d.p(21, hy - 2, OJO[0])
+    d.p(21, hy - 2, OJO[1] if corre or prep else OJO[0])
+    if corre:
+        d.p(20, hy - 2, OJO[0])
     if prep:
-        for (x, y) in ((3, 19), (1, 18), (4, 17), (2, 16)):
-            d.p(x, y, "684937")
+        # terrones compactos al escarbar
+        for (x, y, col) in ((2, 18, "8a624a"), (3, 18, "684937"), (2, 19, "684937"), (4, 16, "8a624a"), (4, 17, "684937")):
+            d.p(x, y, col)
     return d.contorno()
 
 

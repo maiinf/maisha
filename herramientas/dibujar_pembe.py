@@ -32,7 +32,7 @@ SUELO = 64
 def pata(h, x0, y0, x1, y1, rodilla, mat="pelo", oscuro=False):
     """Una pata fina con rodilla y pezuña."""
     kx, ky = rodilla
-    m = h.trazo([(x0, y0), (kx, ky), (x1, y1 - 1)], [3.2, 2.2, 1.8])
+    m = h.trazo([(x0, y0), (kx, ky), (x1, y1)], [3.2, 2.3, 2.0])
     h.forma(m, mat, minimo=1, maximo=2 if oscuro else 3)
     h.px(x1, y1, "pezuna", 1)
     h.px(x1 + 1, y1, "pezuna", 1)
@@ -158,10 +158,11 @@ def cuerpo(h, f, vivo=False):
     if inclina:
         giro = 45.0
     astas(h, hx - 2, hy - 3, vivas=vivo, giro=giro)
-    # al escarbar: tierra
+    # al escarbar: terrón compacto levantado junto a la pezuña delantera
     if prep:
-        for (x, y) in ((50, SUELO - 1), (53, SUELO - 3), (55, SUELO - 1), (51, SUELO - 4)):
-            h.px(x, y, "tierra", 2)
+        terron = h.elipse(49.5, SUELO - 1.5, 2.4, 1.4)
+        h.forma(terron, "tierra", minimo=1, maximo=3)
+        h.px(48, SUELO - 2, "tierra", 3)
 
 
 def fotograma(f):
