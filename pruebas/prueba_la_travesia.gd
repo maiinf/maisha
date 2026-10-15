@@ -113,7 +113,7 @@ func _ready() -> void:
 	await _empujar("mover_izquierda", 2.0)
 	var local: Vector2 = _maisha().global_position - viaje.position
 	_comprobar(cubierta.grow(1).has_point(local), "por mucho que ande, Maisha no se sale de la cubierta")
-	_comprobar(Sonido.musica_actual == "orilla", "suena la barcarola de la Orilla")
+	_comprobar(Sonido.musica_actual == "travesia", "suena su música: «Río arriba» (%s)" % Sonido.musica_actual)
 
 	print("Lo que sale del agua:")
 	viaje.recorrido = viaje._largo * 0.125

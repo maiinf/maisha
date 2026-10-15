@@ -363,6 +363,7 @@ Escena `escenas/mundo/embarcadero_junco.tscn` (mapa de 96×72 casillas, `constru
 - Música propia: **«Canción de barqueros»** (`embarcadero` en `componer_musica.py`), una canción de trabajo en re dórico: la flauta pregunta y las voces graves contestan, con el balafón y el tambor al ritmo de los remos, la cuerda que cruje y la campana del muelle.
 
 ### La Travesía
+- Música propia: «Río arriba» (`componer_musica.py travesia`): el tema de la linterna (la despedida de Mauti), decidido y en re mayor, con la pértiga de Bata marcando cada compás y la corriente por debajo.
 
 Escena `escenas/mundo/la_travesia.tscn` (mapa de 48×170, de sur a norte, `construir_mapa.py la_travesia --crear`, `crear_travesia`). **No se anda: se viaja en el transbordador** (`scripts/mundo/travesia/viaje.gd`). Se sube en la punta del muelle del Embarcadero cuando el transbordador ya flota.
 - La barca (`cubierta.png`, vista desde arriba: tablas, borda con postes y cuerda, caseta con tejado de paja, campana, farol, cajas y sacos) sube sola por el centro del río, a 34 píxeles por segundo, con su estela. Maisha va en la cubierta: se puede mover por ella pero no salirse (en este mapa el agua no es sólida: `agua_solida = false` en el nodo Region). Bata, en la popa, clava la pértiga al ritmo de la barca.
@@ -374,6 +375,7 @@ Escena `escenas/mundo/la_travesia.tscn` (mapa de 48×170, de sur a norte, `const
 - Falta: la música propia del viaje.
 
 ## Gruta de las Raíces
+- Música propia: «Las raíces que duermen» (`gruta`): un bordón grave, las raíces que roncan (respiraciones lentas), gotas en los charcos y el tema de Maisha en menor, de puntillas.
 
 Escena `escenas/mundo/gruta_raices.tscn` (mapa de 64×84, de sur a norte, `construir_mapa.py gruta_raices --crear`, `crear_gruta`; boceto `documentacion/boceto_gruta_raices.png`). **Una cueva por dentro**: el suelo se pinta aparte (`pintar_gruta` en `pintar_suelo.py`: tierra oscura con guijarros, raíces finas y algún charco; la roca, «0», maciza y con la cara iluminada junto al suelo). Se entra desde el muelle de piedra de La Travesía con la hoja de Mauti.
 - **A oscuras** (`scripts/mundo/gruta/oscuridad.gd`, capturas `documentacion/gruta_capturas.png`): un CanvasModulate deja todo en penumbra; alumbran Maisha (una luz que respira), las **semillas dormidas** de los nichos (`ŝ`, `semilla_dormida.png`, laten verdes) y las **huellas lilas de Mauti** (`huella.png`), que van de la entrada al fondo. Sin rayos de sol (`rayos_de_sol = false` en el Ambiente).
@@ -769,6 +771,7 @@ Escena `escenas/mundo/paso_piedra.tscn` (mapa de 150×48 casillas, de oeste a es
 - Prueba: `prueba_paso_piedra`.
 
 ### La cueva de las setas (Paso de Piedra, parte 3)
+- Música propia: «Lo que cae y vuelve» (`setas`): una kalimba que da vueltas, burbujitas de esporas que suben y, al final, la frase de Kimya.
 
 Escena `escenas/mundo/cueva_setas.tscn` (mapa de 56×64, de norte a sur: `construir_mapa.py cueva_setas --crear`, `crear_cueva`; suelo de cueva con **micelio** blanco y violeta en vez de raíces, `pintar_gruta(..., setas=True)`). Se baja por la **escalera del armario** de Nungu (con el armario abierto, la puerta `armario` de la casa) y se sube por la escalera `^`. Capturas: `documentacion/cueva_setas_capturas.png`. Música provisional: la del lago.
 

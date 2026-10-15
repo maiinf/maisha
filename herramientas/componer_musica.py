@@ -570,6 +570,9 @@ TITULOS = {
     "olvidado": "La montaña que no se mueve",
     "ruinas": "Las Ruinas",
     "jefe_arbol": "El miedo del Primer Árbol",
+    "travesia": "Río arriba",
+    "gruta": "Las raíces que duermen",
+    "setas": "Lo que cae y vuelve",
 }
 
 # =============================================================================
@@ -1486,6 +1489,102 @@ def jefe_arbol():
 
 PIEZAS["ruinas"] = ruinas
 PIEZAS["jefe_arbol"] = jefe_arbol
+
+
+# =============================================================================
+# LA TRAVESÍA, LA GRUTA Y LA CUEVA DE LAS SETAS (cada una con su música)
+# =============================================================================
+
+def travesia():
+    """«Río arriba»: el tema de la linterna (la despedida de Mauti), ahora decidido, en re mayor y río arriba: la
+    pértiga de Bata marca el compás (un golpe de agua en cada uno) y la corriente empuja por debajo."""
+    tempo = Tempo(150)                 # corcheas: seis por compás, como la barcarola, pero con más prisa
+    vuelta = 48
+    pulsos = vuelta * 3
+    p = Pista(tempo.s(pulsos))
+    progresion = [("D3", "M"), ("B2", "m"), ("G2", "M"), ("A2", "M"), ("D3", "M"), ("F#2", "m"), ("G2", "M"), ("A2", "sus")] * 3
+    colchones(p, tempo, progresion, compas=6, brillo=950, volumen=0.2, octava_bajo=2, fuerza_bajo=0.32)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 6, 6, cada=1.0, volumen=0.14, pan=-0.3, patron=(0, 1, 2, 1, 2, 3))
+    # la pértiga: un golpe hondo de agua al empezar cada compás y uno suave a la mitad
+    rng = np.random.default_rng(111)
+    for compas in range(pulsos // 6):
+        golpe = paso_banda(ruido_rosa(0.4), 120, 900) * np.exp(-np.arange(int(0.4 * SR)) / SR / 0.12)
+        p.poner(golpe * 0.12, tempo.s(compas * 6), pan=0.3)
+        p.poner(golpe * 0.05, tempo.s(compas * 6 + 3), pan=0.3)
+    # la corriente, por debajo (ruido que sube y baja despacio)
+    d = tempo.s(pulsos)
+    n = int(d * SR)
+    corriente = paso_banda(ruido_rosa(d), 200, 1200) * (0.6 + 0.4 * np.sin(np.linspace(0, 9 * np.pi, n)))
+    p.poner(corriente * 0.05, 0.0)
+    for k in range(20):
+        p.poner(campanita(["A6", "D7", "F#6"][rng.integers(3)], 0.7, 0.07), tempo.s(rng.random() * pulsos), pan=rng.random() - 0.5)
+    tema = transportar(TEMA_LINTERNA, -5)               # de sol a re
+    melodia(p, tempo, tema, desde=0, instrumento=lambda n, d: flauta(n, d, 0.42, vibrato=4.8), volumen=0.32, sostener=0.88, pan=0.15)
+    tocar(p, tempo, tema, desde=vuelta, fuerza=0.34, pan=-0.05)
+    melodia(p, tempo, transportar(tema, 12)[::2], desde=vuelta, instrumento=kalimba, volumen=0.14, pan=0.3)
+    melodia(p, tempo, tema, desde=vuelta * 2, instrumento=lambda n, d: flauta(n, d, 0.42, vibrato=4.8), volumen=0.3, sostener=0.88, pan=0.15)
+    p.poner(coro(["D4", "A4", "F#4"], tempo.s(24)), tempo.s(vuelta * 2), 0.05)
+    return final(p, sala=2.6, mezcla=0.28, brillo=5600)
+
+
+def gruta():
+    """«Las raíces que duermen»: casi a oscuras. Un bordón grave, las raíces que roncan (respiraciones lentas y hondas),
+    gotas que caen en charcos y, muy bajito, el tema de Maisha en menor, como quien camina de puntillas."""
+    tempo = Tempo(52)
+    pulsos = 64
+    p = Pista(tempo.s(pulsos))
+    progresion = [("D2", "m"), ("D2", "m"), ("A#1", "M"), ("A1", "sus")] * 4
+    colchones(p, tempo, progresion, compas=4, brillo=380, volumen=0.2, octava_bajo=1, fuerza_bajo=0.34)
+    # los ronquidos de las raíces: cada cuatro pulsos, una respiración (sube despacio, baja de golpe)
+    for b in range(0, pulsos, 4):
+        d = tempo.s(3.2)
+        n = int(d * SR)
+        forma = np.concatenate([np.linspace(0, 1, int(n * 0.7)) ** 2, np.linspace(1, 0, n - int(n * 0.7)) ** 0.5])
+        p.poner(paso_banda(ruido_rosa(d), 60, 320) * forma * 0.2, tempo.s(b + 0.5), pan=(b % 8 - 4) / 8.0)
+    # gotas que caen en los charcos, con su eco
+    rng = np.random.default_rng(121)
+    for k in range(16):
+        b = rng.random() * pulsos
+        nota = ["A5", "D6", "F5", "E6"][rng.integers(4)]
+        p.poner(campanita(nota, 1.0, 0.09), tempo.s(b), pan=rng.random() - 0.5)
+        p.poner(campanita(nota, 0.9, 0.035), tempo.s(b + 0.6), pan=rng.random() - 0.5)
+    # el tema en menor, de puntillas: el piano, muy suave y con mucho aire
+    tocar(p, tempo, TEMA_MENOR, desde=8, fuerza=0.18, pan=-0.1)
+    tocar(p, tempo, transportar(TEMA_MENOR, -12), desde=40, fuerza=0.16, pan=0.1)
+    p.poner(coro(["D3", "A3", "F4"], tempo.s(16)), tempo.s(24), 0.035)
+    return final(p, sala=4.2, mezcla=0.46, brillo=3400)
+
+
+def setas():
+    """«Lo que cae y vuelve»: la cueva de las setas de Kimya. Una kalimba que da vueltas (lo que cae vuelve a la
+    tierra), burbujitas de esporas que suben, un bajo que respira y, al final, la frase de Kimya."""
+    tempo = Tempo(76)
+    pulsos = 64
+    p = Pista(tempo.s(pulsos))
+    progresion = [("E2", "m7"), ("A2", "M"), ("E2", "m7"), ("F#2", "m7"), ("C2", "M7"), ("A2", "M"), ("B1", "sus"), ("E2", "m7")] * 2
+    colchones(p, tempo, progresion, compas=4, brillo=650, volumen=0.18, octava_bajo=1, fuerza_bajo=0.26)
+    # la kalimba da vueltas: un patrón que sube y vuelve a empezar desde abajo
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.12, pan=-0.25, patron=(0, 1, 2, 3, 2, 1, 0, 2))
+    # burbujitas de esporas: notas muy agudas y cortas que suben en grupitos de tres
+    rng = np.random.default_rng(131)
+    for k in range(18):
+        b = rng.random() * (pulsos - 2)
+        base = ["E6", "G6", "B6"]
+        for j, nota in enumerate(base):
+            p.poner(campanita(nota, 0.35, 0.05), tempo.s(b + j * 0.25), pan=rng.random() - 0.5)
+    # voces lejanas y la frase de Kimya (sin eco), al final
+    p.poner(coro(["E3", "B3", "G4"], tempo.s(16)), tempo.s(16), 0.045)
+    p.poner(coro(["C3", "G3", "E4"], tempo.s(16)), tempo.s(32), 0.045)
+    melodia(p, tempo, FRASES_PENA[0], desde=20, instrumento=lambda n, d: flauta(n, d, 0.34, vibrato=3.6), volumen=0.22, sostener=0.9, pan=0.2)
+    tocar(p, tempo, FRASE_QUIETA, desde=0, fuerza=0.24, pan=0.0)
+    return final(p, sala=3.6, mezcla=0.38, brillo=4600)
+
+
+PIEZAS["travesia"] = travesia
+PIEZAS["gruta"] = gruta
+PIEZAS["setas"] = setas
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

@@ -186,6 +186,7 @@ func _ready() -> void:
 	await _esperar(0.3)
 	await _cruzar("mover_arriba", "CuevaSetas")
 	_comprobar(_escena() == "CuevaSetas", "por la escalera del armario se baja a la cueva de las setas")
+	_comprobar(Sonido.musica_actual == "setas", "con su música: «Lo que cae y vuelve» (%s)" % Sonido.musica_actual)
 	await _esperar(1.6)
 	await _leer_dialogo()
 	_comprobar(Estado.tiene("cueva_llegada") and Misiones.estado(Misiones.buscar("bajo_la_casa")) == "activa", "sale la misión «Bajo la casa»")

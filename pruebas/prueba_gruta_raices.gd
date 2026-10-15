@@ -121,7 +121,7 @@ func _ready() -> void:
 		if h is Sprite2D:
 			huellas += 1
 	_comprobar(huellas >= 20, "las huellas lilas de Mauti marcan el camino hacia dentro (%d)" % huellas)
-	_comprobar(Sonido.musica_actual != "", "suena música (de momento, la del Lago)")
+	_comprobar(Sonido.musica_actual == "gruta", "suena su música: «Las raíces que duermen» (%s)" % Sonido.musica_actual)
 	var norte := _puerta("olvidado")
 	_comprobar(norte != null and norte.cerrada_hasta != "", "al fondo, el Sendero Olvidado (cerrado)")
 
