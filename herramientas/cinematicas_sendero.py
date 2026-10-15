@@ -1249,16 +1249,16 @@ def eco_lago():
     lz.pintar(vetas, "#a8c8e0", 0.08)
     # SOLO EN EL REFLEJO: el Primer Árbol en su colina (su halo, recortado en suave)...
     a_lz = Lienzo(W, H, semilla=305)
-    _primer_arbol(a_lz, 430, HZ - 8, 56)
+    _primer_arbol(a_lz, 430, HZ - 4, 70)
     # (el halo del árbol llena todo el cielo: fuera la luz débil, y lo que queda se apaga en suave hacia los lados)
-    cerca = np.clip(1.15 - np.hypot((a_lz.x - 430) / 120, (a_lz.y - (HZ - 36)) / 48), 0, 1) ** 1.5
-    a_lz.img = np.clip((a_lz.img - 0.16) / 0.84, 0, 1) * cerca[..., None]
+    cerca = np.clip(1.2 - np.hypot((a_lz.x - 430) / 140, (a_lz.y - (HZ - 46)) / 62), 0, 1) ** 1.2
+    a_lz.img = np.clip((a_lz.img - 0.08) / 0.8, 0, 1) * cerca[..., None]
     _solo_reflejo_luz(lz, a_lz, HZ, agua, 0.8)
     # ...nueve espirales de luz en arco sobre él (ocho verdes y la del Silencio, plateada, en el centro)...
     e_lz = Lienzo(W, H, semilla=306)
     for k in range(9):
         a = math.pi * (0.12 + 0.76 * k / 8)
-        cx, cy = 430 - math.cos(a) * 130, HZ - 22 - math.sin(a) * 52
+        cx, cy = 430 - math.cos(a) * 140, HZ - 18 - math.sin(a) * 74
         plateada = k == 4
         r0 = 6.5 if plateada else 4.5
         pts = [(cx + math.cos(t) * r0 * t / 12, cy + math.sin(t) * r0 * t / 12 * 0.9) for t in np.linspace(0.5, 12, 40)]
@@ -1283,9 +1283,9 @@ def eco_lago():
         menhir = lz.poligono([(x - 6, y), (x - 5, y - alto), (x, y - alto - 3), (x + 5, y - alto + 1), (x + 6, y)])
         lz.sombrear(menhir, ["#0c0e16", "#1a1e2a", "#2c3242", "#40485a"], 4, (0.5, -0.8, 0.5))
     hierba = np.zeros((lz.H, lz.W))
-    for k in range(120):
-        x = rng.random() * 220
-        yb = 178 + x * 0.14 + rng.random() * 40
+    for k in range(420):
+        x = rng.random() * 230
+        yb = 178 + x * 0.14 + rng.random() * 70
         hierba = np.maximum(hierba, lz.trazo([(x, yb), (x + (rng.random() - 0.5) * 3, yb - 3 - rng.random() * 4)], 0.5))
     lz.pintar(hierba * isla, "#2a4030", 0.9)
     # Maisha, sentada al borde, mirando el agua (su luz se refleja)

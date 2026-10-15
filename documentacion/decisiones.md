@@ -195,3 +195,4 @@ se pasan.
 | La pared de la Cañada en el 17 | Era un polígono negro plano; ahora es roca con escalones, estratos, grietas, un canto iluminado por el horizonte y hierbas arriba |
 | Las paredes de la Cañada (16) | Eran una masa oscura borrosa; ahora son capas de roca apiladas con juntas onduladas, el canto de cada capa con luz y hierba, sombra debajo, algunas grietas y la cara del hueco encendida por el sol |
 | La cueva de las setas (20) | Era un fondo negro con setas; ahora tiene una bóveda de rocas que iluminan las setas desde abajo, estalactitas con gotas que brillan, suelo con piedras y charcos de luz, setas con láminas, motitas y racimos, y dos setas enormes delante |
+| El eco del lago (21) | El árbol del reflejo usa el árbol nuevo, más grande y con más brillo; las nueve espirales forman un arco alrededor de la copa que cabe en el reflejo; más hierba en la isla |
