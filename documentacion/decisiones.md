@@ -204,4 +204,4 @@ se pasan.
 | Giza en Sigilia | El miedo a olvidar: lo escribieron todo, la tinta se heló (Tinta Quieta) y quien la toca pierde su nombre («en blanco») |
 | Llegada | Por el Paso de la Escarcha, que sale de las Ruinas del Primer Árbol |
 | Ficha (propuesta) | Ciudad Maandiko; caminos: Paso de la Escarcha, Estanterías Colgantes, Canal de Tinta, Observatorio de la Aurora y Sección Prohibida. Sigilos Fuego, Hielo y Rayo (arte Runa). Jefes: Bibliotecario Hueco, Pweza, Kengele y el Grimorio de Tinta. Misterio: 12 fichas del Índice que devuelven nombres. Detalle en el GDD, sección «Sigilia: ficha del mundo 2» |
-| Boceto | `documentacion/boceto_sigilia.png` (`herramientas/boceto_sigilia.py`) |
+| Bocetos | Ambiente: `documentacion/boceto_sigilia.png` (`herramientas/boceto_sigilia.py`). Mapa de regiones: `documentacion/boceto_mapa_sigilia.png` (`herramientas/boceto_mapa_sigilia.py`) |
