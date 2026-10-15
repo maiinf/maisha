@@ -191,3 +191,5 @@ se pasan.
 | La fiesta (recuerdo 1) | Los castores eran siluetas negras: ahora la hoguera les ilumina la cara y el pecho, y hay un charco de luz en el suelo |
 | Pembe (9) | Rehecho con anatomía de ciervo: pecho hondo, anca, patas con rodilla, corvejón y pezuña, cuello largo que baja en reverencia, cabeza con hocico y oreja; musgo en manchitas en vez de rectángulos |
 | Manchas en los ecos | Los ecos (noche, agua, niebla) se veían sucios: la paleta no tenía esos tonos y los degradados saltaban a gris en manchas. Se añadieron 5 rampas a la paleta de cinemáticas (agua honda, verde agua, bruma, malva y nieve: 210 colores) y el marco de niebla de los recuerdos pasa a ser un velo suave hecho con la propia escena desenfocada |
+| El Primer Árbol en los ecos 15 y 23 | Era una nube amarilla con un palo; ahora usa el mismo árbol de racimos dorados, tronco y raíces que el primer eco (`_primer_arbol` llama a `_arbol_dorado`) |
+| La pared de la Cañada en el 17 | Era un polígono negro plano; ahora es roca con escalones, estratos, grietas, un canto iluminado por el horizonte y hierbas arriba |

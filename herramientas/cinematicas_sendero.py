@@ -66,33 +66,8 @@ SILUETA = ["#122020", "#1a2c2c", "#243b3a", "#2f4a48", "#3d5c58"]
 
 
 def _primer_arbol(lz, x, y, alto):
-    """El Primer Árbol en la colina: tronco ancho y retorcido, ramas como brazos y una copa enorme de luz dorada."""
-    # la luz que da (como un sol detrás de la copa)
-    halo = np.clip(1 - np.hypot((lz.x - x) / 190, (lz.y - (y - alto * 0.72)) / 120), 0, 1)
-    lz.sumar_luz(halo ** 1.6, "#ffe9a8", 0.75)
-    tronco = lz.poligono([(x - 9, y), (x - 6, y - alto * 0.3), (x - 3, y - alto * 0.55), (x + 3, y - alto * 0.55),
-                          (x + 7, y - alto * 0.3), (x + 11, y)])
-    for (a, b, c) in (((x - 2, y - alto * 0.5), (x - 22, y - alto * 0.62), (x - 38, y - alto * 0.66)),
-                      ((x + 2, y - alto * 0.5), (x + 20, y - alto * 0.66), (x + 40, y - alto * 0.7)),
-                      ((x, y - alto * 0.52), (x - 4, y - alto * 0.7), (x + 2, y - alto * 0.82))):
-        tronco = np.maximum(tronco, lz.trazo(lz.curva(a, b, c, n=20), 3.2, 1.0))
-    lz.sombrear(tronco, ["#2a3a30", "#3d4f40", "#566a52", "#7a8c66"], 4, LUZ, textura=lz.ruido(2, 3, semilla=121), fuerza_tex=0.3)
-    # la copa: muchas nubes de hojas doradas, más claras arriba
-    rng = np.random.default_rng(122)
-    copa = np.zeros((lz.H, lz.W))
-    for k in range(26):
-        a = rng.random() * math.pi
-        r = 20 + rng.random() * 46
-        cx, cy = x + math.cos(a) * r * 1.4, y - alto * 0.74 - math.sin(a) * r * 0.55
-        copa = np.maximum(copa, lz.elipse(cx, cy, 14 + rng.random() * 12, 9 + rng.random() * 7))
-    lz.sombrear(copa, DORADO + ["#fffbe8"], 10, (0.0, -1.0, 0.6), textura=lz.ruido(2.5, 3, semilla=123), fuerza_tex=0.35)
-    lz.sumar_luz(lz.desenfocar(copa, 10), "#ffe39a", 0.5)
-    # hojas de luz que caen de la copa
-    hojas = np.zeros((lz.H, lz.W))
-    for k in range(40):
-        hx, hy = x + (rng.random() - 0.5) * 220, y - alto * 0.6 + rng.random() * 70
-        hojas = np.maximum(hojas, lz.elipse(hx, hy, 1.4, 0.7, rng.random() * 180) * rng.random())
-    lz.sumar_luz(hojas, "#fff1c0", 0.9)
+    """El Primer Árbol en la colina, de lejos o de cerca: el mismo árbol de racimos dorados que en el primer eco."""
+    _arbol_dorado(lz, x, y, np.random.default_rng(122), escala=alto / 150)
 
 
 def _constructor(lz, x, y, e, mira, carga=False, tortuga=False, sem=0):
@@ -615,7 +590,7 @@ def eco_surcos():
     lz.pintar(lejos, "#141a24")
     loma = np.clip((lz.y - (HZ - 16 + 0.0012 * (lz.x - 470) ** 2)) / 1.5, 0, 1)
     lz.pintar(loma, "#1a2224")
-    _primer_arbol(lz, 470, HZ - 14, 70)
+    _primer_arbol(lz, 470, HZ - 12, 92)
     # los campos: franjas de rastrojo y gavillas en hileras, iluminadas por la hoguera
     campo = lz.y > HZ
     lz.pintar(campo, rampa(["#1a140c", "#2a2010", "#3e2e16", "#5a4420"], np.clip((lz.y - HZ) / 140 + (np.sin(lz.y * 0.9 + lz.x * 0.05) * 0.5 + 0.5) * 0.25, 0, 1)))
@@ -818,8 +793,25 @@ def kimya_lago():
     lz.pintar(arboles * (lz.y < HZ + 1), "#141a28")
     sauces = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 4, 4, 14, 208))
     lz.pintar(sauces * (lz.y < HZ + 1), "#10141f")
-    pena = lz.poligono([(470, HZ + 2), (490, HZ - 26), (520, HZ - 30), (560, HZ - 22), (600, HZ - 34), (600, HZ + 2)])
-    lz.pintar(pena, "#1a1a2c")
+    # la pared de la Cañada: roca con escalones y grietas, iluminada de lado por el resplandor del horizonte
+    perfil = [(456, HZ + 2), (468, HZ - 8), (476, HZ - 10), (486, HZ - 24), (500, HZ - 27), (508, HZ - 22), (522, HZ - 31),
+              (540, HZ - 30), (552, HZ - 24), (566, HZ - 26), (578, HZ - 38), (592, HZ - 40), (600, HZ - 37), (600, HZ + 2)]
+    pena = lz.poligono(perfil)
+    estratos = (np.abs(np.sin((lz.y + lz.ruido(8, 2, semilla=209) * 6) * 0.9)) > 0.9) * 1.0
+    grietas = np.zeros((lz.H, lz.W))
+    for gx in (482, 514, 548, 584):
+        grietas = np.maximum(grietas, lz.trazo([(gx, HZ - 20), (gx + 3, HZ - 10), (gx - 1, HZ)], 0.6))
+    lz.sombrear(pena, ["#0a0a14", "#10121f", "#161a2a", "#1e2234", "#2a2c42", "#3a3a52"], 8, (-0.7, -0.5, 0.5),
+                textura=1 - estratos * 0.3 - grietas * 0.8, fuerza_tex=0.3)
+    canto = np.clip(pena - np.roll(pena, int(1.5 * lz.s), axis=1), 0, 1) + np.clip(pena - np.roll(pena, int(1.5 * lz.s), axis=0), 0, 1)
+    lz.pintar(np.clip(canto, 0, 1), "#a08aa0", 0.35)
+    # matas oscuras en lo alto de la pared
+    matas = np.zeros((lz.H, lz.W))
+    for (mx_, my_) in perfil[1:-1]:
+        for k in range(4):
+            hx = mx_ + rng.normal(0, 3)
+            matas = np.maximum(matas, lz.trazo([(hx, my_ + 1), (hx + rng.normal(0, 1), my_ - 2 - rng.random() * 3)], 0.5))
+    lz.pintar(matas, "#10141f")
     # el lago: un espejo. Refleja el cielo del revés (más oscuro) y la orilla lejana
     agua = (lz.y >= HZ).astype(float)
     filas = lz.img.shape[0]
