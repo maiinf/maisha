@@ -1120,32 +1120,67 @@ def eco_cueva():
     — «Lo necesario casi nunca es bonito.» — «Una seta que mandara en vez de servir... eso sí sería feo.»"""
     lz = Lienzo(W, H, semilla=200)
     rng = np.random.default_rng(201)
-    # la cueva: roca oscura, más clara en el centro, con estalactitas arriba
+    # la cueva: al fondo, la oscuridad honda; alrededor, una bóveda de rocas redondeadas que solo ilumina,
+    # desde abajo, la luz verde-agua y violeta de las setas
     fondo = np.clip(1 - np.hypot((lz.x - 300) / 330, (lz.y - 150) / 200), 0, 1)
-    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#050408", "#0c0a12", "#16121e", "#221c2c", "#30283c"],
-                                           np.clip(fondo * 0.8 + (lz.ruido(30, 3, semilla=202) - 0.5) * 0.25, 0, 1)))
-    for k in range(12):
-        x = rng.random() * W
-        largo = 14 + rng.random() * 36
-        est = lz.poligono([(x - 6 - rng.random() * 6, 0), (x + 6 + rng.random() * 6, 0), (x + rng.random() * 2, largo)])
-        lz.sombrear(est, ["#08060c", "#141018", "#221c28", "#342a3a"], 4, LUZ)
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#030306", "#07060c", "#0c0a14", "#12101c"], np.clip(fondo * 0.7 + (lz.ruido(30, 3, semilla=202) - 0.5) * 0.1, 0, 1)))
+    ROCA = ["#050409", "#09080f", "#0f0f18", "#161a22", "#1e282c", "#2a3c3c", "#3a5450"]
+    LUZ_ABAJO = (0.15, 0.85, 0.5)
+    rocas = []
+    for k in range(70):                       # la bóveda: un arco de rocas (más grandes en los lados)
+        a = np.pi * (k / 69)
+        rx, ry = 300 - np.cos(a) * rng.uniform(250, 330), 165 - np.sin(a) * rng.uniform(150, 190)
+        rocas.append((rx, ry, rng.uniform(14, 30) * (1.2 - 0.5 * np.sin(a))))
+    for k in range(22):                       # los lados, hasta el suelo
+        lado = -1 if k % 2 else 1
+        rocas.append((300 + lado * rng.uniform(230, 320), rng.uniform(100, 190), rng.uniform(18, 34)))
+    ci.bolas(lz, rocas, ROCA, luz=LUZ_ABAJO, ruido_borde=0.06, textura=lz.ruido(4, 2, semilla=209), fuerza_tex=0.15,
+             ambiente=0.05, filo=("#5ae0c0", 0.3), filo_dir=(0.0, 1.0), plano=1.8, suave=0.35)
+    # estalactitas que cuelgan de la bóveda, con la punta mojada que brilla
+    for k in range(16):
+        x = 60 + rng.random() * 480
+        y0 = 40 - 34 * np.cos((x - 300) / 300 * np.pi / 2) ** 0.5 + rng.uniform(-4, 6)
+        largo = 12 + rng.random() * 30
+        ancho = 3 + rng.random() * 4
+        est = lz.poligono([(x - ancho, y0 - 10), (x + ancho, y0 - 10), (x + ancho * 0.4, y0 + largo * 0.7), (x + 0.3, y0 + largo)])
+        lz.sombrear(est, ROCA[1:6], ancho * 0.8, LUZ_ABAJO, textura=((lz.y * 1.3 % 3) < 0.6) * 1.0, fuerza_tex=-0.2)
+        lz.pintar(lz.circulo(x + 0.3, y0 + largo + 1.2, 0.7), "#b8fff0", 0.9)
+    # el suelo: tierra oscura con piedras, que las setas iluminan por manchas
     suelo = lz.poligono([(0, 176), (120, 166), (300, 170), (480, 164), (600, 172), (600, 256), (0, 256)])
-    lz.pintar(suelo, rampa(["#0e0a12", "#1a141e", "#261e2a", "#342a38"], np.clip((lz.y - 166) / 90 + (lz.ruido(8, 2, semilla=203) - 0.5) * 0.3, 0, 1)))
-    # las setas que brillan, por todas partes (más grandes delante)
+    lz.pintar(suelo, rampa(["#07060a", "#0e0c14", "#16141e", "#201e2a"], np.clip((lz.y - 166) / 90 + (lz.ruido(8, 2, semilla=203) - 0.5) * 0.2, 0, 1)))
+    piedras = [(rng.random() * W, 172 + rng.random() * 80, 0) for _ in range(40)]
+    piedras = [(x, y, 1.5 + (y - 166) / 90 * 5 * rng.uniform(0.5, 1.2)) for (x, y, _) in piedras if not (200 < x < 400 and y > 196)]
+    ci.bolas(lz, piedras, ROCA[1:7], luz=(0.2, -0.9, 0.5), ruido_borde=0.2, ambiente=0.1, plano=1.6, suave=0.4)
+    # las setas que brillan, por todas partes (más grandes delante, a veces en racimos)
     def seta(x, y, r, col):
-        lz.sumar_luz(lz.desenfocar(lz.circulo(x, y - r * 1.4, r * 2.2), r * 1.6), col[2], 0.35)
-        lz.sombrear(lz.trazo([(x, y), (x + r * 0.15, y - r * 1.4)], r * 0.32, r * 0.24), ["#5a5262", "#8a8094", "#c8c0d0", "#eee8f4"], r * 0.2, LUZ)
-        som = lz.elipse(x + r * 0.15, y - r * 1.5, r, r * 0.55)
-        lz.sombrear(som, col, r * 0.4, LUZ)
-        lz.sumar_luz(som, col[3], 0.25)
+        lz.sumar_luz(lz.desenfocar(lz.elipse(x, y + 0.5, r * 3.2, r * 0.9), r * 1.2) * (lz.y > y - r * 0.2), col[2], 0.3)   # su luz en el suelo
+        lz.sumar_luz(lz.desenfocar(lz.circulo(x, y - r * 1.4, r * 2.4), r * 1.8), col[2], 0.3)
+        pie = lz.trazo([(x, y), (x + r * 0.15, y - r * 1.4)], r * 0.32, r * 0.22)
+        lz.sombrear(pie, ["#4a4252", "#8a8094", "#c8c0d0", "#eee8f4"], r * 0.2, (-0.5, -0.4, 0.6))
+        som = lz.elipse(x + r * 0.15, y - r * 1.5, r, r * 0.55) * (lz.y < y - r * 1.25)
+        laminas = lz.elipse(x + r * 0.15, y - r * 1.27, r * 0.92, r * 0.18)
+        lz.pintar(laminas * (np.sin(lz.x * 6 / max(r * 0.12, 0.3)) > 0), col[1], 0.9)
+        lz.pintar(laminas * (np.sin(lz.x * 6 / max(r * 0.12, 0.3)) <= 0), col[0], 0.9)
+        lz.sombrear(som, col, r * 0.45, (-0.3, -0.9, 0.5))
+        lz.sumar_luz(som, col[3], 0.22)
+        if r > 4:
+            for _ in range(int(r * 0.7)):
+                a_ = rng.uniform(0.3, 2.8)
+                lz.pintar(lz.circulo(x + r * 0.15 - np.cos(a_) * r * 0.65, y - r * 1.5 - np.sin(a_) * r * 0.3, r * 0.09), col[3], 0.8)
     VERDE = ["#0e3a3a", "#1e7a6e", "#5ae0c0", "#c8fff0"]
     VIOLETA = ["#2a1040", "#6a2a9a", "#b070e0", "#f0d8ff"]
-    for k in range(70):
+    sitios = []
+    for k in range(46):
         x = rng.random() * W
-        y = 150 + rng.random() * 100
-        if 210 < x < 400 and y > 180:
+        y = 160 + rng.random() * 90
+        if 200 < x < 410 and y > 180:
             continue
-        seta(x, y, 2 + (y - 150) / 100 * 7 * rng.uniform(0.6, 1.2), VERDE if k % 3 else VIOLETA)
+        sitios.append((y, x, k))
+        if rng.random() < 0.5:                                  # un racimo: dos o tres más pequeñas al lado
+            for j in range(rng.integers(1, 3)):
+                sitios.append((y + rng.uniform(-1, 2), x + rng.uniform(-8, 8) * (1 + (y - 160) / 60), k))
+    for (y, x, k) in sorted(sitios):
+        seta(x, y, (2 + (y - 150) / 100 * 7) * rng.uniform(0.55, 1.15), VERDE if k % 3 else VIOLETA)
     # en el centro: el montón de hojas caídas y el corro de setas pequeñas que se las come; de la tierra brotan hojitas
     YM = 222
     for k in range(40):
@@ -1172,6 +1207,10 @@ def eco_cueva():
     lz.sumar_luz(motas, "#e6d0ff", 0.7)
     lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.06)
     ci.marco_recuerdo(lz, color="#4a4058", semilla=204)
+    # dos setas enormes en primer plano, en las esquinas (dan profundidad; por delante del velo del recuerdo)
+    seta(28, 262, 20, VIOLETA)
+    seta(582, 266, 24, VERDE)
+    seta(552, 262, 11, VERDE)
     return lz
 
 
