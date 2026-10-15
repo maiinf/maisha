@@ -729,11 +729,11 @@ def parpadea(l):
 
 def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
     """Gesto por defecto: levanta lo que lleva en la mano derecha (lo que hay a la derecha de «desde_x» y por debajo de
-    «desde_y», menos los pies)."""
+    «desde_y», levantando todo el objeto hasta el suelo)."""
     n = _copia(l)
     for x in range(desde_x, ANCHO):
-        for y in range(desde_y, 28):
-            n.m[y][x] = l.m[y + filas][x] if y + filas < 28 else None
+        for y in range(desde_y, ALTO):
+            n.m[y][x] = l.m[y + filas][x] if y + filas < ALTO else None
     return n
 
 
