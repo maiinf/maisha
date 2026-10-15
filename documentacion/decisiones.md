@@ -208,3 +208,10 @@ se pasan.
 | Mauti en Sigilia | Va con Maisha pero se queda en la ciudad ayudando a los escribas en blanco; aparece en momentos clave (Iam: «vale sigue») |
 | Paso de la Escarcha, parte 2 | Taa (armiño farolero) está en blanco a media subida; su ficha del Índice se la llevó el viento al este. Al devolvérsela recupera el color y enseña el SIGILO DE FUEGO: tecla nueva U (RB en el mando; RB deja de ser «cambiar de semilla», que no se usaba), 20 de Aliento. Los faroles rúnicos solo los enciende el sigilo y, encendidos, abrigan del viento y ablandan la nieve |
 | Paso de la Escarcha, parte 3 | Páginas sueltas (enemigo: 2 golpes, el fuego las quema de un trazo). La Puerta Sellada se derrite con 3 sigilos; arriba la peña se cierra para que no se rodee. Misión «El Paso de la Escarcha». Música «La nieve que escribe» con el tema de Sigilia (vals de caja de música en si menor) |
+
+### Revisión de música y sintetizador (`revision/musica`)
+| Qué | Decisión |
+| --- | --- |
+| Timbre orgánico | En `herramientas/sintetizador.py`, `kalimba` añade resonancia de caja de madera (`180-900 Hz`) y leve caída inicial de afinación al pulsar la lámina; `balafon` suma el 2.º armónico del resonador de calabaza y el golpe cálido de maza; `flauta` añade soplo de embocadura en los primeros 35 ms |
+| Costura de bucle | `Pista.bucle()` y `final()` en `componer_musica.py` funden los últimos 6-8 ms hacia la primera muestra tras plegar la cola de reverberación, eliminando cualquier chasquido al repetir |
+| Equilibrio de volumen | `normalizar()` aplica saturación suave (`tanh`) cuando picos aislados de percusión superan `4,4 × RMS` (regeneradas `kitovu`, `jefe_pembe`, `jefe_konokono` y `jefe_kambare`, que estaban entre `-18,5` y `-19,8 dBFS`), y `scripts/globales/sonido.gd` incorpora `VOLUMEN_MUSICA` y `_db_musica()` para alinear todas las piezas en torno a `-15,5 dBFS` |

@@ -122,33 +122,42 @@ def barrido_bajo(x, desde, hasta, trozos=64):
 
 # --- instrumentos ------------------------------------------------------------------
 def kalimba(nota, dur=1.6, fuerza=1.0):
-    """Lámina de kalimba: fundamental, parciales inarmónicos y un golpecito al principio."""
+    """Lámina de kalimba: fundamental con leve caída inicial de afinación, parciales inarmónicos y caja de madera."""
     f = hz(nota)
     n = int(dur * SR)
-    x = seno(f, dur) * caida(n, dur * 0.42)
-    x += 0.25 * seno(f * 2.0, dur) * caida(n, dur * 0.18)
+    f_lamina = f * (1 + 0.01 * caida(n, 0.008))
+    x = seno(f_lamina, dur) * caida(n, dur * 0.42)
+    x += 0.28 * seno(f * 2.0, dur) * caida(n, dur * 0.20)
     x += 0.14 * seno(f * 5.42, dur) * caida(n, 0.09)
     x += 0.06 * seno(f * 9.7, dur) * caida(n, 0.03)
-    golpe = paso_alto(ruido(0.01), 2500) * caida(int(0.01 * SR), 0.002) * 0.3
+    golpe = paso_alto(ruido(0.01), 2500) * caida(int(0.01 * SR), 0.002) * 0.26
+    caja = paso_banda(ruido(0.018), 180, 900) * caida(int(0.018 * SR), 0.005) * 0.22
     x[:len(golpe)] += golpe
+    x[:len(caja)] += caja
     return x * adsr(n, 0.002, 0.05, 1.0, 0.05) * fuerza
 
 
 def balafon(nota, dur=0.9, fuerza=1.0):
-    """Balafón (marimba de madera): cálido y seco."""
+    """Balafón (marimba de madera con resonador de calabaza): cálido y con cuerpo."""
     f = hz(nota)
     n = int(dur * SR)
-    x = seno(f, dur) * caida(n, 0.35) + 0.35 * seno(f * 3.9, dur) * caida(n, 0.06) + 0.12 * seno(f * 10.2, dur) * caida(n, 0.015)
+    x = (seno(f, dur) * caida(n, 0.36)
+         + 0.22 * seno(f * 2.0, dur) * caida(n, 0.14)
+         + 0.34 * seno(f * 3.9, dur) * caida(n, 0.06)
+         + 0.11 * seno(f * 10.2, dur) * caida(n, 0.015))
+    maza = paso_banda(ruido(0.014), 220, 1400) * caida(int(0.014 * SR), 0.004) * 0.24
+    x[:len(maza)] += maza
     return x * adsr(n, 0.003, 0.05, 1.0, 0.03) * fuerza
 
 
 def flauta(nota, dur=1.0, fuerza=1.0, vibrato=5.0):
     f = hz(nota)
     n = int(dur * SR)
-    vib = 1 + 0.006 * np.sin(2 * np.pi * vibrato * t(dur)) * subida(n, 0.35)
-    x = seno(f * vib, dur) + 0.18 * seno(f * 2 * vib, dur) + 0.05 * seno(f * 3 * vib, dur)
-    soplo = paso_banda(ruido(dur), f * 0.8, min(f * 4, 12000)) * 0.12
-    return (x + soplo) * adsr(n, 0.08, 0.1, 0.8, min(0.25, dur * 0.4)) * fuerza
+    tt = t(dur)
+    vib = (1 - 0.006 * caida(n, 0.022)) * (1 + 0.006 * np.sin(2 * np.pi * vibrato * tt) * subida(n, 0.35))
+    x = seno(f * vib, dur) + 0.20 * seno(f * 2 * vib, dur) + 0.06 * seno(f * 3 * vib, dur)
+    soplo = paso_banda(ruido(dur), f * 0.8, min(f * 4, 12000)) * (0.11 + 0.14 * caida(n, 0.035))
+    return (x + soplo) * adsr(n, 0.075, 0.1, 0.82, min(0.25, dur * 0.4)) * fuerza
 
 
 def colchon(notas, dur, brillo=1200.0, ataque=1.5, salida=1.5, fuerza=1.0):
@@ -274,6 +283,10 @@ class Pista:
         cola = self.x[n:]
         out = self.x[:n].copy()
         out[:min(n, len(cola))] += cola[:min(n, len(cola))]
+        costura = min(int(0.008 * SR), n // 8)
+        if costura > 1:
+            t_c = np.linspace(0.0, 1.0, costura)[:, None]
+            out[-costura:] = out[-costura:] * (1.0 - t_c) + out[0:1] * t_c
         return out
 
     def entera(self, recortar=True):
@@ -286,7 +299,14 @@ class Pista:
 
 def normalizar(x, pico=0.89):
     m = np.abs(x).max()
-    return x if m == 0 else x / m * pico
+    if m == 0:
+        return x
+    rms = float(np.sqrt(np.mean(x ** 2)))
+    if rms > 0 and m > rms * 4.4:
+        techo = rms * 4.2
+        x = np.tanh(x / techo) * techo
+        m = np.abs(x).max()
+    return x / m * pico
 
 
 def suavizar_bordes(x, entrada=0.003, salida=0.01):
