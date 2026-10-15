@@ -682,26 +682,49 @@ def _ondas(lz, cx, cy, radios, ang0, ang1, color, alfa):
 
 def _pared_garganta(lz, borde, lado, semilla):
     """Una pared de la garganta, de roca a contraluz. borde(y) da el filo interior; lado -1 = pared izquierda.
-    Caras planas (facetas), estratos, grietas verticales y el filo encendido por el sol poniente."""
+    Hecha de CAPAS de roca apiladas (estratos), cada una partida en bloques por grietas verticales: el canto de arriba
+    de cada capa coge la luz, debajo hay sombra, y la cara que da al hueco de la garganta se enciende con el sol."""
+    rng = np.random.default_rng(semilla)
     ys = np.arange(lz.H) / lz.s
     filo_x = np.array([borde(y) for y in ys])[:, None]
     dentro = (lz.x < filo_x) if lado < 0 else (lz.x > filo_x)
     m = dentro.astype(float)
     dist = np.abs(lz.x - filo_x)                                    # lo lejos que está del filo
-    faceta = np.floor(lz.ruido(26, 2, semilla=semilla) * 6) / 6     # caras planas de la roca
-    estratos = np.sin((lz.y + (lz.ruido(30, 2, semilla=semilla + 1) - 0.5) * 10) * 0.42) * 0.5 + 0.5
-    v = 0.18 + faceta * 0.22 + (estratos - 0.5) * 0.08 + np.clip(1 - dist / 70, 0, 1) * 0.25
+    # las capas: alturas distintas, y cada una con sus bloques desplazados (así no hay una cuadrícula)
+    cortes = [-4.0]
+    while cortes[-1] < 260:
+        cortes.append(cortes[-1] + rng.uniform(11, 24))
+    cortes = np.array(cortes)
+    yo = lz.y + (lz.ruido(9, 2, semilla=semilla + 7) - 0.5) * 9 + np.sin(lz.x * 0.05 + semilla) * 2   # juntas onduladas
+    capa = np.clip(np.searchsorted(cortes, yo) - 1, 0, len(cortes) - 2)
+    y0, y1 = cortes[capa], cortes[capa + 1]
+    t = np.clip((yo - y0) / (y1 - y0), 0, 1)                        # 0 arriba de la capa, 1 abajo
+    anchos = rng.uniform(34, 90, len(cortes))
+    despl = rng.uniform(0, 40, len(cortes))
+    tono = rng.uniform(-0.06, 0.06, (len(cortes), 64))
+    u_ = (lz.x + despl[capa] + (lz.ruido(6, 2, semilla=semilla + 8) - 0.5) * 16 + t * rng.uniform(-6, 6)) / anchos[capa]
+    bloque = np.floor(u_).astype(int) % 64
+    u = u_ - np.floor(u_)                                            # 0..1 a lo ancho del bloque
+    hacia_luz = (1 - u) if lado > 0 else u                           # el lado del bloque que mira al hueco
+    v = 0.3 + tono[capa, bloque] + (lz.ruido(14, 2, semilla=semilla + 9) - 0.5) * 0.12
+    v = v + np.clip(1 - t / 0.16, 0, 1) * 0.26                       # el canto de arriba, con luz
+    v = v - np.clip((t - 0.78) / 0.22, 0, 1) * 0.16                  # la sombra de abajo
+    v = v + np.clip((hacia_luz - 0.85) / 0.15, 0, 1) * 0.1
+    v = v + np.clip(1 - dist / 70, 0, 1) * 0.22 + (lz.ruido(1.2, 2, semilla=semilla) - 0.5) * 0.08
     lz.pintar(m, rampa(["#120a14", "#1e1220", "#2e1c2e", "#44283a", "#5e3646", "#80485a", "#a8606a"], np.clip(v, 0, 1)))
-    # la cara que mira al sol (cerca del filo) se enciende de naranja
-    lz.sumar_luz(m * np.clip(1 - dist / 26, 0, 1) * (faceta > 0.4), "#e08050", 0.35)
-    grietas = np.abs(np.sin(lz.x * 0.21 + lz.ruido(8, 2, semilla=semilla + 2) * 6)) < 0.05
-    lz.pintar(m * grietas * (lz.ruido(12, 2, semilla=semilla + 3) > 0.45), "#0c060e", 0.8)
-    lz.pintar(m * (np.abs(estratos - 0.5) < 0.035), "#0c060e", 0.5)
+    rota = (tono[capa, bloque] > -0.01)                              # solo algunos bloques están partidos
+    grieta = (u < 0.035) & rota & (lz.ruido(4, 2, semilla=semilla + 2) > 0.3)
+    lz.pintar(m * grieta, "#0c060e", 0.7)
+    lz.pintar(m * (t > 0.93) * (lz.ruido(5, 2, semilla=semilla + 6) > 0.25), "#0c060e", 0.55)   # la junta entre capas
+    # la cara que mira al sol (cerca del filo) y el canto de cada capa se encienden de naranja
+    lz.sumar_luz(m * np.clip(1 - dist / 30, 0, 1) * np.clip(1 - t / 0.2, 0, 1), "#f09060", 0.5)
+    lz.sumar_luz(m * np.clip(1 - dist / 24, 0, 1), "#e08050", 0.2)
     filo = m * (dist < 1.6)
     lz.sumar_luz(lz.desenfocar(filo, 1.0), "#f9b070", 0.9)
-    # matas de hierba en los salientes
-    matas = np.clip((lz.ruido(2.5, 2, semilla=semilla + 4) - 0.74) * 6, 0, 1) * m * (estratos > 0.85)
+    # matas de hierba en los cantos de las capas
+    matas = (lz.ruido(1.5, 2, semilla=semilla + 4) > 0.68) * m * (t < 0.12)
     lz.pintar(matas, "#2e3a24", 0.9)
+    lz.pintar(matas * (lz.ruido(0.6, 1, semilla=semilla + 5) > 0.6), "#5a6a34", 0.8)
     return m
 
 
@@ -738,7 +761,7 @@ def eco_canada():
     YC = 196
     cornisa = lz.poligono([(0, YC + 2), (90, YC - 3), (230, YC - 1), (268, YC + 4), (276, YC + 14), (250, 230), (210, 256), (0, 256)])
     lz.sombrear(cornisa, ["#120a14", "#1e1420", "#2e2030", "#46303e", "#6a4650", "#9a6a60"], 6, (0.6, -0.8, 0.5),
-                textura=np.floor(lz.ruido(10, 2, semilla=187) * 5) / 5, fuerza_tex=0.4)
+                textura=(np.sin((lz.y + lz.ruido(6, 2, semilla=187) * 8) * 0.8) > 0.85) * -1.0 + lz.ruido(2, 2, semilla=188) * 0.5, fuerza_tex=0.3)
     filo_c = np.clip(cornisa - np.roll(cornisa, int(2 * lz.s), axis=0), 0, 1)
     lz.sumar_luz(filo_c, "#f9a060", 0.7)
     hierba = np.zeros((lz.H, lz.W))
