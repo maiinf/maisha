@@ -209,10 +209,15 @@ se pasan.
 | Paso de la Escarcha, parte 2 | Taa (armiño farolero) está en blanco a media subida; su ficha del Índice se la llevó el viento al este. Al devolvérsela recupera el color y enseña el SIGILO DE FUEGO: tecla nueva U (RB en el mando; RB deja de ser «cambiar de semilla», que no se usaba), 20 de Aliento. Los faroles rúnicos solo los enciende el sigilo y, encendidos, abrigan del viento y ablandan la nieve |
 | Paso de la Escarcha, parte 3 | Páginas sueltas (enemigo: 2 golpes, el fuego las quema de un trazo). La Puerta Sellada se derrite con 3 sigilos; arriba la peña se cierra para que no se rodee. Misión «El Paso de la Escarcha». Música «La nieve que escribe» con el tema de Sigilia (vals de caja de música en si menor) |
 
-### Revisión de sprites · Bastones y gestos de los aldeanos (16-10)
+### Revisión de sprites · Personajes, aldeanos, enemigos y jefes (16-10)
 | Qué | Decisión |
 | --- | --- |
-| El fallo | En el 4.º fotograma de la animación de los aldeanos (Shamba, Bibi, Bata, Mbuzi y Msafiri), el bastón, pértiga o cayado se cortaba con un hueco vacío de varios píxeles antes del suelo y dejaba la base flotando desconectada. |
-| Causa | En `herramientas/dibujar_aldeanos.py`, `alza_derecha` detenía el desplazamiento en la fila 28 con la intención de excluir los pies, dejando las filas 28..31 intactas y borrando las filas anteriores. En `herramientas/dibujar_kitovu.py`, `shamba_anim` recortaba `h - 4` pero no limpiaba la base. |
-| Solución | Se ampliaron ambos recortes para desplazar verticalmente todo el tramo hasta el suelo (`ALTO` y `h`), levantando los bastones enteros en el aire sin truncar la base. Se regeneraron todos los sprites de aldeanos y Kitovu. |
+| Bastones de aldeanos | En el 4.º fotograma de la animación de Shamba, Bibi, Bata, Mbuzi y Msafiri, el bastón, pértiga o cayado se cortaba con un hueco vacío antes del suelo. Se ampliaron `alza_derecha` (`dibujar_aldeanos.py`) y `shamba_anim` (`dibujar_kitovu.py`) para desplazar todo el tramo vertical hasta el suelo (`ALTO` y `h`). |
+| Konokono (`dibujar_konokono.py`) | `HojaE.grieta()` aplicaba el factor de escala `E` dos veces (`E * E = 1,69x`), desplazando las grietas de Giza fuera del caparazón hacia el cuello y dejando un píxel violeta flotando en el aire en el fotograma 5. Corregido eliminando el escalado duplicado en `HojaE.grieta()`. |
+| Pembe (`dibujar_pembe.py`) | En el galope (fotograma 3) las pezuñas quedaban separadas del resto de la pata por un hueco transparente, y al escarbar (fotograma 2) los granos de polvo eran píxeles aislados con contorno negro. Unido el trazo de la pata hasta la pezuña y agrupado el terrón de tierra. |
+| Petrino (`dibujar_criaturas.py`) | La grieta violeta del corazón colgaba por debajo de la entrepierna al vacío y el cuerpo era un óvalo liso. Subido el corazón a `arriba + 10`, blindado `Hoja.grieta()` para no pintar puntos de luz sobre fondo transparente y añadido relieve de piedra (`corteza()`). |
+| Jabalí de Hierro (`dibujar_jabali.py`) | Añadidos remaches oscuros, brillos y filo de óxido a las placas dorsales, textura de cerdas en el lomo, estela violeta en el ojo al embestir y terrones compactos al escarbar. |
+| Pino (`dibujar_aldeanos.py`) | Añadidas láminas bajo el sombrero de seta, pañuelo verde de explorador al cuello, bandolera cruzada con hebilla de latón, bolsito de semillas y sonrisilla. |
+| Maisha (`dibujar_maisha.py`) | Añadido `CUERPO_PERFIL_LATE` en `reposo_lado` (el corazón brilla en el 3.er fotograma como de frente) y `PIERNAS_PERFIL_AIRE_*` en `correr_lado` para que ambos pies despeguen del suelo en los fotogramas de vuelo (2 y 4), manteniendo intacto el anclaje de la mano. |
+
 

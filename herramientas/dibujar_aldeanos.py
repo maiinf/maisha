@@ -165,22 +165,30 @@ def bibi():
 
 
 def pino():
-    """PINO: niño-seta, curioso y travieso. Sombrero rojo con motas."""
+    """PINO: niño-seta, curioso y travieso. Sombrero rojo con motas, láminas bajo la copa, pañuelo y bandolera de explorador."""
     l = Lienzo()
     l.ovalo(12, 24, 5, 6, "pie_seta")                        # cuerpo
     l.rect(9, 29, 10, 30, "pie_seta", 1); l.rect(13, 29, 14, 30, "pie_seta", 1)
     l.ovalo(12, 17, 5.5, 4.5, "pie_seta")                    # cara
     l.ovalo(12, 12, 10, 5.5, "seta", recorte=lambda x, y: y <= 14)   # sombrero
-    for (x, y) in [(7, 10), (11, 9), (15, 11), (18, 12), (9, 13)]:
+    for x in range(4, 21):                                   # láminas bajo el sombrero
+        if l.m[14][x]:
+            l.px(x, 14, "pie_seta", 1 if x % 2 == 0 else 2)
+    for (x, y) in [(6, 11), (7, 10), (11, 9), (12, 8), (15, 11), (18, 12), (9, 12)]:
         l.px(x, y, "punto"); l.px(x + 1, y, "punto")
     ojos(l, 16, 9, 13, alto=3)
     l.px(9, 19, "rubor"); l.px(15, 19, "rubor")
+    l.px(12, 19, "pie_seta", 1)                              # sonrisilla traviesa
+    # pañuelo verde de explorador al cuello y bandolera cruzada con bolsito
+    l.rect(9, 20, 15, 20, "musgo", 2); l.px(11, 21, "musgo", 3); l.px(12, 21, "musgo", 2)
+    for k in range(5):
+        l.px(9 + k, 21 + k, "delantal", 2)
+    l.px(11, 23, "laton", 3)                                 # hebilla
+    l.rect(14, 25, 16, 27, "delantal", 1); l.px(15, 25, "delantal", 2)   # bolsito de semillas
     l.ovalo(6.5, 24, 1.6, 2.2, "pie_seta"); l.ovalo(17.5, 24, 1.6, 2.2, "pie_seta")   # brazos
-    # detalle: pecas, la mochilita de explorador (correas) y una hoja en la mano
+    # detalle: pecas y una hoja en la mano
     l.px(10, 18, "pie_seta", 1); l.px(14, 18, "pie_seta", 1)
-    l.px(9, 21, "delantal", 1); l.px(15, 21, "delantal", 1); l.px(9, 22, "delantal", 2); l.px(15, 22, "delantal", 2)
-    l.px(5, 25, "musgo", 3); l.px(5, 26, "musgo", 2); l.px(4, 26, "musgo", 1)
-    l.px(12, 26, "delantal", 3)
+    l.px(5, 25, "musgo", 3); l.px(5, 26, "musgo", 2); l.px(4, 25, "musgo", 2); l.px(4, 26, "musgo", 1)
     return l
 
 

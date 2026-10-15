@@ -150,6 +150,9 @@ CUERPO_PERFIL = [
     ".osbbbbssso.",
     "..osssssso..",
 ]
+CUERPO_PERFIL_LATE = list(CUERPO_PERFIL)
+CUERPO_PERFIL_LATE[1] = ".olbbbbbbwo."
+CUERPO_PERFIL_LATE[2] = ".olbbbbbbao."
 # Brazo de perfil: se dibuja encima del cuerpo. Dentro de la silueta se separa con tonos de
 # sombra (sin contorno cerrado, para que no parezca un aro); la mano lleva contorno solo
 # cuando asoma fuera del cuerpo. (columna dentro del cuerpo, dibujo)
@@ -237,6 +240,17 @@ PIERNAS_PERFIL_PASO_LEJOS = [      # apoya la lejana; la cercana va levantada
     "..ossoooo",
     "..ooooo..",
 ]
+# Instante en el aire al correr de perfil (ambas piernas recogidas, 3 filas con dy=-1 -> despegan 2 px del suelo)
+PIERNAS_PERFIL_AIRE_CERCA = [
+    ".ossobbo..",
+    ".ossoolbbo",
+    "..oooooooo",
+]
+PIERNAS_PERFIL_AIRE_LEJOS = [
+    ".obbosso..",
+    ".olboossso",
+    "..oooooooo",
+]
 
 
 # ---------------------------------------------------------------------------
@@ -297,10 +311,10 @@ def montar_frente(cabeza=CABEZA_FRENTE, cuerpo=CUERPO_FRENTE, brote=BROTE_A,
     return l
 
 
-def montar_perfil(cabeza=CABEZA_PERFIL, brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_QUIETO,
+def montar_perfil(cabeza=CABEZA_PERFIL, cuerpo=CUERPO_PERFIL, brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_QUIETO,
                   dy=0, dy_cabeza=0, piernas=PIERNAS_PERFIL_QUIETO, piernas_x=8):
     l = lienzo()
-    pegar(l, CUERPO_PERFIL, 6, 20 + dy)
+    pegar(l, cuerpo, 6, 20 + dy)
     pegar(l, brazo[1], 6 + brazo[0], 22 + dy)
     pegar(l, piernas, piernas_x, 28 + dy)
     pegar(l, brote, 7, 0 + dy + dy_cabeza)
@@ -343,7 +357,7 @@ def reposo_lado():
     return [
         montar_perfil(),
         montar_perfil(dy_cabeza=1, brote=BROTE_PERFIL_B),
-        montar_perfil(dy_cabeza=1, brote=BROTE_PERFIL_B),
+        montar_perfil(dy_cabeza=1, brote=BROTE_PERFIL_B, cuerpo=CUERPO_PERFIL_LATE),
         montar_perfil(),
     ]
 
@@ -513,10 +527,10 @@ def correr_lado():
     return [
         montar_perfil(dy=1, brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_PASO_DETRAS,
                       piernas=PIERNAS_PERFIL_ZANCADA_CERCA, piernas_x=7),
-        montar_perfil(dy=-1, brote=BROTE_PERFIL_B, piernas=PIERNAS_PERFIL_PASO_CERCA, piernas_x=7),
+        montar_perfil(dy=-1, brote=BROTE_PERFIL_B, piernas=PIERNAS_PERFIL_AIRE_CERCA, piernas_x=7),
         montar_perfil(dy=1, brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_PASO_DELANTE,
                       piernas=PIERNAS_PERFIL_ZANCADA_LEJOS, piernas_x=7),
-        montar_perfil(dy=-1, brote=BROTE_PERFIL_B, piernas=PIERNAS_PERFIL_PASO_LEJOS, piernas_x=7),
+        montar_perfil(dy=-1, brote=BROTE_PERFIL_B, piernas=PIERNAS_PERFIL_AIRE_LEJOS, piernas_x=7),
     ]
 
 
