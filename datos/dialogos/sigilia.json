@@ -23,5 +23,68 @@
 				]
 			}
 		]
+	},
+	"taa_blanco": {
+		"nombre": "Un armiño en blanco",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"tiene": {
+					"ficha_taa": 1
+				},
+				"lineas": [
+					"La ficha que se llevó el viento... «Taa, farolero del Paso de la Escarcha».",
+					"Tiene la misma pértiga. Tiene que ser suya.",
+					"Toma. Esto es tuyo. Te llamas Taa."
+				],
+				"entrega": {
+					"ficha_taa": 1
+				},
+				"marca": [
+					"taa_nombre"
+				]
+			},
+			{
+				"lineas": [
+					"Es un armiño... pero está blanco, blanco del todo, como una hoja sin escribir. Ni siquiera tiene color en los ojos.",
+					"Mueve la boca y no le sale la voz. Me mira como si buscara algo que se le ha olvidado.",
+					"Lleva una pértiga de farolero, y del cuello le cuelga un cordón vacío, como si ahí hubiera ido una tarjeta.",
+					"Con este viento, un papel vuela lejos. Siempre hacia el este."
+				],
+				"marca": [
+					"taa_visto"
+				]
+			}
+		]
+	},
+	"taa": {
+		"nombre": "Taa",
+		"conversaciones": [
+			{
+				"no": [
+					"sigilo_fuego"
+				],
+				"lineas": [
+					"¡Taa! ¡Me llamo Taa! Ay... qué alivio. Llevaba aquí plantado no sé cuánto, sin saber ni para qué tenía esta pértiga.",
+					"Tú no eres de aquí, ¿verdad? Brillas como un farol recién encendido.",
+					"Soy el farolero del Paso. Subí a encender los faroles antes de la ventisca, y la ventisca trajo páginas... páginas mojadas de Tinta Quieta. Una me rozó la ficha y se me fue el nombre.",
+					"En Maandiko, la ciudad, pasa lo mismo, o peor. Allí lo escribimos todo para no olvidar nada. Y de tanto miedo a olvidar... la tinta se heló.",
+					"Pero mira, te enseño algo. Los faroleros no encendemos con cerillas: encendemos con una runa.",
+					"Coge tu bastón. Un trazo de arriba abajo, dos brazos que suben, una raya abajo... ¡y que arda!",
+					"¡Eso es! Con ese sigilo prenden los faroles, se derrite la escarcha... y la Tinta Quieta también, si no es mucha.",
+					"Enciende los faroles del camino: junto a un farol encendido el viento no empuja y la nieve se ablanda. Arriba está la puerta de la ciudad, sellada. Yo subo detrás, a mi paso."
+				],
+				"marca": [
+					"sigilo_fuego"
+				],
+				"aviso": "Has aprendido el SIGILO DE FUEGO: pulsa U (o RB) para trazarlo"
+			},
+			{
+				"lineas": [
+					"Un farol, un trazo. Si el viento aprieta, busca la luz.",
+					"Arriba está la Puerta Sellada. Con tu fuego... igual se abre."
+				]
+			}
+		]
 	}
 }

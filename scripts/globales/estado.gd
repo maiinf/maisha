@@ -54,6 +54,8 @@ const OBJETOS := {
 		"texto": "Un remo de madera de fresno, con una cinta roja atada en el mango. Kasia ata una cinta a cada remo para saber cuál es cuál."},
 	"mazorca": {"uno": "Mazorca antigua", "encargo": 3, "hecho": "sungura_mazorcas", "icono": 21,
 		"texto": "Maíz de los antiguos labradores de Raíz, de granos dorados y alguno rojo. Sungura guarda sus semillas para que no se pierdan."},
+	"ficha_taa": {"uno": "Ficha del Índice", "encargo": 0, "hecho": "", "icono": 27,
+		"texto": "Una tarjeta del Índice del Archivo de Maandiko, con su pestaña morada. Pone, con letra muy pulcra: «Taa, farolero del Paso de la Escarcha»."},
 	"sopa": {"uno": "Sopa de Juncia", "encargo": 0, "hecho": "", "icono": 10, "usable": true,
 		"texto": "Calentita. Devuelve 3 hojas de vida. Tómala con F (o desde aquí, con Acción), incluso en plena pelea."},
 }

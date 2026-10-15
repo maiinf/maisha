@@ -83,8 +83,12 @@ func _empujar() -> void:
 		Sonido.efecto("pagina", -10.0, maisha.global_position, 0.3)
 
 
-## ¿Hay algo sólido a su lado de donde viene el viento? (rayos a la altura de los pies y un poco más arriba)
+## ¿Hay algo sólido a su lado de donde viene el viento (rayos a la altura de los pies y un poco más arriba), o un
+## farol rúnico encendido cerca?
 func _esta_cobijada(maisha: CharacterBody2D) -> bool:
+	for f in get_tree().get_nodes_in_group("faroles_runicos"):
+		if f.call("abriga", maisha.global_position):
+			return true
 	var espacio := get_world_2d().direct_space_state
 	for alto in [-3.0, -9.0]:
 		var desde_p := maisha.global_position + Vector2(0, alto)

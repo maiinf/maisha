@@ -17,6 +17,9 @@ const MARGEN_GIRO := 0.15      # en diagonal, evita que el dibujo cambie de dire
 const ESCENA_SEMILLA := preload("res://scripts/combate/semilla.gd")
 const ESCENA_GOLPE := preload("res://scripts/combate/golpe_efecto.gd")
 const ESCENA_LATIDO := preload("res://scripts/combate/latido_efecto.gd")
+const SIGILO_FUEGO := preload("res://scripts/combate/sigilo_fuego.gd")
+const SIGILO_COSTE := 20.0      # Aliento que gasta trazar un sigilo
+const SIGILO_ESPERA := 0.7      # segundos entre sigilo y sigilo
 const RELIEVE := preload("res://scripts/mundo/relieve.gd")
 const RASGOS := preload("res://scripts/personajes/rasgos_maisha.gd")
 
@@ -39,6 +42,7 @@ var viento := Vector2.ZERO     # el empuje del viento (lo pone la ventisca cada 
 var _invulnerable := 0.0
 var _espera_golpe := 0.0
 var _espera_latido := 0.0
+var _espera_sigilo := 0.0
 var _golpeando := false
 var _tiempo_agotada := 0.0
 var _desde_ultima_semilla := 99.0
@@ -72,6 +76,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_espera_golpe = maxf(0.0, _espera_golpe - delta)
 	_espera_latido = maxf(0.0, _espera_latido - delta)
+	_espera_sigilo = maxf(0.0, _espera_sigilo - delta)
 	_invulnerable = maxf(0.0, _invulnerable - delta)
 	pegajoso = maxf(0.0, pegajoso - delta)
 	hundida = maxf(0.0, hundida - delta)
@@ -128,6 +133,8 @@ func _physics_process(delta: float) -> void:
 			lanzar_semilla()
 		if Input.is_action_just_pressed("latido"):
 			latido()
+		if Input.is_action_just_pressed("sigilo"):
+			sigilo()
 
 	if Input.is_action_just_pressed("usar"):
 		tomar_sopa()
@@ -235,6 +242,21 @@ func latido() -> bool:
 	efecto.position = Vector2(0, -12)
 	add_child(efecto)
 	RELIEVE.destello(self, Vector2(0, -12), Color("e6a852"), 1.2, 0.9, 0.35)
+	if aliento < 1.0:
+		_agotarse()
+	return true
+
+
+## El sigilo (arte Runa, Sigilia): traza delante una runa de fuego que enciende, derrite y quema.
+## Hace falta haberlo aprendido (marca «sigilo_fuego», se lo enseña Taa en el Paso de la Escarcha).
+func sigilo() -> bool:
+	if not Estado.tiene("sigilo_fuego") or _espera_sigilo > 0.0 or agotada or aliento < SIGILO_COSTE:
+		return false
+	aliento -= SIGILO_COSTE
+	_espera_sigilo = SIGILO_ESPERA
+	var efecto: Node2D = SIGILO_FUEGO.new()
+	efecto.position = global_position + direccion_mirada() * 18.0 + Vector2(0, -6)
+	get_parent().add_child(efecto)
 	if aliento < 1.0:
 		_agotarse()
 	return true

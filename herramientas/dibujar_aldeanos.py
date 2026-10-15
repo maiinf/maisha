@@ -60,6 +60,11 @@ MATERIALES = {
     "vapor":    ["C8C4C0", "D8D4D0", "E8E4E0", "F8F4F0"],
     "flor":     ["8F2532", "D5525E", "F4B39A", "FFE0D8"],
     "azul":     ["1E3A5A", "2E5A8A", "4A82B8", "8AB8E0"],
+    # SIGILIA
+    "armino":   ["4E4870", "A8A0C4", "E2DEEE", "FFFFFF"],   # pelo blanco de armiño (sombra lila)
+    "tinta":    ["0A0814", "16122A", "241E3C", "342C50"],   # la punta negra de la cola
+    "morado":   ["2E1A44", "5A3480", "7A52A6", "A07AC4"],   # bufanda morada de escriba
+    "en_blanco": ["8A869A", "B4B0C2", "CDCAD8", "E0DEE8"],  # lo que la Tinta Quieta deja sin color
 }
 ANCHO, ALTO = 24, 32
 
@@ -624,6 +629,69 @@ def kasia():
 # --- Los fotogramas de cada aldeano (para que estén vivos) -----------------------------------------
 # 0 quieto · 1 respira (todo lo de arriba baja un píxel; los pies, no) · 2 parpadea (los ojos se cierran) · 3 su gesto
 
+def taa(blanco=False):
+    """TAA: el armiño farolero de Sigilia, el que enciende los faroles del Paso de la Escarcha. Esbelto y de cuello
+    largo, de pelo blanco con la punta de la cola negra, gafas redondas de latón, bufanda morada de escriba y la
+    pértiga de farolero con su ganchito y una llamita en lo alto. EN BLANCO (blanco=True): la Tinta Quieta le ha
+    borrado el nombre: todo pálido y sin color, los ojos vacíos y la llamita apagada."""
+    l = Lienzo()
+    for y in range(3, 31):                                    # la pértiga de farolero
+        l.px(19, y, "laton", 2 if y % 6 else 3)
+    l.px(20, 3, "laton", 2); l.px(21, 4, "laton", 2); l.px(21, 5, "laton", 1)       # el gancho
+    l.px(18, 2, "brasa", 2); l.px(18, 1, "brasa", 3); l.px(17, 2, "brasa", 1)       # la llamita
+    for (x, y) in ((3, 29), (2, 28), (2, 27), (3, 26), (4, 25), (5, 25)):            # la cola, larga, con la punta negra
+        l.px(x, y, "armino", 2)
+    for (x, y) in ((3, 29), (2, 28), (2, 27)):
+        l.px(x, y, "tinta", 2)
+    l.ovalo(11.5, 23, 4.3, 7.0, "armino")                     # el cuerpo, esbelto
+    l.ovalo(11.5, 24.5, 2.2, 4.5, "hocico", plano=True)       # la tripa crema
+    l.ovalo(7.5, 22, 1.4, 3.0, "armino")                      # el brazo de la izquierda
+    l.ovalo(17.5, 19.5, 1.6, 2.0, "armino")                   # la mano que sujeta la pértiga
+    l.ovalo(11.5, 15.5, 2.6, 2.8, "armino")                   # el cuello largo
+    l.ovalo(11.5, 10, 5.0, 4.0, "armino")                     # la cabeza
+    l.ovalo(11.5, 12.6, 2.4, 1.5, "hocico", plano=True)       # el morro claro
+    l.px(11, 12, "rosa", 2); l.px(12, 12, "rosa", 2)          # la naricilla
+    l.px(7, 6, "armino", 2); l.px(8, 5, "armino", 2); l.px(8, 6, "rosa", 1)       # orejas redondas
+    l.px(15, 6, "armino", 2); l.px(14, 5, "armino", 2); l.px(14, 6, "rosa", 1)
+    ojos(l, 9, 9, 14, alto=2)
+    for x0 in (9, 14):                                        # las gafas redondas de latón: la montura, fina
+        l.px(x0, 8, "laton", 3); l.px(x0 + 1, 8, "laton", 3)
+        l.px(x0, 11, "laton", 1); l.px(x0 + 1, 11, "laton", 1)
+    for y in (9, 10):
+        l.px(8, y, "laton", 2); l.px(16, y, "laton", 2)
+    for x in (11, 12, 13):                                    # el puente
+        l.px(x, 9, "laton", 3 if x == 12 else 2)
+    for (x0, lado) in ((8, -1), (15, 1)):                     # bigotes finos
+        for k in range(2):
+            l.px(x0 + lado * k, 12 + k, "cana", 3)
+    l.rect(8, 16, 15, 17, "morado", 2); l.rect(8, 16, 15, 16, "morado", 3)          # la bufanda morada
+    l.px(9, 18, "morado", 2); l.px(9, 19, "morado", 1); l.px(10, 20, "morado", 1)
+    l.px(13, 17, "laton", 3)                                  # el broche de pluma
+    for x in (9, 14):                                         # las patas
+        l.rect(x - 1, 29, x + 1, 30, "armino", 1)
+    if blanco:
+        # la Tinta Quieta: todo pálido y sin color, los ojos vacíos, la llamita apagada
+        for y in range(ALTO):
+            for x in range(ANCHO):
+                c = l.m[y][x]
+                if c is None:
+                    continue
+                mat, t = c
+                if mat == "brasa":
+                    l.m[y][x] = None
+                elif mat == "ojo":
+                    l.m[y][x] = ("en_blanco", 0)
+                elif mat == "brillo":
+                    l.m[y][x] = ("en_blanco", 1)
+                else:
+                    l.m[y][x] = ("en_blanco", max(1, min(3, t + (1 if mat in ("tinta", "morado", "laton") else 0))))
+    return l
+
+
+def taa_blanco():
+    return taa(True)
+
+
 def _copia(l):
     n = Lienzo()
     n.m = [fila[:] for fila in l.m]
@@ -737,7 +805,7 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+ALDEANOS = {"taa": taa, "taa_blanco": taa_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

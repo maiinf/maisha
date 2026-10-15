@@ -1935,7 +1935,8 @@ def crear_paso_escarcha():
     Maandiko. Un valle de montaña ancho y abierto, todo de NIEVE HONDA (fuera del sendero pisado, «#», Maisha se hunde
     y va despacio) y barrido por RACHAS DE VIENTO del oeste que traen páginas sueltas: empujan a Maisha hacia el este si
     no se cobija detrás de algo (rocas «ň», pinos «ğ» y las ESTELAS RÚNICAS «ȩ», piedras viejas con letras talladas).
-    El sendero sube en eses de una estela a otra; arriba, la puerta del norte («^») hacia la ciudad."""
+    El sendero sube en eses de una estela a otra; arriba, la puerta del norte («^») hacia la ciudad. A media subida,
+    TAA el farolero en blanco («ţ»); su FICHA DEL ÍNDICE («ǩ»), en la nieve honda del este; y los FAROLES RÚNICOS («ƒ»)."""
     ANCHO, ALTO = 60, 110
     azar = random.Random(611)
     m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
@@ -1990,7 +1991,21 @@ def crear_paso_escarcha():
     for x in range(27, 33):
         poner(x, 0, "^")
         poner(x, ALTO - 1, "_")
-    reservados = [(29, 107, 3), (29, 3, 4)] + [(x, y, 2) for (x, y) in estelas]
+    # TAA, el farolero en blanco, junto a su farol apagado, a media subida; su FICHA DEL ÍNDICE se la llevó el viento
+    # al este, a la nieve honda; y los FAROLES RÚNICOS («ƒ») del sendero, más arriba (se encienden con el sigilo)
+    taa, farol_taa, ficha = (38, 58), (40, 57), (49, 62)
+    faroles = [farol_taa, (27, 48), (22, 41), (35, 31), (32, 21), (27, 12)]
+    poner(*taa, "ţ")
+    poner(*ficha, "ǩ")
+    # (los faroles van al borde del sendero, nunca encima: si caen en él, se apartan al este)
+    puestos = []
+    for (x, y) in faroles:
+        while m[y][x] == "#":
+            x += 1
+        poner(x, y, "ƒ")
+        puestos.append((x, y))
+    faroles = puestos
+    reservados = [(29, 107, 3), (29, 3, 4), (taa[0], taa[1], 3), (ficha[0], ficha[1], 2)] + [(x, y, 2) for (x, y) in estelas + faroles]
 
     def libre(x, y):
         if m[y][x] != ".":

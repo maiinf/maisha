@@ -1,7 +1,8 @@
 extends Node2D
-## LA NIEVE HONDA (Sigilia). Fuera del sendero pisado («#» y las puertas) la nieve es blanda y honda: Maisha se
-## hunde, anda más despacio y no puede correr (maisha.hundirse). Por donde ya ha pasado deja un SURCO: la nieve queda
-## apretada y, si vuelve a pasar por él, ya no se hunde (los surcos se ven en el suelo y duran un buen rato).
+## LA NIEVE HONDA (Sigilia). Fuera del sendero pisado («#» y las puertas) y lejos de un farol rúnico encendido,
+## la nieve es blanda y honda: Maisha se hunde, anda más despacio y no puede correr (maisha.hundirse). Por donde
+## ya ha pasado deja un SURCO: la nieve queda apretada y, si vuelve a pasar por él, ya no se hunde (los surcos se
+## ven en el suelo y duran un buen rato).
 
 const DURA := 90.0                    # segundos que dura un surco antes de que la nieve lo tape
 const PISADO := "#^_"
@@ -22,7 +23,7 @@ func _process(delta: float) -> void:
 	if maisha == null or region == null:
 		return
 	var casilla := Vector2i((maisha.global_position / 16.0).floor())
-	if es_honda(casilla) and not _surcos.has(casilla):
+	if es_honda(casilla) and not _surcos.has(casilla) and not _junto_a_farol(maisha.global_position):
 		maisha.call("hundirse", 0.15)
 	# al salir de una casilla de nieve honda, queda un surco
 	if casilla != _ultima:
@@ -35,6 +36,14 @@ func _process(delta: float) -> void:
 		if _surcos[c] <= 0.0:
 			_surcos.erase(c)
 	queue_redraw()
+
+
+## Junto a un farol rúnico encendido, la nieve se ablanda (no se hunde)
+func _junto_a_farol(punto: Vector2) -> bool:
+	for f in get_tree().get_nodes_in_group("faroles_runicos"):
+		if f.call("abriga", punto):
+			return true
+	return false
 
 
 func es_honda(c: Vector2i) -> bool:

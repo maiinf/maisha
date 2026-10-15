@@ -10,6 +10,8 @@ signal recogido
 @export var color_halo := Color(0.43, 0.69, 0.69)
 ## Si es más de 0: vuelve a salir pasados estos segundos de juego (bayas, juncos). Se guarda en Estado.extra.
 @export var rebrota := 0.0
+## Dibujo propio (2 fotogramas); si no, arte/mundos/raiz/objetos/<objeto>.png
+@export var dibujo := ""
 
 var _sprite: Sprite2D
 var _halo: Node2D
@@ -30,7 +32,7 @@ func _ready() -> void:
 	_halo.draw.connect(_dibujar_halo)
 	add_child(_halo)
 	_sprite = Sprite2D.new()
-	_sprite.texture = load("res://arte/mundos/raiz/objetos/%s.png" % objeto)
+	_sprite.texture = load(dibujo if dibujo != "" else "res://arte/mundos/raiz/objetos/%s.png" % objeto)
 	_sprite.hframes = 2
 	_sprite.centered = false
 	_sprite.offset = Vector2(-_sprite.texture.get_width() / 4, -_sprite.texture.get_height() + 1)

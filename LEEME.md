@@ -689,7 +689,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_kitovu.gd` juega el comienzo entero: el despertar lento, la chispa y sus 3 recuerdos, Kuku y la puerta, la noche y el amanecer, el despertar sin cetro, la zona dormida, el susurro del castor, las tres tareas (con la pesca), el cetro y el mapa, el espantapájaros, la mochila, las 3 manchas de práctica con el narrador, la pelea contra Mzizi y el arco hasta los prados y vuelta.
 - `pruebas/prueba_guardado.gd` empieza una partida desde el inicio (el diario se abre y la introducción se escribe en él), guarda, pausa, vuelve al inicio, continúa donde lo dejó, comprueba que en plena pelea se guarda el último sitio seguro, que «Nueva partida» pregunta antes de borrar y que un archivo estropeado no rompe nada.
 - `pruebas/prueba_encargos.gd` recoge setas y mineral, comprueba que el cetro rebota en la roca y la semilla la rompe, entrega los encargos, ve levantarse las casas, entra en ellas y prueba las recompensas (haces del vigía y cetro templado).
-- `pruebas/prueba_paso_escarcha.gd` comprueba el paso del norte de las Ruinas (cerrado hasta curar al árbol), llega al Paso de la Escarcha, prueba la nieve honda (frena, no deja correr, deja surcos que ya no frenan), la ventisca (empuja en medio del valle, no detrás de una estela, y se apaga al pasar la racha), que revivir lo quita todo y que la puerta a Maandiko aún no deja pasar.
+- `pruebas/prueba_paso_escarcha.gd` comprueba el paso del norte de las Ruinas (cerrado hasta curar al árbol), llega al Paso de la Escarcha, prueba la nieve honda (frena, no deja correr, deja surcos que ya no frenan), la ventisca (empuja en medio del valle, no detrás de una estela, y se apaga al pasar la racha), a Taa en blanco, la ficha en la nieve honda, que al dársela recupera su nombre y enseña el sigilo de fuego, el sigilo (sin aprender no sale; gasta Aliento; espera) que enciende un farol, el abrigo del farol (ni viento ni nieve honda), que revivir lo quita todo y que la puerta a Maandiko aún no deja pasar.
 - `pruebas/prueba_sendero.gd` va de los Prados al Sendero del Puente y a la aldea y vuelta, prueba los pretiles y el vado, el eco perdido (con su ilustración), el encargo de Msafiri y el cuaderno de ecos.
 - `pruebas/prueba_pasarelas.gd` va de la aldea a Las Pasarelas y a la ciénaga y vuelta, prueba el agua y las tablas, el tramo roto, la rana de piedra (aviso, salto, onda, atontada), el encargo de Korongo (que arregla la pasarela) y el segundo eco.
 - `pruebas/prueba_camino_cobrizo.gd` sube de los Prados al Camino Cobrizo y al bosque y vuelta, prueba la peña y el derrumbe, el topo de piedra (bajo tierra, aviso, mordisco, atontado, las raíces que lo sacan), el encargo de Fuko (que despeja la galería) y el tercer eco.
@@ -727,7 +727,8 @@ No hace falta ejecutarlas; sirven para detectar si algo se rompe al cambiar el c
 | Semilla (explosivo) | K | Y |
 | Latido | L o Mayúsculas | B |
 | Correr (mantener) | C | LB |
-| Cambiar de semilla | Q | RB |
+| Sigilo (Sigilia: cuando se aprende) | U | RB |
+| Cambiar de semilla | Q | — |
 | Tomar sopa | F | Stick derecho (pulsar) |
 | Menú | Esc | Start |
 
@@ -845,7 +846,16 @@ Escena `escenas/mundo/paso_escarcha.tscn` (`scripts/mundo/paso_escarcha.gd`). Se
 | Pensamientos | Al llegar (`escarcha_llegada`) y tras la primera racha (`escarcha_racha`) |
 | Música | Por ahora la del Sendero Olvidado |
 
-Falta: Taa el farolero y el sigilo de fuego, los faroles, la Puerta Sellada de Tinta Quieta, los enemigos (páginas sueltas), la primera ficha del Índice, la misión y su música.
+### Paso de la Escarcha (parte 2: Taa, la primera ficha y el sigilo de fuego)
+
+| Qué | Cómo |
+| --- | --- |
+| Taa | `ţ`, `sigilia/taa.gd` (un aldeano de `dibujar_aldeanos.py`: `taa` y `taa_blanco`, 4 fotogramas). El armiño farolero, a media subida junto a su farol apagado, **en blanco**: pálido, sin color en los ojos y sin voz (`taa_blanco`, lo piensa Maisha). Si se le devuelve su ficha, le vuelve el color de golpe (destello y gotitas de tinta) y habla (`taa`) |
+| La ficha del Índice | `ǩ`: una tarjeta de pergamino con pestaña morada (`ficha.png`, icono 28.º de `objetos.png`; objeto `ficha_taa`). El viento la llevó al este, a la nieve honda. Es la primera de las 12 del misterio de Sigilia |
+| El sigilo de fuego | Lo enseña Taa (marca `sigilo_fuego`). **U** (o RB): Maisha traza delante una runa de fuego (`scripts/combate/sigilo_fuego.gd`) que arde a los 0,25 s: enciende los faroles rúnicos, lo que se enciende (braseros), derrite lo «derretible» (la Tinta Quieta, más adelante) y quema a los enemigos (1). Gasta 20 de Aliento; 0,7 s entre uno y otro |
+| Los faroles rúnicos | `ƒ`, `sigilia/farol_runico.gd` (`farol.png`: apagado con escarcha / encendido). 6 por el sendero; solo los enciende el sigilo (no las semillas) y se quedan encendidos. A su lado (52 px) **el viento no empuja y la nieve no es honda** |
+
+Falta: la Puerta Sellada de Tinta Quieta, los enemigos (páginas sueltas), la misión y su música.
 
 ## Las construcciones, al nivel de la casa del castor
 

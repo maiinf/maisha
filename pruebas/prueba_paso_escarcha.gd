@@ -145,6 +145,73 @@ func _ready() -> void:
 	_comprobar(m.viento.length() < 1.0, "al pasar la racha, el viento se apaga (no se queda empujando)")
 	await _leer_dialogo()
 
+	print("Taa, el farolero en blanco:")
+	ventisca.activa = false
+	var taa: Node = null
+	for a in get_tree().get_nodes_in_group("aldeanos"):
+		if String(a.id).begins_with("taa"):
+			taa = a
+	_comprobar(taa != null and taa.id == "taa_blanco", "a media subida está Taa, en blanco (sin nombre)")
+	var faroles := get_tree().get_nodes_in_group("faroles_runicos")
+	_comprobar(faroles.size() == 6 and faroles.all(func(f: Node) -> bool: return not f.encendido), "seis faroles rúnicos, todos apagados")
+	# sin el sigilo, U no hace nada
+	_comprobar(not m.sigilo(), "sin haberlo aprendido, no hay sigilo")
+	m.global_position = (taa as Node2D).global_position + Vector2(-14, 4)
+	taa.interactuar()
+	await _leer_dialogo()
+	_comprobar(Estado.tiene("taa_visto") and not Estado.tiene("taa_nombre"), "Maisha nota que está en blanco y le falta algo")
+	var ficha: Node2D = null
+	for r in get_tree().get_nodes_in_group("recogibles"):
+		if r.objeto == "ficha_taa":
+			ficha = r
+	_comprobar(ficha != null, "su ficha del Índice está tirada en la nieve honda del este")
+	_comprobar(ficha != null and nieve.es_honda(Vector2i((ficha.global_position / 16.0).floor())), "(en la nieve honda, adonde la llevó el viento)")
+	m.global_position = ficha.global_position + Vector2(0, 2)
+	await _esperar(0.5)
+	_comprobar(Estado.cuantos("ficha_taa") == 1, "Maisha recoge la ficha")
+	m.global_position = (taa as Node2D).global_position + Vector2(-14, 4)
+	await _esperar(0.2)
+	taa.interactuar()
+	await _leer_dialogo()
+	await _esperar(1.0)
+	await _leer_dialogo()
+	await _esperar(0.5)
+	_comprobar(Estado.tiene("taa_nombre") and Estado.cuantos("ficha_taa") == 0, "le devuelve la ficha y Taa recupera su nombre")
+	_comprobar(taa.id == "taa", "y su color (ya es «Taa»)")
+	_comprobar(Estado.tiene("sigilo_fuego"), "Taa le enseña el sigilo de fuego")
+
+	print("El sigilo de fuego y los faroles:")
+	var farol: Node2D = faroles[0]
+	for f in faroles:
+		if (f as Node2D).global_position.y < farol.global_position.y:
+			farol = f
+	m.aliento = m.aliento_maximo()
+	m.global_position = farol.global_position + Vector2(-20, 2)
+	m.mirar(Vector2.RIGHT)
+	await _esperar(0.2)
+	var aliento0: float = m.aliento
+	_comprobar(m.sigilo(), "con U traza el sigilo")
+	_comprobar(m.aliento < aliento0, "gasta Aliento")
+	_comprobar(not m.sigilo(), "y hay que esperar un poco para el siguiente")
+	await _esperar(0.6)
+	_comprobar(farol.encendido and Estado.tiene(farol.marca), "el farol se enciende (y se queda encendido)")
+	# junto al farol encendido: ni viento ni nieve honda
+	m.global_position = farol.global_position + Vector2(30, 6)
+	await _esperar(0.3)
+	_comprobar(nieve.es_honda(Vector2i((m.global_position / 16.0).floor())), "(Maisha está fuera del sendero)")
+	await _esperar(0.3)
+	_comprobar(m.hundida <= 0.0, "junto al farol la nieve no es honda")
+	ventisca.activa = true
+	ventisca.desde = -1
+	ventisca.fase = ventisca.Fase.RACHA
+	ventisca.set("_t", 2.0)
+	var xf := m.global_position.x
+	await _esperar(0.8)
+	_comprobar(ventisca.cobijada and absf(m.global_position.x - xf) < 6, "y el viento no la empuja")
+	ventisca.fase = ventisca.Fase.CALMA
+	ventisca.set("_t", 30.0)
+	ventisca.activa = false
+
 	print("Las puertas:")
 	m.revivir(m.global_position)
 	_comprobar(m.hundida == 0.0 and m.viento == Vector2.ZERO, "al revivir no queda nieve ni viento que la frenen")

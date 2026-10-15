@@ -5,12 +5,19 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ##     pasa deja un surco.
 ##   - LA VENTISCA DE PÁGINAS (sigilia/ventisca.gd): rachas del oeste que la empujan fuera del sendero si no se
 ##     cobija detrás de las ESTELAS RÚNICAS («ȩ»), las rocas o los pinos.
+##   - TAA («ţ», sigilia/taa.gd), el farolero en blanco: su FICHA DEL ÍNDICE («ǩ») está en la nieve honda del este.
+##     Al devolvérsela recupera el nombre y enseña el SIGILO DE FUEGO (marca «sigilo_fuego»).
+##   - LOS FAROLES RÚNICOS («ƒ», sigilia/farol_runico.gd): se encienden con el sigilo; a su lado no empuja el viento
+##     y la nieve no es honda.
 ## Nieva (la nevada del Sendero Olvidado).
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const NEVADA := preload("res://scripts/mundo/olvidado/nevada.gd")
 const VENTISCA := preload("res://scripts/mundo/sigilia/ventisca.gd")
 const NIEVE_HONDA := preload("res://scripts/mundo/sigilia/nieve_honda.gd")
+const TAA := preload("res://scripts/mundo/sigilia/taa.gd")
+const FAROL := preload("res://scripts/mundo/sigilia/farol_runico.gd")
+const RECOGIBLE := preload("res://scripts/mundo/objetos/recogible.gd")
 
 var ventisca: Node2D
 var nieve: Node2D
@@ -19,6 +26,7 @@ var nieve: Node2D
 func _ready() -> void:
 	super()
 	Estado.marcar("paso_escarcha")
+	_poner_cosas()
 	nieve = NIEVE_HONDA.new()
 	nieve.name = "NieveHonda"
 	nieve.region = $Region
@@ -31,6 +39,32 @@ func _ready() -> void:
 	if not Estado.tiene("escarcha_llegada"):
 		ventisca.activa = false               # (que pueda leer lo que piensa antes de la primera racha)
 		_pensar_al_llegar.call_deferred()
+
+
+func _poner_cosas() -> void:
+	var filas: PackedStringArray = $Region._filas
+	for y in filas.size():
+		var fila := filas[y]
+		for x in fila.length():
+			var c := fila[x]
+			var pos := Vector2(x, y) * 16.0 + Vector2(8, 14)
+			if c == "ţ":
+				var t: StaticBody2D = TAA.new()
+				t.position = pos
+				$Entidades.add_child(t)
+			elif c == "ƒ":
+				var f: StaticBody2D = FAROL.new()
+				f.marca = "farol/paso_escarcha/%d,%d" % [x, y]
+				f.position = pos
+				$Entidades.add_child(f)
+			elif c == "ǩ":
+				var ficha: Node2D = RECOGIBLE.new()
+				ficha.objeto = "ficha_taa"
+				ficha.marca = "ficha/taa"
+				ficha.dibujo = "res://arte/mundos/sigilia/paso/ficha.png"
+				ficha.color_halo = Color(0.85, 0.7, 1.0)
+				ficha.position = pos
+				$Entidades.add_child(ficha)
 
 
 func _pensar_al_llegar() -> void:
