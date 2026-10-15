@@ -241,13 +241,13 @@ Todo es visual: las colisiones y el movimiento siguen siendo 2D planos y no sabe
 
 | Qué | Cómo |
 | --- | --- |
-| Relieve | `herramientas/relieve.py --todo` calcula el «mapa de normales» de cada dibujo del mundo (`<dibujo>_n.png`: hacia dónde mira cada píxel) con un abombado a varias escalas más la claridad del pixel art. Los suelos no (su relieve es ruido y ocupaba 40 MB). Hay que relanzarlo al repintar un dibujo del mundo |
+| Relieve | `herramientas/relieve.py --todo` calcula el «mapa de normales» de cada dibujo del mundo, de los aldeanos y de las criaturas de Raíz (`<dibujo>_n.png`: hacia dónde mira cada píxel) con un abombado a varias escalas más la claridad del pixel art. Los suelos no (su relieve es ruido y ocupaba 40 MB). Hay que relanzarlo al repintar un dibujo |
 | En el juego | `scripts/mundo/relieve.gd` (lo pone `escena_mundo.gd` en todas las escenas): cambia cada dibujo con relieve por una CanvasTexture y pone la luz |
 | Hora del día | El autoload **Reloj** (`scripts/globales/reloj.gd`): un día dura 16 minutos (día, atardecer, noche y amanecer) y se guarda con la partida. No corre hasta llegar a Cuna de Musgo (el Kitovu del principio es de día) |
-| Exteriores | De día, un sol bajo desde arriba a la izquierda; al atardecer, luz rosada; de noche, luna azulada y todo oscuro. Los rayos de sol (`luz_sol.gd`) se vuelven naranjas y se apagan de noche |
-| Luces de noche | Ventanas, faroles y fuegos de 14 edificios (tabla `LUCES`, en píxeles del dibujo; las ruinas no se encienden), los faroles de la aldea y las hogueras. Alrededor de Maisha, una luz suave para jugar de noche. Las casas abandonadas (Nungu, granero, molino) quedan a oscuras |
+| Exteriores | De día, el sol gira suavemente de este a oeste; al atardecer, luz rosada y sombras más largas (`sombra.gd`); de noche, luna azulada y todo oscuro. Cada bioma aporta un matiz suave (`BIOMAS`: cálido en el bosque, verdoso en la ciénaga, frío en la cumbre). Los rayos de sol (`luz_sol.gd`) llevan motas de polvo en el haz, se vuelven naranjas al atardecer y se apagan de noche |
+| Luces de noche | Ventanas, faroles y fuegos de 17 edificios (tabla `LUCES`, incluidos los del Kitovu; las ruinas no se encienden), los faroles de la aldea y las hogueras. Alrededor de Maisha, una luz suave para jugar de noche. Las casas abandonadas (Nungu, granero, molino) quedan a oscuras |
 | Escenas con su penumbra | Cuevas, Gruta, el amanecer del Kitovu y la casa de Shamba: el ciclo se aparta mientras dure y mandan sus luces (que también ven el relieve) |
-| Magia | `Relieve.destello(...)`: fogonazo naranja al estallar una semilla, ámbar con el Latido y verde con el golpe; se notan más cuanto más oscuro está (`Reloj.oscuridad`) |
+| Magia | `Relieve.destello(...)`: fogonazo naranja al estallar una semilla, ámbar con el Latido y verde con el golpe; reutiliza la textura radial en caché y se nota más cuanto más oscuro está (`Reloj.oscuridad`) |
 
 ## Raíz, mundo libre: los caminos
 

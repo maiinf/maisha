@@ -208,3 +208,11 @@ se pasan.
 | Mauti en Sigilia | Va con Maisha pero se queda en la ciudad ayudando a los escribas en blanco; aparece en momentos clave (Iam: «vale sigue») |
 | Paso de la Escarcha, parte 2 | Taa (armiño farolero) está en blanco a media subida; su ficha del Índice se la llevó el viento al este. Al devolvérsela recupera el color y enseña el SIGILO DE FUEGO: tecla nueva U (RB en el mando; RB deja de ser «cambiar de semilla», que no se usaba), 20 de Aliento. Los faroles rúnicos solo los enciende el sigilo y, encendidos, abrigan del viento y ablandan la nieve |
 | Paso de la Escarcha, parte 3 | Páginas sueltas (enemigo: 2 golpes, el fuego las quema de un trazo). La Puerta Sellada se derrite con 3 sigilos; arriba la peña se cierra para que no se rodee. Misión «El Paso de la Escarcha». Música «La nieve que escribe» con el tema de Sigilia (vals de caja de música en si menor) |
+
+### Revisión de luz y relieve 2.5D (16-10)
+| Qué | Decisión |
+| --- | --- |
+| Mapas de normales de aldeanos y criaturas (`relieve.py`) | `relieve.py --todo` solo procesaba `arte/mundos`, dejando planos a los aldeanos (`arte/personajes/aldeanos/`) y a las criaturas y jefes de `arte/zonas/raiz/`. Se amplió `relieve.py` y se generaron sus `_n.png` para que la luz del sol, faroles y fogonazos resbale también sobre ellos. |
+| Luces nocturnas del Kitovu y biomas (`relieve.gd`) | Añadidas a `LUCES` las ventanas y faroles de `casa_shamba.png`, `almacen.png` y `cubierta.png`. Añadida tabla `BIOMAS` para modular suavemente el tinte ambiental según la región (otoño cálido en el Bosque Cobrizo, bruma verdosa en la Ciénaga Quieta, aire frío en las cumbres) y giro progresivo del ángulo solar a lo largo del día. Reutilizada `_textura_luz()` en `Relieve.destello()`. |
+| Sombras y rayos de sol (`sombra.gd`, `luz_sol.gd`) | La sombra elíptica bajo los personajes se inclina y estira suavemente al atardecer según `Reloj.calidez()` y `Reloj.luz_dia()`. En `luz_sol.gd` se añadieron motas de polvo luminoso flotando dentro de los haces de sol. |
+

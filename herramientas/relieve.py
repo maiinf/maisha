@@ -75,9 +75,11 @@ if __name__ == "__main__":
         rutas = [os.path.join(RAIZ, r) for r in ALDEA]
     elif "--todo" in rutas:
         rutas = []
-        for carpeta, _, archivos in os.walk(os.path.join(RAIZ, "arte", "mundos")):
-            if carpeta.endswith("suelos"):
-                continue   # los suelos no: su relieve es ruido (la hierba), ocupa muchísimo y apenas se nota
-            rutas += [os.path.join(carpeta, a) for a in sorted(archivos) if a.endswith(".png") and not a.endswith("_n.png")]
+        for raiz_dir in ("arte/mundos", "arte/personajes/aldeanos", "arte/zonas/raiz"):
+            for carpeta, _, archivos in os.walk(os.path.join(RAIZ, raiz_dir)):
+                if carpeta.endswith("suelos"):
+                    continue   # los suelos no: su relieve es ruido (la hierba), ocupa muchísimo y apenas se nota
+                rutas += [os.path.join(carpeta, a) for a in sorted(archivos) if a.endswith(".png") and not a.endswith("_n.png")]
     for r in rutas:
         print("relieve:", os.path.relpath(normales(r), RAIZ))
+
