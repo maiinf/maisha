@@ -85,11 +85,18 @@ func camara_lenta(aviso: String, sigue_haciendo_falta: Callable, maximo := 2.5) 
 	_aviso_lento = aviso
 	Impacto.poner_lenta(0.35)
 	var t := 0.0
-	while t < maximo and sigue_haciendo_falta.call():
+	while t < maximo and is_inside_tree() and sigue_haciendo_falta.is_valid() and sigue_haciendo_falta.call():
 		await get_tree().process_frame
 		t += get_process_delta_time() / maxf(Engine.time_scale, 0.01)
 	Impacto.poner_lenta(1.0)
 	_lenta = false
+
+
+## Si la lección desaparece a mitad de la cámara lenta, la velocidad vuelve a la normal
+func _exit_tree() -> void:
+	if _lenta:
+		_lenta = false
+		Impacto.poner_lenta(1.0)
 
 
 func _process(delta: float) -> void:

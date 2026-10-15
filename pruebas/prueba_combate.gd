@@ -191,6 +191,29 @@ func _ready() -> void:
 	Impacto.poner_lenta(0.35)
 	Impacto.restablecer_velocidad()
 	_comprobar(is_equal_approx(Engine.time_scale, normal), "al cambiar de escena, todo a velocidad normal")
+	Impacto.poner_lenta(0.35)                # una cámara lenta que nadie quita...
+	await get_tree().create_timer(8.6, true, false, true).timeout
+	_comprobar(is_equal_approx(Engine.time_scale, normal), "...se quita sola a los 8 s (%.2f)" % Engine.time_scale)
+
+	print("Nada deja a Maisha lenta para siempre (el fallo de K + L):")
+	maisha.set("_invulnerable", 0.0)
+	for i in 4:
+		Input.action_press("explosivo")
+		Input.action_press("latido")
+		await get_tree().physics_frame
+		Input.action_release("explosivo")
+		Input.action_release("latido")
+		await _esperar(0.2)
+	await _esperar(4.0)
+	_comprobar(not maisha.agotada and is_equal_approx(maisha.lentitud, 1.0) and is_equal_approx(Engine.time_scale, normal), "tras pulsar K y L a la vez, vuelve a su velocidad")
+	maisha.lentitud = 0.4
+	maisha.recuperar_lentitud(1.0)
+	await _esperar(1.3)
+	_comprobar(is_equal_approx(maisha.lentitud, 1.0), "entumecida, se recupera sola (%.2f)" % maisha.lentitud)
+	maisha.lentitud = 0.5
+	maisha.pegajoso = 9.0
+	maisha.revivir(maisha.global_position)
+	_comprobar(is_equal_approx(maisha.lentitud, 1.0) and maisha.pegajoso == 0.0 and not maisha.agotada, "al revivir, nada la frena")
 
 	print("RESULTADO: ", "todo correcto" if _fallos == 0 else "%d fallos" % _fallos)
 	await Sonido.callar()

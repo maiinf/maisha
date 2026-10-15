@@ -24,6 +24,7 @@ var _temblor_dura := 0.0
 var _temblor_tiempo := 0.0
 var _capa: CanvasLayer
 var _velo: ColorRect
+var _lenta_desde := 0.0            # segundos reales en cámara lenta (si se olvida quitarla, se quita sola)
 
 
 const AJUSTES := "user://ajustes.cfg"
@@ -138,6 +139,15 @@ func _al_mundo(nodo: Node2D) -> void:
 
 
 func _process(delta: float) -> void:
+	# seguridad: una cámara lenta no dura nunca tanto; si alguien olvidó quitarla, se quita
+	if _lenta < 1.0:
+		_lenta_desde += delta / maxf(Engine.time_scale, 0.001)
+		if _lenta_desde > 8.0:
+			push_warning("Impacto: la cámara lenta llevaba demasiado tiempo puesta; se quita")
+			_lenta = 1.0
+			_aplicar_velocidad()
+	else:
+		_lenta_desde = 0.0
 	var camara := get_viewport().get_camera_2d()
 	if _temblor <= 0.0:
 		return

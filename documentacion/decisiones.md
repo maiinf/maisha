@@ -177,3 +177,9 @@ se pasan.
 | Los Quietos (hecho) | Se tapan los ojos con las manos cuando Maisha los mira; de espaldas, se acercan muy deprisa. Encaja con la escarcha: vigilarlos parada congela |
 | Las Ruinas (hecho) | Se gana recordando: nueve piedras que se despiertan manteniendo Acción (eso es estar quieta, y hiela); el miedo ataca con raíces, anillos de escarcha y Quietos; al final, el corazón de Giza. El final de verdad pasa a las Ruinas; la Cosechadora enseña un final a medias («algo sigue enfermo en el norte») |
 
+### El fallo de K + L (15-10)
+| Qué | Decisión |
+| --- | --- |
+| El fallo | Iam: «cuando presionabas K y L, el personaje se quedaba bugueado, no podía correr, iba muy despacio y hasta que no morías no volvía a su velocidad» |
+| Qué se hizo | No se pudo reproducir con certeza, así que se blindaron las dos causas posibles que encajan: (1) el entumecimiento del despertar (andar al 40 % y sin correr) lo recupera ahora Maisha sola, no una animación de la escena que podía cortarse, y a los 20 s sin recuperación se recupera igual; (2) la cámara lenta de la lección «¡Sal de la cruz!» se quita si la lección desaparece y, como seguridad, sola a los 8 s. Además, al revivir se quita todo lo que frena |
+

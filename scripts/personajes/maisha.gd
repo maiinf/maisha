@@ -28,6 +28,8 @@ var esta_caida := false
 var puede_actuar := true
 var combate_activo := true     # en la aldea y en las casas no se lucha
 var lentitud := 1.0            # menos de 1: anda más despacio (al despertar, entumecida)
+var _lentitud_vuelve := 0.0    # cuánto se recupera por segundo (recuperar_lentitud); nunca se queda lenta para siempre
+var _lenta_sin_motivo := 0.0
 var corriendo := false
 var pegajoso := 0.0            # segundos que le queda pisando óxido de babosa (anda más despacio)
 
@@ -71,6 +73,7 @@ func _physics_process(delta: float) -> void:
 	pegajoso = maxf(0.0, pegajoso - delta)
 	mareo = maxf(0.0, mareo - delta)
 	_desde_ultima_semilla += delta
+	_recuperar_entumecimiento(delta)
 	if _emocion > 0.0:
 		_emocion -= delta
 		if _emocion <= 0.0:
@@ -295,6 +298,32 @@ func revivir(posicion: Vector2) -> void:
 	esta_caida = false
 	_empuje = Vector2.ZERO
 	_invulnerable = 1.0
+	# (y todo lo que frena, por si algo se quedó a medias)
+	lentitud = 1.0
+	pegajoso = 0.0
+	_golpeando = false
+	_poner_escudo(false)
+	Impacto.restablecer_velocidad()
+
+
+## Vuelve poco a poco a andar normal tras estar entumecida (al despertar en el Kitovu): la recuperación la lleva
+## Maisha y no una animación de fuera, que podía cortarse y dejarla lenta para siempre
+func recuperar_lentitud(segundos: float) -> void:
+	_lentitud_vuelve = (1.0 - lentitud) / maxf(segundos, 0.1)
+
+
+func _recuperar_entumecimiento(delta: float) -> void:
+	if lentitud >= 1.0:
+		_lenta_sin_motivo = 0.0
+		return
+	if _lentitud_vuelve <= 0.0:
+		# lenta sin que nadie la esté recuperando: a los 20 s, se recupera sola (seguridad)
+		_lenta_sin_motivo += delta
+		if _lenta_sin_motivo > 20.0:
+			_lentitud_vuelve = 0.1
+	lentitud = minf(1.0, lentitud + _lentitud_vuelve * delta)
+	if lentitud >= 1.0:
+		_lentitud_vuelve = 0.0
 
 
 ## Levanta o baja el escudo de corteza (se dibuja delante de Maisha, hacia donde mira)

@@ -102,7 +102,7 @@ func _despertar() -> void:
 	_maisha.call("expresar", "despertar")            # sentada en el cráter, abre los ojos y se levanta
 	await get_tree().create_timer(2.2).timeout
 	await CHARLA.hablar(self, "maisha_despierta")
-	create_tween().tween_property(_maisha, "lentitud", 1.0, 15.0).set_trans(Tween.TRANS_SINE)
+	_maisha.call("recuperar_lentitud", 15.0)          # (lo lleva Maisha: así no se queda entumecida si algo se corta)
 	await get_tree().create_timer(1.5).timeout
 	_aparecer_chispa(true)
 
