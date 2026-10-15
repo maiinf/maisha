@@ -29,68 +29,87 @@ def _hojas_suelo(lz, n, zona, semilla):
 
 
 def _ciervo(lz):
-    """Pembe libre, de lado, mirando a la izquierda (hacia Maisha), con la cabeza baja: se inclina."""
+    """Pembe libre, de lado, mirando a la izquierda (hacia Maisha): un ciervo esbelto, de patas largas, que baja la
+    cabeza en una reverencia (el hocico a la altura del pecho). Sus astas, de madera viva, suben con hojas cobrizas."""
     G = 214
     pelo = ci.pelo(lz, 31)
+    ilum = dict(recorte=("#ffd98a", 0.7), recorte_dir=(1, -0.7))
     # sombra en el suelo
-    lz.pintar(lz.desenfocar(lz.elipse(400, G + 2, 66, 7), 2.0), "#120a06", 0.55)
-    # patas del otro lado (más oscuras): delantera y trasera (con el corvejón)
-    for pts in ([(372, 176), (370, 196), (368, G - 1)], [(436, 170), (446, 190), (440, 204), (442, G - 1)]):
-        m = lz.trazo(pts, 8, 4)
-        lz.sombrear(m, PELO[:5], 3.0, LUZ, textura=pelo, fuerza_tex=0.25)
-        lz.pintar(lz.elipse(pts[-1][0], G - 1, 3.6, 2.2), "#140c0a")
-    # cuerpo: grupa, tronco y pecho hondo
-    cuerpo = np.maximum(np.maximum(lz.elipse(438, 156, 27, 23), lz.elipse(402, 160, 42, 21)), lz.elipse(364, 162, 26, 25))
-    lz.sombrear(cuerpo, PELO, 20, LUZ, textura=pelo, fuerza_tex=0.35, recorte=("#ffd98a", 0.8), recorte_dir=(1, -0.6),
-                rebote=("#4a2a16", 0.35))
-    vientre = lz.elipse(400, 176, 36, 7) * cuerpo
-    lz.pintar(lz.desenfocar(vientre, 2.0), "#c79a78", 0.3)
-    lz.pintar(lz.desenfocar(lz.elipse(452, 150, 10, 12) * cuerpo, 2.0), "#ecd09a", 0.35)      # la grupa clara
-    # musgo y hojitas donde estaban las placas de hierro
-    for k, x in enumerate((372, 392, 412, 432)):
-        lz.sombrear(lz.elipse(x, 139 + (k % 2) * 2, 7, 3.0), ci.HIERBA[3:8], 2.0, LUZ, textura=lz.ruido(0.6, 2), fuerza_tex=0.5)
-    # patas de este lado
-    for pts in ([(360, 178), (358, 198), (356, G)], [(428, 172), (436, 192), (428, 205), (430, G)]):
-        m = lz.trazo(pts, 9, 4.5)
-        lz.sombrear(m, PELO[1:7], 3.2, LUZ, textura=pelo, fuerza_tex=0.25, recorte=("#ffd98a", 0.5), recorte_dir=(1, 0))
-        lz.pintar(lz.elipse(pts[-1][0], G + 0.5, 4, 2.4), "#140c0a")
-    # rabo
-    lz.sombrear(lz.trazo([(462, 142), (468, 146), (467, 154)], 5, 3), PELO[2:7], 2.0, LUZ)
-    lz.pintar(lz.elipse(467, 153, 2.6, 3), "#ecd09a", 0.8)
-    # cuello grueso que baja hasta la cabeza
-    cuello = lz.poligono([(372, 138), (352, 140), (322, 178), (330, 196), (350, 182), (378, 166)])
-    lz.sombrear(cuello, PELO, 12, LUZ, textura=pelo, fuerza_tex=0.3, recorte=("#ffd98a", 0.6), recorte_dir=(0.6, -1))
-    # melena del cuello (pelo más largo)
-    for k in range(7):
-        y = 160 + k * 4
-        lz.pintar(lz.trazo([(338 + k * 1.5, y), (334 + k * 1.5, y + 7)], 1.4, 0.4), PELO[2], 0.8)
-    # cabeza y hocico (casi rozando el suelo)
-    cabeza = np.maximum(lz.elipse(318, 194, 15, 10, 25), lz.elipse(302, 203, 9, 6.5, 30))
-    lz.sombrear(cabeza, PELO, 8, LUZ, textura=pelo, fuerza_tex=0.25, recorte=("#ffd98a", 0.6), recorte_dir=(1, -1))
-    lz.pintar(lz.elipse(296, 206, 3.4, 2.6), "#1b100b")                         # nariz
-    lz.pintar(lz.trazo([(314, 189), (321, 190)], 1.1), "#140c0a")               # ojo cerrado (en paz)
-    lz.pintar(lz.trazo([(314, 191), (320, 192)], 0.6), "#ecd09a", 0.4)
-    oreja = lz.poligono([(330, 186), (344, 178), (334, 192)])
-    lz.sombrear(oreja, PELO[2:8], 2.5, LUZ)
-    # las astas: grandes, de madera viva, con hojas cobrizas y rojizas y brotes que brillan
-    for k, (dx, sombra) in enumerate(((-8, True), (0, False))):
-        base = (322 + dx, 184)
-        tronco = [base, (332 + dx * 1.4, 160), (340 + dx * 1.8, 134), (338 + dx * 2.2, 108), (328 + dx * 2.6, 84)]
+    lz.pintar(lz.desenfocar(lz.elipse(404, G + 2, 62, 6), 2.0), "#120a06", 0.55)
+
+    def pata(pts, g0, g1, oscura):
+        m = lz.trazo(pts, g0, g1)
+        cols = PELO[:5] if oscura else PELO[1:7]
+        lz.sombrear(m, cols, 2.4, LUZ, textura=pelo, fuerza_tex=0.12, **({} if oscura else ilum))
+        x_, y_ = pts[-1]
+        pezuna = lz.poligono([(x_ - 3.2, G + 0.5), (x_ + 3.2, G + 0.5), (x_ + 2.4, G - 3.5), (x_ - 2.4, G - 3.5)])
+        lz.sombrear(pezuna, ["#0a0606", "#1e1410", "#3a2a22"], 1.2, LUZ)
+        lz.pintar(lz.trazo([(x_ - 2.6, G - 4.2), (x_ + 2.6, G - 4.2)], 0.9), "#e8d0a8", 0.5)
+    # las patas del otro lado (más oscuras): delantera recta, trasera con el corvejón hacia atrás
+    pata([(378, 164), (377, 186), (376, 198), (375, G - 3)], 8.0, 3.0, True)
+    pata([(444, 158), (452, 180), (446, 194), (448, G - 3)], 10.0, 3.0, True)
+    # el cuerpo: tronco esbelto, el pecho hondo delante y el anca redonda detrás
+    tronco = lz.elipse(408, 151, 37, 17, -3)
+    pecho = lz.elipse(372, 152, 18, 18, 10)
+    anca = lz.elipse(442, 148, 18, 17)
+    paleta = lz.elipse(374, 160, 11, 15, 10)
+    muslo = lz.elipse(442, 162, 13, 17, -15)
+    cuerpo = np.clip(tronco + pecho + anca + paleta + muslo, 0, 1)
+    lz.sombrear(cuerpo, PELO, 18, LUZ, textura=pelo, fuerza_tex=0.14, rebote=("#4a2a16", 0.3), **ilum)
+    lz.pintar(lz.desenfocar(lz.elipse(408, 163, 32, 5) * cuerpo, 2.0), "#e8cfa8", 0.35)        # la tripa, clara
+    lz.pintar(lz.desenfocar(lz.elipse(455, 146, 8, 11) * cuerpo, 1.6), "#f2e2c4", 0.55)        # la grupa blanca
+    # musgo y hojitas donde estaban las placas de hierro (manchitas irregulares, no rectángulos)
+    rng = np.random.default_rng(33)
+    for k in range(5):
+        cx_, cy_ = 386 + k * 14 + rng.normal(0, 2), 136 + rng.normal(0, 1)
+        musgo = lz.elipse(cx_, cy_, 5 + rng.random() * 2, 2.2, rng.normal(0, 10)) * (lz.ruido(0.5, 2, semilla=70 + k) > 0.35)
+        lz.sombrear(musgo, ci.HIERBA[3:8], 1.4, LUZ)
+    # las patas de este lado
+    pata([(370, 166), (368, 188), (367, 200), (365, G)], 9.0, 3.2, False)
+    pata([(438, 164), (446, 186), (440, 199), (441, G)], 11.0, 3.2, False)
+    for (x_, y_) in ((368, 188), (446, 186)):
+        lz.sombrear(lz.circulo(x_, y_, 2.6), PELO[1:7], 1.6, LUZ)          # la rodilla y el corvejón
+    # el rabo, corto y claro por debajo
+    lz.sombrear(lz.trazo([(458, 140), (463, 144), (462, 150)], 4.2, 2.6), PELO[2:7], 1.6, LUZ)
+    lz.pintar(lz.elipse(461, 149, 2.4, 2.6), "#f2e2c4", 0.85)
+    # el cuello, largo, que baja en la reverencia
+    cuello = lz.trazo(lz.curva((374, 146), (346, 144), (326, 168), n=30), 20, 10)
+    lz.sombrear(cuello, PELO, 9, LUZ, textura=pelo, fuerza_tex=0.14, **ilum)
+    lz.pintar(lz.desenfocar(lz.elipse(340, 162, 6, 9, 35) * cuello, 2.0), "#f0dcb0", 0.4)      # la garganta clara
+    for k in range(6):
+        y_ = 148 + k * 4
+        lz.pintar(lz.trazo([(352 - k * 3, y_), (349 - k * 3, y_ + 6)], 1.2, 0.3), PELO[2], 0.6)   # la melena
+    # la cabeza: el cráneo y el hocico largo, bajados; la oreja hacia atrás; el ojo cerrado (en paz)
+    craneo = lz.elipse(321, 172, 12.5, 9.5, 35)
+    hocico = lz.elipse(307, 185, 7.5, 5.6, 40)
+    cabeza = np.clip(craneo + hocico + lz.trazo([(318, 176), (309, 184)], 8, 6), 0, 1)
+    lz.sombrear(cabeza, PELO, 6, LUZ, textura=pelo, fuerza_tex=0.12, **ilum)
+    lz.pintar(lz.desenfocar(lz.elipse(310, 185, 5, 3.6, 40) * cabeza, 1.0), "#e8d0a8", 0.45)
+    lz.pintar(lz.elipse(304, 188, 3.0, 2.2, 40), "#1b100b")                                   # la nariz
+    lz.pintar(lz.circulo(303.4, 187.4, 0.6), "#c8b8a8", 0.8)
+    lz.pintar(lz.trazo([(318, 171), (324, 173)], 0.9), "#140c0a")                             # el ojo cerrado
+    lz.pintar(lz.trazo([(318, 172.5), (323, 174.5)], 0.5), "#ecd09a", 0.4)
+    oreja = lz.poligono([(328, 166), (343, 160), (339, 165), (330, 171)])
+    lz.sombrear(oreja, PELO[2:8], 2.0, LUZ, **ilum)
+    lz.pintar(lz.poligono([(331, 167), (340, 162.5), (337, 165.5)]), "#c8987a", 0.6)
+    # las astas: de madera viva, que salen de la cabeza y suben, con hojas cobrizas y rojizas y brotes que brillan
+    for k, (dx, sombra) in enumerate(((-7, True), (0, False))):
+        base = (326 + dx * 0.5, 165)
+        tronco = [base, (330 + dx, 146), (334 + dx * 1.4, 124), (330 + dx * 1.8, 102), (322 + dx * 2.2, 80)]
         cols = ci.MADERA[0:4] if sombra else ["#251812", "#3a2418", "#5a3826", "#7d5034", "#a0704a"]
-        ci.hebra(lz, tronco, 9.0, 4.0, cols, LUZ, semilla=40 + k)
-        for i, largo in enumerate((26, 30, 22)):
+        ci.hebra(lz, tronco, 6.5, 2.8, cols, LUZ, semilla=40 + k)
+        for i, largo in enumerate((22, 26, 18)):
             bx, by = tronco[i + 1]
-            fin = (bx - largo * 0.55, by - largo * 0.8)
-            punta = lz.curva((bx, by), (bx - largo * 0.15, by - largo * 0.5), fin, n=14)
-            ci.hebra(lz, punta, 4.6, 1.8, cols, LUZ, semilla=50 + i + k * 5)
-        # hojas en las puntas (más en las de delante)
+            fin = (bx - largo * 0.55 + (i % 2) * largo * 0.9, by - largo * 0.75)
+            punta = lz.curva((bx, by), (bx - largo * 0.1 + (i % 2) * largo * 0.4, by - largo * 0.45), fin, n=14)
+            ci.hebra(lz, punta, 3.4, 1.4, cols, LUZ, semilla=50 + i + k * 5)
         rng = np.random.default_rng(60 + k * 7)
-        puntas = [tronco[-1]] + [(tronco[i + 1][0] - l * 0.55, tronco[i + 1][1] - l * 0.8) for i, l in enumerate((26, 30, 22))]
+        puntas = [tronco[-1]] + [(tronco[i + 1][0] - l * 0.55 + (i % 2) * l * 0.9, tronco[i + 1][1] - l * 0.75) for i, l in enumerate((22, 26, 18))]
         for (fx, fy) in puntas:
             for h in range(7 if not sombra else 4):
-                hx, hy = fx + (rng.random() - 0.5) * 14, fy + (rng.random() - 0.5) * 9
+                hx, hy = fx + (rng.random() - 0.5) * 13, fy + (rng.random() - 0.5) * 8
                 col = [COBRE[4:8], ROJIZO[3:7], COBRE[3:7]][h % 3]
-                lz.sombrear(lz.elipse(hx, hy, 5.5, 2.6, rng.random() * 180), col, 2.0, LUZ, textura=lz.ruido(0.5, 1), fuerza_tex=0.3)
+                lz.sombrear(lz.elipse(hx, hy, 4.8, 2.3, rng.random() * 180), col, 1.8, LUZ, textura=lz.ruido(0.5, 1), fuerza_tex=0.25)
             if not sombra:
                 lz.sumar_luz(lz.desenfocar(lz.circulo(fx, fy - 3, 3), 4), "#fde27e", 0.6)
                 lz.pintar(lz.circulo(fx, fy - 3, 1.5), "#fff3c4")

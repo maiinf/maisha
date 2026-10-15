@@ -47,7 +47,43 @@ def mascara_bajo(lz, linea):
     return np.clip((lz.y - linea[None, :]) * lz.s * 0.5 + 0.5, 0, 1)
 
 
+def copa_racimos(lz, grupos, rampa_copa, luz=(-0.7, -0.6, 0.5), semilla=0, filo=None):
+    """Una copa hecha de RACIMOS de hojas con volumen: cada grupo (x, y, radio) se pinta por separado, de atrás adelante,
+    con su luz y su sombra, el borde hecho de hojitas y una sombra suave debajo (así se ven los volúmenes y no ruido).
+    filo = (color, fuerza): la luz que roza el borde de cada racimo por el lado de la luz. Devuelve la máscara de la copa."""
+    copa = np.zeros((lz.H, lz.W))
+    for n, (gx, gy, r) in enumerate(sorted(grupos, key=lambda g: g[1])):
+        forma = lz.elipse(gx, gy, r * 1.12, r * 0.84)
+        hojitas = lz.desenfocar((lz.ruido(min(1.4, max(0.6, r * 0.07)), 2, semilla=semilla + n * 7) > 0.42).astype(float), 0.6) > 0.5
+        borde = np.clip(lz.elipse(gx, gy, r * 1.3, r * 1.0) - forma, 0, 1) * hojitas
+        racimo = np.clip(forma + borde, 0, 1)
+        lz.sombrear(racimo, rampa_copa, r * 0.7, luz, textura=lz.ruido(max(1.0, r * 0.1), 2, semilla=semilla + n * 13), fuerza_tex=0.12)
+        if filo:
+            lado = np.clip(racimo - np.roll(np.roll(racimo, int(-luz[1] * 1.5 * lz.s), axis=0), int(-luz[0] * 1.5 * lz.s), axis=1), 0, 1)
+            lz.pintar(lado, filo[0], filo[1])
+        abajo = np.clip(racimo - np.roll(racimo, int(-1.4 * lz.s), axis=0), 0, 1) * (lz.y > gy)
+        lz.pintar(abajo, rampa_copa[0], 0.2)
+        copa = np.maximum(copa, racimo)
+    return copa
+
+
 def arbol(lz, x, y, alto, ancho, luz=(-0.7, -0.6, 0.5), rampa_copa=FOLLAJE, semilla=0, sombra=True, tronco_col=MADERA):
+    """Un árbol de copa redonda hecha de racimos de hojas con volumen, con tronco y sombra en el suelo."""
+    rng = np.random.default_rng(semilla)
+    if sombra:
+        lz.pintar(lz.desenfocar(lz.elipse(x + ancho * 0.25, y + 1, ancho * 0.6, ancho * 0.14), 1.0), "#0c140c", 0.45)
+    tronco = lz.poligono([(x - ancho * 0.07, y), (x - ancho * 0.045, y - alto * 0.55), (x + ancho * 0.045, y - alto * 0.55), (x + ancho * 0.08, y)])
+    lz.sombrear(tronco, tronco_col, ancho * 0.08, luz, textura=lz.ruido(2, 2), fuerza_tex=0.2)
+    cy = y - alto * 0.62
+    grupos = [(x, cy, ancho * 0.3)]
+    for _ in range(9):
+        a_ = rng.random() * 2 * np.pi
+        d_ = np.sqrt(rng.random())
+        grupos.append((x + np.cos(a_) * ancho * 0.32 * d_, cy + np.sin(a_) * alto * 0.2 * d_ - alto * 0.04, ancho * (0.16 + rng.random() * 0.1)))
+    return copa_racimos(lz, grupos, rampa_copa, luz, semilla=semilla, filo=(rampa_copa[-1], 0.22))
+
+
+def arbol_antiguo(lz, x, y, alto, ancho, luz=(-0.7, -0.6, 0.5), rampa_copa=FOLLAJE, semilla=0, sombra=True, tronco_col=MADERA):
     """Un árbol de copa redonda hecha de varios grupos de hojas, con tronco y sombra en el suelo."""
     rng = np.random.default_rng(semilla)
     if sombra:
@@ -844,18 +880,16 @@ def arbol_grande(lz, x, y, alto, ancho, luz=(0.7, -0.6, 0.5), semilla=0, rampa_c
         return tronco
     # la copa: muchos grupos de hojas (los de atrás más oscuros)
     grupos = []
-    for k in range(46):
+    for k in range(84):
         a_ = rng.random() * 2 * np.pi
         d_ = np.sqrt(rng.random())
-        gx = x + np.cos(a_) * ancho * 0.5 * d_
-        gy = y - alto * 0.72 + np.sin(a_) * alto * 0.26 * d_
-        grupos.append((gx, gy, ancho * (0.09 + rng.random() * 0.08)))
+        gx = x + np.cos(a_) * ancho * 0.52 * d_
+        gy = y - alto * 0.72 + np.sin(a_) * alto * 0.27 * d_
+        grupos.append((gx, gy, ancho * (0.06 + rng.random() * 0.055)))
     for (rx_, ry_) in ramas:
-        grupos.append((rx_, ry_, ancho * 0.12))
+        grupos.append((rx_, ry_, ancho * 0.09))
     grupos.sort(key=lambda g: g[1])
-    hojas_tex = lz.ruido(1.3, 2)
-    bolas(lz, grupos, rampa_copa, luz=luz, ruido_borde=0.6, textura=hojas_tex, fuerza_tex=0.45, ambiente=0.15,
-          filo=("#dcd994", 0.28), filo_dir=(luz[0], luz[1]), plano=1.4, suave=0.5)
+    copa_racimos(lz, grupos, rampa_copa, luz, semilla=semilla, filo=(rampa_copa[-1], 0.22))
     return tronco
 
 
@@ -1443,15 +1477,18 @@ def recuerdo_aldea():
         lz.sombrear(lz.trazo([a0, a1], 5), MADERA[:4], 2, (0, -1, 0.5))
     fuego = llamas(lz, fuego_xy[0], 216, 22, 40, semilla=7, n=9)
     lz.sumar_luz(lz.desenfocar(fuego, 30), "#d45a17", 0.6)
-    # los vecinos alrededor, a contraluz del fuego (unos bailan, otros miran sentados)
-    OSC = ["#07060d", "#0d0a0a", "#160f0d", "#21150f", "#2e1d14"]
-    crema_o = ["#0d0a0a", "#160f0d", "#2e1d14", "#4a3322", "#5e4430", "#6d5038"]
+    # el charco de luz de la hoguera en el suelo de la plaza
+    charco = np.clip(1 - np.hypot((lz.x - fuego_xy[0]) / 170, (lz.y - 228) / 34), 0, 1) * (lz.y > 198)
+    lz.sumar_luz(charco ** 1.3, "#d4782a", 0.55)
+    # los vecinos alrededor del fuego (unos bailan, otros miran): la hoguera les ilumina la cara y el pecho
+    FUEGO_PELO = ["#140a06", "#2e170c", "#5a2e16", "#8a4a22", "#c0703a", "#e8a058", "#ffd08a"]
+    FUEGO_CREMA = ["#3a2014", "#7a4a2a", "#b87a48", "#e0a868", "#f4c88a", "#ffe4b0"]
     for (vx, vy, e, m_, kw_) in [(232, 228, 1.4, 1, dict(brazo_alto=True)), (262, 236, 1.0, 1, dict(cria=True)),
                                  (372, 230, 1.5, -1, dict(sombrero=True, brazo_alto=True)), (338, 240, 1.1, -1, dict(cria=True, brazo_alto=True)),
                                  (186, 238, 1.6, 1, dict(chal=True)), (420, 242, 1.7, -1, dict(delantal=True))]:
-        dir_r = (1, -0.3) if vx < fuego_xy[0] else (-1, -0.3)
-        castor(lz, vx, vy, e, m_, luz=(-dir_r[0] * 0.8, -0.3, 0.4), recorte=("#f9b947", 0.95), recorte_dir=dir_r,
-               rampa_pelo=OSC, crema=crema_o, sem=int(vx), mirada=(1, -1), **kw_)
+        hacia_fuego = 1 if vx < fuego_xy[0] else -1
+        castor(lz, vx, vy, e, m_, luz=(hacia_fuego * 0.85, -0.25, 0.45), recorte=("#ffd890", 0.7), recorte_dir=(hacia_fuego, -0.2),
+               rampa_pelo=FUEGO_PELO, crema=FUEGO_CREMA, sem=int(vx), mirada=(1, -1), **kw_)
     # chispas que suben al cielo
     ch = np.zeros((lz.H, lz.W))
     for i in range(40):

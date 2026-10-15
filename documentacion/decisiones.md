@@ -183,3 +183,10 @@ se pasan.
 | El fallo | Iam: «cuando presionabas K y L, el personaje se quedaba bugueado, no podía correr, iba muy despacio y hasta que no morías no volvía a su velocidad» |
 | Qué se hizo | No se pudo reproducir con certeza, así que se blindaron las dos causas posibles que encajan: (1) el entumecimiento del despertar (andar al 40 % y sin correr) lo recupera ahora Maisha sola, no una animación de la escena que podía cortarse, y a los 20 s sin recuperación se recupera igual; (2) la cámara lenta de la lección «¡Sal de la cruz!» se quita si la lección desaparece y, como seguridad, sola a los 8 s. Además, al revivir se quita todo lo que frena |
 
+
+### Ilustraciones más realistas (2.ª tanda)
+| Qué | Decisión |
+| --- | --- |
+| Árboles | Las copas eran ruido de puntitos. Ahora `copa_racimos` (en `cinematicas.py`) pinta racimos de hojas con luz, sombra y borde de hojitas; lo usan `arbol` y `arbol_grande`, así que mejoran todas las ilustraciones con árboles (Kitovu de antes, Pembe, la fiesta…) |
+| La fiesta (recuerdo 1) | Los castores eran siluetas negras: ahora la hoguera les ilumina la cara y el pecho, y hay un charco de luz en el suelo |
+| Pembe (9) | Rehecho con anatomía de ciervo: pecho hondo, anca, patas con rodilla, corvejón y pezuña, cuello largo que baja en reverencia, cabeza con hocico y oreja; musgo en manchitas en vez de rectángulos |
