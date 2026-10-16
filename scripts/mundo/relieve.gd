@@ -57,7 +57,7 @@ var _de_noche: Array[Dictionary] = []   # {"luz": PointLight2D, "fuerza": float,
 var _ajenas := 0                        # penumbras propias de la escena (mientras haya, el ciclo se aparta)
 var _tiempo := 0.0
 var _cache := {}                        # ruta del dibujo -> CanvasTexture con relieve (o null)
-var _textura_luz_cache: GradientTexture2D
+static var _cache_luz := {}             # tam -> GradientTexture2D radial compartida
 
 
 ## Para comparar (capturas): con esto a true, las escenas nuevas salen sin relieve ni luz
@@ -175,16 +175,16 @@ func _poner_luz(padre: Node, pos: Vector2, tipo: String) -> PointLight2D:
 func _nueva_luz(color: Color, escala: float) -> PointLight2D:
 	var luz := PointLight2D.new()
 	luz.color = color
-	luz.texture = _textura_luz()
+	luz.texture = textura_luz()
 	luz.texture_scale = escala
 	luz.height = 16.0
 	return luz
 
 
-## Un círculo de luz que se apaga hacia el borde por escalones suaves
-func _textura_luz() -> GradientTexture2D:
-	if _textura_luz_cache:
-		return _textura_luz_cache
+## Un círculo de luz que se apaga hacia el borde por escalones suaves (compartido en caché por tamaño)
+static func textura_luz(tam := 112) -> GradientTexture2D:
+	if _cache_luz.has(tam):
+		return _cache_luz[tam]
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.3, 0.62, 1.0])
 	g.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.6), Color(1, 1, 1, 0.2), Color(1, 1, 1, 0)])
@@ -193,9 +193,9 @@ func _textura_luz() -> GradientTexture2D:
 	t.fill = GradientTexture2D.FILL_RADIAL
 	t.fill_from = Vector2(0.5, 0.5)
 	t.fill_to = Vector2(1.0, 0.5)
-	t.width = 112
-	t.height = 112
-	_textura_luz_cache = t
+	t.width = tam
+	t.height = tam
+	_cache_luz[tam] = t
 	return t
 
 
@@ -256,17 +256,7 @@ static func destello(padre: Node, pos: Vector2, color: Color, escala: float, fue
 	luz.color = color
 	luz.texture_scale = escala
 	luz.height = 20.0
-	var g := Gradient.new()
-	g.offsets = PackedFloat32Array([0.0, 0.45, 1.0])
-	g.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.35), Color(1, 1, 1, 0)])
-	var t := GradientTexture2D.new()
-	t.gradient = g
-	t.fill = GradientTexture2D.FILL_RADIAL
-	t.fill_from = Vector2(0.5, 0.5)
-	t.fill_to = Vector2(1.0, 0.5)
-	t.width = 96
-	t.height = 96
-	luz.texture = t
+	luz.texture = textura_luz(96)
 	luz.position = pos
 	luz.energy = energia
 	padre.add_child(luz)

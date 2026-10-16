@@ -385,19 +385,12 @@ func _brotar_flores() -> void:
 func _al_caer_maisha() -> void:
 	if estado != Estado.CERRADA:
 		return
-	if modo_eco:
-		# en el eco no pasa nada: el eco se deshace y el rescoldo vuelve
-		var hud_eco := get_tree().get_first_node_in_group("hud")
-		if hud_eco:
-			hud_eco.call("fundido", _deshacer_eco)
-		else:
-			_deshacer_eco()
-		return
+	var accion: Callable = _deshacer_eco if modo_eco else _reiniciar_tras_caida
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud:
-		hud.call("fundido", _reiniciar_tras_caida)
+		hud.call("fundido", accion)
 	else:
-		_reiniciar_tras_caida()
+		accion.call()
 
 
 # --- El eco de un jefe ya vencido (para mejorar su rango en el Bestiario) ---------------------------

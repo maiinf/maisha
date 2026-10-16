@@ -27,7 +27,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sintetizador import (SR, Pista, bajo, balafon, barrido_bajo, campanita, colchon, coro, estereo, flauta, guardar,
-                          piano, acorde_piano, paso_bajo,
+                          piano, acorde_piano,
                           kalimba, maraca, paso_bajo, paso_banda, reverb, semilla, suavizar_bordes, tambor, taiko, ruido_rosa)
 import crear_sonidos
 

@@ -905,3 +905,7 @@ Cada uno tiene ahora **4 fotogramas** (`<id>_anim.png`): quieto, respira (todo b
 - **Desactivación de proceso en nodos eliminados en `_ready()`**: Cuando un nodo condicional (`aldeano.gd`, `recogible.gd`) evalúa que no debe existir según el `Estado` y ejecuta `queue_free()`, se desactiva explícitamente el procesamiento con `set_process(false)`. Esto previene que `_process()` se ejecute en el fotograma inicial accediendo a propiedades de nodos hijos no instanciados.
 - **Captura segura en lambdas de cierre**: En lecciones y corrutinas temporales (`kitovu.gd`), las lambdas no retienen referencias a nodos de escena susceptibles de ser liberados durante la animación (`semilla`), sino identificadores numéricos primitivos (`instance_id`) validados dinámicamente con `is_instance_id_valid()`.
 
+## Limpieza de código (`revision/codigo`)
+
+- `Relieve.textura_luz(tam)` (`scripts/mundo/relieve.gd`) centraliza y guarda en caché por tamaño la textura radial `GradientTexture2D` usada por las luces nocturnas, `Relieve.destello()`, `scripts/mundo/olvidado/brasero.gd` y `scripts/mundo/gruta/oscuridad.gd`.
+- En `scripts/interfaz/objetivo.gd` se unifica la comprobación de menús en `oculto_por_menu()`, y en `scripts/combate/zona_corrupta.gd` se simplifica `_al_caer_maisha()`.

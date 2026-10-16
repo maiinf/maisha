@@ -221,3 +221,8 @@ se pasan.
 | Acceso nulo en `aldeano.gd` | Al activarse `requiere` o `esconder_si`, `queue_free()` en `_ready()` no evita que `_process()` corra en ese fotograma antes de instanciarse el sprite. Se añade `set_process(false)` antes de `queue_free()` y guarda de seguridad en `_process()`. |
 | Captura de lambda liberada en `kitovu.gd` | La lección de la semilla («¡Sal de la cruz!») pasaba una lambda capturando directamente el nodo `semilla`. Al estallar la semilla y liberarse, Godot lanzaba error por captura liberada. Se captura el identificador numérico `id_semilla` (`get_instance_id()`) y se valida con `is_instance_id_valid()`. |
 | Blindaje en objetos recogibles | En `recogible.gd`, se añade `set_process(false)` antes de `queue_free()` y guarda de `_sprite` en `_process()`. |
+### Limpieza y deduplicación de código (`revision/codigo`)
+| Qué | Decisión |
+| --- | --- |
+| Textura radial de luz (`relieve.gd`) | `Relieve.textura_luz(tam)` pasa a ser estática y con caché por tamaño (`_cache_luz`), eliminando la construcción repetida de `GradientTexture2D` en `Relieve.destello()`, `scripts/mundo/olvidado/brasero.gd` y `scripts/mundo/gruta/oscuridad.gd` |
+| Deduplicación en interfaz y combate | En `scripts/interfaz/objetivo.gd`, `_oculto()` reutiliza `oculto_por_menu()`; en `scripts/combate/zona_corrupta.gd`, `_al_caer_maisha()` unifica la llamada a `hud.fundido()`; en `herramientas/componer_musica.py` se elimina la importación duplicada de `paso_bajo` |
