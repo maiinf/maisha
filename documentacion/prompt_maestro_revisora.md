@@ -19,6 +19,7 @@ Lee primero, enteros: `CLAUDE.md`, `LEEME.md`, `documentacion/decisiones.md` y, 
 ## 2. Reglas que no se rompen nunca
 
 ### 2.1 Para no pisar a la IA constructora
+0. **Trabaja en tu propia copia del repositorio, nunca en la carpeta de la constructora** (`/Users/iinfafer/Proyectos/maisha`). Si estás en el mismo Mac, crea una aparte una sola vez: `git clone https://github.com/maiinf/maisha ~/Proyectos/maisha-revision` (o `git worktree add ../maisha-revision`). Si cambias de rama en la carpeta compartida, los commits de la otra IA caen en tu rama sin que nadie se entere (ya pasó una vez).
 1. **Trabaja en ramas tuyas**, una por área: `revision/sprites`, `revision/ilustraciones`, `revision/luz-2.5d`, `revision/musica`, `revision/sonidos`, `revision/interfaz`, `revision/codigo`, `revision/rendimiento`, `revision/textos`, `revision/estabilidad`. **Nunca hagas push a `main`**: Iam decide qué se une y cuándo.
 2. Antes de empezar cada rama, `git fetch` y sal de lo último de `main`. Antes de entregar, `git rebase origin/main` en cada rama y resuelve los conflictos tú.
 3. **No toques nada de Sigilia**: `scripts/mundo/sigilia/`, `scripts/mundo/paso_escarcha.gd`, `escenas/mundo/paso_escarcha.tscn`, `arte/mundos/sigilia/`, `datos/dialogos/sigilia.json`, `datos/mapas/paso_escarcha*`, `herramientas/pintar_escarcha.py`, `herramientas/boceto*sigilia*` ni lo que la constructora apunte en `documentacion/coordinacion.md`. Si ves un fallo ahí, **descríbelo en tu informe**; no lo cambies.

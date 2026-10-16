@@ -281,3 +281,17 @@ se pasan.
 | El Primer Árbol en las Ruinas (`22_ruinas_mauti`) | `_arbol_gris()` tenía un tronco trapezoidal recto sin raíces ni corteza, en contraste con `_arbol_dorado()` en `23_arbol_libre`. Se igualó su anatomía con raíces extendidas en la nieve, corteza estriada con relieve, ramas nudosas y tres grandes vetas violetas de Giza. |
 | La granja y la leyenda (`2_familia_shamba`, `3_leyenda`) | En `casa_troncos()` se pintó la acequia de piedra con agua y espuma al pie de la rueda del molino; en `leyenda()` se sombreó el brazo de la mecedora (`brazo_m`, que se calculaba pero no se pintaba) y se reemplazó el árbol de 3 trazos rectos dentro de la visión del cetro por un árbol viejo con raíces y primeros brotes verdes. |
 
+
+### Revisión de la IA revisora (unida el 2026-10-16 por la constructora)
+| Rama | Qué aporta | Valoración |
+| --- | --- | --- |
+| textos | Corrige tres frases con género para Maisha («Sola no», «cansada pero entera», «pequeño brote») | Buena y necesaria |
+| estabilidad | Aldeanos y recogibles que se borran al nacer ya no siguen procesando; la lección de la semilla del Kitovu no guarda un nodo ya borrado | Buena |
+| codigo | Una sola textura de luz compartida (`Relieve.textura_luz`), menos código repetido | Buena (las luces cambian muy poco de forma) |
+| rendimiento | Aldeanos, ambiente y rayos de sol hacen menos trabajo por fotograma (+9-10 % medido en Cuna de Musgo y Prados) | Buena |
+| interfaz | Pausa con iconos y dos columnas; letras más nítidas; atajos con teclados no españoles | Buena |
+| sonidos | Nuevos `cetro_golpe`, `golpe_acierto` y `semilla_plantar`; volúmenes de jefes | Correcta, pendiente de oír |
+| musica | Instrumentos del sintetizador más ricos, costuras de bucle sin clic, `VOLUMEN_MUSICA` para igualar pistas | A medias: solo se regeneraron 4 pistas; no hay música nueva |
+| luz-2.5d | Mapas de normales para aldeanos y enemigos, sombras que se estiran con el sol, motas de polvo en los rayos, luces en casa de Shamba, tinte por bioma | Buena; se quitó un nombre de escena equivocado (de Sigilia) |
+| sprites / bastones | Bastones que no se cortan, Pino con bufanda y correa, corazón de Petrino más visible, retoques de 1-2 px en Pembe, Konokono, Jabalí y Maisha de perfil | Pequeña |
+| ilustraciones | Tronco de la 22 con corteza y raíces; charco junto al molino en la 2 | Pequeña; en la 3 y la 17 apenas cambia nada |
