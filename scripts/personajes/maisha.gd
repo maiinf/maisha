@@ -71,6 +71,7 @@ func _ready() -> void:
 	add_child(rasgos)
 	_sprite.play("reposo_abajo")
 	_sprite.animation_finished.connect(_al_terminar_animacion)
+	_sprite.frame_changed.connect(_al_cambiar_fotograma)
 
 
 func _physics_process(delta: float) -> void:
@@ -546,3 +547,49 @@ func _actualizar_animacion(direccion: Vector2) -> void:
 func _reproducir(animacion: String) -> void:
 	if _sprite.animation != animacion:
 		_sprite.play(animacion)
+
+
+# --- Pasos y pisadas según el terreno ----------------------------------------
+
+func _al_cambiar_fotograma() -> void:
+	if not is_instance_valid(_sprite):
+		return
+	var anim: String = _sprite.animation
+	if (anim.begins_with("andar_") or anim.begins_with("correr_")) and velocity.length_squared() > 1.0:
+		if _sprite.frame == 0 or _sprite.frame == 2:
+			_emitir_paso()
+
+
+func _emitir_paso() -> void:
+	var efecto_paso := _determinar_sonido_paso()
+	var vol_extra: float = 1.5 if corriendo else 0.0
+	Sonido.efecto(efecto_paso, vol_extra, global_position, 0.08)
+
+
+func _determinar_sonido_paso() -> String:
+	if hundida > 0.0:
+		return "paso_nieve"
+	var escena_act := get_tree().current_scene
+	if escena_act:
+		if escena_act.is_in_group("interior"):
+			return "paso_madera"
+		var n_esc: String = escena_act.name.to_lower()
+		if n_esc.contains("casa") or n_esc.contains("taller") or n_esc.contains("tienda"):
+			return "paso_madera"
+	var reg: Node = get_tree().get_first_node_in_group("region")
+	if reg and reg.has_method("tipo_suelo"):
+		var t: String = reg.tipo_suelo(global_position)
+		match t:
+			"madera":
+				return "paso_madera"
+			"tierra":
+				return "paso_tierra"
+			"piedra":
+				return "paso_piedra"
+			"nieve":
+				return "paso_nieve"
+			"agua":
+				return "paso_agua"
+			_:
+				return "paso_hierba"
+	return "paso_hierba"

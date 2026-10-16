@@ -35,6 +35,7 @@ const SILENCIO := -60.0
 const VOLUMEN := {
 	"dialogo_pasar": -6.0, "dialogo_cerrar": -8.0, "menu_mover": -10.0, "menu_aceptar": -6.0, "menu_atras": -7.0,
 	"mochila_abrir": -5.0, "mochila_cerrar": -6.0, "pausa": -6.0,
+	"paso_hierba": -17.0, "paso_tierra": -16.0, "paso_piedra": -15.5, "paso_madera": -15.0, "paso_nieve": -15.5, "paso_agua": -16.0,
 	"cetro_golpe": -6.5, "golpe_acierto": -4.0, "clinc": -6.0, "semilla_plantar": -5.0, "semilla_mecha": -9.5,
 	"explosion": -2.5, "brotes": -9.0, "latido": -3.0, "maisha_herida": -3.0, "maisha_cae": -3.0,
 	"recoger": -5.0, "esencia": -4.0, "puerta": -6.0,

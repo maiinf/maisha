@@ -303,3 +303,12 @@ se pasan.
 | Sigilia | Se sigue construyendo en 2D; se pasará a HD-2D con el mismo conversor que el resto |
 | Quién | La constructora hace el conversor de mapas (`Region3D`) y la parte visual; la revisora vuelve a revisar y pulir lo hecho |
 | Modelos 3D de la rama experimental | Se quedan en esa rama como referencia; no se usan |
+
+### Pasos de Maisha adaptados al terreno (16-10)
+| Qué | Decisión |
+| --- | --- |
+| Sonidos generados | 6 tipos de pisada sintetizados proceduralmente en `herramientas/crear_sonidos.py`: `paso_hierba`, `paso_tierra`, `paso_piedra`, `paso_madera`, `paso_nieve`, `paso_agua`. |
+| Sincronización | En `scripts/personajes/maisha.gd`, se conecta a `frame_changed` del sprite y se emite paso en los fotogramas 0 y 2 del ciclo de 4 frames al andar (8 fps) y correr (12 fps), siempre que haya velocidad real. |
+| Detección de suelo | `Region.tipo_suelo(pos_global)` mapea la casilla del mapa (`=`, `[`, `]` madera; `#`, `/`, `b` tierra; `%`, `-`, `r`, `0`, `N` piedra; `~`, `\`, `'` agua; nieve en biomas fríos o con `hundida > 0.0`; hierba por defecto). En interiores se usa madera. |
+| Calibración | Volumen sutil y discreto (-15 a -17 dBFS en `Sonido.VOLUMEN`), +1.5 dB al correr, y variación aleatoria de tono de ±8 % para evitar cualquier repetición mecánica. |
+

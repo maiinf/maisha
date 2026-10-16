@@ -50,6 +50,7 @@ func _pulsar(accion: String) -> void:
 func _ready() -> void:
 	Engine.time_scale = 2.0
 	Estado.olvidar_todo()
+	Estado.borrar_partida()
 
 	print("Los archivos:")
 	var faltan: Array[String] = []
@@ -219,6 +220,17 @@ func _ready() -> void:
 	await _esperar_cambio("PradosDelEco")
 	await _esperar(0.5)
 	_comprobar(Sonido.musica_actual == "prados" and Sonido._objetivo_ambiente.has("brisa") and Sonido._objetivo_ambiente.has("agua"), "música de los prados, brisa y el río")
+
+	print("Pasos según el terreno:")
+	var maisha_prados: CharacterBody2D = get_tree().get_first_node_in_group("maisha")
+	if maisha_prados:
+		var pasos_antes := _veces("paso_hierba") + _veces("paso_piedra") + _veces("paso_tierra")
+		maisha_prados.velocity = Vector2.RIGHT * 70.0
+		maisha_prados._actualizar_animacion(Vector2.RIGHT)
+		maisha_prados._sprite.frame = 0
+		maisha_prados._al_cambiar_fotograma()
+		var pasos_despues := _veces("paso_hierba") + _veces("paso_piedra") + _veces("paso_tierra")
+		_comprobar(pasos_despues > pasos_antes, "al andar suena el paso correspondiente al terreno")
 
 	print("RESULTADO: ", "todo correcto" if _fallos == 0 else "%d fallos" % _fallos)
 	await Sonido.callar()

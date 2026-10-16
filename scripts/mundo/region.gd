@@ -736,3 +736,29 @@ func _al_recoger_secreto() -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud:
 		hud.mostrar_mensaje("¡Secreto encontrado! (%d/%d)" % [secretos_encontrados, secretos_total])
+
+
+## Devuelve el tipo de suelo ("hierba", "tierra", "piedra", "madera", "nieve", "agua") según la casilla del mapa
+func tipo_suelo(pos_global: Vector2) -> String:
+	var x := int(pos_global.x / R.CASILLA)
+	var y := int(pos_global.y / R.CASILLA)
+	if y < 0 or y >= _filas.size():
+		return "hierba"
+	var fila: String = _filas[y]
+	if x < 0 or x >= fila.length():
+		return "hierba"
+	var c := fila[x]
+	var es_mundo_nieve: bool = mundo == "sigilia" or mapa.begins_with("ruinas") or mapa.begins_with("paso_escarcha")
+	match c:
+		"=", "[", "]":
+			return "madera"
+		"#", "/", "b":
+			return "tierra"
+		"%", "-", "r", "0", "N":
+			return "piedra"
+		"~", "\\", "'":
+			return "agua"
+		".", ",", "*":
+			return "nieve" if es_mundo_nieve else "hierba"
+		_:
+			return "nieve" if es_mundo_nieve else "hierba"

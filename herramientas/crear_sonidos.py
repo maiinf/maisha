@@ -198,6 +198,70 @@ def maisha_cae():
     return reverb(p.entera(), 1.8, 0.3)
 
 
+# --- Pasos de Maisha según el terreno ---------------------------------------
+
+def paso_hierba():
+    """Pisada suave sobre hierba fresca: roce de briznas y leve impacto elástico."""
+    d = 0.085
+    n = _n(d)
+    briznas = paso_banda(ruido(d), 1600, 5200) * caida(n, 0.028) * 0.65
+    tierra = paso_bajo(ruido_rosa(d), 360) * caida(n, 0.022) * 0.7
+    frote = paso_banda(ruido_rosa(d), 650, 2200) * caida(n, 0.035) * 0.55
+    return (briznas + tierra + frote) * adsr(n, 0.003, 0.02, 0.45, 0.03)
+
+
+def paso_tierra():
+    """Pisada sobre camino de tierra apisonada o surco: golpe terroso seco con arenilla."""
+    d = 0.085
+    n = _n(d)
+    golpe = seno(_desliz(170, 75, d), d) * caida(n, 0.022) * 0.35
+    grano = paso_banda(ruido(d), 1100, 3600) * caida(n, 0.025) * 0.5
+    polvo = paso_banda(ruido_rosa(d), 300, 1500) * caida(n, 0.035) * 0.4
+    return (golpe + grano + polvo) * adsr(n, 0.002, 0.02, 0.4, 0.025)
+
+
+def paso_piedra():
+    """Pisada sobre losas o rocas: chasquido mineral nítido y resonancia corta."""
+    d = 0.075
+    n = _n(d)
+    impacto = paso_banda(ruido(d), 2200, 6800) * caida(n, 0.016) * 0.55
+    clic = seno(_desliz(900, 380, d), d) * caida(n, 0.012) * 0.22
+    cuerpo = paso_bajo(ruido_rosa(d), 700) * caida(n, 0.022) * 0.45
+    return (impacto + clic + cuerpo) * adsr(n, 0.001, 0.015, 0.35, 0.025)
+
+
+def paso_madera():
+    """Pisada sobre tablas o puente de madera: golpe hueco cálido con resonancia de caja."""
+    d = 0.09
+    n = _n(d)
+    hueco = triangulo(200, d, 2) * caida(n, 0.032) * 0.45
+    cuerpo = seno(_desliz(150, 85, d), d) * caida(n, 0.035) * 0.4
+    crujido = paso_banda(ruido(d), 550, 2000) * caida(n, 0.02) * 0.35
+    x = (hueco + cuerpo + crujido) * adsr(n, 0.002, 0.025, 0.35, 0.03)
+    return reverb(x, 0.06, 0.08)
+
+
+def paso_nieve():
+    """Pisada sobre nieve: crujido de compresión cristalina y amortiguación sorda."""
+    d = 0.10
+    n = _n(d)
+    cristal = paso_banda(ruido(d), 2400, 7500) * caida(n, 0.038) * 0.6
+    aplastado = paso_banda(ruido_rosa(d), 350, 1800) * caida(n, 0.035) * 0.45
+    grave = paso_bajo(ruido_rosa(d), 260) * caida(n, 0.028) * 0.3
+    return (cristal + aplastado + grave) * adsr(n, 0.004, 0.03, 0.45, 0.035)
+
+
+def paso_agua():
+    """Pisada en agua somera o vado: chapoteo tenue de gotas y burbujeo."""
+    d = 0.11
+    n = _n(d)
+    gota = seno(_desliz(380, 190, d), d) * caida(n, 0.035) * 0.35
+    salpica = paso_banda(ruido(d), 1300, 4800) * caida(n, 0.04) * 0.5
+    burbuja = paso_banda(ruido_rosa(d), 300, 1600) * caida(n, 0.045) * 0.3
+    x = (gota + salpica + burbuja) * adsr(n, 0.003, 0.025, 0.4, 0.04)
+    return reverb(x, 0.08, 0.12)
+
+
 def recoger():
     """Coger algo (setas, mineral, zanahorias...): dos notas que suben."""
     p = Pista(0.6)
@@ -1890,6 +1954,8 @@ EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
     "mochila_abrir": (mochila_abrir, 0.55), "mochila_cerrar": (mochila_cerrar, 0.5), "pausa": (pausa, 0.5),
+    "paso_hierba": (paso_hierba, 0.4), "paso_tierra": (paso_tierra, 0.42), "paso_piedra": (paso_piedra, 0.48),
+    "paso_madera": (paso_madera, 0.5), "paso_nieve": (paso_nieve, 0.42), "paso_agua": (paso_agua, 0.5),
     "cetro_golpe": (cetro_golpe, 0.45), "golpe_acierto": (golpe_acierto, 0.75), "clinc": (clinc, 0.55),
     "semilla_plantar": (semilla_plantar, 0.6), "semilla_mecha": (semilla_mecha, 0.35), "explosion": (explosion, 0.95),
     "brotes": (brotes, 0.4), "latido": (latido, 0.8), "maisha_herida": (maisha_herida, 0.7), "maisha_cae": (maisha_cae, 0.6),
