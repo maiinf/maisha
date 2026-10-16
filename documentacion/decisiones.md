@@ -250,3 +250,10 @@ se pasan.
 | Timbre orgánico | En `herramientas/sintetizador.py`, `kalimba` añade resonancia de caja de madera (`180-900 Hz`) y leve caída inicial de afinación al pulsar la lámina; `balafon` suma el 2.º armónico del resonador de calabaza y el golpe cálido de maza; `flauta` añade soplo de embocadura en los primeros 35 ms |
 | Costura de bucle | `Pista.bucle()` y `final()` en `componer_musica.py` funden los últimos 6-8 ms hacia la primera muestra tras plegar la cola de reverberación, eliminando cualquier chasquido al repetir |
 | Equilibrio de volumen | `normalizar()` aplica saturación suave (`tanh`) cuando picos aislados de percusión superan `4,4 × RMS` (regeneradas `kitovu`, `jefe_pembe`, `jefe_konokono` y `jefe_kambare`, que estaban entre `-18,5` y `-19,8 dBFS`), y `scripts/globales/sonido.gd` incorpora `VOLUMEN_MUSICA` y `_db_musica()` para alinear todas las piezas en torno a `-15,5 dBFS` |
+### Revisión de luz y relieve 2.5D (16-10)
+| Qué | Decisión |
+| --- | --- |
+| Mapas de normales de aldeanos y criaturas (`relieve.py`) | `relieve.py --todo` solo procesaba `arte/mundos`, dejando planos a los aldeanos (`arte/personajes/aldeanos/`) y a las criaturas y jefes de `arte/zonas/raiz/`. Se amplió `relieve.py` y se generaron sus `_n.png` para que la luz del sol, faroles y fogonazos resbale también sobre ellos. |
+| Luces nocturnas del Kitovu y biomas (`relieve.gd`) | Añadidas a `LUCES` las ventanas y faroles de `casa_shamba.png`, `almacen.png` y `cubierta.png`. Añadida tabla `BIOMAS` para modular suavemente el tinte ambiental según la región (otoño cálido en el Bosque Cobrizo, bruma verdosa en la Ciénaga Quieta, aire frío en las cumbres) y giro progresivo del ángulo solar a lo largo del día. Reutilizada `_textura_luz()` en `Relieve.destello()`. |
+| Sombras y rayos de sol (`sombra.gd`, `luz_sol.gd`) | La sombra elíptica bajo los personajes se inclina y estira suavemente al atardecer según `Reloj.calidez()` y `Reloj.luz_dia()`. En `luz_sol.gd` se añadieron motas de polvo luminoso flotando dentro de los haces de sol. |
+

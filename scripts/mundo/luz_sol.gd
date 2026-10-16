@@ -84,3 +84,12 @@ func _dibujar() -> void:
 			PackedColorArray([c0, c1, c1b, c0]))
 		_lienzo.draw_polygon(PackedVector2Array([arriba, arriba + der, abajo + der, abajo]),
 			PackedColorArray([c1, c0, c0, c1b]))
+		# motas de polvo iluminadas dentro del haz
+		if _calidez > 0.25:
+			for m in 3:
+				var semilla := i * 7.3 + m * 2.9
+				var u := fposmod(_tiempo * 0.025 + semilla * 0.19, 1.0)
+				var pos_m := arriba.lerp(abajo, u) + Vector2(sin(_tiempo * 0.6 + semilla) * (ancho * 0.28), 0.0)
+				var brillo_m := a * 2.2 * sin(u * PI) * (0.5 + 0.5 * sin(_tiempo * 1.8 + semilla))
+				_lienzo.draw_rect(Rect2(pos_m.round(), Vector2.ONE), Color(color, clampf(brillo_m, 0.0, 0.32)))
+

@@ -36,7 +36,19 @@ const LUCES := {
 	"casa_barcas.png": [["v", 55, 50], ["f", 113, 48]],
 	"casa_bata.png": [["v", 52, 43], ["f", 10, 51]],
 	"casa_juncos.png": [["v", 55, 43], ["v", 127, 43], ["f", 185, 37]],
+	"casa_shamba.png": [["v", 40, 96], ["v", 124, 96], ["f", 90, 95]],
+	"almacen.png": [["v", 52, 42]],
+	"cubierta.png": [["f", 54, 34]],
 	"farol.png": [["f", 4, 4]],
+}
+## Matiz suave del ambiente según el bioma de la escena exterior
+const BIOMAS := {
+	"bosque_cobrizo": Color(1.04, 0.96, 0.90),
+	"camino_cobrizo": Color(1.03, 0.97, 0.92),
+	"cienaga_quieta": Color(0.92, 1.02, 0.96),
+	"las_pasarelas": Color(0.95, 1.02, 0.98),
+	"sendero_olvidado": Color(0.93, 0.96, 1.04),
+	"ruinas_primer_arbol": Color(0.91, 0.95, 1.05),
 }
 ## Los edificios que cambian de fotograma al reconstruirse (ruina → casa): sus luces se rehacen con el fotograma.
 ## (El farol cambia de fotograma para que la llama tiemble: ahí la luz se queda donde está.)
@@ -50,6 +62,7 @@ const TIPOS := {"v": [0.34, 0.9, CALIDO], "f": [0.62, 1.0, CALIDO], "h": [0.8, 1
 @export var altura_sol := 0.25          # 0 = rasante (mucho relieve), 1 = desde arriba (casi nada)
 
 var exterior := false                   # ¿hay ciclo de día y noche aquí?
+var _tinte_bioma := Color.WHITE
 var _sombra: CanvasModulate
 var _sol: DirectionalLight2D
 var _luz_maisha: PointLight2D
@@ -67,7 +80,10 @@ static var desactivado := false
 func _ready() -> void:
 	if desactivado:
 		return
-	exterior = get_parent().scene_file_path.begins_with("res://escenas/mundo/")
+	var ruta_escena := get_parent().scene_file_path
+	exterior = ruta_escena.begins_with("res://escenas/mundo/")
+	var id_escena := ruta_escena.get_file().get_basename()
+	_tinte_bioma = BIOMAS.get(id_escena, Color.WHITE)
 	_aplicar.call_deferred()
 
 
@@ -217,12 +233,14 @@ func _actualizar_luz() -> void:
 	_sol.visible = ciclo
 	if ciclo:
 		var base := NOCHE.lerp(DIA, dia).lerp(TARDE, calido * 0.6)
+		base = Color(clampf(base.r * _tinte_bioma.r, 0.0, 1.0), clampf(base.g * _tinte_bioma.g, 0.0, 1.0), clampf(base.b * _tinte_bioma.b, 0.0, 1.0))
 		_sombra.color = base
-		# de día y al atardecer, el sol (desde arriba a la izquierda); de noche, la luna (desde arriba a la derecha)
+		# de día y al atardecer, el sol gira suavemente de este a oeste; de noche, la luna
 		if dia > 0.25:
 			_sol.color = SOL_DIA.lerp(SOL_TARDE, calido)
 			_sol.energy = fuerza_sol * clampf((dia - 0.25) / 0.35, 0.0, 1.0)
-			_sol.rotation_degrees = -45.0
+			var progreso_dia := clampf((Reloj.hora() - 0.15) / 0.55, 0.0, 1.0)
+			_sol.rotation_degrees = lerpf(-58.0, -32.0, progreso_dia)
 			_sol.height = altura_sol - calido * 0.1
 		else:
 			_sol.color = LUNA
