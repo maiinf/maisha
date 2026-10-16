@@ -38,6 +38,9 @@ func _ready() -> void:
 	layer = 11
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_fuente = FUENTE
+	_fuente.antialiasing = TextServer.FONT_ANTIALIASING_NONE
+	_fuente.hinting = TextServer.HINTING_NONE
+	_fuente.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
 	_lienzo = Control.new()
 	_lienzo.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_lienzo.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -69,7 +69,7 @@ const PUNTO_RAIZ := {"ruinas_primer_arbol": Vector2(384, 30), "sendero_olvidado"
 	"casa_shamba": Vector2(53, 196), "cienaga_quieta": Vector2(322, 182), "campo_segado": Vector2(208, 44),
 	"sendero_del_puente": Vector2(160, 166), "las_pasarelas": Vector2(268, 166),
 	"camino_cobrizo": Vector2(104, 132), "senda_surcos": Vector2(205, 90),
-	"canada_eco": Vector2(68, 91), "lago_espejo": Vector2(40, 110), "orilla_juncos": Vector2(370, 150), "embarcadero_junco": Vector2(388, 124), "la_travesia": Vector2(356, 90), "gruta_raices": Vector2(318, 64)}
+	"canada_eco": Vector2(68, 91), "cueva_eco": Vector2(68, 91), "lago_espejo": Vector2(40, 110), "orilla_juncos": Vector2(370, 150), "embarcadero_junco": Vector2(388, 124), "la_travesia": Vector2(356, 90), "gruta_raices": Vector2(318, 64)}
 const NIEBLA := Color("e2cea0")
 const NIEBLA_SOMBRA := Color("c9b07e")
 const TINTA := Color("5c3e26")
@@ -209,6 +209,7 @@ func _ready() -> void:
 	_fuente = FUENTE
 	_fuente.antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	_fuente.hinting = TextServer.HINTING_NONE
+	_fuente.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
 	_lienzo = Control.new()
 	_lienzo.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_lienzo.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -218,11 +219,12 @@ func _ready() -> void:
 	visible = false
 
 
-## Atajos: 1-5 (y M) abren la mochila directamente en una pestaña
+## Atajos: 1-6 (y M) abren la mochila directamente en una pestaña
 func _unhandled_input(evento: InputEvent) -> void:
 	if not (evento is InputEventKey) or not evento.pressed or evento.echo:
 		return
-	var tecla: int = (evento as InputEventKey).physical_keycode
+	var ev := evento as InputEventKey
+	var tecla: int = ev.physical_keycode if ev.physical_keycode != 0 else ev.keycode
 	if not ATAJOS.has(tecla):
 		return
 	var cual: int = ATAJOS[tecla]

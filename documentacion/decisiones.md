@@ -234,3 +234,8 @@ se pasan.
 | Luz del sol (`luz_sol.gd`) | Se cachean los nodos de grupo `maisha` y `corrupcion` en lugar de buscarlos en cada fotograma |
 | Medición | `cuna_de_musgo` mejora de 7.81 ms/frame (128 FPS) a 7.08 ms/frame (141 FPS); `prados_del_eco` de 9.20 ms/frame (108 FPS) a 8.49 ms/frame (118 FPS) |
 
+### Revisión de interfaz (`revision/interfaz`)
+| Qué | Decisión |
+| --- | --- |
+| Menú de pausa (`menu_pausa.gd`) | Los objetos que lleva Maisha dibujan todos su icono de `objetos.png` (antes solo `seta_luminosa` y `mineral`) y se disponen en 2 columnas a partir de 4 objetos para que no desborden `CAJA_INFO` |
+| Nitidez de fuente y mapa | Desactivado el posicionamiento subpíxel en `objetivo.gd`, `menu_pausa.gd` y `mochila.gd`; añadido `"cueva_eco"` a `PUNTO_RAIZ` en `mochila.gd` y soporte de `keycode` además de `physical_keycode` en los atajos `1-6` y `M` |

@@ -914,3 +914,7 @@ Cada uno tiene ahora **4 fotogramas** (`<id>_anim.png`): quieto, respira (todo b
 - En `scripts/mundo/aldea/aldeano.gd`: se cachea `_tiene_novedad` (evaluada cada 0.5 s o al actualizar marcas) para no evaluar misiones por cada aldeano 60 veces por segundo, y se evita llamar a `queue_redraw()` innecesariamente.
 - En `scripts/mundo/ambiente.gd`: se eliminan las llamadas a `.filter()` por fotograma usando eliminación in-place inversa para no generar objetos temporales en el GC; se descartan las nubes fuera de la vista y se dibujan con `draw_set_transform()` sin reservar arrays.
 - En `scripts/mundo/luz_sol.gd`: se cachean las referencias a los nodos de grupo `maisha` y `corrupcion`.
+## Pulido de interfaz (`revision/interfaz`)
+
+- En `scripts/interfaz/menu_pausa.gd`, la ficha de objetos llevados muestra el icono de `arte/interfaz/objetos.png` para cualquier objeto y se organiza en dos columnas cuando hay más de tres para no desbordar `CAJA_INFO`.
+- En `scripts/interfaz/objetivo.gd`, `menu_pausa.gd` y `mochila.gd` se desactiva el posicionamiento subpíxel de la fuente; en `mochila.gd` se añade `cueva_eco` a `PUNTO_RAIZ` y se acepta `keycode` además de `physical_keycode` en los atajos `1-6` y `M`.
