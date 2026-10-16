@@ -68,6 +68,16 @@ const VOLUMEN := {
 }
 ## Nivel de cada bus (0 a 10) y su volumen en dB con el nivel al máximo (la música, sutil)
 const BUSES := {"Musica": -9.0, "Ambiente": -10.0, "Efectos": -3.0}
+## Ajuste fino (dB) de las piezas musicales cuyo nivel medio se aparta de la referencia (-15,5 dBFS)
+const VOLUMEN_MUSICA := {
+	"raiz_libre": -3.0, "ruinas": -1.5, "pasarelas_viva": -1.5, "pasarelas": -1.0,
+	"embarcadero_viva": -1.0, "gruta": -1.0, "jefe_pembe": -1.5, "jefe_konokono": -1.0, "jefe_kambare": -1.5,
+	"bosque": 1.5, "bosque_gris": 2.0, "bosque_viva": 2.5,
+	"cueva": 2.0, "surcos_gris": 2.0, "pasarelas_gris": 1.5,
+	"lago": 2.0, "lago_gris": 1.5, "lago_viva": 2.0,
+	"setas": 2.0, "jefe_kuvu": 1.5, "despertar": 1.5, "orilla_gris": 1.5, "orilla": 1.5,
+	"canada": 1.5, "canada_gris": 1.5, "canada_viva": 1.5,
+}
 
 var musica_actual := ""
 var niveles := {"Musica": 7, "Ambiente": 8, "Efectos": 8}
@@ -114,6 +124,10 @@ func _ready() -> void:
 
 # --- Música ---------------------------------------------------------------------
 
+func _db_musica(nombre: String) -> float:
+	return float(VOLUMEN_MUSICA.get(nombre, 0.0))
+
+
 func musica(nombre: String, fundido := 1.5, siguiente := "") -> void:
 	if nombre == musica_actual:
 		if siguiente != "":
@@ -140,7 +154,7 @@ func musica(nombre: String, fundido := 1.5, siguiente := "") -> void:
 	nueva.stream = stream
 	nueva.volume_db = SILENCIO
 	nueva.play()
-	_tween_musica.tween_property(nueva, "volume_db", 0.0, fundido).set_trans(Tween.TRANS_SINE)
+	_tween_musica.tween_property(nueva, "volume_db", _db_musica(nombre), fundido).set_trans(Tween.TRANS_SINE)
 	_tween_musica.tween_property(vieja, "volume_db", SILENCIO, fundido)
 	_tween_musica.chain().tween_callback(vieja.stop)
 
@@ -162,7 +176,7 @@ func _al_acabar_musica(jugador: AudioStreamPlayer) -> void:
 		if musica_actual == cual and not jugador.playing:
 			jugador.volume_db = SILENCIO
 			jugador.play()
-			create_tween().tween_property(jugador, "volume_db", 0.0, 3.0)
+			create_tween().tween_property(jugador, "volume_db", _db_musica(cual), 3.0)
 
 
 ## Una pieza corta por encima de la música (purgar una zona, conseguir algo...): la música baja mientras suena
@@ -181,12 +195,12 @@ func fanfarria(nombre: String) -> void:
 	_fanfarria.stream = stream
 	_fanfarria.play()
 	var t := create_tween()
-	t.tween_property(_musica[_activa], "volume_db", -18.0, 0.3)
+	t.tween_property(_musica[_activa], "volume_db", _db_musica(musica_actual) - 18.0, 0.3)
 
 
 func _al_acabar_fanfarria() -> void:
 	if musica_actual != "":
-		create_tween().tween_property(_musica[_activa], "volume_db", 0.0, 1.5)
+		create_tween().tween_property(_musica[_activa], "volume_db", _db_musica(musica_actual), 1.5)
 
 
 # --- Ambiente -------------------------------------------------------------------

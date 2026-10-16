@@ -922,3 +922,8 @@ Cada uno tiene ahora **4 fotogramas** (`<id>_anim.png`): quieto, respira (todo b
 
 - `cetro_golpe` usa un barrido continuo de aire con cuerpo de madera en lugar de tramos escalonados de ruido; `golpe_acierto` suma chasquido de piedra y corteza; `semilla_plantar` añade roce de hojarasca y reverberación corta (`herramientas/crear_sonidos.py`).
 - En `scripts/globales/sonido.gd` (`VOLUMEN`), los rugidos y victorias de jefes se moderan a `-2,0 dB` para no tapar la música ni las fanfarrias, mientras que `cetro_golpe` (`-6,5 dB`) y `semilla_mecha` (`-9,5 dB`) ganan presencia en combate.
+## Equilibrio musical y sintetizador (`revision/musica`)
+
+- En `herramientas/sintetizador.py`, `kalimba` incorpora resonancia de caja de madera (`180-900 Hz`) y leve caída inicial de afinación; `balafon` añade el 2.º armónico del resonador de calabaza y el golpe cálido de maza; `flauta` añade soplo de embocadura en el ataque.
+- `Pista.bucle()` y `final()` (`herramientas/componer_musica.py`) funden suavemente los últimos 6-8 ms hacia el inicio tras plegar la cola de reverberación para evitar chasquidos al repetir.
+- `normalizar()` aplica saturación suave (`tanh`) ante picos aislados (`> 4,4 × RMS`) —regeneradas `kitovu`, `jefe_pembe`, `jefe_konokono` y `jefe_kambare`— y `scripts/globales/sonido.gd` incorpora `VOLUMEN_MUSICA` (`_db_musica()`) para equilibrar el volumen percibido de las 44 pistas en torno a `-15,5 dBFS`.

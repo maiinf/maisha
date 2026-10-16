@@ -244,3 +244,9 @@ se pasan.
 | --- | --- |
 | Efectos orgánicos | En `herramientas/crear_sonidos.py`, `cetro_golpe` reemplaza los 16 tramos escalonados de ruido blanco por un barrido continuo de ruido rosa con cuerpo grave de madera y reverberación corta; `golpe_acierto` incorpora chasquido de piedra/corteza (`_crujido_piedra`); `semilla_plantar` añade textura de hojarasca y reverberación corta |
 | Equilibrio de `VOLUMEN` | En `scripts/globales/sonido.gd`, se moderan a `-2,0 dB` los rugidos y victorias de jefes que estaban en `0,0` / `-1,0 dB` (para que no tapen la música ni las fanfarrias) y se suben `cetro_golpe` (`-8,0` → `-6,5 dB`), `semilla_mecha` (`-12,0` → `-9,5 dB`) y `mende_corre` (`-12,0` → `-10,0 dB`) |
+### Revisión de música y sintetizador (`revision/musica`)
+| Qué | Decisión |
+| --- | --- |
+| Timbre orgánico | En `herramientas/sintetizador.py`, `kalimba` añade resonancia de caja de madera (`180-900 Hz`) y leve caída inicial de afinación al pulsar la lámina; `balafon` suma el 2.º armónico del resonador de calabaza y el golpe cálido de maza; `flauta` añade soplo de embocadura en los primeros 35 ms |
+| Costura de bucle | `Pista.bucle()` y `final()` en `componer_musica.py` funden los últimos 6-8 ms hacia la primera muestra tras plegar la cola de reverberación, eliminando cualquier chasquido al repetir |
+| Equilibrio de volumen | `normalizar()` aplica saturación suave (`tanh`) cuando picos aislados de percusión superan `4,4 × RMS` (regeneradas `kitovu`, `jefe_pembe`, `jefe_konokono` y `jefe_kambare`, que estaban entre `-18,5` y `-19,8 dBFS`), y `scripts/globales/sonido.gd` incorpora `VOLUMEN_MUSICA` y `_db_musica()` para alinear todas las piezas en torno a `-15,5 dBFS` |

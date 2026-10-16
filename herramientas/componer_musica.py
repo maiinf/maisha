@@ -183,7 +183,12 @@ def final(p, bucle=True, sala=2.6, mezcla=0.3, brillo=6500):
         n = len(x)
         cola = y[n:]
         y = y[:n].copy()
-        y[:len(cola)] += cola[:n]
+        m = min(n, len(cola))
+        y[:m] += cola[:m]
+        costura = min(int(0.006 * SR), n // 8)
+        if costura > 1:
+            t_c = np.linspace(0.0, 1.0, costura)[:, None]
+            y[-costura:] = y[-costura:] * (1.0 - t_c) + y[0:1] * t_c
     return y
 
 
