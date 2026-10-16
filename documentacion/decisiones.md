@@ -208,3 +208,10 @@ se pasan.
 | Mauti en Sigilia | Va con Maisha pero se queda en la ciudad ayudando a los escribas en blanco; aparece en momentos clave (Iam: «vale sigue») |
 | Paso de la Escarcha, parte 2 | Taa (armiño farolero) está en blanco a media subida; su ficha del Índice se la llevó el viento al este. Al devolvérsela recupera el color y enseña el SIGILO DE FUEGO: tecla nueva U (RB en el mando; RB deja de ser «cambiar de semilla», que no se usaba), 20 de Aliento. Los faroles rúnicos solo los enciende el sigilo y, encendidos, abrigan del viento y ablandan la nieve |
 | Paso de la Escarcha, parte 3 | Páginas sueltas (enemigo: 2 golpes, el fuego las quema de un trazo). La Puerta Sellada se derrite con 3 sigilos; arriba la peña se cierra para que no se rodee. Misión «El Paso de la Escarcha». Música «La nieve que escribe» con el tema de Sigilia (vals de caja de música en si menor) |
+
+### Revisión de estabilidad (16-10)
+| Qué | Decisión |
+| --- | --- |
+| Acceso nulo en `aldeano.gd` | Al activarse `requiere` o `esconder_si`, `queue_free()` en `_ready()` no evita que `_process()` corra en ese fotograma antes de instanciarse el sprite. Se añade `set_process(false)` antes de `queue_free()` y guarda de seguridad en `_process()`. |
+| Captura de lambda liberada en `kitovu.gd` | La lección de la semilla («¡Sal de la cruz!») pasaba una lambda capturando directamente el nodo `semilla`. Al estallar la semilla y liberarse, Godot lanzaba error por captura liberada. Se captura el identificador numérico `id_semilla` (`get_instance_id()`) y se valida con `is_instance_id_valid()`. |
+| Blindaje en objetos recogibles | En `recogible.gd`, se añade `set_process(false)` antes de `queue_free()` y guarda de `_sprite` en `_process()`. |

@@ -30,6 +30,7 @@ var _proximo_gesto := 7.0
 
 func _ready() -> void:
 	if (requiere != "" and not Estado.tiene(requiere)) or (esconder_si != "" and Estado.tiene(esconder_si)):
+		set_process(false)
 		queue_free()
 		return
 	Estado.marca_puesta.connect(_al_poner_marca)
@@ -62,6 +63,8 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if _sprite == null or not is_instance_valid(_sprite):
+		return
 	_tiempo += delta
 	if _animado:
 		_animar(delta)

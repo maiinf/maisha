@@ -437,9 +437,10 @@ func _leccion_semilla() -> void:
 	if _maisha.call("lanzar_semilla"):
 		var semilla := get_tree().get_nodes_in_group("semillas").back() as Node2D
 		var casilla := Vector2i((semilla.global_position / 16.0).floor()) if semilla else Vector2i.ZERO
+		var id_semilla := semilla.get_instance_id() if semilla else 0
 		# a cámara lenta hasta que Maisha sale de la cruz (o estalla)
 		await _leccion_lista().camara_lenta("¡Sal de la cruz!", func() -> bool:
-			if not is_instance_valid(semilla) or not semilla.is_inside_tree():
+			if id_semilla == 0 or not is_instance_id_valid(id_semilla):
 				return false
 			var c := Vector2i((_maisha.global_position / 16.0).floor())
 			return (c.x == casilla.x and absi(c.y - casilla.y) <= 2) or (c.y == casilla.y and absi(c.x - casilla.x) <= 2))
