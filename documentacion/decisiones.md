@@ -295,3 +295,11 @@ se pasan.
 | luz-2.5d | Mapas de normales para aldeanos y enemigos, sombras que se estiran con el sol, motas de polvo en los rayos, luces en casa de Shamba, tinte por bioma | Buena; se quitó un nombre de escena equivocado (de Sigilia) |
 | sprites / bastones | Bastones que no se cortan, Pino con bufanda y correa, corazón de Petrino más visible, retoques de 1-2 px en Pembe, Konokono, Jabalí y Maisha de perfil | Pequeña |
 | ilustraciones | Tronco de la 22 con corteza y raíces; charco junto al molino en la 2 | Pequeña; en la 3 y la 17 apenas cambia nada |
+
+### El aspecto del juego: HD-2D (2026-10-16, Iam: «vale sigue»)
+| Qué | Decisión |
+| --- | --- |
+| Camino | **HD-2D**: los sprites de pixel art de siempre en un mundo 3D (sombras reales, desniveles, luces, niebla), como el prototipo de `experimento/prototipo-visual`. No 3D completo con modelos (sería rehacer todo el juego y, generando el arte con código, quedaría peor que el 2D) |
+| Sigilia | Se sigue construyendo en 2D; se pasará a HD-2D con el mismo conversor que el resto |
+| Quién | La constructora hace el conversor de mapas (`Region3D`) y la parte visual; la revisora vuelve a revisar y pulir lo hecho |
+| Modelos 3D de la rama experimental | Se quedan en esa rama como referencia; no se usan |
