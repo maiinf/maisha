@@ -51,7 +51,19 @@ class HojaE(Hoja):
         return super().linea([(x * E, y * E) for (x, y) in puntos], mat, tono, solo_encima)
 
     def grieta(self, puntos, ancha=False, brillo=3):
-        return super().grieta([(x * E, y * E) for (x, y) in puntos], ancha, brillo)
+        pts_e = [(x * E, y * E) for (x, y) in puntos]
+        if ancha:
+            for (x, y) in dc._puntos_de(pts_e):
+                for dx, dy in ((1, 0), (0, 1), (-1, 0), (0, -1)):
+                    if 0 <= x + dx < self.w and 0 <= y + dy < self.h and self.mat[y + dy, x + dx] not in ("", "giza"):
+                        self.mat[y + dy, x + dx] = "giza"
+                        self.tono[y + dy, x + dx] = 0
+            Hoja.linea(self, pts_e, "giza", brillo, solo_encima=True)
+        else:
+            Hoja.linea(self, pts_e, "giza", 1, solo_encima=True)
+            mx, my = int(round(pts_e[len(pts_e) // 2][0])), int(round(pts_e[len(pts_e) // 2][1]))
+            if 0 <= mx < self.w and 0 <= my < self.h and self.mat[my, mx] != "":
+                Hoja.px(self, mx, my, "giza", brillo)
 
 
 def concha(h, cx, cy, r, libre=False, giro=0.0):

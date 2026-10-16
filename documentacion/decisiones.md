@@ -256,4 +256,15 @@ se pasan.
 | Mapas de normales de aldeanos y criaturas (`relieve.py`) | `relieve.py --todo` solo procesaba `arte/mundos`, dejando planos a los aldeanos (`arte/personajes/aldeanos/`) y a las criaturas y jefes de `arte/zonas/raiz/`. Se amplió `relieve.py` y se generaron sus `_n.png` para que la luz del sol, faroles y fogonazos resbale también sobre ellos. |
 | Luces nocturnas del Kitovu y biomas (`relieve.gd`) | Añadidas a `LUCES` las ventanas y faroles de `casa_shamba.png`, `almacen.png` y `cubierta.png`. Añadida tabla `BIOMAS` para modular suavemente el tinte ambiental según la región (otoño cálido en el Bosque Cobrizo, bruma verdosa en la Ciénaga Quieta, aire frío en las cumbres) y giro progresivo del ángulo solar a lo largo del día. Reutilizada `_textura_luz()` en `Relieve.destello()`. |
 | Sombras y rayos de sol (`sombra.gd`, `luz_sol.gd`) | La sombra elíptica bajo los personajes se inclina y estira suavemente al atardecer según `Reloj.calidez()` y `Reloj.luz_dia()`. En `luz_sol.gd` se añadieron motas de polvo luminoso flotando dentro de los haces de sol. |
+### Revisión de sprites · Personajes, aldeanos, enemigos y jefes (16-10)
+| Qué | Decisión |
+| --- | --- |
+| Bastones de aldeanos | En el 4.º fotograma de la animación de Shamba, Bibi, Bata, Mbuzi y Msafiri, el bastón, pértiga o cayado se cortaba con un hueco vacío antes del suelo. Se ampliaron `alza_derecha` (`dibujar_aldeanos.py`) y `shamba_anim` (`dibujar_kitovu.py`) para desplazar todo el tramo vertical hasta el suelo (`ALTO` y `h`). |
+| Konokono (`dibujar_konokono.py`) | `HojaE.grieta()` aplicaba el factor de escala `E` dos veces (`E * E = 1,69x`), desplazando las grietas de Giza fuera del caparazón hacia el cuello y dejando un píxel violeta flotando en el aire en el fotograma 5. Corregido eliminando el escalado duplicado en `HojaE.grieta()`. |
+| Pembe (`dibujar_pembe.py`) | En el galope (fotograma 3) las pezuñas quedaban separadas del resto de la pata por un hueco transparente, y al escarbar (fotograma 2) los granos de polvo eran píxeles aislados con contorno negro. Unido el trazo de la pata hasta la pezuña y agrupado el terrón de tierra. |
+| Petrino (`dibujar_criaturas.py`) | La grieta violeta del corazón colgaba por debajo de la entrepierna al vacío y el cuerpo era un óvalo liso. Subido el corazón a `arriba + 10`, blindado `Hoja.grieta()` para no pintar puntos de luz sobre fondo transparente y añadido relieve de piedra (`corteza()`). |
+| Jabalí de Hierro (`dibujar_jabali.py`) | Añadidos remaches oscuros, brillos y filo de óxido a las placas dorsales, textura de cerdas en el lomo, estela violeta en el ojo al embestir y terrones compactos al escarbar. |
+| Pino (`dibujar_aldeanos.py`) | Añadidas láminas bajo el sombrero de seta, pañuelo verde de explorador al cuello, bandolera cruzada con hebilla de latón, bolsito de semillas y sonrisilla. |
+| Maisha (`dibujar_maisha.py`) | Añadido `CUERPO_PERFIL_LATE` en `reposo_lado` (el corazón brilla en el 3.er fotograma como de frente) y `PIERNAS_PERFIL_AIRE_*` en `correr_lado` para que ambos pies despeguen del suelo en los fotogramas de vuelo (2 y 4), manteniendo intacto el anclaje de la mano. |
+
 
