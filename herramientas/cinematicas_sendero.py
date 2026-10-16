@@ -799,90 +799,237 @@ def eco_canada():
     return lz
 
 
+def _kimya_figura_serena(lz, x, y, e=1.9):
+    """Kimya para el encuentro en el lago: un espíritu de luz plateada y aguamarina, serena,
+    con velos vaporosos, ojos cerrados sonrientes y largas estelas de luz que flotan en el aire."""
+    cuerpo = np.zeros((lz.H, lz.W))
+    for k in range(35):
+        t = k / 34.0
+        ancho = (5.5 - t * 4.2 + np.sin(t * np.pi) * 2.2) * e
+        alto = 3.2 * e
+        curva_cuerpo = np.sin(t * 3.0) * 3.5 * e
+        cuerpo = np.maximum(cuerpo, lz.elipse(x - curva_cuerpo, y - 26 * e + t * 34 * e, ancho, alto))
+
+    cabeza = lz.circulo(x + 1.2 * e, y - 28.5 * e, 6.0 * e)
+    desvanece = np.clip(1.0 - (lz.y - (y - 2 * e)) / (12 * e), 0.0, 1.0)
+    figura = lz.desenfocar(np.maximum(cuerpo * desvanece, cabeza), 1.2)
+
+    lz.sumar_luz(lz.desenfocar(figura, 14 * e), "#569898", 0.5)
+    lz.sumar_luz(lz.desenfocar(figura, 5 * e), "#86cfcb", 0.6)
+    lz.sumar_luz(figura, "#e0f6f2", 0.75)
+    lz.sumar_luz(lz.desenfocar(cabeza, 2.2 * e), "#ffffff", 0.4)
+
+    hilos = np.zeros((lz.H, lz.W))
+    for k, (dy_o, amp, fq) in enumerate([(-2.0, 3.5, 5.0), (0.0, 4.5, 4.2), (2.5, 3.0, 6.0)]):
+        pts = [(x - 4 * e - t * 36 * e,
+                y - 31 * e + dy_o * e + np.sin(t * fq + k * 1.5) * amp * e - t * 8 * e)
+               for t in np.linspace(0, 1, 36)]
+        hilos = np.maximum(hilos, lz.trazo(pts, (0.9 - k * 0.15) * e, 0.2 * e))
+    lz.sumar_luz(lz.desenfocar(hilos, 2.5), "#82d4d0", 0.6)
+    lz.sumar_luz(lz.desenfocar(hilos, 0.8), "#f0fcfa", 0.85)
+
+    for ox in (x - 0.7 * e, x + 3.8 * e):
+        ojo_curva = lz.curva((ox - 1.4 * e, y - 27.6 * e), (ox, y - 26.6 * e), (ox + 1.4 * e, y - 27.6 * e), n=10)
+        lz.pintar(lz.trazo(ojo_curva, 0.55 * e), "#224e4e", 0.85)
+    sonrisa = lz.curva((x + 0.4 * e, y - 24.5 * e), (x + 1.6 * e, y - 23.8 * e), (x + 2.8 * e, y - 24.5 * e), n=8)
+    lz.pintar(lz.trazo(sonrisa, 0.45 * e), "#224e4e", 0.75)
+    return figura
+
+
+def _mauti_reflejo_lago(lz, x, y, e=1.6):
+    """Mauti en el reflejo bajo el agua: hecha de luz plateada y lila, con su hoja de cobre y corazón violeta,
+    extendiendo su mano hacia arriba hacia la superficie del agua buscando a Maisha."""
+    figura = np.maximum.reduce([
+        lz.elipse(x, y - 15 * e, 9 * e, 8.5 * e),
+        lz.elipse(x, y - 4.5 * e, 5 * e, 5 * e),
+        lz.trazo([(x - 2.2 * e, y - 1 * e), (x - 2.4 * e, y + 1 * e)], 2.2 * e),
+        lz.trazo([(x + 2.2 * e, y - 1 * e), (x + 2.4 * e, y + 1 * e)], 2.2 * e),
+        # Brazo extendido hacia la superficie
+        lz.trazo([(x + 4 * e, y - 6 * e), (x + 7.5 * e, y - 3.5 * e), (x + 9 * e, y - 1.2 * e)], 2.0 * e, 1.3 * e)
+    ])
+    mano = lz.elipse(x + 9.5 * e, y - 1.0 * e, 1.8 * e, 1.4 * e)
+    figura = np.maximum(figura, mano)
+
+    lz.sumar_luz(lz.desenfocar(figura, 7 * e), "#9282c4", 0.75)
+    lz.pintar(figura, rampa(["#72689c", "#a8a2d0", "#dcd6f4"], lz.volumen(figura, 6 * e, (-0.5, -0.7, 0.6))[0]))
+
+    rabito = lz.trazo(lz.curva((x, y - 23 * e), (x - 0.5 * e, y - 26 * e), (x - 1 * e, y - 27.5 * e), n=8), 0.9 * e)
+    hoja = lz.elipse(x + 1.5 * e, y - 29 * e, 3.8 * e, 1.8 * e, -35)
+    hoja_t = np.maximum(rabito, hoja)
+    lz.pintar(hoja_t, "#c06a32")
+    lz.pintar(lz.trazo([(x - 1 * e, y - 27.5 * e), (x + 3.5 * e, y - 30.5 * e)], 0.4 * e), "#f4b470", 0.85)
+
+    corazon = lz.circulo(x - 0.5 * e, y - 5 * e, 1.6 * e)
+    lz.sumar_luz(lz.desenfocar(corazon, 3 * e), "#ba92f0", 0.95)
+    lz.pintar(corazon, "#e2caff")
+
+    lz.pintar(lz.elipse(x + 3.5 * e, y - 15 * e, 1.1 * e, 1.7 * e), "#221c34", 0.85)
+    return figura
+
+
 def kimya_lago():
     """«Mira el agua. ¿A quién ves en tu reflejo?» — en el lago quieto, bajo Maisha, está Mauti."""
     lz = Lienzo(W, H, semilla=200)
     rng = np.random.default_rng(201)
-    HZ = 98
-    # el cielo de la hora azul: azul hondo arriba, lila y melocotón pálido en el horizonte, las primeras estrellas
-    cielo_cols = ["#0e1428", "#1c2a4a", "#3a3e6a", "#7a6a90", "#c8a0a8", "#f0c8a8"]
+    HZ = 96
+    # el cielo de la hora azul: azul hondo arriba, lavanda, albaricoque y resplandor suave en el horizonte
+    cielo_cols = ["#080c18", "#121d36", "#263254", "#54466c", "#966882", "#d89684", "#f4c4a0"]
     lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(cielo_cols, desde=0, hasta=HZ))
-    ci.estrellas(lz, 70, HZ - 30, semilla=202, color="#e8f0f4")
-    luna = lz.circulo(120, 30, 8)
-    lz.sumar_luz(lz.desenfocar(luna, 14), "#c8d8e8", 0.4)
-    lz.pintar(luna, "#f0f4ec")
-    # la orilla lejana: sauces y, al este, las paredes de la Cañada, a contraluz
-    arboles = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 8, 7, 34, 203))
-    lz.pintar(arboles * (lz.y < HZ + 1), "#141a28")
-    sauces = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 4, 4, 14, 208))
-    lz.pintar(sauces * (lz.y < HZ + 1), "#10141f")
-    # la pared de la Cañada: roca con escalones y grietas, iluminada de lado por el resplandor del horizonte
-    perfil = [(456, HZ + 2), (468, HZ - 8), (476, HZ - 10), (486, HZ - 24), (500, HZ - 27), (508, HZ - 22), (522, HZ - 31),
-              (540, HZ - 30), (552, HZ - 24), (566, HZ - 26), (578, HZ - 38), (592, HZ - 40), (600, HZ - 37), (600, HZ + 2)]
+    ci.estrellas(lz, 80, HZ - 25, semilla=202, color="#e8f0f4")
+    luna = lz.circulo(120, 28, 8)
+    lz.sumar_luz(lz.desenfocar(luna, 16), "#c8d8e8", 0.45)
+    lz.pintar(luna, "#f4f8f0")
+
+    # capas de profundidad en el horizonte
+    # 1. colinas lejanas en bruma azulada
+    colinas_lejos = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 10, 6, 48, 201))
+    lz.pintar(colinas_lejos * (lz.y < HZ + 1), "#1c2438", 0.65)
+
+    # 2. orilla lejana: sauces y abetos a contraluz
+    arboles = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 6, 7, 32, 203))
+    lz.pintar(arboles * (lz.y < HZ + 1), "#121824")
+    sauces = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 3, 4, 14, 208))
+    lz.pintar(sauces * (lz.y < HZ + 1), "#0e121c")
+
+    # 3. pared de la Cañada al este: roca con estratos y cantos iluminados por el crepúsculo
+    perfil = [(446, HZ + 2), (460, HZ - 8), (472, HZ - 12), (484, HZ - 26), (498, HZ - 29), (508, HZ - 24), (522, HZ - 33),
+              (540, HZ - 32), (552, HZ - 26), (566, HZ - 28), (578, HZ - 40), (592, HZ - 42), (600, HZ - 39), (600, HZ + 2)]
     pena = lz.poligono(perfil)
-    estratos = (np.abs(np.sin((lz.y + lz.ruido(8, 2, semilla=209) * 6) * 0.9)) > 0.9) * 1.0
+    estratos = (np.abs(np.sin((lz.y + lz.ruido(8, 2, semilla=209) * 6) * 0.9)) > 0.88) * 1.0
     grietas = np.zeros((lz.H, lz.W))
-    for gx in (482, 514, 548, 584):
-        grietas = np.maximum(grietas, lz.trazo([(gx, HZ - 20), (gx + 3, HZ - 10), (gx - 1, HZ)], 0.6))
+    for gx in (478, 510, 544, 580):
+        grietas = np.maximum(grietas, lz.trazo([(gx, HZ - 22), (gx + 3, HZ - 11), (gx - 1, HZ)], 0.7))
     lz.sombrear(pena, ["#0a0a14", "#10121f", "#161a2a", "#1e2234", "#2a2c42", "#3a3a52"], 8, (-0.7, -0.5, 0.5),
                 textura=1 - estratos * 0.3 - grietas * 0.8, fuerza_tex=0.3)
     canto = np.clip(pena - np.roll(pena, int(1.5 * lz.s), axis=1), 0, 1) + np.clip(pena - np.roll(pena, int(1.5 * lz.s), axis=0), 0, 1)
-    lz.pintar(np.clip(canto, 0, 1), "#a08aa0", 0.35)
-    # matas oscuras en lo alto de la pared
+    lz.pintar(np.clip(canto, 0, 1), "#b29ab2", 0.4)
     matas = np.zeros((lz.H, lz.W))
     for (mx_, my_) in perfil[1:-1]:
         for k in range(4):
             hx = mx_ + rng.normal(0, 3)
             matas = np.maximum(matas, lz.trazo([(hx, my_ + 1), (hx + rng.normal(0, 1), my_ - 2 - rng.random() * 3)], 0.5))
-    lz.pintar(matas, "#10141f")
-    # el lago: un espejo. Refleja el cielo del revés (más oscuro) y la orilla lejana
+    lz.pintar(matas, "#0e121c")
+
+    # el lago: un espejo que refleja el cielo invertido y la orilla lejana
     agua = (lz.y >= HZ).astype(float)
     filas = lz.img.shape[0]
     eje = int(HZ * lz.s)
-    # cada fila del agua toma la del cielo que tiene encima en espejo (más abajo de lo que refleja, el cielo de arriba)
     origen = np.clip(2 * eje - 1 - np.arange(filas), 0, filas - 1)
     reflejo = lz.img[origen]
-    lz.pintar(agua, reflejo * 0.82)
-    # más abajo de 2 * HZ se agota el cielo reflejado: fundir a azul noche hondo para no repetir la fila 0 con sus estrellas
-    lz.pintar(agua * np.clip((lz.y - (2 * HZ - 20)) / 24, 0, 1), "#0b1122")
-    lz.pintar(agua * np.clip((lz.y - HZ) / 160, 0, 1), "#0a1424", 0.25)
-    vetas = (estirar_h(lz, lz.ruido(1.5, 2, semilla=204), 40) > 0.72) * agua
-    lz.pintar(vetas, "#c8e0e8", 0.12)
-    # Kimya, alzándose del agua, a la derecha (con su reflejo)
-    kx, ky = 400, 176
+    lz.pintar(agua, reflejo * 0.84)
+    lz.pintar(agua * np.clip((lz.y - (2 * HZ - 20)) / 24, 0, 1), "#070d1a")
+    lz.pintar(agua * np.clip((lz.y - HZ) / 160, 0, 1), "#081220", 0.25)
+
+    # columna de luz de luna reflejada en el agua
+    columna_luna = np.clip(1 - np.abs(lz.x - 120) / 12, 0, 1) * np.clip((lz.y - HZ) / 50, 0, 1) * np.clip((210 - lz.y) / 50, 0, 1) * agua
+    columna_luna = columna_luna * (np.sin(lz.y * 0.95) > 0.05).astype(float)
+    lz.sumar_luz(lz.desenfocar(columna_luna, 2.5), "#c8e2f0", 0.35)
+
+    # vetas sutiles de agua cristalina
+    vetas = (estirar_h(lz, lz.ruido(1.5, 2, semilla=204), 45) > 0.70) * agua
+    lz.pintar(vetas, "#c8e4ec", 0.14)
+
+    # bruma baja y etérea resbalando sobre el lago en calma
+    niebla_base = np.clip(np.sin(np.clip((lz.y - HZ) / (256 - HZ) * np.pi, 0, np.pi)), 0, 1) ** 1.6
+    niebla_ruido = lz.ruido(3.5, 2, semilla=314) * 0.5 + 0.5
+    niebla = niebla_base * niebla_ruido * agua
+    lz.sumar_luz(lz.desenfocar(niebla, 4), "#729eb6", 0.22)
+
+    # Kimya, alzándose del agua a la derecha con velos etéreos
+    kx, ky = 405, 172
     k_lz = Lienzo(W, H, semilla=205)
-    _kimya_pie(k_lz, kx, ky, e=1.9)
-    _sumar_con_reflejo(lz, k_lz, ky + 4, agua, 0.55)
-    lz.sumar_luz(lz.desenfocar(lz.elipse(kx, ky + 4, 26, 4), 4) * agua, "#9fd0d0", 0.5)
-    # la orilla de la isla, a la izquierda: hierba, el círculo de piedras y el borde donde está Maisha
-    YO = 196
-    isla = lz.poligono([(0, 150), (60, 158), (140, 172), (200, YO - 2), (250, YO), (262, YO + 6), (240, YO + 12),
-                        (150, 230), (90, 256), (0, 256)])
-    lz.sombrear(isla, ["#0e1a14", "#16261c", "#203422", "#2c4428", "#3a5430"], 6, (0.5, -0.8, 0.5),
+    _kimya_figura_serena(k_lz, kx, ky, e=1.9)
+    _sumar_con_reflejo(lz, k_lz, ky + 4, agua, 0.58)
+
+    # ondas concéntricas de silencio donde Kimya flota sobre el agua
+    for r in (8, 16, 26, 38, 52):
+        onda_k = np.clip(1 - np.abs(np.hypot((lz.x - kx) / 3.0, lz.y - (ky + 4)) - r) * 1.3, 0, 1)
+        lz.sumar_luz(onda_k * agua, "#80d0d0", 0.38 * (1 - r / 60.0))
+    lz.sumar_luz(lz.desenfocar(lz.elipse(kx, ky + 4, 30, 6), 5) * agua, "#9fd4d4", 0.55)
+
+    # la orilla de la isla a la izquierda: tierra rica, hierba frondosa y juncos
+    YO = 194
+    isla = lz.poligono([(0, 145), (55, 152), (120, 166), (180, 178), (218, YO - 2), (238, YO), (248, YO + 5),
+                        (236, YO + 12), (185, 218), (120, 242), (60, 256), (0, 256)])
+    lz.sombrear(isla, ["#0a140e", "#122016", "#1a2e1e", "#264026", "#345432", "#487042"], 6, (0.5, -0.8, 0.5),
                 textura=lz.ruido(1.5, 2, semilla=206), fuerza_tex=0.35)
     filo = np.clip(isla - np.roll(isla, int(2 * lz.s), axis=0), 0, 1)
     lz.sumar_luz(filo, "#9fb8c8", 0.35)
-    for (x, y, r) in ((40, 178, 6), (78, 190, 5), (120, 206, 5.5), (26, 214, 6)):
+
+    # cantos rodados húmedos en la orilla
+    for (x, y, r) in ((36, 172, 6.5), (74, 184, 5.5), (115, 198, 6.0), (165, 214, 5.5), (22, 210, 6.5)):
         piedra = lz.elipse(x, y, r * 1.3, r * 0.8)
-        lz.sombrear(piedra, ["#1a1c24", "#2e3240", "#4a5060", "#6a7080"], r, (0.5, -0.8, 0.5))
+        lz.sombrear(piedra, ["#161820", "#262a36", "#424856", "#626876"], r, (0.5, -0.8, 0.5))
+        # brillo de humedad en la piedra
+        lz.pintar(lz.elipse(x - 0.5, y - r * 0.3, r * 0.6, r * 0.25), "#98b0c0", 0.4)
+
+    # hierba y tréboles a lo largo de la península
     hierba = np.zeros((lz.H, lz.W))
-    for k in range(140):
-        x = rng.random() * 250
-        yb = 150 + x * 0.18 + rng.random() * 40
+    for k in range(160):
+        x = rng.random() * 236
+        yb = 145 + x * 0.22 + rng.random() * 38
         hierba = np.maximum(hierba, lz.trazo([(x, yb), (x + (rng.random() - 0.5) * 3, yb - 3 - rng.random() * 4)], 0.5))
-    lz.pintar(hierba * isla, "#3e5a34", 0.9)
-    # Maisha en el borde, mirando el agua; y en el agua, bajo ella, del revés... Mauti
-    mx = 222
+    lz.pintar(hierba * isla, "#3e6234", 0.9)
+
+    # juncos en el agua junto a la orilla
+    juncos = np.zeros((lz.H, lz.W))
+    espigas = np.zeros((lz.H, lz.W))
+    for (jx, jy, jh) in [(175, 182, 22), (188, 186, 26), (198, 190, 20), (236, 212, 20), (242, 220, 24)]:
+        curva_j = lz.curva((jx, jy), (jx - 2, jy - jh * 0.6), (jx + 1, jy - jh), n=16)
+        juncos = np.maximum(juncos, lz.trazo(curva_j, 1.2, 0.6))
+        espigas = np.maximum(espigas, lz.elipse(jx + 1, jy - jh + 3, 1.4, 4.2))
+    lz.sombrear(juncos, ["#122012", "#1e341c", "#325228", "#4e763a"], 0.8, (0.5, -0.8, 0.5))
+    lz.sombrear(espigas, ["#321e12", "#52301a", "#7e4a26"], 1.2, (0.5, -0.8, 0.5))
+
+    # nenúfares flotando sobre el agua quieta
+    nenufares = np.zeros((lz.H, lz.W))
+    for (nx, ny, nr) in [(248, 196, 5.5), (262, 204, 6.2), (276, 201, 4.8), (254, 222, 5.2)]:
+        hoja_nen = lz.elipse(nx, ny, nr * 1.4, nr * 0.55)
+        corte = lz.trazo([(nx, ny), (nx + nr * 1.2, ny - nr * 0.25)], 0.8)
+        nenufares = np.maximum(nenufares, np.clip(hoja_nen - corte, 0, 1))
+    lz.sombrear(nenufares * agua, ["#101e14", "#182e1c", "#26442a", "#3c643e"], 1.2, (0.5, -0.8, 0.5))
+    flor_n = lz.circulo(262, 203, 2.5) + lz.circulo(263, 202, 1.8)
+    lz.pintar(flor_n * agua, "#fffdf6")
+    lz.pintar(lz.circulo(262, 203, 0.9) * agua, "#fde27e")
+
+    # Maisha en el borde, asomada mirando el agua; y en el reflejo, extendiendo su mano... Mauti
+    mx = 216
     m_lz = Lienzo(W, H, semilla=207)
-    _mauti_luz(m_lz, mx, YO, e=1.6, mira=1)
-    _pegar_con_reflejo(lz, m_lz, YO + 2, agua, 0.75, solo_reflejo=True)
+    _mauti_reflejo_lago(m_lz, mx, YO, e=1.6)
+    _pegar_con_reflejo(lz, m_lz, YO + 2, agua, 0.82, solo_reflejo=True)
     ci.maisha_luz(lz, mx, YO, e=1.6)
-    # la luz de las dos, sobre el agua quieta
-    lz.sumar_luz(lz.desenfocar(lz.elipse(mx, YO + 22, 14, 18), 8) * agua, "#b8a8e0", 0.35)
+
+    # brazo de Maisha descendiendo hacia la superficie del agua buscando el reflejo
+    e_m = 1.6
+    brazo_m = lz.trazo([(mx + 4 * e_m, YO - 6 * e_m), (mx + 7.5 * e_m, YO - 3.5 * e_m), (mx + 9 * e_m, YO - 1.2 * e_m)], 2.0 * e_m, 1.3 * e_m)
+    mano_m = lz.elipse(mx + 9.5 * e_m, YO - 1.0 * e_m, 1.8 * e_m, 1.4 * e_m)
+    fig_brazo = np.maximum(brazo_m, mano_m)
+    lz.sumar_luz(lz.desenfocar(fig_brazo, 4), "#f9b947", 0.75)
+    lz.pintar(fig_brazo, rampa(["#e8b860", "#ffe08a", "#fff3c4"], lz.volumen(fig_brazo, 4, (-0.5, -0.7, 0.6))[0]))
+
+    # punto de encuentro en la superficie: un destello de luz donde las dos manos casi se tocan
+    contacto_x, contacto_y = mx + 9.5 * e_m, YO + 1
+    destello = lz.circulo(contacto_x, contacto_y, 2.2)
+    lz.sumar_luz(lz.desenfocar(destello, 4), "#ffd864", 0.85)
+    lz.sumar_luz(destello, "#ffffff", 1.0)
+    lz.sumar_luz(lz.desenfocar(destello, 8), "#ba92f0", 0.6)
+
+    # ondas concéntricas en el agua donde el reflejo de Mauti casi toca la mano de Maisha
+    for r in (5, 11, 18, 28):
+        onda_m = np.clip(1 - np.abs(np.hypot((lz.x - contacto_x) / 2.8, lz.y - contacto_y) - r) * 1.4, 0, 1)
+        lz.sumar_luz(onda_m * agua, "#c4b4f0", 0.42 * (1 - r / 34.0))
+
+    # la luz de ambas sobre el agua quieta
+    lz.sumar_luz(lz.desenfocar(lz.elipse(mx, YO + 22, 15, 20), 8) * agua, "#b498e8", 0.42)
+    lz.sumar_luz(lz.desenfocar(lz.elipse(mx, YO - 2, 12, 6), 5), "#ffd864", 0.35)
+
+    # luciérnagas y motas de luz flotando sobre el lago
     motas = np.zeros((lz.H, lz.W))
-    for k in range(26):
-        motas = np.maximum(motas, lz.circulo(300 + rng.random() * 200, 80 + rng.random() * 100, 0.5 + rng.random() * 0.4))
-    lz.sumar_luz(motas, "#e8f4f0", 0.8)
+    for k in range(32):
+        motas = np.maximum(motas, lz.circulo(230 + rng.random() * 260, 95 + rng.random() * 115, 0.45 + rng.random() * 0.45))
+    lz.sumar_luz(lz.desenfocar(motas, 1.2), "#a4ece4", 0.75)
+    lz.sumar_luz(motas, "#ffffff", 0.95)
+
     # viñeta suave
     lz.pintar(np.clip((np.hypot((lz.x - 300) / 330, (lz.y - 140) / 170) - 0.75) * 2.0, 0, 1), "#05070c", 0.6)
     return lz

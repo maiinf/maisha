@@ -597,11 +597,127 @@ def maisha_luz(lz, x, y, e=1.0, alfa=1.0):
 
 
 # ---------------------------------------------------------------- 3. La leyenda
+def cria_leyenda(lz, x, y, e=1.2, mira=-1, sombrero=False, pata_alzada=False, sem=12, luz=(-0.9, -0.5, 0.45)):
+    """Cría de castor acurrucada sobre la alfombra, sentada y con la cabeza alzada mirando la leyenda."""
+    m = mira
+    def X(dx):
+        return x + dx * e * m
+    def Y(dy):
+        return y - dy * e
+    cab = 1.25
+    crema = CREMA
+    tex = pelo(lz, sem)
+    kw = dict(luz=luz, textura=tex, fuerza_tex=0.28)
+
+    # sombra cálida en la alfombra
+    lz.pintar(lz.desenfocar(lz.elipse(X(-1), y, 16 * e, 3.8 * e), 1.5), "#180a0e", 0.55)
+
+    # la cola de castor apoyada plana en la alfombra
+    cola = lz.elipse(X(-13), Y(2.5), 11 * e, 3.6 * e, -4 * m)
+    escamas = np.clip(1 - np.minimum(np.abs(np.sin((lz.x + lz.y) / (1.5 * e))), np.abs(np.sin((lz.x - lz.y) / (1.5 * e)))) * 4, 0, 1)
+    lz.sombrear(cola, COLA, 2.5 * e, kw["luz"], textura=1 - escamas * 0.8, fuerza_tex=0.45)
+
+    # patita trasera descansando flexionada a un lado
+    pata_trasera = lz.elipse(X(-5), Y(3), 5.5 * e, 3.2 * e)
+    lz.sombrear(pata_trasera, COLA[1:], 2.0 * e, kw["luz"])
+
+    # el cuerpo: redondeado de cachorro sentado
+    cuerpo = np.maximum(lz.elipse(X(0), Y(10), 12.5 * e, 10.5 * e), lz.elipse(X(2.5), Y(18), 9.5 * e, 8.5 * e))
+    lz.sombrear(cuerpo, PELO, 9 * e, **kw)
+
+    # barriguita clara en el pecho
+    barriga = lz.elipse(X(5), Y(13), 6.5 * e, 8.5 * e) * cuerpo
+    lz.sombrear(barriga, crema[1:], 5 * e, kw["luz"], textura=tex, fuerza_tex=0.2)
+
+    # patitas delanteras / brazos
+    if pata_alzada:
+        brazo_apoyo = lz.trazo([(X(3), Y(16)), (X(6), Y(7)), (X(7.5), Y(1.5))], 3.6 * e, 2.6 * e)
+        mano_apoyo = lz.elipse(X(7.8), Y(1.5), 2.8 * e, 2.0 * e)
+        lz.sombrear(brazo_apoyo, PELO, 2.0 * e, **kw)
+        lz.sombrear(mano_apoyo, COLA[1:], 1.6 * e, kw["luz"])
+        # brazo alzado señalando la esfera dorada
+        brazo_alto = lz.trazo([(X(4), Y(17)), (X(10), Y(23)), (X(16), Y(28))], 3.8 * e, 2.2 * e)
+        mano_alta = lz.elipse(X(16.5), Y(28.5), 2.8 * e, 2.2 * e, -25 * m)
+        dedo = lz.trazo([(X(16.5), Y(28.5)), (X(19.8), Y(31.8))], 1.6 * e, 1.0 * e)
+        lz.sombrear(brazo_alto, PELO, 2.0 * e, **kw)
+        lz.sombrear(mano_alta, COLA[1:], 1.6 * e, kw["luz"])
+        lz.sombrear(dedo, COLA[1:], 1.0 * e, kw["luz"])
+        lz.sumar_luz(lz.circulo(X(19.8), Y(31.8), 2.0 * e), "#fde27e", 0.5)
+    else:
+        # ambas manitas juntas bajo la barbilla (pequeño Shamba)
+        brazo1 = lz.trazo([(X(2), Y(15)), (X(6.5), Y(16.5))], 3.6 * e, 2.6 * e)
+        brazo2 = lz.trazo([(X(3.5), Y(13.5)), (X(7.5), Y(15.5))], 3.4 * e, 2.4 * e)
+        manitas = lz.elipse(X(8.2), Y(16.8), 3.4 * e, 2.6 * e)
+        lz.sombrear(np.maximum(brazo1, brazo2), PELO, 2.0 * e, **kw)
+        lz.sombrear(manitas, COLA[1:], 1.8 * e, kw["luz"])
+
+    # cabeza de cachorro alzada hacia la leyenda
+    hx, hy = X(4.5 * cab), Y(28.5 + (cab - 1) * 6)
+    r = 10.5 * e * cab
+    cabeza = np.maximum(lz.circulo(hx, hy, r), lz.elipse(hx + 3 * e * m * cab, hy - 2 * e * cab, r * 0.9, r * 0.75))
+    oreja = lz.circulo(hx - 6.5 * e * m * cab, hy - 7.5 * e * cab, 3.4 * e * cab)
+    lz.sombrear(oreja, PELO, 2 * e, **kw)
+    lz.pintar(lz.circulo(hx - 6.2 * e * m * cab, hy - 7.2 * e * cab, 1.8 * e * cab) * oreja, "#2e1a10", 0.8)
+    lz.sombrear(cabeza, PELO, 8 * e * cab, **kw)
+
+    # hocico levantado con ternura
+    hoc_x, hoc_y = hx + 7.2 * e * m * cab, hy - 1.5 * e * cab
+    hocico = np.maximum(lz.elipse(hoc_x, hoc_y, 5.8 * e * cab, 4.4 * e * cab), lz.elipse(hoc_x - 2.8 * e * m * cab, hoc_y + 1 * e * cab, 4.8 * e * cab, 3.8 * e * cab))
+    lz.sombrear(hocico, crema, 3.8 * e * cab, kw["luz"], textura=tex, fuerza_tex=0.15)
+
+    # nariz negra brillante con reflejo dorado
+    nariz = lz.elipse(hoc_x + 3.2 * e * m * cab, hoc_y - 2.4 * e * cab, 2.4 * e * cab, 1.7 * e * cab)
+    lz.sombrear(nariz, ["#050304", "#140c0c", "#2e2222", "#5a4a48"], 1.4 * e, kw["luz"])
+    lz.pintar(lz.circulo(hoc_x + 2.7 * e * m * cab, hoc_y - 3.0 * e * cab, 0.6 * e * cab), "#fff5dc", 0.95)
+
+    # boquita entreabierta de asombro con dientecito
+    boca_asombro = lz.elipse(hoc_x + 2.4 * e * m * cab, hoc_y + 1.8 * e * cab, 1.6 * e * cab, 1.2 * e * cab)
+    lz.pintar(boca_asombro, "#2b1410")
+    diente = lz.poligono([(hoc_x + 1.4 * e * m * cab, hoc_y + 0.8 * e * cab), (hoc_x + 2.8 * e * m * cab, hoc_y + 0.8 * e * cab),
+                          (hoc_x + 2.6 * e * m * cab, hoc_y + 2.0 * e * cab), (hoc_x + 1.6 * e * m * cab, hoc_y + 2.0 * e * cab)])
+    lz.pintar(diente, "#fffaf0")
+
+    # bigotitos
+    for k in (-1, 0, 1):
+        lz.pintar(lz.trazo(lz.curva((hoc_x + 1 * e * m * cab, hoc_y - 0.2 * e * cab + k),
+                                    (hoc_x + 6 * e * m * cab, hoc_y - 1.2 * e * cab + k * 2),
+                                    (hoc_x + 10 * e * m * cab, hoc_y + k * 2.8 - 2), n=12), 0.3 * e), "#f3e0b8", 0.5)
+
+    # mejillas tiernas sonrosadas
+    mejilla = lz.elipse(hx + 3.0 * e * m * cab, hy + 2.5 * e * cab, 2.8 * e * cab, 1.8 * e * cab)
+    lz.pintar(mejilla, "#9c4436", 0.3)
+
+    # ojos grandes mirando arriba hacia la leyenda
+    ox, oy = hx + 3.2 * e * m * cab, hy - 5.5 * e * cab
+    lz.pintar(lz.elipse(ox, oy, 2.8 * e * cab, 3.2 * e * cab), "#24140e", 0.7)
+    ojo = lz.elipse(ox + 0.3 * e * m, oy - 0.5 * e, 2.3 * e * cab, 2.7 * e * cab)
+    lz.sombrear(ojo, ["#050304", "#120b0a", "#2b1e17"], 1.4 * e, kw["luz"])
+    lz.pintar(lz.circulo(ox + 0.4 * e * m * cab, oy - 1.0 * e * cab, 0.95 * e * cab), "#ffffff")
+    lz.sumar_luz(lz.circulo(ox + 0.4 * e * m * cab, oy - 1.0 * e * cab, 1.6 * e * cab), "#fde27e", 0.6)
+    lz.pintar(lz.circulo(ox - 0.6 * e * m * cab, oy + 0.8 * e * cab, 0.45 * e * cab), "#f3d8a8", 0.75)
+
+    # sombrero para el pequeño Shamba
+    if sombrero:
+        sx, sy = hx - 0.5 * e * m, hy - 9.5 * e * cab
+        ala = lz.elipse(sx, sy + 1.2 * e, 15 * e, 3.6 * e, -12 * m)
+        copa = np.maximum(lz.elipse(sx, sy - 3.5 * e, 8.8 * e, 5.0 * e),
+                           lz.poligono([(sx - 8.2 * e, sy - 3.5 * e), (sx + 8.2 * e, sy - 3.5 * e),
+                                        (sx + 7.8 * e, sy + 1 * e), (sx - 7.8 * e, sy + 1 * e)]))
+        paja = (np.abs(np.sin(lz.x * 1.6 / e + lz.y * 0.4)) > 0.55).astype(float) * 0.6 + lz.ruido(0.8, 2) * 0.4
+        straw = ["#3d2a10", "#704f25", "#a37036", "#d29a43", "#efc06a", "#f8dc96"]
+        lz.sombrear(ala, straw, 2 * e, kw["luz"], textura=paja, fuerza_tex=0.35)
+        lz.sombrear(copa, straw, 4 * e, kw["luz"], textura=paja, fuerza_tex=0.35)
+        cinta = lz.trazo([(sx - 7.6 * e, sy - 0.5 * e), (sx + 7.6 * e, sy - 0.5 * e)], 1.6 * e) * copa
+        lz.sombrear(cinta, ["#1b2e15", "#2d4a22", "#4a7038", "#789e52"], 1.0 * e, kw["luz"])
+        lazo = lz.elipse(sx - 7.2 * e * m, sy - 0.5 * e, 1.8 * e, 1.3 * e, -20 * m)
+        lz.sombrear(lazo, ["#2d4a22", "#4a7038", "#789e52"], 0.8 * e, kw["luz"])
+
+
 def leyenda():
     """«Mi abuela guardaba el Cetro de Raíz. Por las noches nos contaba la leyenda…»
     Noche en la casa de los Shamba: la abuela, con su chal y sus gafas, sostiene el cetro junto al fuego.
     Dos crías (una es el pequeño Shamba, con su primer sombrero) la escuchan en la alfombra. Del corazón
-    del cetro sube una luz dorada donde se ve la leyenda: un espíritu pequeño con un brote de luz."""
+    del cetro sube una luz dorada donde se ve la leyenda: el Primer Árbol florecido y Maisha, el espíritu brote."""
     lz = Lienzo(W, H, semilla=3)
     fuego_xy = (92, 170)
 
@@ -609,19 +725,19 @@ def leyenda():
     # la ventana: noche azul con luna y estrellas
     vx0, vy0, vx1, vy1 = 474, 34, 556, 112
     cristal = lz.poligono([(vx0, vy0), (vx1, vy0), (vx1, vy1), (vx0, vy1)])
-    lz.pintar(cristal, lz.gradiente(["#0d0c19", "#1e2038", "#3b4063"], desde=vy0, hasta=vy1))
+    lz.pintar(cristal, lz.gradiente(["#0a0b16", "#141c30", "#283454"], desde=vy0, hasta=vy1))
     rng = np.random.default_rng(4)
     est = np.zeros((lz.H, lz.W))
-    for _ in range(26):
-        est = np.maximum(est, lz.circulo(vx0 + rng.random() * (vx1 - vx0), vy0 + rng.random() * (vy1 - vy0) * 0.7, 0.4 + rng.random() * 0.5))
+    for _ in range(30):
+        est = np.maximum(est, lz.circulo(vx0 + rng.random() * (vx1 - vx0), vy0 + rng.random() * (vy1 - vy0) * 0.75, 0.4 + rng.random() * 0.5))
     lz.sumar_luz(est * cristal, "#e8f0dc", 1.0)
     luna = lz.circulo(538, 54, 8)
-    lz.sumar_luz(lz.desenfocar(luna, 8) * cristal, "#7680a0", 0.8)
-    lz.pintar(luna * cristal, rampa(["#97c1bf", "#e8f0dc"], lz.volumen(luna, 5, (-0.6, -0.4, 0.6))[0]))
-    lz.pintar(lz.circulo(542, 52, 7) * luna, "#1e2038", 0.0)
+    lz.sumar_luz(lz.desenfocar(luna, 10) * cristal, "#768cb0", 0.85)
+    lz.pintar(luna * cristal, rampa(["#97c1bf", "#e8f0dc", "#ffffff"], lz.volumen(luna, 5, (-0.6, -0.4, 0.6))[0]))
+    lz.pintar(lz.circulo(542, 52, 7) * luna, "#141c30", 0.0)
     # copos de árboles secos fuera (silueta)
     rama = lz.trazo(lz.curva((vx0, 100), (500, 86), (520, 70), n=20), 2.4, 0.6)
-    lz.pintar(rama * cristal, "#0d0c19")
+    lz.pintar(rama * cristal, "#0a0b16")
     marco = np.clip(lz.poligono([(vx0 - 6, vy0 - 6), (vx1 + 6, vy0 - 6), (vx1 + 6, vy1 + 8), (vx0 - 6, vy1 + 8)]) - cristal, 0, 1)
     marco = np.maximum(marco, lz.trazo([((vx0 + vx1) / 2, vy0), ((vx0 + vx1) / 2, vy1)], 3) * cristal)
     marco = np.maximum(marco, lz.trazo([(vx0, (vy0 + vy1) / 2), (vx1, (vy0 + vy1) / 2)], 3) * cristal)
@@ -637,8 +753,8 @@ def leyenda():
     lz.pintar(suelo * np.clip(1 - np.abs(np.sin(ang * 46)) * 9, 0, 1), "#140c0a", 0.8)
     lz.pintar(np.clip(1 - np.abs(lz.y - 189) * lz.s / 2, 0, 1), "#140c0a")
     # la luz de luna que entra por la ventana y cae en el suelo
-    rayo = lz.poligono([(vx0, vy1), (vx1, vy1), (vx1 - 10, 250), (vx0 - 70, 250)])
-    lz.sumar_luz(lz.desenfocar(rayo, 6) * np.clip((lz.y - vy1) / 40, 0, 1), "#3b4063", 0.35)
+    rayo = lz.poligono([(vx0, vy1), (vx1, vy1), (vx1 + 10, 256), (vx0 - 55, 256)])
+    lz.sumar_luz(lz.desenfocar(rayo, 8) * np.clip((lz.y - vy1) / 40, 0, 1), "#445580", 0.45)
 
     # la alfombra trenzada
     alfombra = lz.elipse(372, 226, 156, 24)
@@ -658,11 +774,14 @@ def leyenda():
     lz.pintar(boca, lz.gradiente(["#1a0a06", "#2e1208", "#140c0a"], desde=116, hasta=196))
     repisa = lz.poligono([(6, 92), (178, 92), (176, 102), (8, 102)])
     lz.sombrear(repisa, MADERA, 3, (-0.6, -0.8, 0.5), textura=lz.ruido(2, 2), fuerza_tex=0.3)
-    # cosas en la repisa: dos tarros, una vela y un ramito seco
-    for (tx, th, tc) in [(30, 16, COBRE), (48, 11, ["#152814", "#24401f", "#5d793e", "#a8b866"])]:
+    # cosas en la repisa: tarros, vela encendida y libro antiguo
+    for (tx, th, tc) in [(28, 16, COBRE), (46, 11, ["#152814", "#24401f", "#5d793e", "#a8b866"])]:
         tarro = lz.elipse(tx, 92 - th / 2, 6, th / 2)
         lz.sombrear(tarro, tc, 4, (-0.6, -0.5, 0.6))
         lz.pintar(lz.poligono([(tx - 4, 92 - th - 1), (tx + 4, 92 - th - 1), (tx + 3.5, 92 - th + 2), (tx - 3.5, 92 - th + 2)]), "#7c5843")
+    libro = lz.poligono([(62, 92), (86, 92), (84, 84), (64, 84)])
+    lz.sombrear(libro, ["#3a1a12", "#642c1e", "#8c442c"], 2, (-0.6, -0.8, 0.5))
+    lz.pintar(lz.poligono([(65, 87), (83, 87), (83, 90), (65, 90)]), "#f2e4c8")
     vela = lz.poligono([(150, 92), (150, 78), (156, 78), (156, 92)])
     lz.sombrear(vela, ["#a3794f", "#e3c391", "#f3e0b8"], 2, (-0.8, -0.3, 0.5))
     llama_v = lz.elipse(153, 74, 1.6, 3.4)
@@ -675,7 +794,6 @@ def leyenda():
     fuego = llamas(lz, fuego_xy[0], 190, 44, 46, semilla=3, n=9)
     brasas = (lz.ruido(1.2, 2) > 0.7) * lz.elipse(92, 192, 40, 5)
     lz.sumar_luz(brasas, "#ef8a26", 0.9)
-
 
     # la mecedora (respaldo detrás de la abuela)
     for k in range(5):
@@ -693,64 +811,160 @@ def leyenda():
     brazo_m = lz.trazo([(222, 176), (294, 178)], 3.2)
     lz.sombrear(brazo_m, MADERA, 1.6, (-0.8, -0.4, 0.5))
     cetro(lz, 300, 222, 116, e=1.7, luz=(-0.9, -0.3, 0.45))
-    # la mano que agarra el cetro (delante del palo)
+    # la mano que agarra el cetro
     mano = lz.elipse(299, 149, 4.4, 4.6)
     lz.sombrear(mano, COLA[1:], 2.4, (-0.9, -0.3, 0.45))
     for k in (-1.6, 0, 1.6):
         lz.pintar(lz.trazo([(297, 149 + k), (302, 149 + k)], 0.6), "#120b0a", 0.6)
 
-    # la leyenda: una luz dorada que sube del cetro y, dentro, un espíritu con un brote
-    cx_v, cy_v = 388, 74
-    camino = lz.curva((302, 110), (320, 70), (cx_v - 30, cy_v + 10), n=40)
-    rng = np.random.default_rng(21)
+    # la leyenda: una luz dorada que sube del cetro y, dentro, el Primer Árbol y Maisha
+    cx_v, cy_v = 388, 76
+    radio_v = 48
+
+    # 1. Torrente de luz y chispas doradas desde el cetro a la visión
+    camino = lz.curva((300, 116), (324, 78), (cx_v - 32, cy_v + 10), n=45)
+    rng_c = np.random.default_rng(21)
     chispas = np.zeros((lz.H, lz.W))
-    for (px_, py_) in camino[::2]:
-        chispas = np.maximum(chispas, lz.circulo(px_ + (rng.random() - 0.5) * 8, py_ + (rng.random() - 0.5) * 8, 0.5 + rng.random() * 0.9))
-    lz.sumar_luz(lz.desenfocar(chispas, 2), "#f9b947", 0.7)
-    lz.sumar_luz(chispas, "#fff8d2", 0.9)
-    burbuja = lz.circulo(cx_v, cy_v, 44)
-    humo_dorado = lz.ruido(8, 4, semilla=22)
-    d_b = np.hypot(lz.x - cx_v, lz.y - cy_v) / 44
-    # un disco de luz con el borde deshilachado
-    borde_b = np.clip(1 - np.abs(d_b - 0.95 + (humo_dorado - 0.5) * 0.25) * 9, 0, 1)
-    dentro_b = np.clip((1 - d_b) * 4 + (humo_dorado - 0.5) * 0.6, 0, 1)
-    lz.pintar(dentro_b, rampa(["#3a2238", "#6a3446", "#9c4b4a", "#c96d4f"], np.clip(1 - d_b + humo_dorado * 0.3, 0, 1)), 0.75)
-    # dentro: el mundo gris, con el árbol viejo que empieza a reverdecer donde llega la luz
-    for (hx_, hy_, hr_, col_) in [(cx_v - 20, cy_v + 40, 40, "#525458"), (cx_v + 26, cy_v + 44, 36, "#3d3f43")]:
-        lz.pintar(lz.circulo(hx_, hy_, hr_) * dentro_b, col_, 0.9)
-    ax, ay = cx_v - 25, cy_v + 12
-    arb = lz.trazo(lz.curva((ax, ay), (ax - 1.5, ay - 9), (ax - 1, ay - 18), n=16), 2.8, 1.4)
-    for (p1, p2, g_) in [((ax - 4, ay + 1), (ax - 9, ay + 3), 1.4), ((ax + 3, ay + 1), (ax + 8, ay + 2), 1.4),
-                         ((ax - 1, ay - 13), (ax - 10, ay - 22), 1.4), ((ax - 1, ay - 15), (ax + 8, ay - 23), 1.3),
-                         ((ax - 4, ay - 17), (ax - 3, ay - 26), 1.1)]:
-        arb = np.maximum(arb, lz.trazo(lz.curva((ax - 1, p1[1]), p1, p2, n=12), g_, g_ * 0.45))
-    lz.sombrear(arb * dentro_b, ["#1b1c1f", "#2b2c30", "#525458", "#85878a"], 1.5, (0.8, -0.4, 0.5))
-    brotes_v = (lz.elipse(ax + 6, ay - 22, 4.5, 3.0) + lz.elipse(ax - 2, ay - 25, 4.0, 2.6)) * dentro_b
-    lz.sombrear( np.clip(brotes_v, 0, 1), ["#24401f", "#3e9a35", "#6fcf4f", "#b8ef8e"], 2.0, (0.7, -0.5, 0.5))
-    lz.sumar_luz(borde_b, "#f9b947", 0.8)
-    lz.sumar_luz(lz.desenfocar(borde_b, 3), "#ef8a26", 0.6)
-    rayos_l = lz.rayos(lz.circulo(cx_v, cy_v - 4, 9), (cx_v, cy_v - 4), largo=0.965, pasos=34)
-    lz.sumar_luz(rayos_l * 2.4 * dentro_b, "#fde27e", 0.7)
-    # el color vuelve donde toca su luz: hierba verde a sus pies
-    pie_verde = lz.elipse(cx_v, cy_v + 22, 22, 5) * dentro_b
-    lz.pintar(lz.desenfocar(pie_verde, 1.5), "#5d793e", 0.85)
-    maisha_luz(lz, cx_v, cy_v + 20, 1.2, alfa=0.97)
+    for i, (px_, py_) in enumerate(camino):
+        rad = 0.5 + rng_c.random() * 1.0
+        off_r = (rng_c.random() - 0.5) * (3.5 + i * 0.18)
+        off_a = rng_c.random() * 2 * np.pi
+        chispas = np.maximum(chispas, lz.circulo(px_ + np.cos(off_a) * off_r, py_ + np.sin(off_a) * off_r, rad))
+    estela_haz = lz.trazo(camino, 3.8, 1.4)
+    lz.sumar_luz(lz.desenfocar(estela_haz, 5), "#d47a18", 0.5)
+    lz.sumar_luz(lz.desenfocar(estela_haz, 2), "#f9b947", 0.75)
+    lz.sumar_luz(lz.desenfocar(chispas, 2.5), "#f9b947", 0.85)
+    lz.sumar_luz(chispas, "#fff8d2", 1.0)
 
-    # las dos crías en la alfombra, mirando a la abuela (una es el pequeño Shamba)
-    castor(lz, 412, 236, 1.32, -1, cria=True, sem=12, luz=(-0.9, -0.4, 0.45), recorte=("#535a80", 0.7), recorte_dir=(1, -0.3), mirada=(1, -1))
-    castor(lz, 458, 244, 1.18, -1, cria=True, sombrero=True, sem=13, luz=(-0.9, -0.4, 0.45), recorte=("#535a80", 0.7), recorte_dir=(1, -0.3), mirada=(1, -1))
+    # 2. El orbe de la visión
+    d_v = np.hypot(lz.x - cx_v, lz.y - cy_v)
+    d_b = d_v / radio_v
+    burbuja = np.clip(1 - (d_b - 0.94) * 8, 0, 1)
 
-    # la luz del fuego sobre toda la habitación (cálida, cae con la distancia); lo que brilla, brilla igual
+    # Fondo interior: cielo crepuscular mágico
+    cielo_vision = lz.gradiente(["#120e26", "#26153c", "#4c2048", "#823c4a", "#b86248", "#e69956"], desde=cy_v - radio_v, hasta=cy_v + radio_v)
+    lz.pintar(burbuja, cielo_vision, 0.95)
+
+    # Polvo de estrellas dentro de la esfera
+    estrellas_v = np.zeros((lz.H, lz.W))
+    for _ in range(35):
+        ex = cx_v + (rng_c.random() - 0.5) * radio_v * 1.6
+        ey = cy_v + (rng_c.random() - 0.5) * radio_v * 1.6
+        if np.hypot(ex - cx_v, ey - cy_v) < radio_v - 4:
+            estrellas_v = np.maximum(estrellas_v, lz.circulo(ex, ey, 0.4 + rng_c.random() * 0.6))
+    lz.sumar_luz(estrellas_v * burbuja, "#fff8d2", 0.9)
+
+    # Colina sagrada
+    colina = lz.elipse(cx_v, cy_v + 30, 42, 18) * burbuja
+    lz.sombrear(colina, ["#162414", "#253c1d", "#385827", "#527a36", "#7ca44b"], 6, (0.5, -0.8, 0.5), textura=lz.ruido(2, 2, semilla=42), fuerza_tex=0.25)
+
+    # El Primer Árbol de la Leyenda con ramas y racimos dorados
+    ax, ay = cx_v - 20, cy_v + 22
+    tronco_arb = lz.trazo(lz.curva((ax, ay), (ax - 2, ay - 14), (ax - 1, ay - 24), n=20), 4.0, 2.0)
+    raices_arb = np.maximum(lz.trazo(lz.curva((ax, ay - 2), (ax - 6, ay + 2), (ax - 12, ay + 4), n=12), 2.0, 0.9),
+                            lz.trazo(lz.curva((ax + 2, ay - 2), (ax + 7, ay + 2), (ax + 12, ay + 3), n=12), 1.8, 0.8))
+    ramas_arb = np.maximum.reduce([
+        lz.trazo(lz.curva((ax - 1, ay - 16), (ax - 8, ay - 24), (ax - 15, ay - 29), n=16), 2.0, 1.0),
+        lz.trazo(lz.curva((ax - 1, ay - 18), (ax + 5, ay - 25), (ax + 11, ay - 30), n=16), 1.8, 0.9),
+        lz.trazo(lz.curva((ax - 1, ay - 22), (ax - 3, ay - 31), (ax - 4, ay - 37), n=16), 1.6, 0.8),
+    ])
+    arbol_madera = np.maximum.reduce([tronco_arb, raices_arb, ramas_arb]) * burbuja
+    lz.sombrear(arbol_madera, MADERA, 2.5, (0.8, -0.4, 0.5), textura=lz.ruido(3, 3, semilla=15), fuerza_tex=0.3)
+
+    follaje_arb = np.maximum.reduce([
+        lz.elipse(ax - 14, ay - 30, 8.5, 6.0),
+        lz.elipse(ax - 4, ay - 37, 9.5, 7.0),
+        lz.elipse(ax + 9, ay - 31, 9.0, 6.5),
+        lz.elipse(ax - 6, ay - 25, 7.0, 5.0),
+        lz.elipse(ax + 4, ay - 24, 6.5, 4.5)
+    ]) * burbuja
+    lz.sombrear(follaje_arb, FOLLAJE, 4, (0.6, -0.6, 0.5), textura=lz.ruido(2, 2, semilla=16), fuerza_tex=0.3)
+
+    racimos = np.maximum.reduce([
+        lz.elipse(ax - 11, ay - 27, 2.6, 3.8),
+        lz.elipse(ax - 2, ay - 33, 3.0, 4.2),
+        lz.elipse(ax + 7, ay - 28, 2.8, 3.8),
+        lz.elipse(ax + 2, ay - 22, 2.2, 3.2),
+    ]) * burbuja
+    lz.sombrear(racimos, ["#8c4a10", "#c6781e", "#f3b038", "#ffe678"], 1.6, (0.6, -0.6, 0.5))
+    lz.sumar_luz(lz.desenfocar(racimos, 2), "#ffd75e", 0.65)
+
+    # Maisha, el espíritu brote, en la colina
+    mx_v, my_v = cx_v + 13, cy_v + 22
+    maisha_luz(lz, mx_v, my_v, e=1.2, alfa=0.98)
+    aura_maisha = lz.circulo(mx_v, my_v - 12, 16) * burbuja
+    lz.sumar_luz(lz.desenfocar(aura_maisha, 6), "#ffd868", 0.55)
+
+    # Pétalos dorados flotando
+    petalos = np.zeros((lz.H, lz.W))
+    for _ in range(22):
+        px = cx_v - 25 + rng_c.random() * 50
+        py = cy_v - 30 + rng_c.random() * 55
+        if np.hypot(px - cx_v, py - cy_v) < radio_v - 3:
+            petalos = np.maximum(petalos, lz.elipse(px, py, 1.4, 0.7, rng_c.random() * 180))
+    lz.sumar_luz(petalos * burbuja, "#fff3a8", 0.85)
+
+    # Corona y filamentos solares en el borde del orbe
+    corona = np.clip(1 - np.abs(d_b - 0.98) * 14, 0, 1)
+    filamentos = corona * (0.6 + lz.ruido(6, 4, semilla=99) * 0.8)
+    lz.sumar_luz(filamentos, "#ffd250", 0.9)
+    lz.sumar_luz(lz.desenfocar(filamentos, 3), "#f58c20", 0.75)
+    lz.sumar_luz(lz.desenfocar(corona, 8), "#ff9820", 0.5)
+
+    # Rayos volumétricos que salen del orbe iluminando la habitación
+    rayos_v = lz.rayos(lz.circulo(cx_v, cy_v, 14), (cx_v, cy_v), largo=0.96, pasos=40)
+    lz.sumar_luz(rayos_v * 1.8, "#fde27e", 0.55)
+
+    # las dos crías en la alfombra, escuchando asombradas la historia
+    # 1. La primera cría, sentada con una patita alzada señalando con emoción la leyenda
+    cria_leyenda(lz, 408, 238, e=1.3, mira=-1, pata_alzada=True, sem=12, luz=(-0.9, -0.5, 0.45))
+    # 2. El pequeño Shamba, con su primer sombrero, manitas juntas embelesado
+    cria_leyenda(lz, 460, 244, e=1.2, mira=-1, sombrero=True, sem=13, luz=(-0.9, -0.5, 0.45))
+
+    # la luz de la habitación:
+    # 1. El fuego de la chimenea (cálido rojizo/ámbar desde 92, 170)
     d_f = np.hypot(lz.x - fuego_xy[0], (lz.y - fuego_xy[1]) * 1.3)
-    luz_f = np.clip(1 - d_f / 420, 0, 1) ** 1.5
-    propia = np.clip(lz.desenfocar(fuego, 1) + lz.desenfocar(burbuja, 2) * 0.8, 0, 1)[..., None]
-    luz_total = 0.34 + 1.0 * luz_f[..., None] * hex2("#f1c27a") + lz.desenfocar(lz.circulo(302, 116, 6), 30)[..., None] * hex2("#f9b947") * 1.5
+    luz_f = np.clip(1 - d_f / 410, 0, 1) ** 1.6
+
+    # 2. La luz de la visión mágica (dorado celestial desde 388, 76)
+    d_vis = np.hypot(lz.x - cx_v, (lz.y - cy_v) * 1.1)
+    luz_vis = np.clip(1 - d_vis / 360, 0, 1) ** 1.4
+
+    # 3. La luz fría de la luna desde la ventana (515, 73)
+    d_luna = np.hypot(lz.x - 515, (lz.y - 73) * 1.2)
+    luz_luna = np.clip(1 - d_luna / 280, 0, 1) ** 2.0
+
+    # Máscara de elementos autoiluminados (fuego y orbe) para que conserven su pureza
+    propia = np.clip(lz.desenfocar(fuego, 1) + lz.desenfocar(burbuja, 2) * 0.85, 0, 1)[..., None]
+
+    # Iluminación global equilibrada
+    luz_ambiente = 0.32
+    col_fuego = hex2("#f1a852") * (1.1 * luz_f[..., None])
+    col_vision = hex2("#fedb76") * (1.25 * luz_vis[..., None])
+    col_luna = hex2("#546894") * (0.4 * luz_luna[..., None])
+
+    luz_total = luz_ambiente + col_fuego + col_vision + col_luna
+
     base_img = lz.img.copy()
-    lz.img = base_img * (1 - propia) * np.clip(luz_total, 0, 1.6) + base_img * propia
+    lz.img = base_img * (1 - propia) * np.clip(luz_total, 0, 1.7) + base_img * propia
     lz.img = np.clip(lz.img, 0, 1)
-    lz.sumar_luz(lz.desenfocar(fuego, 22), "#d45a17", 0.55)
+
+    # Resplandores difusos adicionales
+    lz.sumar_luz(lz.desenfocar(fuego, 24), "#d45a17", 0.6)
     lz.sumar_luz(lz.desenfocar(fuego, 6), "#f9b947", 0.5)
-    brillo_cetro(lz, 302, 116, 5, 0.8)
+    lz.sumar_luz(lz.desenfocar(burbuja, 20), "#d4821a", 0.45)
+    lz.sumar_luz(lz.desenfocar(burbuja, 6), "#ffd85c", 0.4)
+    brillo_cetro(lz, 300, 116, 6, 0.95)
+
+    # Motas de polvo dorado en suspensión en el aire de la cabaña
+    polvo_aire = np.zeros((lz.H, lz.W))
+    rng_p = np.random.default_rng(77)
+    for _ in range(40):
+        mpx = 250 + rng_p.random() * 260
+        mpy = 50 + rng_p.random() * 180
+        polvo_aire = np.maximum(polvo_aire, lz.circulo(mpx, mpy, 0.35 + rng_p.random() * 0.55))
+    lz.sumar_luz(lz.desenfocar(polvo_aire, 1.0), "#ffd86c", 0.75)
+    lz.sumar_luz(polvo_aire, "#ffffff", 0.85)
 
     # viñeta
     vin = np.clip(np.hypot((lz.x - 300) / 360, (lz.y - 140) / 200) - 0.55, 0, 1)

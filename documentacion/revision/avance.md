@@ -35,10 +35,10 @@ Todas las ramas parten limpiamente de `origin/main` (`03c5857`) y han sido verif
 - **Pino**: Detalladas las pecas, la mochila exploradora y la hojita en el sombrero de seta.
 - **Maisha de perfil**: Pulido el movimiento vertical del brote y el eje de la cabeza en `maisha_reposo_lado` y `maisha_correr_lado` para evitar saltos de 1 px.
 
-### 2. `revision/ilustraciones`
+### 2. `revision/ilustraciones` (y `revision/ilustraciones-v2`)
 - **2_familia_shamba.png**: Eliminadas líneas y patrones periódicos en el cielo y la hierba lejana. Añadida espuma de agua y salpicaduras en la acequia que desciende hacia la rueda del molino.
-- **3_leyenda.png**: El Primer Árbol de la leyenda ahora cuenta con racimos dorados detallados, resplandor volumétrico y raíces bien ancladas en lugar de formas nebulosas.
-- **17_kimya_lago.png**: Corregido el ángulo y deformación del reflejo en el agua quieta del Lago Kimya, alineando la isla y el cielo con la perspectiva del jugador.
+- **3_leyenda.png (Rediseño profundo v2)**: Esfera de la visión con el Primer Árbol frondoso, racimos dorados y Maisha espiritual sobre la colina sagrada; torrente fluido de chispas y corona solar. Crías de castor acurrucadas y sentadas en la alfombra (`cria_leyenda`) con expresiones tiernas y atentas mirando la magia: una señalando asombrada y el pequeño Shamba con su sombrerito ladeado y manitas en el pecho. Iluminación volumétrica global de 3 fuentes (fuego de chimenea cálido, resplandor dorado celestial de la visión y luz de luna fría en la ventana).
+- **17_kimya_lago.png (Rediseño profundo v2)**: Kimya espectral (`_kimya_figura_serena`) con velos diáfanos de aurora, mirada serena y ondas concéntricas de agua a sus pies. Península de la orilla enriquecida con juncos con espigas, piedras húmedas y nenúfares flotantes con flor blanca abierta. En el agua, el reflejo de Mauti (`_mauti_reflejo_lago`) extiende la mano hacia arriba hacia la de Maisha, casi tocándose en la superficie del lago con un destello y ondas de contacto. Columna de luna reflejada y bruma baja sobre el lago en calma.
 - **22_ruinas_mauti.png**: Añadidas piedras caídas, musgo y grietas orgánicas con relieve de sombras en las ruinas.
 
 ### 3. `revision/luz-2.5d`

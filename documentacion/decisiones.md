@@ -303,3 +303,10 @@ se pasan.
 | Sigilia | Se sigue construyendo en 2D; se pasará a HD-2D con el mismo conversor que el resto |
 | Quién | La constructora hace el conversor de mapas (`Region3D`) y la parte visual; la revisora vuelve a revisar y pulir lo hecho |
 | Modelos 3D de la rama experimental | Se quedan en esa rama como referencia; no se usan |
+
+### Ilustraciones cinemáticas profundas · Leyenda y Lago Kimya (16-10)
+| Qué | Decisión |
+| --- | --- |
+| La Leyenda (`3_leyenda.png`) | La versión anterior apenas cambiaba el tono de una rama. Se rediseñó la esfera de la visión con el Primer Árbol frondoso con racimos dorados, Maisha espiritual radiante sobre la colina sagrada, torrente de polvo estelar fluido y corona solar. Se crearon las crías de castor acurrucadas y sentadas en la alfombra (`cria_leyenda`), con rostros expresivos mirando la magia: una señalando asombrada y el pequeño Shamba con su sombrerito ladeado y manitas en el pecho. Iluminación volumétrica global de 3 focos (fuego de chimenea cálido, resplandor dorado celestial de la visión que baña la estancia y luz de luna fría por la ventana). |
+| Lago Kimya (`17_kimya_lago.png`) | El cambio previo era casi imperceptible (solo eliminaba dos líneas de borde). Se rediseñó a Kimya (`_kimya_figura_serena`) como una aparición de paz celestial con velos translúcidos de luz aguamarina, aura de silencio y ondas concéntricas de agua a sus pies. En la orilla se agregaron juncos con espigas, piedras húmedas y nenúfares flotantes con flor blanca abierta. En el reflejo bajo el agua, Mauti (`_mauti_reflejo_lago`) aparece con su luz lila y su hoja de cobre, extendiendo su mano hacia arriba hacia la superficie buscando la mano de Maisha; ambas manos se encuentran a escasos píxeles con un destello de contacto y ondas concéntricas. Reflejo vibrante de la luna y sutil bruma baja sobre el lago en calma. |
+
