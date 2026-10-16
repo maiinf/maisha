@@ -208,3 +208,10 @@ se pasan.
 | Mauti en Sigilia | Va con Maisha pero se queda en la ciudad ayudando a los escribas en blanco; aparece en momentos clave (Iam: «vale sigue») |
 | Paso de la Escarcha, parte 2 | Taa (armiño farolero) está en blanco a media subida; su ficha del Índice se la llevó el viento al este. Al devolvérsela recupera el color y enseña el SIGILO DE FUEGO: tecla nueva U (RB en el mando; RB deja de ser «cambiar de semilla», que no se usaba), 20 de Aliento. Los faroles rúnicos solo los enciende el sigilo y, encendidos, abrigan del viento y ablandan la nieve |
 | Paso de la Escarcha, parte 3 | Páginas sueltas (enemigo: 2 golpes, el fuego las quema de un trazo). La Puerta Sellada se derrite con 3 sigilos; arriba la peña se cierra para que no se rodee. Misión «El Paso de la Escarcha». Música «La nieve que escribe» con el tema de Sigilia (vals de caja de música en si menor) |
+
+### Revisión de textos y género gramatical neutro (`revision/textos`)
+| Qué | Decisión |
+| --- | --- |
+| Neutro para Maisha | En `datos/dialogos/raiz.json` (`embarcadero_darsena_sola`), `"No. Sola no."` pasa a `"No. Sin ayuda no."` para respetar estrictamente que Maisha no tiene género gramatical asignado |
+| Claridad y tono | En `datos/dialogos/raiz.json` (`primer_arbol_final`), `"una luz lila, cansada pero entera"` se ajusta a `"una luz lila, tenue pero entera"` para evitar ambigüedad léxica; en `scripts/mundo/interiores/casa_shamba.gd`, Shamba susurra `"(Duerme, brotecito...)"` en vez de `"(Duerme, pequeño brote...)"` |
+

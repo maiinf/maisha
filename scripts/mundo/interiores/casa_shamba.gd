@@ -112,7 +112,7 @@ func _pasar_la_noche() -> void:
 	await dialogo.decir("Maisha", ["La sopa de zanahoria está caliente.", "Hacía... no sé cuánto que no comía nada.",
 		"El fuego cruje. Se me cierran los ojos..."], "pensamiento")
 	_maisha.set("puede_actuar", false)
-	dialogo.susurrar(_shamba, "(Duerme, pequeño brote. Mañana será otro día.)", 3.5)
+	dialogo.susurrar(_shamba, "(Duerme, brotecito. Mañana será otro día.)", 3.5)
 	await get_tree().create_timer(3.0).timeout
 	await _fundido_con_textos()
 	# a la mañana siguiente: Maisha junto a la cama y la luz entrando por la ventana
