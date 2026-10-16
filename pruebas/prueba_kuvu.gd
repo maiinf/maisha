@@ -109,25 +109,37 @@ func _ready() -> void:
 	_comprobar(kuvu.recibir_golpe(1, Vector2.UP) and kuvu.vida == R.KUVU_VIDA - 1, "con las láminas al aire, el cetro le quita 1")
 	kuvu.recibir_danio(2, kuvu.global_position, "explosion")
 	_comprobar(kuvu.vida == R.KUVU_VIDA - 3, "y una semilla, 2")
-	# un latigazo con el escudo: no hace daño (Kuvu, quieto mientras tanto)
+	# un latigazo con el escudo: no hace daño (Kuvu y Nungu, quietos mientras tanto, y sin esporas: así nada más
+	# puede tocar a Maisha ni apartarla de la raya del latigazo)
 	kuvu.set_process(false)
+	nungu.set_process(false)
+	nungu.set_physics_process(false)
 	for n in get_tree().get_nodes_in_group("esporas"):
 		n.queue_free()
 	maisha.global_position = kuvu.global_position + Vector2(0, 60)
-	await _mirar("mover_arriba")
-	maisha.global_position = kuvu.global_position + Vector2(0, 60)
+	maisha.mirar(Vector2.UP)                 # (mirando a Kuvu: directamente, no con un toque de tecla que puede perderse)
 	Input.action_press("golpe")
-	await _esperar(0.4)
+	for i in 40:
+		if maisha.escudo:
+			break
+		await _esperar(0.05)
+	maisha.mirar(Vector2.UP)
+	maisha.global_position = kuvu.global_position + Vector2(0, 60)
 	var vida_antes: int = maisha.vida
 	kuvu._latigo_hacia = (maisha.global_position + Vector2(0, -8) - (kuvu.global_position + Vector2(0, -30))).normalized()
 	kuvu._latigazo(maisha)
 	Input.action_release("golpe")
 	_comprobar(maisha.vida == vida_antes, "el escudo, de frente, para el latigazo de hilo")
-	maisha.set("_invulnerable", 0.0)
 	await _esperar(0.3)
+	maisha.set("_invulnerable", 0.0)
+	maisha.global_position = kuvu.global_position + Vector2(0, 60)
+	vida_antes = maisha.vida
+	kuvu._latigo_hacia = (maisha.global_position + Vector2(0, -8) - (kuvu.global_position + Vector2(0, -30))).normalized()
 	kuvu._latigazo(maisha)
 	_comprobar(maisha.vida == vida_antes - 1 and float(maisha.mareo) > 0.0, "sin escudo, el latigazo duele y marea")
 	kuvu.set_process(true)
+	nungu.set_process(true)
+	nungu.set_physics_process(true)
 
 	print("La fase 3: el hilo lento que va a por Nungu:")
 	kuvu.vida = R.KUVU_VIDA / 3

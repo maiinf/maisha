@@ -1,14 +1,21 @@
 extends Node3D
 ## EL ESPEJO HD-2D: dibuja en 3D la escena 2D que se está jugando, sin cambiar nada del juego.
 ## El juego sigue siendo 2D por dentro (física, enemigos, zonas, diálogos...); esto solo cambia CÓMO SE VE:
-##   - EL SUELO: el suelo pintado del mapa (arte/mundos/<mundo>/suelos/<mapa>_suelo.png) es el suelo 3D.
+##   - EL SUELO: cerca de Maisha, la capa de suelo (abajo); más lejos, el suelo pintado del mapa
+##     (arte/mundos/<mundo>/suelos/<mapa>_suelo.png).
 ##   - LAS PEÑAS («0» del mapa) se levantan como bloques de roca, con el suelo pintado encima.
 ##   - CADA DIBUJO del mundo (Sprite2D y AnimatedSprite2D) tiene su gemelo 3D DE PIE (Sprite3D que mira a la cámara),
 ##     en su sitio del suelo y con SOMBRA real; lo que va pegado al suelo (z por debajo de -4) se tumba en el suelo.
 ##     Las capas de un mismo personaje (cuerpo, ropa, cetro) se apoyan en el mismo punto del suelo.
-##   - UNA CÁMARA en perspectiva que sigue a Maisha, el sol (con el reloj del día), niebla y resplandor.
-## Medidas: 16 px = 1 m (una casilla).
-## Lo que se dibuja con código (_draw: llamas, auras, la ventisca...) todavía no tiene gemelo 3D: se ve en 2D encima.
+##   - LO QUE SE DIBUJA CON CÓDIGO (_draw) va por capas (el «canal» visibility_layer de cada dibujo):
+##       · lo del suelo y los efectos (zonas de Giza, hierba, brotes, avisos, golpes...): se pinta en una CAPA DE
+##         SUELO (un SubViewport que mira la misma escena 2D) que se tumba sobre el suelo 3D alrededor de Maisha;
+##       · lo de pantalla (niebla, hojas, nevada, ventisca, rayos de sol): CAPA DE PANTALLA, delante, como en 2D;
+##       · las sombras ovaladas pintadas (sombra.gd): no se ven (ya hay sombras de verdad).
+##     Los dibujos pegados al suelo (z por debajo de -4) también van a la capa de suelo.
+##   - UNA CÁMARA en perspectiva que sigue a Maisha, el sol (con el reloj del día) y algo de niebla.
+## La escena 2D no se oculta: solo deja de pintarse en la pantalla principal (canvas_cull_mask); la interfaz
+## (CanvasLayer) sigue igual. Medidas: 16 px = 1 m (una casilla).
 
 const PX := 1.0 / 16.0
 const ALTO_PENA := 1.25            # metros que se levanta una peña
@@ -17,6 +24,27 @@ const CAMARA_INCLINACION := -48.0  # grados (mirando hacia abajo)
 const CAMARA_DISTANCIA := 30.0     # metros hasta Maisha (se ve más o menos lo mismo que en 2D)
 const CAMARA_FOV := 30.0
 const LEJOS := 30.0                # metros: más allá de esto (de la cámara), los gemelos no se copian
+## Los canales de dibujo (visibility_layer) del mundo; la interfaz se queda en el 1, el de siempre. La pantalla
+## principal deja de pintar estos canales y las capas pintan solo el suyo.
+const CANAL_SUELO := 1 << 12
+const CANAL_GEMELO := 1 << 13
+const CANAL_PANTALLA := 1 << 14
+const CANAL_NADA := 1 << 15
+const CANALES_MUNDO := CANAL_SUELO | CANAL_GEMELO | CANAL_PANTALLA | CANAL_NADA
+const LADO_CAPA := 1024            # píxeles de la capa de suelo (64 m alrededor de Maisha)
+## El suelo cercano: la capa de suelo, con luz (para las sombras)
+const SOMBREADOR_CAPA := """
+shader_type spatial;
+render_mode diffuse_lambert, specular_disabled;
+uniform sampler2D capa : filter_nearest;
+void fragment() {
+	vec3 c = texture(capa, UV).rgb;
+	ALBEDO = c;
+	ROUGHNESS = 1.0;
+}
+"""
+## Dibujos de pantalla (por su script): van a la capa de pantalla, con sus hijos
+const DE_PANTALLA := ["ambiente.gd", "nevada.gd", "ventisca.gd", "luz_sol.gd"]
 
 var escena: Node2D
 var region: Node2D
@@ -26,6 +54,12 @@ var _gemelos := {}                 # id del dibujo 2D -> Sprite3D
 var _maisha: Node2D
 var _foco := Vector3.ZERO
 var _tinte := Color.WHITE
+var _canales := {}                 # id de cada dibujo -> [dibujo, su canal de antes] (para devolverlo al apagar)
+var _capa_suelo: SubViewport
+var _plano_capa: MeshInstance3D
+var _capa_pantalla: SubViewport
+var _velo_pantalla: CanvasLayer
+var _mascara_antes := 0xFFFFFFFF
 
 
 func _ready() -> void:
@@ -34,8 +68,12 @@ func _ready() -> void:
 	_crear_ambiente()
 	_crear_suelo()
 	_crear_camara()
+	_crear_capas()
 	for n in _todos(escena):
 		_registrar(n)
+	# la raíz de la escena, en los canales de las dos capas (si no, se llevaría por delante a todos sus hijos)
+	_canales[escena.get_instance_id()] = [escena, escena.visibility_layer]
+	escena.visibility_layer = escena.visibility_layer | CANAL_SUELO | CANAL_PANTALLA
 	escena.get_tree().node_added.connect(_registrar)
 	escena.get_tree().node_removed.connect(_quitar)
 
@@ -55,18 +93,16 @@ func _crear_ambiente() -> void:
 	entorno.background_color = RenderingServer.get_default_clear_color()
 	entorno.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	entorno.ambient_light_color = Color(1, 1, 1)
-	entorno.ambient_light_energy = 0.62
+	entorno.ambient_light_energy = 0.4     # (medido: con esto y el sol, el suelo al sol sale igual de claro que en 2D)
 	entorno.tonemap_mode = Environment.TONE_MAPPER_LINEAR      # (los colores del pixel art, tal cual)
-	entorno.fog_enabled = true
-	entorno.fog_light_color = RenderingServer.get_default_clear_color()
-	entorno.fog_density = 0.0035
+	entorno.fog_enabled = false        # (la niebla aclaraba los oscuros: la del juego ya la pinta la capa de pantalla)
 	entorno.glow_enabled = false
 	var mundo := WorldEnvironment.new()
 	mundo.environment = entorno
 	add_child(mundo)
 	sol = DirectionalLight3D.new()
 	sol.shadow_enabled = true
-	sol.light_energy = 0.48
+	sol.light_energy = 0.27
 	sol.light_color = Color(1.0, 0.95, 0.86)
 	sol.rotation_degrees = Vector3(-50, -35, 0)          # (desde arriba a la izquierda y algo por detrás: sombras hacia delante y a la derecha, como las pintadas)
 	sol.directional_shadow_max_distance = 60.0
@@ -91,7 +127,7 @@ func _crear_suelo() -> void:
 	var mat := StandardMaterial3D.new()
 	mat.albedo_texture = tex
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	mat.roughness = 0.95
+	mat.roughness = 1.0
 	# el suelo: una sola malla del tamaño del mapa con el suelo pintado
 	var plano := PlaneMesh.new()
 	plano.size = Vector2(ancho, alto)
@@ -155,6 +191,74 @@ func _cuad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, ua :
 		st.add_vertex(p[0])
 
 
+# --- Las capas de lo que se dibuja con código -----------------------------------------------------------------
+
+func _crear_capas() -> void:
+	var vista := escena.get_viewport()
+	# la capa de suelo: mira la escena 2D alrededor de Maisha y se tumba sobre el suelo
+	_capa_suelo = SubViewport.new()
+	_capa_suelo.size = Vector2i(LADO_CAPA, LADO_CAPA)
+	_capa_suelo.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	_capa_suelo.world_2d = vista.world_2d
+	_capa_suelo.canvas_cull_mask = CANAL_SUELO
+	_capa_suelo.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+	add_child(_capa_suelo)
+	# (el suelo cercano ES esta capa: el suelo pintado, con el gris de Giza donde lo hay, y todo lo que se dibuja
+	# encima; con luz, para que reciba las sombras de verdad)
+	var sombreador := Shader.new()
+	sombreador.code = SOMBREADOR_CAPA
+	var mat := ShaderMaterial.new()
+	mat.shader = sombreador
+	mat.set_shader_parameter("capa", _capa_suelo.get_texture())
+	var plano := PlaneMesh.new()
+	plano.size = Vector2(LADO_CAPA * PX, LADO_CAPA * PX)
+	_plano_capa = MeshInstance3D.new()
+	_plano_capa.mesh = plano
+	_plano_capa.material_override = mat
+	_plano_capa.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(_plano_capa)
+	# la capa de pantalla: lo mismo que verían los ojos en 2D, delante del 3D (y detrás de la interfaz)
+	_capa_pantalla = SubViewport.new()
+	_capa_pantalla.size = vista.get_visible_rect().size
+	_capa_pantalla.transparent_bg = true
+	_capa_pantalla.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	_capa_pantalla.world_2d = vista.world_2d
+	_capa_pantalla.canvas_cull_mask = CANAL_PANTALLA
+	_capa_pantalla.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+	add_child(_capa_pantalla)
+	_velo_pantalla = CanvasLayer.new()
+	_velo_pantalla.layer = 5
+	var cuadro := TextureRect.new()
+	cuadro.texture = _capa_pantalla.get_texture()
+	cuadro.set_anchors_preset(Control.PRESET_FULL_RECT)
+	cuadro.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cuadro.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_velo_pantalla.add_child(cuadro)
+	add_child(_velo_pantalla)
+	# la pantalla principal deja de pintar el mundo 2D (sigue vivo y viéndose en las capas); la interfaz, sí
+	_mascara_antes = vista.canvas_cull_mask
+	vista.canvas_cull_mask = _mascara_antes & ~CANALES_MUNDO
+
+
+func _mover_capas() -> void:
+	# la capa de suelo, centrada en el foco (a píxeles enteros, para que no tiemble)
+	var centro := Vector2(roundf(_foco.x / PX), roundf(_foco.z / PX))
+	_capa_suelo.canvas_transform = Transform2D(0.0, -(centro - Vector2(LADO_CAPA, LADO_CAPA) / 2.0))
+	_plano_capa.position = Vector3(centro.x * PX, 0.005, centro.y * PX)
+	_capa_pantalla.canvas_transform = escena.get_viewport().canvas_transform
+
+
+func _exit_tree() -> void:
+	# todo como estaba: la escena vuelve a pintarse y cada dibujo a su canal
+	if is_instance_valid(escena) and escena.is_inside_tree():
+		escena.get_viewport().canvas_cull_mask = _mascara_antes
+	else:
+		get_viewport().canvas_cull_mask = _mascara_antes
+	for par in _canales.values():
+		if is_instance_valid(par[0]):
+			(par[0] as CanvasItem).visibility_layer = par[1]
+
+
 # --- La cámara ------------------------------------------------------------------------------------------------
 
 func _crear_camara() -> void:
@@ -188,10 +292,22 @@ func _al_suelo(p: Vector2) -> Vector3:
 # --- Los gemelos de los dibujos -------------------------------------------------------------------------------
 
 func _registrar(n: Node) -> void:
-	if not (n is Sprite2D or n is AnimatedSprite2D):
+	if not (n is CanvasItem) or not escena.is_ancestor_of(n) or _en_interfaz(n):
 		return
-	if not escena.is_ancestor_of(n) or n.name == "Suelo":
+	var ci := n as CanvasItem
+	if not _canales.has(ci.get_instance_id()):
+		_canales[ci.get_instance_id()] = [ci, ci.visibility_layer]
+	# ¿a qué capa va?
+	if n.get_script() and String(n.get_script().resource_path).ends_with("sombra.gd"):
+		ci.visibility_layer = CANAL_NADA
 		return
+	if _de_pantalla(n):
+		ci.visibility_layer = CANAL_PANTALLA
+		return
+	if not (n is Sprite2D or n is AnimatedSprite2D) or _z(n) < SUELO_BAJO:
+		ci.visibility_layer = CANAL_SUELO
+		return
+	ci.visibility_layer = CANAL_GEMELO
 	if _gemelos.has(n.get_instance_id()):
 		return
 	var g := Sprite3D.new()
@@ -201,20 +317,38 @@ func _registrar(n: Node) -> void:
 	g.shaded = false                 # (sus colores de pixel art; de noche se oscurecen con «_tinte»)
 	g.double_sided = true
 	g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
-	var tumbado := _z(n) < SUELO_BAJO
-	if tumbado:
-		g.axis = Vector3.AXIS_Y
-		g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	else:
-		g.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
-	g.set_meta("tumbado", tumbado)
+	g.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
 	add_child(g)
 	# (lo que no cambia: el cuerpo en el que se apoya y su orden de dibujo; se calcula una vez)
 	_gemelos[n.get_instance_id()] = [n, g, null, _z(n)]
 
 
+## ¿Cuelga de una CanvasLayer (la interfaz: el HUD, los diálogos, la mochila...)? Eso no se toca.
+func _en_interfaz(n: Node) -> bool:
+	var c: Node = n
+	while c and c != escena:
+		if c is CanvasLayer:
+			return true
+		c = c.get_parent()
+	return false
+
+
+## ¿Es un dibujo de pantalla (o cuelga de uno)?
+func _de_pantalla(n: Node) -> bool:
+	var c: Node = n
+	while c and c != escena:
+		if c.get_script():
+			var ruta := String(c.get_script().resource_path)
+			for nombre in DE_PANTALLA:
+				if ruta.ends_with(nombre):
+					return true
+		c = c.get_parent()
+	return false
+
+
 func _quitar(n: Node) -> void:
 	var id := n.get_instance_id()
+	_canales.erase(id)
 	if _gemelos.has(id):
 		(_gemelos[id][1] as Node).queue_free()
 		_gemelos.erase(id)
@@ -272,9 +406,10 @@ func _process(_delta: float) -> void:
 			par[2] = _ancla(n)
 		_copiar(n, g, par[2], par[3])
 	_colocar_camara(0.12)
+	_mover_capas()
 	# el sol sigue la hora del día (de día, cálido; de noche, frío y flojo), y los dibujos se tiñen igual
 	var dia: float = Reloj.luz_dia() if Reloj.has_method("luz_dia") else 1.0
-	sol.light_energy = lerpf(0.12, 0.48, dia)
+	sol.light_energy = lerpf(0.07, 0.27, dia)
 	sol.light_color = Color(0.6, 0.66, 0.95).lerp(Color(1.0, 0.95, 0.86), dia)
 	_tinte = Color(0.42, 0.46, 0.68).lerp(Color.WHITE, dia)
 
@@ -309,12 +444,6 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 	g.modulate = n.modulate * n.self_modulate * _tinte
 	var escala := n.global_scale
 	g.scale = Vector3(escala.x, escala.y, 1.0)
-	if g.get_meta("tumbado"):
-		# pegado al suelo: en su sitio, mirando hacia arriba
-		var o: Vector2 = n.offset
-		g.offset = Vector2(o.x, -o.y)
-		g.position = _al_suelo(n.global_position) + Vector3(0, 0.01 + z * 0.0005 + 0.05, 0)
-		return
 	# de pie: apoyado en el suelo de su cuerpo; lo que en 2D está más arriba que el cuerpo, en 3D está más alto
 	var sube: Vector2 = n.global_position - ancla.global_position
 	var o2: Vector2 = n.offset + Vector2(sube.x, sube.y)

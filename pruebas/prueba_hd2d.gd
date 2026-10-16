@@ -50,7 +50,7 @@ func _ready() -> void:
 	await _esperar(0.5)
 	var espejo := _espejo()
 	_comprobar(espejo != null, "con H se enciende el HD-2D")
-	_comprobar(not escena.visible, "el dibujo 2D del mundo se oculta")
+	_comprobar(escena.visible and espejo != null and espejo.get("_capa_suelo") != null, "el dibujo 2D del mundo pasa a las capas 3D (la escena sigue viva)")
 	var gemelos: Dictionary = espejo.get("_gemelos") if espejo else {}
 	_comprobar(gemelos.size() > 40, "cada dibujo del mundo tiene su gemelo 3D (%d)" % gemelos.size())
 	_comprobar(espejo != null and espejo.camara.current, "y una cámara 3D lo mira")
@@ -76,7 +76,7 @@ func _ready() -> void:
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")
 	espejo = _espejo()
-	_comprobar(espejo != null and not get_tree().current_scene.visible, "al cambiar de escena, sigue en HD-2D (se recuerda)")
+	_comprobar(espejo != null, "al cambiar de escena, sigue en HD-2D (se recuerda)")
 	var hay_penas := false
 	if espejo:
 		for h in espejo.get_children():
@@ -85,7 +85,13 @@ func _ready() -> void:
 	_comprobar(hay_penas, "las peñas del mapa se levantan en 3D")
 	get_tree().current_scene.poner_hd2d(false)
 	await _esperar(0.3)
-	_comprobar(_espejo() == null and get_tree().current_scene.visible and not Estado.extra.get("hd2d", false), "al apagarlo, vuelve el 2D de siempre")
+	_comprobar(_espejo() == null and not Estado.extra.get("hd2d", false), "al apagarlo, vuelve el 2D de siempre")
+	var sombras_ok := true
+	for s in get_tree().get_nodes_in_group("maisha"):
+		for h in s.get_children():
+			if h is CanvasItem and (h as CanvasItem).visibility_layer != 1:
+				sombras_ok = false
+	_comprobar(sombras_ok, "y cada dibujo vuelve a su canal")
 
 	print()
 	print("RESULTADO: todo correcto" if _fallos == 0 else "RESULTADO: %d fallos" % _fallos)

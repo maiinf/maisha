@@ -41,7 +41,7 @@ Lee primero, enteros: `CLAUDE.md`, `LEEME.md`, `documentacion/decisiones.md` y, 
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_X
 ```
 - Hay 32 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto». Al final de cada rama, **pásalas todas**.
-- Algunas fallan **a veces** sin motivo (`prueba_kuvu` —el latigazo—, `prueba_kitovu`, `prueba_lago_espejo`, `prueba_sonido`): **repítelas** antes de dar nada por roto. Si una falla siempre, la has roto tú: arréglalo antes de seguir.
+- Algunas fallan **a veces** sin motivo (`prueba_kitovu`, `prueba_lago_espejo`, `prueba_sonido`): **repítelas** antes de dar nada por roto. Si una falla siempre, la has roto tú: arréglalo antes de seguir.
 - Si mejoras un sistema que no tiene prueba, **añádele una**.
 - No existe el comando `timeout`: para limitar una prueba, lánzala en segundo plano y mátala si se pasa.
 - **Capturas**: un script temporal `pruebas/_captura.gd` (debe ser `extends Node`) lanzado sin `--headless`, que guarde `get_viewport().get_texture().get_image()`. **Bórralo** (y su `.uid`) después. En este Mac la ventana del juego a veces se frena y no sale la imagen: repite, o comprueba el dibujo en una escena mínima con fondo y cámara.

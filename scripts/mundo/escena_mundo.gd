@@ -101,7 +101,7 @@ func _ready() -> void:
 
 
 ## HD-2D (en pruebas): la misma escena dibujada en 3D (scripts/mundo/hd2d/espejo_hd2d.gd). El juego no cambia:
-## solo se oculta el dibujo 2D del mundo (la interfaz sigue igual). Con H se cambia entre 2D y HD-2D.
+## el dibujo 2D del mundo deja de pintarse en pantalla (la interfaz sigue igual). Con H se cambia entre 2D y HD-2D.
 var _espejo: Node3D
 
 
@@ -116,7 +116,6 @@ func poner_hd2d(si: bool) -> void:
 	elif not si and _espejo:
 		_espejo.queue_free()
 		_espejo = null
-	visible = not si
 
 
 func _unhandled_key_input(evento: InputEvent) -> void:

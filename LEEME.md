@@ -836,14 +836,19 @@ Decidido con Iam: el juego irá a **HD-2D** (los sprites de pixel art de siempre
 
 | Qué | Cómo |
 | --- | --- |
-| El suelo | El suelo pintado de cada mapa es el suelo 3D (1 casilla = 1 m) |
+| El suelo | Cerca de Maisha, la **capa de suelo**: un SubViewport que mira la misma escena 2D (el suelo pintado con el gris de Giza, la hierba, las zonas, las raíces, los avisos, los golpes, las llamas...) y se tumba sobre el suelo 3D, con luz para recibir las sombras. Más lejos, el suelo pintado (1 casilla = 1 m) |
 | Las peñas | Las casillas «0» se levantan 1,25 m, con el suelo pintado encima y paredes de roca |
 | Los dibujos | Cada Sprite2D y AnimatedSprite2D del mundo tiene un gemelo 3D **de pie** que mira a la cámara, con **sombra real**; lo pegado al suelo (z por debajo de -4) se tumba. Las capas de un personaje (cuerpo, ropa, cetro) se apoyan en el mismo punto. Conservan sus colores de pixel art y de noche se tiñen de azul |
-| Luz y cámara | Sol que sigue el reloj del día, poca niebla, cámara en perspectiva (30°, inclinada 48°) que sigue a Maisha sin salirse del mapa |
+| Lo de pantalla | Niebla, hojas que caen, nevada, ventisca y rayos de sol: la **capa de pantalla**, delante, igual que en 2D |
+| Sombras | Las sombras ovaladas pintadas no se ven: las pone el sol de verdad |
+| Cómo se separa | Cada dibujo va a un «canal» (`visibility_layer` 13-16): la pantalla principal deja de pintar el mundo 2D (`canvas_cull_mask`) y cada capa pinta solo el suyo; la interfaz se queda en el canal 1. Al apagarlo, todo vuelve a su canal |
+| Luz y cámara | Sol que sigue el reloj del día y luz de ambiente medidas para que el suelo al sol salga igual de claro que en 2D; sin niebla 3D. Cámara en perspectiva (30°, inclinada 48°) que sigue a Maisha sin salirse del mapa |
 | Rendimiento | Solo se copian los dibujos a menos de 30 m de la cámara: el fotograma cuesta lo mismo que en 2D (7,5 ms en los Prados) |
 | Prueba | `pruebas/prueba_hd2d.gd` |
 
-Falta: lo que se dibuja con código (llamas, auras, la ventisca, las zonas de Giza, el decorado de hierba, las sombras pintadas a mano) aún se ve solo en 2D; el agua y los desniveles del terreno; el relieve de los dibujos (mapas de normales) en 3D.
+Comparativas: `documentacion/hd2d_comparativa_1.png` y `hd2d_comparativa_2.png`.
+
+Falta: lo que se dibuja con código y va **de pie** (llamas de los braseros, el «!» de los aldeanos, auras) sale tumbado en el suelo; el agua y los desniveles del terreno; las paredes de las peñas con su dibujo; el relieve de los dibujos (mapas de normales) en 3D.
 
 # SIGILIA (mundo 2)
 
