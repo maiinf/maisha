@@ -208,3 +208,9 @@ se pasan.
 | Mauti en Sigilia | Va con Maisha pero se queda en la ciudad ayudando a los escribas en blanco; aparece en momentos clave (Iam: «vale sigue») |
 | Paso de la Escarcha, parte 2 | Taa (armiño farolero) está en blanco a media subida; su ficha del Índice se la llevó el viento al este. Al devolvérsela recupera el color y enseña el SIGILO DE FUEGO: tecla nueva U (RB en el mando; RB deja de ser «cambiar de semilla», que no se usaba), 20 de Aliento. Los faroles rúnicos solo los enciende el sigilo y, encendidos, abrigan del viento y ablandan la nieve |
 | Paso de la Escarcha, parte 3 | Páginas sueltas (enemigo: 2 golpes, el fuego las quema de un trazo). La Puerta Sellada se derrite con 3 sigilos; arriba la peña se cierra para que no se rodee. Misión «El Paso de la Escarcha». Música «La nieve que escribe» con el tema de Sigilia (vals de caja de música en si menor) |
+
+### Revisión de efectos de sonido (`revision/sonidos`)
+| Qué | Decisión |
+| --- | --- |
+| Efectos orgánicos | En `herramientas/crear_sonidos.py`, `cetro_golpe` reemplaza los 16 tramos escalonados de ruido blanco por un barrido continuo de ruido rosa con cuerpo grave de madera y reverberación corta; `golpe_acierto` incorpora chasquido de piedra/corteza (`_crujido_piedra`); `semilla_plantar` añade textura de hojarasca y reverberación corta |
+| Equilibrio de `VOLUMEN` | En `scripts/globales/sonido.gd`, se moderan a `-2,0 dB` los rugidos y victorias de jefes que estaban en `0,0` / `-1,0 dB` (para que no tapen la música ni las fanfarrias) y se suben `cetro_golpe` (`-8,0` → `-6,5 dB`), `semilla_mecha` (`-12,0` → `-9,5 dB`) y `mende_corre` (`-12,0` → `-10,0 dB`) |
