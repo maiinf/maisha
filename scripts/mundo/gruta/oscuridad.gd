@@ -18,18 +18,7 @@ var _tiempo := 0.0
 
 
 static func textura_luz(tam := 256) -> GradientTexture2D:
-	var g := Gradient.new()
-	g.set_color(0, Color(1, 1, 1, 1))
-	g.add_point(0.45, Color(1, 1, 1, 0.55))
-	g.set_color(g.get_point_count() - 1, Color(1, 1, 1, 0))
-	var t := GradientTexture2D.new()
-	t.gradient = g
-	t.fill = GradientTexture2D.FILL_RADIAL
-	t.fill_from = Vector2(0.5, 0.5)
-	t.fill_to = Vector2(1.0, 0.5)
-	t.width = tam
-	t.height = tam
-	return t
+	return preload("res://scripts/mundo/relieve.gd").textura_luz(tam)
 
 
 func _ready() -> void:

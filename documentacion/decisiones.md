@@ -208,3 +208,9 @@ se pasan.
 | Mauti en Sigilia | Va con Maisha pero se queda en la ciudad ayudando a los escribas en blanco; aparece en momentos clave (Iam: «vale sigue») |
 | Paso de la Escarcha, parte 2 | Taa (armiño farolero) está en blanco a media subida; su ficha del Índice se la llevó el viento al este. Al devolvérsela recupera el color y enseña el SIGILO DE FUEGO: tecla nueva U (RB en el mando; RB deja de ser «cambiar de semilla», que no se usaba), 20 de Aliento. Los faroles rúnicos solo los enciende el sigilo y, encendidos, abrigan del viento y ablandan la nieve |
 | Paso de la Escarcha, parte 3 | Páginas sueltas (enemigo: 2 golpes, el fuego las quema de un trazo). La Puerta Sellada se derrite con 3 sigilos; arriba la peña se cierra para que no se rodee. Misión «El Paso de la Escarcha». Música «La nieve que escribe» con el tema de Sigilia (vals de caja de música en si menor) |
+
+### Limpieza y deduplicación de código (`revision/codigo`)
+| Qué | Decisión |
+| --- | --- |
+| Textura radial de luz (`relieve.gd`) | `Relieve.textura_luz(tam)` pasa a ser estática y con caché por tamaño (`_cache_luz`), eliminando la construcción repetida de `GradientTexture2D` en `Relieve.destello()`, `scripts/mundo/olvidado/brasero.gd` y `scripts/mundo/gruta/oscuridad.gd` |
+| Deduplicación en interfaz y combate | En `scripts/interfaz/objetivo.gd`, `_oculto()` reutiliza `oculto_por_menu()`; en `scripts/combate/zona_corrupta.gd`, `_al_caer_maisha()` unifica la llamada a `hud.fundido()`; en `herramientas/componer_musica.py` se elimina la importación duplicada de `paso_bajo` |

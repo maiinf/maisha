@@ -87,24 +87,18 @@ func _hablando() -> bool:
 
 ## La mochila, la pausa o el Árbol de la Vida tapan la pantalla: los avisos esperan
 func oculto_por_menu() -> bool:
-	for grupo in ["mochila", "pausa", "arbol_vida"]:
-		var n := get_tree().get_first_node_in_group(grupo)
-		if n and n.visible:
-			return true
-	return false
-
-
-func _oculto() -> bool:
-	if not Estado.jugando or Estado.cambiando or _hablando():
-		return true
 	var mochila := get_tree().get_first_node_in_group("mochila")
-	if mochila and mochila.abierta:
+	if mochila and (mochila.abierta or mochila.visible):
 		return true
 	var arbol := get_tree().get_first_node_in_group("arbol_vida")
 	if arbol and arbol.visible:
 		return true
 	var pausa := get_tree().get_first_node_in_group("pausa")
-	if pausa and pausa.abierto:
+	return pausa != null and (pausa.abierto or pausa.visible)
+
+
+func _oculto() -> bool:
+	if not Estado.jugando or Estado.cambiando or _hablando() or oculto_por_menu():
 		return true
 	for zona in get_tree().get_nodes_in_group("zonas"):
 		if zona.estado in [1, 2, 3]:          # en plena pelea
