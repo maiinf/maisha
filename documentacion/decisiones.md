@@ -208,3 +208,9 @@ se pasan.
 | Mauti en Sigilia | Va con Maisha pero se queda en la ciudad ayudando a los escribas en blanco; aparece en momentos clave (Iam: «vale sigue») |
 | Paso de la Escarcha, parte 2 | Taa (armiño farolero) está en blanco a media subida; su ficha del Índice se la llevó el viento al este. Al devolvérsela recupera el color y enseña el SIGILO DE FUEGO: tecla nueva U (RB en el mando; RB deja de ser «cambiar de semilla», que no se usaba), 20 de Aliento. Los faroles rúnicos solo los enciende el sigilo y, encendidos, abrigan del viento y ablandan la nieve |
 | Paso de la Escarcha, parte 3 | Páginas sueltas (enemigo: 2 golpes, el fuego las quema de un trazo). La Puerta Sellada se derrite con 3 sigilos; arriba la peña se cierra para que no se rodee. Misión «El Paso de la Escarcha». Música «La nieve que escribe» con el tema de Sigilia (vals de caja de música en si menor) |
+
+### Revisión de interfaz (`revision/interfaz`)
+| Qué | Decisión |
+| --- | --- |
+| Menú de pausa (`menu_pausa.gd`) | Los objetos que lleva Maisha dibujan todos su icono de `objetos.png` (antes solo `seta_luminosa` y `mineral`) y se disponen en 2 columnas a partir de 4 objetos para que no desborden `CAJA_INFO` |
+| Nitidez de fuente y mapa | Desactivado el posicionamiento subpíxel en `objetivo.gd`, `menu_pausa.gd` y `mochila.gd`; añadido `"cueva_eco"` a `PUNTO_RAIZ` en `mochila.gd` y soporte de `keycode` además de `physical_keycode` en los atajos `1-6` y `M` |

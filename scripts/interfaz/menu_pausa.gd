@@ -6,10 +6,7 @@ extends CanvasLayer
 
 const LISTA := preload("res://scripts/interfaz/menu_lista.gd")
 const FUENTE := preload("res://fuentes/pixelify_sans.woff")
-const ICONOS := {
-	"seta_luminosa": preload("res://arte/mundos/raiz/objetos/seta_luminosa.png"),
-	"mineral": preload("res://arte/mundos/raiz/objetos/mineral.png"),
-}
+const OBJETOS_TEX := preload("res://arte/interfaz/objetos.png")
 ## Mejoras que se muestran si se tiene su marca: marca -> texto
 const MEJORAS := {
 	"cetro_templado": "Cetro templado: el golpe llega más lejos",
@@ -38,6 +35,7 @@ func _ready() -> void:
 	_fuente = FUENTE
 	_fuente.antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	_fuente.hinting = TextServer.HINTING_NONE
+	_fuente.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
 	_lienzo = Control.new()
 	_lienzo.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_lienzo.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -173,33 +171,40 @@ func _dibujar() -> void:
 	var p := CAJA_INFO.position + Vector2(16, 24)
 	_texto(Estado.lugar if Estado.lugar != "" else "Raíz", p, AMBAR)
 	_texto("Tiempo de juego: %s" % Estado.texto_tiempo(Estado.tiempo_jugado), p + Vector2(0, 20), APAGADO)
-	# lo que lleva Maisha
-	p.y += 50
+	# lo que lleva Maisha (en dos columnas para que no se salga de la caja aunque lleve muchos objetos)
+	p.y += 46
 	_texto("Lleva", p, TEXTO)
-	p.y += 8
-	var algo := false
+	p.y += 6
+	var llevados: Array[String] = []
 	for o in Estado.OBJETOS:
-		var n := Estado.cuantos(o)
-		if n <= 0:
-			continue
-		algo = true
-		var icono: Texture2D = ICONOS.get(o)
-		if icono:
-			_lienzo.draw_texture_rect_region(icono, Rect2(p + Vector2(0, 4), Vector2(icono.get_width() / 2, icono.get_height())),
-				Rect2(0, 0, icono.get_width() / 2, icono.get_height()))
-		_texto("%s  x%d" % [Estado.OBJETOS[o]["uno"], n], p + Vector2(18, 16), APAGADO)
-		p.y += 20
-	if not algo:
+		if Estado.cuantos(o) > 0:
+			llevados.append(o)
+	if llevados.is_empty():
 		_texto("Nada, por ahora", p + Vector2(0, 16), Color(APAGADO, 0.6))
 		p.y += 20
+	else:
+		var dos_col := llevados.size() > 3
+		for idx in llevados.size():
+			var o := llevados[idx]
+			var n := Estado.cuantos(o)
+			var col := (idx % 2) if dos_col else 0
+			var fila := (idx / 2) if dos_col else idx
+			var pos_o := p + Vector2(col * 142, fila * 19)
+			var idx_icono: int = int(Estado.OBJETOS[o].get("icono", -1))
+			if idx_icono >= 0:
+				_lienzo.draw_texture_rect_region(OBJETOS_TEX, Rect2(pos_o + Vector2(0, 2), Vector2(16, 16)),
+					Rect2(idx_icono * 16, 0, 16, 16))
+			_texto("%s x%d" % [Estado.OBJETOS[o]["uno"], n], pos_o + Vector2(19, 15), APAGADO)
+		var filas_usadas := ((llevados.size() + 1) / 2) if dos_col else llevados.size()
+		p.y += filas_usadas * 19
 	# mejoras
-	p.y += 18
+	p.y = minf(p.y + 16, CAJA_INFO.end.y - 62)
 	_texto("Mejoras", p, TEXTO)
 	var hay_mejoras := false
 	for m in MEJORAS:
 		if Estado.tiene(m):
 			hay_mejoras = true
-			p.y += 20
+			p.y += 18
 			_texto("· " + String(MEJORAS[m]), p, APAGADO)
 	if not hay_mejoras:
-		_texto("Ninguna, por ahora", p + Vector2(0, 20), Color(APAGADO, 0.6))
+		_texto("Ninguna, por ahora", p + Vector2(0, 18), Color(APAGADO, 0.6))
