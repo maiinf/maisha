@@ -8,6 +8,8 @@ var _tiempo := 0.0
 var _lienzo: Node2D
 var _vineta: TextureRect
 var _calidez := 1.0            # 1 = al sol con color; 0 = gris
+var _maisha: Node2D = null
+var _gestor: Node = null
 
 
 func _ready() -> void:
@@ -41,11 +43,13 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_tiempo += delta
 	# ¿hay color alrededor de Maisha?
-	var maisha := get_tree().get_first_node_in_group("maisha") as Node2D
-	var gestor := get_tree().get_first_node_in_group("corrupcion")
+	if _maisha == null or not is_instance_valid(_maisha):
+		_maisha = get_tree().get_first_node_in_group("maisha") as Node2D
+	if _gestor == null or not is_instance_valid(_gestor):
+		_gestor = get_tree().get_first_node_in_group("corrupcion")
 	var objetivo := 1.0
-	if maisha and gestor:
-		objetivo = 1.0 - clampf(gestor.gris_en(maisha.global_position), 0.0, 1.0)
+	if _maisha and _gestor:
+		objetivo = 1.0 - clampf(_gestor.gris_en(_maisha.global_position), 0.0, 1.0)
 	_calidez = move_toward(_calidez, objetivo, delta * 0.5)
 	_lienzo.queue_redraw()
 

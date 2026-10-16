@@ -226,3 +226,11 @@ se pasan.
 | --- | --- |
 | Textura radial de luz (`relieve.gd`) | `Relieve.textura_luz(tam)` pasa a ser estática y con caché por tamaño (`_cache_luz`), eliminando la construcción repetida de `GradientTexture2D` en `Relieve.destello()`, `scripts/mundo/olvidado/brasero.gd` y `scripts/mundo/gruta/oscuridad.gd` |
 | Deduplicación en interfaz y combate | En `scripts/interfaz/objetivo.gd`, `_oculto()` reutiliza `oculto_por_menu()`; en `scripts/combate/zona_corrupta.gd`, `_al_caer_maisha()` unifica la llamada a `hud.fundido()`; en `herramientas/componer_musica.py` se elimina la importación duplicada de `paso_bajo` |
+### Optimización y rendimiento (`revision/rendimiento`)
+| Qué | Decisión |
+| --- | --- |
+| Aldeanos (`aldeano.gd`) | Se cachea `_tiene_novedad` (revisada solo cada 0.5 s o al cambiar marcas) y la referencia a Maisha, evitando llamar a `CHARLA.tiene_novedad()` y `queue_redraw()` en cada fotograma cuando el aldeano no tiene novedad |
+| Ambiente (`ambiente.gd`) | Se sustituyen 5 llamadas a `.filter()` por fotograma con eliminación in-place inversa para no reservar nuevos arrays ni closures cada fotograma; se descarta el dibujo de nubes fuera de la vista y se dibujan con `draw_set_transform()` sin reservar `PackedVector2Array` |
+| Luz del sol (`luz_sol.gd`) | Se cachean los nodos de grupo `maisha` y `corrupcion` en lugar de buscarlos en cada fotograma |
+| Medición | `cuna_de_musgo` mejora de 7.81 ms/frame (128 FPS) a 7.08 ms/frame (141 FPS); `prados_del_eco` de 9.20 ms/frame (108 FPS) a 8.49 ms/frame (118 FPS) |
+

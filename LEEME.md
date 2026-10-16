@@ -909,3 +909,8 @@ Cada uno tiene ahora **4 fotogramas** (`<id>_anim.png`): quieto, respira (todo b
 
 - `Relieve.textura_luz(tam)` (`scripts/mundo/relieve.gd`) centraliza y guarda en caché por tamaño la textura radial `GradientTexture2D` usada por las luces nocturnas, `Relieve.destello()`, `scripts/mundo/olvidado/brasero.gd` y `scripts/mundo/gruta/oscuridad.gd`.
 - En `scripts/interfaz/objetivo.gd` se unifica la comprobación de menús en `oculto_por_menu()`, y en `scripts/combate/zona_corrupta.gd` se simplifica `_al_caer_maisha()`.
+## Rendimiento y optimización (`revision/rendimiento`)
+
+- En `scripts/mundo/aldea/aldeano.gd`: se cachea `_tiene_novedad` (evaluada cada 0.5 s o al actualizar marcas) para no evaluar misiones por cada aldeano 60 veces por segundo, y se evita llamar a `queue_redraw()` innecesariamente.
+- En `scripts/mundo/ambiente.gd`: se eliminan las llamadas a `.filter()` por fotograma usando eliminación in-place inversa para no generar objetos temporales en el GC; se descartan las nubes fuera de la vista y se dibujan con `draw_set_transform()` sin reservar arrays.
+- En `scripts/mundo/luz_sol.gd`: se cachean las referencias a los nodos de grupo `maisha` y `corrupcion`.
