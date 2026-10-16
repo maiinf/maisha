@@ -50,6 +50,7 @@ var _bancos: Array[Dictionary] = []      # bancos de niebla (en coordenadas de p
 var _espesor := -1.0                      # lo espesa que está la niebla ahora (sigue al gris con suavidad)
 var _tiempo := 0.0
 var _azar := RandomNumberGenerator.new()
+var _gestor: Node = null
 
 
 func _ready() -> void:
@@ -84,6 +85,9 @@ func _vista() -> Rect2:
 func _process(delta: float) -> void:
 	_tiempo += delta
 	var vista := _vista()
+	if _gestor == null or not is_instance_valid(_gestor):
+		_gestor = get_tree().get_first_node_in_group("corrupcion")
+	var gestor := _gestor
 	# nubes: avanzan con el viento y dan la vuelta al mapa
 	for n in _nubes:
 		n["pos"] += VIENTO * delta
@@ -93,8 +97,7 @@ func _process(delta: float) -> void:
 			n["pos"].y = -100
 	# niebla: bancos que cruzan la pantalla despacio; se espesa con el gris del sitio
 	if niebla > 0.0:
-		var gestor_n := get_tree().get_first_node_in_group("corrupcion")
-		var gris: float = gestor_n.gris_en(vista.get_center()) if gestor_n else 1.0
+		var gris: float = gestor.gris_en(vista.get_center()) if gestor else 1.0
 		var meta := niebla * (0.3 + 0.7 * gris)
 		_espesor = meta if _espesor < 0.0 else move_toward(_espesor, meta, delta * 0.15)
 		for b in _bancos:
@@ -102,17 +105,18 @@ func _process(delta: float) -> void:
 			if b["pos"].x > vista.size.x + 160:
 				b["pos"] = Vector2(-160, _azar.randf() * (vista.size.y + 40) - 20)
 	# hojas: verdes y cobrizas donde hay color; grises y secas donde Giza se lo ha llevado
-	var gestor := get_tree().get_first_node_in_group("corrupcion")
 	if _hojas.size() < HOJAS_MAX * (3 if otono else 1) and _azar.randf() < delta * (9.0 if otono else 3.0):
 		var inicio := Vector2(vista.position.x + _azar.randf() * vista.size.x, vista.position.y - 4)
 		var seca: bool = gestor != null and gestor.gris_en(inicio + Vector2(0, vista.size.y * 0.5)) > 0.5
 		var colores: Array = COLORES_HOJA_SECA if seca else (COLORES_HOJA_OTONO if otono else COLORES_HOJA)
 		_hojas.append({"pos": inicio, "vida": 0.0, "fase": _azar.randf() * TAU, "color": colores[_azar.randi() % colores.size()],
 			"caida": _azar.randf_range(12, 22), "giro": _azar.randf_range(4.0, 8.0), "alto": _azar.randf_range(8, 16)})
-	for h in _hojas:
+	for i in range(_hojas.size() - 1, -1, -1):
+		var h: Dictionary = _hojas[i]
 		h["vida"] += delta
 		h["pos"] += Vector2(VIENTO.x + sin(h["vida"] * 2.2 + h["fase"]) * 14.0, h["caida"]) * delta
-	_hojas = _hojas.filter(func(h: Dictionary) -> bool: return h["pos"].y < vista.end.y + 8)
+		if h["pos"].y >= vista.end.y + 8:
+			_hojas.remove_at(i)
 	# motas: polen dorado al sol donde hay vida; ceniza que cae despacio donde todo es gris
 	if _motas.size() < MOTAS_MAX and _azar.randf() < delta * 12.0:
 		var p := vista.position + Vector2(_azar.randf() * vista.size.x, _azar.randf() * vista.size.y)
@@ -120,45 +124,53 @@ func _process(delta: float) -> void:
 		if g > 0.6 or g < 0.3:
 			_motas.append({"pos": p, "vida": 0.0, "dura": _azar.randf_range(3.0, 7.0), "fase": _azar.randf() * TAU,
 				"ceniza": g > 0.6})
-	for mo in _motas:
+	for i in range(_motas.size() - 1, -1, -1):
+		var mo: Dictionary = _motas[i]
 		mo["vida"] += delta
 		if mo["ceniza"]:
 			mo["pos"] += Vector2(VIENTO.x * 0.8 + sin(mo["vida"] * 1.3 + mo["fase"]) * 4.0, 6.0) * delta
 		else:
 			mo["pos"] += Vector2(sin(mo["vida"] * 0.8 + mo["fase"]) * 5.0 + 2.0, cos(mo["vida"] * 0.6 + mo["fase"]) * 3.0 - 3.0) * delta
-	_motas = _motas.filter(func(mo: Dictionary) -> bool: return mo["vida"] < mo["dura"])
+		if mo["vida"] >= mo["dura"]:
+			_motas.remove_at(i)
 	# mariposas: solo donde ya hay color
 	if gestor and _mariposas.size() < MARIPOSAS_MAX and _azar.randf() < delta * 2.0:
 		var p := vista.position + Vector2(_azar.randf() * vista.size.x, _azar.randf() * vista.size.y)
 		if gestor.gris_en(p) < 0.2:
 			_mariposas.append({"pos": p, "destino": p, "color": _azar.randi() % 2, "vida": 0.0, "dura": _azar.randf_range(8, 16)})
-	for m in _mariposas:
+	for i in range(_mariposas.size() - 1, -1, -1):
+		var m: Dictionary = _mariposas[i]
 		m["vida"] += delta
 		if m["pos"].distance_to(m["destino"]) < 3.0:
 			m["destino"] = m["pos"] + Vector2(_azar.randf_range(-40, 40), _azar.randf_range(-30, 30))
 		m["pos"] = m["pos"].move_toward(m["destino"], 18.0 * delta)
-	_mariposas = _mariposas.filter(func(m: Dictionary) -> bool:
-		return m["vida"] < m["dura"] and (gestor == null or gestor.gris_en(m["pos"]) < 0.5))
+		if m["vida"] >= m["dura"] or (gestor != null and gestor.gris_en(m["pos"]) >= 0.5):
+			_mariposas.remove_at(i)
 	# destellos en el agua visible
 	if not agua.is_empty() and _azar.randf() < delta * 10.0:
 		var c: Vector2 = agua[_azar.randi() % agua.size()]
 		if vista.grow(16).has_point(c):
 			_destellos.append({"pos": c + Vector2(_azar.randi_range(-6, 6), _azar.randi_range(-6, 6)), "vida": 0.0})
-	for d in _destellos:
+	for i in range(_destellos.size() - 1, -1, -1):
+		var d: Dictionary = _destellos[i]
 		d["vida"] += delta
-	_destellos = _destellos.filter(func(d: Dictionary) -> bool: return d["vida"] < 0.5)
+		if d["vida"] >= 0.5:
+			_destellos.remove_at(i)
 	# luciérnagas: aparecen y se apagan despacio, vagando
 	if _bichitos.size() < luciernagas and _azar.randf() < delta * 4.0:
 		_bichitos.append({"pos": vista.position + Vector2(_azar.randf() * vista.size.x, _azar.randf() * vista.size.y),
 			"fase": _azar.randf() * TAU, "vida": 0.0, "dura": _azar.randf_range(4, 9)})
-	for b in _bichitos:
+	for i in range(_bichitos.size() - 1, -1, -1):
+		var b: Dictionary = _bichitos[i]
 		b["vida"] += delta
 		b["pos"] += Vector2(sin(b["vida"] * 0.9 + b["fase"]) * 9.0, cos(b["vida"] * 0.7 + b["fase"] * 2.0) * 6.0 - 2.0) * delta
-	_bichitos = _bichitos.filter(func(b: Dictionary) -> bool: return b["vida"] < b["dura"])
+		if b["vida"] >= b["dura"]:
+			_bichitos.remove_at(i)
 	queue_redraw()
 
 
 func _draw() -> void:
+	var vista := _vista()
 	# destellos del agua (a ras de suelo, se dibujan primero)
 	for d in _destellos:
 		var p: Vector2 = d["pos"].round()
@@ -206,7 +218,7 @@ func _draw() -> void:
 				draw_rect(Rect2(p + Vector2(col, fila), Vector2.ONE), c)
 	# niebla: varias capas suaves por banco, que respiran un poco
 	if niebla > 0.0 and _espesor > 0.01:
-		var origen := _vista().position
+		var origen := vista.position
 		for b in _bancos:
 			var forma: PackedVector2Array = b["forma"]
 			var respira := 0.85 + 0.15 * sin(_tiempo * 0.4 + b["fase"])
@@ -216,10 +228,12 @@ func _draw() -> void:
 				for q in forma:
 					puntos.append((origen + b["pos"] + q * escala * respira).round())
 				draw_colored_polygon(puntos, Color(COLOR_NIEBLA, 0.075 * _espesor))
-	# sombras de nubes (encima de todo lo del mundo)
+	# sombras de nubes visibles en cámara (sin alojar arrays nuevos por nube)
+	var vista_nubes := vista.grow(140.0)
 	for n in _nubes:
-		var forma: PackedVector2Array = n["forma"]
-		var desplazada := PackedVector2Array()
-		for q in forma:
-			desplazada.append((q + n["pos"]).round())
-		draw_colored_polygon(desplazada, SOMBRA_NUBE)
+		var pos_n: Vector2 = n["pos"]
+		if not vista_nubes.has_point(pos_n):
+			continue
+		draw_set_transform(pos_n.round())
+		draw_colored_polygon(n["forma"], SOMBRA_NUBE)
+	draw_set_transform(Vector2.ZERO)

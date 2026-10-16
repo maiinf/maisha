@@ -26,10 +26,14 @@ var _parpadeo := 0.0
 var _gesto := 0.0
 var _proximo_parpadeo := 3.0
 var _proximo_gesto := 7.0
+var _tiene_novedad := false
+var _revisar_novedad := 0.0
+var _maisha: Node2D
 
 
 func _ready() -> void:
 	if (requiere != "" and not Estado.tiene(requiere)) or (esconder_si != "" and Estado.tiene(esconder_si)):
+		set_process(false)
 		queue_free()
 		return
 	Estado.marca_puesta.connect(_al_poner_marca)
@@ -59,6 +63,7 @@ func _ready() -> void:
 	forma.position = Vector2(0, -3)
 	add_child(forma)
 	_tiempo = randf() * 3.0
+	_tiene_novedad = CHARLA.tiene_novedad(id)
 
 
 func _process(delta: float) -> void:
@@ -68,7 +73,15 @@ func _process(delta: float) -> void:
 	else:
 		# respiración: el cuerpo se estira un píxel de vez en cuando
 		_sprite.scale.y = 1.0 + (1.0 / _sprite.texture.get_height() if fmod(_tiempo, 1.6) < 0.8 else 0.0)
-	queue_redraw()
+	_revisar_novedad -= delta
+	if _revisar_novedad <= 0.0:
+		_revisar_novedad = 0.5
+		var antes := _tiene_novedad
+		_tiene_novedad = CHARLA.tiene_novedad(id)
+		if antes != _tiene_novedad:
+			queue_redraw()
+	if _tiene_novedad:
+		queue_redraw()
 
 
 func _animar(delta: float) -> void:
@@ -94,9 +107,13 @@ func interactuar() -> void:
 	if _animado:
 		_gesto = 1.0                           # al empezar a hablar, su gesto
 	await CHARLA.hablar(self, id)
+	_tiene_novedad = CHARLA.tiene_novedad(id)
+	queue_redraw()
 
 
 func _al_poner_marca(marca: String) -> void:
+	_tiene_novedad = CHARLA.tiene_novedad(id)
+	queue_redraw()
 	if marca != esconder_si or esconder_si == "":
 		return
 	remove_from_group("interactuables")
@@ -124,10 +141,11 @@ func _al_poner_marca(marca: String) -> void:
 
 
 func _draw() -> void:
-	if not CHARLA.tiene_novedad(id):
+	if not _tiene_novedad:
 		return
-	var maisha := get_tree().get_first_node_in_group("maisha") as Node2D
-	if maisha and maisha.global_position.distance_to(global_position) < radio_interaccion:
+	if _maisha == null or not is_instance_valid(_maisha):
+		_maisha = get_tree().get_first_node_in_group("maisha") as Node2D
+	if _maisha and _maisha.global_position.distance_to(global_position) < radio_interaccion:
 		return
 	# «!» que bota sobre la cabeza
 	var p := Vector2(0, -altura_bocadillo - 4 + round(sin(_tiempo * 5.0) * 1.5))

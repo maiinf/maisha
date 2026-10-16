@@ -208,3 +208,12 @@ se pasan.
 | Mauti en Sigilia | Va con Maisha pero se queda en la ciudad ayudando a los escribas en blanco; aparece en momentos clave (Iam: «vale sigue») |
 | Paso de la Escarcha, parte 2 | Taa (armiño farolero) está en blanco a media subida; su ficha del Índice se la llevó el viento al este. Al devolvérsela recupera el color y enseña el SIGILO DE FUEGO: tecla nueva U (RB en el mando; RB deja de ser «cambiar de semilla», que no se usaba), 20 de Aliento. Los faroles rúnicos solo los enciende el sigilo y, encendidos, abrigan del viento y ablandan la nieve |
 | Paso de la Escarcha, parte 3 | Páginas sueltas (enemigo: 2 golpes, el fuego las quema de un trazo). La Puerta Sellada se derrite con 3 sigilos; arriba la peña se cierra para que no se rodee. Misión «El Paso de la Escarcha». Música «La nieve que escribe» con el tema de Sigilia (vals de caja de música en si menor) |
+
+### Optimización y rendimiento (`revision/rendimiento`)
+| Qué | Decisión |
+| --- | --- |
+| Aldeanos (`aldeano.gd`) | Se cachea `_tiene_novedad` (revisada solo cada 0.5 s o al cambiar marcas) y la referencia a Maisha, evitando llamar a `CHARLA.tiene_novedad()` y `queue_redraw()` en cada fotograma cuando el aldeano no tiene novedad |
+| Ambiente (`ambiente.gd`) | Se sustituyen 5 llamadas a `.filter()` por fotograma con eliminación in-place inversa para no reservar nuevos arrays ni closures cada fotograma; se descarta el dibujo de nubes fuera de la vista y se dibujan con `draw_set_transform()` sin reservar `PackedVector2Array` |
+| Luz del sol (`luz_sol.gd`) | Se cachean los nodos de grupo `maisha` y `corrupcion` en lugar de buscarlos en cada fotograma |
+| Medición | `cuna_de_musgo` mejora de 7.81 ms/frame (128 FPS) a 7.08 ms/frame (141 FPS); `prados_del_eco` de 9.20 ms/frame (108 FPS) a 8.49 ms/frame (118 FPS) |
+
