@@ -1285,25 +1285,26 @@ def eco_cueva():
         rocas.append((300 + lado * rng.uniform(230, 320), rng.uniform(100, 190), rng.uniform(18, 34)))
     ci.bolas(lz, rocas, ROCA, luz=LUZ_ABAJO, ruido_borde=0.06, textura=lz.ruido(4, 2, semilla=209), fuerza_tex=0.15,
              ambiente=0.05, filo=("#5ae0c0", 0.3), filo_dir=(0.0, 1.0), plano=1.8, suave=0.35)
-    # estalactitas que cuelgan de la bóveda, con la punta mojada que brilla
-    for k in range(16):
-        x = 60 + rng.random() * 480
+    # estalactitas que cuelgan de la bóveda, con la punta mojada y gotas minerales que brillan
+    for k in range(24):
+        x = 50 + rng.random() * 500
         y0 = 40 - 34 * np.cos((x - 300) / 300 * np.pi / 2) ** 0.5 + rng.uniform(-4, 6)
-        largo = 12 + rng.random() * 30
-        ancho = 3 + rng.random() * 4
-        est = lz.poligono([(x - ancho, y0 - 10), (x + ancho, y0 - 10), (x + ancho * 0.4, y0 + largo * 0.7), (x + 0.3, y0 + largo)])
+        largo = 14 + rng.random() * 32
+        ancho = 2.5 + rng.random() * 4.5
+        est = lz.poligono([(x - ancho, y0 - 10), (x + ancho, y0 - 10), (x + ancho * 0.35, y0 + largo * 0.75), (x + 0.3, y0 + largo)])
         lz.sombrear(est, ROCA[1:6], ancho * 0.8, LUZ_ABAJO, textura=((lz.y * 1.3 % 3) < 0.6) * 1.0, fuerza_tex=-0.2)
-        lz.pintar(lz.circulo(x + 0.3, y0 + largo + 1.2, 0.7), "#b8fff0", 0.9)
-    # el suelo: tierra oscura con piedras, que las setas iluminan por manchas
+        lz.pintar(lz.circulo(x + 0.3, y0 + largo + 1.2, 0.75), "#b8fff0", 0.95)
+        lz.sumar_luz(lz.desenfocar(lz.circulo(x + 0.3, y0 + largo + 1.2, 2.0), 1.5), "#5ae0c0", 0.4)
+    # el suelo: tierra oscura con piedras y suave musgo, que las setas iluminan por manchas
     suelo = lz.poligono([(0, 176), (120, 166), (300, 170), (480, 164), (600, 172), (600, 256), (0, 256)])
     lz.pintar(suelo, rampa(["#07060a", "#0e0c14", "#16141e", "#201e2a"], np.clip((lz.y - 166) / 90 + (lz.ruido(8, 2, semilla=203) - 0.5) * 0.2, 0, 1)))
-    piedras = [(rng.random() * W, 172 + rng.random() * 80, 0) for _ in range(40)]
+    piedras = [(rng.random() * W, 172 + rng.random() * 80, 0) for _ in range(48)]
     piedras = [(x, y, 1.5 + (y - 166) / 90 * 5 * rng.uniform(0.5, 1.2)) for (x, y, _) in piedras if not (200 < x < 400 and y > 196)]
     ci.bolas(lz, piedras, ROCA[1:7], luz=(0.2, -0.9, 0.5), ruido_borde=0.2, ambiente=0.1, plano=1.6, suave=0.4)
     # las setas que brillan, por todas partes (más grandes delante, a veces en racimos)
     def seta(x, y, r, col):
-        lz.sumar_luz(lz.desenfocar(lz.elipse(x, y + 0.5, r * 3.2, r * 0.9), r * 1.2) * (lz.y > y - r * 0.2), col[2], 0.3)   # su luz en el suelo
-        lz.sumar_luz(lz.desenfocar(lz.circulo(x, y - r * 1.4, r * 2.4), r * 1.8), col[2], 0.3)
+        lz.sumar_luz(lz.desenfocar(lz.elipse(x, y + 0.5, r * 3.4, r * 1.0), r * 1.2) * (lz.y > y - r * 0.2), col[2], 0.35)   # su luz en el suelo
+        lz.sumar_luz(lz.desenfocar(lz.circulo(x, y - r * 1.4, r * 2.5), r * 1.8), col[2], 0.3)
         pie = lz.trazo([(x, y), (x + r * 0.15, y - r * 1.4)], r * 0.32, r * 0.22)
         lz.sombrear(pie, ["#4a4252", "#8a8094", "#c8c0d0", "#eee8f4"], r * 0.2, (-0.5, -0.4, 0.6))
         som = lz.elipse(x + r * 0.15, y - r * 1.5, r, r * 0.55) * (lz.y < y - r * 1.25)
@@ -1311,15 +1312,15 @@ def eco_cueva():
         lz.pintar(laminas * (np.sin(lz.x * 6 / max(r * 0.12, 0.3)) > 0), col[1], 0.9)
         lz.pintar(laminas * (np.sin(lz.x * 6 / max(r * 0.12, 0.3)) <= 0), col[0], 0.9)
         lz.sombrear(som, col, r * 0.45, (-0.3, -0.9, 0.5))
-        lz.sumar_luz(som, col[3], 0.22)
-        if r > 4:
-            for _ in range(int(r * 0.7)):
+        lz.sumar_luz(som, col[3], 0.25)
+        if r > 3.5:
+            for _ in range(int(r * 0.8)):
                 a_ = rng.uniform(0.3, 2.8)
-                lz.pintar(lz.circulo(x + r * 0.15 - np.cos(a_) * r * 0.65, y - r * 1.5 - np.sin(a_) * r * 0.3, r * 0.09), col[3], 0.8)
+                lz.pintar(lz.circulo(x + r * 0.15 - np.cos(a_) * r * 0.65, y - r * 1.5 - np.sin(a_) * r * 0.3, r * 0.09), col[3], 0.85)
     VERDE = ["#0e3a3a", "#1e7a6e", "#5ae0c0", "#c8fff0"]
     VIOLETA = ["#2a1040", "#6a2a9a", "#b070e0", "#f0d8ff"]
     sitios = []
-    for k in range(46):
+    for k in range(50):
         x = rng.random() * W
         y = 160 + rng.random() * 90
         if 200 < x < 410 and y > 180:
@@ -1330,36 +1331,67 @@ def eco_cueva():
                 sitios.append((y + rng.uniform(-1, 2), x + rng.uniform(-8, 8) * (1 + (y - 160) / 60), k))
     for (y, x, k) in sorted(sitios):
         seta(x, y, (2 + (y - 150) / 100 * 7) * rng.uniform(0.55, 1.15), VERDE if k % 3 else VIOLETA)
-    # en el centro: el montón de hojas caídas y el corro de setas pequeñas que se las come; de la tierra brotan hojitas
+
+    # En el centro: el compost de hojas fértiles y el micelio luminoso que nutre los nuevos brotes
     YM = 222
-    for k in range(40):
-        hx, hy = 300 + rng.normal(0, 30), YM + rng.normal(0, 6)
-        lz.sombrear(lz.elipse(hx, hy, 4.5, 2.2, rng.uniform(0, 180)),
+    for k in range(48):
+        hx, hy = 300 + rng.normal(0, 32), YM + rng.normal(0, 7)
+        lz.sombrear(lz.elipse(hx, hy, 4.6, 2.3, rng.uniform(0, 180)),
                     [["#3a1e0a", "#7a4a1a", "#c47a2a", "#e0a050"], ["#3a2a0a", "#6a5a1a", "#a08a30", "#c8b050"]][k % 2], 1.2, LUZ)
-    for k in range(12):
-        a = k / 12 * 2 * np.pi
+
+    # Red de micelio bioluminiscente que conecta las setas del corro
+    for k in range(14):
+        a1 = k / 14 * 2 * np.pi
+        a2 = ((k + 1) % 14) / 14 * 2 * np.pi
+        p1 = (300 + np.cos(a1) * 54, YM + 6 + np.sin(a1) * 12)
+        p2 = (300 + np.cos(a2) * 54, YM + 6 + np.sin(a2) * 12)
+        pm = ((p1[0] + p2[0]) * 0.5 + rng.uniform(-4, 4), (p1[1] + p2[1]) * 0.5 + rng.uniform(-2, 2))
+        hilo = lz.trazo(lz.curva(p1, pm, p2, n=12), 0.6)
+        lz.sumar_luz(hilo, "#5ae0c0", 0.45)
+        pc = (300 + rng.uniform(-15, 15), YM + rng.uniform(-4, 4))
+        hilo_c = lz.trazo(lz.curva(pm, ((pm[0]+pc[0])*0.5, (pm[1]+pc[1])*0.5), pc, n=8), 0.4)
+        lz.sumar_luz(hilo_c, "#9ff0e0", 0.3)
+
+    for k in range(14):
+        a = k / 14 * 2 * np.pi
         seta(300 + np.cos(a) * 54, YM + 6 + np.sin(a) * 12, 5.0, VERDE if k % 2 else VIOLETA)
-    for (bx, by) in ((292, YM - 4), (308, YM - 2), (300, YM - 8)):
-        lz.pintar(lz.trazo([(bx, by + 4), (bx, by - 4)], 0.8), "#3e9a35")
-        lz.pintar(lz.elipse(bx - 2.5, by - 4, 2.6, 1.2, 25), "#8fe06a")
-        lz.pintar(lz.elipse(bx + 2.5, by - 5, 2.6, 1.2, -25), "#6fcf4f")
-    lz.sumar_luz(lz.desenfocar(lz.circulo(300, YM - 6, 10), 8), "#8fe06a", 0.4)
-    # Maisha, de rodillas a la izquierda (mirando las setas), y Kimya, flotando a la derecha
-    lz.sumar_luz(lz.desenfocar(lz.elipse(300, 200, 150, 60), 30), "#5ae0c0", 0.18)
+
+    # Brotes de vida renovada naciendo de la tierra
+    for (bx, by) in ((292, YM - 4), (308, YM - 2), (300, YM - 8), (298, YM + 2)):
+        lz.pintar(lz.trazo([(bx, by + 4), (bx, by - 5)], 0.9), "#3e9a35")
+        lz.pintar(lz.elipse(bx - 2.8, by - 5, 2.8, 1.3, 25), "#8fe06a")
+        lz.pintar(lz.elipse(bx + 2.8, by - 6, 2.8, 1.3, -25), "#6fcf4f")
+        lz.sumar_luz(lz.circulo(bx, by - 6, 1.0), "#fff3c4", 0.8)
+    lz.sumar_luz(lz.desenfocar(lz.circulo(300, YM - 6, 14), 10), "#8fe06a", 0.45)
+
+    # Maisha contemplando el ciclo con asombro; Kimya con su figura etérea y serena a la derecha
+    lz.sumar_luz(lz.desenfocar(lz.elipse(300, 200, 160, 65), 32), "#5ae0c0", 0.22)
     lz.pintar(lz.desenfocar(lz.elipse(226, YM + 8, 22, 3), 2), "#050308", 0.5)
     ci.maisha_luz(lz, 226, YM + 6, e=1.9)
-    _kimya_pie(lz, 380, 196, e=1.8)
-    # esporas flotando
-    motas = np.zeros((lz.H, lz.W))
-    for k in range(80):
-        motas = np.maximum(motas, lz.circulo(rng.random() * W, 60 + rng.random() * 150, 0.4 + rng.random() * 0.4))
-    lz.sumar_luz(motas, "#e6d0ff", 0.7)
-    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.06)
+    _kimya_figura_serena(lz, 380, 196, e=1.75)
+
+    # Esporas bioluminiscentes flotando en suaves corrientes de aire
+    motas_v = np.zeros((lz.H, lz.W))
+    motas_l = np.zeros((lz.H, lz.W))
+    for k in range(90):
+        sx, sy = rng.random() * W, 50 + rng.random() * 170
+        r_ = 0.4 + rng.random() * 0.55
+        if k % 2 == 0:
+            motas_v = np.maximum(motas_v, lz.circulo(sx, sy, r_))
+        else:
+            motas_l = np.maximum(motas_l, lz.circulo(sx, sy, r_))
+    lz.sumar_luz(lz.desenfocar(motas_v, 1.2), "#5ae0c0", 0.6)
+    lz.sumar_luz(motas_v, "#c8fff0", 0.9)
+    lz.sumar_luz(lz.desenfocar(motas_l, 1.2), "#b070e0", 0.5)
+    lz.sumar_luz(motas_l, "#f0d8ff", 0.85)
+
+    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.04)
     ci.marco_recuerdo(lz, color="#4a4058", semilla=204)
-    # dos setas enormes en primer plano, en las esquinas (dan profundidad; por delante del velo del recuerdo)
-    seta(28, 262, 20, VIOLETA)
-    seta(582, 266, 24, VERDE)
-    seta(552, 262, 11, VERDE)
+
+    # Setas en primer plano (enmarcan la escena con gran profundidad)
+    seta(28, 262, 22, VIOLETA)
+    seta(582, 266, 25, VERDE)
+    seta(552, 262, 12, VERDE)
     return lz
 
 
@@ -1378,76 +1410,109 @@ def eco_lago():
     lz = Lienzo(W, H, semilla=300)
     rng = np.random.default_rng(301)
     HZ = 96
-    # la noche: azul hondo, sin luna (la luz de esta noche está en el agua)
+    # La noche: azul hondo, sin luna (la luz de esta noche está en el agua)
     lz.pintar(np.ones((lz.H, lz.W)), lz.gradiente(["#04060e", "#0a1020", "#121a32", "#1c2644", "#26304e"], desde=0, hasta=HZ))
-    ci.estrellas(lz, 90, HZ - 20, semilla=302, color="#dce6f4")
-    # la orilla lejana: colinas negras y, al norte, una colina vacía (donde el agua dice que está el Primer Árbol)
-    colinas = ci.mascara_bajo(lz, ci.linea_horizonte(lz, HZ - 10, 9, 60, 303))
-    lz.pintar(colinas * (lz.y < HZ + 1), "#070a14")
-    colina = lz.poligono([(330, HZ + 1), (380, HZ - 22), (430, HZ - 30), (480, HZ - 20), (530, HZ + 1)])
+    ci.estrellas(lz, 110, HZ - 18, semilla=302, color="#dce6f4")
+
+    # Horizonte lejana: crestas montañosas orgánicas y naturales (sin periodicidad artificial)
+    montanas_lejanas = np.zeros(lz.W)
+    for x in range(lz.W):
+        t = x / float(lz.W)
+        montanas_lejanas[x] = HZ - 14 - np.sin(t * np.pi * 3.2 + 0.4) * 8.0 - np.sin(t * np.pi * 6.5) * 4.0 - np.cos(t * np.pi * 1.5) * 6.0
+    masc_mont = ci.mascara_bajo(lz, montanas_lejanas)
+    lz.pintar(masc_mont * (lz.y < HZ + 1), "#070a14")
+
+    # Colina del norte donde la visión del árbol aguarda en el agua
+    colina = lz.poligono([(320, HZ + 1), (370, HZ - 20), (430, HZ - 28), (490, HZ - 18), (540, HZ + 1)])
     lz.pintar(colina, "#080b16")
-    # el lago, liso como un espejo: refleja el cielo del revés
+
+    # El lago, liso como un espejo perfecto: refleja el cielo
     agua = (lz.y >= HZ).astype(float)
     filas = lz.img.shape[0]
     eje = int(HZ * lz.s)
     origen = np.clip(2 * eje - 1 - np.arange(filas), 0, filas - 1)
     lz.pintar(agua, lz.img[origen] * 0.85)
-    # el agua de cerca refleja lo más alto del cielo, lo más oscuro (y así no se repite la fila de arriba)
     lz.pintar(agua * np.clip((lz.y - 150) / 40, 0, 1), "#04060e")
     vetas = (estirar_h(lz, lz.ruido(1.5, 2, semilla=304), 50) > 0.76) * agua
     lz.pintar(vetas, "#a8c8e0", 0.08)
-    # SOLO EN EL REFLEJO: el Primer Árbol en su colina (su halo, recortado en suave)...
+
+    # SOLO EN EL REFLEJO: el Primer Árbol en su colina dorada
     a_lz = Lienzo(W, H, semilla=305)
     _primer_arbol(a_lz, 430, HZ - 4, 70)
-    # (el halo del árbol llena todo el cielo: fuera la luz débil, y lo que queda se apaga en suave hacia los lados)
     cerca = np.clip(1.2 - np.hypot((a_lz.x - 430) / 140, (a_lz.y - (HZ - 46)) / 62), 0, 1) ** 1.2
     a_lz.img = np.clip((a_lz.img - 0.08) / 0.8, 0, 1) * cerca[..., None]
-    _solo_reflejo_luz(lz, a_lz, HZ, agua, 0.8)
-    # ...nueve espirales de luz en arco sobre él (ocho verdes y la del Silencio, plateada, en el centro)...
+    _solo_reflejo_luz(lz, a_lz, HZ, agua, 0.82)
+
+    # Nueve espirales místicas en arco sobre el árbol: 8 celadón/jade y la Novena de Platino puro
     e_lz = Lienzo(W, H, semilla=306)
     for k in range(9):
         a = math.pi * (0.12 + 0.76 * k / 8)
         cx, cy = 430 - math.cos(a) * 140, HZ - 18 - math.sin(a) * 74
-        plateada = k == 4
-        r0 = 6.5 if plateada else 4.5
-        pts = [(cx + math.cos(t) * r0 * t / 12, cy + math.sin(t) * r0 * t / 12 * 0.9) for t in np.linspace(0.5, 12, 40)]
-        espiral = lz.trazo(pts, 0.9)
-        e_lz.sumar_luz(lz.desenfocar(lz.circulo(cx, cy, r0 + 2), 4), "#e8f0ff" if plateada else "#9ff0c0", 0.35)
-        e_lz.sumar_luz(espiral, "#ffffff" if plateada else "#c8ffd8", 0.95)
-    _solo_reflejo_luz(lz, e_lz, HZ, agua, 0.85)
-    # ...y Kimya, de pie sobre el agua (arriba no hay nadie)
+        plateada = (k == 4)
+        r0 = 7.0 if plateada else 4.6
+        pts = [(cx + math.cos(t) * r0 * t / 12, cy + math.sin(t) * r0 * t / 12 * 0.9) for t in np.linspace(0.5, 12, 44)]
+        espiral = lz.trazo(pts, 1.0 if plateada else 0.85)
+        e_lz.sumar_luz(lz.desenfocar(lz.circulo(cx, cy, r0 + 3), 5), "#f0f6ff" if plateada else "#8ae8b8", 0.45)
+        e_lz.sumar_luz(espiral, "#ffffff" if plateada else "#c8ffd8", 0.98)
+        e_lz.sumar_luz(lz.circulo(cx, cy, 1.2), "#ffffff", 1.0)
+    _solo_reflejo_luz(lz, e_lz, HZ, agua, 0.88)
+
+    # Kimya serena y luminosa, presente SOLO en el reflejo del agua
     kx, ky = 310, 170
     k_lz = Lienzo(W, H, semilla=307)
-    _kimya_pie(k_lz, kx, ky, e=2.0)
-    _solo_reflejo_luz(lz, k_lz, ky + 3, agua, 0.75)
-    lz.sumar_luz(lz.desenfocar(lz.elipse(kx, ky + 3, 22, 3), 4) * agua, "#c0d0e8", 0.45)
-    # la orilla de la isla, abajo a la izquierda, con dos menhires del círculo
+    _kimya_figura_serena(k_lz, kx, ky, e=1.95)
+    _solo_reflejo_luz(lz, k_lz, ky + 3, agua, 0.78)
+    for r_ond in (8, 16, 26):
+        ond = lz.desenfocar(np.abs(lz.elipse(kx, ky + 3, r_ond, r_ond * 0.22) - 0.5) < 0.2, 1.2) * agua
+        lz.sumar_luz(ond, "#a0e8e0", 0.25 * (1.0 - r_ond / 30.0))
+    lz.sumar_luz(lz.desenfocar(lz.elipse(kx, ky + 3, 24, 4), 5) * agua, "#c0d0e8", 0.45)
+
+    # Orilla de la isla abajo a la izquierda: relieve orgánico y piedras lacustres
     YO = 210
-    isla = lz.poligono([(0, 176), (80, 186), (160, 198), (214, YO - 2), (236, YO + 4), (210, YO + 14), (120, 236), (60, 256), (0, 256)])
+    pts_isla = [(0, 174), (70, 182), (140, 192), (195, 202), (222, YO - 1), (236, YO + 4), (218, YO + 14), (130, 238), (60, 256), (0, 256)]
+    isla = lz.poligono(pts_isla)
     lz.sombrear(isla, ["#070c0c", "#0e1814", "#16221c", "#203024", "#2a3c2c"], 6, (0.5, -0.8, 0.5),
                 textura=lz.ruido(1.5, 2, semilla=308), fuerza_tex=0.35)
     filo = np.clip(isla - np.roll(isla, int(2 * lz.s), axis=0), 0, 1)
-    lz.sumar_luz(filo, "#8aa8c8", 0.3)
-    for (x, y, alto) in ((36, 190, 26), (92, 200, 20)):
-        menhir = lz.poligono([(x - 6, y), (x - 5, y - alto), (x, y - alto - 3), (x + 5, y - alto + 1), (x + 6, y)])
-        lz.sombrear(menhir, ["#0c0e16", "#1a1e2a", "#2c3242", "#40485a"], 4, (0.5, -0.8, 0.5))
+    lz.sumar_luz(filo, "#8aa8c8", 0.35)
+
+    # Juncos con espigas en la orilla
+    for jx in (180, 195, 210, 226):
+        jy = 196 + (jx - 180) * 0.25
+        tallo = lz.trazo([(jx, jy), (jx - 3, jy - 16), (jx - 1, jy - 28)], 0.7, 0.3)
+        espiga = lz.elipse(jx - 1, jy - 24, 1.3, 4.5, -5)
+        lz.pintar(tallo, "#1b2e22", 0.9)
+        lz.sombrear(espiga, ["#1b1510", "#38281e", "#5a4230"], 0.8, (0.5, -0.8, 0.5))
+
+    # Dos menhires antiguos erosionados con runas espirales tenues
+    for (x, y, alto, sem_m) in ((36, 190, 28, 311), (92, 200, 22, 312)):
+        menhir = lz.poligono([(x - 6, y), (x - 5.5, y - alto + 3), (x - 2, y - alto - 2), (x + 2, y - alto - 1), (x + 5.5, y - alto + 4), (x + 6, y)])
+        lz.sombrear(menhir, ["#0c0e16", "#1a1e2a", "#2c3242", "#40485a"], 4, (0.5, -0.8, 0.5),
+                    textura=lz.ruido(2, 2, semilla=sem_m), fuerza_tex=0.25)
+        r_runa = 3.2
+        pts_r = [(x + math.cos(t) * r_runa * t / 8, (y - alto * 0.55) + math.sin(t) * r_runa * t / 8) for t in np.linspace(0.5, 8, 20)]
+        lz.pintar(lz.trazo(pts_r, 0.6), "#5ae0c0", 0.45)
+
+    # Manto de hierba ribereña
     hierba = np.zeros((lz.H, lz.W))
-    for k in range(420):
+    for k in range(450):
         x = rng.random() * 230
-        yb = 178 + x * 0.14 + rng.random() * 70
+        yb = 176 + x * 0.14 + rng.random() * 72
         hierba = np.maximum(hierba, lz.trazo([(x, yb), (x + (rng.random() - 0.5) * 3, yb - 3 - rng.random() * 4)], 0.5))
     lz.pintar(hierba * isla, "#2a4030", 0.9)
-    # Maisha, sentada al borde, mirando el agua (su luz se refleja)
+
+    # Maisha, sentada al borde del agua con su luz reflejada
     m_lz = Lienzo(W, H, semilla=309)
     ci.maisha_luz(m_lz, 200, YO, e=1.5)
     _pegar_con_reflejo(lz, m_lz, YO + 2, agua, 0.55)
-    lz.sumar_luz(lz.desenfocar(lz.elipse(200, YO + 18, 10, 14), 7) * agua, "#ffe0a0", 0.3)
-    # unas pocas motas plateadas sobre el agua
+    lz.sumar_luz(lz.desenfocar(lz.elipse(200, YO + 18, 12, 16), 8) * agua, "#ffe0a0", 0.35)
+
+    # Motas plateadas y velo de recuerdo
     motas = np.zeros((lz.H, lz.W))
-    for k in range(30):
+    for k in range(36):
         motas = np.maximum(motas, lz.circulo(230 + rng.random() * 330, HZ + 8 + rng.random() * 120, 0.4 + rng.random() * 0.4))
     lz.sumar_luz(motas * agua, "#e8f0ff", 0.7)
-    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.05)
+    lz.pintar(np.ones((lz.H, lz.W)), "#3e8a86", 0.04)
     ci.marco_recuerdo(lz, color="#40506a", semilla=310)
     return lz
 

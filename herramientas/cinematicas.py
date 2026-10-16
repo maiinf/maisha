@@ -1658,20 +1658,33 @@ def hoy():
 
 # ---------------------------------------------------------------- los recuerdos de Maisha
 def marco_recuerdo(lz, color="#efe6cf", semilla=90):
-    """Los recuerdos se ven como a través de una niebla clara que se come los bordes."""
-    d = np.maximum(np.abs(lz.x - 300) / 300, np.abs(lz.y - 128) / 128) * 0.55 + np.hypot((lz.x - 300) / 300, (lz.y - 128) / 128) * 0.45
-    # un velo suave y estrecho (sin manchas): los bordes de la propia escena, desenfocados y aclarados hacia el color
-    ondas = lz.desenfocar(lz.ruido(20, 2, semilla=semilla), 12)
-    borde = lz.desenfocar(np.clip((d - 0.76 + (ondas - 0.5) * 0.08) * 2.4, 0, 1), 14) ** 1.6
-    velo = np.clip(cv2.GaussianBlur(lz.img.astype(np.float32), (0, 0), 6 * lz.s) * 0.7 + 0.22, 0, 1)
-    lz.pintar(borde, velo, 0.75)
-    lz.pintar(borde, color, 0.35)
-    # motas de luz flotando
+    """Los recuerdos se ven como a través de una niebla clara y suave que difumina los bordes sin aristas."""
+    dx = np.abs(lz.x - 300) / 300.0
+    dy = np.abs(lz.y - 128) / 128.0
+    d = np.maximum(dx, dy) * 0.5 + np.hypot(dx, dy) * 0.5
+    ondas = lz.desenfocar(lz.ruido(20, 2, semilla=semilla), 16)
+    t = np.clip((d - 0.72 + (ondas - 0.5) * 0.07) / 0.36, 0.0, 1.0)
+    borde = lz.desenfocar(t * t * (3.0 - 2.0 * t), 16)
+
+    # Desenfocar la imagen original para crear el velo de ensoñación
+    img_blur = cv2.GaussianBlur(lz.img.astype(np.float32), (0, 0), 10 * lz.s)
+    luz_local = np.mean(img_blur, axis=2, keepdims=True)
+    c_color = hex2(color) if isinstance(color, str) else np.asarray(color, float)
+
+    # El velo respeta la luminosidad natural de la escena:
+    # en escenas oscuras el velo es niebla profunda sin aro brillante;
+    # en escenas iluminadas es niebla diáfana color recuerdo
+    velo = np.clip(img_blur * 0.65 + c_color * (0.08 + 0.28 * luz_local), 0, 1)
+
+    a = (borde * 0.85)[..., None]
+    lz.img = np.clip(lz.img * (1 - a) + velo * a, 0, 1)
+
+    # Motas sutiles de recuerdo flotando
     rng = np.random.default_rng(semilla)
     motas = np.zeros((lz.H, lz.W))
-    for _ in range(40):
-        motas = np.maximum(motas, lz.circulo(rng.random() * 600, rng.random() * 256, 0.5 + rng.random()) * rng.random())
-    lz.sumar_luz(lz.desenfocar(motas, 0.8), "#fff4d6", 0.6)
+    for _ in range(35):
+        motas = np.maximum(motas, lz.circulo(rng.random() * 600, rng.random() * 256, 0.4 + rng.random() * 0.7) * rng.random())
+    lz.sumar_luz(lz.desenfocar(motas, 1.0), c_color, 0.45)
 
 
 def recuerdo_aldea():
