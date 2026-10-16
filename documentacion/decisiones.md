@@ -303,3 +303,11 @@ se pasan.
 | Sigilia | Se sigue construyendo en 2D; se pasará a HD-2D con el mismo conversor que el resto |
 | Quién | La constructora hace el conversor de mapas (`Region3D`) y la parte visual; la revisora vuelve a revisar y pulir lo hecho |
 | Modelos 3D de la rama experimental | Se quedan en esa rama como referencia; no se usan |
+
+### Regeneración completa de la música y calibración (2026-10-16)
+| Qué | Decisión |
+| --- | --- |
+| Regeneración total | Se generaron en paralelo las 43 pistas musicales de Maisha con los timbres orgánicos actualizados de `sintetizador.py` (kalimba, balafón, flauta dulce, armónicos cálidos de cuerda y costuras sin clic de 8 ms). |
+| Homogeneidad de volumen | Medición sistemática RMS con ffmpeg: las 43 pistas quedan concentradas de forma natural en una banda estrecha de -12,8 a -15,2 dBFS (media -13,85 dBFS, frente a la dispersión previa de > 6 dB). |
+| Calibración VOLUMEN_MUSICA | Actualizada la tabla en `scripts/globales/sonido.gd` centrando la referencia en ~ -14,5 dBFS (ajustes finos de entre -1,5 y +0,5 dB). Toda la banda sonora suena homogénea sin saltos bruscos entre biomas, casas o combates. |
+| Verificación | `pruebas/prueba_sonido.gd` ejecutada con Godot headless: 100 % superada (`RESULTADO: todo correcto`). |

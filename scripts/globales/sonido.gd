@@ -68,15 +68,18 @@ const VOLUMEN := {
 }
 ## Nivel de cada bus (0 a 10) y su volumen en dB con el nivel al máximo (la música, sutil)
 const BUSES := {"Musica": -9.0, "Ambiente": -10.0, "Efectos": -3.0}
-## Ajuste fino (dB) de las piezas musicales cuyo nivel medio se aparta de la referencia (-15,5 dBFS)
+## Ajuste fino (dB) de las piezas musicales calibradas tras la regeneración completa (~ -14,5 dBFS)
 const VOLUMEN_MUSICA := {
-	"raiz_libre": -3.0, "ruinas": -1.5, "pasarelas_viva": -1.5, "pasarelas": -1.0,
-	"embarcadero_viva": -1.0, "gruta": -1.0, "jefe_pembe": -1.5, "jefe_konokono": -1.0, "jefe_kambare": -1.5,
-	"bosque": 1.5, "bosque_gris": 2.0, "bosque_viva": 2.5,
-	"cueva": 2.0, "surcos_gris": 2.0, "pasarelas_gris": 1.5,
-	"lago": 2.0, "lago_gris": 1.5, "lago_viva": 2.0,
-	"setas": 2.0, "jefe_kuvu": 1.5, "despertar": 1.5, "orilla_gris": 1.5, "orilla": 1.5,
-	"canada": 1.5, "canada_gris": 1.5, "canada_viva": 1.5,
+	"cobrizo": -1.5, "bosque": -1.5, "bosque_gris": -1.5, "bosque_viva": -1.5,
+	"jefe": -1.5, "aldea": -1.5, "jefe_guardian": -1.5, "surcos": -1.5, "surcos_gris": -1.5,
+	"pasarelas": -1.5, "pasarelas_gris": -1.5, "pasarelas_viva": -1.5,
+	"jefe_kambare": -1.5, "sendero": -1.5, "jefe_cosechadora": -1.5,
+	"campo": -1.0, "embarcadero": -1.0, "embarcadero_viva": -1.0, "travesia": -1.0, "ruinas": -1.0,
+	"orilla": -1.0, "orilla_gris": -1.0, "jefe_pembe": -1.0, "combate": -1.0, "setas": -1.0,
+	"prados": -1.0, "cienaga": -1.0, "inicio": -1.0, "canada": -1.0, "canada_gris": -1.0, "canada_viva": -1.0,
+	"noche": -0.5, "lago": -0.5, "lago_gris": -0.5, "lago_viva": -0.5,
+	"jefe_konokono": -0.5, "tienda": -0.5, "olvidado": -0.5, "jefe_kuvu": -0.5,
+	"despertar": 0.5, "objeto": 0.5, "recuerdo": 0.5,
 }
 
 var musica_actual := ""
