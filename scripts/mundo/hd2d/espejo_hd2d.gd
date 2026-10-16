@@ -44,16 +44,50 @@ const VENTANA_PIE := Vector2(64, 148)     # dónde cae el pie del objeto dentro 
 const VENTANAS := 10                      # como mucho, las de los 10 objetos de pie más cerca de la cámara
 const LADO_CAPA := 1024            # píxeles de la capa de suelo (64 m alrededor de Maisha)
 ## El suelo cercano: la capa de suelo, con luz (para las sombras)
+## Con «hundido» = 0 es el suelo, con un agujero donde hay agua; con 1, el agua (más abajo, algo más oscura y azul,
+## con un brillo que se mueve). «agua» es la máscara del mapa (1 píxel por casilla).
 const SOMBREADOR_CAPA := """
 shader_type spatial;
 render_mode diffuse_lambert, specular_disabled;
 uniform sampler2D capa : filter_nearest;
+uniform sampler2D agua : filter_nearest;
+uniform vec2 origen = vec2(0.0);
+uniform vec2 casillas = vec2(1.0);
+uniform float lado = 1024.0;
+uniform float hundido = 0.0;
 void fragment() {
+	vec2 px = origen + UV * lado;
+	float es_agua = texture(agua, px / 16.0 / casillas).r;
+	if (hundido < 0.5 && es_agua > 0.5) { discard; }
+	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
 	vec3 c = texture(capa, UV).rgb;
+	if (hundido > 0.5) {
+		float brillo = sin(px.x * 0.07 + TIME * 1.3) * sin(px.y * 0.11 - TIME * 0.9);
+		c = mix(c, vec3(0.08, 0.16, 0.24), 0.22) + vec3(0.05, 0.07, 0.08) * smoothstep(0.75, 1.0, brillo);
+	}
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
 }
 """
+## El suelo lejano (todo el mapa): igual, pero con el suelo pintado y la máscara a la medida del mapa
+const SOMBREADOR_LEJANO := """
+shader_type spatial;
+render_mode diffuse_lambert, specular_disabled;
+uniform sampler2D suelo : filter_nearest, source_color;
+uniform sampler2D agua : filter_nearest;
+uniform float hundido = 0.0;
+void fragment() {
+	float es_agua = texture(agua, UV).r;
+	if (hundido < 0.5 && es_agua > 0.5) { discard; }
+	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
+	vec3 c = texture(suelo, UV).rgb;
+	if (hundido > 0.5) { c = mix(c, vec3(0.08, 0.16, 0.24), 0.22); }
+	ALBEDO = c;
+	ROUGHNESS = 1.0;
+}
+"""
+const HONDO_AGUA := 0.35             # metros que baja el agua
+const LETRAS_AGUA := "~\\"
 ## Dibujos de pantalla (por su script): van a la capa de pantalla, con sus hijos
 const DE_PANTALLA := ["ambiente.gd", "nevada.gd", "ventisca.gd", "luz_sol.gd"]
 
@@ -65,6 +99,10 @@ var _gemelos := {}                 # id del dibujo 2D -> Sprite3D
 var _maisha: Node2D
 var _foco := Vector3.ZERO
 var _alto_pena := ALTO_PENA
+var _mats_capa: Array[ShaderMaterial] = []
+var _plano_agua: MeshInstance3D
+var _mascara_agua: ImageTexture
+var _suelos_lejanos: Array[ShaderMaterial] = []
 var _tinte := Color.WHITE
 var _canales := {}                 # id de cada dibujo -> [dibujo, su canal de antes] (para devolverlo al apagar)
 var _capa_suelo: SubViewport
@@ -143,14 +181,54 @@ func _crear_suelo() -> void:
 	mat.albedo_texture = tex
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	mat.roughness = 1.0
-	# el suelo: una sola malla del tamaño del mapa con el suelo pintado
+	# el suelo: una sola malla del tamaño del mapa con el suelo pintado (con el agujero del agua) y, debajo, el agua
 	var plano := PlaneMesh.new()
 	plano.size = Vector2(ancho, alto)
-	var suelo := MeshInstance3D.new()
-	suelo.mesh = plano
-	suelo.material_override = mat
-	suelo.position = Vector3(ancho / 2.0, 0.0, alto / 2.0)
-	add_child(suelo)
+	var lejano := Shader.new()
+	lejano.code = SOMBREADOR_LEJANO
+	_suelos_lejanos.clear()
+	for hundido in [0.0, 1.0]:
+		var m := ShaderMaterial.new()
+		m.shader = lejano
+		m.set_shader_parameter("suelo", tex)
+		m.set_shader_parameter("hundido", hundido)
+		_suelos_lejanos.append(m)
+		var suelo := MeshInstance3D.new()
+		suelo.mesh = plano
+		suelo.material_override = m
+		suelo.position = Vector3(ancho / 2.0, -HONDO_AGUA if hundido > 0.5 else 0.0, alto / 2.0)
+		add_child(suelo)
+	# el agua: una máscara (1 píxel por casilla) para hundirla, y las orillas, paredes de tierra hacia abajo
+	var img := Image.create(int(ancho), int(alto), false, Image.FORMAT_L8)
+	var orillas := SurfaceTool.new()
+	orillas.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var hay_agua := false
+	for y in filas.size():
+		for x in filas[y].length():
+			if not LETRAS_AGUA.contains(filas[y][x]):
+				continue
+			hay_agua = true
+			img.set_pixel(x, y, Color.WHITE)
+			var d := -HONDO_AGUA
+			if y + 1 < filas.size() and not LETRAS_AGUA.contains(filas[y + 1][x]):
+				_cuad(orillas, Vector3(x + 1, 0, y + 1), Vector3(x, 0, y + 1), Vector3(x, d, y + 1), Vector3(x + 1, d, y + 1))
+			if y > 0 and not LETRAS_AGUA.contains(filas[y - 1][x]):
+				_cuad(orillas, Vector3(x, 0, y), Vector3(x + 1, 0, y), Vector3(x + 1, d, y), Vector3(x, d, y))
+			if x > 0 and not LETRAS_AGUA.contains(filas[y][x - 1]):
+				_cuad(orillas, Vector3(x, 0, y + 1), Vector3(x, 0, y), Vector3(x, d, y), Vector3(x, d, y + 1))
+			if x + 1 < filas[y].length() and not LETRAS_AGUA.contains(filas[y][x + 1]):
+				_cuad(orillas, Vector3(x + 1, 0, y), Vector3(x + 1, 0, y + 1), Vector3(x + 1, d, y + 1), Vector3(x + 1, d, y))
+	_mascara_agua = ImageTexture.create_from_image(img)
+	for m in _suelos_lejanos:
+		m.set_shader_parameter("agua", _mascara_agua)
+	if hay_agua:
+		var mat_orilla := StandardMaterial3D.new()
+		mat_orilla.albedo_color = Color(0.27, 0.21, 0.15)
+		mat_orilla.roughness = 1.0
+		var muro := MeshInstance3D.new()
+		muro.mesh = orillas.commit()
+		muro.material_override = mat_orilla
+		add_child(muro)
 	# las peñas: bloques que se levantan, con el suelo pintado encima y los lados de roca oscura
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -227,16 +305,26 @@ func _crear_capas() -> void:
 	# encima; con luz, para que reciba las sombras de verdad)
 	var sombreador := Shader.new()
 	sombreador.code = SOMBREADOR_CAPA
-	var mat := ShaderMaterial.new()
-	mat.shader = sombreador
-	mat.set_shader_parameter("capa", _capa_suelo.get_texture())
 	var plano := PlaneMesh.new()
 	plano.size = Vector2(LADO_CAPA * PX, LADO_CAPA * PX)
-	_plano_capa = MeshInstance3D.new()
-	_plano_capa.mesh = plano
-	_plano_capa.material_override = mat
-	_plano_capa.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(_plano_capa)
+	for hundido in [0.0, 1.0]:
+		var mat := ShaderMaterial.new()
+		mat.shader = sombreador
+		mat.set_shader_parameter("capa", _capa_suelo.get_texture())
+		mat.set_shader_parameter("agua", _mascara_agua)
+		mat.set_shader_parameter("casillas", Vector2(_mascara_agua.get_width(), _mascara_agua.get_height()) if _mascara_agua else Vector2.ONE)
+		mat.set_shader_parameter("lado", float(LADO_CAPA))
+		mat.set_shader_parameter("hundido", hundido)
+		_mats_capa.append(mat)
+		var p := MeshInstance3D.new()
+		p.mesh = plano
+		p.material_override = mat
+		p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(p)
+		if hundido > 0.5:
+			_plano_agua = p
+		else:
+			_plano_capa = p
 	# la capa de pantalla: lo mismo que verían los ojos en 2D, delante del 3D (y detrás de la interfaz)
 	_capa_pantalla = SubViewport.new()
 	_capa_pantalla.size = vista.get_visible_rect().size
@@ -288,6 +376,9 @@ func _mover_capas() -> void:
 	var centro := Vector2(roundf(_foco.x / PX), roundf(_foco.z / PX))
 	_capa_suelo.canvas_transform = Transform2D(0.0, -(centro - Vector2(LADO_CAPA, LADO_CAPA) / 2.0))
 	_plano_capa.position = Vector3(centro.x * PX, 0.005, centro.y * PX)
+	_plano_agua.position = Vector3(centro.x * PX, -HONDO_AGUA, centro.y * PX)
+	for mat in _mats_capa:
+		mat.set_shader_parameter("origen", centro - Vector2(LADO_CAPA, LADO_CAPA) / 2.0)
 	_capa_pantalla.canvas_transform = escena.get_viewport().canvas_transform
 	# las ventanitas: para los objetos de pie más cercanos a la cámara, cada una mirando su trocito de la escena
 	var cerca := []
