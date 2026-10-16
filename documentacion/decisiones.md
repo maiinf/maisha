@@ -303,3 +303,11 @@ se pasan.
 | Solución adoptada | Prototipo HD-2D interactivo en `experimento/prototipo-visual` (`escenas/experimento/prototipo_hd2d.tscn`): espacio 3D real con cámara en perspectiva cinematográfica ($34^\circ$), sombras dinámicas proyectadas en tiempo real por los sprites sobre el terreno, desniveles físicos (río hundido, puente de madera, colina), faroles con luz cálida física y niebla volumétrica. |
 | Vertical slice jugable | Incluye diálogo interactivo con Pino (retrato y bocadillo con tecla E), combate contra Petrinos con golpe de cetro (J) y semillas explosivas (K) con físicas y destellos 3D, y alternancia instantánea entre vista HD-2D y vista 2D plana con tecla 3. |
 | Hoja de ruta | Documentada en `documentacion/plan_hd2d.md` para adaptar mapas existentes mediante `Region3D` sin tocar el trabajo de la constructora en Sigilia. |
+
+### Modelado 3D Procedural en Blender y Escena Cuna de Musgo 3D (16-10)
+| Qué | Decisión |
+| --- | --- |
+| Petición de Iam | Conectar el proyecto a Blender y modelar proceduralmente los elementos de Maisha en 3D para una evolución visual completa. |
+| Pipeline Blender | Conexión con Blender 4.5.15 LTS headless vía Python (`bpy`) en `herramientas/blender/generador_3d_maisha.py`. Generación simultánea de archivos `.blend` (para edición manual) y `.glb` estándar (para importación inmediata en Godot 4 sin dependencias). |
+| Activos generados | 18 modelos completos: Maisha (chibi, brote, corazón Asili, cetro), Pino (sombrero seta, mochila), Mzee Shamba (castor, bastón, peto), Corteza (delantal, gafas, martillo), Petrino de Giza (amatista pulsante y rocas flotantes), Mzizi (tocón ancestral), Babosa de Óxido, Corazón de Giza, Gran Árbol hueco, Casa Seta, Taller de Forja, Molino de agua, Puente rústico, Farol de poste y bloques modulares de terreno. |
+| Escena 3D Godot | `escenas/mundo/3d/cuna_de_musgo_3d.tscn` y `scripts/mundo/3d/cuna_de_musgo_3d.gd`: aldea completa en 3D con ciclo día/noche (1), 3 modos de cámara (3), Maisha controlable con salto, combate con cetro (J) y semilla de vida (K), diálogo con NPCs (E) y patrulla de Petrinos. |

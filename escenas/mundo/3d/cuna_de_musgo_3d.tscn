@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/mundo/3d/cuna_de_musgo_3d.gd" id="1_cuna3d"]
+
+[node name="CunaDeMusgo3D" type="Node3D"]
+script = ExtResource("1_cuna3d")
