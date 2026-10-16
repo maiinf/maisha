@@ -295,3 +295,11 @@ se pasan.
 | luz-2.5d | Mapas de normales para aldeanos y enemigos, sombras que se estiran con el sol, motas de polvo en los rayos, luces en casa de Shamba, tinte por bioma | Buena; se quitó un nombre de escena equivocado (de Sigilia) |
 | sprites / bastones | Bastones que no se cortan, Pino con bufanda y correa, corazón de Petrino más visible, retoques de 1-2 px en Pembe, Konokono, Jabalí y Maisha de perfil | Pequeña |
 | ilustraciones | Tronco de la 22 con corteza y raíces; charco junto al molino en la 2 | Pequeña; en la 3 y la 17 apenas cambia nada |
+
+### Prototipo HD-2D / 2.5D en espacio 3D (16-10)
+| Qué | Decisión |
+| --- | --- |
+| Petición de Iam | El juego se percibe plano y antiguo en comparación con los juegos modernos. Se solicita la opción experimental de prueba para ver el salto visual en pantalla. |
+| Solución adoptada | Prototipo HD-2D interactivo en `experimento/prototipo-visual` (`escenas/experimento/prototipo_hd2d.tscn`): espacio 3D real con cámara en perspectiva cinematográfica ($34^\circ$), sombras dinámicas proyectadas en tiempo real por los sprites sobre el terreno, desniveles físicos (río hundido, puente de madera, colina), faroles con luz cálida física y niebla volumétrica. |
+| Vertical slice jugable | Incluye diálogo interactivo con Pino (retrato y bocadillo con tecla E), combate contra Petrinos con golpe de cetro (J) y semillas explosivas (K) con físicas y destellos 3D, y alternancia instantánea entre vista HD-2D y vista 2D plana con tecla 3. |
+| Hoja de ruta | Documentada en `documentacion/plan_hd2d.md` para adaptar mapas existentes mediante `Region3D` sin tocar el trabajo de la constructora en Sigilia. |
