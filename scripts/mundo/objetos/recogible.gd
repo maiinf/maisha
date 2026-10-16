@@ -21,6 +21,7 @@ var _cogido := false
 
 func _ready() -> void:
 	if marca != "" and not _disponible():
+		set_process(false)
 		queue_free()
 		return
 	add_to_group("recogibles")
@@ -41,7 +42,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if _cogido:
+	if _cogido or _sprite == null:
 		return
 	_tiempo += delta
 	_sprite.frame = 1 if fmod(_tiempo, 1.4) < 0.35 else 0

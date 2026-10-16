@@ -900,3 +900,8 @@ Cada uno tiene ahora **4 fotogramas** (`<id>_anim.png`): quieto, respira (todo b
 
 - En `datos/dialogos/raiz.json`: se sustituye `"No. Sola no."` por `"No. Sin ayuda no."` para respetar que Maisha no tiene género gramatical asignado en ninguna línea de diálogo ni pensamiento; en el epílogo del Primer Árbol, se pule `"una luz lila, cansada pero entera"` a `"una luz lila, tenue pero entera"`.
 - En `scripts/mundo/interiores/casa_shamba.gd`: Mzee Shamba susurra `"(Duerme, brotecito. Mañana será otro día.)"` evitando el adjetivo masculino.
+## Estabilidad y ciclo de vida de nodos
+
+- **Desactivación de proceso en nodos eliminados en `_ready()`**: Cuando un nodo condicional (`aldeano.gd`, `recogible.gd`) evalúa que no debe existir según el `Estado` y ejecuta `queue_free()`, se desactiva explícitamente el procesamiento con `set_process(false)`. Esto previene que `_process()` se ejecute en el fotograma inicial accediendo a propiedades de nodos hijos no instanciados.
+- **Captura segura en lambdas de cierre**: En lecciones y corrutinas temporales (`kitovu.gd`), las lambdas no retienen referencias a nodos de escena susceptibles de ser liberados durante la animación (`semilla`), sino identificadores numéricos primitivos (`instance_id`) validados dinámicamente con `is_instance_id_valid()`.
+
