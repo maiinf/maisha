@@ -11,6 +11,7 @@ extends Node3D
 ##       · lo del suelo y los efectos (zonas de Giza, hierba, brotes, avisos, golpes...): se pinta en una CAPA DE
 ##         SUELO (un SubViewport que mira la misma escena 2D) que se tumba sobre el suelo 3D alrededor de Maisha;
 ##       · lo de pantalla (niebla, hojas, nevada, ventisca, rayos de sol): CAPA DE PANTALLA, delante, como en 2D;
+##       · lo que va de pie (llamas, halos, el «!»...: DE_PIE): en una VENTANITA de pie sobre su objeto;
 ##       · las sombras ovaladas pintadas (sombra.gd): no se ven (ya hay sombras de verdad).
 ##     Los dibujos pegados al suelo (z por debajo de -4) también van a la capa de suelo.
 ##   - UNA CÁMARA en perspectiva que sigue a Maisha, el sol (con el reloj del día) y algo de niebla.
@@ -18,7 +19,9 @@ extends Node3D
 ## (CanvasLayer) sigue igual. Medidas: 16 px = 1 m (una casilla).
 
 const PX := 1.0 / 16.0
-const ALTO_PENA := 1.25            # metros que se levanta una peña
+const ALTO_PENA := 1.25            # metros que se levanta una peña (lo que mide su pared pintada: unos 20 px)
+## Mapas en los que la pared pintada es el doble de alta (gargantas y montaña: pintar_suelo, «cara=2»)
+const PARED_DOBLE := ["canada_eco", "paso_piedra", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha"]
 const SUELO_BAJO := -4             # dibujos con z_index por debajo: se tumban en el suelo
 const CAMARA_INCLINACION := -48.0  # grados (mirando hacia abajo)
 const CAMARA_DISTANCIA := 30.0     # metros hasta Maisha (se ve más o menos lo mismo que en 2D)
@@ -30,7 +33,15 @@ const CANAL_SUELO := 1 << 12
 const CANAL_GEMELO := 1 << 13
 const CANAL_PANTALLA := 1 << 14
 const CANAL_NADA := 1 << 15
-const CANALES_MUNDO := CANAL_SUELO | CANAL_GEMELO | CANAL_PANTALLA | CANAL_NADA
+const CANAL_PIE := 1 << 16
+const CANALES_MUNDO := CANAL_SUELO | CANAL_GEMELO | CANAL_PANTALLA | CANAL_NADA | CANAL_PIE
+## Los que dibujan con código algo que va DE PIE (llamas, halos, el «!» de los aldeanos, la niebla de un arco):
+## lo que dibujan ellos (o sus hijos sin script) se ve en una VENTANITA de pie sobre ellos (_ventanas)
+const DE_PIE := ["brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_perdido.gd", "esencia.gd",
+	"recogible.gd", "arco_ruinas.gd", "portal.gd", "aldeano.gd", "taa.gd"]
+const VENTANA := Vector2i(128, 160)       # píxeles de cada ventanita
+const VENTANA_PIE := Vector2(64, 148)     # dónde cae el pie del objeto dentro de la ventanita
+const VENTANAS := 10                      # como mucho, las de los 10 objetos de pie más cerca de la cámara
 const LADO_CAPA := 1024            # píxeles de la capa de suelo (64 m alrededor de Maisha)
 ## El suelo cercano: la capa de suelo, con luz (para las sombras)
 const SOMBREADOR_CAPA := """
@@ -53,11 +64,14 @@ var sol: DirectionalLight3D
 var _gemelos := {}                 # id del dibujo 2D -> Sprite3D
 var _maisha: Node2D
 var _foco := Vector3.ZERO
+var _alto_pena := ALTO_PENA
 var _tinte := Color.WHITE
 var _canales := {}                 # id de cada dibujo -> [dibujo, su canal de antes] (para devolverlo al apagar)
 var _capa_suelo: SubViewport
 var _plano_capa: MeshInstance3D
 var _capa_pantalla: SubViewport
+var _ventanas: Array = []          # [SubViewport, Sprite3D] (se reparten entre los objetos de pie más cercanos)
+var _de_pie := {}                  # id del objeto de pie (su cuerpo) -> el cuerpo
 var _velo_pantalla: CanvasLayer
 var _mascara_antes := 0xFFFFFFFF
 
@@ -73,7 +87,7 @@ func _ready() -> void:
 		_registrar(n)
 	# la raíz de la escena, en los canales de las dos capas (si no, se llevaría por delante a todos sus hijos)
 	_canales[escena.get_instance_id()] = [escena, escena.visibility_layer]
-	escena.visibility_layer = escena.visibility_layer | CANAL_SUELO | CANAL_PANTALLA
+	escena.visibility_layer = escena.visibility_layer | CANAL_SUELO | CANAL_PANTALLA | CANAL_PIE
 	escena.get_tree().node_added.connect(_registrar)
 	escena.get_tree().node_removed.connect(_quitar)
 
@@ -121,6 +135,7 @@ func _crear_suelo() -> void:
 	if region == null:
 		return
 	var tex := _textura_suelo()
+	_alto_pena = ALTO_PENA * (2.0 if String(region.get("mapa")) in PARED_DOBLE else 1.0)
 	var filas: PackedStringArray = region.get("_filas")
 	var ancho: float = filas[0].length()
 	var alto: float = filas.size()
@@ -156,31 +171,36 @@ func _crear_suelo() -> void:
 	techo.mesh = st.commit()
 	techo.material_override = mat
 	add_child(techo)
-	var mat_roca := StandardMaterial3D.new()
-	mat_roca.albedo_color = Color(0.36, 0.33, 0.34)
-	mat_roca.roughness = 1.0
+	# las paredes: la del sur, con la pared de roca que ya está pintada en el suelo; las demás, de roca oscura
 	var paredes := MeshInstance3D.new()
 	paredes.mesh = lados.commit()
-	paredes.material_override = mat_roca
+	paredes.material_override = mat
 	add_child(paredes)
 
 
 ## Un tramo de peña de x0 a x1 (casillas) en la fila y: techo con el suelo pintado y paredes donde no hay peña al lado
 func _bloque(st: SurfaceTool, lados: SurfaceTool, x0: int, x1: int, y: int, ancho: float, alto: float, filas: PackedStringArray) -> void:
-	var h := ALTO_PENA
-	var uv := func(px: float, pz: float) -> Vector2: return Vector2(px / ancho, pz / alto)
+	# En el dibujo 2D (vista 3/4) la peña ya está pintada como se vería: su pared del sur ocupa una franja de
+	# «h» casillas dentro de la peña, y lo de encima está corrido hacia el norte esa misma altura. Por eso, en 3D:
+	# el techo (a «h» de alto) toma el dibujo de «h» casillas más al norte, y la pared del sur, la franja pintada.
+	var h := _alto_pena
+	var uv := func(px: float, pz: float) -> Vector2: return Vector2(px / ancho, clampf(pz, 0.0, alto) / alto)
 	_cuad(st, Vector3(x0, h, y), Vector3(x1, h, y), Vector3(x1, h, y + 1), Vector3(x0, h, y + 1),
-		uv.call(x0, y), uv.call(x1, y), uv.call(x1, y + 1), uv.call(x0, y + 1))
-	# la pared de delante (sur), si abajo no hay peña: es la que se ve
+		uv.call(x0, y - h), uv.call(x1, y - h), uv.call(x1, y + 1 - h), uv.call(x0, y + 1 - h))
 	for x in range(x0, x1):
 		if y + 1 >= filas.size() or filas[y + 1][x] != "0":
-			_cuad(lados, Vector3(x, h, y + 1), Vector3(x + 1, h, y + 1), Vector3(x + 1, 0, y + 1), Vector3(x, 0, y + 1))
+			_cuad(lados, Vector3(x, h, y + 1), Vector3(x + 1, h, y + 1), Vector3(x + 1, 0, y + 1), Vector3(x, 0, y + 1),
+				uv.call(x, y + 1 - h), uv.call(x + 1, y + 1 - h), uv.call(x + 1, y + 1), uv.call(x, y + 1))
 		if y == 0 or filas[y - 1][x] != "0":
-			_cuad(lados, Vector3(x + 1, h, y), Vector3(x, h, y), Vector3(x, 0, y), Vector3(x + 1, 0, y))
+			_cuad(lados, Vector3(x + 1, h, y), Vector3(x, h, y), Vector3(x, 0, y), Vector3(x + 1, 0, y),
+				uv.call(x + 1, y - h), uv.call(x, y - h), uv.call(x, y), uv.call(x + 1, y))
+	# los lados este y oeste: la pared pintada de la casilla de la esquina, estirada (se ven poco)
 	if x0 > 0:
-		_cuad(lados, Vector3(x0, h, y), Vector3(x0, h, y + 1), Vector3(x0, 0, y + 1), Vector3(x0, 0, y))
+		_cuad(lados, Vector3(x0, h, y), Vector3(x0, h, y + 1), Vector3(x0, 0, y + 1), Vector3(x0, 0, y),
+			uv.call(x0, y + 1 - h), uv.call(x0 + 1, y + 1 - h), uv.call(x0 + 1, y + 1), uv.call(x0, y + 1))
 	if x1 < filas[y].length():
-		_cuad(lados, Vector3(x1, h, y + 1), Vector3(x1, h, y), Vector3(x1, 0, y), Vector3(x1, 0, y + 1))
+		_cuad(lados, Vector3(x1, h, y + 1), Vector3(x1, h, y), Vector3(x1, 0, y), Vector3(x1, 0, y + 1),
+			uv.call(x1 - 1, y + 1 - h), uv.call(x1, y + 1 - h), uv.call(x1, y + 1), uv.call(x1 - 1, y + 1))
 
 
 func _cuad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, ua := Vector2.ZERO, ub := Vector2.ZERO, uc := Vector2.ZERO, ud := Vector2.ZERO) -> void:
@@ -235,6 +255,29 @@ func _crear_capas() -> void:
 	cuadro.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_velo_pantalla.add_child(cuadro)
 	add_child(_velo_pantalla)
+	# las ventanitas de lo que va de pie
+	for i in VENTANAS:
+		var v := SubViewport.new()
+		v.size = VENTANA
+		v.transparent_bg = true
+		v.world_2d = vista.world_2d
+		v.canvas_cull_mask = CANAL_PIE
+		v.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		v.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
+		add_child(v)
+		var g := Sprite3D.new()
+		g.texture = v.get_texture()
+		g.pixel_size = PX
+		g.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+		g.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+		g.shaded = false
+		g.alpha_cut = SpriteBase3D.ALPHA_CUT_DISABLED
+		g.transparent = true
+		g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		g.offset = Vector2(VENTANA.x / 2.0 - VENTANA_PIE.x, VENTANA_PIE.y - VENTANA.y / 2.0)
+		g.visible = false
+		add_child(g)
+		_ventanas.append([v, g])
 	# la pantalla principal deja de pintar el mundo 2D (sigue vivo y viéndose en las capas); la interfaz, sí
 	_mascara_antes = vista.canvas_cull_mask
 	vista.canvas_cull_mask = _mascara_antes & ~CANALES_MUNDO
@@ -246,6 +289,29 @@ func _mover_capas() -> void:
 	_capa_suelo.canvas_transform = Transform2D(0.0, -(centro - Vector2(LADO_CAPA, LADO_CAPA) / 2.0))
 	_plano_capa.position = Vector3(centro.x * PX, 0.005, centro.y * PX)
 	_capa_pantalla.canvas_transform = escena.get_viewport().canvas_transform
+	# las ventanitas: para los objetos de pie más cercanos a la cámara, cada una mirando su trocito de la escena
+	var cerca := []
+	for id in _de_pie.keys():
+		var c: Node2D = _de_pie[id]
+		if not is_instance_valid(c):
+			_de_pie.erase(id)
+			continue
+		var d := _al_suelo(c.global_position).distance_to(_foco)
+		if d < LEJOS * 0.7:
+			cerca.append([d, c])
+	cerca.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	for i in _ventanas.size():
+		var v: SubViewport = _ventanas[i][0]
+		var g: Sprite3D = _ventanas[i][1]
+		if i >= cerca.size():
+			g.visible = false
+			continue
+		var c: Node2D = cerca[i][1]
+		var pie := c.global_position.round()
+		v.canvas_transform = Transform2D(0.0, -(pie - VENTANA_PIE))
+		g.position = _al_suelo(pie) + Vector3(0, 0, 0.06)        # (un pelín hacia la cámara: por delante de su dibujo)
+		g.modulate = _tinte
+		g.visible = true
 
 
 func _exit_tree() -> void:
@@ -305,7 +371,16 @@ func _registrar(n: Node) -> void:
 		ci.visibility_layer = CANAL_PANTALLA
 		return
 	if not (n is Sprite2D or n is AnimatedSprite2D) or _z(n) < SUELO_BAJO:
-		ci.visibility_layer = CANAL_SUELO
+		var dueno := _dueno_de_pie(n)
+		if _contenedor(n):
+			# un contenedor (no pinta nada): en todos los canales, para que sus hijos se vean en su capa
+			ci.visibility_layer = CANAL_SUELO | CANAL_PIE
+		else:
+			# lo que pinta (con código, o un sprite pegado al suelo): de pie (en su ventanita) o en el suelo
+			ci.visibility_layer = CANAL_PIE if dueno and _dibuja(n) else CANAL_SUELO
+		if dueno:
+			var cuerpo := _ancla(dueno as Node2D)
+			_de_pie[cuerpo.get_instance_id()] = cuerpo
 		return
 	ci.visibility_layer = CANAL_GEMELO
 	if _gemelos.has(n.get_instance_id()):
@@ -331,6 +406,30 @@ func _en_interfaz(n: Node) -> bool:
 			return true
 		c = c.get_parent()
 	return false
+
+
+## ¿No pinta nada él mismo? (un Node2D, un cuerpo, una forma de choque, una luz... sin _draw)
+func _contenedor(n: Node) -> bool:
+	if _dibuja(n):
+		return false
+	return n.get_class() == "Node2D" or n is CollisionObject2D or n is CollisionShape2D or n is CollisionPolygon2D \
+		or n is Light2D or n is LightOccluder2D or n is Marker2D or n is RemoteTransform2D or n is CanvasModulate
+
+
+## ¿Dibuja algo con código? (_draw en su script, o alguien conectado a su señal «draw»)
+func _dibuja(n: Node) -> bool:
+	return (n.get_script() != null and n.has_method("_draw")) or not n.get_signal_connection_list("draw").is_empty()
+
+
+## El objeto de pie al que pertenece este dibujo (él mismo o su padre, si es de los DE_PIE), o null
+func _dueno_de_pie(n: Node) -> Node:
+	for c in [n, n.get_parent()]:
+		if c and c != escena and c.get_script():
+			var ruta := String(c.get_script().resource_path)
+			for nombre in DE_PIE:
+				if ruta.ends_with("/" + nombre):
+					return c
+	return null
 
 
 ## ¿Es un dibujo de pantalla (o cuelga de uno)?

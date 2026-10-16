@@ -837,7 +837,8 @@ Decidido con Iam: el juego irá a **HD-2D** (los sprites de pixel art de siempre
 | Qué | Cómo |
 | --- | --- |
 | El suelo | Cerca de Maisha, la **capa de suelo**: un SubViewport que mira la misma escena 2D (el suelo pintado con el gris de Giza, la hierba, las zonas, las raíces, los avisos, los golpes, las llamas...) y se tumba sobre el suelo 3D, con luz para recibir las sombras. Más lejos, el suelo pintado (1 casilla = 1 m) |
-| Las peñas | Las casillas «0» se levantan 1,25 m, con el suelo pintado encima y paredes de roca |
+| Las peñas | Las casillas «0» se levantan lo que mide su pared pintada (1,25 m; 2,5 en gargantas y montaña). La **pared del sur lleva la roca pintada** del suelo (estratos, grietas, vetas) y el techo toma el dibujo de encima, corrido hacia el norte esa misma altura (como lo pinta la vista 3/4) |
+| Lo que va de pie | Llamas de braseros, fogatas y faroles, halos de ecos, esencias y recogibles, la niebla del arco de las Ruinas, el portal del Kitovu y el «!» de los aldeanos (`DE_PIE`): cada uno se ve en una **ventanita** (un SubViewport de 128×160 que mira su trocito de la escena 2D) de pie sobre su objeto; hay 10, para los más cercanos a la cámara |
 | Los dibujos | Cada Sprite2D y AnimatedSprite2D del mundo tiene un gemelo 3D **de pie** que mira a la cámara, con **sombra real**; lo pegado al suelo (z por debajo de -4) se tumba. Las capas de un personaje (cuerpo, ropa, cetro) se apoyan en el mismo punto. Conservan sus colores de pixel art y de noche se tiñen de azul |
 | Lo de pantalla | Niebla, hojas que caen, nevada, ventisca y rayos de sol: la **capa de pantalla**, delante, igual que en 2D |
 | Sombras | Las sombras ovaladas pintadas no se ven: las pone el sol de verdad |
@@ -846,9 +847,9 @@ Decidido con Iam: el juego irá a **HD-2D** (los sprites de pixel art de siempre
 | Rendimiento | Solo se copian los dibujos a menos de 30 m de la cámara: el fotograma cuesta lo mismo que en 2D (7,5 ms en los Prados) |
 | Prueba | `pruebas/prueba_hd2d.gd` |
 
-Comparativas: `documentacion/hd2d_comparativa_1.png` y `hd2d_comparativa_2.png`.
+Comparativas: `documentacion/hd2d_comparativa_1.png`, `_2.png` y `_3.png`.
 
-Falta: lo que se dibuja con código y va **de pie** (llamas de los braseros, el «!» de los aldeanos, auras) sale tumbado en el suelo; el agua y los desniveles del terreno; las paredes de las peñas con su dibujo; el relieve de los dibujos (mapas de normales) en 3D.
+Falta: el agua y los desniveles del terreno; el relieve de los dibujos (mapas de normales) en 3D; lo de pie que dibujan los enemigos con código (auras, avisos en el aire) sale aún en el suelo.
 
 # SIGILIA (mundo 2)
 
