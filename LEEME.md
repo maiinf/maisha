@@ -918,3 +918,7 @@ Cada uno tiene ahora **4 fotogramas** (`<id>_anim.png`): quieto, respira (todo b
 
 - En `scripts/interfaz/menu_pausa.gd`, la ficha de objetos llevados muestra el icono de `arte/interfaz/objetos.png` para cualquier objeto y se organiza en dos columnas cuando hay más de tres para no desbordar `CAJA_INFO`.
 - En `scripts/interfaz/objetivo.gd`, `menu_pausa.gd` y `mochila.gd` se desactiva el posicionamiento subpíxel de la fuente; en `mochila.gd` se añade `cueva_eco` a `PUNTO_RAIZ` y se acepta `keycode` además de `physical_keycode` en los atajos `1-6` y `M`.
+## Efectos de sonido y equilibrio (`revision/sonidos`)
+
+- `cetro_golpe` usa un barrido continuo de aire con cuerpo de madera en lugar de tramos escalonados de ruido; `golpe_acierto` suma chasquido de piedra y corteza; `semilla_plantar` añade roce de hojarasca y reverberación corta (`herramientas/crear_sonidos.py`).
+- En `scripts/globales/sonido.gd` (`VOLUMEN`), los rugidos y victorias de jefes se moderan a `-2,0 dB` para no tapar la música ni las fanfarrias, mientras que `cetro_golpe` (`-6,5 dB`) y `semilla_mecha` (`-9,5 dB`) ganan presencia en combate.

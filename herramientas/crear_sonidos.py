@@ -106,25 +106,25 @@ def pausa():
 # =============================================================================
 
 def cetro_golpe():
-    """El cetro corta el aire: un «fsss» corto."""
-    d = 0.16
-    x = ruido(d)
-    out = np.zeros(_n(d))
-    trozos = 16
-    for i in range(trozos):
-        a, b = i * len(x) // trozos, (i + 1) * len(x) // trozos
-        f = 900 + 2600 * math.sin(math.pi * i / trozos)
-        out[a:b] = paso_banda(x[a:b], f * 0.7, f * 1.4)
-    return out * adsr(_n(d), 0.02, 0.04, 0.6, 0.08) * 0.5
+    """El cetro corta el aire: silbido continuo de madera con cuerpo grave y sin escalones de filtro."""
+    d = 0.17
+    n = _n(d)
+    aire = paso_alto(barrido_bajo(ruido_rosa(d), 700, 3600, 32), 450)
+    palo = seno(_desliz(280, 135, d, 0.7), d) * caida(n, 0.045) * 0.32
+    roce = paso_banda(ruido(d), 1400, 4800) * np.sin(np.linspace(0, np.pi, n)) ** 2 * 0.28
+    x = (aire * 0.55 + palo + roce) * adsr(n, 0.015, 0.04, 0.65, 0.07)
+    return reverb(x, 0.45, 0.10)
 
 
 def golpe_acierto():
-    """El cetro le da a un Petrino: un golpe seco de madera contra piedra."""
+    """El cetro le da a un Petrino: golpe con cuerpo de madera, chasquido de corteza y piedra."""
     d = 0.22
-    x = seno(_desliz(260, 110, d), d) * caida(_n(d), 0.05) * 0.9
-    x += paso_banda(ruido(d), 800, 4000) * caida(_n(d), 0.015) * 0.6
-    x += balafon("D4", d, 0.3)
-    return reverb(x, 0.6, 0.1)
+    n = _n(d)
+    x = seno(_desliz(260, 105, d), d) * caida(n, 0.055) * 0.85
+    x += paso_banda(ruido(d), 800, 4200) * caida(n, 0.018) * 0.55
+    x += _crujido_piedra(d, 140, grave=False) * caida(n, 0.035) * 0.42
+    x += balafon("D4", d, 0.34)
+    return reverb(x, 0.6, 0.12)
 
 
 def clinc():
@@ -136,11 +136,13 @@ def clinc():
 
 
 def semilla_plantar():
-    """La semilla cae al suelo: un «pop» de tierra blanda."""
-    d = 0.18
-    x = seno(_desliz(420, 160, d, 0.5), d) * caida(_n(d), 0.04) * 0.8
-    x += paso_bajo(ruido(d), 1200) * caida(_n(d), 0.02) * 0.4
-    return x
+    """La semilla cae al suelo: un «pop» húmedo de tierra blanda y hojarasca."""
+    d = 0.19
+    n = _n(d)
+    x = seno(_desliz(420, 165, d, 0.5), d) * caida(n, 0.045) * 0.78
+    x += paso_bajo(ruido_rosa(d), 1200) * caida(n, 0.028) * 0.45
+    x += paso_banda(ruido(d), 1800, 5200) * caida(n, 0.022) * 0.18
+    return reverb(x, 0.45, 0.12)
 
 
 def semilla_mecha():

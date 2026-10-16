@@ -239,3 +239,8 @@ se pasan.
 | --- | --- |
 | Menú de pausa (`menu_pausa.gd`) | Los objetos que lleva Maisha dibujan todos su icono de `objetos.png` (antes solo `seta_luminosa` y `mineral`) y se disponen en 2 columnas a partir de 4 objetos para que no desborden `CAJA_INFO` |
 | Nitidez de fuente y mapa | Desactivado el posicionamiento subpíxel en `objetivo.gd`, `menu_pausa.gd` y `mochila.gd`; añadido `"cueva_eco"` a `PUNTO_RAIZ` en `mochila.gd` y soporte de `keycode` además de `physical_keycode` en los atajos `1-6` y `M` |
+### Revisión de efectos de sonido (`revision/sonidos`)
+| Qué | Decisión |
+| --- | --- |
+| Efectos orgánicos | En `herramientas/crear_sonidos.py`, `cetro_golpe` reemplaza los 16 tramos escalonados de ruido blanco por un barrido continuo de ruido rosa con cuerpo grave de madera y reverberación corta; `golpe_acierto` incorpora chasquido de piedra/corteza (`_crujido_piedra`); `semilla_plantar` añade textura de hojarasca y reverberación corta |
+| Equilibrio de `VOLUMEN` | En `scripts/globales/sonido.gd`, se moderan a `-2,0 dB` los rugidos y victorias de jefes que estaban en `0,0` / `-1,0 dB` (para que no tapen la música ni las fanfarrias) y se suben `cetro_golpe` (`-8,0` → `-6,5 dB`), `semilla_mecha` (`-12,0` → `-9,5 dB`) y `mende_corre` (`-12,0` → `-10,0 dB`) |
