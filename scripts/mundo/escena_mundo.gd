@@ -44,6 +44,7 @@ const AMBIENTE_DE := {
 	"claro_de_calma": {"brisa": 0.3},
 }
 const OIDO_AGUA := preload("res://scripts/mundo/oido_agua.gd")
+const ESPEJO_HD2D := preload("res://scripts/mundo/hd2d/espejo_hd2d.gd")
 const PAUSA := preload("res://scripts/interfaz/menu_pausa.gd")
 const MOCHILA := preload("res://scripts/interfaz/mochila.gd")
 const OBJETIVO := preload("res://scripts/interfaz/objetivo.gd")
@@ -88,6 +89,8 @@ func _ready() -> void:
 	Estado.marcar("visto/" + Estado.escena_actual)
 	_poner_sonido()
 	Estado.lugar = titulo
+	if Estado.extra.get("hd2d", false):
+		poner_hd2d.call_deferred(true)
 	Estado.guardar.call_deferred()
 	if Estado.llegada == "" or continuando:
 		# empieza la partida aquí: aparece desde negro con el nombre del sitio
@@ -95,6 +98,31 @@ func _ready() -> void:
 	elif titulo != "":
 		_hud.mostrar_mensaje(titulo)
 	Estado.llegada = ""
+
+
+## HD-2D (en pruebas): la misma escena dibujada en 3D (scripts/mundo/hd2d/espejo_hd2d.gd). El juego no cambia:
+## solo se oculta el dibujo 2D del mundo (la interfaz sigue igual). Con H se cambia entre 2D y HD-2D.
+var _espejo: Node3D
+
+
+func poner_hd2d(si: bool) -> void:
+	Estado.extra["hd2d"] = si
+	if si and _espejo == null:
+		_espejo = ESPEJO_HD2D.new()
+		_espejo.name = "EspejoHD2D"
+		_espejo.escena = self
+		get_tree().root.add_child(_espejo)
+		tree_exiting.connect(_espejo.queue_free)
+	elif not si and _espejo:
+		_espejo.queue_free()
+		_espejo = null
+	visible = not si
+
+
+func _unhandled_key_input(evento: InputEvent) -> void:
+	var tecla := evento as InputEventKey
+	if tecla and tecla.pressed and not tecla.echo and tecla.physical_keycode == KEY_H:
+		poner_hd2d(_espejo == null)
 
 
 ## La música y el ambiente de esta escena (el Kitovu lo cambia para el despertar)

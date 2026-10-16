@@ -689,6 +689,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_kitovu.gd` juega el comienzo entero: el despertar lento, la chispa y sus 3 recuerdos, Kuku y la puerta, la noche y el amanecer, el despertar sin cetro, la zona dormida, el susurro del castor, las tres tareas (con la pesca), el cetro y el mapa, el espantapájaros, la mochila, las 3 manchas de práctica con el narrador, la pelea contra Mzizi y el arco hasta los prados y vuelta.
 - `pruebas/prueba_guardado.gd` empieza una partida desde el inicio (el diario se abre y la introducción se escribe en él), guarda, pausa, vuelve al inicio, continúa donde lo dejó, comprueba que en plena pelea se guarda el último sitio seguro, que «Nueva partida» pregunta antes de borrar y que un archivo estropeado no rompe nada.
 - `pruebas/prueba_encargos.gd` recoge setas y mineral, comprueba que el cetro rebota en la roca y la semilla la rompe, entrega los encargos, ve levantarse las casas, entra en ellas y prueba las recompensas (haces del vigía y cetro templado).
+- `pruebas/prueba_hd2d.gd` enciende el HD-2D con H, comprueba que cada dibujo tiene su gemelo 3D, que la interfaz sigue, que Maisha anda igual y su gemelo la sigue, que las peñas se levantan, que se recuerda al cambiar de escena y que al apagarlo vuelve el 2D.
 - `pruebas/prueba_paso_escarcha.gd` comprueba el paso del norte de las Ruinas (cerrado hasta curar al árbol), llega al Paso de la Escarcha, prueba la nieve honda (frena, no deja correr, deja surcos que ya no frenan), la ventisca (empuja en medio del valle, no detrás de una estela, y se apaga al pasar la racha), a Taa en blanco, la ficha en la nieve honda, que al dársela recupera su nombre y enseña el sigilo de fuego, el sigilo (sin aprender no sale; gasta Aliento; espera) que enciende un farol, el abrigo del farol (ni viento ni nieve honda), que revivir lo quita todo, las páginas sueltas (atacan y el fuego las quema; cuentan en el Bestiario), la Puerta Sellada (no se rodea; tres sigilos la abren), que la misión se cumple y que la puerta a Maandiko aún no deja pasar.
 - `pruebas/prueba_sendero.gd` va de los Prados al Sendero del Puente y a la aldea y vuelta, prueba los pretiles y el vado, el eco perdido (con su ilustración), el encargo de Msafiri y el cuaderno de ecos.
 - `pruebas/prueba_pasarelas.gd` va de la aldea a Las Pasarelas y a la ciénaga y vuelta, prueba el agua y las tablas, el tramo roto, la rana de piedra (aviso, salto, onda, atontada), el encargo de Korongo (que arregla la pasarela) y el segundo eco.
@@ -828,6 +829,21 @@ Escena `escenas/mundo/ruinas_primer_arbol.tscn` (`scripts/mundo/ruinas_primer_ar
 | Música | «Las Ruinas» (solemne, coro lejano) y «El miedo del Primer Árbol» (un latido grave que no para y, por encima, las frases de los ecos) |
 | Misión | «El Primer Árbol» (historia) |
 | Bestiario | «El miedo del Primer Árbol», como jefe (rango por los golpes recibidos) |
+
+# HD-2D (en pruebas: tecla H)
+
+Decidido con Iam: el juego irá a **HD-2D** (los sprites de pixel art de siempre en un mundo 3D). Se hace con un **espejo** (`scripts/mundo/hd2d/espejo_hd2d.gd`): el juego sigue siendo 2D por dentro (nada de la física, los enemigos, las zonas o los diálogos cambia) y el espejo lo **dibuja en 3D**. Así vale para todos los mapas a la vez, también los que se hagan después. En cualquier escena del mundo, **H** cambia entre 2D y HD-2D (se recuerda en la partida).
+
+| Qué | Cómo |
+| --- | --- |
+| El suelo | El suelo pintado de cada mapa es el suelo 3D (1 casilla = 1 m) |
+| Las peñas | Las casillas «0» se levantan 1,25 m, con el suelo pintado encima y paredes de roca |
+| Los dibujos | Cada Sprite2D y AnimatedSprite2D del mundo tiene un gemelo 3D **de pie** que mira a la cámara, con **sombra real**; lo pegado al suelo (z por debajo de -4) se tumba. Las capas de un personaje (cuerpo, ropa, cetro) se apoyan en el mismo punto. Conservan sus colores de pixel art y de noche se tiñen de azul |
+| Luz y cámara | Sol que sigue el reloj del día, poca niebla, cámara en perspectiva (30°, inclinada 48°) que sigue a Maisha sin salirse del mapa |
+| Rendimiento | Solo se copian los dibujos a menos de 30 m de la cámara: el fotograma cuesta lo mismo que en 2D (7,5 ms en los Prados) |
+| Prueba | `pruebas/prueba_hd2d.gd` |
+
+Falta: lo que se dibuja con código (llamas, auras, la ventisca, las zonas de Giza, el decorado de hierba, las sombras pintadas a mano) aún se ve solo en 2D; el agua y los desniveles del terreno; el relieve de los dibujos (mapas de normales) en 3D.
 
 # SIGILIA (mundo 2)
 
