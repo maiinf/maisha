@@ -273,4 +273,11 @@ se pasan.
 | El fallo | En el 4.º fotograma de la animación de los aldeanos (Shamba, Bibi, Bata, Mbuzi y Msafiri), el bastón, pértiga o cayado se cortaba con un hueco vacío de varios píxeles antes del suelo y dejaba la base flotando desconectada. |
 | Causa | En `herramientas/dibujar_aldeanos.py`, `alza_derecha` detenía el desplazamiento en la fila 28 con la intención de excluir los pies, dejando las filas 28..31 intactas y borrando las filas anteriores. En `herramientas/dibujar_kitovu.py`, `shamba_anim` recortaba `h - 4` pero no limpiaba la base. |
 | Solución | Se ampliaron ambos recortes para desplazar verticalmente todo el tramo hasta el suelo (`ALTO` y `h`), levantando los bastones enteros en el aire sin truncar la base. Se regeneraron todos los sprites de aldeanos y Kitovu. |
+### Revisión de ilustraciones · Cinemáticas y ecos (16-10)
+| Qué | Decisión |
+| --- | --- |
+| Horizontes periódicos (`linea_horizonte`) | `linea_horizonte()` en `herramientas/cinematicas.py` usaba frecuencias armónicas exactas (`(2 ** o) / escala`), lo que en escalas cortas como `17_kimya_lago` producía una repetición exacta de dientes de sierra cada 34 px. Reemplazado por frecuencias incommensurables (`2.17 ** o` con variación aleatoria y onda base de baja frecuencia). |
+| Reflejo de `17_kimya_lago` (`cinematicas_sendero.py`) | Por debajo de `y = 2 * HZ` (`196 px`), el espejo del agua saturaba `origen = 0` y repetía verticalmente la fila 0 del cielo, estirando dos estrellas del borde superior como dos rayas verticales en el agua. Ahora el tramo inferior del reflejo se funde suavemente hacia azul noche profundo (`#0b1122`), como en `21_eco_lago`. |
+| El Primer Árbol en las Ruinas (`22_ruinas_mauti`) | `_arbol_gris()` tenía un tronco trapezoidal recto sin raíces ni corteza, en contraste con `_arbol_dorado()` en `23_arbol_libre`. Se igualó su anatomía con raíces extendidas en la nieve, corteza estriada con relieve, ramas nudosas y tres grandes vetas violetas de Giza. |
+| La granja y la leyenda (`2_familia_shamba`, `3_leyenda`) | En `casa_troncos()` se pintó la acequia de piedra con agua y espuma al pie de la rueda del molino; en `leyenda()` se sombreó el brazo de la mecedora (`brazo_m`, que se calculaba pero no se pintaba) y se reemplazó el árbol de 3 trazos rectos dentro de la visión del cetro por un árbol viejo con raíces y primeros brotes verdes. |
 

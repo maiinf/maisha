@@ -32,13 +32,13 @@ def linea_horizonte(lz, base, amplitud, escala, semilla, octavas=4):
     """Una silueta de montañas o colinas: devuelve la altura (y) para cada x."""
     rng = np.random.default_rng(semilla)
     x = np.arange(lz.W) / lz.s
-    y = np.zeros_like(x)
-    amp, suma = 1.0, 0.0
+    y = 0.45 * np.sin(x * (0.37 / escala) * 2 * np.pi + rng.random() * 6.28)
+    amp, suma = 1.0, 0.45
     for o in range(octavas):
-        f = (2 ** o) / escala
+        f = (2.17 ** o) / escala * (0.92 + 0.16 * rng.random())
         y += amp * np.sin(x * f * 2 * np.pi + rng.random() * 6.28) * (0.6 + 0.4 * rng.random())
         suma += amp
-        amp *= 0.5
+        amp *= 0.52
     return base - amplitud * y / suma
 
 
@@ -491,19 +491,27 @@ def piedras(lz, region, tam=9.0, semilla=2, rampa_p=PIEDRA, luz=(-0.5, -0.7, 0.5
         return
     x0, x1, y0, y1 = xs.min() / lz.s, xs.max() / lz.s, ys.min() / lz.s, ys.max() / lz.s
     lz.pintar(region, mortero)
+    tex_p = lz.ruido(1.5, 2, semilla=semilla + 11)
+    grupos = [np.zeros((lz.H, lz.W)) for _ in range(4)]
     fila = 0
     y = y0
     while y < y1 + tam:
         x = x0 - (tam * 0.5 if fila % 2 else 0)
+        col = 0
         while x < x1 + tam:
             w_ = tam * (0.8 + rng.random() * 0.6)
             h_ = tam * (0.6 + rng.random() * 0.25)
             p = lz.elipse(x + w_ / 2, y + h_ / 2, w_ / 2 - 0.6, h_ / 2 - 0.6, (rng.random() - 0.5) * 20) * region
             if p.max() > 0.3:
-                lz.sombrear(p, rampa_p, min(w_, h_) * 0.35, luz, textura=lz.ruido(1.5, 2), fuerza_tex=0.3)
+                g_idx = (fila % 2) * 2 + (col % 2)
+                grupos[g_idx] = np.maximum(grupos[g_idx], p)
             x += w_
+            col += 1
         y += tam * 0.72
         fila += 1
+    for g in grupos:
+        if g.max() > 0.3:
+            lz.sombrear(g, rampa_p, tam * 0.25, luz, textura=tex_p, fuerza_tex=0.3)
 
 
 def lengua(lz, x, base, ancho, alto, curva, fase=0.0):
@@ -679,10 +687,11 @@ def leyenda():
     # la abuela con su chal y sus gafas, con el cetro en alto
     castor(lz, 266, 214, 2.05, 1, chal=True, gafas=True, brazo_alto=True, sem=11,
            luz=(-0.9, -0.3, 0.45), recorte=("#535a80", 0.6), recorte_dir=(1, -0.2))
-    # el balancín de la mecedora delante
+    # el balancín y el brazo de la mecedora delante
     balancin = lz.trazo(lz.curva((206, 212), (262, 226), (318, 210), n=30), 3.4)
     lz.sombrear(balancin, MADERA, 1.7, (-0.8, -0.5, 0.5))
-    brazo_m = lz.trazo([(222, 176), (300, 178)], 3.4)
+    brazo_m = lz.trazo([(222, 176), (294, 178)], 3.2)
+    lz.sombrear(brazo_m, MADERA, 1.6, (-0.8, -0.4, 0.5))
     cetro(lz, 300, 222, 116, e=1.7, luz=(-0.9, -0.3, 0.45))
     # la mano que agarra el cetro (delante del palo)
     mano = lz.elipse(299, 149, 4.4, 4.6)
@@ -706,13 +715,18 @@ def leyenda():
     borde_b = np.clip(1 - np.abs(d_b - 0.95 + (humo_dorado - 0.5) * 0.25) * 9, 0, 1)
     dentro_b = np.clip((1 - d_b) * 4 + (humo_dorado - 0.5) * 0.6, 0, 1)
     lz.pintar(dentro_b, rampa(["#3a2238", "#6a3446", "#9c4b4a", "#c96d4f"], np.clip(1 - d_b + humo_dorado * 0.3, 0, 1)), 0.75)
-    # dentro: el mundo gris, con el árbol, y la luz que llega
+    # dentro: el mundo gris, con el árbol viejo que empieza a reverdecer donde llega la luz
     for (hx_, hy_, hr_, col_) in [(cx_v - 20, cy_v + 40, 40, "#525458"), (cx_v + 26, cy_v + 44, 36, "#3d3f43")]:
         lz.pintar(lz.circulo(hx_, hy_, hr_) * dentro_b, col_, 0.9)
-    arb = lz.trazo([(cx_v - 26, cy_v + 8), (cx_v - 27, cy_v - 8)], 2)
-    arb = np.maximum(arb, lz.trazo([(cx_v - 27, cy_v - 4), (cx_v - 33, cy_v - 12)], 1.2))
-    arb = np.maximum(arb, lz.trazo([(cx_v - 27, cy_v - 6), (cx_v - 21, cy_v - 14)], 1.2))
-    lz.pintar(arb * dentro_b, "#2b2c30")
+    ax, ay = cx_v - 25, cy_v + 12
+    arb = lz.trazo(lz.curva((ax, ay), (ax - 1.5, ay - 9), (ax - 1, ay - 18), n=16), 2.8, 1.4)
+    for (p1, p2, g_) in [((ax - 4, ay + 1), (ax - 9, ay + 3), 1.4), ((ax + 3, ay + 1), (ax + 8, ay + 2), 1.4),
+                         ((ax - 1, ay - 13), (ax - 10, ay - 22), 1.4), ((ax - 1, ay - 15), (ax + 8, ay - 23), 1.3),
+                         ((ax - 4, ay - 17), (ax - 3, ay - 26), 1.1)]:
+        arb = np.maximum(arb, lz.trazo(lz.curva((ax - 1, p1[1]), p1, p2, n=12), g_, g_ * 0.45))
+    lz.sombrear(arb * dentro_b, ["#1b1c1f", "#2b2c30", "#525458", "#85878a"], 1.5, (0.8, -0.4, 0.5))
+    brotes_v = (lz.elipse(ax + 6, ay - 22, 4.5, 3.0) + lz.elipse(ax - 2, ay - 25, 4.0, 2.6)) * dentro_b
+    lz.sombrear( np.clip(brotes_v, 0, 1), ["#24401f", "#3e9a35", "#6fcf4f", "#b8ef8e"], 2.0, (0.7, -0.5, 0.5))
     lz.sumar_luz(borde_b, "#f9b947", 0.8)
     lz.sumar_luz(lz.desenfocar(borde_b, 3), "#ef8a26", 0.6)
     rayos_l = lz.rayos(lz.circulo(cx_v, cy_v - 4, 9), (cx_v, cy_v - 4), largo=0.965, pasos=34)
@@ -1056,9 +1070,13 @@ def casa_troncos(lz, x, y, ancho, alto, luz=(-0.7, -0.6, 0.5), ventanas_luz=0.0,
         lz.pintar(lz.poligono([(vx_ - 8, y - 9), (vx_ + 8, y - 9), (vx_ + 7, y - 6), (vx_ - 7, y - 6)]), "#6d4534")
         flores(lz, 6, (vx_ - 7, y - 9, vx_ + 7, y - 8.5), [["#8f2532", "#d5525e", "#e98378"], ["#b2721a", "#df9022", "#f1c27a"]], semilla=int(vx_), tam=0.7)
     if rueda:
-        # la rueda del molino, a un lado, con su acequia
+        # la rueda del molino, a un lado, con su acequia de piedra y agua con espuma
         rx_, ry_ = x0 - 10, y - 12
         r_ = alto * 0.3
+        acequia = lz.trazo(lz.curva((rx_ - 42, y + 6), (rx_ - 6, y + 3), (rx_ + 22, y + 1), n=28), 7.5, 5.0)
+        borde_a = np.clip(lz.desenfocar(acequia, 1.6) - acequia, 0, 1)
+        lz.sombrear(borde_a, PIEDRA[:5], 1.5, luz)
+        lz.pintar(acequia, rampa(["#1d3a44", "#335777", "#6b9eab", "#c4ddd0"], np.clip(0.35 + lz.ruido(2, 2, semilla=semilla + 9) * 0.55, 0, 1)))
         aro = np.clip(lz.circulo(rx_, ry_, r_) - lz.circulo(rx_, ry_, r_ - 2.5), 0, 1)
         for k in range(10):
             a_ = k * np.pi / 5
@@ -1066,6 +1084,8 @@ def casa_troncos(lz, x, y, ancho, alto, luz=(-0.7, -0.6, 0.5), ventanas_luz=0.0,
             aro = np.maximum(aro, lz.trazo([(rx_ + np.cos(a_) * (r_ - 1), ry_ + np.sin(a_) * (r_ - 1)), (rx_ + np.cos(a_) * (r_ + 3), ry_ + np.sin(a_) * (r_ + 3))], 2.4))
         lz.sombrear(aro, MADERA, 1.2, luz)
         lz.sombrear(lz.circulo(rx_, ry_, 3), MADERA, 2, luz)
+        espuma = lz.elipse(rx_, y + 2, 12, 2.6) * (lz.ruido(1.2, 2, semilla=semilla + 11) > 0.38)
+        lz.pintar(lz.desenfocar(espuma, 0.6), "#e8f0dc", 0.85)
     return pared
 
 
@@ -1073,29 +1093,31 @@ def zanahorias(lz, x0, x1, y, e=1.0, semilla=0, n=None):
     """Una fila de zanahorias: la cabeza naranja asomando y un penacho de hojas."""
     rng = np.random.default_rng(semilla)
     n = n or int((x1 - x0) / (7 * e))
+    cabs_m = np.zeros((lz.H, lz.W))
     hojas_m = np.zeros((lz.H, lz.W))
     for k in range(n):
         x = x0 + (x1 - x0) * (k + 0.5) / n + (rng.random() - 0.5) * 2 * e
-        cab = lz.elipse(x, y - 0.5 * e, 2.4 * e, 1.6 * e)
-        lz.sombrear(cab, ["#6e200c", "#a8380f", "#d45a17", "#ef8a26", "#f9b947"], 1.4 * e, (-0.6, -0.7, 0.5))
+        cabs_m = np.maximum(cabs_m, lz.elipse(x, y - 0.5 * e, 2.4 * e, 1.6 * e))
         for j in range(5):
             a_ = np.radians(-90 + (j - 2) * 22 + (rng.random() - 0.5) * 10)
             l_ = (6 + rng.random() * 4) * e
             pts = lz.curva((x, y - 1 * e), (x + np.cos(a_) * l_ * 0.5, y - 1 * e + np.sin(a_) * l_ * 0.6), (x + np.cos(a_) * l_, y - 1 * e + np.sin(a_) * l_ * 0.9 + 1 * e), n=10)
             hojas_m = np.maximum(hojas_m, lz.trazo(pts, 1.6 * e, 0.6 * e))
+    lz.sombrear(cabs_m, ["#6e200c", "#a8380f", "#d45a17", "#ef8a26", "#f9b947"], 1.4 * e, (-0.6, -0.7, 0.5))
     lz.sombrear(hojas_m, HIERBA[2:], 0.9 * e, (-0.6, -0.7, 0.5), textura=lz.ruido(0.7, 2), fuerza_tex=0.4)
 
 
 def coles(lz, x0, x1, y, e=1.0, semilla=0):
     rng = np.random.default_rng(semilla)
     n = int((x1 - x0) / (12 * e))
+    hojas_ = []
     for k in range(n):
         x = x0 + (x1 - x0) * (k + 0.5) / n
-        hojas_ = []
         for j in range(9):
             a_ = j / 9 * 2 * np.pi
             hojas_.append((x + np.cos(a_) * 3.5 * e, y - 3 * e + np.sin(a_) * 2 * e, 3.4 * e))
         hojas_.append((x, y - 3.6 * e, 3.2 * e))
+    if hojas_:
         bolas(lz, hojas_, ["#24401f", "#355029", "#5d793e", "#8aa152", "#b4c070", "#dcd994"], luz=(-0.6, -0.7, 0.5),
               ruido_borde=0.2, fuerza_tex=0.2, plano=1.3)
 
