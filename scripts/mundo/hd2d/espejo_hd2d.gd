@@ -48,7 +48,7 @@ const LADO_CAPA := 768             # píxeles de la capa de suelo (48 m alrededo
 ## con un brillo que se mueve). «agua» es la máscara del mapa (1 píxel por casilla).
 const SOMBREADOR_CAPA := """
 shader_type spatial;
-render_mode diffuse_lambert, specular_disabled;
+render_mode diffuse_lambert;
 uniform sampler2D capa : filter_nearest;
 uniform sampler2D agua : filter_linear;
 uniform sampler2D mapa_ao : filter_linear;
@@ -56,50 +56,109 @@ uniform vec2 origen = vec2(0.0);
 uniform vec2 casillas = vec2(1.0);
 uniform float lado = 1024.0;
 uniform float hundido = 0.0;
+
+void vertex() {
+	if (hundido < 0.5) {
+		vec3 wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+		vec2 uv_m = wp.xz / max(vec2(1.0), casillas);
+		float ag = textureLod(agua, uv_m, 0.0).r;
+		float tierra = 1.0 - smoothstep(0.08, 0.42, ag);
+		float h = (sin(wp.x * 0.24 + wp.z * 0.17) * cos(wp.z * 0.21 - wp.x * 0.14) * 0.075
+			+ sin(wp.x * 0.51 - wp.z * 0.43) * 0.025) * tierra;
+		VERTEX.y += h;
+		float dhx = cos(wp.x * 0.24 + wp.z * 0.17) * 0.018 * tierra;
+		float dhz = -sin(wp.z * 0.21 - wp.x * 0.14) * 0.018 * tierra;
+		NORMAL = normalize(vec3(-dhx, 1.0, -dhz));
+	}
+}
+
 void fragment() {
 	vec2 px = origen + UV * lado;
 	vec2 uv_mapa = px / 16.0 / casillas;
 	// (la máscara, suavizada y con un temblor, para que la orilla sea curva como la pintada y no en escalones)
-	float temblor = sin(px.x * 0.37 + px.y * 0.21) * 0.06 + sin(px.y * 0.53 - px.x * 0.17) * 0.05;
+	float temblor = sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.055 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.045;
 	float es_agua = texture(agua, uv_mapa).r + temblor;
 	if (hundido < 0.5 && es_agua > 0.5) { discard; }
 	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
 	vec3 c = texture(capa, UV).rgb;
 	if (hundido > 0.5) {
-		float brillo = sin(px.x * 0.07 + TIME * 1.3) * sin(px.y * 0.11 - TIME * 0.9);
-		c = mix(c, vec3(0.08, 0.16, 0.24), 0.22) + vec3(0.05, 0.07, 0.08) * smoothstep(0.75, 1.0, brillo);
-		// junto a la orilla, la sombra del borde (se nota que el agua está más abajo)
-		c *= mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua));
+		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0);
+		float onda2 = sin(px.x * 0.19 - px.y * 0.15 - TIME * 1.9) * 0.5 + 0.5;
+		float profundidad = smoothstep(0.5, 0.88, es_agua);
+		c = mix(c, vec3(0.06, 0.15, 0.25), 0.18 + profundidad * 0.14);
+		c += vec3(0.06, 0.09, 0.11) * smoothstep(0.68, 0.98, onda1);
+		c += vec3(0.03, 0.05, 0.07) * smoothstep(0.76, 0.96, onda2) * profundidad;
+		// Sombra del escalón de la orilla + espuma blanca animada junto al borde
+		c *= mix(0.56, 1.0, smoothstep(0.5, 0.70, es_agua));
+		float pulso_orilla = sin(px.x * 0.34 + px.y * 0.29 - TIME * 2.3) * 0.5 + 0.5;
+		float franja_espuma = smoothstep(0.62, 0.50, es_agua) * smoothstep(0.49, 0.515, es_agua);
+		float espuma = smoothstep(0.32, 0.65, franja_espuma + pulso_orilla * 0.26) * smoothstep(0.63, 0.50, es_agua);
+		c = mix(c, vec3(0.84, 0.91, 0.95), espuma * 0.58);
+		ROUGHNESS = 0.34;
+		SPECULAR = 0.32;
 	} else {
 		float ao = texture(mapa_ao, uv_mapa).r;
 		c *= mix(1.0, 0.56, ao);
+		ROUGHNESS = 0.96;
+		SPECULAR = 0.04;
 	}
+	// Desvanecimiento suave en los bordes del mapa para evitar cualquier corte brusco
+	vec2 d_borde = min(uv_mapa * casillas, (vec2(1.0) - uv_mapa) * casillas);
+	float f_borde = clamp(min(d_borde.x, d_borde.y) / 2.2, 0.0, 1.0);
+	c *= mix(0.28, 1.0, smoothstep(0.0, 1.0, f_borde));
 	ALBEDO = c;
-	ROUGHNESS = 1.0;
 }
 """
-## El suelo lejano (todo el mapa): igual, pero con el suelo pintado, la oclusión ambiental y el tinte de penumbra/noche
+## El suelo lejano (todo el mapa): con desniveles suaves, espuma de agua, oclusión ambiental y desvanecimiento perimetral
 const SOMBREADOR_LEJANO := """
 shader_type spatial;
-render_mode diffuse_lambert, specular_disabled;
+render_mode diffuse_lambert;
 uniform sampler2D suelo : filter_nearest, source_color;
 uniform sampler2D agua : filter_linear;
 uniform sampler2D mapa_ao : filter_linear;
+uniform vec2 casillas = vec2(60.0, 60.0);
 uniform vec3 tinte_2d = vec3(1.0);
 uniform float hundido = 0.0;
+
+void vertex() {
+	if (hundido < 0.5) {
+		vec3 wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+		float ag = textureLod(agua, UV, 0.0).r;
+		float tierra = 1.0 - smoothstep(0.08, 0.42, ag);
+		float h = (sin(wp.x * 0.24 + wp.z * 0.17) * cos(wp.z * 0.21 - wp.x * 0.14) * 0.075
+			+ sin(wp.x * 0.51 - wp.z * 0.43) * 0.025) * tierra;
+		VERTEX.y += h;
+		float dhx = cos(wp.x * 0.24 + wp.z * 0.17) * 0.018 * tierra;
+		float dhz = -sin(wp.z * 0.21 - wp.x * 0.14) * 0.018 * tierra;
+		NORMAL = normalize(vec3(-dhx, 1.0, -dhz));
+	}
+}
+
 void fragment() {
-	float es_agua = texture(agua, UV).r;
+	vec2 px = UV * casillas * 16.0;
+	float temblor = sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.05 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.04;
+	float es_agua = texture(agua, UV).r + temblor;
 	if (hundido < 0.5 && es_agua > 0.5) { discard; }
 	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
 	vec3 c = texture(suelo, UV).rgb * tinte_2d;
 	if (hundido > 0.5) {
-		c = mix(c, vec3(0.08, 0.16, 0.24) * tinte_2d, 0.22) * mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua));
+		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0);
+		c = mix(c, vec3(0.06, 0.15, 0.25) * tinte_2d, 0.24) * mix(0.56, 1.0, smoothstep(0.5, 0.72, es_agua));
+		c += vec3(0.05, 0.08, 0.10) * tinte_2d * smoothstep(0.70, 0.98, onda1);
+		float franja_espuma = smoothstep(0.61, 0.50, es_agua) * smoothstep(0.49, 0.515, es_agua);
+		c = mix(c, vec3(0.82, 0.90, 0.94) * tinte_2d, franja_espuma * 0.52);
+		ROUGHNESS = 0.36;
+		SPECULAR = 0.28;
 	} else {
 		float ao = texture(mapa_ao, UV).r;
 		c *= mix(1.0, 0.56, ao);
+		ROUGHNESS = 0.96;
+		SPECULAR = 0.04;
 	}
+	vec2 d_borde = min(UV * casillas, (vec2(1.0) - UV) * casillas);
+	float f_borde = clamp(min(d_borde.x, d_borde.y) / 2.2, 0.0, 1.0);
+	c *= mix(0.28, 1.0, smoothstep(0.0, 1.0, f_borde));
 	ALBEDO = c;
-	ROUGHNESS = 1.0;
 }
 """
 ## Sombreador 3D para los gemelos con mapa de normales (*_n.png):
@@ -409,10 +468,13 @@ func _crear_suelo() -> void:
 	_mat_penas = StandardMaterial3D.new()
 	_mat_penas.albedo_texture = tex
 	_mat_penas.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	_mat_penas.roughness = 1.0
+	_mat_penas.vertex_color_use_as_albedo = true
+	_mat_penas.roughness = 0.95
 	# el suelo: una sola malla del tamaño del mapa con el suelo pintado (con el agujero del agua) y, debajo, el agua
 	var plano := PlaneMesh.new()
 	plano.size = Vector2(ancho, alto)
+	plano.subdivide_width = clampi(int(ancho), 24, 56)
+	plano.subdivide_depth = clampi(int(alto), 24, 56)
 	var lejano := Shader.new()
 	lejano.code = SOMBREADOR_LEJANO
 	_suelos_lejanos.clear()
@@ -420,6 +482,7 @@ func _crear_suelo() -> void:
 		var m := ShaderMaterial.new()
 		m.shader = lejano
 		m.set_shader_parameter("suelo", tex)
+		m.set_shader_parameter("casillas", Vector2(ancho, alto))
 		m.set_shader_parameter("hundido", hundido)
 		_suelos_lejanos.append(m)
 		var suelo := MeshInstance3D.new()
@@ -491,7 +554,7 @@ func _hornear_ao_suelo() -> void:
 			if junto_pena:
 				for dy in 2:
 					for dx in 2:
-						img_ao.set_pixel(x * 2 + dx, y * 2 + dy, Color(0.52, 0.52, 0.52, 1.0))
+						img_ao.set_pixel(x * 2 + dx, y * 2 + dy, Color(0.58, 0.58, 0.58, 1.0))
 	# 2. Oclusión ambiental de contacto bajo edificios, árboles y rocas estáticas
 	for par in _gemelos.values():
 		var n: Node2D = par[0]
@@ -531,35 +594,44 @@ func _hornear_ao_suelo() -> void:
 		mat.set_shader_parameter("mapa_ao", _mascara_ao)
 
 
-## Un tramo de peña de x0 a x1 (casillas) en la fila y: techo con el suelo pintado y paredes donde no hay peña al lado
+## Un tramo de peña de x0 a x1 (casillas) en la fila y: techo con biseles suaves en las aristas y oclusión en el pie
 func _bloque(st: SurfaceTool, lados: SurfaceTool, x0: int, x1: int, y: int, ancho: float, alto: float, filas: PackedStringArray) -> void:
 	# En el dibujo 2D (vista 3/4) la peña ya está pintada como se vería: su pared del sur ocupa una franja de
-	# «h» casillas dentro de la peña, y lo de encima está corrido hacia el norte esa misma altura. Por eso, en 3D:
-	# el techo (a «h» de alto) toma el dibujo de «h» casillas más al norte, y la pared del sur, la franja pintada.
+	# «h» casillas dentro de la peña, y lo de encima está corrido hacia el norte esa misma altura.
 	var h := _alto_pena
+	var bh := h * 0.16
+	var y_base := -0.10
+	var c_techo := Color.WHITE
+	var c_bisel := Color(1.05, 1.04, 1.02)
+	var c_pared_sup := Color(0.95, 0.95, 0.97)
+	var c_pared_pie := Color(0.58, 0.58, 0.64)
 	var uv := func(px: float, pz: float) -> Vector2: return Vector2(px / ancho, clampf(pz, 0.0, alto) / alto)
 	_cuad(st, Vector3(x0, h, y), Vector3(x1, h, y), Vector3(x1, h, y + 1), Vector3(x0, h, y + 1),
-		uv.call(x0, y - h), uv.call(x1, y - h), uv.call(x1, y + 1 - h), uv.call(x0, y + 1 - h))
+		uv.call(x0, y - h), uv.call(x1, y - h), uv.call(x1, y + 1 - h), uv.call(x0, y + 1 - h), c_techo, c_techo)
 	for x in range(x0, x1):
 		if y + 1 >= filas.size() or filas[y + 1][x] != "0":
-			_cuad(lados, Vector3(x, h, y + 1), Vector3(x + 1, h, y + 1), Vector3(x + 1, 0, y + 1), Vector3(x, 0, y + 1),
-				uv.call(x, y + 1 - h), uv.call(x + 1, y + 1 - h), uv.call(x + 1, y + 1), uv.call(x, y + 1))
+			# Bisel superior sur + pared sur con oclusión en el pie
+			_cuad(lados, Vector3(x, h, y + 0.88), Vector3(x + 1, h, y + 0.88), Vector3(x + 1, h - bh, y + 1), Vector3(x, h - bh, y + 1),
+				uv.call(x, y + 0.88 - h), uv.call(x + 1, y + 0.88 - h), uv.call(x + 1, y + 1 - h + bh), uv.call(x, y + 1 - h + bh), c_bisel, c_pared_sup)
+			_cuad(lados, Vector3(x, h - bh, y + 1), Vector3(x + 1, h - bh, y + 1), Vector3(x + 1, y_base, y + 1), Vector3(x, y_base, y + 1),
+				uv.call(x, y + 1 - h + bh), uv.call(x + 1, y + 1 - h + bh), uv.call(x + 1, y + 1), uv.call(x, y + 1), c_pared_sup, c_pared_pie)
 		if y == 0 or filas[y - 1][x] != "0":
-			_cuad(lados, Vector3(x + 1, h, y), Vector3(x, h, y), Vector3(x, 0, y), Vector3(x + 1, 0, y),
-				uv.call(x + 1, y - h), uv.call(x, y - h), uv.call(x, y), uv.call(x + 1, y))
-	# los lados este y oeste: la pared pintada de la casilla de la esquina, estirada (se ven poco)
+			_cuad(lados, Vector3(x + 1, h, y), Vector3(x, h, y), Vector3(x, y_base, y), Vector3(x + 1, y_base, y),
+				uv.call(x + 1, y - h), uv.call(x, y - h), uv.call(x, y), uv.call(x + 1, y), c_pared_sup, c_pared_pie)
+	# los lados este y oeste: con sombreado de pie
 	if x0 > 0:
-		_cuad(lados, Vector3(x0, h, y), Vector3(x0, h, y + 1), Vector3(x0, 0, y + 1), Vector3(x0, 0, y),
-			uv.call(x0, y + 1 - h), uv.call(x0 + 1, y + 1 - h), uv.call(x0 + 1, y + 1), uv.call(x0, y + 1))
+		_cuad(lados, Vector3(x0, h, y), Vector3(x0, h, y + 1), Vector3(x0, y_base, y + 1), Vector3(x0, y_base, y),
+			uv.call(x0, y + 1 - h), uv.call(x0 + 1, y + 1 - h), uv.call(x0 + 1, y + 1), uv.call(x0, y + 1), c_pared_sup, c_pared_pie)
 	if x1 < filas[y].length():
-		_cuad(lados, Vector3(x1, h, y + 1), Vector3(x1, h, y), Vector3(x1, 0, y), Vector3(x1, 0, y + 1),
-			uv.call(x1 - 1, y + 1 - h), uv.call(x1, y + 1 - h), uv.call(x1, y + 1), uv.call(x1 - 1, y + 1))
+		_cuad(lados, Vector3(x1, h, y + 1), Vector3(x1, h, y), Vector3(x1, y_base, y), Vector3(x1, y_base, y + 1),
+			uv.call(x1 - 1, y + 1 - h), uv.call(x1, y + 1 - h), uv.call(x1, y + 1), uv.call(x1 - 1, y + 1), c_pared_sup, c_pared_pie)
 
 
-func _cuad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, ua := Vector2.ZERO, ub := Vector2.ZERO, uc := Vector2.ZERO, ud := Vector2.ZERO) -> void:
+func _cuad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, ua := Vector2.ZERO, ub := Vector2.ZERO, uc := Vector2.ZERO, ud := Vector2.ZERO, col_arriba := Color.WHITE, col_abajo := Color.WHITE) -> void:
 	var n := (b - a).cross(c - a).normalized() * -1.0
-	for p in [[a, ua], [b, ub], [c, uc], [a, ua], [c, uc], [d, ud]]:
+	for p in [[a, ua, col_arriba], [b, ub, col_arriba], [c, uc, col_abajo], [a, ua, col_arriba], [c, uc, col_abajo], [d, ud, col_abajo]]:
 		st.set_normal(n)
+		st.set_color(p[2])
 		st.set_uv(p[1])
 		st.add_vertex(p[0])
 
@@ -582,6 +654,8 @@ func _crear_capas() -> void:
 	sombreador.code = SOMBREADOR_CAPA
 	var plano := PlaneMesh.new()
 	plano.size = Vector2(LADO_CAPA * PX, LADO_CAPA * PX)
+	plano.subdivide_width = 36
+	plano.subdivide_depth = 36
 	for hundido in [0.0, 1.0]:
 		var mat := ShaderMaterial.new()
 		mat.shader = sombreador
