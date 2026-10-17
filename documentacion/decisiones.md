@@ -303,3 +303,15 @@ se pasan.
 | Sigilia | Se sigue construyendo en 2D; se pasará a HD-2D con el mismo conversor que el resto |
 | Quién | La constructora hace el conversor de mapas (`Region3D`) y la parte visual; la revisora vuelve a revisar y pulir lo hecho |
 | Modelos 3D de la rama experimental | Se quedan en esa rama como referencia; no se usan |
+
+### Blindaje de estabilidad y guardado (`revision/estabilidad-blindaje`, 2026-10-17)
+| Qué | Decisión |
+| --- | --- |
+| Watchdog de pausas de impacto | En `scripts/globales/impacto.gd`, si una pausa de impacto (`pausa()`) es interrumpida por cambio de escena, liberación de nodo o fin de animación, `_pausas` podía quedar en 1 indefinidamente, congelando el juego a velocidad 0.05x. Se añade `_pausa_desde` en `_process()` que limpia automáticamente las pausas si superan 1.2 s reales. |
+| Restablecimiento total en `revivir()` | En `scripts/personajes/maisha.gd`, `revivir()` ahora limpia obligatoriamente `puede_actuar = true`, `corriendo = false`, `_emocion = 0.0`, `_tiempo_agotada = 0.0`, `_lentitud_vuelve = 0.0`, `_lenta_sin_motivo = 0.0` y `velocity = Vector2.ZERO`, impidiendo que Maisha quede inmóvil o en estado alterado tras caer en combate o en cinemáticas. |
+| Disipación de fuerzas en inacción | En `_physics_process()`, las fuerzas `_empuje` y `viento` se atenúan hacia cero incluso cuando `puede_actuar == false` o `esta_caida`, evitando que un empuje acumulado salga disparado al terminar un diálogo o cinemática. |
+| Cierre forzado de diálogos | En `scripts/interfaz/dialogo.gd`, se implementa `cerrar()` para permitir el cierre inmediato y seguro de cualquier diálogo abierto, restaurando la pausa del árbol y devolviendo `puede_actuar` a Maisha. |
+| Guardado atómico con respaldo `.bak` | En `scripts/globales/estado.gd`, `guardar()` escribe primero en `partida.json.tmp`, respalda en `partida.json.bak` y renombra atómicamente a `partida.json`. Si el archivo principal se trunca a 0 bytes por caída del sistema, `leer_partida()` recupera automáticamente desde `.bak`. `borrar_partida()` limpia todas las extensiones (`.bak`, `.tmp`). |
+| Cierre limpio de autoloads | En `scripts/globales/reloj.gd`, se añade comprobación `if Estado == null or not is_instance_valid(Estado): return` en `_process()` para evitar errores durante la destrucción del árbol al salir del juego. |
+| Suite de pruebas | Añadida `pruebas/prueba_estabilidad.gd` validando watchdog de impacto, revivir completo, cierre de diálogo y recuperación ante archivos truncados. |
+

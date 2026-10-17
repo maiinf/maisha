@@ -227,25 +227,53 @@ func guardar() -> bool:
 		"objetos": objetos,
 		"extra": extra,
 	}
-	var archivo := FileAccess.open(ruta_partida, FileAccess.WRITE)
+	var ruta_tmp := ruta_partida + ".tmp"
+	var ruta_bak := ruta_partida + ".bak"
+	var contenido := JSON.stringify(datos, "\t")
+	# 1. Escritura atómica previa en archivo temporal
+	var archivo := FileAccess.open(ruta_tmp, FileAccess.WRITE)
 	if archivo == null:
-		push_error("No se pudo guardar la partida en %s" % ruta_partida)
+		push_error("No se pudo guardar la partida temporal en %s" % ruta_tmp)
 		return false
-	archivo.store_string(JSON.stringify(datos, "\t"))
+	archivo.store_string(contenido)
 	archivo.close()
+	# 2. Respaldo previo de la partida existente
+	if FileAccess.file_exists(ruta_partida):
+		var dir := DirAccess.open("user://")
+		if dir:
+			dir.copy(ruta_partida, ruta_bak)
+	# 3. Sustitución definitiva del archivo principal
+	var dir_tmp := DirAccess.open("user://")
+	if dir_tmp:
+		var err := dir_tmp.rename(ruta_tmp, ruta_partida)
+		if err != OK:
+			var archivo_dest := FileAccess.open(ruta_partida, FileAccess.WRITE)
+			if archivo_dest:
+				archivo_dest.store_string(contenido)
+				archivo_dest.close()
+				dir_tmp.remove(ruta_tmp)
 	guardado.emit()
 	return true
 
 
 func hay_partida() -> bool:
-	return FileAccess.file_exists(ruta_partida) and not leer_partida().is_empty()
+	return (FileAccess.file_exists(ruta_partida) or FileAccess.file_exists(ruta_partida + ".bak")) and not leer_partida().is_empty()
 
 
-## Lee el archivo de la partida sin cargarla ({} si no hay o está estropeado)
+## Lee el archivo de la partida sin cargarla ({} si no hay o está estropeado; recupera .bak si el principal se truncó o falta)
 func leer_partida() -> Dictionary:
-	if not FileAccess.file_exists(ruta_partida):
+	var texto := ""
+	if FileAccess.file_exists(ruta_partida):
+		texto = FileAccess.get_file_as_string(ruta_partida)
+		if texto.is_empty() and FileAccess.file_exists(ruta_partida + ".bak"):
+			texto = FileAccess.get_file_as_string(ruta_partida + ".bak")
+	elif FileAccess.file_exists(ruta_partida + ".bak"):
+		texto = FileAccess.get_file_as_string(ruta_partida + ".bak")
+	else:
 		return {}
-	var texto := FileAccess.get_file_as_string(ruta_partida)
+
+	if texto.is_empty():
+		return {}
 	var json := JSON.new()
 	if json.parse(texto) != OK:
 		return {}
@@ -288,8 +316,11 @@ func continuar() -> bool:
 
 
 func borrar_partida() -> void:
-	if FileAccess.file_exists(ruta_partida):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(ruta_partida))
+	var extensiones: Array[String] = ["", ".bak", ".tmp"]
+	for ext: String in extensiones:
+		var r: String = ruta_partida + ext
+		if FileAccess.file_exists(r):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(r))
 
 
 ## «1 h 05 min», «12 min»

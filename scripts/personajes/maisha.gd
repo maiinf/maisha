@@ -89,6 +89,8 @@ func _physics_process(delta: float) -> void:
 			_fin_emocion()
 
 	if esta_caida or not puede_actuar:
+		_empuje = _empuje.move_toward(Vector2.ZERO, 600.0 * delta)
+		viento = viento.move_toward(Vector2.ZERO, 900.0 * delta)
 		velocity = Vector2.ZERO
 		modulate.a = 1.0
 		return
@@ -325,6 +327,13 @@ func revivir(posicion: Vector2) -> void:
 	aliento = aliento_maximo()
 	agotada = false
 	esta_caida = false
+	puede_actuar = true
+	corriendo = false
+	_emocion = 0.0
+	_tiempo_agotada = 0.0
+	_lentitud_vuelve = 0.0
+	_lenta_sin_motivo = 0.0
+	velocity = Vector2.ZERO
 	_empuje = Vector2.ZERO
 	_invulnerable = 1.0
 	# (y todo lo que frena, por si algo se quedó a medias)

@@ -219,6 +219,20 @@ func pasar() -> void:
 	terminado.emit()
 
 
+## Fuerza el cierre inmediato de cualquier diálogo abierto (seguridad al cambiar de escena o en cancelaciones)
+func cerrar() -> void:
+	if not hablando:
+		return
+	Sonido.efecto("dialogo_cerrar")
+	hablando = false
+	_texto.visible = false
+	if _pause_mio:
+		_pause_mio = false
+		get_tree().paused = false
+	_bloquear_maisha(false)
+	terminado.emit()
+
+
 func _bloquear_maisha(si: bool) -> void:
 	var maisha := get_tree().get_first_node_in_group("maisha")
 	if maisha:

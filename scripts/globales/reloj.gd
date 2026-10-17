@@ -22,7 +22,7 @@ var oscuridad := 0.0
 
 
 func _process(delta: float) -> void:
-	if not Estado.jugando or get_tree().paused or not Estado.tiene(MARCA_INICIO):
+	if Estado == null or not is_instance_valid(Estado) or not Estado.jugando or get_tree().paused or not Estado.tiene(MARCA_INICIO):
 		return
 	Estado.extra["hora"] = fposmod(hora() + delta / DURACION, 1.0)
 

@@ -25,6 +25,7 @@ var _temblor_tiempo := 0.0
 var _capa: CanvasLayer
 var _velo: ColorRect
 var _lenta_desde := 0.0            # segundos reales en cámara lenta (si se olvida quitarla, se quita sola)
+var _pausa_desde := 0.0            # segundos reales en pausa de impacto (si se interrumpe, se quita sola)
 
 
 const AJUSTES := "user://ajustes.cfg"
@@ -77,6 +78,8 @@ func poner_lenta(factor: float) -> void:
 
 ## Todo a velocidad normal (al cambiar de escena, por si algo se quedó a medias)
 func restablecer_velocidad() -> void:
+	_pausa_desde = 0.0
+	_lenta_desde = 0.0
 	if _pausas == 0 and is_equal_approx(_lenta, 1.0):
 		return                         # (no hay nada a medias: no se toca)
 	_lenta = 1.0
@@ -139,6 +142,15 @@ func _al_mundo(nodo: Node2D) -> void:
 
 
 func _process(delta: float) -> void:
+	# seguridad: una pausa de impacto dura fracciones de segundo; si se interrumpió el temporizador, se quita
+	if _pausas > 0:
+		_pausa_desde += delta / maxf(Engine.time_scale, 0.001)
+		if _pausa_desde > 1.2:
+			push_warning("Impacto: la pausa de impacto llevaba demasiado tiempo puesta; se quita")
+			_pausas = 0
+			_aplicar_velocidad()
+	else:
+		_pausa_desde = 0.0
 	# seguridad: una cámara lenta no dura nunca tanto; si alguien olvidó quitarla, se quita
 	if _lenta < 1.0:
 		_lenta_desde += delta / maxf(Engine.time_scale, 0.001)
