@@ -51,15 +51,17 @@ shader_type spatial;
 render_mode diffuse_lambert, specular_disabled;
 uniform sampler2D capa : filter_nearest;
 uniform sampler2D agua : filter_linear;
+uniform sampler2D mapa_ao : filter_linear;
 uniform vec2 origen = vec2(0.0);
 uniform vec2 casillas = vec2(1.0);
 uniform float lado = 1024.0;
 uniform float hundido = 0.0;
 void fragment() {
 	vec2 px = origen + UV * lado;
+	vec2 uv_mapa = px / 16.0 / casillas;
 	// (la máscara, suavizada y con un temblor, para que la orilla sea curva como la pintada y no en escalones)
 	float temblor = sin(px.x * 0.37 + px.y * 0.21) * 0.06 + sin(px.y * 0.53 - px.x * 0.17) * 0.05;
-	float es_agua = texture(agua, px / 16.0 / casillas).r + temblor;
+	float es_agua = texture(agua, uv_mapa).r + temblor;
 	if (hundido < 0.5 && es_agua > 0.5) { discard; }
 	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
 	vec3 c = texture(capa, UV).rgb;
@@ -68,28 +70,114 @@ void fragment() {
 		c = mix(c, vec3(0.08, 0.16, 0.24), 0.22) + vec3(0.05, 0.07, 0.08) * smoothstep(0.75, 1.0, brillo);
 		// junto a la orilla, la sombra del borde (se nota que el agua está más abajo)
 		c *= mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua));
+	} else {
+		float ao = texture(mapa_ao, uv_mapa).r;
+		c *= mix(1.0, 0.56, ao);
 	}
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
 }
 """
-## El suelo lejano (todo el mapa): igual, pero con el suelo pintado y la máscara a la medida del mapa
+## El suelo lejano (todo el mapa): igual, pero con el suelo pintado, la oclusión ambiental y el tinte de penumbra/noche
 const SOMBREADOR_LEJANO := """
 shader_type spatial;
 render_mode diffuse_lambert, specular_disabled;
 uniform sampler2D suelo : filter_nearest, source_color;
 uniform sampler2D agua : filter_linear;
+uniform sampler2D mapa_ao : filter_linear;
+uniform vec3 tinte_2d = vec3(1.0);
 uniform float hundido = 0.0;
 void fragment() {
 	float es_agua = texture(agua, UV).r;
 	if (hundido < 0.5 && es_agua > 0.5) { discard; }
 	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
-	vec3 c = texture(suelo, UV).rgb;
-	if (hundido > 0.5) { c = mix(c, vec3(0.08, 0.16, 0.24), 0.22) * mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua)); }
+	vec3 c = texture(suelo, UV).rgb * tinte_2d;
+	if (hundido > 0.5) {
+		c = mix(c, vec3(0.08, 0.16, 0.24) * tinte_2d, 0.22) * mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua));
+	} else {
+		float ao = texture(mapa_ao, UV).r;
+		c *= mix(1.0, 0.56, ao);
+	}
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
 }
 """
+## Sombreador 3D para los gemelos con mapa de normales (*_n.png):
+## Conserva los colores exactos del pixel art al sol, proyecta y recibe sombras 3D suaves y reacciona con volumen
+## tanto al sol/luna como a las luces puntuales 3D (OmniLight3D) de faroles, ventanas, braseros y fogatas.
+const SOMBREADOR_GEMELO := """
+shader_type spatial;
+render_mode ambient_light_disabled, specular_disabled, cull_disabled;
+uniform sampler2D tex_albedo : filter_nearest, source_color;
+uniform sampler2D tex_normal : filter_nearest;
+uniform vec3 tinte_ambiente = vec3(1.0);
+uniform float usa_normal = 1.0;
+uniform float volteo_x = 1.0;
+
+void fragment() {
+	vec4 c = texture(tex_albedo, UV);
+	if (c.a < 0.5) {
+		discard;
+	}
+	ALBEDO = c.rgb;
+	ALPHA = c.a;
+	ALPHA_SCISSOR_THRESHOLD = 0.5;
+	ROUGHNESS = 1.0;
+	vec3 n_vista = normalize(vec3(0.0, 0.68, 0.73));
+	if (usa_normal > 0.5) {
+		vec3 nm = texture(tex_normal, UV).rgb * 2.0 - 1.0;
+		n_vista = normalize(vec3(nm.x * volteo_x * 0.58, 0.68 + nm.y * 0.58, max(0.25, 0.73 * nm.z)));
+	}
+	NORMAL = n_vista;
+}
+
+void light() {
+	if (LIGHT_IS_DIRECTIONAL) {
+		float relieve = (dot(NORMAL, LIGHT) - 0.50) * (usa_normal > 0.5 ? 0.38 : 0.10);
+		float sombra_3d = mix(0.70, 1.0, ATTENUATION);
+		DIFFUSE_LIGHT += tinte_ambiente * sombra_3d * clamp(1.0 + relieve, 0.76, 1.24);
+	} else {
+		float ndl = max(0.28, dot(NORMAL, LIGHT));
+		DIFFUSE_LIGHT += LIGHT_COLOR * ATTENUATION * ndl * 0.95;
+	}
+}
+"""
+## Tabla de luces 3D por edificio y objeto luminoso (reutiliza Relieve.LUCES + edificios de Maandiko + setas y runas)
+const LUCES_3D := {
+	"casa_seta.png": [["v", 166, 90], ["v", 196, 96], ["f", 195, 112]],
+	"taller.png": [["v", 217, 77], ["v", 238, 77], ["h", 174, 120], ["f", 242, 107]],
+	"cocina.png": [["v", 195, 90], ["h", 149, 118]],
+	"puesto.png": [["f", 143, 46], ["f", 174, 46], ["f", 203, 46]],
+	"gran_arbol.png": [["v", 98, 122], ["v", 88, 186], ["f", 66, 158]],
+	"campamento.png": [["f", 52, 28]],
+	"palafito.png": [["f", 27, 51], ["v", 47, 52], ["v", 81, 53]],
+	"madriguera.png": [["v", 29, 66], ["f", 59, 68], ["f", 85, 68]],
+	"horreo.png": [["v", 58, 58]],
+	"aprisco.png": [["v", 30, 92], ["f", 75, 85], ["f", 42, 82]],
+	"casa_barcas.png": [["v", 55, 50], ["f", 113, 48]],
+	"casa_bata.png": [["v", 52, 43], ["f", 10, 51]],
+	"casa_juncos.png": [["v", 55, 43], ["v", 127, 43], ["f", 185, 37]],
+	"casa_shamba.png": [["v", 40, 96], ["v", 124, 96], ["f", 90, 95]],
+	"almacen.png": [["v", 52, 42]],
+	"cubierta.png": [["f", 54, 34]],
+	"farol.png": [["f", 4, 4]],
+	"casa_escriba.png": [["v", 20, 48], ["v", 52, 48], ["v", 92, 48], ["v", 124, 48]],
+	"casa_kalamu.png": [["v", 26, 65], ["v", 68, 65], ["f", 48, 72]],
+	"gran_archivo.png": [["v", 52, 110], ["v", 140, 110], ["f", 96, 124]],
+	"taller_taa.png": [["h", 34, 58], ["f", 58, 52]],
+	"puesto_tinta.png": [["f", 28, 22], ["f", 84, 22]],
+	"seta_luminosa.png": [["m", 12, 6]],
+	"seta_luz.png": [["m", 16, 8], ["m", 48, 8]],
+	"piedra_eco.png": [["m", 8, 10]],
+	"estela.png": [["m", 33, 18]],
+}
+const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png", "puesto.png"]
+const TIPOS_LUZ_3D := {
+	"v": [5.2, 2.15, Color(1.0, 0.76, 0.38), false],
+	"f": [6.8, 2.35, Color(1.0, 0.72, 0.35), false],
+	"h": [8.2, 2.65, Color(1.0, 0.56, 0.22), true],
+	"m": [5.4, 1.85, Color(0.45, 0.95, 0.85), false],
+}
 const HONDO_AGUA := 0.35             # metros que baja el agua
 const LETRAS_AGUA := "~\\"
 ## Dibujos de pantalla (por su script): van a la capa de pantalla, con sus hijos
@@ -207,6 +295,7 @@ var escena: Node2D
 var region: Node2D
 var camara: Camera3D
 var sol: DirectionalLight3D
+var _entorno: Environment
 var _gemelos := {}                 # id del dibujo 2D -> [n, g, ancla, z, mod_base]
 var _ids_dinamicos := {}           # id -> true
 var _ids_estaticos := {}           # id -> true
@@ -217,7 +306,9 @@ var _alto_pena := ALTO_PENA
 var _mats_capa: Array[ShaderMaterial] = []
 var _plano_agua: MeshInstance3D
 var _mascara_agua: ImageTexture
+var _mascara_ao: ImageTexture
 var _suelos_lejanos: Array[ShaderMaterial] = []
+var _mat_penas: StandardMaterial3D
 var _tinte := Color.WHITE
 var _canales := {}                 # id de cada dibujo -> [dibujo, su canal de antes] (para devolverlo al apagar)
 var _capa_suelo: SubViewport
@@ -232,6 +323,13 @@ var _id_escena := ""
 var _tinte_bioma := Color.WHITE
 var _es_nieve := 0.0
 var _mascara_antes := 0xFFFFFFFF
+var _tiempo_luces := 0.0
+var _luces_3d: Array[Dictionary] = []      # {"luz": OmniLight3D, "pos": Vector3, "fuerza": float, "fuego": bool, "siempre": bool, "fase": float, "dueno": Node}
+var _luces_pt2d := {}                      # id de PointLight2D -> [PointLight2D, OmniLight3D]
+var _moduladores_2d: Array[CanvasModulate] = []
+var _sh_gemelo: Shader
+var _cache_mat_relieve := {}               # clave -> ShaderMaterial
+static var _cache_normales := {}           # ruta -> Texture2D
 
 
 func _ready() -> void:
@@ -240,6 +338,8 @@ func _ready() -> void:
 	_id_escena = escena.scene_file_path.get_file().get_basename()
 	_tinte_bioma = BIOMAS_HD2D.get(_id_escena, Color.WHITE)
 	_es_nieve = 1.0 if _id_escena in ZONAS_NIEVE else 0.0
+	_sh_gemelo = Shader.new()
+	_sh_gemelo.code = SOMBREADOR_GEMELO
 	_crear_ambiente()
 	_crear_suelo()
 	_crear_camara()
@@ -247,6 +347,7 @@ func _ready() -> void:
 	_crear_postproceso()
 	for n in _todos(escena):
 		_registrar(n)
+	_hornear_ao_suelo()
 	# la raíz de la escena, en los canales de las dos capas (si no, se llevaría por delante a todos sus hijos)
 	_canales[escena.get_instance_id()] = [escena, escena.visibility_layer]
 	escena.visibility_layer = escena.visibility_layer | CANAL_SUELO | CANAL_PANTALLA | CANAL_PIE
@@ -264,20 +365,24 @@ func _todos(nodo: Node) -> Array:
 # --- El ambiente: sol, cielo, niebla -------------------------------------------------------------------------
 
 func _crear_ambiente() -> void:
-	var entorno := Environment.new()
-	entorno.background_mode = Environment.BG_COLOR
-	entorno.background_color = RenderingServer.get_default_clear_color()
-	entorno.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	entorno.ambient_light_color = Color(1, 1, 1)
-	entorno.ambient_light_energy = 0.4     # (medido: con esto y el sol, el suelo al sol sale igual de claro que en 2D)
-	entorno.tonemap_mode = Environment.TONE_MAPPER_LINEAR      # (los colores del pixel art, tal cual)
-	entorno.fog_enabled = false        # (la niebla aclaraba los oscuros: la del juego ya la pinta la capa de pantalla)
-	entorno.glow_enabled = false
+	_entorno = Environment.new()
+	_entorno.background_mode = Environment.BG_COLOR
+	_entorno.background_color = RenderingServer.get_default_clear_color()
+	_entorno.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	_entorno.ambient_light_color = Color(1, 1, 1)
+	_entorno.ambient_light_energy = 0.4     # (medido: con esto y el sol, el suelo al sol sale igual de claro que en 2D)
+	_entorno.tonemap_mode = Environment.TONE_MAPPER_LINEAR      # (los colores del pixel art, tal cual)
+	_entorno.fog_enabled = false        # (la niebla aclaraba los oscuros: la del juego ya la pinta la capa de pantalla)
+	_entorno.glow_enabled = false
 	var mundo := WorldEnvironment.new()
-	mundo.environment = entorno
+	mundo.environment = _entorno
 	add_child(mundo)
 	sol = DirectionalLight3D.new()
 	sol.shadow_enabled = true
+	sol.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
+	sol.directional_shadow_blend_splits = true
+	sol.shadow_blur = 1.65
+	sol.shadow_opacity = 0.78
 	sol.light_energy = 0.27
 	sol.light_color = Color(1.0, 0.95, 0.86)
 	sol.rotation_degrees = Vector3(-50, -35, 0)          # (desde arriba a la izquierda y algo por detrás: sombras hacia delante y a la derecha, como las pintadas)
@@ -301,10 +406,10 @@ func _crear_suelo() -> void:
 	var filas: PackedStringArray = region.get("_filas")
 	var ancho: float = filas[0].length()
 	var alto: float = filas.size()
-	var mat := StandardMaterial3D.new()
-	mat.albedo_texture = tex
-	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	mat.roughness = 1.0
+	_mat_penas = StandardMaterial3D.new()
+	_mat_penas.albedo_texture = tex
+	_mat_penas.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	_mat_penas.roughness = 1.0
 	# el suelo: una sola malla del tamaño del mapa con el suelo pintado (con el agujero del agua) y, debajo, el agua
 	var plano := PlaneMesh.new()
 	plano.size = Vector2(ancho, alto)
@@ -351,13 +456,79 @@ func _crear_suelo() -> void:
 			_bloque(st, lados, x0, x, y, ancho, alto, filas)
 	var techo := MeshInstance3D.new()
 	techo.mesh = st.commit()
-	techo.material_override = mat
+	techo.material_override = _mat_penas
 	add_child(techo)
 	# las paredes: la del sur, con la pared de roca que ya está pintada en el suelo; las demás, de roca oscura
 	var paredes := MeshInstance3D.new()
 	paredes.mesh = lados.commit()
-	paredes.material_override = mat
+	paredes.material_override = _mat_penas
 	add_child(paredes)
+
+
+## Hornea un mapa de oclusión ambiental (AO) de contacto en la base de las peñas, árboles, rocas y edificios
+func _hornear_ao_suelo() -> void:
+	if region == null:
+		return
+	var filas: PackedStringArray = region.get("_filas")
+	var w := filas[0].length() * 2
+	var h := filas.size() * 2
+	var img_ao := Image.create(w, h, false, Image.FORMAT_L8)
+	# 1. Oclusión suave al pie de las paredes de peña («0»)
+	for y in filas.size():
+		var fila := filas[y]
+		for x in fila.length():
+			if fila[x] == "0":
+				continue
+			var junto_pena := false
+			if y > 0 and filas[y - 1][x] == "0":
+				junto_pena = true
+			elif y + 1 < filas.size() and filas[y + 1][x] == "0":
+				junto_pena = true
+			elif x > 0 and fila[x - 1] == "0":
+				junto_pena = true
+			elif x + 1 < fila.length() and fila[x + 1] == "0":
+				junto_pena = true
+			if junto_pena:
+				for dy in 2:
+					for dx in 2:
+						img_ao.set_pixel(x * 2 + dx, y * 2 + dy, Color(0.52, 0.52, 0.52, 1.0))
+	# 2. Oclusión ambiental de contacto bajo edificios, árboles y rocas estáticas
+	for par in _gemelos.values():
+		var n: Node2D = par[0]
+		var g: Sprite3D = par[1]
+		var ancla: Node2D = par[2]
+		if not is_instance_valid(n) or not is_instance_valid(ancla) or not (ancla is StaticBody2D):
+			continue
+		var tex: Texture2D = g.texture
+		if tex == null:
+			continue
+		var ancho_px := (g.region_rect.size.x if g.region_enabled else tex.get_width() / float(maxi(g.hframes, 1)))
+		var alto_px := (g.region_rect.size.y if g.region_enabled else tex.get_height() / float(maxi(g.vframes, 1)))
+		if alto_px <= 14.0:
+			continue
+		var cx := int(roundf(ancla.global_position.x / 8.0))
+		var cy := int(roundf(ancla.global_position.y / 8.0))
+		var rx := clampi(int(roundf(ancho_px / 22.0)), 1, 9)
+		var ry := clampi(int(roundf(ancho_px / 48.0)), 1, 3)
+		for dy in range(-ry, ry + 1):
+			var py := cy + dy
+			if py < 0 or py >= h:
+				continue
+			for dx in range(-rx, rx + 1):
+				var px := cx + dx
+				if px < 0 or px >= w:
+					continue
+				var d2 := float(dx * dx) / float(maxi(1, rx * rx)) + float(dy * dy) / float(maxi(1, ry * ry))
+				if d2 <= 1.0:
+					var f := (1.0 - d2) * 0.68
+					var prev := img_ao.get_pixel(px, py).r
+					if f > prev:
+						img_ao.set_pixel(px, py, Color(f, f, f, 1.0))
+	_mascara_ao = ImageTexture.create_from_image(img_ao)
+	for mat in _mats_capa:
+		mat.set_shader_parameter("mapa_ao", _mascara_ao)
+	for mat in _suelos_lejanos:
+		mat.set_shader_parameter("mapa_ao", _mascara_ao)
 
 
 ## Un tramo de peña de x0 a x1 (casillas) en la fila y: techo con el suelo pintado y paredes donde no hay peña al lado
@@ -562,6 +733,10 @@ func _exit_tree() -> void:
 	_ids_estaticos.clear()
 	_de_pie.clear()
 	_ventanas.clear()
+	_luces_3d.clear()
+	_luces_pt2d.clear()
+	_moduladores_2d.clear()
+	_cache_mat_relieve.clear()
 
 
 # --- La cámara ------------------------------------------------------------------------------------------------
@@ -594,6 +769,142 @@ func _al_suelo(p: Vector2) -> Vector3:
 	return Vector3(p.x * PX, 0.0, p.y * PX)
 
 
+# --- Luces 3D reales y relieve con mapas de normales ----------------------------------------------------------
+
+func _textura_normal_de(tex: Texture2D) -> Texture2D:
+	if tex == null:
+		return null
+	var ruta := tex.resource_path
+	if ruta == "":
+		return null
+	if _cache_normales.has(ruta):
+		return _cache_normales[ruta]
+	var ruta_n := ruta.get_basename() + "_n.png"
+	if ResourceLoader.exists(ruta_n):
+		var tn: Texture2D = load(ruta_n)
+		_cache_normales[ruta] = tn
+		return tn
+	_cache_normales[ruta] = null
+	return null
+
+
+func _material_relieve(tex: Texture2D, tex_n: Texture2D, flip_h: bool) -> ShaderMaterial:
+	var clave := "%d_%d" % [tex.get_instance_id(), 1 if flip_h else 0]
+	if _cache_mat_relieve.has(clave):
+		return _cache_mat_relieve[clave]
+	var mat := ShaderMaterial.new()
+	mat.shader = _sh_gemelo
+	mat.set_shader_parameter("tex_albedo", tex)
+	if tex_n != null:
+		mat.set_shader_parameter("tex_normal", tex_n)
+		mat.set_shader_parameter("usa_normal", 1.0)
+	else:
+		mat.set_shader_parameter("usa_normal", 0.0)
+	mat.set_shader_parameter("volteo_x", -1.0 if flip_h else 1.0)
+	mat.set_shader_parameter("tinte_ambiente", Vector3(_tinte.r, _tinte.g, _tinte.b))
+	_cache_mat_relieve[clave] = mat
+	return mat
+
+
+func _crear_omni_3d(color: Color, rango: float, pos_3d: Vector3) -> OmniLight3D:
+	var luz := OmniLight3D.new()
+	luz.light_color = color
+	luz.omni_range = rango
+	luz.omni_attenuation = 1.35
+	luz.shadow_enabled = false
+	luz.light_energy = 0.0
+	luz.visible = false
+	luz.position = pos_3d
+	add_child(luz)
+	return luz
+
+
+func _registrar_luces_sprite(s: Sprite2D, tex: Texture2D) -> void:
+	if tex == null:
+		return
+	var arch := tex.resource_path.get_file()
+	if not LUCES_3D.has(arch):
+		return
+	var padre := s.get_parent()
+	if padre and padre.get_script() and String(padre.get_script().resource_path).ends_with("farol_runico.gd"):
+		return
+	_rehacer_luces_sprite(s, tex, LUCES_3D[arch])
+	if arch in CAMBIAN_AL_RECONSTRUIRSE_3D and not s.frame_changed.is_connected(_rehacer_luces_sprite):
+		s.frame_changed.connect(_rehacer_luces_sprite.bind(s, tex, LUCES_3D[arch]))
+
+
+func _rehacer_luces_sprite(s: Sprite2D, tex: Texture2D, puntos: Array) -> void:
+	if not is_instance_valid(s) or tex == null:
+		return
+	for i in range(_luces_3d.size() - 1, -1, -1):
+		if _luces_3d[i]["dueno"] == s:
+			var l_ant: OmniLight3D = _luces_3d[i]["luz"]
+			if is_instance_valid(l_ant):
+				l_ant.queue_free()
+			_luces_3d.remove_at(i)
+	var ancla := _ancla(s)
+	var tam_fotograma := tex.get_size() / Vector2(maxi(1, s.hframes), maxi(1, s.vframes))
+	var arch := tex.resource_path.get_file()
+	var fotograma := 0 if arch == "farol.png" else s.frame
+	var esquina := Vector2(fotograma % maxi(1, s.hframes), fotograma / maxi(1, s.hframes)) * tam_fotograma
+	var origen := (-tam_fotograma / 2.0 if s.centered else Vector2.ZERO) + s.offset
+	for p in puntos:
+		var en_dibujo := Vector2(p[1], p[2])
+		if not Rect2(esquina, tam_fotograma).has_point(en_dibujo):
+			continue
+		var local := origen + (en_dibujo - esquina)
+		if s.flip_h:
+			local.x = -local.x if s.centered else tam_fotograma.x - local.x
+		var global_2d := s.global_position + local
+		var x_3d := global_2d.x * PX
+		var y_3d := clampf(-(global_2d.y - ancla.global_position.y) * PX, 0.45, 3.6)
+		var z_3d := ancla.global_position.y * PX + 0.48
+		var tipo := String(p[0])
+		var cfg: Array = TIPOS_LUZ_3D.get(tipo, TIPOS_LUZ_3D["v"])
+		var pos_3d := Vector3(x_3d, y_3d, z_3d)
+		var omni := _crear_omni_3d(cfg[2], float(cfg[0]), pos_3d)
+		_luces_3d.append({
+			"luz": omni,
+			"pos": pos_3d,
+			"color": cfg[2],
+			"rango": float(cfg[0]),
+			"fuerza": float(cfg[1]),
+			"fuego": bool(cfg[3]),
+			"siempre": tipo == "m",
+			"fase": randf() * TAU,
+			"dueno": s,
+		})
+
+
+func _luz_en_punto(pos: Vector3) -> Color:
+	var r := 0.0
+	var g := 0.0
+	var b := 0.0
+	for d in _luces_3d:
+		var omni: OmniLight3D = d["luz"]
+		if not is_instance_valid(omni) or not omni.visible:
+			continue
+		var dist := pos.distance_to(d["pos"])
+		var rango: float = d["rango"]
+		if dist < rango:
+			var f := pow(1.0 - dist / rango, 1.6) * omni.light_energy * 0.28
+			var col: Color = d["color"]
+			r += col.r * f
+			g += col.g * f
+			b += col.b * f
+	for par_pt in _luces_pt2d.values():
+		var omni_pt: OmniLight3D = par_pt[1]
+		if not is_instance_valid(omni_pt) or not omni_pt.visible:
+			continue
+		var dist := pos.distance_to(omni_pt.position)
+		if dist < omni_pt.omni_range:
+			var f := pow(1.0 - dist / omni_pt.omni_range, 1.6) * omni_pt.light_energy * 0.24
+			r += omni_pt.light_color.r * f
+			g += omni_pt.light_color.g * f
+			b += omni_pt.light_color.b * f
+	return Color(r, g, b, 1.0)
+
+
 # --- Los gemelos de los dibujos -------------------------------------------------------------------------------
 
 func _registrar(n: Node) -> void:
@@ -602,9 +913,34 @@ func _registrar(n: Node) -> void:
 	var ci := n as CanvasItem
 	if not _canales.has(ci.get_instance_id()):
 		_canales[ci.get_instance_id()] = [ci, ci.visibility_layer]
+	if n is CanvasModulate:
+		if not _moduladores_2d.has(n):
+			_moduladores_2d.append(n as CanvasModulate)
+	elif n is PointLight2D and not n.has_meta("luz_edificio"):
+		var id_pt := n.get_instance_id()
+		if not _luces_pt2d.has(id_pt):
+			var pt := n as PointLight2D
+			var omni := _crear_omni_3d(pt.color, clampf(pt.texture_scale * 6.8, 3.0, 9.5), Vector3.ZERO)
+			_luces_pt2d[id_pt] = [pt, omni]
+	elif n.get_script() and String(n.get_script().resource_path).ends_with("/fogata.gd"):
+		var p_fog := _al_suelo((n as Node2D).global_position) + Vector3(0.0, 0.55, 0.35)
+		var cfg_h: Array = TIPOS_LUZ_3D["h"]
+		var omni_f := _crear_omni_3d(cfg_h[2], float(cfg_h[0]), p_fog)
+		_luces_3d.append({
+			"luz": omni_f,
+			"pos": p_fog,
+			"color": cfg_h[2],
+			"rango": float(cfg_h[0]),
+			"fuerza": float(cfg_h[1]),
+			"fuego": true,
+			"siempre": true,
+			"fase": randf() * TAU,
+			"dueno": n,
+		})
 	# ¿a qué capa va?
+	# Las sombras elípticas (sombra.gd) van al suelo (CANAL_SUELO) para dar oclusión ambiental de contacto bajo pies y bases
 	if n.get_script() and String(n.get_script().resource_path).ends_with("sombra.gd"):
-		ci.visibility_layer = CANAL_NADA
+		ci.visibility_layer = CANAL_SUELO
 		return
 	if _de_pantalla(n):
 		ci.visibility_layer = CANAL_PANTALLA
@@ -640,18 +976,28 @@ func _registrar(n: Node) -> void:
 	var par := [n, g, ancla, z, mod_base]
 	_gemelos[id] = par
 	var estatico := false
-	if n is Sprite2D and n.get_script() == null and ancla is StaticBody2D and ancla.get_script() == null:
+	if n is Sprite2D:
 		var s := n as Sprite2D
 		var tex_s := s.texture
+		var tex_n: Texture2D = null
 		if tex_s is CanvasTexture:
+			tex_n = (tex_s as CanvasTexture).normal_texture
 			tex_s = (tex_s as CanvasTexture).diffuse_texture
+		else:
+			tex_n = _textura_normal_de(tex_s)
+		_registrar_luces_sprite.call_deferred(s, tex_s)
 		var arch := tex_s.resource_path.get_file() if tex_s else ""
-		if not (arch in ["casa_seta.png", "taller.png", "cocina.png", "puesto.png", "farol.png", "transbordador.png"]):
-			estatico = true
-		if tex_s:
-			var alto_f := (s.region_rect.size.y if s.region_enabled else tex_s.get_height() / float(maxi(s.vframes, 1)))
-			if alto_f <= 14.0:
-				g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		if n.get_script() == null and ancla is StaticBody2D and ancla.get_script() == null:
+			if not (arch in ["casa_seta.png", "taller.png", "cocina.png", "puesto.png", "farol.png", "transbordador.png"]):
+				estatico = true
+			if tex_s:
+				var alto_f := (s.region_rect.size.y if s.region_enabled else tex_s.get_height() / float(maxi(s.vframes, 1)))
+				if alto_f <= 14.0:
+					g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				elif tex_n != null and s.hframes == 1 and s.vframes == 1 and not s.region_enabled:
+					g.material_override = _material_relieve(tex_s, tex_n, s.flip_h)
+		elif tex_n != null and s.hframes == 1 and s.vframes == 1 and not s.region_enabled and ancla is StaticBody2D:
+			g.material_override = _material_relieve(tex_s, tex_n, s.flip_h)
 	if estatico:
 		g.visibility_range_end = 38.0
 		_copiar(n as Node2D, g, ancla, z)
@@ -712,6 +1058,10 @@ func _quitar(n: Node) -> void:
 	_canales.erase(id)
 	_ids_dinamicos.erase(id)
 	_ids_estaticos.erase(id)
+	if _luces_pt2d.has(id):
+		if is_instance_valid(_luces_pt2d[id][1]):
+			(_luces_pt2d[id][1] as Node).queue_free()
+		_luces_pt2d.erase(id)
 	if _gemelos.has(id):
 		if is_instance_valid(_gemelos[id][1]):
 			(_gemelos[id][1] as Node).queue_free()
@@ -752,16 +1102,47 @@ func _visible(n: CanvasItem) -> bool:
 	return true
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_tiempo_luces += delta
 	# el sol sigue la hora del día (de día, cálido; de noche, frío y flojo), y los dibujos se tiñen igual
 	var dia: float = Reloj.luz_dia() if Reloj.has_method("luz_dia") else 1.0
 	var calido: float = Reloj.calidez() if Reloj.has_method("calidez") else 0.0
-	sol.light_energy = lerpf(0.07, 0.27, dia)
-	sol.light_color = Color(0.6, 0.66, 0.95).lerp(Color(1.0, 0.95, 0.86), dia).lerp(Color(1.0, 0.72, 0.45), calido * 0.5)
-	_tinte = Color(0.42, 0.46, 0.68).lerp(Color.WHITE, dia).lerp(Color(1.0, 0.88, 0.78), calido * 0.35)
+	var mod_2d := Color.WHITE
+	var en_penumbra := false
+	for i in range(_moduladores_2d.size() - 1, -1, -1):
+		var m := _moduladores_2d[i]
+		if not is_instance_valid(m):
+			_moduladores_2d.remove_at(i)
+			continue
+		if m.visible:
+			mod_2d = m.color
+			if m.name != "LuzDelDia":
+				en_penumbra = true
+				break
+	if en_penumbra:
+		sol.light_energy = 0.08
+		sol.light_color = Color(0.65, 0.62, 0.85)
+		_tinte = Color(clampf(mod_2d.r * 2.3, 0.24, 1.0), clampf(mod_2d.g * 2.3, 0.22, 1.0), clampf(mod_2d.b * 2.3, 0.28, 1.0))
+	else:
+		sol.light_energy = lerpf(0.07, 0.27, dia)
+		sol.light_color = Color(0.6, 0.66, 0.95).lerp(Color(1.0, 0.95, 0.86), dia).lerp(Color(1.0, 0.72, 0.45), calido * 0.5)
+		_tinte = Color(0.42, 0.46, 0.68).lerp(Color.WHITE, dia).lerp(Color(1.0, 0.88, 0.78), calido * 0.35)
+	var tinte_roca := Color(minf(1.0, mod_2d.r * 1.65), minf(1.0, mod_2d.g * 1.65), minf(1.0, mod_2d.b * 1.65)) if en_penumbra else mod_2d
+	if _mat_penas:
+		_mat_penas.albedo_color = tinte_roca
+	for m_lej in _suelos_lejanos:
+		m_lej.set_shader_parameter("tinte_2d", Vector3(tinte_roca.r, tinte_roca.g, tinte_roca.b))
 	_colocar_camara(0.12)
-	if absf(_tinte.r - _ultimo_tinte.r) + absf(_tinte.g - _ultimo_tinte.g) + absf(_tinte.b - _ultimo_tinte.b) > 0.008:
+	var noche_ef := 1.0 if en_penumbra else (1.0 - dia)
+	_actualizar_luces_3d(noche_ef)
+	var cambio_tinte := absf(_tinte.r - _ultimo_tinte.r) + absf(_tinte.g - _ultimo_tinte.g) + absf(_tinte.b - _ultimo_tinte.b) > 0.008
+	var toca_luces_est := noche_ef > 0.15 and int((_tiempo_luces - delta) * 6.0) != int(_tiempo_luces * 6.0)
+	if cambio_tinte or toca_luces_est:
 		_ultimo_tinte = _tinte
+		var vec_tinte := Vector3(_tinte.r, _tinte.g, _tinte.b)
+		for mat_r in _cache_mat_relieve.values():
+			(mat_r as ShaderMaterial).set_shader_parameter("tinte_ambiente", vec_tinte)
+		var hay_luces_activas := noche_ef > 0.15 and (_luces_3d.size() > 0 or _luces_pt2d.size() > 0)
 		for id_e in _ids_estaticos.keys():
 			if not _gemelos.has(id_e):
 				_ids_estaticos.erase(id_e)
@@ -771,7 +1152,15 @@ func _process(_delta: float) -> void:
 				_ids_estaticos.erase(id_e)
 				_gemelos.erase(id_e)
 				continue
-			(pe[1] as Sprite3D).modulate = (pe[4] as Color) * _tinte
+			var g_e: Sprite3D = pe[1]
+			if not hay_luces_activas:
+				g_e.modulate = (pe[4] as Color) * _tinte
+				continue
+			if absf(g_e.position.x - _foco.x) > LEJOS or absf(g_e.position.z - _foco.z) > LEJOS:
+				continue
+			var luz_e := _luz_en_punto(g_e.position)
+			var tf_e := Color(minf(1.3, _tinte.r + luz_e.r), minf(1.25, _tinte.g + luz_e.g), minf(1.2, _tinte.b + luz_e.b), 1.0)
+			g_e.modulate = (pe[4] as Color) * tf_e
 	for id in _ids_dinamicos.keys():
 		if not _gemelos.has(id):
 			_ids_dinamicos.erase(id)
@@ -793,7 +1182,59 @@ func _process(_delta: float) -> void:
 			par[2] = _ancla(n)
 		_copiar(n, g, par[2], par[3])
 	_mover_capas()
-	_actualizar_postproceso(dia, calido)
+	_actualizar_postproceso(0.15 if en_penumbra else dia, calido)
+
+
+func _actualizar_luces_3d(noche: float) -> void:
+	var encendidas := smoothstep(0.12, 0.58, noche)
+	for i in range(_luces_3d.size() - 1, -1, -1):
+		var d: Dictionary = _luces_3d[i]
+		var omni: OmniLight3D = d["luz"]
+		if not is_instance_valid(omni) or not is_instance_valid(d["dueno"]):
+			if is_instance_valid(omni):
+				omni.queue_free()
+			_luces_3d.remove_at(i)
+			continue
+		var pos_l: Vector3 = d["pos"]
+		if absf(pos_l.x - _foco.x) > LEJOS or absf(pos_l.z - _foco.z) > LEJOS:
+			omni.visible = false
+			continue
+		var factor_hora := maxf(0.45, encendidas) if bool(d["siempre"]) else encendidas
+		if factor_hora <= 0.02:
+			omni.light_energy = 0.0
+			omni.visible = false
+			continue
+		var vacila := 0.14 * sin(_tiempo_luces * (7.2 if d["fuego"] else 2.2) + float(d["fase"])) \
+			+ (0.08 * sin(_tiempo_luces * 13.0 + float(d["fase"]) * 2.0) if d["fuego"] else 0.0)
+		omni.light_energy = float(d["fuerza"]) * factor_hora * (1.0 + vacila)
+		omni.visible = omni.light_energy > 0.02
+	for id_pt in _luces_pt2d.keys():
+		var par_pt: Array = _luces_pt2d[id_pt]
+		var pt: PointLight2D = par_pt[0]
+		var omni_pt: OmniLight3D = par_pt[1]
+		if not is_instance_valid(pt) or not is_instance_valid(omni_pt):
+			if is_instance_valid(omni_pt):
+				omni_pt.queue_free()
+			_luces_pt2d.erase(id_pt)
+			continue
+		if not pt.visible or pt.energy <= 0.02:
+			omni_pt.visible = false
+			omni_pt.light_energy = 0.0
+			continue
+		var ancla_pt := _ancla(pt)
+		var pos_3d := Vector3(
+			pt.global_position.x * PX,
+			clampf(-(pt.global_position.y - ancla_pt.global_position.y) * PX + 0.4, 0.45, 3.2),
+			ancla_pt.global_position.y * PX + 0.38
+		)
+		if absf(pos_3d.x - _foco.x) > LEJOS or absf(pos_3d.z - _foco.z) > LEJOS:
+			omni_pt.visible = false
+			continue
+		omni_pt.position = pos_3d
+		omni_pt.light_color = pt.color
+		omni_pt.omni_range = clampf(pt.texture_scale * 6.8, 3.0, 9.5)
+		omni_pt.light_energy = pt.energy * 1.45
+		omni_pt.visible = true
 
 
 func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
@@ -818,12 +1259,11 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 		g.region_enabled = s.region_enabled
 		g.region_rect = s.region_rect
 	if tex is CanvasTexture:
-		tex = (tex as CanvasTexture).diffuse_texture          # (en 3D, sin el relieve 2D)
+		tex = (tex as CanvasTexture).diffuse_texture          # (en 3D, el relieve va en SOMBREADOR_GEMELO)
 	g.texture = tex
 	g.flip_h = n.flip_h
 	g.flip_v = n.flip_v
 	g.centered = n.centered
-	g.modulate = n.modulate * n.self_modulate * _tinte
 	var escala := n.global_scale
 	g.scale = Vector3(escala.x, escala.y, 1.0)
 	# de pie: apoyado en el suelo de su cuerpo; lo que en 2D está más arriba que el cuerpo, en 3D está más alto
@@ -838,3 +1278,7 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 	# (las capas de un mismo cuerpo, un pelín hacia la cámara según su orden de dibujo, para que no parpadeen)
 	var orden := z * 0.004 + n.get_index() * 0.0015
 	g.position = _al_suelo(ancla.global_position) + Vector3(0, 0, orden)
+	var luz_p := _luz_en_punto(g.position)
+	var tf := Color(minf(1.3, _tinte.r + luz_p.r), minf(1.25, _tinte.g + luz_p.g), minf(1.2, _tinte.b + luz_p.b), 1.0)
+	g.modulate = n.modulate * n.self_modulate * tf
+

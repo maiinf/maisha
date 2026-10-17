@@ -65,6 +65,8 @@ func _ready() -> void:
 	Estado.extra["calidad_hd2d"] = "alta"
 	await get_tree().process_frame
 	await get_tree().process_frame
+	_comprobar(espejo != null and espejo.get("_mascara_ao") != null, "la oclusión ambiental de contacto del suelo está horneada")
+	_comprobar(espejo != null and ((espejo.get("_luces_3d") as Array).size() > 0 or (espejo.get("_luces_pt2d") as Dictionary).size() > 0), "las luces puntuales 3D (OmniLight3D) están registradas")
 
 	print("El juego no cambia:")
 	var m := get_tree().get_first_node_in_group("maisha") as CharacterBody2D
