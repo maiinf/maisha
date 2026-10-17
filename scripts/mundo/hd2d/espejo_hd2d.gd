@@ -62,6 +62,8 @@ uniform vec2 origen = vec2(0.0);
 uniform vec2 casillas = vec2(1.0);
 uniform float lado = 1024.0;
 uniform float hundido = 0.0;
+uniform float fuerza_nubes = 0.14;
+uniform float calma_lago = 0.0;
 
 void vertex() {
 	if (hundido < 0.5) {
@@ -81,32 +83,40 @@ void vertex() {
 void fragment() {
 	vec2 px = origen + UV * lado;
 	vec2 uv_mapa = px / 16.0 / casillas;
+	float f_calma = 1.0 - calma_lago * 0.85;
 	// (la máscara, suavizada y con un temblor, para que la orilla sea curva como la pintada y no en escalones)
-	float temblor = sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.055 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.045;
+	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.055 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.045) * f_calma;
 	float es_agua = texture(agua, uv_mapa).r + temblor;
 	if (hundido < 0.5 && es_agua > 0.5) { discard; }
 	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
 	vec3 c = texture(capa, UV).rgb;
 	if (hundido > 0.5) {
-		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0);
-		float onda2 = sin(px.x * 0.19 - px.y * 0.15 - TIME * 1.9) * 0.5 + 0.5;
+		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4 * f_calma) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0 * f_calma);
+		float onda2 = sin(px.x * 0.19 - px.y * 0.15 - TIME * 1.9 * f_calma) * 0.5 + 0.5;
 		float profundidad = smoothstep(0.5, 0.88, es_agua);
 		c = mix(c, vec3(0.06, 0.15, 0.25), 0.18 + profundidad * 0.14);
-		c += vec3(0.06, 0.09, 0.11) * smoothstep(0.68, 0.98, onda1);
-		c += vec3(0.03, 0.05, 0.07) * smoothstep(0.76, 0.96, onda2) * profundidad;
+		c = mix(c, vec3(0.18, 0.34, 0.52), calma_lago * 0.32 * profundidad);
+		c += vec3(0.06, 0.09, 0.11) * smoothstep(0.68, 0.98, onda1) * f_calma;
+		c += vec3(0.03, 0.05, 0.07) * smoothstep(0.76, 0.96, onda2) * profundidad * f_calma;
 		// Sombra del escalón de la orilla + espuma blanca animada junto al borde
 		c *= mix(0.56, 1.0, smoothstep(0.5, 0.70, es_agua));
-		float pulso_orilla = sin(px.x * 0.34 + px.y * 0.29 - TIME * 2.3) * 0.5 + 0.5;
+		float pulso_orilla = sin(px.x * 0.34 + px.y * 0.29 - TIME * 2.3 * f_calma) * 0.5 + 0.5;
 		float franja_espuma = smoothstep(0.62, 0.50, es_agua) * smoothstep(0.49, 0.515, es_agua);
 		float espuma = smoothstep(0.32, 0.65, franja_espuma + pulso_orilla * 0.26) * smoothstep(0.63, 0.50, es_agua);
 		c = mix(c, vec3(0.84, 0.91, 0.95), espuma * 0.58);
-		ROUGHNESS = 0.34;
-		SPECULAR = 0.32;
+		ROUGHNESS = mix(0.34, 0.08, calma_lago);
+		SPECULAR = mix(0.32, 0.65, calma_lago);
 	} else {
 		float ao = texture(mapa_ao, uv_mapa).r;
 		c *= mix(1.0, 0.56, ao);
 		ROUGHNESS = 0.96;
 		SPECULAR = 0.04;
+	}
+	// Sombras suaves de nubes desplazándose por el mundo al sol
+	if (fuerza_nubes > 0.005) {
+		vec2 p_nube = px * 0.0065 + vec2(TIME * 0.09, TIME * 0.04);
+		float n_nube = sin(p_nube.x + sin(p_nube.y * 1.3)) * cos(p_nube.y * 0.9 - sin(p_nube.x * 0.8)) * 0.5 + 0.5;
+		c *= 1.0 - smoothstep(0.54, 0.88, n_nube) * fuerza_nubes;
 	}
 	// Desvanecimiento suave en los bordes del mapa para evitar cualquier corte brusco
 	vec2 d_borde = min(uv_mapa * casillas, (vec2(1.0) - uv_mapa) * casillas);
@@ -125,6 +135,8 @@ uniform sampler2D mapa_ao : filter_linear;
 uniform vec2 casillas = vec2(60.0, 60.0);
 uniform vec3 tinte_2d = vec3(1.0);
 uniform float hundido = 0.0;
+uniform float fuerza_nubes = 0.14;
+uniform float calma_lago = 0.0;
 
 void vertex() {
 	if (hundido < 0.5) {
@@ -142,24 +154,31 @@ void vertex() {
 
 void fragment() {
 	vec2 px = UV * casillas * 16.0;
-	float temblor = sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.05 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.04;
+	float f_calma = 1.0 - calma_lago * 0.85;
+	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.05 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.04) * f_calma;
 	float es_agua = texture(agua, UV).r + temblor;
 	if (hundido < 0.5 && es_agua > 0.5) { discard; }
 	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
 	vec3 c = texture(suelo, UV).rgb * tinte_2d;
 	if (hundido > 0.5) {
-		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0);
+		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4 * f_calma) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0 * f_calma);
 		c = mix(c, vec3(0.06, 0.15, 0.25) * tinte_2d, 0.24) * mix(0.56, 1.0, smoothstep(0.5, 0.72, es_agua));
-		c += vec3(0.05, 0.08, 0.10) * tinte_2d * smoothstep(0.70, 0.98, onda1);
+		c = mix(c, vec3(0.18, 0.34, 0.52) * tinte_2d, calma_lago * 0.32);
+		c += vec3(0.05, 0.08, 0.10) * tinte_2d * smoothstep(0.70, 0.98, onda1) * f_calma;
 		float franja_espuma = smoothstep(0.61, 0.50, es_agua) * smoothstep(0.49, 0.515, es_agua);
 		c = mix(c, vec3(0.82, 0.90, 0.94) * tinte_2d, franja_espuma * 0.52);
-		ROUGHNESS = 0.36;
-		SPECULAR = 0.28;
+		ROUGHNESS = mix(0.36, 0.08, calma_lago);
+		SPECULAR = mix(0.28, 0.65, calma_lago);
 	} else {
 		float ao = texture(mapa_ao, UV).r;
 		c *= mix(1.0, 0.56, ao);
 		ROUGHNESS = 0.96;
 		SPECULAR = 0.04;
+	}
+	if (fuerza_nubes > 0.005) {
+		vec2 p_nube = px * 0.0065 + vec2(TIME * 0.09, TIME * 0.04);
+		float n_nube = sin(p_nube.x + sin(p_nube.y * 1.3)) * cos(p_nube.y * 0.9 - sin(p_nube.x * 0.8)) * 0.5 + 0.5;
+		c *= 1.0 - smoothstep(0.54, 0.88, n_nube) * fuerza_nubes;
 	}
 	vec2 d_borde = min(UV * casillas, (vec2(1.0) - UV) * casillas);
 	float f_borde = clamp(min(d_borde.x, d_borde.y) / 2.2, 0.0, 1.0);
@@ -170,6 +189,7 @@ void fragment() {
 ## Sombreador 3D para los gemelos con mapa de normales (*_n.png):
 ## Conserva los colores exactos del pixel art al sol, proyecta y recibe sombras 3D suaves y reacciona con volumen
 ## tanto al sol/luna como a las luces puntuales 3D (OmniLight3D) de faroles, ventanas, braseros y fogatas.
+const COMPENSACION_Y := 1.24       # compensación vertical de perspectiva bajo cámara a -48°
 const SOMBREADOR_GEMELO := """
 shader_type spatial;
 render_mode ambient_light_disabled, specular_disabled, cull_disabled;
@@ -179,6 +199,8 @@ uniform vec3 tinte_ambiente = vec3(1.0);
 uniform float usa_normal = 1.0;
 uniform float volteo_x = 1.0;
 uniform float mecido = 0.0;
+uniform float curvatura_3d = 0.75;
+uniform vec2 hv_frames = vec2(1.0, 1.0);
 uniform vec3 pos_maisha = vec3(0.0);
 
 void vertex() {
@@ -203,26 +225,43 @@ void fragment() {
 	if (c.a < 0.5) {
 		discard;
 	}
-	ALBEDO = c.rgb;
+	// Bisel volumétrico 3D en tiempo real midiendo el contorno de la silueta del fotograma actual
+	vec2 tex_tam = vec2(textureSize(tex_albedo, 0));
+	vec2 paso = 1.0 / max(tex_tam, vec2(1.0));
+	float a_izq = texture(tex_albedo, UV - vec2(paso.x * 2.2, 0.0)).a * 0.6 + texture(tex_albedo, UV - vec2(paso.x * 4.8, 0.0)).a * 0.4;
+	float a_der = texture(tex_albedo, UV + vec2(paso.x * 2.2, 0.0)).a * 0.6 + texture(tex_albedo, UV + vec2(paso.x * 4.8, 0.0)).a * 0.4;
+	float a_arr = texture(tex_albedo, UV - vec2(0.0, paso.y * 2.2)).a * 0.6 + texture(tex_albedo, UV - vec2(0.0, paso.y * 4.8)).a * 0.4;
+	float a_aba = texture(tex_albedo, UV + vec2(0.0, paso.y * 2.2)).a * 0.6 + texture(tex_albedo, UV + vec2(0.0, paso.y * 4.8)).a * 0.4;
+	float bisel_x = (a_der - a_izq) * -0.75;
+	float bisel_y = (a_aba - a_arr) * 0.65;
+	// Curvatura cilíndrica/cúpula 3D a lo ancho y alto del fotograma para dar cuerpo redondo a estructuras y jefes
+	vec2 uv_f = fract(UV * hv_frames);
+	float cilindro_x = (uv_f.x - 0.5) * 2.0 * volteo_x * curvatura_3d * 0.42;
+	float cupula_y = (0.45 - uv_f.y) * curvatura_3d * 0.28;
+	float interior = clamp((a_izq + a_der + a_arr + a_aba) * 0.25, 0.0, 1.0);
+	float sombra_borde = mix(0.82, 1.0, smoothstep(0.15, 0.92, interior));
+	ALBEDO = c.rgb * sombra_borde;
 	ALPHA = c.a;
 	ALPHA_SCISSOR_THRESHOLD = 0.5;
 	ROUGHNESS = 1.0;
-	vec3 n_vista = normalize(vec3(0.0, 0.68, 0.73));
+	vec3 nm = vec3(0.0, 0.0, 1.0);
 	if (usa_normal > 0.5) {
-		vec3 nm = texture(tex_normal, UV).rgb * 2.0 - 1.0;
-		n_vista = normalize(vec3(nm.x * volteo_x * 0.58, 0.68 + nm.y * 0.58, max(0.25, 0.73 * nm.z)));
+		nm = texture(tex_normal, UV).rgb * 2.0 - 1.0;
 	}
-	NORMAL = n_vista;
+	float nx = nm.x * volteo_x * 0.65 + bisel_x * curvatura_3d + cilindro_x;
+	float ny = 0.64 + nm.y * 0.62 + bisel_y * curvatura_3d + cupula_y;
+	float nz = max(0.22, 0.72 * nm.z * (1.0 - min(0.45, length(vec2(bisel_x, bisel_y)) * 0.45)));
+	NORMAL = normalize(vec3(nx, ny, nz));
 }
 
 void light() {
 	if (LIGHT_IS_DIRECTIONAL) {
-		float relieve = (dot(NORMAL, LIGHT) - 0.50) * (usa_normal > 0.5 ? 0.38 : 0.10);
-		float sombra_3d = mix(0.70, 1.0, ATTENUATION);
-		DIFFUSE_LIGHT += tinte_ambiente * sombra_3d * clamp(1.0 + relieve, 0.76, 1.24);
+		float relieve = (dot(NORMAL, LIGHT) - 0.50) * (usa_normal > 0.5 ? 0.52 : 0.28);
+		float sombra_3d = mix(0.68, 1.0, ATTENUATION);
+		DIFFUSE_LIGHT += tinte_ambiente * sombra_3d * clamp(1.0 + relieve, 0.72, 1.26);
 	} else {
 		float ndl = max(0.28, dot(NORMAL, LIGHT));
-		DIFFUSE_LIGHT += LIGHT_COLOR * ATTENUATION * ndl * 0.95;
+		DIFFUSE_LIGHT += LIGHT_COLOR * ATTENUATION * ndl * 0.96;
 	}
 }
 """
@@ -276,10 +315,10 @@ const LUCES_3D := {
 }
 const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png", "puesto.png"]
 const TIPOS_LUZ_3D := {
-	"v": [5.2, 2.15, Color(1.0, 0.76, 0.38), false],
-	"f": [6.8, 2.35, Color(1.0, 0.72, 0.35), false],
-	"h": [8.2, 2.65, Color(1.0, 0.56, 0.22), true],
-	"m": [5.4, 1.85, Color(0.45, 0.95, 0.85), false],
+	"v": [4.6, 0.92, Color(1.0, 0.84, 0.55), false],
+	"f": [5.6, 1.12, Color(1.0, 0.78, 0.46), false],
+	"h": [6.8, 1.35, Color(1.0, 0.64, 0.30), true],
+	"m": [4.8, 0.88, Color(0.50, 0.92, 0.82), false],
 }
 const HONDO_AGUA := 0.35             # metros que baja el agua
 const LETRAS_AGUA := "~\\"
@@ -328,9 +367,9 @@ vec3 extraer_emision(vec3 s, float d, float nieve) {
 	float calido = max(0.0, s.r - s.b * 0.85);
 	// En la nieve al sol, los píxeles blancos/lilas tienen baja saturación y poco exceso cálido: no emiten bloom
 	float mascara_nieve = mix(1.0, smoothstep(0.18, 0.36, sat + calido * 0.8), nieve * d);
-	float relevancia = lum * (0.42 + sat * 0.95 + calido * 0.75);
-	float umbral = mix(0.36, 0.64, d) + nieve * d * 0.14;
-	return s * smoothstep(umbral, umbral + 0.28, relevancia) * mascara_nieve;
+	float relevancia = lum * (0.32 + sat * 0.55 + calido * 0.45);
+	float umbral = mix(0.56, 0.68, d) + nieve * d * 0.14;
+	return s * smoothstep(umbral, umbral + 0.25, relevancia) * mascara_nieve;
 }
 
 void fragment() {
@@ -367,28 +406,28 @@ void fragment() {
 			col = mix(base, acum / peso_t, smoothstep(0.0, 0.15, desenfoque));
 		}
 		// 2. Bloom suave selectivo (llamas, faroles, ventanas, runas y ecos)
-		vec3 bloom = extraer_emision(col, dia, es_nieve) * 0.20;
-		vec2 pb = paso * 3.2;
-		bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(pb.x, 0.0), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.13;
-		bloom += extraer_emision(texture(pantalla, clamp(uv - vec2(pb.x, 0.0), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.13;
-		bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(0.0, pb.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.13;
-		bloom += extraer_emision(texture(pantalla, clamp(uv - vec2(0.0, pb.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.13;
+		vec3 bloom = extraer_emision(col, dia, es_nieve) * 0.16;
+		vec2 pb = paso * 3.0;
+		bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(pb.x, 0.0), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.10;
+		bloom += extraer_emision(texture(pantalla, clamp(uv - vec2(pb.x, 0.0), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.10;
+		bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(0.0, pb.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.10;
+		bloom += extraer_emision(texture(pantalla, clamp(uv - vec2(0.0, pb.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.10;
 		if (calidad >= 2) {
 			vec2 pd = pb * 1.45;
-			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(pd.x, pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.07;
-			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(-pd.x, pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.07;
-			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(pd.x, -pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.07;
-			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(-pd.x, -pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.07;
+			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(pd.x, pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.05;
+			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(-pd.x, pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.05;
+			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(pd.x, -pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.05;
+			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(-pd.x, -pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.05;
 		}
-		float fuerza_bloom = mix(0.46, 0.24, dia);
+		float fuerza_bloom = mix(0.24, 0.15, dia);
 		col += bloom * fuerza_bloom;
-		// 3. Etalonaje de color por hora y bioma (preservando el brillo central al sol)
+		// 3. Etalonaje de color por hora y bioma (preservando el brillo natural sin saturar)
 		float noche = 1.0 - dia;
-		vec3 sombra_tinte = mix(vec3(0.96, 0.97, 1.02), vec3(0.82, 0.88, 1.12), noche);
-		vec3 luz_tinte = mix(vec3(1.0), vec3(1.08, 0.94, 0.82), calidez * 0.65);
+		vec3 sombra_tinte = mix(vec3(0.97, 0.98, 1.01), vec3(0.88, 0.91, 1.05), noche);
+		vec3 luz_tinte = mix(vec3(1.0), vec3(1.04, 0.95, 0.86), calidez * 0.45);
 		float lum_c = dot(col, vec3(0.299, 0.587, 0.114));
 		col *= mix(sombra_tinte, luz_tinte, smoothstep(0.15, 0.75, lum_c));
-		col *= mix(vec3(1.0), tinte_bioma, 0.45);
+		col *= mix(vec3(1.0), tinte_bioma, 0.35);
 		// 4. Viñeta cinematográfica suave en los bordes
 		vec2 d_centro = (uv - vec2(0.5, 0.5)) * vec2(1.12, 1.0);
 		float vineta = 1.0 - smoothstep(0.46, 0.92, length(d_centro)) * mix(0.24, 0.14, dia);
@@ -1089,8 +1128,15 @@ func _textura_normal_de(tex: Texture2D) -> Texture2D:
 	return null
 
 
-func _material_relieve(tex: Texture2D, tex_n: Texture2D, flip_h: bool, mecido_amp: float = 0.0) -> ShaderMaterial:
-	var clave := "%d_%d_%d" % [tex.get_instance_id(), 1 if flip_h else 0, int(roundf(mecido_amp * 1000.0))]
+func _material_relieve(tex: Texture2D, tex_n: Texture2D, flip_h: bool, mecido_amp: float = 0.0, curvatura: float = 0.75, hv: Vector2 = Vector2.ONE) -> ShaderMaterial:
+	var clave := "%d_%d_%d_%d_%dx%d" % [
+		tex.get_instance_id(),
+		1 if flip_h else 0,
+		int(roundf(mecido_amp * 1000.0)),
+		int(roundf(curvatura * 100.0)),
+		int(hv.x),
+		int(hv.y)
+	]
 	if _cache_mat_relieve.has(clave):
 		return _cache_mat_relieve[clave]
 	var mat := ShaderMaterial.new()
@@ -1103,9 +1149,97 @@ func _material_relieve(tex: Texture2D, tex_n: Texture2D, flip_h: bool, mecido_am
 		mat.set_shader_parameter("usa_normal", 0.0)
 	mat.set_shader_parameter("volteo_x", -1.0 if flip_h else 1.0)
 	mat.set_shader_parameter("mecido", mecido_amp)
+	mat.set_shader_parameter("curvatura_3d", curvatura)
+	mat.set_shader_parameter("hv_frames", hv)
 	mat.set_shader_parameter("tinte_ambiente", Vector3(_tinte.r, _tinte.g, _tinte.b))
 	_cache_mat_relieve[clave] = mat
 	return mat
+
+
+func _config_volumen_3d(n: Node2D, ancla: Node2D, arch: String, ancho_px: float, alto_px: float) -> Vector2:
+	if alto_px <= 14.0 or arch in ["agujero.png", "charco.png", "mancha.png", "setitas.png", "sombra.png"]:
+		return Vector2.ZERO
+	if n.get_parent() and n.get_parent().name == "Ropa":
+		return Vector2.ZERO
+	var es_jefe := ancla.is_in_group("jefes") or (n.get_parent() and n.get_parent().is_in_group("jefes"))
+	var es_edificio := ancla.is_in_group("edificios") or LUCES_3D.has(arch)
+	if es_jefe:
+		var prof_j := clampf(minf(ancho_px, alto_px) * PX * 0.38, 0.44, 0.86)
+		return Vector2(5.0, prof_j)
+	if es_edificio or alto_px >= 40.0 or ancho_px >= 42.0:
+		var prof_e := clampf(minf(ancho_px, alto_px) * PX * 0.36, 0.48, 0.88)
+		return Vector2(5.0, prof_e)
+	if alto_px >= 22.0 or ancho_px >= 22.0:
+		var prof_m := clampf(minf(ancho_px, alto_px) * PX * 0.32, 0.28, 0.54)
+		return Vector2(4.0, prof_m)
+	return Vector2(3.0, 0.22)
+
+
+func _sincronizar_volumen_3d(n: Node2D, g: Sprite3D, ancla: Node2D, tex: Texture2D, arch: String, ancho_px: float, alto_px: float, mod_final: Color) -> void:
+	var cfg := _config_volumen_3d(n, ancla, arch, ancho_px, alto_px)
+	var num_capas := int(cfg.x)
+	if num_capas <= 0 or tex == null:
+		if g.has_meta("capas_fondo"):
+			for c_ant in g.get_meta("capas_fondo"):
+				if is_instance_valid(c_ant):
+					(c_ant as Sprite3D).visible = false
+		return
+	var prof_z := cfg.y
+	var capas: Array = []
+	if g.has_meta("capas_fondo"):
+		capas = g.get_meta("capas_fondo")
+	else:
+		for k in range(1, num_capas + 1):
+			var c_sp := Sprite3D.new()
+			c_sp.pixel_size = PX
+			c_sp.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+			c_sp.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
+			c_sp.alpha_scissor_threshold = 0.52
+			c_sp.shaded = false
+			c_sp.double_sided = true
+			c_sp.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+			c_sp.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if (k == num_capas or k == maxi(1, num_capas / 2)) else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			g.add_child(c_sp)
+			capas.append(c_sp)
+		g.set_meta("capas_fondo", capas)
+	var alto_m := maxf(alto_px * PX * COMPENSACION_Y, 0.5)
+	var y_base_local := (g.offset.y - (alto_px * 0.5 if g.centered else 0.0)) * PX
+	for k in capas.size():
+		var c_sp: Sprite3D = capas[k]
+		if not is_instance_valid(c_sp):
+			continue
+		c_sp.visible = g.visible
+		var t := float(k + 1) / float(capas.size())
+		var dz := prof_z * t
+		c_sp.texture = tex
+		c_sp.hframes = g.hframes
+		c_sp.vframes = g.vframes
+		c_sp.frame = g.frame
+		c_sp.region_enabled = g.region_enabled
+		c_sp.region_rect = g.region_rect
+		c_sp.flip_h = g.flip_h
+		c_sp.flip_v = g.flip_v
+		c_sp.centered = g.centered
+		c_sp.offset = g.offset
+		c_sp.visibility_range_end = g.visibility_range_end
+		var sx := 1.0 + 0.055 * sin(t * PI) - 0.018 * t * t
+		var sy := clampf(1.0 - (dz * 0.72) / alto_m, 0.48, 0.96)
+		c_sp.scale = Vector3(sx, sy, 1.0)
+		c_sp.position = Vector3(0.0, y_base_local * (1.0 - sy), -dz)
+		var osc := lerpf(0.78, 0.42, t)
+		c_sp.modulate = mod_final * Color(osc * 0.94, osc * 0.96, osc * 1.05, 1.0)
+
+
+func _actualizar_color_volumen_3d(g: Sprite3D, mod_final: Color) -> void:
+	if not g.has_meta("capas_fondo"):
+		return
+	var capas: Array = g.get_meta("capas_fondo")
+	for k in capas.size():
+		var c_sp: Sprite3D = capas[k]
+		if is_instance_valid(c_sp):
+			var t := float(k + 1) / float(capas.size())
+			var osc := lerpf(0.78, 0.42, t)
+			c_sp.modulate = mod_final * Color(osc * 0.94, osc * 0.96, osc * 1.05, 1.0)
 
 
 func _crear_omni_3d(color: Color, rango: float, pos_3d: Vector3) -> OmniLight3D:
@@ -1190,7 +1324,7 @@ func _luz_en_punto(pos: Vector3) -> Color:
 		var dist := pos.distance_to(d["pos"])
 		var rango: float = d["rango"]
 		if dist < rango:
-			var f := pow(1.0 - dist / rango, 1.6) * omni.light_energy * 0.28
+			var f := pow(1.0 - dist / rango, 1.6) * omni.light_energy * 0.12
 			var col: Color = d["color"]
 			r += col.r * f
 			g += col.g * f
@@ -1201,7 +1335,7 @@ func _luz_en_punto(pos: Vector3) -> Color:
 			continue
 		var dist := pos.distance_to(omni_pt.position)
 		if dist < omni_pt.omni_range:
-			var f := pow(1.0 - dist / omni_pt.omni_range, 1.6) * omni_pt.light_energy * 0.24
+			var f := pow(1.0 - dist / omni_pt.omni_range, 1.6) * omni_pt.light_energy * 0.10
 			r += omni_pt.light_color.r * f
 			g += omni_pt.light_color.g * f
 			b += omni_pt.light_color.b * f
@@ -1283,15 +1417,10 @@ func _registrar(n: Node) -> void:
 	if n is Sprite2D:
 		var s := n as Sprite2D
 		var tex_s := s.texture
-		var tex_n: Texture2D = null
 		if tex_s is CanvasTexture:
-			tex_n = (tex_s as CanvasTexture).normal_texture
 			tex_s = (tex_s as CanvasTexture).diffuse_texture
-		else:
-			tex_n = _textura_normal_de(tex_s)
 		_registrar_luces_sprite.call_deferred(s, tex_s)
 		var arch := tex_s.resource_path.get_file() if tex_s else ""
-		var amp_mecido := float(FLORA_MECIDA.get(arch, 0.0))
 		if n.get_script() == null and ancla is StaticBody2D and ancla.get_script() == null:
 			if not (arch in ["casa_seta.png", "taller.png", "cocina.png", "puesto.png", "farol.png", "transbordador.png"]):
 				estatico = true
@@ -1299,10 +1428,6 @@ func _registrar(n: Node) -> void:
 				var alto_f := (s.region_rect.size.y if s.region_enabled else tex_s.get_height() / float(maxi(s.vframes, 1)))
 				if alto_f <= 14.0:
 					g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-				elif (tex_n != null or amp_mecido > 0.0) and s.hframes == 1 and s.vframes == 1 and not s.region_enabled:
-					g.material_override = _material_relieve(tex_s, tex_n, s.flip_h, amp_mecido)
-		elif (tex_n != null or amp_mecido > 0.0) and s.hframes == 1 and s.vframes == 1 and not s.region_enabled and ancla is StaticBody2D:
-			g.material_override = _material_relieve(tex_s, tex_n, s.flip_h, amp_mecido)
 	if estatico:
 		g.visibility_range_end = 64.0
 		_copiar(n as Node2D, g, ancla, z)
@@ -1436,8 +1561,16 @@ func _process(delta: float) -> void:
 	var tinte_roca := Color(minf(1.0, mod_2d.r * 1.65), minf(1.0, mod_2d.g * 1.65), minf(1.0, mod_2d.b * 1.65)) if en_penumbra else mod_2d
 	if _mat_penas:
 		_mat_penas.albedo_color = tinte_roca
+	var nodo_espejo := get_tree().get_first_node_in_group("espejo_lago")
+	var calma_lago := float(nodo_espejo.get("calma")) if nodo_espejo else 0.0
+	var f_nubes := (0.15 * dia) if not en_penumbra else 0.0
+	for m_cap in _mats_capa:
+		m_cap.set_shader_parameter("fuerza_nubes", f_nubes)
+		m_cap.set_shader_parameter("calma_lago", calma_lago)
 	for m_lej in _suelos_lejanos:
 		m_lej.set_shader_parameter("tinte_2d", Vector3(tinte_roca.r, tinte_roca.g, tinte_roca.b))
+		m_lej.set_shader_parameter("fuerza_nubes", f_nubes)
+		m_lej.set_shader_parameter("calma_lago", calma_lago)
 	_colocar_camara(0.12, delta)
 	var noche_ef := 1.0 if en_penumbra else (1.0 - dia)
 	_actualizar_luces_3d(noche_ef)
@@ -1461,12 +1594,14 @@ func _process(delta: float) -> void:
 			var g_e: Sprite3D = pe[1]
 			if not hay_luces_activas:
 				g_e.modulate = (pe[4] as Color) * _tinte
+				_actualizar_color_volumen_3d(g_e, g_e.modulate)
 				continue
 			if absf(g_e.position.x - _foco.x) > LEJOS or absf(g_e.position.z - _foco.z) > LEJOS:
 				continue
 			var luz_e := _luz_en_punto(g_e.position)
-			var tf_e := Color(minf(1.3, _tinte.r + luz_e.r), minf(1.25, _tinte.g + luz_e.g), minf(1.2, _tinte.b + luz_e.b), 1.0)
+			var tf_e := Color(minf(1.06, _tinte.r + luz_e.r), minf(1.05, _tinte.g + luz_e.g), minf(1.03, _tinte.b + luz_e.b), 1.0)
 			g_e.modulate = (pe[4] as Color) * tf_e
+			_actualizar_color_volumen_3d(g_e, g_e.modulate)
 	for id in _ids_dinamicos.keys():
 		if not _gemelos.has(id):
 			_ids_dinamicos.erase(id)
@@ -1553,6 +1688,7 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 	if not g.visible:
 		return
 	var tex: Texture2D = null
+	var tex_n: Texture2D = null
 	if n is AnimatedSprite2D:
 		var a := n as AnimatedSprite2D
 		if a.sprite_frames:
@@ -1570,26 +1706,48 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 		g.region_enabled = s.region_enabled
 		g.region_rect = s.region_rect
 	if tex is CanvasTexture:
+		tex_n = (tex as CanvasTexture).normal_texture
 		tex = (tex as CanvasTexture).diffuse_texture          # (en 3D, el relieve va en SOMBREADOR_GEMELO)
+	elif tex != null:
+		tex_n = _textura_normal_de(tex)
 	g.texture = tex
 	g.flip_h = n.flip_h
 	g.flip_v = n.flip_v
 	g.centered = n.centered
 	var escala := n.global_scale
-	g.scale = Vector3(escala.x, escala.y, 1.0)
+	g.scale = Vector3(escala.x, escala.y * COMPENSACION_Y, 1.0)
 	# de pie: apoyado en el suelo de su cuerpo; lo que en 2D está más arriba que el cuerpo, en 3D está más alto
 	var sube: Vector2 = n.global_position - ancla.global_position
 	var o2: Vector2 = n.offset + Vector2(sube.x, sube.y)
 	# (en 2D la «y» crece hacia abajo y en 3D hacia arriba: sin centrar, el dibujo va de o2.y a o2.y + alto en 2D,
 	# así que en 3D su borde de abajo está en -(o2.y + alto); centrado, se queda donde está, solo cambia el signo)
-	var alto := 0.0
-	if not g.centered and tex:
-		alto = (g.region_rect.size.y if g.region_enabled else tex.get_height() / float(maxi(g.vframes, 1)))
+	var ancho_f := 0.0
+	var alto_f := 0.0
+	if tex:
+		ancho_f = (g.region_rect.size.x if g.region_enabled else tex.get_width() / float(maxi(g.hframes, 1)))
+		alto_f = (g.region_rect.size.y if g.region_enabled else tex.get_height() / float(maxi(g.vframes, 1)))
+	var alto := alto_f if (not g.centered and tex) else 0.0
 	g.offset = Vector2(o2.x, -(o2.y + alto))
-	# (las capas de un mismo cuerpo, un pelín hacia la cámara según su orden de dibujo, para que no parpadeen)
-	var orden := z * 0.005 + n.get_index() * 0.0018
+	# En jefes por piezas (Cosechadora, Mzizi), separamos las capas con más profundidad Z para que tengan cuerpo mecánico/orgánico real
+	var es_jefe_capas := ancla.is_in_group("jefes") and n.get_parent() != ancla
+	var paso_indice := 0.026 if es_jefe_capas else 0.0018
+	var orden := z * 0.005 + n.get_index() * paso_indice
 	g.position = _al_suelo(ancla.global_position) + Vector3(0, 0, orden)
 	var luz_p := _luz_en_punto(g.position)
-	var tf := Color(minf(1.3, _tinte.r + luz_p.r), minf(1.25, _tinte.g + luz_p.g), minf(1.2, _tinte.b + luz_p.b), 1.0)
-	g.modulate = n.modulate * n.self_modulate * tf
+	var tf := Color(minf(1.06, _tinte.r + luz_p.r), minf(1.05, _tinte.g + luz_p.g), minf(1.03, _tinte.b + luz_p.b), 1.0)
+	var mod_propio := n.modulate * n.self_modulate
+	var mod_final := mod_propio * tf
+	g.modulate = mod_final
+	var arch := tex.resource_path.get_file() if tex else ""
+	if tex and alto_f > 14.0 and not g.region_enabled:
+		var amp_mecido := float(FLORA_MECIDA.get(arch, 0.0))
+		var es_gran_vol := ancla.is_in_group("jefes") or ancla.is_in_group("edificios") or alto_f >= 32.0 or ancho_f >= 32.0
+		var curv := 0.90 if es_gran_vol else 0.65
+		var sin_destello := absf(mod_propio.r - 1.0) < 0.08 and absf(mod_propio.g - 1.0) < 0.08 and absf(mod_propio.b - 1.0) < 0.08 and mod_propio.a > 0.96
+		if sin_destello:
+			g.material_override = _material_relieve(tex, tex_n, g.flip_h, amp_mecido, curv, Vector2(maxi(g.hframes, 1), maxi(g.vframes, 1)))
+		else:
+			g.material_override = null
+	_sincronizar_volumen_3d(n, g, ancla, tex, arch, ancho_f, alto_f, mod_final)
+
 

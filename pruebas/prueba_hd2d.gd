@@ -88,6 +88,7 @@ func _ready() -> void:
 	_comprobar(m.global_position.x > antes.x + 20, "Maisha anda igual que en 2D")
 	_comprobar(gemelo_m != null and absf(gemelo_m.position.x - m.global_position.x / 16.0) < 0.05, "y su gemelo la sigue por el suelo 3D")
 	_comprobar(gemelo_m != null and gemelo_m.texture != null and gemelo_m.billboard == BaseMaterial3D.BILLBOARD_FIXED_Y, "de pie, mirando a la cámara, con su dibujo")
+	_comprobar(gemelo_m != null and gemelo_m.has_meta("capas_fondo") and (gemelo_m.get_meta("capas_fondo") as Array).size() >= 3, "las estructuras, personajes y jefes tienen fondo volumétrico 3D")
 
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")

@@ -75,7 +75,7 @@ if __name__ == "__main__":
         rutas = [os.path.join(RAIZ, r) for r in ALDEA]
     elif "--todo" in rutas:
         rutas = []
-        for raiz_dir in ("arte/mundos", "arte/personajes/aldeanos", "arte/zonas/raiz"):
+        for raiz_dir in ("arte/mundos", "arte/personajes/aldeanos", "arte/personajes/maisha", "arte/zonas"):
             for carpeta, _, archivos in os.walk(os.path.join(RAIZ, raiz_dir)):
                 if carpeta.endswith("suelos"):
                     continue   # los suelos no: su relieve es ruido (la hierba), ocupa muchísimo y apenas se nota
