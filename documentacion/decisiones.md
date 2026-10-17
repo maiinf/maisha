@@ -331,3 +331,10 @@ se pasan.
 | Cámara, vida y remates (`hd2d/camara`, `hd2d/vida`, `hd2d/remates`) | Activación síncrona de HD-2D al entrar en escena, anticipación al correr, encuadre cercano en diálogos, mecido de flora con el viento y al paso de Maisha, partículas 3D (`MultiMeshInstance3D`) por bioma y ventanitas `CANAL_PIE` para enemigos y jefes |
 | Prueba piloto de Blender (`hd2d/blender-piloto`) | Se modeló `casa_seta_piloto.glb` en Blender 4.5 con textura pixel art de la paleta de Raíz (`NEAREST`) y se comparó dentro de `cuna_de_musgo` de día y de noche (`06_blender_piloto_antes_despues.png`). Se descarta sustituir los edificios pintados por mallas 3D porque el sprite 2D con mapa de normales conserva mucha más riqueza artesanal (lunares, vigía, farol, musgo) |
 
+### Arquitectura 3D sólida de Blender 4.5 en HD-2D (2026-10-18, petición explícita de Iam)
+| Qué | Decisión |
+| --- | --- |
+| Escenario y Edificios | A petición de Iam para eliminar el efecto plano de lámina 2D vista desde atrás o arriba, se adopta el modelo exacto de *Octopath Traveler*: los personajes y enemigos son sprites 2D con mapas de normales y relieve, y la arquitectura (edificios, farolas, puentes, gran árbol y archivos) se levanta como **mallas 3D reales (`.glb`)** modeladas proceduralmente en Blender 4.5 (`herramientas/blender/generador_3d_maisha.py`). |
+| Catálogo de Modelos | 11 modelos de arquitectura integrados en `MODELOS_BLENDER` dentro de `espejo_hd2d.gd` (Casa Pino, Forja Corteza, Gran Árbol, Molino Shamba, Farol Madera, Cocina Juncia, Puesto Tawi, Gran Archivo, Taller Taa, Casas de Escribas). Las ruinas conservan su extrusión dilapidada y, al reconstruirse en la historia, se sustituyen por la malla 3D sólida. Documentado en `documentacion/modelos_3d.md` para la bóveda de Obsidian. |
+| Coordinación con Claude | Establecido canal continuo en `documentacion/COORDINACION.md` donde Claude construye mapas y misiones 2D en `/Users/iinfafer/Proyectos/maisha` y Gemini modela e integra el soporte 3D en `/Users/iinfafer/Proyectos/maisha-revision` sin pisarse ramas ni archivos. |
+
