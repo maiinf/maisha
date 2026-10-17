@@ -274,7 +274,11 @@ func _ready() -> void:
 	Input.action_press("mover_arriba")
 	await _esperar(1.5)
 	Input.action_release("mover_arriba")
-	_comprobar(_escena() == "PasoEscarcha" and not Estado.cambiando, "Maandiko aún no existe: la puerta del norte no deja pasar")
+	for i in 300:
+		if _escena() == "Maandiko" and not Estado.cambiando:
+			break
+		await get_tree().process_frame
+	_comprobar(_escena() == "Maandiko", "con la puerta abierta, se llega a Maandiko, la Ciudad-Archivo")
 
 	print()
 	print("RESULTADO: todo correcto" if _fallos == 0 else "RESULTADO: %d fallos" % _fallos)

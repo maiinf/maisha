@@ -136,6 +136,7 @@ const CLAVE := {
 	"hoja_mauti": ["Hoja de Mauti", 24, "Una hoja seca de cobre, todavía tibia. Mauti la dejó bajo una piedra de la isla del río, para Maisha: «Si subes a buscarme, tráemela»."],
 	"semilla_primer_arbol": ["Semilla del Primer Árbol", 26, "Una semilla grande y tibia que cayó de la copa dorada del Primer Árbol. «Plántala cuando llegue el momento: de ella saldrá algo que te hará falta.»"],
 	"cuaderno_ecos": ["Cuaderno de ecos", 18, "El regalo de Msafiri. Cada eco perdido que escuchas queda apuntado aquí. Juntos cuentan qué le pasó al Primer Árbol."],
+	"mapa_norte": ["Trozo del norte del mapa", 3, "El trozo que le faltaba al mapa de Mzee Shamba: Sigilia y lo que hay más allá. Kalamu lo guardaba en el Archivo, por si alguien venía a buscarlo."],
 	"mapa_raiz": ["Mapa de Tawi", 3, "Tawi lo dibujó volando por encima de Raíz: en tu mapa ya se ven todos los lugares (los caminos hay que andarlos)."],
 }
 ## Habilidades: [nombre, tecla, marca que la desbloquea, descripción]

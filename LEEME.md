@@ -690,6 +690,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_guardado.gd` empieza una partida desde el inicio (el diario se abre y la introducción se escribe en él), guarda, pausa, vuelve al inicio, continúa donde lo dejó, comprueba que en plena pelea se guarda el último sitio seguro, que «Nueva partida» pregunta antes de borrar y que un archivo estropeado no rompe nada.
 - `pruebas/prueba_encargos.gd` recoge setas y mineral, comprueba que el cetro rebota en la roca y la semilla la rompe, entrega los encargos, ve levantarse las casas, entra en ellas y prueba las recompensas (haces del vigía y cetro templado).
 - `pruebas/prueba_hd2d.gd` enciende el HD-2D con H, comprueba que cada dibujo tiene su gemelo 3D, que la interfaz sigue, que Maisha anda igual y su gemelo la sigue, que las peñas se levantan, que se recuerda al cambiar de escena y que al apagarlo vuelve el 2D.
+- `pruebas/prueba_maandiko.gd` llega a Maandiko desde el Paso, comprueba la música, la plaza, el Archivo, las casas, los puestos y el taller, los vecinos (Kalamu, Mauti, Wino, Taa y los escribas en blanco), que Kalamu da el trozo del norte del mapa y cumple la misión, y que los charcos de Tinta Quieta de las salidas se derriten con tres sigilos.
 - `pruebas/prueba_paso_escarcha.gd` comprueba el paso del norte de las Ruinas (cerrado hasta curar al árbol), llega al Paso de la Escarcha, prueba la nieve honda (frena, no deja correr, deja surcos que ya no frenan), la ventisca (empuja en medio del valle, no detrás de una estela, y se apaga al pasar la racha), a Taa en blanco, la ficha en la nieve honda, que al dársela recupera su nombre y enseña el sigilo de fuego, el sigilo (sin aprender no sale; gasta Aliento; espera) que enciende un farol, el abrigo del farol (ni viento ni nieve honda), que revivir lo quita todo, las páginas sueltas (atacan y el fuego las quema; cuentan en el Bestiario), la Puerta Sellada (no se rodea; tres sigilos la abren), que la misión se cumple y que la puerta a Maandiko aún no deja pasar.
 - `pruebas/prueba_sendero.gd` va de los Prados al Sendero del Puente y a la aldea y vuelta, prueba los pretiles y el vado, el eco perdido (con su ilustración), el encargo de Msafiri y el cuaderno de ecos.
 - `pruebas/prueba_pasarelas.gd` va de la aldea a Las Pasarelas y a la ciénaga y vuelta, prueba el agua y las tablas, el tramo roto, la rana de piedra (aviso, salto, onda, atontada), el encargo de Korongo (que arregla la pasarela) y el segundo eco.
@@ -847,6 +848,7 @@ Decidido con Iam: el juego irá a **HD-2D** (los sprites de pixel art de siempre
 | Luz y cámara | Sol que sigue el reloj del día y luz de ambiente medidas para que el suelo al sol salga igual de claro que en 2D; sin niebla 3D. Cámara en perspectiva (30°, inclinada 48°) que sigue a Maisha sin salirse del mapa |
 | Rendimiento | Solo se copian los dibujos a menos de 30 m de la cámara: el fotograma cuesta lo mismo que en 2D (7,5 ms en los Prados) |
 | Prueba | `pruebas/prueba_hd2d.gd` |
+| El pie de los dibujos | Los gemelos se apoyan en el suelo por el pie de su dibujo (antes, los dibujos sin centrar flotaban tanto como su altura) |
 
 Comparativas: `documentacion/hd2d_comparativa_1.png` a `_5.png`.
 
@@ -888,6 +890,22 @@ Escena `escenas/mundo/paso_escarcha.tscn` (`scripts/mundo/paso_escarcha.gd`). Se
 | Música | «La nieve que escribe» (`escarcha`): un vals lento de caja de música en si menor, con viento y roce de páginas; el **tema de Sigilia** (`TEMA_SIGILIA`) en la flauta y luego en el piano |
 
 La puerta del norte lleva a Maandiko, que aún no existe (no deja pasar).
+
+## Maandiko, la Ciudad-Archivo (parte 1: la ciudad, Kalamu y el mapa)
+
+Escena `escenas/mundo/maandiko.tscn` (`scripts/mundo/maandiko.gd`), detrás de la Puerta Sellada del Paso de la Escarcha. Mapa de 72×56 (`crear_maandiko`), nevado de lila y amurallado; capturas en `documentacion/maandiko_capturas.png`.
+
+| Qué | Cómo |
+| --- | --- |
+| La ciudad | La avenida del sur lleva a la **Plaza del Índice** (losas de piedra lila, con la **fuente** de tinta helada `ḟ`); al norte, el **Gran Archivo** (`ḃ`, cúpula dorada); al oeste, el Barrio de los Copistas (casas de escribas `ḣ` y la **casa de Kalamu** `ḱ`, con torreón y rollos colgados); al este, el **Mercado de Tinta** (puestos `ṗ`); junto a la avenida, el **taller de Taa** (`ṫ`). Arte en `herramientas/pintar_maandiko.py` (con carámbanos en los aleros) |
+| Los vecinos | `sigilia/vecino.gd` (un aldeano con su dibujo y otra conversación). **Kalamu**, la archivera mayor (no está en blanco: repite su nombre en voz alta); **Wino**, el comerciante del mercado (su tienda abrirá más adelante); **Mauti**, en la plaza (con `mauti_libre`), hablando a los escribas en blanco; **Taa**, en su taller; y **escribas en blanco** por las calles (`dibujar_aldeanos.py`: `kalamu`, `wino`, `escriba_blanco`; Mauti, de su dibujo de las Ruinas) |
+| El mapa | Kalamu cuenta lo que pasó (el miedo a olvidar, la Tinta Quieta, las fichas del Índice que se llevó el viento) y da el **trozo del norte del mapa** (objeto clave `mapa_norte`) |
+| Las salidas | Oeste (Estanterías), este (Canal de Tinta) y noroeste (Observatorio), tapadas por **charcos de Tinta Quieta** (`sigilia/charco_tinta.gd`, `charco.png`): tres sigilos de fuego los derriten. Las escenas de detrás aún no existen |
+| Música | «Las calles del Índice» (`maandiko`): el tema de Sigilia en re mayor, como un vals de salón, con puente en menor |
+| Misión | «La Ciudad-Archivo»: entrar y encontrar a alguien que recuerde su nombre |
+| Prueba | `pruebas/prueba_maandiko.gd` |
+
+Falta: la tienda de Wino, encender los faroles de las calles con Taa, los caminos (Estanterías, Canal, Observatorio) con las fichas del Índice y la Sección Prohibida.
 
 ## Las construcciones, al nivel de la casa del castor
 

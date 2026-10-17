@@ -1,0 +1,5 @@
+; puerta = nombre, escena a la que lleva, puerta por la que se aparece allí, hacia dónde sale Maisha al llegar aquí
+_ = paso, paso_escarcha, ciudad, arriba
+< = estanterias, estanterias_colgantes, ciudad, derecha
+> = canal, canal_tinta, ciudad, izquierda
+^ = observatorio, observatorio_aurora, ciudad, abajo

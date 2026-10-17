@@ -621,7 +621,12 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 	# de pie: apoyado en el suelo de su cuerpo; lo que en 2D está más arriba que el cuerpo, en 3D está más alto
 	var sube: Vector2 = n.global_position - ancla.global_position
 	var o2: Vector2 = n.offset + Vector2(sube.x, sube.y)
-	g.offset = Vector2(o2.x, -o2.y)
+	# (en 2D la «y» crece hacia abajo y en 3D hacia arriba: sin centrar, el dibujo va de o2.y a o2.y + alto en 2D,
+	# así que en 3D su borde de abajo está en -(o2.y + alto); centrado, se queda donde está, solo cambia el signo)
+	var alto := 0.0
+	if not g.centered and tex:
+		alto = (g.region_rect.size.y if g.region_enabled else tex.get_height() / float(maxi(g.vframes, 1)))
+	g.offset = Vector2(o2.x, -(o2.y + alto))
 	# (las capas de un mismo cuerpo, un pelín hacia la cámara según su orden de dibujo, para que no parpadeen)
 	var orden := z * 0.004 + n.get_index() * 0.0015
 	g.position = _al_suelo(ancla.global_position) + Vector3(0, 0, orden)

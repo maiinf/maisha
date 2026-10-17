@@ -127,5 +127,187 @@
 				]
 			}
 		]
+	},
+	"maandiko_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Maandiko... Hay casas por todas partes, con los tejados dorados llenos de nieve. Y mucho silencio.",
+					"Se ve gente por las calles, pero nadie habla. Están quietos, blancos, como hojas sin escribir.",
+					"La cúpula grande del fondo debe de ser el Archivo. Si alguien sabe dónde está el trozo de mapa que falta, será ahí... o cerca."
+				]
+			}
+		]
+	},
+	"kalamu": {
+		"nombre": "Kalamu",
+		"conversaciones": [
+			{
+				"no": [
+					"kalamu_conocida"
+				],
+				"lineas": [
+					"Vaya. Alguien que brilla. Hacía mucho que no entraba nadie por esa puerta... y menos con color.",
+					"Soy Kalamu. Llevo el Archivo desde antes de que tu cetro fuera una ramita. Y no, no estoy en blanco: me paso el día diciendo mi nombre en voz alta. Kalamu, Kalamu. Pareceré tonta, pero funciona.",
+					"Aquí lo apuntábamos todo, ¿sabes? Cada receta, cada canción, cada nombre. Para que nada se perdiera nunca.",
+					"Y entonces llegó ese miedo. Que todo se olvidaría igual, por mucho que escribiéramos. Copiamos y copiamos, cada vez más deprisa... hasta que la tinta se heló en los tinteros.",
+					"La Tinta Quieta. Lo que toca, se queda sin nombre. Mis copistas están ahí fuera, de pie, sin acordarse de quiénes son.",
+					"Sus nombres estaban en las fichas del Índice. Cuando la tinta se heló, el viento se las llevó por los caminos: las Estanterías, el Canal, el Observatorio...",
+					"¿Que buscas un trozo de mapa? ¿El del norte? Ah... Shamba, el castor. Me escribía cartas, hace años.",
+					"Toma. Lo guardé por si alguien venía a buscarlo. Con él, tu mapa ya está entero."
+				],
+				"marca": [
+					"kalamu_conocida",
+					"mapa_norte"
+				],
+				"aviso": "Has conseguido el TROZO DEL NORTE del mapa: el mapa del mundo ya está entero"
+			},
+			{
+				"lineas": [
+					"Las calles de salida están tapadas de Tinta Quieta. Tu fuego la derrite, ¿verdad? Entonces puedes salir a buscar las fichas.",
+					"Debajo del Archivo está la Sección Prohibida. No bajes. Todavía no.",
+					"Kalamu. Me llamo Kalamu. ...Perdona, es la costumbre."
+				]
+			}
+		]
+	},
+	"wino": {
+		"nombre": "Wino",
+		"conversaciones": [
+			{
+				"no": [
+					"wino_conocido"
+				],
+				"lineas": [
+					"¡Alguien con ganas de comprar! ¡Por fin! Te doy la bienvenida a la mejor tienda de tinta de Maandiko. La única que queda abierta, de hecho.",
+					"Soy Wino. Vendo tinta, plumas, papel... bueno, vendía. Se me ha helado casi todo el género.",
+					"Si consigues que la ciudad vuelva a moverse, te prometo precios de amigo. Ahora mismo solo te puedo ofrecer una sonrisa. Es gratis."
+				],
+				"marca": [
+					"wino_conocido"
+				]
+			},
+			{
+				"lineas": [
+					"Cuando se deshiele la tinta de las calles, abriré el puesto en serio. Ya verás qué colores."
+				]
+			}
+		]
+	},
+	"escriba_blanco": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un escriba en blanco. Sujeta un libro abierto, con las páginas vacías, y no me ve.",
+					"Su nombre estará en alguna ficha del Índice, perdida por los caminos."
+				]
+			}
+		]
+	},
+	"mauti": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"no": [
+					"mauti_maandiko"
+				],
+				"lineas": [
+					"¡Maisha! Por fin. Subí antes que tú para ver qué pasaba aquí.",
+					"Esta gente me recuerda a mí, ahí arriba, en las Ruinas. Quietos para no perder nada... y perdiéndolo todo.",
+					"Me quedo en la plaza. Les hablo, les cuento cosas, para que no se apaguen del todo mientras tú buscas sus fichas.",
+					"Ve con cuidado. Y si encuentras un nombre, tráemelo: quiero ver cómo vuelven."
+				],
+				"marca": [
+					"mauti_maandiko"
+				]
+			},
+			{
+				"lineas": [
+					"Les estoy contando lo del Primer Árbol. No sé si me oyen, pero a veces parece que sí."
+				]
+			}
+		]
+	},
+	"taa_ciudad": {
+		"nombre": "Taa",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¡Ya estoy en casa! Mi taller está algo frío, pero los faroles aguantan.",
+					"Si ves calles a oscuras, enciende sus faroles. La luz ayuda a que la gente no se olvide del todo de dónde vive."
+				]
+			}
+		]
+	},
+	"charco_tinta": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Tinta Quieta, helada, tapando toda la calle. Con el sigilo de fuego se irá derritiendo."
+				]
+			}
+		]
+	},
+	"maandiko_archivo": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El Gran Archivo. Tiene la puerta abierta y encendida, pero por dentro no se oye nada.",
+					"Kalamu dice que debajo está la Sección Prohibida."
+				]
+			}
+		]
+	},
+	"maandiko_casa_kalamu": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La casa de Kalamu: la ventana de la torre siempre está encendida."
+				]
+			}
+		]
+	},
+	"maandiko_casa": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una casa de escribas. Hay libros en la repisa, todos con las páginas en blanco."
+				]
+			}
+		]
+	},
+	"maandiko_taller": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El taller de Taa. Huele a aceite de farol y a hierro caliente."
+				]
+			}
+		]
+	},
+	"maandiko_fuente": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La fuente de la plaza. El chorro se quedó helado en el aire, hecho de tinta."
+				]
+			}
+		]
 	}
 }

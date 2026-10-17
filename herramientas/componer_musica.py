@@ -1644,7 +1644,48 @@ def escarcha():
     return final(p, sala=3.4, mezcla=0.36, brillo=5200)
 
 
+def maandiko():
+    """«Las calles del Índice»: la Ciudad-Archivo. El tema de Sigilia, ahora en re mayor y más cálido, como un vals de
+    salón que suena desde una ventana: piano y kalimba a dos voces, un bajo que pasea, pizzicatos de pluma (campanitas
+    cortas, como el rasgueo de escribir) y, en el puente, el tema en menor y lento (la ciudad que se ha olvidado de sí
+    misma), antes de volver a la luz."""
+    tempo = Tempo(96)
+    pulsos = 120
+    p = Pista(tempo.s(pulsos))
+    tema_m = transportar(TEMA_SIGILIA, 3)                      # (de si menor a re mayor relativo: sube una tercera menor)
+    progresion = [("D2", "M"), ("B1", "m"), ("G1", "M"), ("A1", "M"), ("D2", "M"), ("F#1", "m"), ("G1", "M"), ("A1", "sus"),
+                  ("D2", "M"), ("B1", "m"), ("E2", "m"), ("A1", "M"), ("G1", "M"), ("A1", "M"), ("D2", "M"), ("D2", "M"),
+                  ("B1", "m"), ("G1", "M"), ("E2", "m"), ("F#1", "m"), ("B1", "m"), ("G1", "M"), ("A1", "sus"), ("A1", "M"),
+                  ("D2", "M"), ("B1", "m"), ("G1", "M"), ("A1", "M"), ("G1", "M"), ("A1", "M"), ("D2", "M"), ("D2", "M"),
+                  ("B1", "m"), ("G1", "M"), ("D2", "M"), ("A1", "M"), ("B1", "m"), ("E2", "m"), ("A1", "sus"), ("D2", "M")]
+    colchones(p, tempo, progresion, compas=3, brillo=900, volumen=0.13, octava_bajo=2, fuerza_bajo=0.0)
+    # el bajo que pasea (un, dos-tres de vals) y el acompañamiento de piano en los tiempos débiles
+    for i, (raiz, tipo) in enumerate(progresion):
+        notas = acorde(raiz[:-1] + "3", tipo)
+        p.poner(bajo(raiz[:-1] + "2", tempo.s(1) * 0.9), tempo.s(i * 3), 0.3)
+        p.poner(acorde_piano(notas, tempo.s(0.9), 0.16, 0.02), tempo.s(i * 3 + 1), 1.0, pan=0.15)
+        p.poner(acorde_piano(notas, tempo.s(0.9), 0.13, 0.02), tempo.s(i * 3 + 2), 1.0, pan=0.15)
+    # el tema: kalimba la primera vez; piano y kalimba a la octava la segunda
+    melodia(p, tempo, tema_m, desde=6, instrumento=kalimba, volumen=0.3, pan=-0.15)
+    tocar(p, tempo, tema_m, desde=30, fuerza=0.24, pan=-0.05)
+    melodia(p, tempo, transportar(tema_m, 12), desde=30, instrumento=kalimba, volumen=0.13, pan=0.25)
+    # el puente: el tema en menor, lento, en la flauta (la ciudad que no se acuerda)
+    lento = [(n, en * 1.5, d * 1.5) for (n, en, d) in TEMA_SIGILIA]
+    melodia(p, tempo, lento, desde=54, instrumento=lambda n, d: flauta(n, d, 0.34, vibrato=4.0), volumen=0.24, sostener=0.92)
+    # y la vuelta, con contramelodía en terceras
+    melodia(p, tempo, tema_m, desde=94, instrumento=kalimba, volumen=0.28, pan=-0.15)
+    melodia(p, tempo, transportar(tema_m, -3), desde=94, instrumento=kalimba, volumen=0.15, pan=0.2)
+    # rasgueos de pluma: campanitas muy cortas sueltas, como alguien escribiendo
+    rng = np.random.default_rng(151)
+    for k in range(40):
+        b = rng.random() * (pulsos - 1)
+        p.poner(campanita(["A6", "D7", "F#6"][rng.integers(3)], 0.18, 0.035), tempo.s(b), pan=rng.random() - 0.5)
+    return final(p, sala=2.6, mezcla=0.3, brillo=5600)
+
+
 PIEZAS["escarcha"] = escarcha
+PIEZAS["maandiko"] = maandiko
+TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 
 if __name__ == "__main__":

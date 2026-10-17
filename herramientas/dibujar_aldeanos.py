@@ -700,6 +700,101 @@ def taa_blanco():
     return taa(True)
 
 
+def _armino_base(l, cola_x=3):
+    """El cuerpo de un armiño de Sigilia (sin ropa): esbelto, de cuello largo, cola con la punta negra."""
+    for (x, y) in ((cola_x, 29), (cola_x - 1, 28), (cola_x - 1, 27), (cola_x, 26), (cola_x + 1, 25), (cola_x + 2, 25)):
+        l.px(x, y, "armino", 2)
+    for (x, y) in ((cola_x, 29), (cola_x - 1, 28), (cola_x - 1, 27)):
+        l.px(x, y, "tinta", 2)
+    l.ovalo(11.5, 23, 4.3, 7.0, "armino")
+    l.ovalo(11.5, 24.5, 2.2, 4.5, "hocico", plano=True)
+    l.ovalo(7.5, 22, 1.4, 3.0, "armino")
+    l.ovalo(11.5, 15.5, 2.6, 2.8, "armino")
+    l.ovalo(11.5, 10, 5.0, 4.0, "armino")
+    l.ovalo(11.5, 12.6, 2.4, 1.5, "hocico", plano=True)
+    l.px(11, 12, "rosa", 2); l.px(12, 12, "rosa", 2)
+    l.px(7, 6, "armino", 2); l.px(8, 5, "armino", 2); l.px(8, 6, "rosa", 1)
+    l.px(15, 6, "armino", 2); l.px(14, 5, "armino", 2); l.px(14, 6, "rosa", 1)
+    for (x0, lado) in ((8, -1), (15, 1)):
+        for k in range(2):
+            l.px(x0 + lado * k, 12 + k, "cana", 3)
+    for x in (9, 14):
+        l.rect(x - 1, 29, x + 1, 30, "armino", 1)
+
+
+def kalamu():
+    """KALAMU: la archivera mayor de Maandiko, una armiña muy anciana. Encorvada, con el pelo de la cabeza más ralo,
+    unas gafas pequeñas con su cadenita, un chal morado con flecos sobre los hombros y, de bastón, una pluma de cobre
+    enorme. Guarda el trozo del norte del mapa de Mzee Shamba."""
+    l = Lienzo()
+    for y in range(7, 31):                                    # el bastón de madera oscura...
+        l.px(19, y, "concha", 1 if y % 4 else 2)
+    for (x, y) in ((18, 6), (20, 6), (17, 5), (21, 5), (18, 4), (20, 4), (17, 3), (19, 3), (18, 2), (19, 1)):   # ...que acaba en una pluma blanca
+        l.px(x, y, "cana", 3 if (x + y) % 2 else 2)
+    _armino_base(l)
+    l.ovalo(17.5, 19.5, 1.6, 2.0, "armino")                   # la mano en la pluma
+    ojos(l, 9, 9, 14, alto=2)
+    l.px(9, 8, "cana", 3); l.px(10, 8, "cana", 3); l.px(14, 8, "cana", 3); l.px(15, 8, "cana", 3)   # cejas blancas, pobladas
+    for x0 in (9, 14):                                        # medias gafas, bajitas, en la punta del hocico
+        l.px(x0 - 1, 10, "laton", 2); l.px(x0, 11, "laton", 3); l.px(x0 + 1, 11, "laton", 3); l.px(x0 + 2, 10, "laton", 2)
+    for y in range(10, 17):                                   # la cadenita de las gafas
+        l.px(16 + (y - 10) // 3, y, "laton", 1)
+    l.rect(6, 15, 17, 18, "morado", 2); l.rect(6, 15, 17, 15, "morado", 3)   # el chal
+    for x in range(6, 18, 2):
+        l.px(x, 19, "morado", 1)
+    l.px(7, 16, "laton", 3); l.px(16, 16, "laton", 3)         # el broche
+    l.px(10, 6, "cana", 2); l.px(12, 5, "cana", 2); l.px(13, 6, "cana", 1)   # los pelos blancos sueltos
+    return l
+
+
+def wino():
+    """WINO: el comerciante del Mercado de Tinta, un armiño joven y rechoncho, con una boina de lana, un delantal de
+    cuero manchado de tinta de todos los colores y una pluma detrás de la oreja. Siempre sonríe."""
+    l = Lienzo()
+    _armino_base(l)
+    l.ovalo(11.5, 23, 4.8, 7.0, "armino")                     # (más rechoncho)
+    l.ovalo(11.5, 25, 3.2, 4.6, "delantal")                   # el delantal de cuero
+    for (x, y, c) in ((10, 23, "azul"), (13, 25, "rojo"), (11, 27, "morado"), (12, 22, "rana")):
+        l.px(x, y, c, 2)                                      # manchas de tinta
+    l.ovalo(17, 22, 1.4, 3.0, "armino")
+    ojos(l, 9, 9, 14, alto=2)
+    l.px(11, 13, "rubor", 0); l.px(12, 13, "rubor", 0)         # la sonrisa
+    l.px(8, 11, "rubor"); l.px(15, 11, "rubor")
+    l.ovalo(11.5, 6.5, 5.2, 2.2, "morado")                    # la boina
+    l.px(11, 4, "morado", 3); l.px(12, 3, "morado", 2)
+    for y in range(4, 9):                                     # la pluma detrás de la oreja
+        l.px(16 + (8 - y) // 2, y, "cana", 3)
+    return l
+
+
+def escriba_blanco():
+    """UN ESCRIBA EN BLANCO: un armiño al que la Tinta Quieta le ha borrado el nombre. Pálido y sin color, con los ojos
+    vacíos, sujeta una pluma seca y un libro abierto en blanco."""
+    l = Lienzo()
+    _armino_base(l)
+    l.ovalo(17, 21, 1.6, 2.0, "armino")
+    l.rect(14, 19, 20, 22, "panuelo", 3)                      # el libro abierto, en blanco
+    l.px(17, 19, "panuelo", 1); l.px(17, 20, "panuelo", 1); l.px(17, 21, "panuelo", 1)
+    for y in range(14, 20):                                   # la pluma seca
+        l.px(6 + (19 - y) // 3, y, "cana", 2)
+    l.rect(8, 16, 15, 17, "morado", 2)                        # la bufanda de escriba
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            c = l.m[y][x]
+            if c is None:
+                continue
+            mat, t = c
+            if mat in ("ojo", "brillo"):
+                continue
+            l.m[y][x] = ("en_blanco", max(1, min(3, t + (1 if mat in ("tinta", "morado", "laton") else 0))))
+    ojos(l, 9, 9, 14, alto=2)
+    for y in range(ALTO):                                     # los ojos, vacíos (huecos grises, sin brillo)
+        for x in range(ANCHO):
+            if l.m[y][x] and l.m[y][x][0] in ("ojo", "brillo"):
+                l.m[y][x] = ("gris_c", 1)
+    return l
+
+
 def _copia(l):
     n = Lienzo()
     n.m = [fila[:] for fila in l.m]
@@ -813,7 +908,7 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"taa": taa, "taa_blanco": taa_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+ALDEANOS = {"kalamu": kalamu, "wino": wino, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -112,7 +112,11 @@
 			"paso_escarcha"
 		],
 		"paso_escarcha": [
-			"ruinas_primer_arbol"
+			"ruinas_primer_arbol",
+			"maandiko"
+		],
+		"maandiko": [
+			"paso_escarcha"
 		]
 	},
 	"misiones": [
@@ -1337,6 +1341,40 @@
 					"ir": {
 						"escena": "paso_escarcha",
 						"buscar": "grupo:puerta_sellada"
+					}
+				}
+			]
+		},
+		{
+			"id": "maandiko",
+			"tipo": "historia",
+			"titulo": "La Ciudad-Archivo",
+			"texto": "Maandiko, la ciudad de los escribas, se ha quedado en blanco: la Tinta Quieta les ha borrado los nombres. Alguien tendrá que saber qué pasó... y dónde está el trozo de mapa que falta.",
+			"aparece": [
+				"puerta_sellada_abierta"
+			],
+			"hecha": [
+				"mapa_norte"
+			],
+			"pasos": [
+				{
+					"texto": "Entra en Maandiko",
+					"hecho": [
+						"maandiko"
+					],
+					"ir": {
+						"escena": "paso_escarcha",
+						"buscar": "puerta:maandiko"
+					}
+				},
+				{
+					"texto": "Busca a alguien que aún recuerde su nombre",
+					"hecho": [
+						"mapa_norte"
+					],
+					"ir": {
+						"escena": "maandiko",
+						"buscar": "aldeano:kalamu"
 					}
 				}
 			]

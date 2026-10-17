@@ -303,3 +303,12 @@ se pasan.
 | Sigilia | Se sigue construyendo en 2D; se pasará a HD-2D con el mismo conversor que el resto |
 | Quién | La constructora hace el conversor de mapas (`Region3D`) y la parte visual; la revisora vuelve a revisar y pulir lo hecho |
 | Modelos 3D de la rama experimental | Se quedan en esa rama como referencia; no se usan |
+
+### Maandiko, parte 1 (2026-10-17, con las ⭐ de Iam: «vale sigue»)
+| Qué | Decisión |
+| --- | --- |
+| Tienda | Un comerciante nuevo, **Wino**, armiño, en el Mercado de Tinta (tinta, plumas y papel). Abrirá cuando la ciudad se deshiele |
+| Tamaño | Mediana (72×56 casillas, como Cuna de Musgo y algo más) |
+| Taa | Vuelve a su taller; más adelante dará algo por cada calle con los faroles encendidos |
+| Kalamu | No está en blanco: repite su nombre en voz alta. Da el trozo del norte del mapa (`mapa_norte`) |
+| Salidas | Tapadas por charcos de Tinta Quieta (3 sigilos de fuego cada uno) |

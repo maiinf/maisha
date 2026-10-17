@@ -327,7 +327,7 @@ PISADA_N = ["#4a5468", "#5e6a80", "#76829a", "#8e9ab0", "#a8b2c4", "#c0c9d8"]
 NIEVE_LILA = ["#4e4870", "#655e8a", "#7e76a2", "#9890ba", "#b0a9cd", "#c8c2de", "#dddaec", "#f0eef8"]
 PISADA_LILA = ["#4c4664", "#605a7a", "#787292", "#908aa8", "#a8a2bc", "#c0bbd0"]
 # los mapas de Sigilia guardan su suelo en arte/mundos/sigilia/suelos
-SIGILIA = {"paso_escarcha"}
+SIGILIA = {"paso_escarcha", "maandiko"}
 
 
 def _nevar(lz, tipos, fina, media, pared, conservar=(), lila=False):
@@ -345,7 +345,7 @@ def _nevar(lz, tipos, fina, media, pared, conservar=(), lila=False):
         guardar = mascara(lz, tipos, conservar, 5, 0.2, semilla=909)
         suelo = suelo * np.clip(1 - guardar * 0.92, 0, 1)
         # las losas de las Ruinas: piedra vieja y clara (no el gris verdoso de las de los caminos)
-        lz.pintar(guardar * (1 - ri), "#a8a596", 0.35)
+        lz.pintar(guardar * (1 - ri), "#7e7296" if lila else "#a8a596", 0.62 if lila else 0.35)
     grande = lz.ruido(40, 3, semilla=901)
     ondas = estirar(lz.ruido(2.5, 2, semilla=902), int(14 * S), vertical=False)
     # (más oscura y azulada que el blanco puro: si no, deslumbra y no se ve nada encima)
@@ -735,8 +735,8 @@ def pintar(nombre, salida=None):
         lz.pintar(postes * (lz.ruido(0.5, 1, semilla=21) > 0.6), "#a8735a", 0.6)
 
     _puente_piedra(lz, tipos, alto, ancho, fina, media)
-    olvidado = nombre in ("sendero_olvidado", "paso_escarcha")
-    ruinas = nombre == "ruinas_primer_arbol"
+    olvidado = nombre in ("sendero_olvidado", "paso_escarcha", "maandiko")
+    ruinas = nombre in ("ruinas_primer_arbol", "maandiko")
     pared = _riscos(lz, tipos, fina, media, cara=2.0 if (canada or paso or olvidado or ruinas) else 1.0)
     if olvidado or ruinas:
         _nevar(lz, tipos, fina, media, pared, conservar=("losas",) if ruinas else (), lila=nombre in SIGILIA)
@@ -752,7 +752,7 @@ def pintar(nombre, salida=None):
 
     # sombra muy suave de las nubes (da volumen al terreno)
     nubes = np.clip((lz.ruido(90, 3, semilla=20) - 0.6) * 3, 0, 1)
-    lz.pintar(nubes, "#1d2e18" if nombre not in ("sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha") else "#1a2236", 0.12)
+    lz.pintar(nubes, "#1d2e18" if nombre not in ("sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko") else "#1a2236", 0.12)
 
     destino = salida or os.path.join(RAIZ, "arte", "mundos", "sigilia" if nombre in SIGILIA else "raiz", "suelos", nombre + "_suelo.png")
     os.makedirs(os.path.dirname(destino), exist_ok=True)

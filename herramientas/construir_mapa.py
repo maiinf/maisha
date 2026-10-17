@@ -2045,6 +2045,104 @@ def crear_paso_escarcha():
     return ["".join(f) for f in m], {}
 
 
+def crear_maandiko():
+    """MAANDIKO, la Ciudad-Archivo (Sigilia, 72x56). Una ciudad amurallada en la nieve: se entra por el sur (del Paso
+    de la Escarcha) por una avenida hasta la PLAZA DEL ÍNDICE (losas «%», redonda, con la FUENTE de tinta helada «ḟ»);
+    al norte, el GRAN ARCHIVO («ḃ»); al oeste, el Barrio de los Copistas (casas de escribas «ḣ» y la casa de Kalamu
+    «ḱ»); al este, el Mercado de Tinta (puestos «ṗ»); junto a la avenida, el taller de Taa («ṫ»). Tres salidas más,
+    tapadas por charcos de TINTA QUIETA («ẋ», los pone la escena): al oeste (Estanterías, «<»), al este (Canal de
+    Tinta, «>») y al noroeste (Observatorio, «^»). Por las calles, faroles («l») y escribas en blanco (la escena)."""
+    ANCHO, ALTO = 72, 56
+    azar = random.Random(721)
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    # la muralla: peña alrededor, un poco irregular
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            borde = min(x, y, ANCHO - 1 - x, ALTO - 1 - y)
+            if borde < 2 + (1 if (x * 7 + y * 3) % 11 == 0 else 0):
+                poner(x, y, "0")
+
+    def camino(puntos, ancho=3, c="#"):
+        for (a, b) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b[0] - a[0]), abs(b[1] - a[1])) * 2) + 1
+            for i in range(pasos + 1):
+                t = i / pasos
+                x = a[0] + (b[0] - a[0]) * t
+                y = a[1] + (b[1] - a[1]) * t
+                for dx in range(ancho):
+                    for dy in range(ancho):
+                        poner(int(x) + dx - ancho // 2, int(y) + dy - ancho // 2, c)
+
+    CX, CY = 36, 27
+    camino([(36, ALTO - 1), (36, CY)], 4)                     # la avenida de la Puerta Sellada
+    camino([(36, CY), (36, 13)], 4)                           # al Gran Archivo
+    camino([(CX, CY), (22, 27), (12, 24), (0, 24)], 3)        # oeste: copistas y Estanterías
+    camino([(CX, CY), (50, 26), (62, 24), (ANCHO - 1, 24)], 3)  # este: mercado y Canal
+    camino([(30, 14), (20, 9), (14, 0)], 3)                   # noroeste: subida al Observatorio
+    camino([(12, 24), (12, 40), (20, 46)], 2)                 # el callejón de los copistas
+    # la Plaza del Índice: losas en círculo
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            if ((x - CX) / 9.0) ** 2 + ((y - CY) / 7.0) ** 2 <= 1.0:
+                poner(x, y, "%")
+    # las puertas: sur (al Paso), oeste, este y noroeste
+    for x in range(34, 39):
+        poner(x, ALTO - 1, "_")
+        poner(x, ALTO - 2, "#")
+    for y in range(23, 26):
+        poner(0, y, "<")
+        poner(ANCHO - 1, y, ">")
+    for x in range(13, 16):
+        poner(x, 0, "^")
+    # los edificios (el punto es el pie del dibujo)
+    poner(36, 12, "ḃ")                                       # el Gran Archivo
+    poner(CX, CY + 1, "ḟ")                                    # la fuente
+    poner(18, 19, "ḱ")                                       # la casa de Kalamu
+    casas = [(8, 19), (26, 19), (7, 33), (18, 34), (26, 40), (6, 46),
+             # a lo largo de la avenida y de las calles: así la ciudad no queda vacía
+             (29, 47), (43, 38), (29, 37), (44, 52), (28, 53), (50, 46), (58, 46), (66, 44), (55, 12), (63, 12),
+             (48, 8), (25, 13), (8, 11), (60, 40), (15, 51), (20, 28)]
+    for (x, y) in casas:
+        if m[y][x] == "." and m[y - 1][x] == "." and m[y][x - 2] != "#" and m[y][x + 2] != "#":
+            poner(x, y, "ḣ")
+    poner(44, 45, "ṫ")                                       # el taller de Taa
+    for (x, y) in ((48, 20), (55, 20), (62, 20), (50, 33), (57, 33), (64, 33)):
+        poner(x, y, "ṗ")
+    for (x, y) in ((33, 32), (39, 32), (33, 22), (39, 22), (24, 25), (48, 25), (36, 40), (36, 48), (20, 10), (62, 26)):
+        poner(x, y, "l")
+    reservados = [(36, 8, 9), (CX, CY, 10), (18, 16, 5), (44, 42, 5)] + [(x, y - 2, 3) for (x, y) in casas]
+
+    def libre(x, y):
+        if m[y][x] != ".":
+            return False
+        for (rx_, ry_, rr) in reservados:
+            if (x - rx_) ** 2 + (y - ry_) ** 2 <= rr * rr:
+                return False
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO and m[y + dy][x + dx] not in ".0":
+                    return False
+        return True
+
+    # pinos nevados y rocas en los rincones de la muralla
+    for _ in range(900):
+        x, y = azar.randrange(2, ANCHO - 2), azar.randrange(2, ALTO - 2)
+        if libre(x, y):
+            junto = any(m[y + d][x] == "0" or m[y][x + d] == "0" for d in (-2, -1, 1, 2))
+            r = azar.random()
+            if r < (0.16 if junto else 0.012):
+                poner(x, y, "ğ")
+            elif r < (0.2 if junto else 0.02):
+                poner(x, y, "ň")
+    poner(38, ALTO - 4, "L")
+    return ["".join(f) for f in m], {}
+
+
 def crear_cueva():
     """La cueva de las setas (56x64, de norte a sur), bajo la casa de Nungu: se baja por la escalera del armario.
     A oscuras: alumbran las SETAS que brillan («ů»). Salas: la de la escalera (arriba), un pasillo con NUBES DE ESPORAS
@@ -2787,7 +2885,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko"}
 
 
 def construir_suelo(nombre):
@@ -2937,7 +3035,7 @@ if __name__ == "__main__":
                         "canada_eco": crear_canada, "lago_espejo": crear_lago,
                         "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta,
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
-                        "paso_escarcha": crear_paso_escarcha}.get(nombre, crear_prados)()
+                        "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

@@ -51,6 +51,7 @@ const OBJ := "res://arte/mundos/raiz/objetos/"
 const KITOVU := "res://arte/mundos/kitovu/"
 const ALDEA := "res://arte/mundos/raiz/aldea/"
 const SENDERO := "res://arte/mundos/raiz/sendero/"
+const MAANDIKO := "res://arte/mundos/sigilia/maandiko/"
 const ECO_PERDIDO := preload("res://scripts/mundo/objetos/eco_perdido.gd")
 const FOGATA := preload("res://scripts/mundo/objetos/fogata.gd")
 
@@ -106,6 +107,13 @@ const FIJOS := {
 	"ĉ": [PASO + "bloque.png", Vector2(22, 8), 14.0, 2],
 	# SIGILIA · del Paso de la Escarcha: las estelas rúnicas (cobijan del viento)
 	"ȩ": ["res://arte/mundos/sigilia/paso/estela.png", Vector2(14, 6), 10.0, 2],
+	# SIGILIA · de Maandiko: el Gran Archivo, las casas, el taller de Taa, los puestos y la fuente
+	"ḃ": [MAANDIKO + "gran_archivo.png", Vector2(150, 18), 0.0, 1, "maandiko_archivo", 64.0],
+	"ḱ": [MAANDIKO + "casa_kalamu.png", Vector2(82, 14), 0.0, 1, "maandiko_casa_kalamu", 44.0],
+	"ḣ": [MAANDIKO + "casa_escriba.png", Vector2(58, 14), 0.0, 2, "maandiko_casa", 36.0],
+	"ṫ": [MAANDIKO + "taller_taa.png", Vector2(64, 14), 0.0, 1, "maandiko_taller", 40.0],
+	"ṗ": [MAANDIKO + "puesto_tinta.png", Vector2(46, 10), 0.0, 2],
+	"ḟ": [MAANDIKO + "fuente.png", Vector2(52, 14), 0.0, 1, "maandiko_fuente", 36.0],
 }
 ## La casa del viajero de cada camino («{»): [dibujo, colisión, charla al usarla, radio, hoguera]
 const CAMPAMENTOS := {
