@@ -96,7 +96,7 @@ class Lienzo:
 
     def px(self, x, y, material, tono=2):
         if 0 <= x < ANCHO and 0 <= y < ALTO:
-            self.m[y][x] = (material, tono)
+            self.m[y][x] = (material, tono) if material is not None else None
 
     def imagen(self):
         img = Image.new("RGBA", (ANCHO, ALTO), (0, 0, 0, 0))
@@ -715,14 +715,18 @@ def respira(l):
 
 
 def parpadea(l):
-    """Los ojos se cierran: de cada ojo queda solo la fila de abajo (las pestañas); lo de encima, del color de la piel."""
+    """Los ojos se cierran: de cada ojo queda solo la fila de abajo (las pestañas); lo de encima, del color de la piel.
+    Si el ojo tiene 1 solo píxel de alto (como en Mbuzi y Korongo), se sustituye por la línea de párpado cerrado."""
     n = _copia(l)
-    for y in range(ALTO - 1):
+    for y in range(ALTO):
         for x in range(ANCHO):
             c = l.m[y][x]
             if c and c[0] in ("ojo", "brillo"):
-                abajo = l.m[y + 1][x]
-                if abajo and abajo[0] in ("ojo", "brillo"):
+                arriba = l.m[y - 1][x] if y > 0 else None
+                abajo = l.m[y + 1][x] if y + 1 < ALTO else None
+                tiene_ojo_arriba = arriba and arriba[0] in ("ojo", "brillo")
+                tiene_ojo_abajo = abajo and abajo[0] in ("ojo", "brillo")
+                if tiene_ojo_abajo:
                     piel = None
                     for yy in range(y - 1, -1, -1):
                         cc = l.m[yy][x]
@@ -730,6 +734,17 @@ def parpadea(l):
                             piel = cc
                             break
                     n.m[y][x] = piel
+                elif not tiene_ojo_arriba:
+                    # Ojo de un píxel de alto (Mbuzi, Korongo): el párpado se cierra
+                    piel = None
+                    for dx, dy in ((0, -1), (0, 1), (-1, 0), (1, 0)):
+                        if 0 <= x + dx < ANCHO and 0 <= y + dy < ALTO:
+                            cc = l.m[y + dy][x + dx]
+                            if cc and cc[0] not in ("ojo", "brillo"):
+                                piel = cc
+                                break
+                    if piel:
+                        n.m[y][x] = (piel[0], max(1, piel[1] - 1))
                 elif c[0] == "brillo":
                     n.m[y][x] = ("ojo", 2)
     return n
@@ -737,11 +752,19 @@ def parpadea(l):
 
 def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
     """Gesto por defecto: levanta lo que lleva en la mano derecha (lo que hay a la derecha de «desde_x» y por debajo de
-    «desde_y», levantando todo el objeto hasta el suelo)."""
+    «desde_y», levantando todo el objeto hasta el suelo de forma continua sin dejarlo flotando)."""
     n = _copia(l)
     for x in range(desde_x, ANCHO):
+        base_suelo = None
+        for yy in range(ALTO - 1, max(-1, ALTO - 5), -1):
+            if l.m[yy][x] is not None:
+                base_suelo = l.m[yy][x]
+                break
         for y in range(desde_y, ALTO):
-            n.m[y][x] = l.m[y + filas][x] if y + filas < ALTO else None
+            if y + filas < ALTO:
+                n.m[y][x] = l.m[y + filas][x]
+            else:
+                n.m[y][x] = base_suelo if base_suelo is not None else None
     return n
 
 
@@ -770,10 +793,12 @@ def _gesto_pino():
 
 
 def _gesto_juncia():
-    """Juncia levanta el cucharón y sale vapor."""
+    """Juncia levanta el cucharón humeante (mango continuo hasta la mano) y sale vapor."""
     l = alza_derecha(juncia(), filas=4)
     for (x, y) in ((20, 7), (21, 6), (19, 5), (20, 4)):
         l.px(x, y, "vapor", 2 + (x + y) % 2)
+    for y in range(26, 31):
+        l.px(20, y, "concha", 2 if y % 3 else 3)
     return l
 
 
@@ -801,7 +826,153 @@ def _gesto_fuko():
     return l
 
 
-GESTOS = {"corteza": _gesto_corteza, "pino": _gesto_pino, "juncia": _gesto_juncia, "tawi": _gesto_tawi, "fuko": _gesto_fuko}
+def _gesto_bibi():
+    """Bibi alza con calma su bastón de musgo soltando polen dorado y se ajusta las gafas."""
+    l = bibi()
+    for y in range(10, 31):
+        l.px(21, y, "concha", 2 if y % 3 else 3)
+    l.px(20, 10, "musgo", 3); l.px(22, 9, "musgo", 3)
+    l.ovalo(20.5, 19, 1.7, 1.7, "tortuga")
+    l.px(21, 7, "flor", 3); l.px(22, 6, "punto"); l.px(20, 5, "flor", 2)
+    l.ovalo(5, 14, 1.6, 2.0, "tortuga")
+    l.px(6, 12, "cana", 3)
+    return l
+
+
+def _gesto_mbuzi():
+    """Mbuzi inclina la cabeza afablemente; su cencerro de latón tintinea con un destello."""
+    l = mbuzi()
+    for y in range(5, 31):
+        l.px(21, y, "concha", 2 if y % 4 else 3)
+    for (x, y) in ((21, 4), (20, 3), (19, 3), (18, 4), (18, 5)):
+        l.px(x, y, "concha", 3 if y == 3 else 2)
+    l.ovalo(19.5, 18.5, 1.7, 2.0, "cabra")
+    l.px(20, 19, "gris_c", 1)
+    l.px(9, 21, "cabra", 2); l.px(9, 22, "cabra", 2)
+    l.px(8, 22, "cabra", 2); l.px(10, 22, "cabra", 2)
+    l.px(8, 21, "laton", 3); l.px(7, 22, "laton", 2); l.px(8, 22, "laton", 3); l.px(6, 21, "brillo")
+    return l
+
+
+def _gesto_msafiri():
+    """Msafiri alza la mano con la brújula dorada para orientarse mientras se apoya en su bastón."""
+    l = msafiri()
+    for y in range(12, 31):
+        l.px(21, y, "concha", 2 if y % 3 else 3)
+    l.px(20, 12, "musgo", 3); l.px(22, 11, "musgo", 3)
+    l.ovalo(20.5, 22, 1.5, 1.5, "piel_p")
+    for y in range(21, 26):
+        l.px(5, y, "escama", 1)
+    l.ovalo(6.5, 19, 1.8, 2.2, "escama")
+    l.ovalo(8.5, 18, 1.4, 1.4, "piel_p")
+    l.px(8, 17, "laton", 3); l.px(9, 17, "laton", 3); l.px(8, 18, "laton", 2); l.px(9, 18, "brillo")
+    return l
+
+
+def _gesto_bata():
+    """Bata se lleva el ala a la visera de la gorra marinera en un saludo de viejo lobo de río."""
+    l = bata()
+    for y in range(3, 31):
+        l.px(20 + (1 if y < 12 else 0), y, "concha", 2 if y % 5 else 3)
+    l.px(19, 21, "cabra", 3); l.px(19, 22, "cabra", 2)
+    for y in range(19, 26):
+        for x in range(4, 8):
+            if l.m[y][x] and l.m[y][x][0] == "cabra":
+                l.m[y][x] = ("pecho_g", 2) if x >= 6 else None
+    l.ovalo(5.2, 12.5, 2.2, 3.8, "cabra")
+    l.px(5, 8, "cabra", 3); l.px(6, 8, "cabra", 3)
+    l.px(12, 5, "maiz", 3)
+    return l
+
+
+def _gesto_korongo():
+    """Korongo eleva la caña de pescar con curvatura flexible; el corcho rojo oscila en el aire."""
+    l = korongo()
+    for y in range(4, 27):
+        l.px(20, y, None); l.px(21, y, None); l.px(22, y, None); l.px(23, y, None)
+    for y in range(20, 31):
+        l.px(20, y, "concha", 2 if y % 3 else 3)
+    l.px(20, 19, "concha", 2); l.px(21, 18, "concha", 3); l.px(21, 17, "concha", 2)
+    l.px(22, 16, "concha", 3); l.px(22, 15, "concha", 2); l.px(23, 14, "concha", 3)
+    l.px(23, 13, "concha", 3); l.px(23, 12, "concha", 2)
+    l.px(22, 13, "cana", 3); l.px(21, 14, "cana", 3); l.px(21, 15, "cana", 3)
+    l.px(21, 16, "seta", 2); l.px(21, 17, "punto")
+    l.ovalo(18.5, 18, 1.4, 1.6, "garza")
+    return l
+
+
+def _gesto_sungura():
+    """Sungura alza con orgullo la mazorca dorada y sus orejas de liebre se enderezan."""
+    l = sungura()
+    l.px(17, 1, "liebre", 3); l.px(16, 2, "liebre", 2); l.px(17, 2, "liebre", 3)
+    for y in range(18, 27):
+        l.px(20, y, None); l.px(21, y, None)
+    for y in range(14, 22):
+        l.px(19, y, "maiz", 3 if y % 2 else 2); l.px(20, y, "maiz", 2 if y % 2 else 1)
+    l.px(19, 13, "musgo", 3); l.px(20, 12, "musgo", 2); l.px(18, 13, "musgo", 2)
+    l.ovalo(17.5, 18, 1.6, 2.0, "liebre")
+    l.ovalo(21.5, 18, 1.4, 1.8, "liebre")
+    return l
+
+
+def _gesto_kasia():
+    """Kasia alza el remo sobre el hombro en un saludo marinero y ondea la cinta roja."""
+    l = kasia()
+    for y in range(3, 29):
+        l.px(19, y, None); l.px(20, y, None)
+    for y in range(1, 26):
+        l.px(19, y, "concha", 2 if y % 4 else 3)
+    l.ovalo(19.5, 2.5, 1.8, 3.2, "concha")
+    l.px(19, 0, "concha", 3)
+    l.px(20, 8, "rojo", 3); l.px(21, 9, "rojo", 2); l.px(22, 9, "rojo", 3); l.px(22, 10, "rojo", 1)
+    l.ovalo(18, 16, 1.8, 2.0, "pelo")
+    return l
+
+
+def _gesto_mdiria():
+    """Mdiria alza la red de pesca sobre el hombro mostrando los flotadores de corcho y guiña un ojo."""
+    l = mdiria()
+    for y in range(15, 25):
+        for x in range(16, 21):
+            if (x + y) % 2 == 0:
+                l.px(x, y, "delantal", 2 if (x * y) % 3 else 3)
+    l.px(17, 14, "seta", 3); l.px(19, 19, "seta", 3); l.px(18, 23, "seta", 2)
+    l.px(22, 10, "metal", 2); l.px(23, 10, "metal", 1)
+    return l
+
+
+def _gesto_taa(blanco=False):
+    """Taa alza la pértiga de farolero y la llamita de brasa resplandece."""
+    l = taa(blanco)
+    if not blanco:
+        l.px(18, 0, "brasa", 3); l.px(17, 1, "brasa", 3); l.px(19, 1, "brasa", 2); l.px(18, 2, "brasa", 2)
+        l.px(16, 1, "brillo")
+    for y in range(3, 31):
+        l.px(19, y, "en_blanco" if blanco else "laton", 2 if y % 6 else 3)
+    return l
+
+
+def _gesto_taa_blanco():
+    return _gesto_taa(True)
+
+
+GESTOS = {
+    "corteza": _gesto_corteza,
+    "pino": _gesto_pino,
+    "juncia": _gesto_juncia,
+    "tawi": _gesto_tawi,
+    "fuko": _gesto_fuko,
+    "bibi": _gesto_bibi,
+    "mbuzi": _gesto_mbuzi,
+    "msafiri": _gesto_msafiri,
+    "bata": _gesto_bata,
+    "korongo": _gesto_korongo,
+    "sungura": _gesto_sungura,
+    "kasia": _gesto_kasia,
+    "mdiria": _gesto_mdiria,
+    "taa": _gesto_taa,
+    "taa_blanco": _gesto_taa_blanco,
+}
 
 
 def fotogramas(nombre):

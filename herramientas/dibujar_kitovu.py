@@ -709,7 +709,7 @@ def shamba():
 
 def shamba_anim(base):
     """Los 4 fotogramas de Mzee Shamba (como los demás aldeanos): quieto, respira (todo baja un píxel menos los pies),
-    parpadea (los ojos se cierran tras las gafas) y su gesto (levanta el bastón de la hoja)."""
+    parpadea (los ojos se cierran tras las gafas) y su gesto (levanta el bastón de la hoja con apoyo continuo)."""
     w, h = base.size
     respira = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     respira.paste(base.crop((0, 0, w, h - 4)), (0, 1))
@@ -724,6 +724,15 @@ def shamba_anim(base):
     vacio = Image.new("RGBA", (8, h), (0, 0, 0, 0))
     gesto.paste(vacio, (0, 0))
     gesto.alpha_composite(lado, (0, -4))
+    # Asegurar que el bastón sigue continuo hasta el suelo (y=36..39) con su contorno y madera sin quedar flotando
+    color_corteza_0 = base.getpixel((3, 35))
+    color_corteza_2 = base.getpixel((5, 35))
+    color_corteza_3 = base.getpixel((4, 35))
+    for y in range(36, 40):
+        gesto.putpixel((3, y), color_corteza_0)
+        gesto.putpixel((4, y), color_corteza_3 if y % 4 else color_corteza_2)
+        gesto.putpixel((5, y), color_corteza_2)
+        gesto.putpixel((6, y), color_corteza_0)
     tira = Image.new("RGBA", (w * 4, h), (0, 0, 0, 0))
     for i, f in enumerate((base, respira, parpadea, gesto)):
         tira.alpha_composite(f, (i * w, 0))

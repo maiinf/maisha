@@ -303,3 +303,12 @@ se pasan.
 | Sigilia | Se sigue construyendo en 2D; se pasará a HD-2D con el mismo conversor que el resto |
 | Quién | La constructora hace el conversor de mapas (`Region3D`) y la parte visual; la revisora vuelve a revisar y pulir lo hecho |
 | Modelos 3D de la rama experimental | Se quedan en esa rama como referencia; no se usan |
+
+### Animaciones y gestos expresivos de aldeanos (`revision/animaciones-aldeanos`, 2026-10-17)
+| Qué | Decisión |
+| --- | --- |
+| Parpadeo universal | En `herramientas/dibujar_aldeanos.py`, `parpadea()` exigía píxeles verticales contiguos (`abajo[0] in ("ojo", "brillo")`), lo que impedía el parpadeo en ojos de 1 píxel de altura (Mbuzi no parpadeaba nunca; Korongo solo alteraba 1 px asimétrico). Se rediseñó para reconocer ojos de 1 px y cerrar el párpado con la línea de pestaña suave, logrando parpadeo natural en todos los aldeanos. |
+| Gestos dedicados con personalidad | Se reemplazó el desplazamiento genérico de `alza_derecha` por gestos artesanales individuales: Bibi eleva su bastón floral soltando motas de polen y se toca las gafas; Mbuzi inclina la cabeza y tintinea su cencerro con destello dorado; Msafiri alza la brújula en su zarpa para orientarse; Bata saluda tocando la visera marinera; Korongo flexiona la caña balanceando el corcho; Sungura ofrece la mazorca dorada con las orejas erguidas; Kasia alza el remo ondeando la cinta roja; Mdiria muestra la red con flotadores; Taa aviva la llamita de su pértiga. |
+| Anclaje continuo al suelo | En los gestos de Shamba (`dibujar_kitovu.py`) y de los aldeanos portadores de bastones/pértigas (`dibujar_aldeanos.py`), se asegura que el fuste de madera y su contorno se extiendan de forma continua hasta el suelo (filas 36-39 en Shamba, 28-31 en los demás), eliminando cualquier píxel huérfano flotante. |
+| Mapas de normales | Sincronizados y regenerados los 32 archivos `_n.png` para iluminación 2.5D y reimportados en Godot. |
+
