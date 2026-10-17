@@ -7,6 +7,7 @@ extends Node2D
 ##   - después las llamas se apagan y suben chispas.
 
 const RADIO := 20.0
+const RADIO_TINTA_VIVA := 30.0     # con la tinta viva de Wino, arde más lejos
 const TRAZA := 0.25
 const DURA := 0.95
 const LLAMA := [Color("fff4c0"), Color("ffc860"), Color("ff8a2a"), Color("c84a14")]
@@ -14,6 +15,7 @@ const LLAMA := [Color("fff4c0"), Color("ffc860"), Color("ff8a2a"), Color("c84a14
 const TRAZOS := [[Vector2(0, 1), Vector2(0, -0.8)], [Vector2(-0.7, -0.1), Vector2(0, 0.35), Vector2(0.7, -0.1)],
 	[Vector2(-0.45, 0.75), Vector2(0.45, 0.75)]]
 
+var radio := RADIO
 var _t := 0.0
 var _ardio := false
 var _chispas: Array[Dictionary] = []
@@ -21,6 +23,7 @@ var _chispas: Array[Dictionary] = []
 
 func _ready() -> void:
 	z_index = 2
+	radio = RADIO_TINTA_VIVA if Estado.tiene("tinta_viva") else RADIO
 	Sonido.efecto("pluma", -4.0, global_position, 0.1)
 
 
@@ -42,21 +45,21 @@ func _arder() -> void:
 	Sonido.efecto("fuego_quema", 0.0, global_position)
 	var centro := global_position
 	for nodo in get_tree().get_nodes_in_group("faroles_runicos"):
-		if (nodo as Node2D).global_position.distance_to(centro) <= RADIO + 10.0:
+		if (nodo as Node2D).global_position.distance_to(centro) <= radio + 10.0:
 			nodo.call("encender_runa")
 	for nodo in get_tree().get_nodes_in_group("encendibles"):
-		if (nodo as Node2D).global_position.distance_to(centro) <= RADIO + 8.0:
+		if (nodo as Node2D).global_position.distance_to(centro) <= radio + 8.0:
 			nodo.call("encender")
 	for nodo in get_tree().get_nodes_in_group("derretibles"):
-		if (nodo as Node2D).global_position.distance_to(centro) <= RADIO + 10.0:
+		if (nodo as Node2D).global_position.distance_to(centro) <= radio + 10.0:
 			nodo.call("derretir")
 	for nodo in get_tree().get_nodes_in_group("daniables"):
 		var o := nodo as Node2D
-		if o and o.global_position.distance_to(centro) <= RADIO + 4.0:
+		if o and o.global_position.distance_to(centro) <= radio + 4.0:
 			o.call("recibir_danio", 1, centro, "fuego")
 	for i in 18:
 		var a := randf() * TAU
-		_chispas.append({"p": Vector2(cos(a), sin(a)) * randf_range(4, RADIO), "v": Vector2(randf_range(-14, 14), randf_range(-50, -20)), "t": 0.0})
+		_chispas.append({"p": Vector2(cos(a), sin(a)) * randf_range(4, radio), "v": Vector2(randf_range(-14, 14), randf_range(-50, -20)), "t": 0.0})
 	preload("res://scripts/mundo/relieve.gd").destello(get_parent(), position, Color("ff9a40"), 0.7, 0.8, 0.35)
 
 
@@ -86,7 +89,7 @@ func _draw() -> void:
 		var f := 1.0 - clampf((_t - TRAZA) / 0.5, 0.0, 1.0)
 		for k in 14:
 			var ang := k * TAU / 14.0
-			var base := Vector2(cos(ang), sin(ang) * 0.6) * RADIO * (0.6 + 0.4 * (1.0 - f))
+			var base := Vector2(cos(ang), sin(ang) * 0.6) * radio * (0.6 + 0.4 * (1.0 - f))
 			var alto := (5.0 + 3.0 * sin(_t * 30.0 + k)) * f
 			for i in int(alto):
 				var t := float(i) / maxf(alto, 1.0)

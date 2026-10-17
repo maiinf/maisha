@@ -112,6 +112,7 @@ func _process(delta: float) -> void:
 		_atacar(maisha, f)
 	# los anillos de quietud se abren
 	for a in _anillos:
+		a["antes"] = a["r"]
 		a["r"] += VEL_ANILLO[f] * delta
 		a["giro"] += a["vel_giro"] * delta
 		if not a["tocado"] and _anillo_alcanza(a, maisha):
@@ -164,7 +165,8 @@ func _anillo_alcanza(a: Dictionary, maisha: Node2D) -> bool:
 	if maisha.call("es_invulnerable"):
 		return false
 	var v := maisha.global_position - centro
-	if absf(v.length() - a["r"]) > 7.0:
+	# (si el aro ha pasado por donde está en este fotograma, aunque vaya a tirones)
+	if v.length() < float(a.get("antes", a["r"])) - 7.0 or v.length() > a["r"] + 7.0:
 		return false
 	var ang := fposmod(v.angle() - a["giro"], TAU)
 	for hueco in [0.0, PI]:

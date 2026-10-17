@@ -119,8 +119,9 @@ static func hablar(desde: Node, id: String) -> void:
 		if not is_instance_valid(dialogo) or not dialogo.is_inside_tree():
 			return
 		await dialogo.decir(nombre(id), _rellenar(conv["despues"]), estilo, retrato)
-	if String(conv.get("abre", "")) == "tienda":
+	if String(conv.get("abre", "")).begins_with("tienda"):
 		var tienda: CanvasLayer = load("res://scripts/interfaz/tienda_tawi.gd").new()
+		tienda.tendero = String(conv["abre"]).trim_prefix("tienda_") if String(conv["abre"]) != "tienda" else "tawi"
 		arbol.current_scene.add_child(tienda)
 		tienda.abrir()
 		await tienda.cerrado

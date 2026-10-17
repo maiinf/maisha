@@ -571,11 +571,13 @@ func _proceso_corazon(delta: float, maisha: Node2D) -> void:
 			maisha.call("recibir_danio", 1, global_position, "fuego")
 	var centro := global_position + Vector2(0, -6)
 	for an in _anillos:
+		var antes: float = an["r"]
 		an["r"] += R.COSECHADORA_ANILLO_VEL * delta
 		an["hueco"] += an["giro"] * delta
 		if maisha and not an["hecho"] and an["r"] > 30.0:
 			var d := maisha.global_position - centro
-			if absf(d.length() - an["r"]) < 7.0:
+			# (alcanza a Maisha si el aro ha pasado por donde está en este fotograma, aunque vaya a tirones)
+			if d.length() > antes - 7.0 and d.length() < an["r"] + 7.0:
 				an["hecho"] = true
 				if not _en_hueco(an, d.angle()):
 					maisha.call("recibir_danio", 1, centro, "fuego")

@@ -354,6 +354,11 @@ func _ready() -> void:
 	var dano_anillo := false
 	for i in 160:
 		await _esperar(0.05)
+		# (los huecos, lejos de Maisha: si no, a veces el azar la deja pasar justo por uno)
+		var hacia: float = (maisha.global_position - cos.global_position).angle()
+		for an in cos._anillos:
+			an["hueco"] = hacia + PI / 2.0
+			an["giro"] = 0.0
 		if maisha.vida < maisha.vida_maxima():
 			dano_anillo = true
 			break

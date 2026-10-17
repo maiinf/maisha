@@ -312,3 +312,4 @@ se pasan.
 | Taa | Vuelve a su taller; más adelante dará algo por cada calle con los faroles encendidos |
 | Kalamu | No está en blanco: repite su nombre en voz alta. Da el trozo del norte del mapa (`mapa_norte`) |
 | Salidas | Tapadas por charcos de Tinta Quieta (3 sigilos de fuego cada uno) |
+| Maandiko, parte 2 | La tienda de Wino (misma tienda que la de Tawi, con otro tendero) abre al deshelar una calle y vende mejoras de Sigilia: pluma (sigilo más barato), tinta viva (sigilo más grande) y raquetas (menos hundimiento). Los faroles de las calles son rúnicos: encenderlos todos da 3 Cristales a través de Taa |

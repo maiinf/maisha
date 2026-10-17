@@ -6,11 +6,15 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ##   - MAUTI, en la plaza, junto a la fuente (si ya es libre: «mauti_libre»); WINO, en el mercado; TAA, en su taller.
 ##   - LOS ESCRIBAS EN BLANCO por las calles (cada uno con su ficha del Índice perdida por los caminos).
 ##   - Tres salidas tapadas por CHARCOS DE TINTA QUIETA (sigilia/charco_tinta.gd): se derriten con el sigilo de fuego.
+##     Al deshelar la primera, Wino abre su tienda («calle_deshelada»).
+##   - LOS FAROLES RÚNICOS de las calles («ƒ»), apagados: con todos encendidos («faroles_maandiko»), Taa lo agradece
+##     (y la tienda da 3 Cristales del Nexo por ello: datos/tienda.json).
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const NEVADA := preload("res://scripts/mundo/olvidado/nevada.gd")
 const VECINO := preload("res://scripts/mundo/sigilia/vecino.gd")
 const CHARCO := preload("res://scripts/mundo/sigilia/charco_tinta.gd")
+const FAROL := preload("res://scripts/mundo/sigilia/farol_runico.gd")
 ## vecino: [id del dibujo, conversación, casilla, marca que hace falta]
 const VECINOS := [
 	["kalamu", "", Vector2i(21, 21), ""],
@@ -34,6 +38,7 @@ func _ready() -> void:
 	add_child(NEVADA.new())
 	_poner_vecinos()
 	_poner_charcos()
+	_poner_faroles()
 	if not Estado.tiene("maandiko_llegada"):
 		_pensar_al_llegar.call_deferred()
 
@@ -55,6 +60,29 @@ func _poner_charcos() -> void:
 		charco.marca = "charco/maandiko/%d,%d" % [c.x, c.y]
 		charco.position = Vector2(c) * 16.0 + Vector2(8, 14)
 		$Entidades.add_child(charco)
+		charco.derretido.connect(func() -> void: Estado.marcar("calle_deshelada"))
+
+
+func _poner_faroles() -> void:
+	var filas: PackedStringArray = $Region._filas
+	for y in filas.size():
+		for x in filas[y].length():
+			if filas[y][x] != "ƒ":
+				continue
+			var f: StaticBody2D = FAROL.new()
+			f.marca = "farol/maandiko/%d,%d" % [x, y]
+			f.position = Vector2(x, y) * 16.0 + Vector2(8, 14)
+			$Entidades.add_child(f)
+			f.encendido_ahora.connect(_al_encender_farol)
+
+
+func _al_encender_farol() -> void:
+	for f in get_tree().get_nodes_in_group("faroles_runicos"):
+		if not f.encendido:
+			return
+	if not Estado.tiene("faroles_maandiko"):
+		Estado.marcar("faroles_maandiko")
+		_hud.mostrar_mensaje("Todos los faroles de Maandiko están encendidos")
 
 
 func _pensar_al_llegar() -> void:

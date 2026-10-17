@@ -106,6 +106,50 @@ func _ready() -> void:
 	var marca := "charco/maandiko/4,25/3"
 	_comprobar(Estado.tiene(marca), "y no vuelve")
 
+	_comprobar(Estado.tiene("calle_deshelada"), "con la primera calle deshelada...")
+
+	print("La tienda de Wino:")
+	var wino := _vecino("wino")
+	m.global_position = (wino as Node2D).global_position + Vector2(-18, 6)
+	wino.interactuar()
+	var tienda: CanvasLayer = null
+	for i in 200:
+		tienda = get_tree().get_first_node_in_group("tienda") as CanvasLayer
+		if tienda and tienda.abierto:
+			break
+		var d := get_tree().get_first_node_in_group("dialogo")
+		if d.hablando:
+			d.pasar()
+		await _esperar(0.08)
+	_comprobar(tienda != null and tienda.abierto and tienda.tendero == "wino", "...Wino abre su tienda")
+	if tienda:
+		var lista: Array = tienda._lista()
+		var ids := lista.map(func(a: Dictionary) -> String: return String(a["id"]))
+		_comprobar(ids.size() == 3 and "pluma_ligera" in ids and "tinta_viva" in ids and "raquetas" in ids, "vende la pluma, la tinta viva y las raquetas (%s)" % [ids])
+		tienda.cerrar()
+		await _esperar(0.6)
+	Estado.marcar("pluma_ligera")
+	m.aliento = m.aliento_maximo()
+	var antes: float = m.aliento
+	await _esperar(0.8)
+	m.sigilo()
+	_comprobar(absf((antes - m.aliento) - 12.0) < 0.5, "con la pluma de Wino, el sigilo gasta menos Aliento (%.1f)" % (antes - m.aliento))
+
+	print("Los faroles y Taa:")
+	var faroles := get_tree().get_nodes_in_group("faroles_runicos")
+	_comprobar(faroles.size() >= 8 and faroles.all(func(f: Node) -> bool: return not f.encendido), "faroles rúnicos apagados por las calles (%d)" % faroles.size())
+	var cristales_antes: int = Tienda.cristales()
+	for f in faroles:
+		f.encender_runa()
+	await _esperar(0.3)
+	_comprobar(Estado.tiene("faroles_maandiko"), "con todos encendidos, la ciudad se ilumina")
+	var taa := _vecino("taa")
+	m.global_position = (taa as Node2D).global_position + Vector2(-18, 6)
+	taa.interactuar()
+	await _leer_dialogo()
+	await _esperar(0.3)
+	_comprobar(Estado.tiene("taa_premio") and Tienda.cristales() == cristales_antes + 3, "Taa lo agradece: +3 Cristales del Nexo")
+
 	print()
 	print("RESULTADO: todo correcto" if _fallos == 0 else "RESULTADO: %d fallos" % _fallos)
 	get_tree().quit(1 if _fallos else 0)

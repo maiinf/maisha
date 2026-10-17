@@ -9,6 +9,7 @@ signal herida(vida: int)
 signal caida
 
 const HUNDIDA_FRENA := 0.55     # en la nieve honda anda a poco más de la mitad
+const HUNDIDA_FRENA_RAQUETAS := 0.8   # (con las raquetas de nieve de Wino, mucho menos)
 const R := preload("res://scripts/combate/reglas_combate.gd")
 const VELOCIDAD := 70.0        # píxeles por segundo
 const CORRER := 1.65           # al correr (C o LB), va así de rápido
@@ -112,7 +113,7 @@ func _physics_process(delta: float) -> void:
 	if pegajoso > 0.0:
 		rapidez *= 0.55
 	if hundida > 0.0:
-		rapidez *= HUNDIDA_FRENA
+		rapidez *= HUNDIDA_FRENA_RAQUETAS if Estado.tiene("raquetas") else HUNDIDA_FRENA
 	if escudo:
 		rapidez *= 0.5
 	velocity = direccion * rapidez + _empuje + viento
@@ -250,9 +251,10 @@ func latido() -> bool:
 ## El sigilo (arte Runa, Sigilia): traza delante una runa de fuego que enciende, derrite y quema.
 ## Hace falta haberlo aprendido (marca «sigilo_fuego», se lo enseña Taa en el Paso de la Escarcha).
 func sigilo() -> bool:
-	if not Estado.tiene("sigilo_fuego") or _espera_sigilo > 0.0 or agotada or aliento < SIGILO_COSTE:
+	var coste := SIGILO_COSTE * (0.6 if Estado.tiene("pluma_ligera") else 1.0)     # (la pluma de Wino: gasta menos)
+	if not Estado.tiene("sigilo_fuego") or _espera_sigilo > 0.0 or agotada or aliento < coste:
 		return false
-	aliento -= SIGILO_COSTE
+	aliento -= coste
 	_espera_sigilo = SIGILO_ESPERA
 	var efecto: Node2D = SIGILO_FUEGO.new()
 	efecto.position = global_position + direccion_mirada() * 18.0 + Vector2(0, -6)

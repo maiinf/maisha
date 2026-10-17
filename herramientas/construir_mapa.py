@@ -2051,7 +2051,7 @@ def crear_maandiko():
     al norte, el GRAN ARCHIVO («ḃ»); al oeste, el Barrio de los Copistas (casas de escribas «ḣ» y la casa de Kalamu
     «ḱ»); al este, el Mercado de Tinta (puestos «ṗ»); junto a la avenida, el taller de Taa («ṫ»). Tres salidas más,
     tapadas por charcos de TINTA QUIETA («ẋ», los pone la escena): al oeste (Estanterías, «<»), al este (Canal de
-    Tinta, «>») y al noroeste (Observatorio, «^»). Por las calles, faroles («l») y escribas en blanco (la escena)."""
+    Tinta, «>») y al noroeste (Observatorio, «^»). Por las calles, FAROLES RÚNICOS apagados («ƒ»: Taa quiere que se enciendan) y escribas en blanco (la escena)."""
     ANCHO, ALTO = 72, 56
     azar = random.Random(721)
     m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
@@ -2114,7 +2114,7 @@ def crear_maandiko():
     for (x, y) in ((48, 20), (55, 20), (62, 20), (50, 33), (57, 33), (64, 33)):
         poner(x, y, "ṗ")
     for (x, y) in ((33, 32), (39, 32), (33, 22), (39, 22), (24, 25), (48, 25), (36, 40), (36, 48), (20, 10), (62, 26)):
-        poner(x, y, "l")
+        poner(x, y, "ƒ")
     reservados = [(36, 8, 9), (CX, CY, 10), (18, 16, 5), (44, 42, 5)] + [(x, y - 2, 3) for (x, y) in casas]
 
     def libre(x, y):

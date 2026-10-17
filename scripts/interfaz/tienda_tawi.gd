@@ -1,5 +1,5 @@
 extends CanvasLayer
-## LA TIENDA DE TAWI: se abre al hablar con Tawi cuando ya tiene su puesto arreglado.
+## LA TIENDA (de Tawi, en Cuna de Musgo; de Wino, en Maandiko): se abre al hablar con el tendero.
 ## A la izquierda, el puesto por dentro con Tawi detrás del mostrador (parpadea, habla, se alegra al vender);
 ## a la derecha, lo que vende, con su precio en Cristales del Nexo.
 ##   ↑ ↓ elegir · Acción comprar · Tab o Esc salir
@@ -8,8 +8,20 @@ extends CanvasLayer
 signal cerrado
 
 const FUENTE := preload("res://fuentes/pixelify_sans.woff")
-const FONDO := preload("res://arte/interfaz/tienda_fondo.png")
-const TAWI := preload("res://arte/interfaz/tienda_tawi.png")
+## Cada tendero: su puesto por dentro, su dibujo grande (4 gestos), su nombre, el rótulo y lo que dice.
+## (Los artículos llevan «tienda»: el id del tendero; sin ella, son de Tawi.)
+const TENDEROS := {
+	"tawi": {"fondo": preload("res://arte/interfaz/tienda_fondo.png"), "dibujo": preload("res://arte/interfaz/tienda_tawi.png"),
+		"nombre": "Tawi", "rotulo": "Puesto de Tawi", "saludos": [
+		"¡Pasa, pasa! Mira qué género. Todo de primera.",
+		"¡Mira quién viene! Hoy tengo cosas que no verás en ningún otro puesto. Bueno, no hay otro puesto.",
+		"¿Cristales del Nexo? ¡Aquí valen su peso en semillas!"]},
+	"wino": {"fondo": preload("res://arte/interfaz/tienda_wino_fondo.png"), "dibujo": preload("res://arte/interfaz/tienda_wino.png"),
+		"nombre": "Wino", "rotulo": "Tintas de Wino", "saludos": [
+		"¡Bienvenida la luz! Mira, mira: la tinta ya se mueve en los botes.",
+		"Plumas, tinta y papel. Y un par de cosas que no salen en ningún libro... todavía.",
+		"¿Cristales del Nexo? Aquí se cambian por algo que escriba solo. Bueno, casi solo."]},
+}
 const ICONOS := preload("res://arte/interfaz/objetos.png")
 const CRISTAL := preload("res://arte/interfaz/cristal.png")
 const PANEL := Color(0.08, 0.07, 0.10, 0.94)
@@ -23,11 +35,6 @@ const AZUL := Color("97c1bf")
 const POS_FONDO := Vector2(24, 34)
 const PIEL := preload("res://scripts/interfaz/piel.gd")
 const LISTA := Rect2(262, 34, 354, 292)
-const SALUDOS := [
-	"¡Pasa, pasa! Mira qué género. Todo de primera.",
-	"¡Mira quién viene! Hoy tengo cosas que no verás en ningún otro puesto. Bueno, no hay otro puesto.",
-	"¿Cristales del Nexo? ¡Aquí valen su peso en semillas!",
-]
 const VENDIDO := ["¡Trato hecho!", "¡Vendido! Un placer hacer negocios.", "¡Gran elección! Tienes buen ojo."]
 const RESPUESTAS := {
 	"caro": "Te faltan cristales. Cumple encargos y vuelve: ¡aquí te espero!",
@@ -35,6 +42,7 @@ const RESPUESTAS := {
 	"nada_que_olvidar": "Tu Árbol de la Vida aún no ha crecido. No hay nada que olvidar.",
 }
 
+@export var tendero := "tawi"
 var abierto := false
 var seleccion := 0
 var _lienzo: Control
@@ -68,7 +76,8 @@ func abrir() -> void:
 	seleccion = 0
 	_alfa = 0.0
 	_abierto_en = Engine.get_process_frames()
-	_decir(SALUDOS[randi() % SALUDOS.size()])
+	var saludos: Array = TENDEROS[tendero]["saludos"]
+	_decir(String(saludos[randi() % saludos.size()]))
 	get_tree().paused = true
 	Sonido.efecto("mochila_abrir")
 	Sonido.musica("tienda", 0.8)
@@ -99,7 +108,7 @@ func _decir(frase: String) -> void:
 
 
 func _lista() -> Array:
-	return Tienda.disponibles()
+	return Tienda.disponibles().filter(func(a: Dictionary) -> bool: return String(a.get("tienda", "tawi")) == tendero)
 
 
 func _process(delta: float) -> void:
@@ -200,10 +209,13 @@ func _dibujar() -> void:
 	var a := _alfa
 	_lienzo.draw_rect(Rect2(0, 0, 640, 360), Color(0.02, 0.02, 0.03, 0.6 * a))
 	var sube := (1.0 - a) * 16.0
-	# ---- el puesto con Tawi
+	# ---- el puesto con su tendero
+	var fondo: Texture2D = TENDEROS[tendero]["fondo"]
+	var dibujo: Texture2D = TENDEROS[tendero]["dibujo"]
+	var nombre: String = TENDEROS[tendero]["nombre"]
 	var pf := POS_FONDO + Vector2(0, sube)
-	_caja(Rect2(pf - Vector2(6, 6), Vector2(FONDO.get_width() + 12, FONDO.get_height() + 12)), a, "cuero")
-	_lienzo.draw_texture(FONDO, pf, Color(1, 1, 1, a))
+	_caja(Rect2(pf - Vector2(6, 6), Vector2(fondo.get_width() + 12, fondo.get_height() + 12)), a, "cuero")
+	_lienzo.draw_texture(fondo, pf, Color(1, 1, 1, a))
 	var f := 0
 	if _contento > 0.0:
 		f = 3
@@ -213,16 +225,16 @@ func _dibujar() -> void:
 		f = 1
 	var respira := roundf(sin(_tiempo * 2.4) * 0.8)
 	var pt := pf + Vector2(62, 54 + respira)
-	_lienzo.draw_texture_rect_region(TAWI, Rect2(pt, Vector2(96, 84)), Rect2(f * 96, 0, 96, 84), Color(1, 1, 1, a))
+	_lienzo.draw_texture_rect_region(dibujo, Rect2(pt, Vector2(96, 84)), Rect2(f * 96, 0, 96, 84), Color(1, 1, 1, a))
 	# el mostrador por delante de Tawi
-	_lienzo.draw_texture_rect_region(FONDO, Rect2(pf + Vector2(0, 124), Vector2(FONDO.get_width(), 44)),
-		Rect2(0, 124, FONDO.get_width(), 44), Color(1, 1, 1, a))
+	_lienzo.draw_texture_rect_region(fondo, Rect2(pf + Vector2(0, 124), Vector2(fondo.get_width(), 44)),
+		Rect2(0, 124, fondo.get_width(), 44), Color(1, 1, 1, a))
 	# ---- lo que dice Tawi (letra a letra)
-	var bocadillo := Rect2(pf.x - 4, pf.y + FONDO.get_height() + 14, FONDO.get_width() + 8, 100)
+	var bocadillo := Rect2(pf.x - 4, pf.y + fondo.get_height() + 14, fondo.get_width() + 8, 100)
 	_caja(bocadillo, a)
-	var etiqueta := Rect2(bocadillo.position + Vector2(10, -10), Vector2(_ancho("Tawi") + 16, 18))
+	var etiqueta := Rect2(bocadillo.position + Vector2(10, -10), Vector2(_ancho(nombre) + 16, 18))
 	_caja(etiqueta, a, "cuero")
-	_texto("Tawi", etiqueta.position + Vector2(8, 14), Color(PIEL.CREMA, a), 16, false)
+	_texto(nombre, etiqueta.position + Vector2(8, 14), Color(PIEL.CREMA, a), 16, false)
 	var visible_txt := _frase.substr(0, int(_letras))
 	var y := bocadillo.position.y + 38
 	for linea in _lineas(visible_txt, bocadillo.size.x - 20):
@@ -231,7 +243,7 @@ func _dibujar() -> void:
 	# ---- la lista de lo que vende
 	var lista_r := Rect2(LISTA.position + Vector2(0, sube), LISTA.size)
 	_caja(lista_r, a)
-	_texto("Puesto de Tawi", lista_r.position + Vector2(12, 22), Color(AMBAR, a))
+	_texto(String(TENDEROS[tendero]["rotulo"]), lista_r.position + Vector2(12, 22), Color(AMBAR, a))
 	var cr := "%d" % Tienda.cristales()
 	var xc := lista_r.end.x - 16 - _ancho(cr)
 	_lienzo.draw_texture(CRISTAL, Vector2(xc - 14, lista_r.position.y + 10), Color(1, 1, 1, a))

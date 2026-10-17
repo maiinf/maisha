@@ -690,7 +690,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_guardado.gd` empieza una partida desde el inicio (el diario se abre y la introducción se escribe en él), guarda, pausa, vuelve al inicio, continúa donde lo dejó, comprueba que en plena pelea se guarda el último sitio seguro, que «Nueva partida» pregunta antes de borrar y que un archivo estropeado no rompe nada.
 - `pruebas/prueba_encargos.gd` recoge setas y mineral, comprueba que el cetro rebota en la roca y la semilla la rompe, entrega los encargos, ve levantarse las casas, entra en ellas y prueba las recompensas (haces del vigía y cetro templado).
 - `pruebas/prueba_hd2d.gd` enciende el HD-2D con H, comprueba que cada dibujo tiene su gemelo 3D, que la interfaz sigue, que Maisha anda igual y su gemelo la sigue, que las peñas se levantan, que se recuerda al cambiar de escena y que al apagarlo vuelve el 2D.
-- `pruebas/prueba_maandiko.gd` llega a Maandiko desde el Paso, comprueba la música, la plaza, el Archivo, las casas, los puestos y el taller, los vecinos (Kalamu, Mauti, Wino, Taa y los escribas en blanco), que Kalamu da el trozo del norte del mapa y cumple la misión, y que los charcos de Tinta Quieta de las salidas se derriten con tres sigilos.
+- `pruebas/prueba_maandiko.gd` llega a Maandiko desde el Paso, comprueba la música, la plaza, el Archivo, las casas, los puestos y el taller, los vecinos (Kalamu, Mauti, Wino, Taa y los escribas en blanco), que Kalamu da el trozo del norte del mapa y cumple la misión, que los charcos de Tinta Quieta de las salidas se derriten con tres sigilos, que entonces Wino abre su tienda (pluma, tinta viva y raquetas; la pluma abarata el sigilo) y que con todos los faroles encendidos Taa da 3 Cristales.
 - `pruebas/prueba_paso_escarcha.gd` comprueba el paso del norte de las Ruinas (cerrado hasta curar al árbol), llega al Paso de la Escarcha, prueba la nieve honda (frena, no deja correr, deja surcos que ya no frenan), la ventisca (empuja en medio del valle, no detrás de una estela, y se apaga al pasar la racha), a Taa en blanco, la ficha en la nieve honda, que al dársela recupera su nombre y enseña el sigilo de fuego, el sigilo (sin aprender no sale; gasta Aliento; espera) que enciende un farol, el abrigo del farol (ni viento ni nieve honda), que revivir lo quita todo, las páginas sueltas (atacan y el fuego las quema; cuentan en el Bestiario), la Puerta Sellada (no se rodea; tres sigilos la abren), que la misión se cumple y que la puerta a Maandiko aún no deja pasar.
 - `pruebas/prueba_sendero.gd` va de los Prados al Sendero del Puente y a la aldea y vuelta, prueba los pretiles y el vado, el eco perdido (con su ilustración), el encargo de Msafiri y el cuaderno de ecos.
 - `pruebas/prueba_pasarelas.gd` va de la aldea a Las Pasarelas y a la ciénaga y vuelta, prueba el agua y las tablas, el tramo roto, la rana de piedra (aviso, salto, onda, atontada), el encargo de Korongo (que arregla la pasarela) y el segundo eco.
@@ -905,7 +905,14 @@ Escena `escenas/mundo/maandiko.tscn` (`scripts/mundo/maandiko.gd`), detrás de l
 | Misión | «La Ciudad-Archivo»: entrar y encontrar a alguien que recuerde su nombre |
 | Prueba | `pruebas/prueba_maandiko.gd` |
 
-Falta: la tienda de Wino, encender los faroles de las calles con Taa, los caminos (Estanterías, Canal, Observatorio) con las fichas del Índice y la Sección Prohibida.
+### Maandiko (parte 2: la tienda de Wino y los faroles de Taa)
+
+| Qué | Cómo |
+| --- | --- |
+| La tienda de Wino | Abre al deshelar la primera calle (`calle_deshelada`). Es la misma tienda que la de Tawi (`tienda_tawi.gd`, con `tendero = "wino"`; los artículos llevan `"tienda": "wino"`), con su puesto por dentro y Wino grande con 4 gestos (`herramientas/pintar_tienda_wino.py`: `tienda_wino_fondo.png` y `tienda_wino.png`; captura en `documentacion/tienda_wino.png`). Vende la **Pluma de garza nival** (el sigilo gasta 12 de Aliento en vez de 20), la **Tinta viva** (la runa arde a 30 px en vez de 20) y las **Raquetas de nieve** (en la nieve honda se anda al 80 % en vez del 55 %) |
+| Los faroles de Taa | Los faroles de las calles son faroles rúnicos apagados (`ƒ`, 10). Con todos encendidos (`faroles_maandiko`), Taa lo agradece y se ganan **3 Cristales del Nexo** |
+
+Falta: los caminos (Estanterías, Canal, Observatorio) con las fichas del Índice y la Sección Prohibida.
 
 ## Las construcciones, al nivel de la casa del castor
 

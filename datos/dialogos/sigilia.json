@@ -177,6 +177,32 @@
 		"nombre": "Wino",
 		"conversaciones": [
 			{
+				"si": [
+					"calle_deshelada"
+				],
+				"no": [
+					"wino_abierto"
+				],
+				"lineas": [
+					"¡Lo has visto! ¡Se ha deshelado una calle entera! La tinta de mis botes ha empezado a moverse sola.",
+					"Eso se celebra: ¡el puesto de Wino abre hoy! Pasa, pasa."
+				],
+				"marca": [
+					"wino_abierto",
+					"wino_conocido"
+				],
+				"abre": "tienda_wino"
+			},
+			{
+				"si": [
+					"calle_deshelada"
+				],
+				"lineas": [
+					"¿Otra vez por aquí? ¡Así me gusta! Mira lo que tengo."
+				],
+				"abre": "tienda_wino"
+			},
+			{
 				"no": [
 					"wino_conocido"
 				],
@@ -236,9 +262,34 @@
 		"nombre": "Taa",
 		"conversaciones": [
 			{
+				"si": [
+					"faroles_maandiko"
+				],
+				"no": [
+					"taa_premio"
+				],
 				"lineas": [
-					"¡Ya estoy en casa! Mi taller está algo frío, pero los faroles aguantan.",
-					"Si ves calles a oscuras, enciende sus faroles. La luz ayuda a que la gente no se olvide del todo de dónde vive."
+					"¡Míralos! Todos los faroles de la ciudad encendidos, como antes de la tinta.",
+					"Esta noche alguien se va a asomar a la ventana y se va a acordar de su calle. Ya verás.",
+					"Toma, ve a ver a Wino: le he dicho que te debo una. Y yo pago mis deudas en cristales."
+				],
+				"marca": [
+					"taa_premio"
+				],
+				"aviso": "Los faroles de Maandiko: +3 Cristales del Nexo"
+			},
+			{
+				"si": [
+					"taa_premio"
+				],
+				"lineas": [
+					"Un farol, un trazo. Y la ciudad entera, encendida. ¡Qué gusto!"
+				]
+			},
+			{
+				"lineas": [
+					"¡Ya estoy en casa! Mi taller está algo frío, pero mis manos aún saben hacer luz.",
+					"Los faroles de las calles están todos apagados. Si los enciendes con tu runa, la gente se acordará mejor de dónde vive."
 				]
 			}
 		]

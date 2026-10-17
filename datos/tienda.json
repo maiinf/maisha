@@ -3,7 +3,7 @@
 		"LA TIENDA DE TAWI y los CRISTALES DEL NEXO (se leen solos; no hay que tocar código).",
 		"Los Cristales se ganan al cumplir misiones (según su tipo, o «cristales» en la propia misión) y con algunas marcas.",
 		"No se guardan aparte: se cuentan a partir de las marcas y de las misiones cumplidas. Lo gastado sí se guarda.",
-		"articulos: id, nombre, tipo (prenda | objeto | marca | olvido), precio, texto, icono (en arte/interfaz/objetos.png).",
+		"articulos: id, nombre, tipo (prenda | objeto | marca | olvido), precio, texto, icono (en arte/interfaz/objetos.png), tienda (tawi o wino; sin ella, tawi).",
 		"  requiere: marca que hace falta para que salga en la tienda · repetible: se puede comprar más de una vez",
 		"  objeto: «da» = objetos que recibe Maisha · marca: «marca» = la marca que pone · olvido: «sube» = cuánto sube el precio cada vez"
 	],
@@ -15,7 +15,8 @@
 		{"prefijo": "zona/campo_segado/3", "cristales": 5, "motivo": "La Cosechadora"},
 		{"prefijo": "secreto/", "cristales": 1, "motivo": "Secreto"},
 		{"prefijo": "rango/plata/", "cristales": 2, "motivo": "Rango de plata"},
-		{"prefijo": "rango/oro/", "cristales": 4, "motivo": "Rango de oro"}
+		{"prefijo": "rango/oro/", "cristales": 4, "motivo": "Rango de oro"},
+		{"prefijo": "faroles_maandiko", "cristales": 3, "motivo": "Los faroles de Maandiko"}
 	],
 	"articulos": [
 		{"id": "ingredientes", "nombre": "Bayas y junco", "tipo": "objeto", "precio": 2, "icono": 17, "repetible": true,
@@ -32,6 +33,15 @@
 			"texto": "Musgo vivo cosido con hilo de raíz, con un broche de hoja. Póntela desde la mochila."},
 		{"id": "semilla_olvido", "nombre": "Semilla del olvido", "tipo": "olvido", "precio": 4, "sube": 2, "icono": 15,
 			"repetible": true, "requiere": "bibi_meditar",
-			"texto": "Al plantarla, el Árbol de la Vida olvida tus Artes y te devuelve toda la Esencia, para repartirla de nuevo. Cada una cuesta 2 más que la anterior."}
+			"texto": "Al plantarla, el Árbol de la Vida olvida tus Artes y te devuelve toda la Esencia, para repartirla de nuevo. Cada una cuesta 2 más que la anterior."},
+		{"id": "pluma_ligera", "tienda": "wino", "nombre": "Pluma de garza nival", "tipo": "marca", "precio": 4, "icono": 27,
+			"marca": "pluma_ligera", "requiere": "calle_deshelada",
+			"texto": "Una pluma blanca y ligerísima. Con ella el sigilo se traza casi sin esfuerzo: gasta menos Aliento."},
+		{"id": "tinta_viva", "tienda": "wino", "nombre": "Tinta viva", "tipo": "marca", "precio": 6, "icono": 27,
+			"marca": "tinta_viva", "requiere": "calle_deshelada",
+			"texto": "Un frasquito de tinta que nunca se queda quieta. Mojada en ella, tu runa de fuego arde más lejos."},
+		{"id": "raquetas", "tienda": "wino", "nombre": "Raquetas de nieve", "tipo": "marca", "precio": 5, "icono": 7,
+			"marca": "raquetas", "requiere": "calle_deshelada",
+			"texto": "Dos aros de madera con cuerda trenzada, para atar a los pies. En la nieve honda te hundes mucho menos."}
 	]
 }
