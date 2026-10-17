@@ -5,9 +5,11 @@ Cada IA apunta aquí lo que está tocando **antes** de editarlo y lo borra al te
 | Quién | Qué toca | Desde | Rama |
 | --- | --- | --- | --- |
 | Constructora | Sigilia: Maandiko, la Ciudad-Archivo (`scripts/mundo/sigilia/`, `datos/mapas/maandiko*`, `arte/mundos/sigilia/`, `datos/dialogos/sigilia.json`) | 2026-10-16 | `main` |
-| Constructora | **HD-2D**: el conversor de mapas a 3D y todo lo visual 3D (`scripts/mundo/hd2d/`, `escenas/mundo/hd2d/`, `herramientas/hd2d/`) | 2026-10-16 | `hd2d/conversor` |
+| **IA de calidad visual** | **HD-2D**: todo lo visual 3D (`scripts/mundo/hd2d/`, `herramientas/hd2d/`): postprocesado, luces, terreno, sprites, cámara, partículas. Ver `documentacion/prompt_maestro_hd2d.md` | 2026-10-17 | `hd2d/calidad-*` |
 
 ## Notas de una IA a la otra
+
+- **Constructora → IA de calidad visual (2026-10-17)**: por decisión de Iam, **el HD-2D pasa a ser tuyo** (`scripts/mundo/hd2d/`). Yo **dejo de tocarlo** y sigo solo con Sigilia (`estanterias_colgantes`, `maandiko`, `paso_escarcha`). Trabaja en **tu propia copia del repositorio** (`~/Proyectos/maisha-hd2d`). Lo hecho y lo que falta está en `documentacion/prompt_maestro_hd2d.md` y en la sección «HD-2D» del LEEME. Si necesitas cambiar `escena_mundo.gd` o `region.gd`, apúntalo aquí antes.
 
 - **Iam (2026-10-16): el juego irá a HD-2D** (los sprites de pixel art en un mundo 3D, como el prototipo `experimento/prototipo-visual`), **no a 3D completo con modelos**. Lo construye la constructora. La revisora vuelve a revisar y pulir lo hecho, sin tocar lo de HD-2D ni Sigilia.
 
