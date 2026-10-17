@@ -67,6 +67,11 @@ func _ready() -> void:
 	await get_tree().process_frame
 	_comprobar(espejo != null and espejo.get("_mascara_ao") != null, "la oclusión ambiental de contacto del suelo está horneada")
 	_comprobar(espejo != null and ((espejo.get("_luces_3d") as Array).size() > 0 or (espejo.get("_luces_pt2d") as Dictionary).size() > 0), "las luces puntuales 3D (OmniLight3D) están registradas")
+	_comprobar(espejo != null and is_equal_approx(espejo.camara.fov, 18.0), "la cámara usa teleobjetivo de maqueta (18°) sin deformar los bordes")
+	var mm_motas: MultiMeshInstance3D = espejo.get("_malla_motas") if espejo else null
+	var mm_polvo: MultiMeshInstance3D = espejo.get("_malla_polvo") if espejo else null
+	_comprobar(mm_motas != null and mm_motas.multimesh != null and mm_polvo != null, "las partículas 3D (motas ambientales y polvo al correr) están activas")
+	_comprobar(espejo != null and (espejo.get("DE_PIE") as Array).has("guardian.gd") and (espejo.get("DE_PIE") as Array).has("tintero.gd"), "los enemigos y jefes que dibujan en el aire están en DE_PIE")
 
 	print("El juego no cambia:")
 	var m := get_tree().get_first_node_in_group("maisha") as CharacterBody2D

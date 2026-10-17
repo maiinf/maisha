@@ -320,3 +320,14 @@ se pasan.
 | La mecánica | Escaleras rodantes sobre los huecos entre pisos: se cruzan solo tendidas y, si se van con Maisha encima, cae un piso y pierde una hoja |
 | Enemigo nuevo | El Tintero rabioso, el «cazador» de Sigilia (embiste en línea recta y deja manchas que frenan) |
 | Las fichas | Cada ficha cura a un escriba con nombre propio de Maandiko (`sigilia/escriba.gd`). La segunda es la de Daftari, encuadernador |
+
+### Acabado HD-2D de alta calidad (2026-10-17)
+| Qué | Decisión |
+| --- | --- |
+| Postprocesado (`hd2d/postproceso`) | Sombreador propio en GL Compatibility con *tilt-shift* dinámico centrado en Maisha, *bloom* cálido que descarta blancos de baja saturación para no quemar la nieve, etalonaje por hora/bioma y selector `Calidad HD-2D: alta / media / baja` en el menú de pausa |
+| Iluminación 3D y relieve (`hd2d/luces`) | Luces `OmniLight3D` nocturnas reutilizando `Relieve.LUCES` + edificios de Maandiko + espejo automático de `PointLight2D`. Sombreador de gemelos con mapas de normales (`*_n.png`), sombras suaves y oclusión ambiental de contacto horneada en el suelo (`_mascara_ao`) |
+| Terreno y agua (`hd2d/terreno`) | Ondulaciones suaves en `vertex()`, peñas con bisel superior y oclusión en la base, espuma animada en orillas y desvanecimiento perimetral en los bordes del mapa |
+| Perspectiva (`hd2d/sprites`) | Teleobjetivo de maqueta (`CAMARA_FOV = 18.0`, `CAMARA_DISTANCIA = 50.6`) para eliminar la inclinación trapezoidal de las casas en los bordes de la pantalla manteniendo el mismo encuadre; optimización de gemelos estáticos (×3 más rápido en mapas grandes) |
+| Cámara, vida y remates (`hd2d/camara`, `hd2d/vida`, `hd2d/remates`) | Activación síncrona de HD-2D al entrar en escena, anticipación al correr, encuadre cercano en diálogos, mecido de flora con el viento y al paso de Maisha, partículas 3D (`MultiMeshInstance3D`) por bioma y ventanitas `CANAL_PIE` para enemigos y jefes |
+| Prueba piloto de Blender (`hd2d/blender-piloto`) | Se modeló `casa_seta_piloto.glb` en Blender 4.5 con textura pixel art de la paleta de Raíz (`NEAREST`) y se comparó dentro de `cuna_de_musgo` de día y de noche (`06_blender_piloto_antes_despues.png`). Se descarta sustituir los edificios pintados por mallas 3D porque el sprite 2D con mapa de normales conserva mucha más riqueza artesanal (lunares, vigía, farol, musgo) |
+
