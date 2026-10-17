@@ -338,3 +338,11 @@ se pasan.
 | Catálogo de Modelos | 11 modelos de arquitectura integrados en `MODELOS_BLENDER` dentro de `espejo_hd2d.gd` (Casa Pino, Forja Corteza, Gran Árbol, Molino Shamba, Farol Madera, Cocina Juncia, Puesto Tawi, Gran Archivo, Taller Taa, Casas de Escribas). Las ruinas conservan su extrusión dilapidada y, al reconstruirse en la historia, se sustituyen por la malla 3D sólida. Documentado en `documentacion/modelos_3d.md` para la bóveda de Obsidian. |
 | Coordinación con Claude | Establecido canal continuo en `documentacion/COORDINACION.md` donde Claude construye mapas y misiones 2D en `/Users/iinfafer/Proyectos/maisha` y Gemini modela e integra el soporte 3D en `/Users/iinfafer/Proyectos/maisha-revision` sin pisarse ramas ni archivos. |
 
+### Arquitectura 3D sólida de 360° en El Kitovu, ruinas y erradicación de artefactos de agua (2026-10-18, objetivo nocturno)
+| Qué | Decisión |
+| --- | --- |
+| Casas 3D sin fondo plano | Resuelto el problema de ver casas sin fondo al caminar por detrás: `casa_granja.glb` (casona de Mzee Shamba completa en 360°, zócalo perimetral, troncos macizos, tejado a dos aguas con aleros, porche frontal, buhardilla encendida, chimenea y rueda hidráulica con canaleta; pared trasera sólida con ventana). Mapeados también `pozo_antiguo.glb`, `espantapajaros.glb`, `carro_madera.glb` y `valla_madera.glb` para El Kitovu. |
+| Ruinas 3D tridimensionales | `casa_pino_ruina.glb` y `forja_ruina.glb` sustituyen a los edificios destruidos en Cuna de Musgo antes de ser reconstruidos (`frame == 0`), de modo que caminar entre ruinas muestra escombros tridimensionales, vigas astilladas y muros caídos reales por los cuatro costados. Al reconstruirse, se sustituyen dinámicamente por la versión intacta. |
+| Erradicación de bugs de agua | Erradicado el vacío negro y los parpadeos en acequias y estanques: talud natural de $0.28\text{ m}$ en `vertex()`, solape continuo entre tierra (`discard > 0.62`) y agua (`discard <= 0.46`), integración de color de lecho de arena/guijarros cálidos y eliminación del oscurecimiento perimetral agresivo en orillas y bordes de mapa. |
+
+

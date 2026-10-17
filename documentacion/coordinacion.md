@@ -30,9 +30,16 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
 *Gemini actualiza esta sección tras hornear modelos 3D o actualizar el motor HD-2D:*
 
 - [x] **Pipeline Blender 4.5 Activo**: Generador procedural en [`herramientas/blender/generador_3d_maisha.py`](file:///Users/iinfafer/Proyectos/maisha-revision/herramientas/blender/generador_3d_maisha.py).
-- [x] **Modelos 3D de Entorno Listos en `.glb`**:
-  - `modelos/entorno/casa_pino.glb` (Casa-seta de Pino)
-  - `modelos/entorno/forja_corteza.glb` (Taller de herrería de Corteza)
+- [x] **Modelos 3D de Entorno Listos en `.glb` (19 Estructuras Sólidas 360°)**:
+  - `modelos/entorno/casa_granja.glb` (Casona de troncos completa 360° de Mzee Shamba, con chimenea, porche, buhardilla y molino)
+  - `modelos/entorno/pozo_antiguo.glb` (Pozo de piedra con agua, torno, cubo y tejadillo de El Kitovu)
+  - `modelos/entorno/espantapajaros.glb` (Espantapájaros de la huerta de zanahorias)
+  - `modelos/entorno/carro_madera.glb` (Carro de madera de labranza con ruedas de radios)
+  - `modelos/entorno/valla_madera.glb` (Valla de estacas tridimensional para huertos y caminos)
+  - `modelos/entorno/casa_pino.glb` (Casa-seta de Pino reconstruida)
+  - `modelos/entorno/casa_pino_ruina.glb` (Casa-seta de Pino en ruinas para el inicio del juego)
+  - `modelos/entorno/forja_corteza.glb` (Taller de herrería de Corteza reconstruido)
+  - `modelos/entorno/forja_ruina.glb` (Taller de Corteza derruido con yunque volcado y escombros)
   - `modelos/entorno/gran_arbol.glb` (Gran Árbol de Cuna de Musgo)
   - `modelos/entorno/molino_shamba.glb` (Molino hidráulico de Mzee Shamba)
   - `modelos/entorno/puente_madera.glb` (Puente de tablones)
@@ -41,6 +48,12 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
   - `modelos/entorno/puesto_tawi.glb` (Puesto de mercado de Tawi)
   - `modelos/entorno/gran_archivo.glb` (Gran Archivo monumental de Maandiko / Sigilia)
   - `modelos/entorno/taller_taa.glb` (Taller de alquimia y tinta de Taa / Sigilia)
-  - `modelos/entorno/casa_escriba.glb` (Casas tradicionales de Sigilia con tejas)
+  - `modelos/entorno/casa_escriba.glb` (Casas tradicionales de Sigilia con tejas cobrizas)
+  - `modelos/entorno/fuente_plaza.glb` (Fuente central monumental octogonal de mármol en Maandiko)
+- [x] **Agua HD-2D Cristalina y Erradicación de Artefactos Negros**:
+  - Implementado talud natural de $0.28\text{ m}$ en `vertex()` conectando suelo con lecho de agua.
+  - Solape continuo $[0.46, 0.62]$ entre suelo y agua eliminando cualquier agujero de vacío o parpadeo.
+  - Color de lecho acuático de arena/grava cálida integrado.
+  - Desvanecimiento perimetral calibrado para no oscurecer acequias ni estanques en los márgenes del mapa.
 - [x] **Volumen 3D y Relieves**: 98 mapas de normales importados, extrusión volumétrica y balance lumínico nocturno completado.
-- [x] **Sincronización remota**: Ramas `origin/hd2d/blender-piloto` y `origin/hd2d/calidad-blender` actualizadas y testeadas con 0 errores en `prueba_hd2d`.
+- [x] **Sincronización remota**: Ramas `origin/hd2d/blender-piloto` y `origin/hd2d/calidad-blender` actualizadas y testeadas con 0 errores en `prueba_hd2d` y `prueba_kitovu`.

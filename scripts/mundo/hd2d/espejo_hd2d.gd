@@ -73,6 +73,8 @@ void vertex() {
 		float tierra = 1.0 - smoothstep(0.08, 0.42, ag);
 		float h = (sin(wp.x * 0.24 + wp.z * 0.17) * cos(wp.z * 0.21 - wp.x * 0.14) * 0.075
 			+ sin(wp.x * 0.51 - wp.z * 0.43) * 0.025) * tierra;
+		// Talud natural: el terreno desciende suavemente hacia el lecho de agua para eliminar huecos
+		h -= smoothstep(0.20, 0.56, ag) * 0.28;
 		VERTEX.y += h;
 		float dhx = cos(wp.x * 0.24 + wp.z * 0.17) * 0.018 * tierra;
 		float dhz = -sin(wp.z * 0.21 - wp.x * 0.14) * 0.018 * tierra;
@@ -84,25 +86,29 @@ void fragment() {
 	vec2 px = origen + UV * lado;
 	vec2 uv_mapa = px / 16.0 / casillas;
 	float f_calma = 1.0 - calma_lago * 0.85;
-	// (la máscara, suavizada y con un temblor, para que la orilla sea curva como la pintada y no en escalones)
-	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.055 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.045) * f_calma;
+	// (la máscara, suavizada y con un temblor suave para ondas curvas sin saltos de escalon)
+	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.04 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.03) * f_calma;
 	float es_agua = texture(agua, uv_mapa).r + temblor;
-	if (hundido < 0.5 && es_agua > 0.5) { discard; }
-	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
+	// Solape continuo: el suelo baja por el talud y se extiende bajo el agua (descarte en 0.62);
+	// la lámina de agua comienza en 0.46 eliminando cualquier rendija visible de vacío negro
+	if (hundido < 0.5 && es_agua > 0.62) { discard; }
+	if (hundido > 0.5 && es_agua <= 0.46) { discard; }
 	vec3 c = texture(capa, UV).rgb;
 	if (hundido > 0.5) {
 		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4 * f_calma) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0 * f_calma);
 		float onda2 = sin(px.x * 0.19 - px.y * 0.15 - TIME * 1.9 * f_calma) * 0.5 + 0.5;
-		float profundidad = smoothstep(0.5, 0.88, es_agua);
+		float profundidad = smoothstep(0.48, 0.88, es_agua);
+		// Fondo de lecho acuático (arena/guijarros cálidos) integrado para transparencia real
+		vec3 color_lecho = mix(vec3(0.22, 0.28, 0.24), c, 0.65);
+		c = mix(color_lecho, c, 0.60 + profundidad * 0.40);
 		c = mix(c, vec3(0.06, 0.15, 0.25), 0.18 + profundidad * 0.14);
 		c = mix(c, vec3(0.18, 0.34, 0.52), calma_lago * 0.32 * profundidad);
 		c += vec3(0.06, 0.09, 0.11) * smoothstep(0.68, 0.98, onda1) * f_calma;
 		c += vec3(0.03, 0.05, 0.07) * smoothstep(0.76, 0.96, onda2) * profundidad * f_calma;
-		// Sombra del escalón de la orilla + espuma blanca animada junto al borde
-		c *= mix(0.56, 1.0, smoothstep(0.5, 0.70, es_agua));
+		// Espuma blanca animada suave junto al borde, sin oscurecimiento perimetral agresivo
 		float pulso_orilla = sin(px.x * 0.34 + px.y * 0.29 - TIME * 2.3 * f_calma) * 0.5 + 0.5;
-		float franja_espuma = smoothstep(0.62, 0.50, es_agua) * smoothstep(0.49, 0.515, es_agua);
-		float espuma = smoothstep(0.32, 0.65, franja_espuma + pulso_orilla * 0.26) * smoothstep(0.63, 0.50, es_agua);
+		float franja_espuma = smoothstep(0.62, 0.48, es_agua) * smoothstep(0.46, 0.51, es_agua);
+		float espuma = smoothstep(0.32, 0.65, franja_espuma + pulso_orilla * 0.26) * smoothstep(0.63, 0.48, es_agua);
 		c = mix(c, vec3(0.84, 0.91, 0.95), espuma * 0.58);
 		ROUGHNESS = mix(0.34, 0.08, calma_lago);
 		SPECULAR = mix(0.32, 0.65, calma_lago);
@@ -118,10 +124,11 @@ void fragment() {
 		float n_nube = sin(p_nube.x + sin(p_nube.y * 1.3)) * cos(p_nube.y * 0.9 - sin(p_nube.x * 0.8)) * 0.5 + 0.5;
 		c *= 1.0 - smoothstep(0.54, 0.88, n_nube) * fuerza_nubes;
 	}
-	// Desvanecimiento suave en los bordes del mapa para evitar cualquier corte brusco
+	// Desvanecimiento suave en los bordes del mapa (el agua nunca se ensombrece bruscamente)
 	vec2 d_borde = min(uv_mapa * casillas, (vec2(1.0) - uv_mapa) * casillas);
 	float f_borde = clamp(min(d_borde.x, d_borde.y) / 2.2, 0.0, 1.0);
-	c *= mix(0.28, 1.0, smoothstep(0.0, 1.0, f_borde));
+	float min_borde = hundido > 0.5 ? 0.88 : 0.28;
+	c *= mix(min_borde, 1.0, smoothstep(0.0, 1.0, f_borde));
 	ALBEDO = c;
 }
 """
@@ -145,6 +152,7 @@ void vertex() {
 		float tierra = 1.0 - smoothstep(0.08, 0.42, ag);
 		float h = (sin(wp.x * 0.24 + wp.z * 0.17) * cos(wp.z * 0.21 - wp.x * 0.14) * 0.075
 			+ sin(wp.x * 0.51 - wp.z * 0.43) * 0.025) * tierra;
+		h -= smoothstep(0.20, 0.56, ag) * 0.28;
 		VERTEX.y += h;
 		float dhx = cos(wp.x * 0.24 + wp.z * 0.17) * 0.018 * tierra;
 		float dhz = -sin(wp.z * 0.21 - wp.x * 0.14) * 0.018 * tierra;
@@ -155,17 +163,20 @@ void vertex() {
 void fragment() {
 	vec2 px = UV * casillas * 16.0;
 	float f_calma = 1.0 - calma_lago * 0.85;
-	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.05 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.04) * f_calma;
+	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.04 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.03) * f_calma;
 	float es_agua = texture(agua, UV).r + temblor;
-	if (hundido < 0.5 && es_agua > 0.5) { discard; }
-	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
+	if (hundido < 0.5 && es_agua > 0.62) { discard; }
+	if (hundido > 0.5 && es_agua <= 0.46) { discard; }
 	vec3 c = texture(suelo, UV).rgb * tinte_2d;
 	if (hundido > 0.5) {
 		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4 * f_calma) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0 * f_calma);
-		c = mix(c, vec3(0.06, 0.15, 0.25) * tinte_2d, 0.24) * mix(0.56, 1.0, smoothstep(0.5, 0.72, es_agua));
+		float profundidad = smoothstep(0.48, 0.88, es_agua);
+		vec3 color_lecho = mix(vec3(0.22, 0.28, 0.24) * tinte_2d, c, 0.65);
+		c = mix(color_lecho, c, 0.60 + profundidad * 0.40);
+		c = mix(c, vec3(0.06, 0.15, 0.25) * tinte_2d, 0.24);
 		c = mix(c, vec3(0.18, 0.34, 0.52) * tinte_2d, calma_lago * 0.32);
 		c += vec3(0.05, 0.08, 0.10) * tinte_2d * smoothstep(0.70, 0.98, onda1) * f_calma;
-		float franja_espuma = smoothstep(0.61, 0.50, es_agua) * smoothstep(0.49, 0.515, es_agua);
+		float franja_espuma = smoothstep(0.61, 0.48, es_agua) * smoothstep(0.46, 0.51, es_agua);
 		c = mix(c, vec3(0.82, 0.90, 0.94) * tinte_2d, franja_espuma * 0.52);
 		ROUGHNESS = mix(0.36, 0.08, calma_lago);
 		SPECULAR = mix(0.28, 0.65, calma_lago);
@@ -182,7 +193,8 @@ void fragment() {
 	}
 	vec2 d_borde = min(UV * casillas, (vec2(1.0) - UV) * casillas);
 	float f_borde = clamp(min(d_borde.x, d_borde.y) / 2.2, 0.0, 1.0);
-	c *= mix(0.28, 1.0, smoothstep(0.0, 1.0, f_borde));
+	float min_borde = hundido > 0.5 ? 0.88 : 0.28;
+	c *= mix(min_borde, 1.0, smoothstep(0.0, 1.0, f_borde));
 	ALBEDO = c;
 }
 """
@@ -317,19 +329,35 @@ const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png
 ## Modelos 3D de Blender 4.5 para arquitectura y accesorios:
 ## Sustituyen al sprite plano por una malla 3D completa (.glb) con aleros, volumen sólido y sombras reales
 const MODELOS_BLENDER := {
+	"casa_granja.png": {
+		"ruta": "res://modelos/entorno/casa_granja.glb",
+		"escala": Vector3(1.15, 1.15, 1.15),
+		"offset": Vector3(0.0, 0.0, -0.22),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
 	"casa_seta.png": {
 		"ruta": "res://modelos/entorno/casa_pino.glb",
+		"ruta_ruina": "res://modelos/entorno/casa_pino_ruina.glb",
 		"escala": Vector3(1.12, 1.12, 1.12),
 		"offset": Vector3(0.0, 0.0, -0.22),
 		"rot_y": 0.0,
-		"solo_reconstruido": true,
+		"solo_reconstruido": false,
+	},
+	"ruina_casa.png": {
+		"ruta": "res://modelos/entorno/casa_pino_ruina.glb",
+		"escala": Vector3(1.12, 1.12, 1.12),
+		"offset": Vector3(0.0, 0.0, -0.22),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
 	},
 	"taller.png": {
 		"ruta": "res://modelos/entorno/forja_corteza.glb",
+		"ruta_ruina": "res://modelos/entorno/forja_ruina.glb",
 		"escala": Vector3(1.05, 1.05, 1.05),
 		"offset": Vector3(0.0, 0.0, -0.18),
 		"rot_y": 0.0,
-		"solo_reconstruido": true,
+		"solo_reconstruido": false,
 	},
 	"gran_arbol.png": {
 		"ruta": "res://modelos/entorno/gran_arbol.glb",
@@ -345,6 +373,41 @@ const MODELOS_BLENDER := {
 		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
+	"pozo.png": {
+		"ruta": "res://modelos/entorno/pozo_antiguo.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.10),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"espantapajaros.png": {
+		"ruta": "res://modelos/entorno/espantapajaros.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"carro.png": {
+		"ruta": "res://modelos/entorno/carro_madera.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.10),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"valla.png": {
+		"ruta": "res://modelos/entorno/valla_madera.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"cerca.png": {
+		"ruta": "res://modelos/entorno/valla_madera.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
 	"farol.png": {
 		"ruta": "res://modelos/entorno/farol_madera.glb",
 		"escala": Vector3(1.0, 1.0, 1.0),
@@ -356,42 +419,63 @@ const MODELOS_BLENDER := {
 		"ruta": "res://modelos/entorno/farol_madera.glb",
 		"escala": Vector3(1.0, 1.0, 1.0),
 		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
 	"cocina.png": {
 		"ruta": "res://modelos/entorno/cocina_juncia.glb",
 		"escala": Vector3(1.08, 1.08, 1.08),
 		"offset": Vector3(0.0, 0.0, -0.18),
-		"solo_reconstruido": true,
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
 	},
 	"puesto.png": {
 		"ruta": "res://modelos/entorno/puesto_tawi.glb",
 		"escala": Vector3(1.05, 1.05, 1.05),
 		"offset": Vector3(0.0, 0.0, -0.12),
-		"solo_reconstruido": true,
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
 	},
 	"gran_archivo.png": {
 		"ruta": "res://modelos/entorno/gran_archivo.glb",
 		"escala": Vector3(1.15, 1.15, 1.15),
 		"offset": Vector3(0.0, 0.0, -0.35),
+		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
 	"taller_taa.png": {
 		"ruta": "res://modelos/entorno/taller_taa.glb",
 		"escala": Vector3(1.10, 1.10, 1.10),
 		"offset": Vector3(0.0, 0.0, -0.20),
+		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
 	"casa_escriba.png": {
 		"ruta": "res://modelos/entorno/casa_escriba.glb",
 		"escala": Vector3(1.06, 1.06, 1.06),
 		"offset": Vector3(0.0, 0.0, -0.18),
+		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
 	"casa_kalamu.png": {
 		"ruta": "res://modelos/entorno/casa_escriba.glb",
 		"escala": Vector3(1.06, 1.06, 1.06),
 		"offset": Vector3(0.0, 0.0, -0.18),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"fuente.png": {
+		"ruta": "res://modelos/entorno/fuente_plaza.glb",
+		"escala": Vector3(1.10, 1.10, 1.10),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"fuente_plaza.png": {
+		"ruta": "res://modelos/entorno/fuente_plaza.glb",
+		"escala": Vector3(1.10, 1.10, 1.10),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
 }
@@ -401,7 +485,7 @@ const TIPOS_LUZ_3D := {
 	"h": [6.8, 1.35, Color(1.0, 0.64, 0.30), true],
 	"m": [4.8, 0.88, Color(0.50, 0.92, 0.82), false],
 }
-const HONDO_AGUA := 0.35             # metros que baja el agua
+const HONDO_AGUA := 0.28             # metros que baja el agua
 const LETRAS_AGUA := "~\\"
 ## Dibujos de pantalla (por su script): van a la capa de pantalla, con sus hijos
 const DE_PANTALLA := ["ambiente.gd", "nevada.gd", "ventisca.gd", "luz_sol.gd"]
@@ -1263,7 +1347,16 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 	if not MODELOS_BLENDER.has(arch):
 		return false
 	var cfg: Dictionary = MODELOS_BLENDER[arch]
-	if cfg.get("solo_reconstruido", false):
+	var ruta_b: String = cfg["ruta"]
+	if cfg.has("ruta_ruina"):
+		var frame_act := 0
+		if n is Sprite2D:
+			frame_act = (n as Sprite2D).frame
+		elif n is AnimatedSprite2D:
+			frame_act = (n as AnimatedSprite2D).frame
+		if frame_act < 1:
+			ruta_b = cfg["ruta_ruina"]
+	elif cfg.get("solo_reconstruido", false):
 		var frame_act := 0
 		if n is Sprite2D:
 			frame_act = (n as Sprite2D).frame
@@ -1279,14 +1372,19 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 
 	var id := n.get_instance_id()
 	var m3d: Node3D = _modelos_blender_instanciados.get(id)
+	if m3d != null and is_instance_valid(m3d):
+		if m3d.get_meta("ruta_origen", "") != ruta_b:
+			m3d.queue_free()
+			m3d = null
+			_modelos_blender_instanciados.erase(id)
 	if m3d == null or not is_instance_valid(m3d):
-		var ruta_b: String = cfg["ruta"]
 		if not _escenas_blender_cache.has(ruta_b):
 			_escenas_blender_cache[ruta_b] = load(ruta_b) if ResourceLoader.exists(ruta_b) else null
 		var ps: PackedScene = _escenas_blender_cache[ruta_b]
 		if ps:
 			m3d = ps.instantiate() as Node3D
 			m3d.name = "Blender3D_%s_%d" % [arch.get_basename(), id]
+			m3d.set_meta("ruta_origen", ruta_b)
 			add_child(m3d)
 			_modelos_blender_instanciados[id] = m3d
 			var esc: Vector3 = cfg.get("escala", Vector3.ONE)
@@ -1305,7 +1403,6 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 					(c_ant as Sprite3D).visible = false
 		return true
 	return false
-
 
 func _sincronizar_volumen_3d(n: Node2D, g: Sprite3D, ancla: Node2D, tex: Texture2D, arch: String, ancho_px: float, alto_px: float, mod_final: Color) -> void:
 	if _sincronizar_modelo_blender(n, g, ancla, arch, mod_final):
