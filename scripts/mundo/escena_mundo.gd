@@ -92,7 +92,7 @@ func _ready() -> void:
 	_poner_sonido()
 	Estado.lugar = titulo
 	if Estado.extra.get("hd2d", false):
-		poner_hd2d.call_deferred(true)
+		poner_hd2d(true)
 	Estado.guardar.call_deferred()
 	if Estado.llegada == "" or continuando:
 		# empieza la partida aquí: aparece desde negro con el nombre del sitio

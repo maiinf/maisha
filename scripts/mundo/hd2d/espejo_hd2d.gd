@@ -361,6 +361,8 @@ var _ids_estaticos := {}           # id -> true
 var _ultimo_tinte := Color(-1, -1, -1, -1)
 var _maisha: Node2D
 var _foco := Vector3.ZERO
+var _adelanto_camara := Vector3.ZERO
+var _fotogramas_camara := 0
 var _alto_pena := ALTO_PENA
 var _mats_capa: Array[ShaderMaterial] = []
 var _plano_agua: MeshInstance3D
@@ -821,22 +823,50 @@ func _crear_camara() -> void:
 	camara.rotation_degrees = Vector3(CAMARA_INCLINACION, 0, 0)
 	add_child(camara)
 	camara.current = true
+	_fotogramas_camara = 0
+	_adelanto_camara = Vector3.ZERO
 	if _maisha:
 		_foco = _al_suelo(_maisha.global_position)
 	_colocar_camara(1.0)
 
 
-func _colocar_camara(suave: float) -> void:
+func _colocar_camara(suave: float, delta: float = 0.016) -> void:
 	if _maisha and is_instance_valid(_maisha):
-		_foco = _foco.lerp(_al_suelo(_maisha.global_position), suave)
+		var base := _al_suelo(_maisha.global_position)
+		if _fotogramas_camara < 2 or suave >= 0.99:
+			_foco = base
+			_adelanto_camara = Vector3.ZERO
+		else:
+			var vel_2d := Vector2.ZERO
+			if _maisha is CharacterBody2D:
+				vel_2d = (_maisha as CharacterBody2D).velocity
+			var meta_adelanto := Vector3(
+				clampf(vel_2d.x * PX * 0.14, -1.35, 1.35),
+				0.0,
+				clampf(vel_2d.y * PX * 0.11, -1.05, 1.05)
+			)
+			_adelanto_camara = _adelanto_camara.lerp(meta_adelanto, clampf(delta * 4.5, 0.02, 0.35))
+			var paso := clampf(1.0 - exp(-9.5 * delta), 0.04, 0.45)
+			_foco = _foco.lerp(base + _adelanto_camara, paso)
+		_fotogramas_camara += 1
+	# encuadre más íntimo durante los diálogos y vuelta suave al terminar
+	var nodo_dlg := escena.get_tree().get_first_node_in_group("dialogo") if is_instance_valid(escena) and escena.is_inside_tree() else null
+	var en_dialogo := nodo_dlg != null and bool(nodo_dlg.get("hablando"))
+	var fov_meta := CAMARA_FOV - 1.4 if en_dialogo else CAMARA_FOV
+	camara.fov = lerpf(camara.fov, fov_meta, clampf(delta * 5.0, 0.04, 0.35))
 	# sin salirse del mapa (como la cámara 2D): deja un margen de media pantalla a cada lado
 	if region:
 		var tam: Vector2 = region.get("tam") * PX
 		var mx := minf(16.0, tam.x / 2.0)
 		_foco.x = clampf(_foco.x, mx, tam.x - mx)
 		_foco.z = clampf(_foco.z, minf(7.0, tam.y / 2.0), tam.y - minf(11.0, tam.y / 2.0))
+	# sacudida de impacto limpia sincronizada con la cámara 2D
+	var sacudida := Vector3.ZERO
+	var cam_2d := escena.get_viewport().get_camera_2d() if is_instance_valid(escena) and escena.is_inside_tree() else null
+	if cam_2d and cam_2d.offset != Vector2.ZERO:
+		sacudida = Vector3(cam_2d.offset.x * PX * 0.85, -cam_2d.offset.y * PX * 0.55, cam_2d.offset.y * PX * 0.65)
 	var atras := camara.global_transform.basis.z * CAMARA_DISTANCIA
-	camara.global_position = _foco + atras
+	camara.global_position = _foco + sacudida + atras
 
 
 func _al_suelo(p: Vector2) -> Vector3:
@@ -1207,7 +1237,7 @@ func _process(delta: float) -> void:
 		_mat_penas.albedo_color = tinte_roca
 	for m_lej in _suelos_lejanos:
 		m_lej.set_shader_parameter("tinte_2d", Vector3(tinte_roca.r, tinte_roca.g, tinte_roca.b))
-	_colocar_camara(0.12)
+	_colocar_camara(0.12, delta)
 	var noche_ef := 1.0 if en_penumbra else (1.0 - dia)
 	_actualizar_luces_3d(noche_ef)
 	var cambio_tinte := absf(_tinte.r - _ultimo_tinte.r) + absf(_tinte.g - _ultimo_tinte.g) + absf(_tinte.b - _ultimo_tinte.b) > 0.008
