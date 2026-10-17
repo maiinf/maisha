@@ -314,6 +314,51 @@ const LUCES_3D := {
 	"estela.png": [["m", 33, 18]],
 }
 const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png", "puesto.png"]
+## Modelos 3D de Blender 4.5 para arquitectura y accesorios:
+## Sustituyen al sprite plano por una malla 3D completa (.glb) con aleros, volumen sólido y sombras reales
+const MODELOS_BLENDER := {
+	"casa_seta.png": {
+		"ruta": "res://modelos/entorno/casa_pino.glb",
+		"escala": Vector3(1.12, 1.12, 1.12),
+		"offset": Vector3(0.0, 0.0, -0.22),
+		"rot_y": 0.0,
+		"solo_reconstruido": true,
+	},
+	"taller.png": {
+		"ruta": "res://modelos/entorno/forja_corteza.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.18),
+		"rot_y": 0.0,
+		"solo_reconstruido": true,
+	},
+	"gran_arbol.png": {
+		"ruta": "res://modelos/entorno/gran_arbol.glb",
+		"escala": Vector3(1.22, 1.22, 1.22),
+		"offset": Vector3(0.0, 0.0, -0.30),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"molino.png": {
+		"ruta": "res://modelos/entorno/molino_shamba.glb",
+		"escala": Vector3(1.08, 1.08, 1.08),
+		"offset": Vector3(0.0, 0.0, -0.20),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"farol.png": {
+		"ruta": "res://modelos/entorno/farol_madera.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"farol_apagado.png": {
+		"ruta": "res://modelos/entorno/farol_madera.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"solo_reconstruido": false,
+	},
+}
 const TIPOS_LUZ_3D := {
 	"v": [4.6, 0.92, Color(1.0, 0.84, 0.55), false],
 	"f": [5.6, 1.12, Color(1.0, 0.78, 0.46), false],
@@ -483,6 +528,8 @@ var _malla_polvo: MultiMeshInstance3D
 var _polvo_datos: Array[Dictionary] = []
 var _reloj_polvo := 0.0
 static var _cache_normales := {}           # ruta -> Texture2D
+static var _escenas_blender_cache := {}     # ruta -> PackedScene
+var _modelos_blender_instanciados := {}     # id de Node2D -> Node3D (instancia de Blender)
 
 
 func _ready() -> void:
@@ -1049,6 +1096,7 @@ func _exit_tree() -> void:
 	_luces_pt2d.clear()
 	_moduladores_2d.clear()
 	_cache_mat_relieve.clear()
+	_modelos_blender_instanciados.clear()
 
 
 # --- La cámara ------------------------------------------------------------------------------------------------
@@ -1175,7 +1223,58 @@ func _config_volumen_3d(n: Node2D, ancla: Node2D, arch: String, ancho_px: float,
 	return Vector2(3.0, 0.22)
 
 
+func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: String, mod_final: Color) -> bool:
+	if not MODELOS_BLENDER.has(arch):
+		return false
+	var cfg: Dictionary = MODELOS_BLENDER[arch]
+	if cfg.get("solo_reconstruido", false):
+		var frame_act := 0
+		if n is Sprite2D:
+			frame_act = (n as Sprite2D).frame
+		elif n is AnimatedSprite2D:
+			frame_act = (n as AnimatedSprite2D).frame
+		if frame_act < 1:
+			var id_r := n.get_instance_id()
+			if _modelos_blender_instanciados.has(id_r):
+				var m_prev = _modelos_blender_instanciados[id_r]
+				if is_instance_valid(m_prev):
+					m_prev.visible = false
+			return false
+
+	var id := n.get_instance_id()
+	var m3d: Node3D = _modelos_blender_instanciados.get(id)
+	if m3d == null or not is_instance_valid(m3d):
+		var ruta_b: String = cfg["ruta"]
+		if not _escenas_blender_cache.has(ruta_b):
+			_escenas_blender_cache[ruta_b] = load(ruta_b) if ResourceLoader.exists(ruta_b) else null
+		var ps: PackedScene = _escenas_blender_cache[ruta_b]
+		if ps:
+			m3d = ps.instantiate() as Node3D
+			m3d.name = "Blender3D_%s_%d" % [arch.get_basename(), id]
+			add_child(m3d)
+			_modelos_blender_instanciados[id] = m3d
+			var esc: Vector3 = cfg.get("escala", Vector3.ONE)
+			m3d.scale = esc
+			if cfg.get("rot_y", 0.0) != 0.0:
+				m3d.rotation.y = deg_to_rad(cfg["rot_y"])
+	if m3d and is_instance_valid(m3d):
+		var off: Vector3 = cfg.get("offset", Vector3.ZERO)
+		m3d.position = _al_suelo(ancla.global_position) + off
+		m3d.visible = g.visible
+		g.transparency = 1.0
+		g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		if g.has_meta("capas_fondo"):
+			for c_ant in g.get_meta("capas_fondo"):
+				if is_instance_valid(c_ant):
+					(c_ant as Sprite3D).visible = false
+		return true
+	return false
+
+
 func _sincronizar_volumen_3d(n: Node2D, g: Sprite3D, ancla: Node2D, tex: Texture2D, arch: String, ancho_px: float, alto_px: float, mod_final: Color) -> void:
+	if _sincronizar_modelo_blender(n, g, ancla, arch, mod_final):
+		return
+	g.transparency = 0.0
 	var cfg := _config_volumen_3d(n, ancla, arch, ancho_px, alto_px)
 	var num_capas := int(cfg.x)
 	if num_capas <= 0 or tex == null:
@@ -1497,6 +1596,10 @@ func _quitar(n: Node) -> void:
 		if is_instance_valid(_gemelos[id][1]):
 			(_gemelos[id][1] as Node).queue_free()
 		_gemelos.erase(id)
+	if _modelos_blender_instanciados.has(id):
+		if is_instance_valid(_modelos_blender_instanciados[id]):
+			(_modelos_blender_instanciados[id] as Node).queue_free()
+		_modelos_blender_instanciados.erase(id)
 
 
 ## El z_index de verdad de un dibujo (sumando el de sus padres, si es relativo)

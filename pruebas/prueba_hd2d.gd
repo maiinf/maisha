@@ -72,6 +72,7 @@ func _ready() -> void:
 	var mm_polvo: MultiMeshInstance3D = espejo.get("_malla_polvo") if espejo else null
 	_comprobar(mm_motas != null and mm_motas.multimesh != null and mm_polvo != null, "las partículas 3D (motas ambientales y polvo al correr) están activas")
 	_comprobar(espejo != null and (espejo.get("DE_PIE") as Array).has("guardian.gd") and (espejo.get("DE_PIE") as Array).has("tintero.gd"), "los enemigos y jefes que dibujan en el aire están en DE_PIE")
+	_comprobar(espejo != null and espejo.get("MODELOS_BLENDER") != null and (espejo.get("MODELOS_BLENDER") as Dictionary).has("casa_seta.png") and (espejo.get("MODELOS_BLENDER") as Dictionary).has("gran_arbol.png"), "los modelos 3D de Blender para arquitectura (.glb) están conectados")
 
 	print("El juego no cambia:")
 	var m := get_tree().get_first_node_in_group("maisha") as CharacterBody2D
