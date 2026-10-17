@@ -93,7 +93,11 @@ def get_mat(clave):
         "farol_luz": ("Mat_Farol_Luz", "#FDE047", 0.2, 0.0, "#FEF08A", 4.0),
         "agua_limpia": ("Mat_Agua_Limpia", "#38BDF8", 0.15, 0.0, "#0284C7", 0.2),
         "piedra_plaza": ("Mat_Piedra_Plaza", "#64748B", 0.8, 0.0, None, 0.0),
-        "oro_reliquia": ("Mat_Oro_Reliquia", "#F59E0B", 0.25, 0.8, "#FDE68A", 1.0)
+        "oro_reliquia": ("Mat_Oro_Reliquia", "#F59E0B", 0.25, 0.8, "#FDE68A", 1.0),
+        "tinta_sigilia": ("Mat_Tinta_Sigilia", "#312E81", 0.3, 0.0, "#4F46E5", 1.2),
+        "marmol_sigilia": ("Mat_Marmol_Sigilia", "#E2E8F0", 0.5, 0.0, None, 0.0),
+        "teja_cobriza": ("Mat_Teja_Cobriza", "#C2410C", 0.6, 0.0, None, 0.0),
+        "tela_toldo": ("Mat_Tela_Toldo", "#DC2626", 0.7, 0.0, None, 0.0)
     }
     nombre, col, rough, met, emis_col, emis_str = paleta_defs[clave]
     return obtener_material(nombre, col, rough, met, emis_col, emis_str)
@@ -563,6 +567,135 @@ def generar_farol_madera():
 
     exportar_modelo("farol_madera", DIR_ENTORNO)
 
+def generar_cocina_juncia():
+    """Genera la cocina comunitaria de Juncia: cabaña con gran caldero exterior y chimenea."""
+    limpiar_escena()
+    bpy.ops.mesh.primitive_cube_add(size=2.0, location=(0, 0, 1.0))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (1.2, 1.0, 1.0)
+    asignar_material(cuerpo, get_mat("madera_tablas"))
+    
+    bpy.ops.mesh.primitive_cone_add(vertices=16, radius1=1.8, radius2=0.2, depth=1.4, location=(0, 0, 2.7))
+    techo = bpy.context.active_object
+    asignar_material(techo, get_mat("musgo_hojas"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.25, depth=1.6, location=(0.8, 0.4, 2.8))
+    chim = bpy.context.active_object
+    asignar_material(chim, get_mat("piedra_plaza"))
+    
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, radius=0.45, location=(-0.6, -1.3, 0.4))
+    caldero = bpy.context.active_object
+    asignar_material(caldero, get_mat("metal_forja"))
+    
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.22, location=(-0.6, -1.3, 0.15))
+    fuego = bpy.context.active_object
+    asignar_material(fuego, get_mat("corazon_asili"))
+
+    exportar_modelo("cocina_juncia", DIR_ENTORNO)
+
+def generar_puesto_tawi():
+    """Genera el puesto de mercado de Tawi: mostrador con toldo de rayas y cestas."""
+    limpiar_escena()
+    bpy.ops.mesh.primitive_cube_add(size=1.2, location=(0, 0, 0.5))
+    mesa = bpy.context.active_object
+    mesa.scale = (1.8, 0.8, 0.8)
+    asignar_material(mesa, get_mat("madera_tablas"))
+    
+    for sx in [-1.0, 1.0]:
+        for sy in [-0.45, 0.45]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.04, depth=2.0, location=(sx * 0.95, sy, 1.0))
+            poste = bpy.context.active_object
+            asignar_material(poste, get_mat("arbol_corteza"))
+            
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.3, depth=2.4, location=(0, 0, 2.1))
+    toldo = bpy.context.active_object
+    toldo.rotation_euler = (0, math.radians(90), 0)
+    toldo.scale = (0.9, 0.35, 1.0)
+    asignar_material(toldo, get_mat("tela_toldo"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=0.35, location=(-0.5, 0.0, 1.05))
+    caja1 = bpy.context.active_object
+    asignar_material(caja1, get_mat("oro_reliquia"))
+
+    exportar_modelo("puesto_tawi", DIR_ENTORNO)
+
+def generar_gran_archivo_sigilia():
+    """Genera el Gran Archivo de Maandiko (Sigilia): edificio monumental de piedra con columnas y cúpula."""
+    limpiar_escena()
+    bpy.ops.mesh.primitive_cube_add(size=3.6, location=(0, 0, 0.3))
+    base = bpy.context.active_object
+    base.scale = (1.4, 1.1, 0.18)
+    asignar_material(base, get_mat("marmol_sigilia"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=3.0, location=(0, 0.2, 1.7))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (1.3, 0.9, 0.9)
+    asignar_material(cuerpo, get_mat("marmol_sigilia"))
+    
+    for i in range(4):
+        x_col = (i - 1.5) * 1.1
+        bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.18, depth=2.4, location=(x_col, -1.2, 1.4))
+        columna = bpy.context.active_object
+        asignar_material(columna, get_mat("marmol_sigilia"))
+        
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.6, depth=4.2, location=(0, -0.1, 3.4))
+    techo = bpy.context.active_object
+    techo.rotation_euler = (0, math.radians(90), 0)
+    techo.scale = (1.0, 0.45, 1.0)
+    asignar_material(techo, get_mat("teja_cobriza"))
+    
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=0.9, location=(0, 0.4, 4.0))
+    cupula = bpy.context.active_object
+    asignar_material(cupula, get_mat("oro_reliquia"))
+
+    exportar_modelo("gran_archivo", DIR_ENTORNO)
+
+def generar_taller_taa():
+    """Genera el taller de Taa (escriba de Maandiko): arquitectura urbana con frascos de tinta y vitrales."""
+    limpiar_escena()
+    bpy.ops.mesh.primitive_cube_add(size=2.4, location=(0, 0, 1.2))
+    planta_baja = bpy.context.active_object
+    planta_baja.scale = (1.1, 0.9, 1.0)
+    asignar_material(planta_baja, get_mat("piedra_plaza"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=2.2, location=(0, -0.15, 2.6))
+    planta_alta = bpy.context.active_object
+    planta_alta.scale = (1.2, 1.05, 0.8)
+    asignar_material(planta_alta, get_mat("madera_tablas"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.5, depth=3.0, location=(0, -0.15, 3.7))
+    techo = bpy.context.active_object
+    techo.rotation_euler = (0, math.radians(90), 0)
+    techo.scale = (1.1, 0.5, 1.0)
+    asignar_material(techo, get_mat("teja_cobriza"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.32, depth=0.6, location=(1.1, -1.2, 0.35))
+    frasco = bpy.context.active_object
+    asignar_material(frasco, get_mat("tinta_sigilia"))
+
+    exportar_modelo("taller_taa", DIR_ENTORNO)
+
+def generar_casa_escriba():
+    """Genera una casa tradicional de Sigilia (Maandiko): muros blancos, vigas y tejas cobrizas."""
+    limpiar_escena()
+    bpy.ops.mesh.primitive_cube_add(size=2.2, location=(0, 0, 1.1))
+    casa = bpy.context.active_object
+    casa.scale = (1.1, 1.0, 1.0)
+    asignar_material(casa, get_mat("marmol_sigilia"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.4, depth=2.7, location=(0, 0, 2.6))
+    techo = bpy.context.active_object
+    techo.rotation_euler = (0, math.radians(90), 0)
+    techo.scale = (1.05, 0.55, 1.0)
+    asignar_material(techo, get_mat("teja_cobriza"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=0.6, location=(0, -1.15, 1.6))
+    balcon = bpy.context.active_object
+    balcon.scale = (1.6, 0.4, 0.5)
+    asignar_material(balcon, get_mat("madera_tablas"))
+
+    exportar_modelo("casa_escriba", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # GENERADORES DE TERRENO MODULAR
 # ---------------------------------------------------------------------------
@@ -672,15 +805,20 @@ def main():
     generar_babosa_oxido()
     generar_corazon_giza()
     
-    print("\n[3/4] Generando Arquitectura de Cuna de Musgo...")
+    print("\n[3/5] Generando Arquitectura de Cuna de Musgo y Sigilia...")
     generar_gran_arbol()
     generar_casa_pino()
     generar_forja_corteza()
     generar_molino_shamba()
     generar_puente_madera()
     generar_farol_madera()
+    generar_cocina_juncia()
+    generar_puesto_tawi()
+    generar_gran_archivo_sigilia()
+    generar_taller_taa()
+    generar_casa_escriba()
     
-    print("\n[4/4] Generando Módulos de Terreno y Props...")
+    print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_bloque_hierba()
     generar_bloque_risco()
     generar_canal_agua()

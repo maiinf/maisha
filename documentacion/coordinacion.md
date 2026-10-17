@@ -37,5 +37,10 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
   - `modelos/entorno/molino_shamba.glb` (Molino hidráulico de Mzee Shamba)
   - `modelos/entorno/puente_madera.glb` (Puente de tablones)
   - `modelos/entorno/farol_madera.glb` (Farolas de madera con linterna física)
+  - `modelos/entorno/cocina_juncia.glb` (Cocina comunitaria de Juncia)
+  - `modelos/entorno/puesto_tawi.glb` (Puesto de mercado de Tawi)
+  - `modelos/entorno/gran_archivo.glb` (Gran Archivo monumental de Maandiko / Sigilia)
+  - `modelos/entorno/taller_taa.glb` (Taller de alquimia y tinta de Taa / Sigilia)
+  - `modelos/entorno/casa_escriba.glb` (Casas tradicionales de Sigilia con tejas)
 - [x] **Volumen 3D y Relieves**: 98 mapas de normales importados, extrusión volumétrica y balance lumínico nocturno completado.
 - [x] **Sincronización remota**: Ramas `origin/hd2d/blender-piloto` y `origin/hd2d/calidad-blender` actualizadas y testeadas con 0 errores en `prueba_hd2d`.

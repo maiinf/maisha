@@ -358,6 +358,42 @@ const MODELOS_BLENDER := {
 		"offset": Vector3(0.0, 0.0, 0.0),
 		"solo_reconstruido": false,
 	},
+	"cocina.png": {
+		"ruta": "res://modelos/entorno/cocina_juncia.glb",
+		"escala": Vector3(1.08, 1.08, 1.08),
+		"offset": Vector3(0.0, 0.0, -0.18),
+		"solo_reconstruido": true,
+	},
+	"puesto.png": {
+		"ruta": "res://modelos/entorno/puesto_tawi.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.12),
+		"solo_reconstruido": true,
+	},
+	"gran_archivo.png": {
+		"ruta": "res://modelos/entorno/gran_archivo.glb",
+		"escala": Vector3(1.15, 1.15, 1.15),
+		"offset": Vector3(0.0, 0.0, -0.35),
+		"solo_reconstruido": false,
+	},
+	"taller_taa.png": {
+		"ruta": "res://modelos/entorno/taller_taa.glb",
+		"escala": Vector3(1.10, 1.10, 1.10),
+		"offset": Vector3(0.0, 0.0, -0.20),
+		"solo_reconstruido": false,
+	},
+	"casa_escriba.png": {
+		"ruta": "res://modelos/entorno/casa_escriba.glb",
+		"escala": Vector3(1.06, 1.06, 1.06),
+		"offset": Vector3(0.0, 0.0, -0.18),
+		"solo_reconstruido": false,
+	},
+	"casa_kalamu.png": {
+		"ruta": "res://modelos/entorno/casa_escriba.glb",
+		"escala": Vector3(1.06, 1.06, 1.06),
+		"offset": Vector3(0.0, 0.0, -0.18),
+		"solo_reconstruido": false,
+	},
 }
 const TIPOS_LUZ_3D := {
 	"v": [4.6, 0.92, Color(1.0, 0.84, 0.55), false],
