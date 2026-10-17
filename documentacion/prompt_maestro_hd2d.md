@@ -121,6 +121,33 @@ Para **cada** mejora, sin saltarte pasos:
 - Revisa **cada escena** de Raíz y de Sigilia en HD-2D (lista en `LEEME.md`): que no haya cosas flotando, tapadas, sin sombra, con el pie mal puesto o con parpadeos. Corrige lo que veas.
 - Si algún mundo se ve mal con la configuración general, dale un **perfil propio** (cámara, color, niebla) en vez de una solución de compromiso.
 
+### 5.8 Blender para el escenario (`hd2d/blender`) — con prueba antes de extenderlo
+Blender 4.5 está instalado (`/Applications/Blender.app`) y la rama `experimento/prototipo-visual` tiene un generador
+(`herramientas/blender/generador_3d_maisha.py`, se lanza con `Blender -b -P <script>`, exporta `.glb` que Godot carga
+sin más). **Úsalo, pero con cabeza**: así es como lo hace *Octopath Traveler*: **los personajes son sprites 2D y el
+escenario es 3D con texturas de pixel art.**
+
+| Para qué sí | Para qué no |
+| --- | --- |
+| **Edificios, puentes, vallas, rocas, columnas, farolas**: formas con aristas que el código modela bien. Con volumen real reciben luz y sombra de verdad y se ven distintos desde cada ángulo | **Personajes, aldeanos, enemigos y jefes**: se quedan como **sprites 2D** (los 18 modelos de la rama experimental son bolas y cilindros y quedan muy por debajo del pixel art) |
+| **Terreno** con altura real (colinas, cuestas, escalones) | Árboles y plantas grandes: lo orgánico es lo más difícil de modelar con código; solo si la prueba sale claramente mejor |
+| **Mapas de relieve, de oclusión ambiental y de altura** de los sprites que ya existen, horneados en Blender | |
+| Prerenderizar objetos a **sprites de pixel art** con mejor volumen (rocas, edificios, objetos), pasados por la paleta de Raíz | |
+
+**Condiciones, sin saltártelas:**
+1. **Prueba piloto con UN solo edificio** (por ejemplo la casa-seta de Pino o el taller de Corteza): modélalo en Blender,
+   ponle una textura de pixel art **generada con la paleta de Raíz** (filtro `NEAREST`, sin degradados lisos) y colócalo en
+   la escena HD-2D **sin tocar la colisión 2D**. Compáralo **lado a lado** con el sprite actual, de día y de noche.
+   **Solo si se ve claramente mejor y del mismo estilo, extiéndelo** a más edificios. Si no, quédate con el sprite y apúntalo.
+2. **Coherencia de estilo**: el resultado debe parecer del mismo juego. Mismas paletas, mismo grosor de contorno, misma
+   luz (arriba a la izquierda). Si algo se ve «de otro juego», no entra.
+3. **Todo por código**: los modelos salen de scripts de Python (`herramientas/blender/`), se pueden regenerar y no se
+   edita nada a mano en Blender. Guarda los `.glb` y los scripts; **no subas los `.blend` pesados** si no hacen falta.
+4. **El juego sigue siendo 2D por dentro**: un modelo 3D es solo la **cara visible** de algo que en el 2D sigue siendo
+   un `StaticBody2D` con su colisión. Con **H apagada** se ve el sprite de siempre.
+5. **Rendimiento**: mide antes y después (milisegundos por fotograma). Modelos de **pocos polígonos** (decenas o pocos
+   cientos por objeto) y reutilizados (`MultiMeshInstance3D`) si se repiten.
+
 ## 6. Lo que ya nos pasó (no lo repitas)
 - Las capturas dentro del juego fallan a ratos en este Mac: repite antes de dar algo por roto.
 - Los dibujos sin centrar (`centered = false`) **flotaban** tanto como su altura: comprueba siempre que cada dibujo apoya **por el pie**.
@@ -134,7 +161,7 @@ Para **cada** mejora, sin saltarte pasos:
 Entrega **un único mensaje** cuando acabes **todo**, con esta estructura:
 
 1. **Resumen en 5 líneas**: cómo se ve ahora el juego en HD-2D frente a antes.
-2. **Tabla general**: una fila por apartado del 5 (qué hiciste, rama, cómo quedó: bien / mejorable).
+2. **Tabla general**: una fila por apartado del 5 (incluido el 5.8: qué probaste con Blender, qué salió mejor que el sprite y qué descartaste) (qué hiciste, rama, cómo quedó: bien / mejorable).
 3. **Por cada apartado**: tabla de mejoras (qué era, qué es, por qué es mejor), **las imágenes antes / después** más importantes (rutas en `documentacion/hd2d/`), los **números medidos** (ms por fotograma antes y después, en qué mapas) y **lo que todavía no te convence**.
 4. **Una comparativa de cada mundo** en 2D y en HD-2D, de día y de noche.
 5. **Ramas listas para unir**, en orden recomendado (de menos a más riesgo) y qué pruebas pasan en cada una.
