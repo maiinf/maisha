@@ -35,13 +35,19 @@ const CANAL_PANTALLA := 1 << 14
 const CANAL_NADA := 1 << 15
 const CANAL_PIE := 1 << 16
 const CANALES_MUNDO := CANAL_SUELO | CANAL_GEMELO | CANAL_PANTALLA | CANAL_NADA | CANAL_PIE
-## Los que dibujan con código algo que va DE PIE (llamas, halos, el «!» de los aldeanos, la niebla de un arco):
+## Los que dibujan con código algo que va DE PIE (llamas, halos, auras de enemigos, avisos, el «!»):
 ## lo que dibujan ellos (o sus hijos sin script) se ve en una VENTANITA de pie sobre ellos (_ventanas)
-const DE_PIE := ["brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_perdido.gd", "esencia.gd",
-	"recogible.gd", "arco_ruinas.gd", "portal.gd", "aldeano.gd", "taa.gd"]
+const DE_PIE := [
+	"brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_perdido.gd", "esencia.gd",
+	"recogible.gd", "arco_ruinas.gd", "portal.gd", "aldeano.gd", "taa.gd",
+	"bundi.gd", "buibui.gd", "murcielago_eco.gd", "kuvu.gd", "guardian.gd", "mamba.gd",
+	"kambare.gd", "konokono.gd", "petrino.gd", "jabali.gd", "mzizi.gd", "cosechadora.gd",
+	"tintero.gd", "escriba.gd", "piedra_recuerdo.gd", "cerradura_tinta.gd", "atril.gd",
+	"ficha_indice.gd", "altar_corteza.gd", "estatua_quieta.gd", "campanilla.gd"
+]
 const VENTANA := Vector2i(128, 160)       # píxeles de cada ventanita
 const VENTANA_PIE := Vector2(64, 148)     # dónde cae el pie del objeto dentro de la ventanita
-const VENTANAS := 10                      # como mucho, las de los 10 objetos de pie más cerca de la cámara
+const VENTANAS := 16                      # ventanitas para los objetos de pie más cercanos a la cámara
 const LADO_CAPA := 768             # píxeles de la capa de suelo (48 m alrededor de Maisha: cubre toda la cámara)
 ## El suelo cercano: la capa de suelo, con luz (para las sombras)
 ## Con «hundido» = 0 es el suelo, con un agujero donde hay agua; con 1, el agua (más abajo, algo más oscura y azul,
