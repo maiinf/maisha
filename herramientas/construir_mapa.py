@@ -2143,6 +2143,89 @@ def crear_maandiko():
     return ["".join(f) for f in m], {}
 
 
+def crear_estanterias():
+    """LAS ESTANTERÍAS COLGANTES (Sigilia, 60x96, de sur a norte): una biblioteca enorme por dentro, de cuatro pisos.
+    Se entra por el este (de Maandiko, «>»). Paredes de ESTANTERÍAS («0») y pasillos con alfombra («#»). Entre piso y
+    piso, un HUECO («ɵ», la caída a los pisos de abajo) que solo se cruza por las ESCALERAS RODANTES: cada «ǝ» marca la
+    casilla de abajo a la izquierda de una (2 de ancho, cruzan todo el hueco). Por los pisos: TINTEROS RABIOSOS («ǜ»),
+    PÁGINAS SUELTAS («ƥ»), CERRADURAS DE TINTA QUIETA («ẋ», charcos que tapan pasillos), la FICHA DEL ÍNDICE («ʣ»)
+    en una alcoba tapada por una cerradura, y arriba la SALA DE LECTURA (donde espera el Bibliotecario Hueco)."""
+    ANCHO, ALTO = 60, 96
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                poner(x, y, c)
+
+    # el marco de estanterías alrededor
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            if min(x, y, ANCHO - 1 - x, ALTO - 1 - y) < 2:
+                poner(x, y, "0")
+    # los huecos entre pisos y sus escaleras rodantes (casilla de abajo a la izquierda de cada una)
+    huecos = [(70, 73, [14, 44]), (44, 47, [8, 30]), (20, 23, [46])]
+    for (y0, y1, carriles) in huecos:
+        rect(2, y0, ANCHO - 3, y1, "ɵ")
+        for x in carriles:
+            poner(x, y1 + 1, "ǝ")
+    # estanterías dentro de cada piso (filas con huecos de paso, como un laberinto suave)
+    for (y, aberturas) in ((88, [(8, 12), (40, 46)]), (81, [(20, 26), (50, 54)]),
+                           (63, [(4, 8), (24, 30), (48, 52)]), (56, [(14, 18), (36, 42)]),
+                           (37, [(20, 26), (44, 50)]), (30, [(4, 10), (32, 36)])):
+        for x in range(2, ANCHO - 2):
+            if not any(a <= x <= b for (a, b) in aberturas):
+                poner(x, y, "0")
+                poner(x, y + 1, "0")
+    # columnas de estanterías sueltas (islas de libros)
+    for (x, y) in ((26, 92), (34, 92), (12, 76), (30, 76), (48, 66), (20, 51), (40, 51), (12, 41), (36, 33), (52, 27)):
+        rect(x, y, x + 3, y + 1, "0")
+    # la sala de lectura de arriba: abierta, con alfombra en cruz
+    rect(4, 4, ANCHO - 5, 17, ".")
+    rect(26, 4, 33, 17, "#")
+    rect(6, 9, ANCHO - 7, 12, "#")
+    # los pasillos con alfombra que unen la entrada, los carriles y la sala (por los pisos)
+    def alfombra(puntos, ancho=2):
+        for (a, b) in zip(puntos, puntos[1:]):
+            pasos = int(max(abs(b[0] - a[0]), abs(b[1] - a[1]))) + 1
+            for i in range(pasos + 1):
+                t = i / pasos
+                x = int(a[0] + (b[0] - a[0]) * t)
+                y = int(a[1] + (b[1] - a[1]) * t)
+                for dx in range(ancho):
+                    for dy in range(ancho):
+                        if m[y + dy][x + dx] == ".":
+                            poner(x + dx, y + dy, "#")
+    alfombra([(ANCHO - 3, 86), (42, 86), (42, 79), (15, 79), (15, 75)])
+    alfombra([(45, 75), (45, 79)])
+    alfombra([(15, 68), (15, 60), (40, 60), (40, 54), (9, 54), (9, 49)])
+    alfombra([(31, 49), (31, 40), (47, 40), (47, 25)])
+    alfombra([(47, 18), (47, 14), (33, 14)])
+    # la entrada (este)
+    for y in range(85, 88):
+        poner(ANCHO - 1, y, ">")
+        poner(ANCHO - 2, y, "#")
+    # enemigos y cosas
+    for (x, y) in ((24, 84), (50, 77), (30, 66), (10, 58), (44, 34), (18, 27)):
+        poner(x, y, "ǜ")
+    for (x, y) in ((36, 90), (20, 66), (50, 52), (24, 40), (8, 26), (40, 28)):
+        poner(x, y, "ƥ")
+    # la alcoba de la ficha: al oeste del piso 3, tras una cerradura de tinta
+    rect(2, 32, 7, 36, "0")
+    rect(3, 33, 6, 35, ".")
+    poner(4, 34, "ʣ")
+    poner(7, 34, "ẋ")
+    poner(8, 34, "#")
+    # otra cerradura en el paso del piso 2 al carril de arriba
+    poner(9, 50, "ẋ")
+    poner(ANCHO - 6, 84, "L")
+    return ["".join(f) for f in m], {}
+
+
 def crear_cueva():
     """La cueva de las setas (56x64, de norte a sur), bajo la casa de Nungu: se baja por la escalera del armario.
     A oscuras: alumbran las SETAS que brillan («ů»). Salas: la de la escalera (arriba), un pasillo con NUBES DE ESPORAS
@@ -2885,7 +2968,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes"}
 
 
 def construir_suelo(nombre):
@@ -3035,7 +3118,7 @@ if __name__ == "__main__":
                         "canada_eco": crear_canada, "lago_espejo": crear_lago,
                         "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta,
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
-                        "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko}.get(nombre, crear_prados)()
+                        "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

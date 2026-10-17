@@ -360,5 +360,73 @@
 				]
 			}
 		]
+	},
+	"estanterias_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Huele a papel viejo y a cola de encuadernar. Hay estanterías hasta donde se pierde la vista.",
+					"El suelo se acaba de golpe: abajo hay más pisos, y más libros, y oscuridad.",
+					"Esas escaleras se mueven solas... Habrá que cruzar cuando estén quietas. Y deprisa."
+				]
+			}
+		]
+	},
+	"daftari": {
+		"nombre": "Daftari",
+		"conversaciones": [
+			{
+				"no": [
+					"daftari_nombre"
+				],
+				"tiene": {
+					"ficha_daftari": 1
+				},
+				"lineas": [
+					"«Daftari, copista del Barrio, encuadernador de libros raros». Esta ficha es tuya, ¿verdad?",
+					"Toma. Te llamas Daftari."
+				],
+				"entrega": {
+					"ficha_daftari": 1
+				},
+				"marca": [
+					"daftari_nombre"
+				],
+				"estilo": "pensamiento"
+			},
+			{
+				"no": [
+					"daftari_nombre"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un escriba en blanco con un libro abierto. Sus manos tienen callos de aguja, como de coser tapas.",
+					"Su nombre estará en alguna ficha, por los caminos."
+				]
+			},
+			{
+				"si": [
+					"daftari_nombre"
+				],
+				"no": [
+					"daftari_hablado"
+				],
+				"lineas": [
+					"...¿Daftari? ¡Daftari! Sí, sí, ese soy yo. Ay, qué cosa más rara: me acuerdo de todo de golpe, como cuando abres un libro por la página buena.",
+					"Yo cosía los libros que nadie quería coser: los que se deshacían, los de tapas mordidas... Los que tenían miedo de perderse, casi.",
+					"Gracias. De verdad. Ahora voy a mirar qué tengo en este libro abierto... Vaya, está en blanco. Pues lo empezaré otra vez."
+				],
+				"marca": [
+					"daftari_hablado"
+				]
+			},
+			{
+				"lineas": [
+					"Hilo, cola y paciencia: así se arregla casi todo. Lo que no se arregla, por lo menos se encuaderna bonito."
+				]
+			}
+		]
 	}
 }

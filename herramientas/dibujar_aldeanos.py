@@ -767,9 +767,10 @@ def wino():
     return l
 
 
-def escriba_blanco():
-    """UN ESCRIBA EN BLANCO: un armiño al que la Tinta Quieta le ha borrado el nombre. Pálido y sin color, con los ojos
-    vacíos, sujeta una pluma seca y un libro abierto en blanco."""
+def escriba(blanco=False):
+    """UN ESCRIBA de Maandiko: un armiño con su bufanda morada de escriba, un libro abierto y una pluma.
+    EN BLANCO (blanco=True): la Tinta Quieta le ha borrado el nombre: pálido y sin color, con los ojos vacíos,
+    la pluma seca y el libro en blanco."""
     l = Lienzo()
     _armino_base(l)
     l.ovalo(17, 21, 1.6, 2.0, "armino")
@@ -778,6 +779,14 @@ def escriba_blanco():
     for y in range(14, 20):                                   # la pluma seca
         l.px(6 + (19 - y) // 3, y, "cana", 2)
     l.rect(8, 16, 15, 17, "morado", 2)                        # la bufanda de escriba
+    l.rect(8, 16, 15, 16, "morado", 3)
+    l.px(9, 18, "morado", 2); l.px(9, 19, "morado", 1)
+    if not blanco:
+        ojos(l, 9, 9, 14, alto=2)
+        l.px(15, 20, "tinta", 2); l.px(16, 20, "tinta", 2); l.px(18, 20, "tinta", 2)     # lo escrito en el libro
+        l.px(15, 21, "tinta", 1); l.px(17, 21, "tinta", 1)
+        l.px(6, 13, "azul", 2)                                # la punta de la pluma, con tinta
+        return l
     for y in range(ALTO):
         for x in range(ANCHO):
             c = l.m[y][x]
@@ -793,6 +802,10 @@ def escriba_blanco():
             if l.m[y][x] and l.m[y][x][0] in ("ojo", "brillo"):
                 l.m[y][x] = ("gris_c", 1)
     return l
+
+
+def escriba_blanco():
+    return escriba(True)
 
 
 def _copia(l):
@@ -908,7 +921,7 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"kalamu": kalamu, "wino": wino, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+ALDEANOS = {"kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

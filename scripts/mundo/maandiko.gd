@@ -14,6 +14,9 @@ const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const NEVADA := preload("res://scripts/mundo/olvidado/nevada.gd")
 const VECINO := preload("res://scripts/mundo/sigilia/vecino.gd")
 const CHARCO := preload("res://scripts/mundo/sigilia/charco_tinta.gd")
+const ESCRIBA := preload("res://scripts/mundo/sigilia/escriba.gd")
+## los escribas con nombre (los que se pueden curar con su ficha del Índice)
+const ESCRIBAS := ["daftari"]
 const FAROL := preload("res://scripts/mundo/sigilia/farol_runico.gd")
 ## vecino: [id del dibujo, conversación, casilla, marca que hace falta]
 const VECINOS := [
@@ -21,7 +24,7 @@ const VECINOS := [
 	["mauti", "", Vector2i(39, 29), "mauti_libre"],
 	["wino", "", Vector2i(55, 22), ""],
 	["taa", "taa_ciudad", Vector2i(41, 47), "taa_nombre"],
-	["escriba_blanco", "", Vector2i(30, 30), ""],
+	["daftari", "", Vector2i(30, 30), ""],
 	["escriba_blanco", "", Vector2i(44, 24), ""],
 	["escriba_blanco", "", Vector2i(10, 22), ""],
 	["escriba_blanco", "", Vector2i(14, 36), ""],
@@ -47,9 +50,14 @@ func _poner_vecinos() -> void:
 	for v in VECINOS:
 		if v[3] != "" and not Estado.tiene(v[3]):
 			continue
-		var n: StaticBody2D = VECINO.new()
-		n.id = v[0]
-		n.charla = v[1]
+		var n: StaticBody2D
+		if v[0] in ESCRIBAS:
+			n = ESCRIBA.new()
+			n.nombre = v[0]
+		else:
+			n = VECINO.new()
+			n.id = v[0]
+			n.charla = v[1]
 		n.position = Vector2(v[2]) * 16.0 + Vector2(8, 14)
 		$Entidades.add_child(n)
 

@@ -690,6 +690,7 @@ Se lanzan desde la Terminal, dentro de la carpeta del proyecto (cambia el nombre
 - `pruebas/prueba_guardado.gd` empieza una partida desde el inicio (el diario se abre y la introducción se escribe en él), guarda, pausa, vuelve al inicio, continúa donde lo dejó, comprueba que en plena pelea se guarda el último sitio seguro, que «Nueva partida» pregunta antes de borrar y que un archivo estropeado no rompe nada.
 - `pruebas/prueba_encargos.gd` recoge setas y mineral, comprueba que el cetro rebota en la roca y la semilla la rompe, entrega los encargos, ve levantarse las casas, entra en ellas y prueba las recompensas (haces del vigía y cetro templado).
 - `pruebas/prueba_hd2d.gd` enciende el HD-2D con H, comprueba que cada dibujo tiene su gemelo 3D, que la interfaz sigue, que Maisha anda igual y su gemelo la sigue, que las peñas se levantan, que se recuerda al cambiar de escena y que al apagarlo vuelve el 2D.
+- `pruebas/prueba_estanterias.gd` llega a Las Estanterías Colgantes, comprueba que los huecos no se pisan, que las escaleras rodantes se cruzan tendidas y no recogidas y que si se van con Maisha encima cae y pierde una hoja, que el tintero rabioso embiste, hace daño, deja manchas y cuenta en el Bestiario, que la cerradura de tinta se derrite y guarda la ficha de Daftari, y que Daftari recupera su nombre en Maandiko.
 - `pruebas/prueba_maandiko.gd` llega a Maandiko desde el Paso, comprueba la música, la plaza, el Archivo, las casas, los puestos y el taller, los vecinos (Kalamu, Mauti, Wino, Taa y los escribas en blanco), que Kalamu da el trozo del norte del mapa y cumple la misión, que los charcos de Tinta Quieta de las salidas se derriten con tres sigilos, que entonces Wino abre su tienda (pluma, tinta viva y raquetas; la pluma abarata el sigilo) y que con todos los faroles encendidos Taa da 3 Cristales.
 - `pruebas/prueba_paso_escarcha.gd` comprueba el paso del norte de las Ruinas (cerrado hasta curar al árbol), llega al Paso de la Escarcha, prueba la nieve honda (frena, no deja correr, deja surcos que ya no frenan), la ventisca (empuja en medio del valle, no detrás de una estela, y se apaga al pasar la racha), a Taa en blanco, la ficha en la nieve honda, que al dársela recupera su nombre y enseña el sigilo de fuego, el sigilo (sin aprender no sale; gasta Aliento; espera) que enciende un farol, el abrigo del farol (ni viento ni nieve honda), que revivir lo quita todo, las páginas sueltas (atacan y el fuego las quema; cuentan en el Bestiario), la Puerta Sellada (no se rodea; tres sigilos la abren), que la misión se cumple y que la puerta a Maandiko aún no deja pasar.
 - `pruebas/prueba_sendero.gd` va de los Prados al Sendero del Puente y a la aldea y vuelta, prueba los pretiles y el vado, el eco perdido (con su ilustración), el encargo de Msafiri y el cuaderno de ecos.
@@ -913,6 +914,22 @@ Escena `escenas/mundo/maandiko.tscn` (`scripts/mundo/maandiko.gd`), detrás de l
 | Los faroles de Taa | Los faroles de las calles son faroles rúnicos apagados (`ƒ`, 10). Con todos encendidos (`faroles_maandiko`), Taa lo agradece y se ganan **3 Cristales del Nexo** |
 
 Falta: los caminos (Estanterías, Canal, Observatorio) con las fichas del Índice y la Sección Prohibida.
+
+## Las Estanterías Colgantes (parte 1: la biblioteca, las escaleras rodantes y Daftari)
+
+Escena `escenas/mundo/estanterias_colgantes.tscn` (`scripts/mundo/estanterias_colgantes.gd`), por la salida del oeste de Maandiko (tras su charco de Tinta Quieta). Mapa de 60×96 (`crear_estanterias`): una biblioteca de cuatro pisos, de sur a norte. Suelo propio (`pintar_suelo.pintar_biblioteca`): parqué, alfombras moradas con cenefa dorada, **estanterías** con tres baldas de libros (con su lomo y su letrero dorado) y los **huecos** a los pisos de abajo. Capturas en `documentacion/estanterias_capturas.png`.
+
+| Qué | Cómo |
+| --- | --- |
+| Los huecos | `ɵ`: no se pisan (paredes que pone la escena) |
+| Las escaleras rodantes | `ǝ`, `sigilia/escalera_rodante.gd` (`escalera.png`, de `herramientas/pintar_estanterias.py`): tendida 4 s → tiembla 1,1 s → se va rodando → recogida 2,6 s → vuelve. Solo se cruza tendida; si se va con Maisha encima, **cae** al piso de abajo (al pie de la escalera) y pierde una hoja. Cinco, desfasadas |
+| El Tintero rabioso | `ǜ`, `scripts/enemigos/tintero.gd` (`tintero.png`, 6 fotogramas; `mancha.png`): el «cazador» de Sigilia. Si ve a Maisha en línea recta, se agacha y **embiste**, dejando manchas de tinta que pringan (frenan); al chocar, se queda bizco: ahí entra el cetro. 3 golpes; semilla o fuego, 2. En el Bestiario |
+| Cerraduras | `ẋ`: charcos de Tinta Quieta (como en la ciudad) que tapan una alcoba y un paso |
+| La ficha de Daftari | `ʣ`, en la alcoba del oeste del piso 3. En Maandiko, **Daftari** (`sigilia/escriba.gd`: un escriba con nombre propio) está en blanco en la plaza; al darle su ficha recupera el color y habla (encuadernador de libros raros). Dibujo `escriba` (con color) en `dibujar_aldeanos.py` |
+| La sala de lectura | Arriba, con su atril y un libro enorme (`atril.png`): ahí espera el Bibliotecario Hueco (parte 2) |
+| Prueba | `pruebas/prueba_estanterias.gd` |
+
+Falta: el jefe (el Bibliotecario Hueco) y una música propia (por ahora suena la de Maandiko).
 
 ## Las construcciones, al nivel de la casa del castor
 

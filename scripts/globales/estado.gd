@@ -56,6 +56,8 @@ const OBJETOS := {
 		"texto": "Maíz de los antiguos labradores de Raíz, de granos dorados y alguno rojo. Sungura guarda sus semillas para que no se pierdan."},
 	"ficha_taa": {"uno": "Ficha del Índice", "encargo": 0, "hecho": "", "icono": 27,
 		"texto": "Una tarjeta del Índice del Archivo de Maandiko, con su pestaña morada. Pone, con letra muy pulcra: «Taa, farolero del Paso de la Escarcha»."},
+	"ficha_daftari": {"uno": "Ficha del Índice", "encargo": 0, "hecho": "", "icono": 27,
+		"texto": "Una ficha del Índice con la letra muy apretada: «Daftari, copista del Barrio, encuadernador de libros raros»."},
 	"sopa": {"uno": "Sopa de Juncia", "encargo": 0, "hecho": "", "icono": 10, "usable": true,
 		"texto": "Calentita. Devuelve 3 hojas de vida. Tómala con F (o desde aquí, con Acción), incluso en plena pelea."},
 }

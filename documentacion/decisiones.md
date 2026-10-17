@@ -313,3 +313,10 @@ se pasan.
 | Kalamu | No está en blanco: repite su nombre en voz alta. Da el trozo del norte del mapa (`mapa_norte`) |
 | Salidas | Tapadas por charcos de Tinta Quieta (3 sigilos de fuego cada uno) |
 | Maandiko, parte 2 | La tienda de Wino (misma tienda que la de Tawi, con otro tendero) abre al deshelar una calle y vende mejoras de Sigilia: pluma (sigilo más barato), tinta viva (sigilo más grande) y raquetas (menos hundimiento). Los faroles de las calles son rúnicos: encenderlos todos da 3 Cristales a través de Taa |
+
+### Las Estanterías Colgantes, parte 1 (2026-10-17)
+| Qué | Decisión |
+| --- | --- |
+| La mecánica | Escaleras rodantes sobre los huecos entre pisos: se cruzan solo tendidas y, si se van con Maisha encima, cae un piso y pierde una hoja |
+| Enemigo nuevo | El Tintero rabioso, el «cazador» de Sigilia (embiste en línea recta y deja manchas que frenan) |
+| Las fichas | Cada ficha cura a un escriba con nombre propio de Maandiko (`sigilia/escriba.gd`). La segunda es la de Daftari, encuadernador |

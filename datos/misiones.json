@@ -116,7 +116,11 @@
 			"maandiko"
 		],
 		"maandiko": [
-			"paso_escarcha"
+			"paso_escarcha",
+			"estanterias_colgantes"
+		],
+		"estanterias_colgantes": [
+			"maandiko"
 		]
 	},
 	"misiones": [

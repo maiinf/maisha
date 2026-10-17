@@ -327,7 +327,8 @@ PISADA_N = ["#4a5468", "#5e6a80", "#76829a", "#8e9ab0", "#a8b2c4", "#c0c9d8"]
 NIEVE_LILA = ["#4e4870", "#655e8a", "#7e76a2", "#9890ba", "#b0a9cd", "#c8c2de", "#dddaec", "#f0eef8"]
 PISADA_LILA = ["#4c4664", "#605a7a", "#787292", "#908aa8", "#a8a2bc", "#c0bbd0"]
 # los mapas de Sigilia guardan su suelo en arte/mundos/sigilia/suelos
-SIGILIA = {"paso_escarcha", "maandiko"}
+SIGILIA = {"paso_escarcha", "maandiko", "estanterias_colgantes"}
+BIBLIOTECAS = {"estanterias_colgantes"}
 
 
 def _nevar(lz, tipos, fina, media, pared, conservar=(), lila=False):
@@ -524,9 +525,78 @@ def pintar_gruta(nombre, salida=None, setas=False):
     print("Suelo pintado:", destino, (lz.w, lz.h))
 
 
+def pintar_biblioteca(nombre, salida=None):
+    """El suelo de una BIBLIOTECA de Sigilia (Las Estanterías Colgantes): parqué de tablones de madera oscura con
+    alfombras moradas en los pasillos («#»); las paredes («0») son ESTANTERÍAS vistas en 3/4: arriba el canto de la
+    madera, al sur la cara llena de libros de colores en baldas; y los HUECOS («ɵ»), la caída a los pisos de abajo:
+    oscuridad azulada con las baldas del piso de abajo muy al fondo y un canto de madera rota en el borde."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=19)
+    tipos = [["pared" if c == "0" else ("hueco" if c == "ɵ" else ("pasillo" if c in "#_<>^" else "suelo")) for c in f] for f in filas]
+    pared = mascara(lz, tipos, ("pared",), 2.0, 0.1, semilla=191)
+    hueco = mascara(lz, tipos, ("hueco",), 2.0, 0.2, semilla=192)
+    pasillo = mascara(lz, tipos, ("pasillo",), 4.0, 0.3, semilla=193)
+    fina = lz.ruido(0.8, 2, semilla=194)
+    media = lz.ruido(7, 3, semilla=195)
+    # el parqué: tablones largos (en espiga suave), cada uno con su tono, y sus juntas
+    tabla = np.floor(lz.y / 5)
+    corte = np.floor((lz.x + (tabla % 3) * 13) / 40)
+    tono = (np.sin(tabla * 12.9 + corte * 78.2) * 43758.5) % 1
+    veta = estirar(lz.ruido(0.6, 2, semilla=196), 9, False)
+    v = 0.42 + (tono - 0.5) * 0.22 + (veta - 0.5) * 0.25 + (media - 0.5) * 0.1
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#1a1014", "#2a1a1e", "#3c2628", "#523632", "#6a4a3e", "#84604a"], np.clip(v, 0, 1)))
+    junta = ((lz.y % 5) < 0.5) | (((lz.x + (tabla % 3) * 13) % 40) < 0.6)
+    lz.pintar(junta * 1.0, "#120a0c", 0.7)
+    # las alfombras de los pasillos: moradas, con su cenefa dorada
+    lz.pintar(pasillo, rampa(["#2a1838", "#3e2452", "#563470", "#6e4888"], np.clip(0.5 + (fina - 0.5) * 0.4, 0, 1)), 0.95)
+    borde_alf = np.clip(pasillo - lz.desenfocar((pasillo > 0.5).astype(float), 1.2) * 0 - np.clip(desplazar(lz, pasillo, 0, 2) * desplazar(lz, pasillo, 0, -2) * desplazar(lz, pasillo, 2, 0) * desplazar(lz, pasillo, -2, 0), 0, 1), 0, 1)
+    lz.pintar(borde_alf, "#c89a40", 0.8)
+    # los HUECOS: oscuridad que baja, con las baldas del piso de abajo al fondo
+    fondo = rampa(["#05040a", "#0a0814", "#120e20", "#1c162e"], np.clip(0.5 + (media - 0.5) * 0.5, 0, 1))
+    lz.pintar(hueco, fondo)
+    baldas = ((lz.y % 6) < 1.2) * (np.sin(lz.x * 0.4 + lz.y) > -0.2) * hueco
+    lz.pintar(baldas, "#2a1e30", 0.6)
+    lz.pintar(((lz.ruido(0.5, 1, semilla=197) > 0.9) * hueco), "#5a3a6a", 0.5)        # lomos de libros allá abajo
+    # el borde del hueco: el canto de las tablas rotas, iluminado, y la sombra que cae
+    canto = np.clip(desplazar(lz, hueco, 0, 2) - hueco, 0, 1)
+    lz.pintar(np.clip(hueco - desplazar(lz, hueco, 0, -3), 0, 1), "#6a4a3e", 0.9)       # (la cara del suelo que se ve al borde de arriba)
+    lz.pintar(canto, "#2a1a1e", 0.6)
+    # las ESTANTERÍAS: la cara del sur llena de libros, y el canto de arriba de madera
+    vr = 0.45 + (media - 0.5) * 0.2
+    lz.pintar(pared, rampa(["#140a0c", "#24141a", "#362028", "#4a2e34"], np.clip(vr, 0, 1)))
+    cara = np.clip(pared - desplazar(lz, pared, 0, -22), 0, 1)                         # 22 px de estantería por delante (3 baldas)
+    fila = np.floor(lz.y / 7)
+    balda = ((lz.y % 7) < 1.6) * cara
+    # cada libro: 3 o 4 px de ancho (según la balda, desplazados), con su color apagado, su altura y un hueco oscuro
+    u = lz.x + fila * 5.3
+    n_libro = np.floor(u / 3.5)
+    azar_l = (np.sin(n_libro * 12.9898 + fila * 78.233) * 43758.5453) % 1
+    libros_col = rampa(["#4a1a20", "#6a2a2a", "#2a3e5a", "#2e4a34", "#7a5a24", "#4a3060", "#8a7a5a", "#2a3a40"], azar_l)
+    alto_libro = 1.6 + np.floor(((azar_l * 7.13) % 1) * 3)
+    libro = cara * (1 - balda) * ((lz.y % 7) > alto_libro)
+    lz.pintar(cara * (1 - balda), "#0a0608")                                               # el fondo de la balda
+    lz.pintar(libro, libros_col)
+    lz.pintar(libro * ((u % 3.5) < 0.5), "#0a0608", 0.75)                                 # el hueco entre libros
+    lz.pintar(libro * ((u % 3.5) > 3.0), "#ffffff", 0.12)                                  # el lomo, con luz
+    lz.pintar(libro * (np.abs((lz.y % 7) - 4.6) < 0.3) * (azar_l > 0.4), "#d8c088", 0.45)   # el letrero dorado
+    lz.pintar(balda, "#4a2e22")
+    lz.pintar(cara * ((lz.y % 7) < 0.5), "#7a5a40", 0.8)                                   # el canto de la balda
+    encima = np.clip(pared - cara, 0, 1)
+    lz.pintar(encima * (((lz.x + lz.y) % 9) < 0.6), "#0a0608", 0.5)
+    lz.pintar(np.clip(encima - desplazar(lz, encima, 0, 1.5), 0, 1), "#7a5a48", 0.7)    # el canto de arriba, con luz
+    lz.pintar(np.clip(desplazar(lz, pared, 0, -2) - pared, 0, 1), "#08050a", 0.6)       # la sombra al pie
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "sigilia", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.012)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
 def pintar(nombre, salida=None):
     if nombre in ("gruta_raices", "cueva_setas"):
         return pintar_gruta(nombre, salida, setas=nombre == "cueva_setas")
+    if nombre in BIBLIOTECAS:
+        return pintar_biblioteca(nombre, salida)
     filas = leer(nombre)
     cobrizo = nombre == "camino_cobrizo"
     senda = nombre == "senda_surcos"
