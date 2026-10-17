@@ -14,14 +14,16 @@ DIR_CAPTURAS = os.path.join(BASE_DIR, "documentacion", "capturas")
 os.makedirs(DIR_CAPTURAS, exist_ok=True)
 
 MODELOS_A_RENDERIZAR = [
-    ("modelos/personajes/maisha.blend", "render_maisha.png", (0, -2.6, 1.05), (1.5708, 0, 0), 1.2),
-    ("modelos/personajes/pino.blend", "render_pino.png", (0, -2.6, 0.95), (1.5708, 0, 0), 1.2),
-    ("modelos/personajes/mzee_shamba.blend", "render_shamba.png", (0, -2.8, 1.05), (1.5708, 0, 0), 1.2),
-    ("modelos/personajes/corteza.blend", "render_corteza.png", (0, -2.8, 1.10), (1.5708, 0, 0), 1.2),
-    ("modelos/enemigos/petrino_giza.blend", "render_petrino.png", (0, -2.4, 0.70), (1.5708, 0, 0), 1.0),
-    ("modelos/enemigos/mzizi_raiz.blend", "render_mzizi.png", (0, -3.8, 1.0), (1.5708, 0, 0), 1.6),
-    ("modelos/entorno/casa_pino.blend", "render_casa_pino.png", (0, -5.5, 1.6), (1.5708, 0, 0), 2.2),
-    ("modelos/entorno/gran_arbol.blend", "render_gran_arbol.png", (0, -10.5, 3.2), (1.5708, 0, 0), 4.5)
+    ("herramientas/blender/fuentes/maisha.blend", "render_maisha.png", (0, -2.6, 1.05), (1.5708, 0, 0), 1.2),
+    ("herramientas/blender/fuentes/pino.blend", "render_pino.png", (0, -2.6, 0.95), (1.5708, 0, 0), 1.2),
+    ("herramientas/blender/fuentes/mzee_shamba.blend", "render_shamba.png", (0, -2.8, 1.05), (1.5708, 0, 0), 1.2),
+    ("herramientas/blender/fuentes/corteza.blend", "render_corteza.png", (0, -2.8, 1.10), (1.5708, 0, 0), 1.2),
+    ("herramientas/blender/fuentes/casa_granja.blend", "render_shamba_casa.png", (0, -7.5, 2.0), (1.5708, 0, 0), 2.5),
+    ("herramientas/blender/fuentes/pozo_antiguo.blend", "render_pozo.png", (0, -4.0, 1.2), (1.5708, 0, 0), 1.4),
+    ("herramientas/blender/fuentes/casa_pino.blend", "render_casa_pino.png", (0, -5.5, 1.6), (1.5708, 0, 0), 2.2),
+    ("herramientas/blender/fuentes/casa_pino_ruina.blend", "render_casa_ruina.png", (0, -5.5, 1.2), (1.5708, 0, 0), 1.8),
+    ("herramientas/blender/fuentes/fuente_plaza.blend", "render_fuente_plaza.png", (0, -5.5, 1.3), (1.5708, 0, 0), 1.8),
+    ("herramientas/blender/fuentes/gran_arbol.blend", "render_gran_arbol.png", (0, -10.5, 3.2), (1.5708, 0, 0), 4.5)
 ]
 
 for ruta_rel, nombre_salida, cam_pos, cam_rot, target_z in MODELOS_A_RENDERIZAR:
@@ -71,8 +73,8 @@ for ruta_rel, nombre_salida, cam_pos, cam_rot, target_z in MODELOS_A_RENDERIZAR:
     bpy.context.scene.render.resolution_y = 512
     
     if hasattr(bpy.context.scene, "cycles"):
-        bpy.context.scene.cycles.samples = 24
-        bpy.context.scene.cycles.adaptive_threshold = 0.05
+        bpy.context.scene.cycles.samples = 8
+        bpy.context.scene.cycles.adaptive_threshold = 0.1
 
     ruta_final = os.path.join(DIR_CAPTURAS, nombre_salida)
     bpy.context.scene.render.filepath = ruta_final
