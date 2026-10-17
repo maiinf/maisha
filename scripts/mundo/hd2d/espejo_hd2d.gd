@@ -172,6 +172,25 @@ uniform sampler2D tex_normal : filter_nearest;
 uniform vec3 tinte_ambiente = vec3(1.0);
 uniform float usa_normal = 1.0;
 uniform float volteo_x = 1.0;
+uniform float mecido = 0.0;
+uniform vec3 pos_maisha = vec3(0.0);
+
+void vertex() {
+	if (mecido > 0.001) {
+		vec3 wp = (MODEL_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+		float h_copa = clamp(1.0 - UV.y, 0.0, 1.0);
+		float peso = h_copa * h_copa;
+		float brisa = sin(TIME * 2.15 + wp.x * 0.65 + wp.z * 0.45) * 0.7
+			+ sin(TIME * 3.6 - wp.z * 0.8 + wp.x * 0.3) * 0.3;
+		VERTEX.x += brisa * mecido * peso;
+		vec2 d_m = wp.xz - pos_maisha.xz;
+		float dist = length(d_m);
+		if (dist < 1.35 && dist > 0.01) {
+			float empuje = (1.0 - dist / 1.35);
+			VERTEX.x += (d_m.x / dist) * empuje * empuje * min(mecido * 3.2, 0.22) * h_copa;
+		}
+	}
+}
 
 void fragment() {
 	vec4 c = texture(tex_albedo, UV);
@@ -201,6 +220,25 @@ void light() {
 	}
 }
 """
+## Flora que se mece con el viento y se aparta suavemente al paso de Maisha (amplitud en metros en la copa)
+const FLORA_MECIDA := {
+	"arbol_a.png": 0.045,
+	"arbol_b.png": 0.045,
+	"arbol_alto.png": 0.055,
+	"arbol_cobre.png": 0.050,
+	"arbol_rojizo.png": 0.050,
+	"pino_nevado.png": 0.040,
+	"sauce.png": 0.060,
+	"matorral.png": 0.085,
+	"helecho.png": 0.095,
+	"juncos.png": 0.105,
+	"junco.png": 0.105,
+	"bayas.png": 0.080,
+	"trigo.png": 0.110,
+	"brote_vida.png": 0.075,
+	"campanilla.png": 0.085,
+	"espino.png": 0.055,
+}
 ## Tabla de luces 3D por edificio y objeto luminoso (reutiliza Relieve.LUCES + edificios de Maandiko + setas y runas)
 const LUCES_3D := {
 	"casa_seta.png": [["v", 166, 90], ["v", 196, 96], ["f", 195, 112]],
@@ -259,6 +297,10 @@ const BIOMAS_HD2D := {
 	"maandiko": Color(0.97, 0.96, 1.04),
 	"estanterias_colgantes": Color(1.03, 0.96, 0.92),
 }
+const ZONAS_OTONO := ["bosque_cobrizo", "camino_cobrizo", "campo_segado"]
+const ZONAS_ESPORAS := ["gruta_raices", "cueva_setas", "cienaga_quieta", "las_pasarelas"]
+const NUM_MOTAS_3D := 40
+const NUM_POLVO_3D := 10
 const ZONAS_NIEVE := ["sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko"]
 ## Postprocesado cinematográfico HD-2D:
 ##   1. Profundidad de campo Tilt-Shift (nítido en la banda de Maisha, desenfoque bokeh suave arriba y abajo).
@@ -390,6 +432,11 @@ var _luces_pt2d := {}                      # id de PointLight2D -> [PointLight2D
 var _moduladores_2d: Array[CanvasModulate] = []
 var _sh_gemelo: Shader
 var _cache_mat_relieve := {}               # clave -> ShaderMaterial
+var _malla_motas: MultiMeshInstance3D
+var _motas_datos: Array[Dictionary] = []
+var _malla_polvo: MultiMeshInstance3D
+var _polvo_datos: Array[Dictionary] = []
+var _reloj_polvo := 0.0
 static var _cache_normales := {}           # ruta -> Texture2D
 
 
@@ -405,6 +452,7 @@ func _ready() -> void:
 	_crear_suelo()
 	_crear_camara()
 	_crear_capas()
+	_crear_particulas_3d()
 	_crear_postproceso()
 	for n in _todos(escena):
 		_registrar(n)
@@ -722,6 +770,148 @@ func _crear_capas() -> void:
 	vista.canvas_cull_mask = _mascara_antes & ~CANALES_MUNDO
 
 
+func _crear_particulas_3d() -> void:
+	# 1. Motas ambientales 3D con profundidad real (polen dorado, luciérnagas, esporas, hojas cobrizas o copos 3D)
+	var mat_m := StandardMaterial3D.new()
+	mat_m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat_m.vertex_color_use_as_albedo = true
+	mat_m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat_m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	mat_m.billboard_keep_scale = true
+	var quad_m := QuadMesh.new()
+	var es_hoja := _id_escena in ZONAS_OTONO
+	quad_m.size = Vector2(2.2 * PX, 1.5 * PX) if es_hoja else Vector2(1.4 * PX, 1.4 * PX)
+	quad_m.material = mat_m
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.use_colors = true
+	mm.mesh = quad_m
+	mm.instance_count = NUM_MOTAS_3D
+	_malla_motas = MultiMeshInstance3D.new()
+	_malla_motas.multimesh = mm
+	_malla_motas.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(_malla_motas)
+	_motas_datos.clear()
+	for i in NUM_MOTAS_3D:
+		var ox := randf_range(-13.5, 13.5)
+		var oz := randf_range(-9.5, 9.5)
+		var oy := randf_range(0.35, 3.4)
+		_motas_datos.append({
+			"ox": ox,
+			"oz": oz,
+			"oy": oy,
+			"vx": randf_range(-0.35, 0.55) if not es_hoja else randf_range(0.35, 0.95),
+			"vy": randf_range(-0.55, -0.22) if (_es_nieve > 0.5 or es_hoja) else randf_range(-0.08, 0.14),
+			"vz": randf_range(-0.25, 0.35),
+			"fase": randf() * TAU,
+			"escala": randf_range(0.75, 1.30),
+		})
+	# 2. Motas de polvo 3D tras los pies de Maisha al correr
+	var mat_p := StandardMaterial3D.new()
+	mat_p.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat_p.vertex_color_use_as_albedo = true
+	mat_p.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat_p.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	mat_p.billboard_keep_scale = true
+	var quad_p := QuadMesh.new()
+	quad_p.size = Vector2(1.5 * PX, 1.5 * PX)
+	quad_p.material = mat_p
+	var mm_p := MultiMesh.new()
+	mm_p.transform_format = MultiMesh.TRANSFORM_3D
+	mm_p.use_colors = true
+	mm_p.mesh = quad_p
+	mm_p.instance_count = NUM_POLVO_3D
+	_malla_polvo = MultiMeshInstance3D.new()
+	_malla_polvo.multimesh = mm_p
+	_malla_polvo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(_malla_polvo)
+	_polvo_datos.clear()
+	for i in NUM_POLVO_3D:
+		_polvo_datos.append({
+			"pos": Vector3(0.0, -10.0, 0.0),
+			"vel": Vector3.ZERO,
+			"vida": 0.0,
+			"max_vida": 0.45,
+		})
+		mm_p.set_instance_transform(i, Transform3D(Basis(), Vector3(0.0, -10.0, 0.0)))
+		mm_p.set_instance_color(i, Color(1, 1, 1, 0))
+
+
+func _actualizar_particulas_3d(delta: float, dia: float, en_penumbra: bool) -> void:
+	if _malla_motas and _malla_motas.multimesh:
+		var mm := _malla_motas.multimesh
+		var es_hoja := _id_escena in ZONAS_OTONO
+		var es_espora := _id_escena in ZONAS_ESPORAS
+		var noche := 1.0 if en_penumbra else (1.0 - dia)
+		var col_base := Color(1.0, 0.94, 0.68, 0.62)
+		if _es_nieve > 0.5:
+			col_base = Color(0.92, 0.96, 1.0, 0.72)
+		elif es_hoja:
+			col_base = Color(0.92, 0.52, 0.24, 0.78)
+		elif es_espora:
+			col_base = Color(0.52, 0.96, 0.84, 0.68)
+		elif noche > 0.45:
+			col_base = Color(0.76, 0.98, 0.46, 0.76)      # luciérnagas cálidas de noche
+		for i in NUM_MOTAS_3D:
+			var d: Dictionary = _motas_datos[i]
+			var ox := float(d["ox"]) + float(d["vx"]) * delta + sin(_tiempo_luces * 1.4 + float(d["fase"])) * 0.18 * delta
+			var oy := float(d["oy"]) + float(d["vy"]) * delta + cos(_tiempo_luces * 1.8 + float(d["fase"])) * 0.12 * delta
+			var oz := float(d["oz"]) + float(d["vz"]) * delta
+			if ox > 13.5:
+				ox -= 27.0
+			elif ox < -13.5:
+				ox += 27.0
+			if oz > 9.5:
+				oz -= 19.0
+			elif oz < -9.5:
+				oz += 19.0
+			if oy < 0.22:
+				oy = 3.35
+			elif oy > 3.45:
+				oy = 0.28
+			d["ox"] = ox
+			d["oy"] = oy
+			d["oz"] = oz
+			var pos_m := Vector3(_foco.x + ox, oy, _foco.z + oz)
+			var pulso := 0.55 + 0.45 * sin(_tiempo_luces * (3.2 if noche > 0.45 else 1.9) + float(d["fase"]))
+			var esc := float(d["escala"]) * (0.75 + 0.35 * pulso)
+			mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3(esc, esc, esc)), pos_m))
+			mm.set_instance_color(i, Color(col_base.r, col_base.g, col_base.b, col_base.a * pulso))
+	if _malla_polvo and _malla_polvo.multimesh:
+		var mm_p := _malla_polvo.multimesh
+		_reloj_polvo -= delta
+		if _maisha and is_instance_valid(_maisha) and _maisha is CharacterBody2D:
+			var vel_m := (_maisha as CharacterBody2D).velocity
+			if vel_m.length() > 42.0 and _reloj_polvo <= 0.0:
+				_reloj_polvo = 0.085
+				for i in NUM_POLVO_3D:
+					if float(_polvo_datos[i]["vida"]) <= 0.0:
+						var base_m := _al_suelo(_maisha.global_position)
+						var atras_m := -vel_m.normalized() * PX * 3.0
+						_polvo_datos[i]["pos"] = base_m + Vector3(atras_m.x + randf_range(-0.14, 0.14), 0.12, atras_m.y + randf_range(-0.10, 0.16))
+						_polvo_datos[i]["vel"] = Vector3(randf_range(-0.22, 0.22), randf_range(0.32, 0.58), randf_range(-0.18, 0.18))
+						_polvo_datos[i]["vida"] = 0.42
+						_polvo_datos[i]["max_vida"] = 0.42
+						break
+		var col_polvo := Color(0.88, 0.92, 0.98) if _es_nieve > 0.5 else Color(0.82, 0.74, 0.60) * _tinte
+		for i in NUM_POLVO_3D:
+			var dp: Dictionary = _polvo_datos[i]
+			var vida := float(dp["vida"])
+			if vida <= 0.0:
+				continue
+			vida -= delta
+			dp["vida"] = vida
+			if vida <= 0.0:
+				mm_p.set_instance_color(i, Color(1, 1, 1, 0))
+				continue
+			var pos_p: Vector3 = dp["pos"] + dp["vel"] * delta
+			dp["pos"] = pos_p
+			var r_vida := clampf(vida / float(dp["max_vida"]), 0.0, 1.0)
+			var esc_p := lerpf(1.35, 0.55, r_vida)
+			mm_p.set_instance_transform(i, Transform3D(Basis().scaled(Vector3(esc_p, esc_p, esc_p)), pos_p))
+			mm_p.set_instance_color(i, Color(col_polvo.r, col_polvo.g, col_polvo.b, r_vida * 0.58))
+
+
 func _crear_postproceso() -> void:
 	_capa_post = CanvasLayer.new()
 	_capa_post.layer = 4
@@ -892,8 +1082,8 @@ func _textura_normal_de(tex: Texture2D) -> Texture2D:
 	return null
 
 
-func _material_relieve(tex: Texture2D, tex_n: Texture2D, flip_h: bool) -> ShaderMaterial:
-	var clave := "%d_%d" % [tex.get_instance_id(), 1 if flip_h else 0]
+func _material_relieve(tex: Texture2D, tex_n: Texture2D, flip_h: bool, mecido_amp: float = 0.0) -> ShaderMaterial:
+	var clave := "%d_%d_%d" % [tex.get_instance_id(), 1 if flip_h else 0, int(roundf(mecido_amp * 1000.0))]
 	if _cache_mat_relieve.has(clave):
 		return _cache_mat_relieve[clave]
 	var mat := ShaderMaterial.new()
@@ -905,6 +1095,7 @@ func _material_relieve(tex: Texture2D, tex_n: Texture2D, flip_h: bool) -> Shader
 	else:
 		mat.set_shader_parameter("usa_normal", 0.0)
 	mat.set_shader_parameter("volteo_x", -1.0 if flip_h else 1.0)
+	mat.set_shader_parameter("mecido", mecido_amp)
 	mat.set_shader_parameter("tinte_ambiente", Vector3(_tinte.r, _tinte.g, _tinte.b))
 	_cache_mat_relieve[clave] = mat
 	return mat
@@ -923,18 +1114,19 @@ func _crear_omni_3d(color: Color, rango: float, pos_3d: Vector3) -> OmniLight3D:
 	return luz
 
 
-func _registrar_luces_sprite(s: Sprite2D, tex: Texture2D) -> void:
-	if tex == null:
+func _registrar_luces_sprite(s: Variant, tex: Texture2D) -> void:
+	if not is_instance_valid(s) or not (s is Sprite2D) or tex == null:
 		return
+	var sp := s as Sprite2D
 	var arch := tex.resource_path.get_file()
 	if not LUCES_3D.has(arch):
 		return
-	var padre := s.get_parent()
+	var padre := sp.get_parent()
 	if padre and padre.get_script() and String(padre.get_script().resource_path).ends_with("farol_runico.gd"):
 		return
-	_rehacer_luces_sprite(s, tex, LUCES_3D[arch])
-	if arch in CAMBIAN_AL_RECONSTRUIRSE_3D and not s.frame_changed.is_connected(_rehacer_luces_sprite):
-		s.frame_changed.connect(_rehacer_luces_sprite.bind(s, tex, LUCES_3D[arch]))
+	_rehacer_luces_sprite(sp, tex, LUCES_3D[arch])
+	if arch in CAMBIAN_AL_RECONSTRUIRSE_3D and not sp.frame_changed.is_connected(_rehacer_luces_sprite):
+		sp.frame_changed.connect(_rehacer_luces_sprite.bind(sp, tex, LUCES_3D[arch]))
 
 
 func _rehacer_luces_sprite(s: Sprite2D, tex: Texture2D, puntos: Array) -> void:
@@ -1092,6 +1284,7 @@ func _registrar(n: Node) -> void:
 			tex_n = _textura_normal_de(tex_s)
 		_registrar_luces_sprite.call_deferred(s, tex_s)
 		var arch := tex_s.resource_path.get_file() if tex_s else ""
+		var amp_mecido := float(FLORA_MECIDA.get(arch, 0.0))
 		if n.get_script() == null and ancla is StaticBody2D and ancla.get_script() == null:
 			if not (arch in ["casa_seta.png", "taller.png", "cocina.png", "puesto.png", "farol.png", "transbordador.png"]):
 				estatico = true
@@ -1099,10 +1292,10 @@ func _registrar(n: Node) -> void:
 				var alto_f := (s.region_rect.size.y if s.region_enabled else tex_s.get_height() / float(maxi(s.vframes, 1)))
 				if alto_f <= 14.0:
 					g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-				elif tex_n != null and s.hframes == 1 and s.vframes == 1 and not s.region_enabled:
-					g.material_override = _material_relieve(tex_s, tex_n, s.flip_h)
-		elif tex_n != null and s.hframes == 1 and s.vframes == 1 and not s.region_enabled and ancla is StaticBody2D:
-			g.material_override = _material_relieve(tex_s, tex_n, s.flip_h)
+				elif (tex_n != null or amp_mecido > 0.0) and s.hframes == 1 and s.vframes == 1 and not s.region_enabled:
+					g.material_override = _material_relieve(tex_s, tex_n, s.flip_h, amp_mecido)
+		elif (tex_n != null or amp_mecido > 0.0) and s.hframes == 1 and s.vframes == 1 and not s.region_enabled and ancla is StaticBody2D:
+			g.material_override = _material_relieve(tex_s, tex_n, s.flip_h, amp_mecido)
 	if estatico:
 		g.visibility_range_end = 64.0
 		_copiar(n as Node2D, g, ancla, z)
@@ -1286,7 +1479,12 @@ func _process(delta: float) -> void:
 		if par[2] == null or not is_instance_valid(par[2]):
 			par[2] = _ancla(n)
 		_copiar(n, g, par[2], par[3])
+	if _maisha and is_instance_valid(_maisha):
+		var pm := _al_suelo(_maisha.global_position)
+		for mat_r in _cache_mat_relieve.values():
+			(mat_r as ShaderMaterial).set_shader_parameter("pos_maisha", pm)
 	_mover_capas()
+	_actualizar_particulas_3d(delta, dia, en_penumbra)
 	_actualizar_postproceso(0.15 if en_penumbra else dia, calido)
 
 
