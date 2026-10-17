@@ -24,9 +24,9 @@ const ALTO_PENA := 1.25            # metros que se levanta una peña (lo que mid
 const PARED_DOBLE := ["canada_eco", "paso_piedra", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha"]
 const SUELO_BAJO := -4             # dibujos con z_index por debajo: se tumban en el suelo
 const CAMARA_INCLINACION := -48.0  # grados (mirando hacia abajo)
-const CAMARA_DISTANCIA := 30.0     # metros hasta Maisha (se ve más o menos lo mismo que en 2D)
-const CAMARA_FOV := 30.0
-const LEJOS := 30.0                # metros: más allá de esto (de la cámara), los gemelos no se copian
+const CAMARA_DISTANCIA := 50.6     # teleobjetivo de maqueta: mantiene el encuadre sin inclinar las casas en los bordes
+const CAMARA_FOV := 18.0
+const LEJOS := 30.0                # metros: más allá de esto (del foco), los gemelos no se copian
 ## Los canales de dibujo (visibility_layer) del mundo; la interfaz se queda en el 1, el de siempre. La pantalla
 ## principal deja de pintar estos canales y las capas pintan solo el suyo.
 const CANAL_SUELO := 1 << 12
@@ -445,7 +445,7 @@ func _crear_ambiente() -> void:
 	sol.light_energy = 0.27
 	sol.light_color = Color(1.0, 0.95, 0.86)
 	sol.rotation_degrees = Vector3(-50, -35, 0)          # (desde arriba a la izquierda y algo por detrás: sombras hacia delante y a la derecha, como las pintadas)
-	sol.directional_shadow_max_distance = 60.0
+	sol.directional_shadow_max_distance = 86.0
 	add_child(sol)
 
 
@@ -1039,6 +1039,7 @@ func _registrar(n: Node) -> void:
 	g.pixel_size = PX
 	g.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	g.alpha_cut = SpriteBase3D.ALPHA_CUT_DISCARD
+	g.alpha_scissor_threshold = 0.52
 	g.shaded = false                 # (sus colores de pixel art; de noche se oscurecen con «_tinte»)
 	g.double_sided = true
 	g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
@@ -1073,7 +1074,7 @@ func _registrar(n: Node) -> void:
 		elif tex_n != null and s.hframes == 1 and s.vframes == 1 and not s.region_enabled and ancla is StaticBody2D:
 			g.material_override = _material_relieve(tex_s, tex_n, s.flip_h)
 	if estatico:
-		g.visibility_range_end = 38.0
+		g.visibility_range_end = 64.0
 		_copiar(n as Node2D, g, ancla, z)
 		_ids_estaticos[id] = true
 	else:
@@ -1350,7 +1351,7 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 		alto = (g.region_rect.size.y if g.region_enabled else tex.get_height() / float(maxi(g.vframes, 1)))
 	g.offset = Vector2(o2.x, -(o2.y + alto))
 	# (las capas de un mismo cuerpo, un pelín hacia la cámara según su orden de dibujo, para que no parpadeen)
-	var orden := z * 0.004 + n.get_index() * 0.0015
+	var orden := z * 0.005 + n.get_index() * 0.0018
 	g.position = _al_suelo(ancla.global_position) + Vector3(0, 0, orden)
 	var luz_p := _luz_en_punto(g.position)
 	var tf := Color(minf(1.3, _tinte.r + luz_p.r), minf(1.25, _tinte.g + luz_p.g), minf(1.2, _tinte.b + luz_p.b), 1.0)
