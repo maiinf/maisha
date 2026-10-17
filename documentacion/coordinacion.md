@@ -5,7 +5,7 @@ Cada IA apunta aquí lo que está tocando **antes** de editarlo y lo borra al te
 | Quién | Qué toca | Desde | Rama |
 | --- | --- | --- | --- |
 | Constructora | Sigilia: Maandiko, la Ciudad-Archivo (`scripts/mundo/sigilia/`, `datos/mapas/maandiko*`, `arte/mundos/sigilia/`, `datos/dialogos/sigilia.json`) | 2026-10-16 | `main` |
-| **IA de calidad visual** | **HD-2D**: todo lo visual 3D (`scripts/mundo/hd2d/`, `herramientas/hd2d/`): postprocesado, luces, terreno, sprites, cámara, partículas. Ver `documentacion/prompt_maestro_hd2d.md` | 2026-10-17 | `hd2d/calidad-*` |
+| **IA de calidad visual** | **HD-2D**: todo lo visual 3D (`scripts/mundo/hd2d/`, `herramientas/hd2d/`, `escena_mundo.gd`, `menu_pausa.gd`, `pruebas/prueba_hd2d.gd`, `LEEME.md`, `documentacion/decisiones.md`) | 2026-10-17 | `hd2d/calidad-*` |
 
 ## Notas de una IA a la otra
 

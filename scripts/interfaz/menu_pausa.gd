@@ -17,9 +17,10 @@ const FILO := Color("d6b46e")
 const TEXTO := Color("fff3c4")
 const APAGADO := Color("c9b07e")
 const AMBAR := Color("e6a852")
-const CAJA_MENU := Rect2(28, 40, 262, 232)
-const CAJA_INFO := Rect2(300, 40, 312, 232)
+const CAJA_MENU := Rect2(28, 32, 262, 252)
+const CAJA_INFO := Rect2(300, 32, 312, 252)
 const PIEL := preload("res://scripts/interfaz/piel.gd")
+const CALIDADES_HD2D := ["alta", "media", "baja"]
 
 var abierto := false
 var _lista: Control
@@ -42,8 +43,8 @@ func _ready() -> void:
 	_lienzo.draw.connect(_dibujar)
 	add_child(_lienzo)
 	_lista = LISTA.new()
-	_lista.position = CAJA_MENU.position + Vector2(14, 40)
-	_lista.size = Vector2(CAJA_MENU.size.x - 20, 184)
+	_lista.position = CAJA_MENU.position + Vector2(14, 38)
+	_lista.size = Vector2(CAJA_MENU.size.x - 20, 206)
 	_lista.en_papel = true
 	_lista.elegida.connect(_al_elegir)
 	_lista.ajustada.connect(_al_ajustar)
@@ -88,17 +89,19 @@ func cerrar() -> void:
 
 func _montar() -> void:
 	var completa := DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
+	var cal := String(Estado.extra.get("calidad_hd2d", "alta"))
 	_lista.opciones = [
 		{"texto": "Seguir"},
 		{"texto": "Pantalla completa: %s" % ("sí" if completa else "no")},
 		{"texto": "Música  " + _barra(Sonido.niveles["Musica"])},
 		{"texto": "Sonidos  " + _barra(Sonido.niveles["Efectos"])},
+		{"texto": "Calidad HD-2D: %s" % cal},
 		{"texto": "Temblores de pantalla: %s" % ("sí" if Impacto.temblores else "no")},
 		{"texto": "Objetivo en pantalla: %s" % ("sí" if Misiones.ver_objetivo else "no")},
 		{"texto": "Volver al inicio"},
 		{"texto": "Salir del juego"},
 	]
-	_acciones = ["seguir", "pantalla", "musica", "efectos", "temblores", "objetivo", "inicio", "salir"]
+	_acciones = ["seguir", "pantalla", "musica", "efectos", "calidad_hd2d", "temblores", "objetivo", "inicio", "salir"]
 
 
 ## Nivel de volumen con puntitos: ‹•••••••···› (de 0 a 10; con izquierda y derecha se cambia)
@@ -106,10 +109,21 @@ func _barra(nivel: int) -> String:
 	return "‹" + "•".repeat(nivel) + "·".repeat(10 - nivel) + "›"
 
 
-## Izquierda y derecha cambian el volumen; Acción lo sube (y del máximo vuelve a cero)
+## Izquierda y derecha cambian el volumen o la calidad HD-2D; Acción lo sube (y del máximo vuelve a cero)
 func _al_ajustar(i: int, direccion: int) -> void:
 	if _acciones[i] in ["musica", "efectos"]:
 		_cambiar_nivel(_acciones[i], direccion)
+	elif _acciones[i] == "calidad_hd2d":
+		_cambiar_calidad_hd2d(direccion)
+
+
+func _cambiar_calidad_hd2d(direccion: int) -> void:
+	var actual := String(Estado.extra.get("calidad_hd2d", "alta"))
+	var idx := maxi(0, CALIDADES_HD2D.find(actual))
+	idx = (idx + direccion + CALIDADES_HD2D.size()) % CALIDADES_HD2D.size()
+	Estado.extra["calidad_hd2d"] = CALIDADES_HD2D[idx]
+	Sonido.efecto("menu_mover")
+	_montar()
 
 
 func _cambiar_nivel(cual: String, direccion: int) -> void:
@@ -129,6 +143,8 @@ func _al_elegir(i: int) -> void:
 			cerrar()
 		"musica", "efectos":
 			_cambiar_nivel(_acciones[i], 1)
+		"calidad_hd2d":
+			_cambiar_calidad_hd2d(1)
 		"temblores":
 			Impacto.poner_temblores(not Impacto.temblores)
 			Sonido.efecto("menu_mover")

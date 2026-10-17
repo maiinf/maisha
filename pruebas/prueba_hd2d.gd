@@ -56,6 +56,15 @@ func _ready() -> void:
 	_comprobar(espejo != null and espejo.camara.current, "y una cámara 3D lo mira")
 	var hud: CanvasLayer = get_tree().get_first_node_in_group("hud")
 	_comprobar(hud != null and hud.visible, "la interfaz sigue a la vista")
+	_comprobar(espejo != null and espejo.get("_capa_post") != null and espejo.get("_mat_post") != null, "el postprocesado cinematográfico HD-2D está activo")
+	Estado.extra["calidad_hd2d"] = "baja"
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var capa_post: CanvasLayer = espejo.get("_capa_post") if espejo else null
+	_comprobar(capa_post != null and not capa_post.visible, "el selector de calidad HD-2D cambia los niveles de postprocesado")
+	Estado.extra["calidad_hd2d"] = "alta"
+	await get_tree().process_frame
+	await get_tree().process_frame
 
 	print("El juego no cambia:")
 	var m := get_tree().get_first_node_in_group("maisha") as CharacterBody2D

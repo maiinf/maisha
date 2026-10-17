@@ -42,7 +42,7 @@ const DE_PIE := ["brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_
 const VENTANA := Vector2i(128, 160)       # píxeles de cada ventanita
 const VENTANA_PIE := Vector2(64, 148)     # dónde cae el pie del objeto dentro de la ventanita
 const VENTANAS := 10                      # como mucho, las de los 10 objetos de pie más cerca de la cámara
-const LADO_CAPA := 1024            # píxeles de la capa de suelo (64 m alrededor de Maisha)
+const LADO_CAPA := 768             # píxeles de la capa de suelo (48 m alrededor de Maisha: cubre toda la cámara)
 ## El suelo cercano: la capa de suelo, con luz (para las sombras)
 ## Con «hundido» = 0 es el suelo, con un agujero donde hay agua; con 1, el agua (más abajo, algo más oscura y azul,
 ## con un brillo que se mueve). «agua» es la máscara del mapa (1 píxel por casilla).
@@ -94,12 +94,123 @@ const HONDO_AGUA := 0.35             # metros que baja el agua
 const LETRAS_AGUA := "~\\"
 ## Dibujos de pantalla (por su script): van a la capa de pantalla, con sus hijos
 const DE_PANTALLA := ["ambiente.gd", "nevada.gd", "ventisca.gd", "luz_sol.gd"]
+## Matiz cinematográfico por zona para el etalonaje HD-2D (conservando la luminancia central al sol)
+const BIOMAS_HD2D := {
+	"cuna_de_musgo": Color(1.02, 1.01, 0.96),
+	"prados_del_eco": Color(1.01, 1.02, 0.97),
+	"bosque_cobrizo": Color(1.06, 0.96, 0.88),
+	"camino_cobrizo": Color(1.04, 0.97, 0.90),
+	"campo_segado": Color(1.04, 0.98, 0.91),
+	"cienaga_quieta": Color(0.91, 1.03, 0.96),
+	"las_pasarelas": Color(0.94, 1.02, 0.97),
+	"lago_espejo": Color(0.94, 0.99, 1.05),
+	"gruta_raices": Color(0.88, 0.95, 1.08),
+	"cueva_setas": Color(0.95, 0.92, 1.06),
+	"sendero_olvidado": Color(0.94, 0.97, 1.05),
+	"ruinas_primer_arbol": Color(0.93, 0.95, 1.06),
+	"paso_escarcha": Color(0.96, 0.95, 1.05),
+	"maandiko": Color(0.97, 0.96, 1.04),
+	"estanterias_colgantes": Color(1.03, 0.96, 0.92),
+}
+const ZONAS_NIEVE := ["sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko"]
+## Postprocesado cinematográfico HD-2D:
+##   1. Profundidad de campo Tilt-Shift (nítido en la banda de Maisha, desenfoque bokeh suave arriba y abajo).
+##   2. Bloom cálido selectivo en luces, llamas, runas y ecos (ignora blancos neutros para no quemar nunca la nieve).
+##   3. Etalonaje de color por hora del día y bioma + viñeta suave de maqueta.
+const SOMBREADOR_POSTPROCESO := """
+shader_type canvas_item;
+uniform sampler2D pantalla : hint_screen_texture, filter_linear;
+uniform int calidad = 2;
+uniform float foco_y = 0.52;
+uniform float dia = 1.0;
+uniform float calidez = 0.0;
+uniform vec3 tinte_bioma = vec3(1.0, 1.0, 1.0);
+uniform float es_nieve = 0.0;
+
+vec3 extraer_emision(vec3 s, float d, float nieve) {
+	float lum = dot(s, vec3(0.299, 0.587, 0.114));
+	float sat = max(s.r, max(s.g, s.b)) - min(s.r, min(s.g, s.b));
+	float calido = max(0.0, s.r - s.b * 0.85);
+	// En la nieve al sol, los píxeles blancos/lilas tienen baja saturación y poco exceso cálido: no emiten bloom
+	float mascara_nieve = mix(1.0, smoothstep(0.18, 0.36, sat + calido * 0.8), nieve * d);
+	float relevancia = lum * (0.42 + sat * 0.95 + calido * 0.75);
+	float umbral = mix(0.36, 0.64, d) + nieve * d * 0.14;
+	return s * smoothstep(umbral, umbral + 0.28, relevancia) * mascara_nieve;
+}
+
+void fragment() {
+	vec2 uv = SCREEN_UV;
+	vec3 base = texture(pantalla, uv).rgb;
+	if (calidad <= 0) {
+		COLOR = vec4(base, 1.0);
+	} else {
+		vec2 paso = vec2(1.0 / 640.0, 1.0 / 360.0);
+		// 1. Tilt-Shift (efecto maqueta): banda central nítida alrededor de Maisha
+		float dist_arriba = max(0.0, foco_y - uv.y);
+		float dist_abajo = max(0.0, uv.y - foco_y);
+		float desenfoque = smoothstep(0.17, 0.44, dist_arriba) * 1.15 + smoothstep(0.19, 0.45, dist_abajo) * 0.95;
+		desenfoque = clamp(desenfoque, 0.0, 1.0);
+		vec3 col = base;
+		if (desenfoque > 0.01) {
+			float r = desenfoque * (calidad >= 2 ? 2.1 : 1.25);
+			vec3 acum = base * 1.4;
+			float peso_t = 1.4;
+			vec2 dirs[8] = vec2[8](
+				vec2(-0.707, -0.707), vec2(0.707, -0.707),
+				vec2(-0.707, 0.707), vec2(0.707, 0.707),
+				vec2(0.0, -1.0), vec2(0.0, 1.0),
+				vec2(-1.0, 0.0), vec2(1.0, 0.0)
+			);
+			int muestras = calidad >= 2 ? 8 : 4;
+			for (int i = 0; i < muestras; i++) {
+				float escala_r = (i < 4) ? r : r * 0.55;
+				vec3 m = texture(pantalla, clamp(uv + dirs[i] * paso * escala_r, vec2(0.001), vec2(0.999))).rgb;
+				float p = 1.0 + dot(m, vec3(0.299, 0.587, 0.114)) * 0.35;
+				acum += m * p;
+				peso_t += p;
+			}
+			col = mix(base, acum / peso_t, smoothstep(0.0, 0.15, desenfoque));
+		}
+		// 2. Bloom suave selectivo (llamas, faroles, ventanas, runas y ecos)
+		vec3 bloom = extraer_emision(col, dia, es_nieve) * 0.20;
+		vec2 pb = paso * 3.2;
+		bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(pb.x, 0.0), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.13;
+		bloom += extraer_emision(texture(pantalla, clamp(uv - vec2(pb.x, 0.0), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.13;
+		bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(0.0, pb.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.13;
+		bloom += extraer_emision(texture(pantalla, clamp(uv - vec2(0.0, pb.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.13;
+		if (calidad >= 2) {
+			vec2 pd = pb * 1.45;
+			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(pd.x, pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.07;
+			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(-pd.x, pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.07;
+			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(pd.x, -pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.07;
+			bloom += extraer_emision(texture(pantalla, clamp(uv + vec2(-pd.x, -pd.y), vec2(0.001), vec2(0.999))).rgb, dia, es_nieve) * 0.07;
+		}
+		float fuerza_bloom = mix(0.46, 0.24, dia);
+		col += bloom * fuerza_bloom;
+		// 3. Etalonaje de color por hora y bioma (preservando el brillo central al sol)
+		float noche = 1.0 - dia;
+		vec3 sombra_tinte = mix(vec3(0.96, 0.97, 1.02), vec3(0.82, 0.88, 1.12), noche);
+		vec3 luz_tinte = mix(vec3(1.0), vec3(1.08, 0.94, 0.82), calidez * 0.65);
+		float lum_c = dot(col, vec3(0.299, 0.587, 0.114));
+		col *= mix(sombra_tinte, luz_tinte, smoothstep(0.15, 0.75, lum_c));
+		col *= mix(vec3(1.0), tinte_bioma, 0.45);
+		// 4. Viñeta cinematográfica suave en los bordes
+		vec2 d_centro = (uv - vec2(0.5, 0.5)) * vec2(1.12, 1.0);
+		float vineta = 1.0 - smoothstep(0.46, 0.92, length(d_centro)) * mix(0.24, 0.14, dia);
+		col *= vineta;
+		COLOR = vec4(clamp(col, vec3(0.0), vec3(1.0)), 1.0);
+	}
+}
+"""
 
 var escena: Node2D
 var region: Node2D
 var camara: Camera3D
 var sol: DirectionalLight3D
-var _gemelos := {}                 # id del dibujo 2D -> Sprite3D
+var _gemelos := {}                 # id del dibujo 2D -> [n, g, ancla, z, mod_base]
+var _ids_dinamicos := {}           # id -> true
+var _ids_estaticos := {}           # id -> true
+var _ultimo_tinte := Color(-1, -1, -1, -1)
 var _maisha: Node2D
 var _foco := Vector3.ZERO
 var _alto_pena := ALTO_PENA
@@ -115,16 +226,25 @@ var _capa_pantalla: SubViewport
 var _ventanas: Array = []          # [SubViewport, Sprite3D] (se reparten entre los objetos de pie más cercanos)
 var _de_pie := {}                  # id del objeto de pie (su cuerpo) -> el cuerpo
 var _velo_pantalla: CanvasLayer
+var _capa_post: CanvasLayer
+var _mat_post: ShaderMaterial
+var _id_escena := ""
+var _tinte_bioma := Color.WHITE
+var _es_nieve := 0.0
 var _mascara_antes := 0xFFFFFFFF
 
 
 func _ready() -> void:
 	region = escena.get_node_or_null("Region")
 	_maisha = escena.get_tree().get_first_node_in_group("maisha") as Node2D
+	_id_escena = escena.scene_file_path.get_file().get_basename()
+	_tinte_bioma = BIOMAS_HD2D.get(_id_escena, Color.WHITE)
+	_es_nieve = 1.0 if _id_escena in ZONAS_NIEVE else 0.0
 	_crear_ambiente()
 	_crear_suelo()
 	_crear_camara()
 	_crear_capas()
+	_crear_postproceso()
 	for n in _todos(escena):
 		_registrar(n)
 	# la raíz de la escena, en los canales de las dos capas (si no, se llevaría por delante a todos sus hijos)
@@ -334,7 +454,7 @@ func _crear_capas() -> void:
 		v.transparent_bg = true
 		v.world_2d = vista.world_2d
 		v.canvas_cull_mask = CANAL_PIE
-		v.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		v.render_target_update_mode = SubViewport.UPDATE_DISABLED
 		v.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
 		add_child(v)
 		var g := Sprite3D.new()
@@ -353,6 +473,42 @@ func _crear_capas() -> void:
 	# la pantalla principal deja de pintar el mundo 2D (sigue vivo y viéndose en las capas); la interfaz, sí
 	_mascara_antes = vista.canvas_cull_mask
 	vista.canvas_cull_mask = _mascara_antes & ~CANALES_MUNDO
+
+
+func _crear_postproceso() -> void:
+	_capa_post = CanvasLayer.new()
+	_capa_post.layer = 4
+	var rect := ColorRect.new()
+	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sh := Shader.new()
+	sh.code = SOMBREADOR_POSTPROCESO
+	_mat_post = ShaderMaterial.new()
+	_mat_post.shader = sh
+	_mat_post.set_shader_parameter("tinte_bioma", Vector3(_tinte_bioma.r, _tinte_bioma.g, _tinte_bioma.b))
+	_mat_post.set_shader_parameter("es_nieve", _es_nieve)
+	rect.material = _mat_post
+	_capa_post.add_child(rect)
+	add_child(_capa_post)
+
+
+func _actualizar_postproceso(dia: float, calido: float) -> void:
+	if _mat_post == null:
+		return
+	var cal_str := String(Estado.extra.get("calidad_hd2d", "alta"))
+	var nivel_cal := 2 if cal_str == "alta" else (1 if cal_str == "media" else 0)
+	_mat_post.set_shader_parameter("calidad", nivel_cal)
+	_capa_post.visible = nivel_cal > 0
+	if nivel_cal <= 0:
+		return
+	_mat_post.set_shader_parameter("dia", dia)
+	_mat_post.set_shader_parameter("calidez", calido)
+	var fy := 0.52
+	if _maisha and is_instance_valid(_maisha) and camara:
+		var pos_m := _al_suelo(_maisha.global_position) + Vector3(0.0, 0.8, 0.0)
+		if not camara.is_position_behind(pos_m):
+			fy = clampf(camara.unproject_position(pos_m).y / 360.0, 0.28, 0.72)
+	_mat_post.set_shader_parameter("foco_y", fy)
 
 
 func _mover_capas() -> void:
@@ -380,7 +536,9 @@ func _mover_capas() -> void:
 		var g: Sprite3D = _ventanas[i][1]
 		if i >= cerca.size():
 			g.visible = false
+			v.render_target_update_mode = SubViewport.UPDATE_DISABLED
 			continue
+		v.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 		var c: Node2D = cerca[i][1]
 		var pie := c.global_position.round()
 		v.canvas_transform = Transform2D(0.0, -(pie - VENTANA_PIE))
@@ -398,6 +556,12 @@ func _exit_tree() -> void:
 	for par in _canales.values():
 		if is_instance_valid(par[0]):
 			(par[0] as CanvasItem).visibility_layer = par[1]
+	_canales.clear()
+	_gemelos.clear()
+	_ids_dinamicos.clear()
+	_ids_estaticos.clear()
+	_de_pie.clear()
+	_ventanas.clear()
 
 
 # --- La cámara ------------------------------------------------------------------------------------------------
@@ -458,7 +622,8 @@ func _registrar(n: Node) -> void:
 			_de_pie[cuerpo.get_instance_id()] = cuerpo
 		return
 	ci.visibility_layer = CANAL_GEMELO
-	if _gemelos.has(n.get_instance_id()):
+	var id := n.get_instance_id()
+	if _gemelos.has(id):
 		return
 	var g := Sprite3D.new()
 	g.pixel_size = PX
@@ -469,8 +634,30 @@ func _registrar(n: Node) -> void:
 	g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	g.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
 	add_child(g)
-	# (lo que no cambia: el cuerpo en el que se apoya y su orden de dibujo; se calcula una vez)
-	_gemelos[n.get_instance_id()] = [n, g, null, _z(n)]
+	var ancla := _ancla(n as Node2D)
+	var z := _z(n)
+	var mod_base: Color = (n as CanvasItem).modulate * (n as CanvasItem).self_modulate
+	var par := [n, g, ancla, z, mod_base]
+	_gemelos[id] = par
+	var estatico := false
+	if n is Sprite2D and n.get_script() == null and ancla is StaticBody2D and ancla.get_script() == null:
+		var s := n as Sprite2D
+		var tex_s := s.texture
+		if tex_s is CanvasTexture:
+			tex_s = (tex_s as CanvasTexture).diffuse_texture
+		var arch := tex_s.resource_path.get_file() if tex_s else ""
+		if not (arch in ["casa_seta.png", "taller.png", "cocina.png", "puesto.png", "farol.png", "transbordador.png"]):
+			estatico = true
+		if tex_s:
+			var alto_f := (s.region_rect.size.y if s.region_enabled else tex_s.get_height() / float(maxi(s.vframes, 1)))
+			if alto_f <= 14.0:
+				g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	if estatico:
+		g.visibility_range_end = 38.0
+		_copiar(n as Node2D, g, ancla, z)
+		_ids_estaticos[id] = true
+	else:
+		_ids_dinamicos[id] = true
 
 
 ## ¿Cuelga de una CanvasLayer (la interfaz: el HUD, los diálogos, la mochila...)? Eso no se toca.
@@ -523,8 +710,11 @@ func _de_pantalla(n: Node) -> bool:
 func _quitar(n: Node) -> void:
 	var id := n.get_instance_id()
 	_canales.erase(id)
+	_ids_dinamicos.erase(id)
+	_ids_estaticos.erase(id)
 	if _gemelos.has(id):
-		(_gemelos[id][1] as Node).queue_free()
+		if is_instance_valid(_gemelos[id][1]):
+			(_gemelos[id][1] as Node).queue_free()
 		_gemelos.erase(id)
 
 
@@ -563,15 +753,38 @@ func _visible(n: CanvasItem) -> bool:
 
 
 func _process(_delta: float) -> void:
-	for id in _gemelos.keys():
+	# el sol sigue la hora del día (de día, cálido; de noche, frío y flojo), y los dibujos se tiñen igual
+	var dia: float = Reloj.luz_dia() if Reloj.has_method("luz_dia") else 1.0
+	var calido: float = Reloj.calidez() if Reloj.has_method("calidez") else 0.0
+	sol.light_energy = lerpf(0.07, 0.27, dia)
+	sol.light_color = Color(0.6, 0.66, 0.95).lerp(Color(1.0, 0.95, 0.86), dia).lerp(Color(1.0, 0.72, 0.45), calido * 0.5)
+	_tinte = Color(0.42, 0.46, 0.68).lerp(Color.WHITE, dia).lerp(Color(1.0, 0.88, 0.78), calido * 0.35)
+	_colocar_camara(0.12)
+	if absf(_tinte.r - _ultimo_tinte.r) + absf(_tinte.g - _ultimo_tinte.g) + absf(_tinte.b - _ultimo_tinte.b) > 0.008:
+		_ultimo_tinte = _tinte
+		for id_e in _ids_estaticos.keys():
+			if not _gemelos.has(id_e):
+				_ids_estaticos.erase(id_e)
+				continue
+			var pe: Array = _gemelos[id_e]
+			if not is_instance_valid(pe[0]) or not is_instance_valid(pe[1]):
+				_ids_estaticos.erase(id_e)
+				_gemelos.erase(id_e)
+				continue
+			(pe[1] as Sprite3D).modulate = (pe[4] as Color) * _tinte
+	for id in _ids_dinamicos.keys():
+		if not _gemelos.has(id):
+			_ids_dinamicos.erase(id)
+			continue
 		var par: Array = _gemelos[id]
-		var n: Node2D = par[0]
-		var g: Sprite3D = par[1]
-		if not is_instance_valid(n):
-			g.queue_free()
+		if not is_instance_valid(par[0]) or not is_instance_valid(par[1]):
+			if is_instance_valid(par[1]):
+				(par[1] as Node).queue_free()
+			_ids_dinamicos.erase(id)
 			_gemelos.erase(id)
 			continue
-		# (solo los que están cerca de la cámara: los demás, ocultos y sin copiar; así no pesa en los mapas grandes)
+		var n: Node2D = par[0]
+		var g: Sprite3D = par[1]
 		var p := n.global_position * PX
 		if absf(p.x - _foco.x) > LEJOS or absf(p.y - _foco.z) > LEJOS:
 			g.visible = false
@@ -579,13 +792,8 @@ func _process(_delta: float) -> void:
 		if par[2] == null or not is_instance_valid(par[2]):
 			par[2] = _ancla(n)
 		_copiar(n, g, par[2], par[3])
-	_colocar_camara(0.12)
 	_mover_capas()
-	# el sol sigue la hora del día (de día, cálido; de noche, frío y flojo), y los dibujos se tiñen igual
-	var dia: float = Reloj.luz_dia() if Reloj.has_method("luz_dia") else 1.0
-	sol.light_energy = lerpf(0.07, 0.27, dia)
-	sol.light_color = Color(0.6, 0.66, 0.95).lerp(Color(1.0, 0.95, 0.86), dia)
-	_tinte = Color(0.42, 0.46, 0.68).lerp(Color.WHITE, dia)
+	_actualizar_postproceso(dia, calido)
 
 
 func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
