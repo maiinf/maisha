@@ -20,6 +20,11 @@ Todas las ramas parten limpiamente de `origin/main` (`03c5857`) y han sido verif
 | `revision/rendimiento` | `4fca984` | Cacheo de `tiene_novedad` en aldeanos, eliminación in-place en ambiente, descarte de nubes fuera de cámara y grupos en `luz_sol` | `cuna_de_musgo`: 141.2 FPS (+10.3%)<br>`prados_del_eco`: 117.8 FPS (+9.1%)<br>`prueba_aldea`: OK |
 | `revision/textos` | `2970d4d` | Lenguaje neutro estricto para Maisha («Sin ayuda no», «tenue pero entera») y susurro de Shamba | `prueba_embarcadero_junco`: OK |
 | `revision/estabilidad` | `1a85ac9` | `set_process(false)` en `_ready()` para nodos liberados (`aldeano.gd`, `recogible.gd`) y captura por ID en lambda de Kitovu | `prueba_kitovu`: OK<br>`prueba_aldea`: OK<br>`prueba_combate`: OK |
+| `revision/musica-completa` | `1842fa6` | 43 pistas regeneradas con timbres orgánicos en paralelo, eliminación de clics de bucle y calibración RMS (-12.8 a -15.2 dBFS) | `prueba_sonido`: OK |
+| `revision/ilustraciones-v2` | `8504c64` | Ilustraciones 3, 17, 20 y 21 con alto nivel de detalle, suavizado del marco del velo sin aros escalonados | `prueba_kitovu`: OK<br>`prueba_lago_espejo`: OK |
+| `revision/sonidos-pasos` | `c43cc64` | 6 pisadas sintetizadas según el terreno (`Region.tipo_suelo`), sincronizadas con el movimiento de Maisha | `prueba_sonido`: OK<br>`prueba_kitovu`: OK |
+| `revision/animaciones-aldeanos` | `178b7cd` | Gestos expresivos individuales con personalidad, parpadeo universal (Mbuzi y Korongo) y bastones continuos | `prueba_aldea`: OK<br>`prueba_kitovu`: OK<br>`prueba_luz`: OK |
+| `revision/estabilidad-blindaje` | `dea862b` | Watchdog de pausas en Impacto, revivir() seguro en Maisha, guardado atómico con .bak y cierre en Diálogo | `prueba_estabilidad`: OK<br>`prueba_guardado`: OK<br>`prueba_combate`: OK |
 
 ---
 
