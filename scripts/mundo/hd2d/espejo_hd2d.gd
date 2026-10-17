@@ -50,20 +50,24 @@ const SOMBREADOR_CAPA := """
 shader_type spatial;
 render_mode diffuse_lambert, specular_disabled;
 uniform sampler2D capa : filter_nearest;
-uniform sampler2D agua : filter_nearest;
+uniform sampler2D agua : filter_linear;
 uniform vec2 origen = vec2(0.0);
 uniform vec2 casillas = vec2(1.0);
 uniform float lado = 1024.0;
 uniform float hundido = 0.0;
 void fragment() {
 	vec2 px = origen + UV * lado;
-	float es_agua = texture(agua, px / 16.0 / casillas).r;
+	// (la máscara, suavizada y con un temblor, para que la orilla sea curva como la pintada y no en escalones)
+	float temblor = sin(px.x * 0.37 + px.y * 0.21) * 0.06 + sin(px.y * 0.53 - px.x * 0.17) * 0.05;
+	float es_agua = texture(agua, px / 16.0 / casillas).r + temblor;
 	if (hundido < 0.5 && es_agua > 0.5) { discard; }
 	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
 	vec3 c = texture(capa, UV).rgb;
 	if (hundido > 0.5) {
 		float brillo = sin(px.x * 0.07 + TIME * 1.3) * sin(px.y * 0.11 - TIME * 0.9);
 		c = mix(c, vec3(0.08, 0.16, 0.24), 0.22) + vec3(0.05, 0.07, 0.08) * smoothstep(0.75, 1.0, brillo);
+		// junto a la orilla, la sombra del borde (se nota que el agua está más abajo)
+		c *= mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua));
 	}
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
@@ -74,14 +78,14 @@ const SOMBREADOR_LEJANO := """
 shader_type spatial;
 render_mode diffuse_lambert, specular_disabled;
 uniform sampler2D suelo : filter_nearest, source_color;
-uniform sampler2D agua : filter_nearest;
+uniform sampler2D agua : filter_linear;
 uniform float hundido = 0.0;
 void fragment() {
 	float es_agua = texture(agua, UV).r;
 	if (hundido < 0.5 && es_agua > 0.5) { discard; }
 	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
 	vec3 c = texture(suelo, UV).rgb;
-	if (hundido > 0.5) { c = mix(c, vec3(0.08, 0.16, 0.24), 0.22); }
+	if (hundido > 0.5) { c = mix(c, vec3(0.08, 0.16, 0.24), 0.22) * mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua)); }
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
 }
@@ -198,37 +202,17 @@ func _crear_suelo() -> void:
 		suelo.material_override = m
 		suelo.position = Vector3(ancho / 2.0, -HONDO_AGUA if hundido > 0.5 else 0.0, alto / 2.0)
 		add_child(suelo)
-	# el agua: una máscara (1 píxel por casilla) para hundirla, y las orillas, paredes de tierra hacia abajo
+	# el agua: una máscara (1 píxel por casilla) para hundirla (la orilla la dibujan los sombreadores, curva y con su
+	# sombra)
 	var img := Image.create(int(ancho), int(alto), false, Image.FORMAT_L8)
-	var orillas := SurfaceTool.new()
-	orillas.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var hay_agua := false
 	for y in filas.size():
 		for x in filas[y].length():
 			if not LETRAS_AGUA.contains(filas[y][x]):
 				continue
-			hay_agua = true
 			img.set_pixel(x, y, Color.WHITE)
-			var d := -HONDO_AGUA
-			if y + 1 < filas.size() and not LETRAS_AGUA.contains(filas[y + 1][x]):
-				_cuad(orillas, Vector3(x + 1, 0, y + 1), Vector3(x, 0, y + 1), Vector3(x, d, y + 1), Vector3(x + 1, d, y + 1))
-			if y > 0 and not LETRAS_AGUA.contains(filas[y - 1][x]):
-				_cuad(orillas, Vector3(x, 0, y), Vector3(x + 1, 0, y), Vector3(x + 1, d, y), Vector3(x, d, y))
-			if x > 0 and not LETRAS_AGUA.contains(filas[y][x - 1]):
-				_cuad(orillas, Vector3(x, 0, y + 1), Vector3(x, 0, y), Vector3(x, d, y), Vector3(x, d, y + 1))
-			if x + 1 < filas[y].length() and not LETRAS_AGUA.contains(filas[y][x + 1]):
-				_cuad(orillas, Vector3(x + 1, 0, y), Vector3(x + 1, 0, y + 1), Vector3(x + 1, d, y + 1), Vector3(x + 1, d, y))
 	_mascara_agua = ImageTexture.create_from_image(img)
 	for m in _suelos_lejanos:
 		m.set_shader_parameter("agua", _mascara_agua)
-	if hay_agua:
-		var mat_orilla := StandardMaterial3D.new()
-		mat_orilla.albedo_color = Color(0.27, 0.21, 0.15)
-		mat_orilla.roughness = 1.0
-		var muro := MeshInstance3D.new()
-		muro.mesh = orillas.commit()
-		muro.material_override = mat_orilla
-		add_child(muro)
 	# las peñas: bloques que se levantan, con el suelo pintado encima y los lados de roca oscura
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
