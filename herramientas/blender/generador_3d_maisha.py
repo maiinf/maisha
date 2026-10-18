@@ -17,6 +17,7 @@ DIR_PERSONAJES = os.path.join(BASE_DIR, "modelos", "personajes")
 DIR_ENEMIGOS = os.path.join(BASE_DIR, "modelos", "enemigos")
 DIR_ENTORNO = os.path.join(BASE_DIR, "modelos", "entorno")
 DIR_OBJETOS = os.path.join(BASE_DIR, "modelos", "objetos")
+DIR_KITOVU = os.path.join(BASE_DIR, "arte", "mundos", "kitovu")
 
 for d in [DIR_PERSONAJES, DIR_ENEMIGOS, DIR_ENTORNO, DIR_OBJETOS]:
     os.makedirs(d, exist_ok=True)
@@ -57,6 +58,36 @@ def obtener_material(nombre, color_hex, roughness=0.6, metallic=0.0, emission_he
             bsdf.inputs["Emission Color"].default_value = hex_to_rgb(emission_hex)
             bsdf.inputs["Emission Strength"].default_value = emission_strength
 
+    return mat
+
+def obtener_material_textura(nombre, ruta_imagen, rugosidad=0.85, metalicidad=0.0, usar_alpha=False):
+    """Crea un material PBR con textura de imagen pixel art (interpolación Closest)."""
+    if nombre in bpy.data.materials:
+        return bpy.data.materials[nombre]
+    mat = bpy.data.materials.new(name=nombre)
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    if not bsdf:
+        bsdf = nodes.new("ShaderNodeBsdfPrincipled")
+    
+    if os.path.exists(ruta_imagen):
+        img = bpy.data.images.load(ruta_imagen, check_existing=True)
+        img.colorspace_settings.name = 'sRGB'
+        tex_node = nodes.new("ShaderNodeTexImage")
+        tex_node.image = img
+        tex_node.interpolation = 'Closest'
+        links.new(tex_node.outputs['Color'], bsdf.inputs['Base Color'])
+        if usar_alpha and 'Alpha' in tex_node.outputs:
+            links.new(tex_node.outputs['Alpha'], bsdf.inputs['Alpha'])
+            if hasattr(mat, 'blend_method'):
+                mat.blend_method = 'CLIP'
+    
+    if 'Roughness' in bsdf.inputs:
+        bsdf.inputs['Roughness'].default_value = rugosidad
+    if 'Metallic' in bsdf.inputs:
+        bsdf.inputs['Metallic'].default_value = metalicidad
     return mat
 
 def get_mat(clave):
@@ -100,6 +131,10 @@ def get_mat(clave):
         "teja_cobriza": ("Mat_Teja_Cobriza", "#C2410C", 0.6, 0.0, None, 0.0),
         "tela_toldo": ("Mat_Tela_Toldo", "#DC2626", 0.7, 0.0, None, 0.0),
         "paja_dorada": ("Mat_Paja_Dorada", "#D97706", 0.8, 0.0, None, 0.0),
+        "paja_techo": ("Mat_Paja_Techo", "#B45309", 0.85, 0.0, None, 0.0),
+        "pizarra_nieve": ("Mat_Pizarra_Nieve", "#475569", 0.7, 0.0, None, 0.0),
+        "madera_roja": ("Mat_Madera_Roja", "#991B1B", 0.75, 0.0, None, 0.0),
+        "bambu_cana": ("Mat_Bambu_Cana", "#65A30D", 0.65, 0.0, None, 0.0),
         "madera_tronco": ("Mat_Madera_Tronco", "#5C381E", 0.75, 0.0, None, 0.0),
         "madera_viga": ("Mat_Madera_Viga", "#78350F", 0.7, 0.0, None, 0.0),
         "piedra_oscura": ("Mat_Piedra_Oscura", "#334155", 0.85, 0.0, None, 0.0)
@@ -118,6 +153,112 @@ def suavizar(obj):
     """Activa sombreado suave para todos los polígonos."""
     for poly in obj.data.polygons:
         poly.use_smooth = True
+
+def crear_prisma_tejado(nombre, x_min, x_max, y_front, y_back, z_base, z_top, mat=None, u_rep=3.0, v_rep=2.0):
+    """Crea un tejado a dos aguas sólido en 360° con cumbrera en X y mapa UV automático."""
+    mesh = bpy.data.meshes.new(nombre)
+    obj = bpy.data.objects.new(nombre, mesh)
+    bpy.context.collection.objects.link(obj)
+    
+    y_ridge = (y_front + y_back) * 0.5
+    verts = [
+        (x_min, y_front, z_base), # 0: Front Left
+        (x_max, y_front, z_base), # 1: Front Right
+        (x_min, y_back, z_base),  # 2: Back Left
+        (x_max, y_back, z_base),  # 3: Back Right
+        (x_min, y_ridge, z_top),  # 4: Ridge Left
+        (x_max, y_ridge, z_top),  # 5: Ridge Right
+    ]
+    faces = [
+        (0, 1, 5, 4), # Vertiente frontal
+        (5, 3, 2, 4), # Vertiente trasera
+        (0, 4, 2),    # Hastial izquierdo
+        (1, 3, 5),    # Hastial derecho
+        (0, 2, 3, 1), # Techo inferior
+    ]
+    mesh.from_pydata(verts, [], faces)
+    mesh.update(calc_edges=True)
+    
+    uv_layer = mesh.uv_layers.new(name="UVMap")
+    uv_coords = [
+        # Cara 0: Frontal (0, 1, 5, 4)
+        [(0.0, 0.0), (u_rep, 0.0), (u_rep, v_rep), (0.0, v_rep)],
+        # Cara 1: Trasera (5, 3, 2, 4)
+        [(u_rep, v_rep), (u_rep, 0.0), (0.0, 0.0), (0.0, v_rep)],
+        # Cara 2: Hastial izq (0, 4, 2)
+        [(0.0, 0.0), (u_rep * 0.5, v_rep), (u_rep, 0.0)],
+        # Cara 3: Hastial der (1, 3, 5)
+        [(0.0, 0.0), (u_rep, 0.0), (u_rep * 0.5, v_rep)],
+        # Cara 4: Inferior (0, 2, 3, 1)
+        [(0.0, 0.0), (0.0, 1.0), (u_rep, 1.0), (u_rep, 0.0)],
+    ]
+    loop_idx = 0
+    for face_idx, poly in enumerate(mesh.polygons):
+        f_uvs = uv_coords[face_idx]
+        for v_idx in range(len(poly.vertices)):
+            uv_layer.data[loop_idx].uv = f_uvs[v_idx]
+            loop_idx += 1
+            
+    if mat:
+        asignar_material(obj, mat)
+    return obj
+
+def crear_prisma_tejado_lr(nombre, x_left, x_right, y_min, y_max, z_base, z_top, mat=None):
+    """Crea un tejado a dos aguas con cumbrera longitudinal en Y (vertientes hacia izquierda y derecha)."""
+    mesh = bpy.data.meshes.new(nombre)
+    obj = bpy.data.objects.new(nombre, mesh)
+    bpy.context.collection.objects.link(obj)
+    
+    x_ridge = (x_left + x_right) * 0.5
+    verts = [
+        (x_left, y_min, z_base),  # 0: Left Front
+        (x_left, y_max, z_base),  # 1: Left Back
+        (x_right, y_min, z_base), # 2: Right Front
+        (x_right, y_max, z_base), # 3: Right Back
+        (x_ridge, y_min, z_top),  # 4: Ridge Front
+        (x_ridge, y_max, z_top),  # 5: Ridge Back
+    ]
+    faces = [
+        (0, 1, 5, 4), # Vertiente izquierda
+        (4, 5, 3, 2), # Vertiente derecha
+        (0, 4, 2),    # Hastial frontal
+        (1, 3, 5),    # Hastial trasero
+        (0, 2, 3, 1), # Techo inferior
+    ]
+    mesh.from_pydata(verts, [], faces)
+    mesh.update(calc_edges=True)
+    if mat:
+        asignar_material(obj, mat)
+    return obj
+
+def crear_pared_uv(nombre, x0, x1, y, z0, z1, mat, u_range=(0.0, 1.0), v_range=(0.0, 1.0), invertir=False):
+    """Crea una pared vertical plana con mapeado UV configurable."""
+    mesh = bpy.data.meshes.new(nombre)
+    obj = bpy.data.objects.new(nombre, mesh)
+    bpy.context.collection.objects.link(obj)
+    
+    verts = [
+        (x0, y, z0),
+        (x1, y, z0),
+        (x1, y, z1),
+        (x0, y, z1),
+    ]
+    faces = [(3, 2, 1, 0)] if invertir else [(0, 1, 2, 3)]
+    mesh.from_pydata(verts, [], faces)
+    mesh.update(calc_edges=True)
+    
+    uv_layer = mesh.uv_layers.new(name="UVMap")
+    u0, u1 = u_range
+    v0, v1 = v_range
+    uv_coords = [(u0, v0), (u1, v0), (u1, v1), (u0, v1)]
+    if invertir:
+        uv_coords = [(u0, v1), (u1, v1), (u1, v0), (u0, v0)]
+    for i, loop in enumerate(mesh.loops):
+        uv_layer.data[i].uv = uv_coords[i % 4]
+        
+    if mat:
+        asignar_material(obj, mat)
+    return obj
 
 DIR_BLEND = os.path.join(BASE_DIR, "herramientas", "blender", "fuentes")
 os.makedirs(DIR_BLEND, exist_ok=True)
@@ -805,12 +946,8 @@ def generar_puesto_tawi():
             poste = bpy.context.active_object
             asignar_material(poste, get_mat("arbol_corteza"))
             
-    # 3. Toldo de tela arqueado a dos aguas
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.35, depth=2.5, location=(0, 0, 2.25))
-    toldo = bpy.context.active_object
-    toldo.rotation_euler = (0, math.radians(90), 0)
-    toldo.scale = (0.85, 0.42, 1.0)
-    asignar_material(toldo, get_mat("tela_toldo"))
+    # 3. Toldo de tela arqueado a dos aguas sólido en 360°
+    crear_prisma_tejado("Puesto_Toldo", -1.3, 1.3, -0.65, 0.65, 1.95, 2.45, get_mat("tela_toldo"))
     
     # Faldón perimetral decorativo
     for sy in [-0.52, 0.52]:
@@ -895,12 +1032,8 @@ def generar_gran_archivo_sigilia():
         capitel.scale = (0.5, 0.5, 0.15)
         asignar_material(capitel, get_mat("oro_reliquia"))
         
-    # Frontón triangular
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=2.6, depth=1.6, location=(0, -1.35, 3.9))
-    pedimento = bpy.context.active_object
-    pedimento.rotation_euler = (0, math.radians(90), 0)
-    pedimento.scale = (0.35, 1.0, 1.0)
-    asignar_material(pedimento, get_mat("marmol_sigilia"))
+    # Frontón triangular monumental en 360°
+    crear_prisma_tejado("Archivo_Fronton", -2.6, 2.6, -1.75, -0.95, 3.45, 4.45, get_mat("marmol_sigilia"))
     
     # 4. Puertas monumentales de bronce
     bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.32, 1.6))
@@ -961,18 +1094,11 @@ def generar_taller_taa():
             viga_v.scale = (0.12, 0.12, 1.5)
             asignar_material(viga_v, get_mat("madera_tronco"))
             
-    # 3. Tejado a dos aguas de teja cobriza
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.75, depth=3.4, location=(0, -0.15, 4.0))
-    techo = bpy.context.active_object
-    techo.rotation_euler = (0, math.radians(90), 0)
-    techo.scale = (0.9, 0.65, 1.0)
-    asignar_material(techo, get_mat("teja_cobriza"))
+    # 3. Tejado a dos aguas de teja cobriza sólido en 360°
+    crear_prisma_tejado("Taller_Techo", -1.8, 1.8, -1.6, 1.25, 3.4, 4.6, get_mat("teja_cobriza"))
     
     # Buhardilla frontal
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=0.6, depth=0.8, location=(0, -1.3, 4.0))
-    buhardilla = bpy.context.active_object
-    buhardilla.rotation_euler = (math.radians(-90), 0, 0)
-    asignar_material(buhardilla, get_mat("teja_cobriza"))
+    crear_prisma_tejado("Taller_Buhardilla", -0.5, 0.5, -1.75, -1.15, 3.8, 4.4, get_mat("teja_cobriza"))
     
     # 4. Cartel de forja con frasco de tinta
     bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.03, depth=0.9, location=(1.35, -1.4, 2.3))
@@ -1022,12 +1148,8 @@ def generar_casa_escriba():
             esquina.scale = (0.16, 0.16, 2.82)
             asignar_material(esquina, get_mat("piedra_plaza"))
             
-    # 2. Tejado a dos aguas
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.65, depth=3.0, location=(0, 0, 3.4))
-    techo = bpy.context.active_object
-    techo.rotation_euler = (0, math.radians(90), 0)
-    techo.scale = (0.95, 0.62, 1.0)
-    asignar_material(techo, get_mat("teja_cobriza"))
+    # 2. Tejado a dos aguas sólido en 360°
+    crear_prisma_tejado("Escriba_Techo", -1.55, 1.55, -1.35, 1.35, 2.9, 4.1, get_mat("teja_cobriza"))
     
     # 3. Balcón frontal de madera tallada
     bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.25, 1.9))
@@ -1072,162 +1194,137 @@ def generar_casa_escriba():
 
 def generar_casa_granja_shamba():
     """Genera la Casona de troncos de Mzee Shamba completa en 360° (El Kitovu):
-    Dimensiones a escala exacta del pixel art (9.4m ancho, 5.2m profundidad, 8.2m alto).
+    Dimensiones a escala exacta del pixel art y colisión 2D (8.8m ancho, 2.4m fondo, 5.2m alto).
     Zócalo de mampostería de piedra perimetral, paredes de troncos macizos cerradas por los 4 costados,
-    gran tejado a dos aguas con aleros voladizos en 360°, porche frontal con postes y techillo, farol cálido,
-    puerta de madera maciza, buhardilla superior encendida, chimenea de piedra con remate,
-    rueda de molino de agua hidráulica lateral con aspas y canaleta, y ventana trasera con moldura."""
+    fachada frontal y trasera UV-mapeadas a texturas pixel-art oficiales con filtro nearest,
+    gran tejado a dos aguas de paja dorada con aleros voladizos en 360°, buhardilla superior encendida,
+    porche frontal con 4 postes, techillo y farol cálido, chimenea lateral de mampostería y molino de agua hidráulico."""
     limpiar_escena()
     
-    w = 9.4
-    depth = 5.2
-    cx = -0.5
+    tex_frontal = os.path.join(DIR_KITOVU, "casa_granja.png")
+    tex_trasera = os.path.join(DIR_KITOVU, "trasera_casa_granja.png")
+    tex_paja = os.path.join(DIR_KITOVU, "tejado_paja_tile.png")
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    tex_piedra = os.path.join(DIR_KITOVU, "mamposteria_tile.png")
+    tex_molino = os.path.join(DIR_KITOVU, "molino.png")
+    
+    mat_frontal = obtener_material_textura("Mat_Granja_Frontal", tex_frontal, rugosidad=0.88, usar_alpha=True)
+    mat_trasera = obtener_material_textura("Mat_Granja_Trasera", tex_trasera, rugosidad=0.88, usar_alpha=True)
+    mat_tejado = obtener_material_textura("Mat_Granja_Tejado", tex_paja, rugosidad=0.92)
+    mat_troncos = obtener_material_textura("Mat_Granja_Troncos", tex_troncos, rugosidad=0.85)
+    mat_piedra = obtener_material_textura("Mat_Granja_Piedra", tex_piedra, rugosidad=0.90)
+    mat_madera_viga = obtener_material("Mat_Madera_Viga", "#78350F", roughness=0.8)
+    mat_farol = obtener_material("Mat_Farol", "#FDE047", roughness=0.2, emission_hex="#FEF08A", emission_strength=4.0)
+    mat_molino = obtener_material_textura("Mat_Molino", tex_molino, rugosidad=0.8, usar_alpha=True)
+    
+    w = 8.8
+    depth = 2.4
+    cx = 0.0
     
     # 1. Zócalo de mampostería de piedra perimetral (base sólida en 360°)
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, depth * 0.5, 0.45))
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, depth * 0.5, 0.35))
     zocalo = bpy.context.active_object
     zocalo.name = "Granja_Zocalo"
-    zocalo.scale = (w, depth, 0.9)
-    asignar_material(zocalo, get_mat("piedra_plaza"))
+    zocalo.scale = (w, depth, 0.7)
+    asignar_material(zocalo, mat_piedra)
     
-    # 2. Paredes de troncos macizos cerradas por todos los costados (frontal, trasera y laterales)
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, depth * 0.5, 2.35))
-    cuerpo = bpy.context.active_object
-    cuerpo.name = "Granja_Cuerpo"
-    cuerpo.scale = (w - 0.25, depth - 0.25, 2.9)
-    asignar_material(cuerpo, get_mat("madera_tablas"))
-    
-    # Cornisas y vigas de troncos que rodean toda la casa en 360°
-    for z in [0.95, 2.2, 3.75]:
-        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, depth * 0.5, z))
-        viga = bpy.context.active_object
-        viga.scale = (w + 0.1, depth + 0.1, 0.14)
-        asignar_material(viga, get_mat("madera_tronco"))
-        
-    # Postes esquineros verticales de tronco macizo
-    for px in [cx - w * 0.5 + 0.12, cx + w * 0.5 - 0.12]:
-        for py in [0.12, depth - 0.12]:
-            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.22, depth=3.0, location=(px, py, 2.4))
-            col = bpy.context.active_object
-            asignar_material(col, get_mat("madera_tronco"))
+    # 2. Paredes laterales de troncos (cerradas en 360°)
+    for px, sign in [(cx - w * 0.5 + 0.05, -1), (cx + w * 0.5 - 0.05, 1)]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, depth * 0.5, 1.85))
+        pared_lat = bpy.context.active_object
+        pared_lat.name = f"Granja_Pared_Lat_{'D' if sign>0 else 'I'}"
+        pared_lat.scale = (0.1, depth - 0.1, 2.3)
+        asignar_material(pared_lat, mat_troncos)
 
-    # 3. Tejado a dos aguas sólido con aleros voladizos en 360°
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=depth * 0.72, depth=w + 1.2, location=(cx, depth * 0.5, 5.2))
-    techo = bpy.context.active_object
-    techo.name = "Granja_Techo"
-    techo.rotation_euler = (0, math.radians(90), 0)
-    techo.scale = (1.1, depth / (depth * 0.72) * 0.85, 1.0)
-    asignar_material(techo, get_mat("teja_cobriza"))
+    # 3. Fachada Frontal de la pared (desde el suelo z=0 hasta el inicio del alero z=3.0)
+    crear_pared_uv("Granja_Pared_Frontal", cx - w * 0.5, cx + w * 0.5, -0.02, 0.0, 3.0, mat_frontal, 
+                   u_range=(0.163, 0.924), v_range=(0.057, 0.464), invertir=False)
     
-    # Hastiales de madera en los laterales (izquierdo y derecho)
-    for px in [cx - w * 0.5 - 0.05, cx + w * 0.5 + 0.05]:
-        bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=depth * 0.62, depth=0.15, location=(px, depth * 0.5, 5.1))
-        hastial = bpy.context.active_object
-        hastial.rotation_euler = (0, math.radians(90), 0)
-        hastial.scale = (1.05, depth / (depth * 0.72) * 0.8, 1.0)
-        asignar_material(hastial, get_mat("madera_tablas"))
+    # 4. Fachada Trasera de la pared (desde el suelo z=0 hasta el inicio del alero z=3.0)
+    crear_pared_uv("Granja_Pared_Trasera", cx - w * 0.5, cx + w * 0.5, depth + 0.02, 0.0, 3.0, mat_trasera,
+                   u_range=(0.163, 0.924), v_range=(0.057, 0.464), invertir=True)
 
-    # 4. Porche frontal con postes y techillo
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, -0.65, 0.35))
-    porche_suelo = bpy.context.active_object
-    porche_suelo.scale = (6.2, 1.4, 0.3)
-    asignar_material(porche_suelo, get_mat("madera_tablas"))
-    
-    for px in [cx - 2.8, cx - 0.9, cx + 0.9, cx + 2.8]:
-        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.09, depth=2.4, location=(px, -1.25, 1.55))
-        poste = bpy.context.active_object
-        asignar_material(poste, get_mat("madera_viga"))
-        
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, -0.65, 2.75))
-    alero_porche = bpy.context.active_object
-    alero_porche.scale = (6.4, 1.5, 0.12)
-    alero_porche.rotation_euler = (math.radians(12), 0, 0)
-    asignar_material(alero_porche, get_mat("teja_cobriza"))
-    
-    # Farol colgante en el porche (luz cálida)
-    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.18, location=(cx + 1.2, -1.2, 2.35))
-    farol_porche = bpy.context.active_object
-    asignar_material(farol_porche, get_mat("farol_luz"))
-    
-    # 5. Puerta frontal de madera maciza
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, -0.15, 1.5))
-    puerta = bpy.context.active_object
-    puerta.scale = (1.4, 0.15, 2.1)
-    asignar_material(puerta, get_mat("madera_viga"))
-    
-    # Ventanas frontales de la planta baja
-    for px in [cx - 2.2, cx + 2.2]:
-        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, -0.15, 2.2))
-        vent = bpy.context.active_object
-        vent.scale = (1.2, 0.12, 1.1)
-        asignar_material(vent, get_mat("farol_luz"))
-    
-    # 6. Buhardilla superior encendida (en la vertiente frontal del tejado)
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, depth * 0.18, 5.2))
+    # 5. Gran Tejado a dos aguas sólido en 360° con cumbrera central
+    crear_prisma_tejado("Granja_Techo", cx - w * 0.5 - 0.35, cx + w * 0.5 + 0.35, -0.35, depth + 0.35, 2.95, 5.2, mat_tejado, u_rep=3.5, v_rep=2.2)
+
+    # Buhardilla superior 3D con techillo y ventana redonda
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, depth * 0.28, 4.1))
     buhardilla = bpy.context.active_object
-    buhardilla.scale = (1.8, 1.5, 1.5)
-    asignar_material(buhardilla, get_mat("madera_tablas"))
+    buhardilla.name = "Granja_Buhardilla"
+    buhardilla.scale = (1.5, 0.9, 1.1)
+    asignar_material(buhardilla, mat_troncos)
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.1, depth=1.7, location=(cx, depth * 0.18, 6.0))
-    techo_buhardilla = bpy.context.active_object
-    techo_buhardilla.rotation_euler = (0, math.radians(90), 0)
-    techo_buhardilla.scale = (1.0, 0.8, 1.0)
-    asignar_material(techo_buhardilla, get_mat("teja_cobriza"))
+    crear_prisma_tejado("Granja_Buhardilla_Techo", cx - 0.85, cx + 0.85, -0.25, depth * 0.45, 4.5, 5.15, mat_tejado, u_rep=1.0, v_rep=1.0)
     
-    bpy.ops.mesh.primitive_plane_add(size=0.8, location=(cx, -0.58, 5.3))
-    cristal_buhardilla = bpy.context.active_object
-    cristal_buhardilla.rotation_euler = (math.radians(-90), 0, 0)
-    asignar_material(cristal_buhardilla, get_mat("farol_luz"))
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.35, depth=0.1, location=(cx, -0.22, 4.15))
+    cristal_buh = bpy.context.active_object
+    cristal_buh.name = "Granja_Buhardilla_Ventana"
+    cristal_buh.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(cristal_buh, mat_farol)
+
+    # 6. Porche Frontal 3D que se extiende hacia el jugador (Y = -0.4 a -0.75)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, -0.4, 0.18))
+    porche_suelo = bpy.context.active_object
+    porche_suelo.name = "Granja_Porche_Suelo"
+    porche_suelo.scale = (5.8, 0.75, 0.36)
+    asignar_material(porche_suelo, mat_piedra)
     
-    # 7. Gran chimenea lateral de mampostería de piedra
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx + w * 0.5 - 0.75, depth * 0.42, 4.6))
+    for px in [cx - 2.5, cx - 0.85, cx + 0.85, cx + 2.5]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.075, depth=2.1, location=(px, -0.72, 1.20))
+        poste = bpy.context.active_object
+        poste.name = "Granja_Poste"
+        asignar_material(poste, mat_madera_viga)
+        
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, -0.40, 2.30))
+    alero_porche = bpy.context.active_object
+    alero_porche.name = "Granja_Porche_Techo"
+    alero_porche.scale = (6.0, 0.90, 0.12)
+    alero_porche.rotation_euler = (math.radians(10), 0, 0)
+    asignar_material(alero_porche, mat_tejado)
+    
+    # Farol colgante encendido en el porche
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.16, location=(cx + 1.1, -0.68, 2.12))
+    farol = bpy.context.active_object
+    farol.name = "Granja_Farol"
+    asignar_material(farol, mat_farol)
+
+    # 7. Gran chimenea lateral de mampostería de piedra (a la derecha)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx + w * 0.5 - 0.75, depth * 0.5, 3.1))
     chimenea = bpy.context.active_object
-    chimenea.scale = (1.3, 1.3, 8.6)
-    asignar_material(chimenea, get_mat("piedra_plaza"))
+    chimenea.name = "Granja_Chimenea"
+    chimenea.scale = (1.1, 1.1, 6.2)
+    asignar_material(chimenea, mat_piedra)
     
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx + w * 0.5 - 0.75, depth * 0.42, 9.0))
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx + w * 0.5 - 0.75, depth * 0.5, 6.3))
     chimenea_cap = bpy.context.active_object
-    chimenea_cap.scale = (1.5, 1.5, 0.25)
-    asignar_material(chimenea_cap, get_mat("piedra_oscura"))
-    
-    # 8. Rueda de molino de agua hidráulica lateral (a la izquierda)
-    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.35, depth=1.0, location=(cx - w * 0.5 - 0.5, depth * 0.45, 1.8))
+    chimenea_cap.name = "Granja_Chimenea_Cap"
+    chimenea_cap.scale = (1.3, 1.3, 0.25)
+    asignar_material(chimenea_cap, mat_piedra)
+
+    # 8. Rueda de molino de agua lateral (a la izquierda)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.22, depth=0.8, location=(cx - w * 0.5 - 0.42, depth * 0.5, 1.6))
     eje_rueda = bpy.context.active_object
+    eje_rueda.name = "Granja_Molino_Eje"
     eje_rueda.rotation_euler = (0, math.radians(90), 0)
-    asignar_material(eje_rueda, get_mat("madera_viga"))
+    asignar_material(eje_rueda, mat_madera_viga)
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.8, depth=0.45, location=(cx - w * 0.5 - 0.65, depth * 0.45, 1.8))
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.45, depth=0.32, location=(cx - w * 0.5 - 0.52, depth * 0.5, 1.6))
     aro_rueda = bpy.context.active_object
+    aro_rueda.name = "Granja_Molino_Aro"
     aro_rueda.rotation_euler = (0, math.radians(90), 0)
-    asignar_material(aro_rueda, get_mat("madera_tablas"))
+    asignar_material(aro_rueda, mat_molino)
     
     for i in range(8):
         ang = i * (math.pi / 4)
-        lx = cx - w * 0.5 - 0.65
-        ly = depth * 0.45 + math.cos(ang) * 1.45
-        lz = 1.8 + math.sin(ang) * 1.45
+        lx = cx - w * 0.5 - 0.52
+        ly = depth * 0.5 + math.cos(ang) * 1.15
+        lz = 1.6 + math.sin(ang) * 1.15
         bpy.ops.mesh.primitive_cube_add(size=1.0, location=(lx, ly, lz))
         pala = bpy.context.active_object
-        pala.scale = (0.42, 0.36, 0.06)
+        pala.name = f"Granja_Pala_{i}"
+        pala.scale = (0.32, 0.28, 0.05)
         pala.rotation_euler = (ang, 0, 0)
-        asignar_material(pala, get_mat("madera_tronco"))
-        
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx - w * 0.5 - 0.45, depth * 0.45, 3.5))
-    canaleta = bpy.context.active_object
-    canaleta.scale = (0.9, 2.2, 0.22)
-    asignar_material(canaleta, get_mat("madera_tronco"))
-    
-    # 9. Pared trasera detallada con ventanas (vista sólida en 360°)
-    for vx in [cx - 2.2, cx + 1.8]:
-        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(vx, depth + 0.14, 2.2))
-        ventana_trasera = bpy.context.active_object
-        ventana_trasera.scale = (1.2, 0.12, 1.0)
-        asignar_material(ventana_trasera, get_mat("madera_viga"))
-        
-        bpy.ops.mesh.primitive_plane_add(size=0.7, location=(vx, depth + 0.22, 2.2))
-        cristal_trasero = bpy.context.active_object
-        cristal_trasero.rotation_euler = (math.radians(90), 0, 0)
-        asignar_material(cristal_trasero, get_mat("farol_luz"))
+        asignar_material(pala, mat_madera_viga)
 
     exportar_modelo("casa_granja", DIR_ENTORNO)
 
@@ -1270,12 +1367,8 @@ def generar_pozo_antiguo():
     cubo = bpy.context.active_object
     asignar_material(cubo, get_mat("madera_tronco"))
     
-    # 5. Tejadillo a dos aguas
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=0.8, depth=1.65, location=(0, 0, 2.0))
-    techo = bpy.context.active_object
-    techo.rotation_euler = (0, math.radians(90), 0)
-    techo.scale = (1.1, 0.6, 1.0)
-    asignar_material(techo, get_mat("madera_tablas"))
+    # 5. Tejadillo a dos aguas sólido en 360°
+    crear_prisma_tejado("Pozo_Techo", -0.85, 0.85, -0.65, 0.65, 1.7, 2.25, get_mat("madera_tablas"))
     
     exportar_modelo("pozo_antiguo", DIR_ENTORNO)
 
@@ -1687,6 +1780,237 @@ def generar_cetro_raiz():
 
     exportar_modelo("cetro_raiz", DIR_OBJETOS)
 
+def generar_casa_juncos():
+    """Genera la Cabaña de Juncos sobre pilotes (Embarcadero Junco) completa en 360°:
+    Pilotes de madera, plataforma de tablones, paredes de juncos y cañas, tejado a dos aguas de paja dorada."""
+    limpiar_escena()
+    w, depth = 3.6, 2.6
+    for px in [-1.6, 0.0, 1.6]:
+        for py in [-1.1, 1.1]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.10, depth=1.6, location=(px, py, 0.4))
+            poste = bpy.context.active_object
+            asignar_material(poste, get_mat("madera_tronco"))
+            
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.15))
+    suelo = bpy.context.active_object
+    suelo.scale = (w + 0.4, depth + 0.6, 0.2)
+    asignar_material(suelo, get_mat("madera_tablas"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.15, 2.2))
+    paredes = bpy.context.active_object
+    paredes.scale = (w, depth, 1.9)
+    asignar_material(paredes, get_mat("paja_dorada"))
+    
+    for z in [1.3, 2.2, 3.1]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.15, z))
+        viga = bpy.context.active_object
+        viga.scale = (w + 0.1, depth + 0.1, 0.1)
+        asignar_material(viga, get_mat("madera_viga"))
+        
+    crear_prisma_tejado("Juncos_Techo", -w * 0.5 - 0.4, w * 0.5 + 0.4, -depth * 0.5 - 0.2, depth * 0.5 + 0.5, 3.0, 4.4, get_mat("paja_techo"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.05, 1.35))
+    puerta = bpy.context.active_object
+    puerta.scale = (1.0, 0.1, 1.7)
+    asignar_material(puerta, get_mat("madera_viga"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.9, -1.35, 1.6))
+    baranda = bpy.context.active_object
+    baranda.scale = (1.4, 0.06, 0.45)
+    asignar_material(baranda, get_mat("madera_tronco"))
+        
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.14, location=(-1.2, -1.1, 2.3))
+    farol = bpy.context.active_object
+    asignar_material(farol, get_mat("farol_luz"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, depth * 0.5 + 0.18, 2.2))
+    vent_tras = bpy.context.active_object
+    vent_tras.scale = (0.8, 0.1, 0.8)
+    asignar_material(vent_tras, get_mat("farol_luz"))
+    
+    exportar_modelo("casa_juncos", DIR_ENTORNO)
+
+def generar_casa_bata():
+    """Genera la Cabaña del barquero Bata (Embarcadero Junco) completa en 360°:
+    Pilotes sobre el agua, paredes de tablas de madera vieja curtida, tejado de teja cobriza."""
+    limpiar_escena()
+    w, depth = 3.2, 2.4
+    for px in [-1.4, 1.4]:
+        for py in [-1.0, 1.0]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.09, depth=1.5, location=(px, py, 0.4))
+            p = bpy.context.active_object
+            asignar_material(p, get_mat("madera_tronco"))
+            
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.15))
+    suelo = bpy.context.active_object
+    suelo.scale = (w + 0.4, depth + 0.5, 0.18)
+    asignar_material(suelo, get_mat("madera_tablas"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.1, 2.15))
+    pared = bpy.context.active_object
+    pared.scale = (w, depth, 1.8)
+    asignar_material(pared, get_mat("madera_tablas"))
+    
+    crear_prisma_tejado("Bata_Techo", -w * 0.5 - 0.35, w * 0.5 + 0.35, -depth * 0.5 - 0.25, depth * 0.5 + 0.45, 2.95, 4.2, get_mat("teja_cobriza"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.5, -depth * 0.5 + 0.05, 1.85))
+    puerta = bpy.context.active_object
+    puerta.scale = (0.9, 0.1, 1.6)
+    asignar_material(puerta, get_mat("madera_viga"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.28, depth=0.7, location=(1.1, -0.9, 1.55))
+    barril = bpy.context.active_object
+    asignar_material(barril, get_mat("madera_tronco"))
+    
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.14, location=(-0.5, -1.2, 2.4))
+    farol = bpy.context.active_object
+    asignar_material(farol, get_mat("farol_luz"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.3, depth * 0.5 + 0.14, 2.2))
+    v_tras = bpy.context.active_object
+    v_tras.scale = (0.8, 0.1, 0.7)
+    asignar_material(v_tras, get_mat("farol_luz"))
+    
+    exportar_modelo("casa_bata", DIR_ENTORNO)
+
+def generar_casa_nungu():
+    """Genera el Refugio de Montaña de Nungu (Paso Piedra / Paso Escarcha) completo en 360°:
+    Mampostería maciza de granito, tejado alpino de pizarra con vertientes empinadas y chimenea."""
+    limpiar_escena()
+    w, depth = 4.2, 2.8
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.4))
+    muro = bpy.context.active_object
+    muro.scale = (w, depth, 2.6)
+    asignar_material(muro, get_mat("piedra_plaza"))
+    
+    for ex in [-w * 0.5 - 0.05, w * 0.5 + 0.05]:
+        for ey in [-depth * 0.5 - 0.05, depth * 0.5 + 0.05]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(ex, ey, 1.4))
+            esq = bpy.context.active_object
+            esq.scale = (0.35, 0.35, 2.65)
+            asignar_material(esq, get_mat("piedra_oscura"))
+            
+    crear_prisma_tejado("Nungu_Techo", -w * 0.5 - 0.45, w * 0.5 + 0.45, -depth * 0.5 - 0.4, depth * 0.5 + 0.4, 2.6, 4.6, get_mat("pizarra_nieve"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -depth * 0.5 - 0.05, 1.1))
+    puerta = bpy.context.active_object
+    puerta.scale = (1.2, 0.15, 1.9)
+    asignar_material(puerta, get_mat("madera_viga"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(w * 0.5 - 0.3, 0.2, 2.8))
+    chim = bpy.context.active_object
+    chim.scale = (0.9, 0.9, 4.8)
+    asignar_material(chim, get_mat("piedra_plaza"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(w * 0.5 - 0.3, 0.2, 5.25))
+    cap = bpy.context.active_object
+    cap.scale = (1.1, 1.1, 0.2)
+    asignar_material(cap, get_mat("piedra_oscura"))
+    
+    for vy in [-depth * 0.5 - 0.05, depth * 0.5 + 0.05]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.2, vy, 1.6))
+        vent = bpy.context.active_object
+        vent.scale = (0.9, 0.12, 0.9)
+        asignar_material(vent, get_mat("farol_luz"))
+        
+    exportar_modelo("casa_nungu", DIR_ENTORNO)
+
+def generar_granero():
+    """Genera el Granero de Campo Segado completo en 360°:
+    Tablas rojas agrícolas, portón doble, tejado a dos aguas y vano de pajar con polea."""
+    limpiar_escena()
+    w, depth = 6.8, 3.6
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.3))
+    zocalo = bpy.context.active_object
+    zocalo.scale = (w, depth, 0.6)
+    asignar_material(zocalo, get_mat("piedra_plaza"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 2.1))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (w - 0.15, depth - 0.15, 3.0)
+    asignar_material(cuerpo, get_mat("madera_roja"))
+    
+    for z in [0.65, 2.1, 3.55]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, z))
+        viga = bpy.context.active_object
+        viga.scale = (w + 0.1, depth + 0.1, 0.12)
+        asignar_material(viga, get_mat("marmol_sigilia"))
+        
+    crear_prisma_tejado("Granero_Techo", -w * 0.5 - 0.4, w * 0.5 + 0.4, -depth * 0.5 - 0.35, depth * 0.5 + 0.35, 3.5, 5.8, get_mat("teja_cobriza"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -depth * 0.5 - 0.05, 1.4))
+    porton = bpy.context.active_object
+    porton.scale = (2.4, 0.12, 2.2)
+    asignar_material(porton, get_mat("madera_viga"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -depth * 0.5 - 0.05, 4.0))
+    vano = bpy.context.active_object
+    vano.scale = (1.2, 0.12, 1.2)
+    asignar_material(vano, get_mat("madera_tronco"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.04, depth=1.1, location=(0, -depth * 0.5 - 0.55, 4.7))
+    brazo_p = bpy.context.active_object
+    brazo_p.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(brazo_p, get_mat("madera_viga"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -depth * 0.5 - 0.55, 4.1))
+    heno = bpy.context.active_object
+    heno.scale = (0.65, 0.5, 0.5)
+    asignar_material(heno, get_mat("paja_dorada"))
+    
+    for vx in [-1.8, 1.8]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(vx, depth * 0.5 + 0.05, 2.2))
+        vent_t = bpy.context.active_object
+        vent_t.scale = (1.1, 0.1, 0.9)
+        asignar_material(vent_t, get_mat("farol_luz"))
+        
+    exportar_modelo("granero", DIR_ENTORNO)
+
+def generar_palafito():
+    """Genera el Palafito de Las Pasarelas completo en 360°:
+    Altos pilotes sobre aguas profundas, choza de bambú, plataforma de tablas y tejado de paja."""
+    limpiar_escena()
+    w, depth = 3.4, 2.8
+    for px in [-1.4, 0.0, 1.4]:
+        for py in [-1.1, 1.1]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.09, depth=2.4, location=(px, py, 0.8))
+            p = bpy.context.active_object
+            asignar_material(p, get_mat("madera_tronco"))
+            
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.95))
+    suelo = bpy.context.active_object
+    suelo.scale = (w + 0.5, depth + 0.5, 0.18)
+    asignar_material(suelo, get_mat("madera_tablas"))
+    
+    for bx in [-w * 0.5 - 0.15, w * 0.5 + 0.15]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(bx, 0, 2.35))
+        bar = bpy.context.active_object
+        bar.scale = (0.06, depth + 0.4, 0.55)
+        asignar_material(bar, get_mat("madera_viga"))
+        
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.15, 2.9))
+    choza = bpy.context.active_object
+    choza.scale = (w - 0.4, depth - 0.4, 1.7)
+    asignar_material(choza, get_mat("bambu_cana"))
+    
+    crear_prisma_tejado("Palafito_Techo", -w * 0.5 - 0.35, w * 0.5 + 0.35, -depth * 0.5 - 0.2, depth * 0.5 + 0.5, 3.6, 4.9, get_mat("paja_techo"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -depth * 0.5 + 0.25, 2.55))
+    puerta = bpy.context.active_object
+    puerta.scale = (0.9, 0.1, 1.4)
+    asignar_material(puerta, get_mat("madera_viga"))
+    
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.15, location=(-1.1, -1.0, 2.8))
+    farol = bpy.context.active_object
+    asignar_material(farol, get_mat("farol_luz"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, depth * 0.5 + 0.05, 2.85))
+    vent_t = bpy.context.active_object
+    vent_t.scale = (0.75, 0.1, 0.75)
+    asignar_material(vent_t, get_mat("farol_luz"))
+    
+    exportar_modelo("palafito", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -1709,7 +2033,7 @@ def main():
     generar_babosa_oxido()
     generar_corazon_giza()
     
-    print("\n[3/5] Generando Arquitectura de El Kitovu, Cuna de Musgo y Sigilia...")
+    print("\n[3/5] Generando Arquitectura de El Kitovu, Cuna de Musgo, Sigilia y Biomas...")
     generar_gran_arbol()
     generar_casa_granja_shamba()
     generar_casa_pino()
@@ -1728,6 +2052,11 @@ def main():
     generar_taller_taa()
     generar_casa_escriba()
     generar_fuente_plaza()
+    generar_casa_juncos()
+    generar_casa_bata()
+    generar_casa_nungu()
+    generar_granero()
+    generar_palafito()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

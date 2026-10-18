@@ -49,21 +49,17 @@ const VENTANA := Vector2i(128, 160)       # píxeles de cada ventanita
 const VENTANA_PIE := Vector2(64, 148)     # dónde cae el pie del objeto dentro de la ventanita
 const VENTANAS := 16                      # ventanitas para los objetos de pie más cercanos a la cámara
 const LADO_CAPA := 768             # píxeles de la capa de suelo (48 m alrededor de Maisha: cubre toda la cámara)
-## El suelo cercano: la capa de suelo, con luz (para las sombras)
-## Con «hundido» = 0 es el suelo, con un agujero donde hay agua; con 1, el agua (más abajo, algo más oscura y azul,
-## con un brillo que se mueve). «agua» es la máscara del mapa (1 píxel por casilla).
+## El suelo cercano: la capa de suelo, con luz (para las sombras de personajes, huellas y Giza)
 const SOMBREADOR_CAPA := """
 shader_type spatial;
-render_mode diffuse_lambert;
+render_mode diffuse_lambert, depth_draw_opaque;
 uniform sampler2D capa : filter_nearest;
 uniform sampler2D agua : filter_linear;
 uniform sampler2D mapa_ao : filter_linear;
 uniform vec2 origen = vec2(0.0);
 uniform vec2 casillas = vec2(1.0);
-uniform float lado = 1024.0;
-uniform float hundido = 0.0;
+uniform float lado = 768.0;
 uniform float fuerza_nubes = 0.14;
-uniform float calma_lago = 0.0;
 
 void vertex() {
 	// Terreno plano y estable: cero deformación de vértices para erradicar cualquier oscilación al caminar
@@ -72,62 +68,35 @@ void vertex() {
 void fragment() {
 	vec2 px = origen + UV * lado;
 	vec2 uv_mapa = px / 16.0 / casillas;
-	float f_calma = 1.0 - calma_lago * 0.85;
-	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.04 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.03) * f_calma;
-	float es_agua = texture(agua, uv_mapa).r + temblor;
+	float es_agua = texture(agua, uv_mapa).r;
 
-	if (hundido < 0.5) {
-		// Capa de suelo: abre el hueco limpio donde hay agua
-		if (es_agua > 0.38) { discard; }
-		vec3 c = texture(capa, UV).rgb;
-		float ao = texture(mapa_ao, uv_mapa).r;
-		c *= mix(1.0, 0.56, ao);
-		// Sombra suave en la orilla del talud
-		float orilla_sombra = smoothstep(0.18, 0.38, es_agua);
-		c *= mix(1.0, 0.80, orilla_sombra);
-		if (fuerza_nubes > 0.005) {
-			vec2 p_nube = px * 0.0065 + vec2(TIME * 0.09, TIME * 0.04);
-			float n_nube = sin(p_nube.x + sin(p_nube.y * 1.3)) * cos(p_nube.y * 0.9 - sin(p_nube.x * 0.8)) * 0.5 + 0.5;
-			c *= 1.0 - smoothstep(0.54, 0.88, n_nube) * fuerza_nubes;
-		}
-		vec2 d_borde = min(uv_mapa * casillas, (vec2(1.0) - uv_mapa) * casillas);
-		float f_borde = clamp(min(d_borde.x, d_borde.y) / 2.2, 0.0, 1.0);
-		c *= mix(0.28, 1.0, smoothstep(0.0, 1.0, f_borde));
-		ALBEDO = c;
-		ROUGHNESS = 0.96;
-		SPECULAR = 0.04;
-	} else if (hundido > 1.5) {
-		// Lecho sólido del fondo del agua: continuo y seguro, elimina cualquier hueco negro
-		vec3 c = texture(capa, UV).rgb;
-		c = mix(vec3(0.12, 0.20, 0.18), c * 0.52, 0.65);
-		ALBEDO = c;
-		ROUGHNESS = 0.98;
-		SPECULAR = 0.02;
-	} else {
-		// Lámina de agua cristalina y reflectante
-		if (es_agua <= 0.22) { discard; }
-		vec3 c = texture(capa, UV).rgb;
-		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4 * f_calma) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0 * f_calma);
-		float onda2 = sin(px.x * 0.19 - px.y * 0.15 - TIME * 1.9 * f_calma) * 0.5 + 0.5;
-		float profundidad = smoothstep(0.24, 0.75, es_agua);
-		vec3 color_lecho = mix(vec3(0.15, 0.24, 0.22), c, 0.65);
-		c = mix(color_lecho, c, 0.35 + profundidad * 0.55);
-		c = mix(c, vec3(0.08, 0.24, 0.38), 0.35 + profundidad * 0.25);
-		c = mix(c, vec3(0.18, 0.38, 0.58), calma_lago * 0.35 * profundidad);
-		c += vec3(0.06, 0.10, 0.14) * smoothstep(0.68, 0.98, onda1) * f_calma;
-		c += vec3(0.03, 0.06, 0.09) * smoothstep(0.76, 0.96, onda2) * profundidad * f_calma;
-		// Espuma blanca en la orilla
-		float pulso_orilla = sin(px.x * 0.34 + px.y * 0.29 - TIME * 2.3 * f_calma) * 0.5 + 0.5;
-		float franja_espuma = smoothstep(0.38, 0.25, es_agua) * smoothstep(0.21, 0.26, es_agua);
-		float espuma = smoothstep(0.25, 0.55, franja_espuma + pulso_orilla * 0.20);
-		c = mix(c, vec3(0.88, 0.94, 0.98), espuma * 0.65);
-		ALBEDO = c;
-		ROUGHNESS = mix(0.28, 0.06, calma_lago);
-		SPECULAR = mix(0.38, 0.72, calma_lago);
+	// Hueco limpio y estable donde hay agua
+	if (es_agua > 0.36) { discard; }
+
+	vec3 c = texture(capa, UV).rgb;
+	float ao = texture(mapa_ao, uv_mapa).r;
+	c *= mix(1.0, 0.56, ao);
+	float orilla_sombra = smoothstep(0.18, 0.36, es_agua);
+	c *= mix(1.0, 0.80, orilla_sombra);
+
+	if (fuerza_nubes > 0.005) {
+		vec2 p_nube = px * 0.0065 + vec2(TIME * 0.09, TIME * 0.04);
+		float n_nube = sin(p_nube.x + sin(p_nube.y * 1.3)) * cos(p_nube.y * 0.9 - sin(p_nube.x * 0.8)) * 0.5 + 0.5;
+		c *= 1.0 - smoothstep(0.54, 0.88, n_nube) * fuerza_nubes;
 	}
+
+	// Desvanecimiento suave en los bordes de la capa para fundirse invisiblemente con el suelo lejano
+	vec2 d_cuadro = min(UV, vec2(1.0) - UV) * lado;
+	float f_cuadro = clamp(min(d_cuadro.x, d_cuadro.y) / 36.0, 0.0, 1.0);
+	if (f_cuadro < 0.01) { discard; }
+
+	ALBEDO = c;
+	ALPHA = smoothstep(0.0, 1.0, f_cuadro);
+	ROUGHNESS = 0.96;
+	SPECULAR = 0.04;
 }
 """
-## El suelo lejano (todo el mapa): con desniveles suaves, espuma de agua, oclusión ambiental y desvanecimiento perimetral
+## El suelo lejano (todo el mapa): con desniveles suaves, agua cristalina HD-2D, lecho de arena/grava y oclusión perimetral
 const SOMBREADOR_LEJANO := """
 shader_type spatial;
 render_mode diffuse_lambert;
@@ -147,15 +116,16 @@ void vertex() {
 void fragment() {
 	vec2 px = UV * casillas * 16.0;
 	float f_calma = 1.0 - calma_lago * 0.85;
-	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.04 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.03) * f_calma;
+	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.035 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.025) * f_calma;
 	float es_agua = texture(agua, UV).r + temblor;
 
 	if (hundido < 0.5) {
-		if (es_agua > 0.38) { discard; }
+		// Capa de suelo base del mapa
+		if (es_agua > 0.36) { discard; }
 		vec3 c = texture(suelo, UV).rgb * tinte_2d;
 		float ao = texture(mapa_ao, UV).r;
 		c *= mix(1.0, 0.56, ao);
-		float orilla_sombra = smoothstep(0.18, 0.38, es_agua);
+		float orilla_sombra = smoothstep(0.18, 0.36, es_agua);
 		c *= mix(1.0, 0.80, orilla_sombra);
 		if (fuerza_nubes > 0.005) {
 			vec2 p_nube = px * 0.0065 + vec2(TIME * 0.09, TIME * 0.04);
@@ -169,28 +139,34 @@ void fragment() {
 		ROUGHNESS = 0.96;
 		SPECULAR = 0.04;
 	} else if (hundido > 1.5) {
+		// Lecho continuo de guijarros/arena: elimina al 100% el vacío negro
+		if (es_agua <= 0.10) { discard; }
 		vec3 c = texture(suelo, UV).rgb * tinte_2d;
-		c = mix(vec3(0.12, 0.20, 0.18) * tinte_2d, c * 0.52, 0.65);
-		ALBEDO = c;
-		ROUGHNESS = 0.98;
+		vec3 color_grava = mix(vec3(0.24, 0.32, 0.28) * tinte_2d, c * 0.68, 0.70);
+		ALBEDO = color_grava;
+		ROUGHNESS = 0.95;
 		SPECULAR = 0.02;
 	} else {
-		if (es_agua <= 0.22) { discard; }
+		// Lámina de agua cristalina HD-2D reflectante y transparente
+		if (es_agua <= 0.20) { discard; }
 		vec3 c = texture(suelo, UV).rgb * tinte_2d;
 		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4 * f_calma) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0 * f_calma);
-		float profundidad = smoothstep(0.24, 0.75, es_agua);
-		vec3 color_lecho = mix(vec3(0.15, 0.24, 0.22) * tinte_2d, c, 0.65);
-		c = mix(color_lecho, c, 0.35 + profundidad * 0.55);
-		c = mix(c, vec3(0.08, 0.24, 0.38) * tinte_2d, 0.35 + profundidad * 0.25);
-		c = mix(c, vec3(0.18, 0.38, 0.58) * tinte_2d, calma_lago * 0.35 * profundidad);
-		c += vec3(0.06, 0.10, 0.14) * tinte_2d * smoothstep(0.68, 0.98, onda1) * f_calma;
+		float onda2 = sin(px.x * 0.19 - px.y * 0.15 - TIME * 1.9 * f_calma) * 0.5 + 0.5;
+		float profundidad = smoothstep(0.22, 0.75, es_agua);
+		vec3 color_lecho = mix(vec3(0.24, 0.34, 0.32) * tinte_2d, c * 0.72, 0.65);
+		c = mix(color_lecho, c, 0.30 + profundidad * 0.55);
+		c = mix(c, vec3(0.12, 0.34, 0.50) * tinte_2d, 0.35 + profundidad * 0.28);
+		c = mix(c, vec3(0.20, 0.44, 0.64) * tinte_2d, calma_lago * 0.35 * profundidad);
+		c += vec3(0.08, 0.14, 0.18) * tinte_2d * smoothstep(0.68, 0.98, onda1) * f_calma;
+		c += vec3(0.04, 0.08, 0.12) * tinte_2d * smoothstep(0.76, 0.96, onda2) * profundidad * f_calma;
+		// Espuma blanca en la orilla
 		float pulso_orilla = sin(px.x * 0.34 + px.y * 0.29 - TIME * 2.3 * f_calma) * 0.5 + 0.5;
-		float franja_espuma = smoothstep(0.38, 0.25, es_agua) * smoothstep(0.21, 0.26, es_agua);
-		float espuma = smoothstep(0.25, 0.55, franja_espuma + pulso_orilla * 0.20);
-		c = mix(c, vec3(0.88, 0.94, 0.98) * tinte_2d, espuma * 0.65);
+		float franja_espuma = smoothstep(0.36, 0.24, es_agua) * smoothstep(0.20, 0.25, es_agua);
+		float espuma = smoothstep(0.24, 0.55, franja_espuma + pulso_orilla * 0.20);
+		c = mix(c, vec3(0.92, 0.96, 1.0) * tinte_2d, espuma * 0.75);
 		ALBEDO = c;
-		ROUGHNESS = mix(0.28, 0.06, calma_lago);
-		SPECULAR = mix(0.38, 0.72, calma_lago);
+		ROUGHNESS = mix(0.24, 0.05, calma_lago);
+		SPECULAR = mix(0.42, 0.78, calma_lago);
 	}
 }
 """
@@ -467,6 +443,55 @@ const MODELOS_BLENDER := {
 		"ruta": "res://modelos/entorno/fuente_plaza.glb",
 		"escala": Vector3(1.10, 1.10, 1.10),
 		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"casa_shamba.png": {
+		"ruta": "res://modelos/entorno/casa_granja.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"casa_juncos.png": {
+		"ruta": "res://modelos/entorno/casa_juncos.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"casa_barcas.png": {
+		"ruta": "res://modelos/entorno/casa_juncos.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"casa_bata.png": {
+		"ruta": "res://modelos/entorno/casa_bata.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"palafito.png": {
+		"ruta": "res://modelos/entorno/palafito.glb",
+		"escala": Vector3(1.08, 1.08, 1.08),
+		"offset": Vector3(0.0, 0.0, -0.20),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"casa_nungu.png": {
+		"ruta": "res://modelos/entorno/casa_nungu.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"granero.png": {
+		"ruta": "res://modelos/entorno/granero.glb",
+		"escala": Vector3(1.10, 1.10, 1.10),
+		"offset": Vector3(0.0, 0.0, -0.25),
 		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
@@ -750,8 +775,10 @@ func _crear_suelo() -> void:
 		var pos_y := 0.0
 		if hundido > 1.5:
 			pos_y = -HONDO_AGUA - 0.06
+			suelo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		elif hundido > 0.5:
 			pos_y = -HONDO_AGUA
+			suelo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		suelo.position = Vector3(ancho / 2.0, pos_y, alto / 2.0)
 		add_child(suelo)
 	# el agua: una máscara (1 píxel por casilla) para hundirla (la orilla la dibujan los sombreadores, curva y con su
@@ -920,26 +947,19 @@ func _crear_capas() -> void:
 	plano.size = Vector2(LADO_CAPA * PX, LADO_CAPA * PX)
 	plano.subdivide_width = 36
 	plano.subdivide_depth = 36
-	for hundido in [0.0, 1.0, 2.0]:
-		var mat := ShaderMaterial.new()
-		mat.shader = sombreador
-		mat.set_shader_parameter("capa", _capa_suelo.get_texture())
-		mat.set_shader_parameter("agua", _mascara_agua)
-		mat.set_shader_parameter("casillas", Vector2(_mascara_agua.get_width(), _mascara_agua.get_height()) if _mascara_agua else Vector2.ONE)
-		mat.set_shader_parameter("lado", float(LADO_CAPA))
-		mat.set_shader_parameter("hundido", hundido)
-		_mats_capa.append(mat)
-		var p := MeshInstance3D.new()
-		p.mesh = plano
-		p.material_override = mat
-		p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(p)
-		if hundido > 1.5:
-			_plano_lecho = p
-		elif hundido > 0.5:
-			_plano_agua = p
-		else:
-			_plano_capa = p
+	var mat := ShaderMaterial.new()
+	mat.shader = sombreador
+	mat.set_shader_parameter("capa", _capa_suelo.get_texture())
+	mat.set_shader_parameter("agua", _mascara_agua)
+	mat.set_shader_parameter("casillas", Vector2(_mascara_agua.get_width(), _mascara_agua.get_height()) if _mascara_agua else Vector2.ONE)
+	mat.set_shader_parameter("lado", float(LADO_CAPA))
+	_mats_capa.append(mat)
+	var p := MeshInstance3D.new()
+	p.mesh = plano
+	p.material_override = mat
+	p.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(p)
+	_plano_capa = p
 	# la capa de pantalla: lo mismo que verían los ojos en 2D, delante del 3D (y detrás de la interfaz)
 	_capa_pantalla = SubViewport.new()
 	_capa_pantalla.size = vista.get_visible_rect().size
@@ -1246,8 +1266,9 @@ func _mover_capas() -> void:
 	# la capa de suelo, centrada en el foco (a píxeles enteros, para que no tiemble)
 	var centro := Vector2(roundf(_foco.x / PX), roundf(_foco.z / PX))
 	_capa_suelo.canvas_transform = Transform2D(0.0, -(centro - Vector2(LADO_CAPA, LADO_CAPA) / 2.0))
-	_plano_capa.position = Vector3(centro.x * PX, 0.005, centro.y * PX)
-	_plano_agua.position = Vector3(centro.x * PX, -HONDO_AGUA, centro.y * PX)
+	_plano_capa.position = Vector3(centro.x * PX, 0.012, centro.y * PX)
+	if _plano_agua:
+		_plano_agua.position = Vector3(centro.x * PX, -HONDO_AGUA, centro.y * PX)
 	if _plano_lecho:
 		_plano_lecho.position = Vector3(centro.x * PX, -HONDO_AGUA - 0.06, centro.y * PX)
 	for mat in _mats_capa:
@@ -1309,6 +1330,8 @@ func _crear_camara() -> void:
 	camara = Camera3D.new()
 	camara.fov = CAMARA_FOV
 	camara.rotation_degrees = Vector3(CAMARA_INCLINACION, 0, 0)
+	camara.near = 10.0
+	camara.far = 140.0
 	add_child(camara)
 	camara.current = true
 	_fotogramas_camara = 0
@@ -1490,6 +1513,48 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 	return false
 
 
+func _actualizar_transparencias_edificios() -> void:
+	if not _maisha or not is_instance_valid(_maisha):
+		return
+	var pos_m := _al_suelo(_maisha.global_position)
+	for m3d_var in _modelos_blender_instanciados.values():
+		if not is_instance_valid(m3d_var):
+			continue
+		var m3d := m3d_var as Node3D
+		if not m3d.visible:
+			continue
+		var d_x := absf(pos_m.x - m3d.position.x)
+		var d_z := m3d.position.z - pos_m.z # positivo si Maisha está detrás (al norte del edificio)
+		# Rango de oclusión bajo la cámara en perspectiva (-48°):
+		var oculta := (d_x < 5.8) and (d_z > -0.3 and d_z < 5.5)
+		var meta_a := 0.38 if oculta else 1.0
+		var alfa_actual: float = m3d.get_meta("alfa_transparencia", 1.0)
+		var nuevo_alfa := lerpf(alfa_actual, meta_a, 0.28)
+		if absf(nuevo_alfa - meta_a) < 0.02:
+			nuevo_alfa = meta_a
+		m3d.set_meta("alfa_transparencia", nuevo_alfa)
+		if absf(nuevo_alfa - alfa_actual) > 0.01:
+			_aplicar_alfa_a_nodos(m3d, nuevo_alfa)
+
+
+func _aplicar_alfa_a_nodos(nodo: Node, a: float) -> void:
+	if nodo is MeshInstance3D:
+		var mi := nodo as MeshInstance3D
+		var num_surf := mi.mesh.get_surface_count() if mi.mesh else 0
+		for s in num_surf:
+			var mat := mi.get_surface_override_material(s)
+			if mat is StandardMaterial3D:
+				var sm := mat as StandardMaterial3D
+				if a < 0.98:
+					sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+					sm.albedo_color.a = a
+				else:
+					sm.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
+					sm.albedo_color.a = 1.0
+	for h in nodo.get_children():
+		_aplicar_alfa_a_nodos(h, a)
+
+
 func _preparar_materiales_modelo(nodo: Node) -> void:
 	if nodo is MeshInstance3D:
 		var mi := nodo as MeshInstance3D
@@ -1505,12 +1570,18 @@ func _preparar_materiales_modelo(nodo: Node) -> void:
 				sm.diffuse_mode = BaseMaterial3D.DIFFUSE_LAMBERT_WRAP
 				sm.roughness = 0.85
 				sm.metallic_specular = 0.10
-				# Retención ambiental de color: asegura que en sombra las paredes mantengan su color cálido y nunca sean siluetas negras
-				var col_base := sm.albedo_color
-				if not sm.emission_enabled:
+				sm.cull_mode = BaseMaterial3D.CULL_DISABLED
+				# Retención ambiental de color: asegura que en sombra las paredes y tejados mantengan sus detalles pixel art
+				if sm.albedo_texture != null:
+					sm.emission_enabled = true
+					sm.emission_texture = sm.albedo_texture
+					sm.emission = Color.WHITE
+					sm.emission_energy_multiplier = 0.48
+				elif not sm.emission_enabled:
+					var col_base := sm.albedo_color
 					sm.emission_enabled = true
 					sm.emission = col_base
-					sm.emission_energy_multiplier = 0.44
+					sm.emission_energy_multiplier = 0.48
 				mi.set_surface_override_material(s, sm)
 	for h in nodo.get_children():
 		_preparar_materiales_modelo(h)
@@ -1974,6 +2045,7 @@ func _process(delta: float) -> void:
 		var pm := _al_suelo(_maisha.global_position)
 		for mat_r in _cache_mat_relieve.values():
 			(mat_r as ShaderMaterial).set_shader_parameter("pos_maisha", pm)
+	_actualizar_transparencias_edificios()
 	_mover_capas()
 	_actualizar_particulas_3d(delta, dia, en_penumbra)
 	_actualizar_postproceso(0.15 if en_penumbra else dia, calido)
