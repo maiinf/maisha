@@ -579,6 +579,30 @@ const MODELOS_BLENDER := {
 		"radio_occlusion": Vector2(2.0, 1.6),
 		"solo_reconstruido": false,
 	},
+	"almacen.png": {
+		"ruta": "res://modelos/entorno/almacen.glb",
+		"escala": Vector3(1.08, 1.08, 1.08),
+		"offset": Vector3(0.0, 0.0, -0.20),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(3.2, 2.4),
+		"solo_reconstruido": false,
+	},
+	"aprisco.png": {
+		"ruta": "res://modelos/entorno/aprisco.glb",
+		"escala": Vector3(1.08, 1.08, 1.08),
+		"offset": Vector3(0.0, 0.0, -0.20),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(3.4, 2.6),
+		"solo_reconstruido": false,
+	},
+	"madriguera.png": {
+		"ruta": "res://modelos/entorno/madriguera.glb",
+		"escala": Vector3(1.06, 1.06, 1.06),
+		"offset": Vector3(0.0, 0.0, -0.18),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.6, 2.4),
+		"solo_reconstruido": false,
+	},
 }
 const TIPOS_LUZ_3D := {
 	"v": [4.6, 0.92, Color(1.0, 0.84, 0.55), false],
