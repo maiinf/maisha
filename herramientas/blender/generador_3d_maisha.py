@@ -3170,6 +3170,339 @@ def generar_altar():
 
     exportar_modelo("altar", DIR_ENTORNO)
 
+def generar_grua():
+    """Genera la Grúa de carga de Embarcadero Junco completa en 360°:
+    Bancada de madera maciza con durmientes, mástil vertical de tronco reforzado con zunchos de hierro,
+    pluma diagonal con tornapuntas, polea superior de fundición, cable colgante con gancho de hierro,
+    cajón de contrapeso con piedras de balasto, cabrestante con manivela y farol cálido de atraque."""
+    limpiar_escena()
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_troncos = obtener_material_textura("Mat_Grua_Madera", tex_troncos, rugosidad=0.85)
+    mat_viga = get_mat("madera_viga")
+    mat_hierro = get_mat("metal_forja")
+    mat_piedra = get_mat("piedra_oscura")
+    mat_luz = get_mat("farol_luz")
+    mat_cuerda = get_mat("cuero_mochila")
+
+    # 1. Bancada / plataforma base de durmientes
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.16))
+    base = bpy.context.active_object
+    base.scale = (3.2, 2.4, 0.32)
+    asignar_material(base, mat_troncos)
+    aplicar_uv_caja(base, 1.8, 1.2)
+
+    # Tirantes / travesaños de anclaje
+    for by in [-0.85, 0.85]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, by, 0.36))
+        trav = bpy.context.active_object
+        trav.scale = (3.4, 0.22, 0.12)
+        asignar_material(trav, mat_viga)
+
+    # 2. Mástil vertical giratorio central
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.22, depth=4.4, location=(0, 0, 2.36))
+    mastil = bpy.context.active_object
+    asignar_material(mastil, mat_troncos)
+    aplicar_uv_cilindro(mastil, 1.5, 3.0)
+
+    # Zunchos / abrazaderas de hierro del mástil
+    for hz in [0.45, 2.2, 4.3]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.25, depth=0.10, location=(0, 0, hz))
+        zuncho = bpy.context.active_object
+        asignar_material(zuncho, mat_hierro)
+
+    # 3. Tornapuntas de base (soporte en A del mástil)
+    for ang in [math.radians(30), math.radians(150), math.radians(-45), math.radians(-135)]:
+        tx = math.cos(ang) * 0.75
+        ty = math.sin(ang) * 0.75
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.08, depth=1.8, location=(tx, ty, 0.95))
+        strut = bpy.context.active_object
+        strut.rotation_euler = (math.sin(ang) * 0.55, -math.cos(ang) * 0.55, 0)
+        asignar_material(strut, mat_viga)
+
+    # 4. Pluma de carga diagonal inclinada hacia el frente (muelle/agua: -Y)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.14, depth=4.2, location=(0, -1.45, 3.4))
+    pluma = bpy.context.active_object
+    pluma.rotation_euler = (math.radians(-48), 0, 0)
+    asignar_material(pluma, mat_viga)
+
+    # Puntal de soporte de la pluma
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.09, depth=2.4, location=(0, -1.0, 2.4))
+    puntal = bpy.context.active_object
+    puntal.rotation_euler = (math.radians(-25), 0, 0)
+    asignar_material(puntal, mat_viga)
+
+    # 5. Polea superior en la punta de la pluma
+    punta_x, punta_y, punta_z = 0.0, -2.9, 4.8
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.26, depth=0.12, location=(punta_x, punta_y, punta_z))
+    polea = bpy.context.active_object
+    polea.rotation_euler = (0, math.radians(90), 0)
+    asignar_material(polea, mat_hierro)
+
+    # Horquilla de sujeción de la polea
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(punta_x, punta_y, punta_z + 0.12))
+    horquilla = bpy.context.active_object
+    horquilla.scale = (0.34, 0.16, 0.28)
+    asignar_material(horquilla, mat_hierro)
+
+    # 6. Cable y Gancho de elevación
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.022, depth=3.2, location=(punta_x, punta_y, punta_z - 1.6))
+    cable = bpy.context.active_object
+    asignar_material(cable, mat_cuerda)
+
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.14, minor_radius=0.04, major_segments=12, minor_segments=6, location=(punta_x, punta_y, punta_z - 3.2))
+    gancho = bpy.context.active_object
+    asignar_material(gancho, mat_hierro)
+
+    # 7. Cajón de contrapeso posterior (+Y)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 1.25, 0.75))
+    cajon = bpy.context.active_object
+    cajon.scale = (1.4, 0.95, 0.85)
+    asignar_material(cajon, mat_troncos)
+    aplicar_uv_caja(cajon, 1.2, 0.8)
+
+    for px, py, pz in [(-0.35, 1.15, 1.25), (0.35, 1.15, 1.22), (0.0, 1.35, 1.28)]:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.22, location=(px, py, pz))
+        balasto = bpy.context.active_object
+        asignar_material(balasto, mat_piedra)
+
+    # 8. Cabrestante / torno manual en el mástil
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.22, depth=0.65, location=(0, -0.38, 1.15))
+    tambor = bpy.context.active_object
+    tambor.rotation_euler = (0, math.radians(90), 0)
+    asignar_material(tambor, mat_viga)
+
+    for mx, rot_m in [(-0.38, 0), (0.38, math.radians(180))]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(mx, -0.38, 1.15))
+        brazo_m = bpy.context.active_object
+        brazo_m.scale = (0.04, 0.06, 0.42)
+        brazo_m.rotation_euler = (rot_m, 0, 0)
+        asignar_material(brazo_m, mat_hierro)
+
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.04, depth=0.18, location=(mx + (-0.08 if mx < 0 else 0.08), -0.38, 1.15 + (0.18 if rot_m == 0 else -0.18)))
+        mango = bpy.context.active_object
+        mango.rotation_euler = (0, math.radians(90), 0)
+        asignar_material(mango, mat_viga)
+
+    # 9. Farol cálido de faena nocturna
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.14, location=(0.35, -0.5, 2.6))
+    farol = bpy.context.active_object
+    asignar_material(farol, mat_luz)
+
+    exportar_modelo("grua", DIR_ENTORNO)
+
+def generar_barca():
+    """Genera la Barca de remos tradicional (Lago Espejo y Embarcadero) completa en 360°:
+    Casco de madera de tingladillo con roda curvada y espejo de popa, regalas macizas con chumaceras,
+    bancos de remero transversales, cuadernas interiores de refuerzo, par de remos descansando en la borda
+    y cabo de amarre trenzado en la proa."""
+    limpiar_escena()
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_madera = obtener_material_textura("Mat_Barca_Madera", tex_troncos, rugosidad=0.82)
+    mat_viga = get_mat("madera_viga")
+    mat_bronce = get_mat("metal_forja")
+    mat_cuerda = get_mat("cuero_mochila")
+
+    length, width, height = 3.4, 1.4, 0.65
+
+    # 1. Quilla y Roda de proa curvada (-Y proa, +Y popa)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.08))
+    quilla = bpy.context.active_object
+    quilla.scale = (0.14, length, 0.16)
+    asignar_material(quilla, mat_viga)
+
+    # Roda de proa inclinada
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -length * 0.5 - 0.12, 0.38))
+    roda = bpy.context.active_object
+    roda.scale = (0.14, 0.18, 0.65)
+    roda.rotation_euler = (math.radians(-24), 0, 0)
+    asignar_material(roda, mat_viga)
+
+    # 2. Casco: fondo y costados con caída
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.05, 0.14))
+    fondo = bpy.context.active_object
+    fondo.scale = (width * 0.72, length * 0.82, 0.08)
+    asignar_material(fondo, mat_madera)
+    aplicar_uv_caja(fondo, 1.5, 2.5)
+
+    # Costados (bandas de babor y estribor)
+    for sign in [-1, 1]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(sign * width * 0.46, 0.05, 0.38))
+        costado = bpy.context.active_object
+        costado.scale = (0.08, length * 0.85, height * 0.75)
+        costado.rotation_euler = (0, sign * math.radians(14), 0)
+        asignar_material(costado, mat_madera)
+        aplicar_uv_caja(costado, 1.0, 2.5)
+
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.06, depth=length * 0.90, location=(sign * width * 0.52, 0.05, 0.65))
+        regala = bpy.context.active_object
+        regala.rotation_euler = (math.radians(90), 0, 0)
+        asignar_material(regala, mat_viga)
+
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.035, depth=0.12, location=(sign * width * 0.54, 0.0, 0.72))
+        chumacera = bpy.context.active_object
+        asignar_material(chumacera, mat_bronce)
+
+    # 3. Espejo de popa plano (+Y)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, length * 0.5 - 0.05, 0.38))
+    popa = bpy.context.active_object
+    popa.scale = (width * 0.80, 0.10, height * 0.75)
+    asignar_material(popa, mat_viga)
+
+    # 4. Cuadernas interiores
+    for cy in [-0.8, 0.0, 0.8]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, cy, 0.18))
+        cuaderna = bpy.context.active_object
+        cuaderna.scale = (width * 0.75, 0.08, 0.10)
+        asignar_material(cuaderna, mat_viga)
+
+    # 5. Bancos transversales de remero
+    bancos_pos = [
+        (-0.75, 0.45, 0.45),
+        (0.0, 0.65, 0.42),
+        (0.9, 0.60, 0.45),
+    ]
+    for by, bw, bz in bancos_pos:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, by, bz))
+        banco = bpy.context.active_object
+        banco.scale = (width * bw, 0.28, 0.06)
+        asignar_material(banco, mat_viga)
+
+    # 6. Par de remos descansando en ángulo sobre la borda
+    for sign in [-1, 1]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.035, depth=2.2, location=(sign * 0.35, -0.15, 0.62))
+        remo = bpy.context.active_object
+        remo.rotation_euler = (math.radians(16), sign * math.radians(-22), sign * math.radians(15))
+        asignar_material(remo, mat_viga)
+
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(sign * 0.85, 0.80, 0.75))
+        pala = bpy.context.active_object
+        pala.scale = (0.16, 0.55, 0.03)
+        pala.rotation_euler = (math.radians(16), sign * math.radians(-22), sign * math.radians(15))
+        asignar_material(pala, mat_viga)
+
+    # 7. Rollo de cabo de amarre en la proa
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.18, minor_radius=0.045, major_segments=12, minor_segments=6, location=(0, -length * 0.5 + 0.35, 0.42))
+    cabo = bpy.context.active_object
+    asignar_material(cabo, mat_cuerda)
+
+    exportar_modelo("barca", DIR_ENTORNO)
+
+def generar_estela():
+    """Genera la Estela Rúnica de refugio de Paso de la Escarcha (Sigilia) completa en 360°:
+    Pedestal macizo de roca de esquisto labrada, losa monolítica vertical con coronamiento achaflanado,
+    runas de Sigilia profundamente cinceladas con incandescencia cian mística, cornisa con nieve acumulada,
+    y estela satélite menor con glifos de orientación frente a la ventisca."""
+    limpiar_escena()
+    tex_marmol = os.path.join(DIR_SIGILIA, "marmol_sigilia_tile.png")
+    mat_piedra = obtener_material_textura("Mat_Estela_Piedra", tex_marmol, rugosidad=0.80)
+    mat_runa = obtener_material("Mat_Estela_Runa", "#38BDF8", roughness=0.15, emission_hex="#67E8F9", emission_strength=3.5)
+    mat_nieve = obtener_material("Mat_Estela_Nieve", "#F1F5F9", roughness=0.75)
+    mat_base = get_mat("piedra_oscura")
+
+    # 1. Pedestal de mampostería base
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.16))
+    base = bpy.context.active_object
+    base.scale = (1.8, 1.2, 0.32)
+    asignar_material(base, mat_base)
+    aplicar_uv_caja(base, 1.2, 0.5)
+
+    # 2. Monolito principal vertical
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.45))
+    monolito = bpy.context.active_object
+    monolito.scale = (1.25, 0.55, 2.3)
+    asignar_material(monolito, mat_piedra)
+    aplicar_uv_caja(monolito, 1.2, 2.0)
+
+    # 3. Coronamiento triangular achaflanado
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=0.65, depth=0.55, location=(0, 0, 2.85))
+    cumbre = bpy.context.active_object
+    cumbre.rotation_euler = (math.radians(90), 0, math.radians(90))
+    asignar_material(cumbre, mat_piedra)
+
+    # 4. Capa de nieve acumulada en la parte superior y salientes
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 3.12))
+    nieve_sup = bpy.context.active_object
+    nieve_sup.scale = (1.3, 0.58, 0.12)
+    asignar_material(nieve_sup, mat_nieve)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.22, 0.34))
+    nieve_base = bpy.context.active_object
+    nieve_base.scale = (1.7, 0.40, 0.08)
+    asignar_material(nieve_base, mat_nieve)
+
+    # 5. Runas de Sigilia luminosas talladas (frontal y trasera)
+    for rz in [1.1, 1.6, 2.1]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.29, rz))
+        runa_f = bpy.context.active_object
+        runa_f.scale = (0.65, 0.06, 0.18)
+        asignar_material(runa_f, mat_runa)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.22, depth=0.06, location=(0, -0.29, 2.5))
+    glifo_circ_f = bpy.context.active_object
+    glifo_circ_f.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(glifo_circ_f, mat_runa)
+
+    for rz in [1.3, 1.9]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.29, rz))
+        runa_t = bpy.context.active_object
+        runa_t.scale = (0.55, 0.06, 0.18)
+        asignar_material(runa_t, mat_runa)
+
+    # 6. Estela satélite menor al costado
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(1.05, 0.1, 0.55))
+    menor = bpy.context.active_object
+    menor.scale = (0.35, 0.35, 0.8)
+    menor.rotation_euler = (0, 0, math.radians(12))
+    asignar_material(menor, mat_piedra)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(1.05, 0.1, 0.98))
+    nieve_menor = bpy.context.active_object
+    nieve_menor.scale = (0.38, 0.38, 0.08)
+    asignar_material(nieve_menor, mat_nieve)
+
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.08, location=(1.05, -0.09, 0.6))
+    runa_sat = bpy.context.active_object
+    asignar_material(runa_sat, mat_runa)
+
+    exportar_modelo("estela", DIR_ENTORNO)
+
+def generar_menhir():
+    """Genera el Menhir Ancestral de Lago Espejo completo en 360°:
+    Monolito megalítico de piedra tallada que surge de las aguas, aristas achaflanadas orgánicas,
+    petroglifos en espiral con luminiscencia turquesa de lago, y base húmeda sumergida."""
+    limpiar_escena()
+    tex_mamposteria = os.path.join(DIR_KITOVU, "mamposteria_tile.png")
+    mat_piedra = obtener_material_textura("Mat_Menhir_Piedra", tex_mamposteria, rugosidad=0.85)
+    mat_glifo = obtener_material("Mat_Menhir_Agua", "#40D8C8", roughness=0.15, emission_hex="#50F8E0", emission_strength=2.8)
+    mat_base = get_mat("piedra_oscura")
+
+    # 1. Base sumergida
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.75, depth=0.35, location=(0, 0, 0.175))
+    base = bpy.context.active_object
+    asignar_material(base, mat_base)
+
+    # 2. Fuste principal del menhir
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.60, depth=2.8, location=(0, 0, 1.55))
+    fuste = bpy.context.active_object
+    fuste.scale = (0.9, 0.7, 1.0)
+    asignar_material(fuste, mat_piedra)
+    aplicar_uv_cilindro(fuste, 1.5, 2.0)
+
+    # 3. Cumbre piramidal rebajada
+    bpy.ops.mesh.primitive_cylinder_add(vertices=4, radius=0.45, depth=0.55, location=(0, 0, 3.15))
+    punta = bpy.context.active_object
+    punta.rotation_euler = (0, 0, math.radians(45))
+    asignar_material(punta, mat_piedra)
+
+    # 4. Grabados de espirales de agua / turquesa brillante
+    for pz, rot_z in [(1.2, 0), (1.9, math.radians(120)), (2.5, math.radians(240))]:
+        bpy.ops.mesh.primitive_torus_add(major_radius=0.18, minor_radius=0.035, major_segments=12, minor_segments=6, location=(0, -0.40, pz))
+        espiral = bpy.context.active_object
+        espiral.rotation_euler = (math.radians(90), 0, rot_z)
+        asignar_material(espiral, mat_glifo)
+
+    exportar_modelo("menhir", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -3225,6 +3558,10 @@ def main():
     generar_torre()
     generar_monumento()
     generar_altar()
+    generar_grua()
+    generar_barca()
+    generar_estela()
+    generar_menhir()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

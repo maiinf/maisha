@@ -341,6 +341,7 @@ const LUCES_3D := {
 	"seta_luz.png": [["m", 16, 8], ["m", 48, 8]],
 	"piedra_eco.png": [["m", 8, 10]],
 	"estela.png": [["m", 33, 18]],
+	"grua.png": [["f", 36, 68]],
 }
 const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png", "puesto.png"]
 ## Modelos 3D de Blender 4.5 para arquitectura y accesorios:
@@ -624,6 +625,44 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.05, 1.05, 1.05),
 		"offset": Vector3(0.0, 0.0, -0.10),
 		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"grua.png": {
+		"ruta": "res://modelos/entorno/grua.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.0, 2.2),
+		"solo_reconstruido": false,
+	},
+	"barca.png": {
+		"ruta": "res://modelos/entorno/barca.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"barca_bata.png": {
+		"ruta": "res://modelos/entorno/barca.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"estela.png": {
+		"ruta": "res://modelos/entorno/estela.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.10),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.5, 1.5),
+		"solo_reconstruido": false,
+	},
+	"menhir.png": {
+		"ruta": "res://modelos/entorno/menhir.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.08),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.2, 1.2),
 		"solo_reconstruido": false,
 	},
 }

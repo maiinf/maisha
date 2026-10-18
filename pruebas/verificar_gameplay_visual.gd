@@ -269,10 +269,23 @@ func _ready() -> void:
 	if m_almacen:
 		_verificar_materiales_nodo(m_almacen, "almacen")
 
+	# Acercarse a la grúa de carga del muelle (å en col 55, fil 17 -> 880, 272)
+	maisha.global_position = Vector2(880, 280)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_grua: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "grua" in (m as Node3D).name:
+			m_grua = m
+			break
+	_comprobar(m_grua != null, "Grúa de carga portuaria 3D instanciada en el muelle")
+	if m_grua:
+		_verificar_materiales_nodo(m_grua, "grua")
+
 	# -----------------------------------------------------------------------
 	# 5. CAÑADA DEL ECO (Aprisco de Mbuzi)
 	# -----------------------------------------------------------------------
-	print("\n--- [5/6] CAÑADA DEL ECO ---")
+	print("\n--- [5/8] CAÑADA DEL ECO ---")
 	await _ir("canada_eco", "")
 	esp = _espejo()
 	_comprobar(esp != null, "EspejoHD2D activo en Cañada del Eco")
@@ -294,7 +307,7 @@ func _ready() -> void:
 	# -----------------------------------------------------------------------
 	# 6. CAMINO COBRIZO (Madriguera de Fuko)
 	# -----------------------------------------------------------------------
-	print("\n--- [6/6] CAMINO COBRIZO ---")
+	print("\n--- [6/8] CAMINO COBRIZO ---")
 	await _ir("camino_cobrizo", "")
 	esp = _espejo()
 	_comprobar(esp != null, "EspejoHD2D activo en Camino Cobrizo")
@@ -314,9 +327,9 @@ func _ready() -> void:
 		_verificar_materiales_nodo(m_madriguera, "madriguera")
 
 	# -----------------------------------------------------------------------
-	# 7. LAGO ESPEJO (Altar Sagrado)
+	# 7. LAGO ESPEJO (Altar Sagrado, Barca y Menhir)
 	# -----------------------------------------------------------------------
-	print("\n--- [7/7] LAGO ESPEJO ---")
+	print("\n--- [7/8] LAGO ESPEJO ---")
 	await _ir("lago_espejo", "")
 	esp = _espejo()
 	_comprobar(esp != null, "EspejoHD2D activo en Lago Espejo")
@@ -334,6 +347,54 @@ func _ready() -> void:
 	_comprobar(m_altar != null, "Altar sagrado del lago 3D instanciado")
 	if m_altar:
 		_verificar_materiales_nodo(m_altar, "altar")
+
+	# Acercarse a la barca de remos (x=15*16, y=39*16 -> 240, 624)
+	maisha.global_position = Vector2(240, 624)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_barca: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "barca" in (m as Node3D).name:
+			m_barca = m
+			break
+	_comprobar(m_barca != null, "Barca de remos tradicional 3D instanciada en la orilla")
+	if m_barca:
+		_verificar_materiales_nodo(m_barca, "barca")
+
+	# Acercarse al menhir megalítico del lago (x=45*16, y=26*16 -> 720, 416)
+	maisha.global_position = Vector2(720, 416)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_menhir: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "menhir" in (m as Node3D).name:
+			m_menhir = m
+			break
+	_comprobar(m_menhir != null, "Menhir megalítico del lago 3D instanciado")
+	if m_menhir:
+		_verificar_materiales_nodo(m_menhir, "menhir")
+
+	# -----------------------------------------------------------------------
+	# 8. PASO DE LA ESCARCHA (Estela Rúnica de refugio)
+	# -----------------------------------------------------------------------
+	print("\n--- [8/8] PASO DE LA ESCARCHA ---")
+	await _ir("paso_escarcha", "")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Paso de la Escarcha")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse a la primera estela rúnica (x=25*16, y=21*16 -> 400, 336)
+	maisha.global_position = Vector2(400, 340)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_estela: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "estela" in (m as Node3D).name:
+			m_estela = m
+			break
+	_comprobar(m_estela != null, "Estela rúnica de refugio 3D instanciada en la ventisca")
+	if m_estela:
+		_verificar_materiales_nodo(m_estela, "estela")
 
 	# -----------------------------------------------------------------------
 	# RESUMEN FINAL
