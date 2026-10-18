@@ -50,13 +50,18 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
   - `modelos/entorno/taller_taa.glb` (Taller de alquimia y tinta de Taa / Sigilia)
   - `modelos/entorno/casa_escriba.glb` (Casas tradicionales de Sigilia con tejas cobrizas)
   - `modelos/entorno/fuente_plaza.glb` (Fuente central monumental octogonal de mármol en Maandiko)
-- [x] **Arquitectura 3D Sólida y Texturizada en Pixel Art (Blender 4.5)**:
-  - `modelos/entorno/casa_granja.glb`: Modelada con proporciones exactas de la granja (9.6m x 4.8m x 8.2m), tejado a dos aguas 360° (vertiente frontal y trasera completa), chimenea de piedra y rueda de molino. Texturizada directamente con el pixel art oficial (`casa_granja.png`) usando filtrado `NEAREST` (`Closest`).
-  - Ocultación total del sprite plano (`g.visible = false`) al instanciar el modelo 3D para erradicar el solapamiento y z-fighting entre 2D y 3D.
-  - Corrección de ruinas: Eliminada la asociación errónea de `ruina_casa.png` con la casa seta; las ruinas de piedra de El Kitovu recuperan su extrusión volumétrica de mampostería y escombros auténticos sin conos rojos.
-- [x] **Agua HD-2D Cristalina y Erradicación Definitiva de Artefactos**:
-  - El lecho de tierra bajo el agua (`hundido < 0.5`) NUNCA se descarta: es un suelo 100% continuo que forma la cuenca a -0.44m.
-  - La lámina de agua flota a -0.28m (`HONDO_AGUA`), eliminando por completo cualquier coplanaridad, parpadeo o vacío negro.
-  - El agua solo se dibuja donde `es_agua > 0.22`, con espuma blanca en contacto con la orilla y visibilidad limpia del fondo.
+- [x] **Arquitectura 3D Sólida y Erradicación del Monolito Negro (Blender 4.5 & Godot)**:
+  - `modelos/entorno/casa_granja.glb`: Casona de troncos completa en 360° (9.4m x 5.2m x 8.2m) con zócalo de mampostería de piedra, paredes de troncos macizos en los 4 costados, tejado a dos aguas con hastiales y aleros voladizos, porche frontal con postes y techillo, farol cálido, buhardilla encendida, gran chimenea de piedra y rueda de molino con canaleta.
+  - Sombreado de Arquitectura HD-2D (`_preparar_materiales_modelo`): Asignación automática de `diffuse_mode = DIFFUSE_LAMBERT_WRAP` y retención ambiental cálida (`emission = col_base * 0.44`) con filtrado `NEAREST`. Esto erradica por completo la silueta negra en sombra manteniendo los colores auténticos de la paleta oficial en todas las caras del edificio.
+  - Al caminar por detrás de la casa, Maisha ve la pared trasera sólida y el faldón trasero del tejado en perspectiva sin ningún efecto papel ni transparencias huecas.
+- [x] **Erradicación de Bugs al Moverse el Personaje y Sistema de Agua de 3 Capas**:
+  - Eliminada la deformación de vértices por función seno/ruido en `SOMBREADOR_CAPA.vertex()` y `SOMBREADOR_LEJANO.vertex()`. Los planos de suelo y agua son geométricamente planos y estables; el desplazamiento de Maisha no produce oscilaciones de terreno, vibraciones de vértices ni temblor en las orillas.
+  - Sistema de 3 capas físicas estables sin z-fighting:
+    1. Capa de Suelo (`y = 0.005m`, `hundido = 0.0`): Se descarta limpiamente donde `es_agua > 0.38` con sombreado de talud en el borde.
+    2. Lámina de Agua (`y = -0.22m`, `hundido = 1.0`): Translúcida, con ondas suaves, reflejos y espuma animada en la orilla.
+    3. Lecho de Fondo Sólido (`y = -0.28m`, `hundido = 2.0`): Malla continua de tierra/sedimento bajo el agua que garantiza que nunca se vea el vacío negro.
+- [x] **Verificación Integral Superada**:
+  - `prueba_hd2d`: 100 % de comprobaciones pasadas (0 fallos).
+  - `prueba_kitovu`: 100 % de la historia, misiones de la granja, combate y cinemáticas superadas sin fallos.
 - [x] **Escalado de Pantalla**: `window/stretch/scale_mode="fractional"` y `aspect="keep"` en `project.godot` para llenar la ventana sin bandas negras fijas.
 - [x] **Sincronización remota y Pruebas**: Verificado con `prueba_hd2d` (18/18) y `prueba_kitovu` (100% historia y minijuegos).

@@ -12,6 +12,7 @@ import os
 
 # Rutas de salida relativas a la raíz del repositorio
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+DIR_PROYECTO = BASE_DIR
 DIR_PERSONAJES = os.path.join(BASE_DIR, "modelos", "personajes")
 DIR_ENEMIGOS = os.path.join(BASE_DIR, "modelos", "enemigos")
 DIR_ENTORNO = os.path.join(BASE_DIR, "modelos", "entorno")
@@ -705,123 +706,162 @@ def generar_casa_escriba():
 
 def generar_casa_granja_shamba():
     """Genera la Casona de troncos de Mzee Shamba completa en 360° (El Kitovu):
-    Malla 3D sólida y texturizada con el pixel art oficial (casa_granja.png),
-    fachada frontal, tejado a dos aguas continuo (vertiente frontal y trasera),
-    paredes laterales y traseras cerradas, chimenea de piedra y rueda de molino hidráulica."""
+    Dimensiones a escala exacta del pixel art (9.4m ancho, 5.2m profundidad, 8.2m alto).
+    Zócalo de mampostería de piedra perimetral, paredes de troncos macizos cerradas por los 4 costados,
+    gran tejado a dos aguas con aleros voladizos en 360°, porche frontal con postes y techillo, farol cálido,
+    puerta de madera maciza, buhardilla superior encendida, chimenea de piedra con remate,
+    rueda de molino de agua hidráulica lateral con aspas y canaleta, y ventana trasera con moldura."""
     limpiar_escena()
     
-    mesh = bpy.data.meshes.new('CasaGranjaMesh')
-    obj = bpy.data.objects.new('CasaGranja', mesh)
-    bpy.context.collection.objects.link(obj)
-
-    w = 9.6
-    h_wall = 4.0
-    h_total = 8.2
-    depth = 4.8
+    w = 9.4
+    depth = 5.2
     cx = -0.5
-
-    verts = [
-        (cx - w/2,  0.0,   0.0),       # 0: front-bottom-left
-        (cx + w/2,  0.0,   0.0),       # 1: front-bottom-right
-        (cx + w/2,  0.0,   h_wall),    # 2: front-top-right (eaves)
-        (cx - w/2,  0.0,   h_wall),    # 3: front-top-left (eaves)
-        (cx - w/2,  depth, 0.0),       # 4: back-bottom-left
-        (cx + w/2,  depth, 0.0),       # 5: back-bottom-right
-        (cx + w/2,  depth, h_wall),    # 6: back-top-right (eaves)
-        (cx - w/2,  depth, h_wall),    # 7: back-top-left (eaves)
-        (cx - w/2,  depth*0.5, h_total), # 8: ridge-left
-        (cx + w/2,  depth*0.5, h_total), # 9: ridge-right
-    ]
-
-    faces = [
-        (0, 1, 2, 3),  # 0: Front wall (faces -Y -> +Z Godot)
-        (4, 5, 6, 7),  # 1: Back wall (faces +Y -> -Z Godot)
-        (3, 2, 9, 8),  # 2: Front roof slope
-        (9, 6, 7, 8),  # 3: Rear roof slope
-        (0, 4, 7, 3),  # 4: Left wall (bottom)
-        (3, 7, 8),     # 5: Left gable (triangle)
-        (5, 1, 2, 6),  # 6: Right wall (bottom)
-        (2, 6, 9),     # 7: Right gable (triangle)
-        (0, 1, 5, 4),  # 8: Floor
-    ]
-
-    mesh.from_pydata(verts, [], faces)
-    mesh.update()
-
-    # Material con textura de pixel art NEAREST
-    mat = bpy.data.materials.new(name='Mat_CasaGranja')
-    mat.use_nodes = True
-    nodes = mat.node_tree.nodes
-    nodes.clear()
-    node_out = nodes.new(type='ShaderNodeOutputMaterial')
-    node_bsdf = nodes.new(type='ShaderNodeBsdfPrincipled')
-    node_bsdf.inputs['Roughness'].default_value = 0.95
-    node_bsdf.inputs['Specular IOR Level'].default_value = 0.05
-    node_tex = nodes.new(type='ShaderNodeTexImage')
     
-    tex_path = os.path.join(DIR_PROYECTO, "arte", "mundos", "kitovu", "casa_granja.png")
-    if os.path.exists(tex_path):
-        img = bpy.data.images.load(tex_path)
-        node_tex.image = img
-        node_tex.interpolation = 'Closest'
+    # 1. Zócalo de mampostería de piedra perimetral (base sólida en 360°)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, depth * 0.5, 0.45))
+    zocalo = bpy.context.active_object
+    zocalo.name = "Granja_Zocalo"
+    zocalo.scale = (w, depth, 0.9)
+    asignar_material(zocalo, get_mat("piedra_plaza"))
+    
+    # 2. Paredes de troncos macizos cerradas por todos los costados (frontal, trasera y laterales)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, depth * 0.5, 2.35))
+    cuerpo = bpy.context.active_object
+    cuerpo.name = "Granja_Cuerpo"
+    cuerpo.scale = (w - 0.25, depth - 0.25, 2.9)
+    asignar_material(cuerpo, get_mat("madera_tablas"))
+    
+    # Cornisas y vigas de troncos que rodean toda la casa en 360°
+    for z in [0.95, 2.2, 3.75]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, depth * 0.5, z))
+        viga = bpy.context.active_object
+        viga.scale = (w + 0.1, depth + 0.1, 0.14)
+        asignar_material(viga, get_mat("madera_tronco"))
+        
+    # Postes esquineros verticales de tronco macizo
+    for px in [cx - w * 0.5 + 0.12, cx + w * 0.5 - 0.12]:
+        for py in [0.12, depth - 0.12]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.22, depth=3.0, location=(px, py, 2.4))
+            col = bpy.context.active_object
+            asignar_material(col, get_mat("madera_tronco"))
 
-    mat.node_tree.links.new(node_tex.outputs['Color'], node_bsdf.inputs['Base Color'])
-    mat.node_tree.links.new(node_bsdf.outputs['BSDF'], node_out.inputs['Surface'])
-    obj.data.materials.append(mat)
+    # 3. Tejado a dos aguas sólido con aleros voladizos en 360°
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=depth * 0.72, depth=w + 1.2, location=(cx, depth * 0.5, 5.2))
+    techo = bpy.context.active_object
+    techo.name = "Granja_Techo"
+    techo.rotation_euler = (0, math.radians(90), 0)
+    techo.scale = (1.1, depth / (depth * 0.72) * 0.85, 1.0)
+    asignar_material(techo, get_mat("teja_cobriza"))
+    
+    # Hastiales de madera en los laterales (izquierdo y derecho)
+    for px in [cx - w * 0.5 - 0.05, cx + w * 0.5 + 0.05]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=depth * 0.62, depth=0.15, location=(px, depth * 0.5, 5.1))
+        hastial = bpy.context.active_object
+        hastial.rotation_euler = (0, math.radians(90), 0)
+        hastial.scale = (1.05, depth / (depth * 0.72) * 0.8, 1.0)
+        asignar_material(hastial, get_mat("madera_tablas"))
 
-    uv_layer = mesh.uv_layers.new(name='UVMap')
-
-    for poly in mesh.polygons:
-        for loop_index in poly.loop_indices:
-            v_idx = mesh.loops[loop_index].vertex_index
-            if poly.index == 0:   # Front wall: 0, 1, 2, 3
-                uvs = {0: (0.16, 0.02), 1: (0.92, 0.02), 2: (0.92, 0.46), 3: (0.16, 0.46)}
-                uv_layer.data[loop_index].uv = uvs[v_idx]
-            elif poly.index == 1: # Back wall: 4, 5, 6, 7
-                uvs = {4: (0.92, 0.02), 5: (0.16, 0.02), 6: (0.16, 0.46), 7: (0.92, 0.46)}
-                uv_layer.data[loop_index].uv = uvs[v_idx]
-            elif poly.index == 2: # Front roof: 3, 2, 9, 8
-                uvs = {3: (0.08, 0.46), 2: (0.98, 0.46), 9: (0.98, 0.92), 8: (0.08, 0.92)}
-                uv_layer.data[loop_index].uv = uvs[v_idx]
-            elif poly.index == 3: # Rear roof: 9, 6, 7, 8
-                uvs = {9: (0.98, 0.92), 6: (0.98, 0.46), 7: (0.08, 0.46), 8: (0.08, 0.92)}
-                uv_layer.data[loop_index].uv = uvs[v_idx]
-            elif poly.index == 4: # Left wall: 0, 4, 7, 3
-                uvs = {0: (0.35, 0.02), 4: (0.16, 0.02), 7: (0.16, 0.46), 3: (0.35, 0.46)}
-                uv_layer.data[loop_index].uv = uvs[v_idx]
-            elif poly.index == 5: # Left gable: 3, 7, 8
-                uvs = {3: (0.20, 0.46), 7: (0.50, 0.46), 8: (0.35, 0.85)}
-                uv_layer.data[loop_index].uv = uvs[v_idx]
-            elif poly.index == 6: # Right wall: 5, 1, 2, 6
-                uvs = {5: (0.92, 0.02), 1: (0.75, 0.02), 2: (0.75, 0.46), 6: (0.92, 0.46)}
-                uv_layer.data[loop_index].uv = uvs[v_idx]
-            elif poly.index == 7: # Right gable: 2, 6, 9
-                uvs = {2: (0.60, 0.46), 6: (0.80, 0.46), 9: (0.70, 0.85)}
-                uv_layer.data[loop_index].uv = uvs[v_idx]
-            else:
-                uv_layer.data[loop_index].uv = (0.5, 0.25)
-
-    # Chimenea lateral
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx + w/2 - 0.7, depth*0.35, 4.6))
-    chimney = bpy.context.active_object
-    chimney.scale = (1.2, 1.2, 9.2)
-    chimney.data.materials.append(mat)
-    ch_uv = chimney.data.uv_layers.new(name='UVMap')
-    for loop in chimney.data.loops:
-        ch_uv.data[loop.index].uv = (0.79, 0.70)
-
-    # Rueda de molino
-    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.4, depth=0.6, location=(cx - w/2 - 0.4, depth*0.4, 1.4))
-    wheel = bpy.context.active_object
-    wheel.rotation_euler = (0, 1.57079, 0)
-    wheel.data.materials.append(mat)
-    wh_uv = wheel.data.uv_layers.new(name='UVMap')
-    for loop in wheel.data.loops:
-        wh_uv.data[loop.index].uv = (0.10, 0.25)
-
-    bpy.ops.object.select_all(action='SELECT')
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.join()
+    # 4. Porche frontal con postes y techillo
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, -0.65, 0.35))
+    porche_suelo = bpy.context.active_object
+    porche_suelo.scale = (6.2, 1.4, 0.3)
+    asignar_material(porche_suelo, get_mat("madera_tablas"))
+    
+    for px in [cx - 2.8, cx - 0.9, cx + 0.9, cx + 2.8]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.09, depth=2.4, location=(px, -1.25, 1.55))
+        poste = bpy.context.active_object
+        asignar_material(poste, get_mat("madera_viga"))
+        
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, -0.65, 2.75))
+    alero_porche = bpy.context.active_object
+    alero_porche.scale = (6.4, 1.5, 0.12)
+    alero_porche.rotation_euler = (math.radians(12), 0, 0)
+    asignar_material(alero_porche, get_mat("teja_cobriza"))
+    
+    # Farol colgante en el porche (luz cálida)
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.18, location=(cx + 1.2, -1.2, 2.35))
+    farol_porche = bpy.context.active_object
+    asignar_material(farol_porche, get_mat("farol_luz"))
+    
+    # 5. Puerta frontal de madera maciza
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, -0.15, 1.5))
+    puerta = bpy.context.active_object
+    puerta.scale = (1.4, 0.15, 2.1)
+    asignar_material(puerta, get_mat("madera_viga"))
+    
+    # Ventanas frontales de la planta baja
+    for px in [cx - 2.2, cx + 2.2]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, -0.15, 2.2))
+        vent = bpy.context.active_object
+        vent.scale = (1.2, 0.12, 1.1)
+        asignar_material(vent, get_mat("farol_luz"))
+    
+    # 6. Buhardilla superior encendida (en la vertiente frontal del tejado)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, depth * 0.18, 5.2))
+    buhardilla = bpy.context.active_object
+    buhardilla.scale = (1.8, 1.5, 1.5)
+    asignar_material(buhardilla, get_mat("madera_tablas"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.1, depth=1.7, location=(cx, depth * 0.18, 6.0))
+    techo_buhardilla = bpy.context.active_object
+    techo_buhardilla.rotation_euler = (0, math.radians(90), 0)
+    techo_buhardilla.scale = (1.0, 0.8, 1.0)
+    asignar_material(techo_buhardilla, get_mat("teja_cobriza"))
+    
+    bpy.ops.mesh.primitive_plane_add(size=0.8, location=(cx, -0.58, 5.3))
+    cristal_buhardilla = bpy.context.active_object
+    cristal_buhardilla.rotation_euler = (math.radians(-90), 0, 0)
+    asignar_material(cristal_buhardilla, get_mat("farol_luz"))
+    
+    # 7. Gran chimenea lateral de mampostería de piedra
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx + w * 0.5 - 0.75, depth * 0.42, 4.6))
+    chimenea = bpy.context.active_object
+    chimenea.scale = (1.3, 1.3, 8.6)
+    asignar_material(chimenea, get_mat("piedra_plaza"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx + w * 0.5 - 0.75, depth * 0.42, 9.0))
+    chimenea_cap = bpy.context.active_object
+    chimenea_cap.scale = (1.5, 1.5, 0.25)
+    asignar_material(chimenea_cap, get_mat("piedra_oscura"))
+    
+    # 8. Rueda de molino de agua hidráulica lateral (a la izquierda)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.35, depth=1.0, location=(cx - w * 0.5 - 0.5, depth * 0.45, 1.8))
+    eje_rueda = bpy.context.active_object
+    eje_rueda.rotation_euler = (0, math.radians(90), 0)
+    asignar_material(eje_rueda, get_mat("madera_viga"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.8, depth=0.45, location=(cx - w * 0.5 - 0.65, depth * 0.45, 1.8))
+    aro_rueda = bpy.context.active_object
+    aro_rueda.rotation_euler = (0, math.radians(90), 0)
+    asignar_material(aro_rueda, get_mat("madera_tablas"))
+    
+    for i in range(8):
+        ang = i * (math.pi / 4)
+        lx = cx - w * 0.5 - 0.65
+        ly = depth * 0.45 + math.cos(ang) * 1.45
+        lz = 1.8 + math.sin(ang) * 1.45
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(lx, ly, lz))
+        pala = bpy.context.active_object
+        pala.scale = (0.42, 0.36, 0.06)
+        pala.rotation_euler = (ang, 0, 0)
+        asignar_material(pala, get_mat("madera_tronco"))
+        
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx - w * 0.5 - 0.45, depth * 0.45, 3.5))
+    canaleta = bpy.context.active_object
+    canaleta.scale = (0.9, 2.2, 0.22)
+    asignar_material(canaleta, get_mat("madera_tronco"))
+    
+    # 9. Pared trasera detallada con ventanas (vista sólida en 360°)
+    for vx in [cx - 2.2, cx + 1.8]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(vx, depth + 0.14, 2.2))
+        ventana_trasera = bpy.context.active_object
+        ventana_trasera.scale = (1.2, 0.12, 1.0)
+        asignar_material(ventana_trasera, get_mat("madera_viga"))
+        
+        bpy.ops.mesh.primitive_plane_add(size=0.7, location=(vx, depth + 0.22, 2.2))
+        cristal_trasero = bpy.context.active_object
+        cristal_trasero.rotation_euler = (math.radians(90), 0, 0)
+        asignar_material(cristal_trasero, get_mat("farol_luz"))
 
     exportar_modelo("casa_granja", DIR_ENTORNO)
 
