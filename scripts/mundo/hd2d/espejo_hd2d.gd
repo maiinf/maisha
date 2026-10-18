@@ -73,8 +73,8 @@ void vertex() {
 		float tierra = 1.0 - smoothstep(0.08, 0.42, ag);
 		float h = (sin(wp.x * 0.24 + wp.z * 0.17) * cos(wp.z * 0.21 - wp.x * 0.14) * 0.075
 			+ sin(wp.x * 0.51 - wp.z * 0.43) * 0.025) * tierra;
-		// Talud natural: el terreno desciende suavemente hacia el lecho de agua para eliminar huecos
-		h -= smoothstep(0.20, 0.56, ag) * 0.28;
+		// Talud natural: el terreno desciende suavemente hacia el lecho de agua para formar la cuenca
+		h -= smoothstep(0.12, 0.52, ag) * 0.44;
 		VERTEX.y += h;
 		float dhx = cos(wp.x * 0.24 + wp.z * 0.17) * 0.018 * tierra;
 		float dhz = -sin(wp.z * 0.21 - wp.x * 0.14) * 0.018 * tierra;
@@ -89,28 +89,27 @@ void fragment() {
 	// (la máscara, suavizada y con un temblor suave para ondas curvas sin saltos de escalon)
 	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.04 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.03) * f_calma;
 	float es_agua = texture(agua, uv_mapa).r + temblor;
-	// Solape continuo: el suelo baja por el talud y se extiende bajo el agua (descarte en 0.62);
-	// la lámina de agua comienza en 0.46 eliminando cualquier rendija visible de vacío negro
-	if (hundido < 0.5 && es_agua > 0.62) { discard; }
-	if (hundido > 0.5 && es_agua <= 0.46) { discard; }
+	// El lecho de tierra bajo el agua NUNCA se descarta: es continuo y solido, eliminando cualquier hueco negro
+	// La lamina de agua solo se dibuja donde hay presencia de agua
+	if (hundido > 0.5 && es_agua <= 0.22) { discard; }
 	vec3 c = texture(capa, UV).rgb;
 	if (hundido > 0.5) {
 		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4 * f_calma) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0 * f_calma);
 		float onda2 = sin(px.x * 0.19 - px.y * 0.15 - TIME * 1.9 * f_calma) * 0.5 + 0.5;
-		float profundidad = smoothstep(0.48, 0.88, es_agua);
-		// Fondo de lecho acuático (arena/guijarros cálidos) integrado para transparencia real
-		vec3 color_lecho = mix(vec3(0.22, 0.28, 0.24), c, 0.65);
-		c = mix(color_lecho, c, 0.60 + profundidad * 0.40);
-		c = mix(c, vec3(0.06, 0.15, 0.25), 0.18 + profundidad * 0.14);
-		c = mix(c, vec3(0.18, 0.34, 0.52), calma_lago * 0.32 * profundidad);
-		c += vec3(0.06, 0.09, 0.11) * smoothstep(0.68, 0.98, onda1) * f_calma;
-		c += vec3(0.03, 0.05, 0.07) * smoothstep(0.76, 0.96, onda2) * profundidad * f_calma;
-		// Espuma blanca animada suave junto al borde, sin oscurecimiento perimetral agresivo
+		float profundidad = smoothstep(0.24, 0.75, es_agua);
+		// Fondo de lecho acuático cristalino integrado con tono agua
+		vec3 color_lecho = mix(vec3(0.16, 0.24, 0.22), c, 0.70);
+		c = mix(color_lecho, c, 0.40 + profundidad * 0.60);
+		c = mix(c, vec3(0.08, 0.22, 0.36), 0.30 + profundidad * 0.25);
+		c = mix(c, vec3(0.18, 0.36, 0.54), calma_lago * 0.32 * profundidad);
+		c += vec3(0.06, 0.09, 0.12) * smoothstep(0.68, 0.98, onda1) * f_calma;
+		c += vec3(0.03, 0.05, 0.08) * smoothstep(0.76, 0.96, onda2) * profundidad * f_calma;
+		// Espuma blanca animada suave en la orilla
 		float pulso_orilla = sin(px.x * 0.34 + px.y * 0.29 - TIME * 2.3 * f_calma) * 0.5 + 0.5;
-		float franja_espuma = smoothstep(0.62, 0.48, es_agua) * smoothstep(0.46, 0.51, es_agua);
-		float espuma = smoothstep(0.32, 0.65, franja_espuma + pulso_orilla * 0.26) * smoothstep(0.63, 0.48, es_agua);
-		c = mix(c, vec3(0.84, 0.91, 0.95), espuma * 0.58);
-		ROUGHNESS = mix(0.34, 0.08, calma_lago);
+		float franja_espuma = smoothstep(0.38, 0.23, es_agua) * smoothstep(0.21, 0.26, es_agua);
+		float espuma = smoothstep(0.25, 0.55, franja_espuma + pulso_orilla * 0.20);
+		c = mix(c, vec3(0.86, 0.93, 0.97), espuma * 0.60);
+		ROUGHNESS = mix(0.32, 0.08, calma_lago);
 		SPECULAR = mix(0.32, 0.65, calma_lago);
 	} else {
 		float ao = texture(mapa_ao, uv_mapa).r;
@@ -152,7 +151,7 @@ void vertex() {
 		float tierra = 1.0 - smoothstep(0.08, 0.42, ag);
 		float h = (sin(wp.x * 0.24 + wp.z * 0.17) * cos(wp.z * 0.21 - wp.x * 0.14) * 0.075
 			+ sin(wp.x * 0.51 - wp.z * 0.43) * 0.025) * tierra;
-		h -= smoothstep(0.20, 0.56, ag) * 0.28;
+		h -= smoothstep(0.12, 0.52, ag) * 0.44;
 		VERTEX.y += h;
 		float dhx = cos(wp.x * 0.24 + wp.z * 0.17) * 0.018 * tierra;
 		float dhz = -sin(wp.z * 0.21 - wp.x * 0.14) * 0.018 * tierra;
@@ -165,19 +164,19 @@ void fragment() {
 	float f_calma = 1.0 - calma_lago * 0.85;
 	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.04 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.03) * f_calma;
 	float es_agua = texture(agua, UV).r + temblor;
-	if (hundido < 0.5 && es_agua > 0.62) { discard; }
-	if (hundido > 0.5 && es_agua <= 0.46) { discard; }
+	// El lecho nunca se descarta; la lamina de agua se dibuja donde hay agua
+	if (hundido > 0.5 && es_agua <= 0.22) { discard; }
 	vec3 c = texture(suelo, UV).rgb * tinte_2d;
 	if (hundido > 0.5) {
 		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4 * f_calma) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0 * f_calma);
-		float profundidad = smoothstep(0.48, 0.88, es_agua);
-		vec3 color_lecho = mix(vec3(0.22, 0.28, 0.24) * tinte_2d, c, 0.65);
-		c = mix(color_lecho, c, 0.60 + profundidad * 0.40);
-		c = mix(c, vec3(0.06, 0.15, 0.25) * tinte_2d, 0.24);
-		c = mix(c, vec3(0.18, 0.34, 0.52) * tinte_2d, calma_lago * 0.32);
+		float profundidad = smoothstep(0.24, 0.75, es_agua);
+		vec3 color_lecho = mix(vec3(0.16, 0.24, 0.22) * tinte_2d, c, 0.70);
+		c = mix(color_lecho, c, 0.40 + profundidad * 0.60);
+		c = mix(c, vec3(0.08, 0.22, 0.36) * tinte_2d, 0.30);
+		c = mix(c, vec3(0.18, 0.36, 0.54) * tinte_2d, calma_lago * 0.32);
 		c += vec3(0.05, 0.08, 0.10) * tinte_2d * smoothstep(0.70, 0.98, onda1) * f_calma;
-		float franja_espuma = smoothstep(0.61, 0.48, es_agua) * smoothstep(0.46, 0.51, es_agua);
-		c = mix(c, vec3(0.82, 0.90, 0.94) * tinte_2d, franja_espuma * 0.52);
+		float franja_espuma = smoothstep(0.38, 0.23, es_agua) * smoothstep(0.21, 0.26, es_agua);
+		c = mix(c, vec3(0.85, 0.92, 0.96) * tinte_2d, franja_espuma * 0.55);
 		ROUGHNESS = mix(0.36, 0.08, calma_lago);
 		SPECULAR = mix(0.28, 0.65, calma_lago);
 	} else {
@@ -331,21 +330,14 @@ const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png
 const MODELOS_BLENDER := {
 	"casa_granja.png": {
 		"ruta": "res://modelos/entorno/casa_granja.glb",
-		"escala": Vector3(1.15, 1.15, 1.15),
-		"offset": Vector3(0.0, 0.0, -0.22),
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
 		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
 	"casa_seta.png": {
 		"ruta": "res://modelos/entorno/casa_pino.glb",
 		"ruta_ruina": "res://modelos/entorno/casa_pino_ruina.glb",
-		"escala": Vector3(1.12, 1.12, 1.12),
-		"offset": Vector3(0.0, 0.0, -0.22),
-		"rot_y": 0.0,
-		"solo_reconstruido": false,
-	},
-	"ruina_casa.png": {
-		"ruta": "res://modelos/entorno/casa_pino_ruina.glb",
 		"escala": Vector3(1.12, 1.12, 1.12),
 		"offset": Vector3(0.0, 0.0, -0.22),
 		"rot_y": 0.0,
@@ -363,13 +355,6 @@ const MODELOS_BLENDER := {
 		"ruta": "res://modelos/entorno/gran_arbol.glb",
 		"escala": Vector3(1.22, 1.22, 1.22),
 		"offset": Vector3(0.0, 0.0, -0.30),
-		"rot_y": 0.0,
-		"solo_reconstruido": false,
-	},
-	"molino.png": {
-		"ruta": "res://modelos/entorno/molino_shamba.glb",
-		"escala": Vector3(1.08, 1.08, 1.08),
-		"offset": Vector3(0.0, 0.0, -0.20),
 		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
@@ -485,7 +470,7 @@ const TIPOS_LUZ_3D := {
 	"h": [6.8, 1.35, Color(1.0, 0.64, 0.30), true],
 	"m": [4.8, 0.88, Color(0.50, 0.92, 0.82), false],
 }
-const HONDO_AGUA := 0.28             # metros que baja el agua
+const HONDO_AGUA := 0.28             # metros que baja la lámina de agua sobre el lecho hundido (-0.44m)
 const LETRAS_AGUA := "~\\"
 ## Dibujos de pantalla (por su script): van a la capa de pantalla, con sus hijos
 const DE_PANTALLA := ["ambiente.gd", "nevada.gd", "ventisca.gd", "luz_sol.gd"]
@@ -1394,8 +1379,8 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 	if m3d and is_instance_valid(m3d):
 		var off: Vector3 = cfg.get("offset", Vector3.ZERO)
 		m3d.position = _al_suelo(ancla.global_position) + off
-		m3d.visible = g.visible
-		g.transparency = 1.0
+		m3d.visible = _visible(n)
+		g.visible = false
 		g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		if g.has_meta("capas_fondo"):
 			for c_ant in g.get_meta("capas_fondo"):
@@ -1407,7 +1392,7 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 func _sincronizar_volumen_3d(n: Node2D, g: Sprite3D, ancla: Node2D, tex: Texture2D, arch: String, ancho_px: float, alto_px: float, mod_final: Color) -> void:
 	if _sincronizar_modelo_blender(n, g, ancla, arch, mod_final):
 		return
-	g.transparency = 0.0
+	g.visible = _visible(n)
 	var cfg := _config_volumen_3d(n, ancla, arch, ancho_px, alto_px)
 	var num_capas := int(cfg.x)
 	if num_capas <= 0 or tex == null:
@@ -1947,6 +1932,10 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 	elif tex != null:
 		tex_n = _textura_normal_de(tex)
 	g.texture = tex
+	var arch_check := tex.resource_path.get_file() if tex else ""
+	if arch_check == "molino.png" and ancla and (ancla.name.to_lower().contains("granja") or (ancla.get_script() and "granja" in ancla.get_script().resource_path)):
+		g.visible = false
+		return
 	g.flip_h = n.flip_h
 	g.flip_v = n.flip_v
 	g.centered = n.centered

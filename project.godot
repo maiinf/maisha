@@ -37,7 +37,12 @@ window/size/viewport_height=360
 window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="viewport"
-window/stretch/scale_mode="integer"
+window/stretch/scale_mode="fractional"
+window/stretch/aspect="keep"
+
+[filesystem]
+
+import/blender/enabled=false
 
 [input]
 

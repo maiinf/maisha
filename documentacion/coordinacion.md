@@ -50,10 +50,13 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
   - `modelos/entorno/taller_taa.glb` (Taller de alquimia y tinta de Taa / Sigilia)
   - `modelos/entorno/casa_escriba.glb` (Casas tradicionales de Sigilia con tejas cobrizas)
   - `modelos/entorno/fuente_plaza.glb` (Fuente central monumental octogonal de mármol en Maandiko)
-- [x] **Agua HD-2D Cristalina y Erradicación de Artefactos Negros**:
-  - Implementado talud natural de $0.28\text{ m}$ en `vertex()` conectando suelo con lecho de agua.
-  - Solape continuo $[0.46, 0.62]$ entre suelo y agua eliminando cualquier agujero de vacío o parpadeo.
-  - Color de lecho acuático de arena/grava cálida integrado.
-  - Desvanecimiento perimetral calibrado para no oscurecer acequias ni estanques en los márgenes del mapa.
-- [x] **Volumen 3D y Relieves**: 98 mapas de normales importados, extrusión volumétrica y balance lumínico nocturno completado.
-- [x] **Sincronización remota**: Ramas `origin/hd2d/blender-piloto` y `origin/hd2d/calidad-blender` actualizadas y testeadas con 0 errores en `prueba_hd2d` y `prueba_kitovu`.
+- [x] **Arquitectura 3D Sólida y Texturizada en Pixel Art (Blender 4.5)**:
+  - `modelos/entorno/casa_granja.glb`: Modelada con proporciones exactas de la granja (9.6m x 4.8m x 8.2m), tejado a dos aguas 360° (vertiente frontal y trasera completa), chimenea de piedra y rueda de molino. Texturizada directamente con el pixel art oficial (`casa_granja.png`) usando filtrado `NEAREST` (`Closest`).
+  - Ocultación total del sprite plano (`g.visible = false`) al instanciar el modelo 3D para erradicar el solapamiento y z-fighting entre 2D y 3D.
+  - Corrección de ruinas: Eliminada la asociación errónea de `ruina_casa.png` con la casa seta; las ruinas de piedra de El Kitovu recuperan su extrusión volumétrica de mampostería y escombros auténticos sin conos rojos.
+- [x] **Agua HD-2D Cristalina y Erradicación Definitiva de Artefactos**:
+  - El lecho de tierra bajo el agua (`hundido < 0.5`) NUNCA se descarta: es un suelo 100% continuo que forma la cuenca a -0.44m.
+  - La lámina de agua flota a -0.28m (`HONDO_AGUA`), eliminando por completo cualquier coplanaridad, parpadeo o vacío negro.
+  - El agua solo se dibuja donde `es_agua > 0.22`, con espuma blanca en contacto con la orilla y visibilidad limpia del fondo.
+- [x] **Escalado de Pantalla**: `window/stretch/scale_mode="fractional"` y `aspect="keep"` en `project.godot` para llenar la ventana sin bandas negras fijas.
+- [x] **Sincronización remota y Pruebas**: Verificado con `prueba_hd2d` (18/18) y `prueba_kitovu` (100% historia y minijuegos).
