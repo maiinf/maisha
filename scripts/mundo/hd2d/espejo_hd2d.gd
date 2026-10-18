@@ -344,6 +344,9 @@ const LUCES_3D := {
 	"grua.png": [["f", 36, 68]],
 	"portal.png": [["h", 48, 12]],
 	"altar_corteza.png": [["h", 24, 18]],
+	"brasero.png": [["f", 11, 8]],
+	"maquina.png": [["f", 20, 12]],
+	"raiz_gigante.png": [["h", 50, 15]],
 }
 const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png", "puesto.png"]
 ## Modelos 3D de Blender 4.5 para arquitectura y accesorios:
@@ -696,6 +699,29 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.0, 1.0, 1.0),
 		"offset": Vector3(0.0, 0.0, -0.05),
 		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"brasero.png": {
+		"ruta": "res://modelos/entorno/brasero.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"maquina.png": {
+		"ruta": "res://modelos/entorno/maquina_campo.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.2, 1.8),
+		"solo_reconstruido": false,
+	},
+	"raiz_gigante.png": {
+		"ruta": "res://modelos/entorno/raiz_gigante.glb",
+		"escala": Vector3(1.08, 1.08, 1.08),
+		"offset": Vector3(0.0, 0.0, -0.20),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(3.5, 2.0),
 		"solo_reconstruido": false,
 	},
 }

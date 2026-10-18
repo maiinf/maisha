@@ -3761,6 +3761,190 @@ def generar_balsa():
 
     exportar_modelo("balsa", DIR_ENTORNO)
 
+def generar_brasero():
+    """Genera el Brasero Ancestral de fuego y calor (Sendero Olvidado) completo en 360°:
+    Cuenco semiesférico de piedra labrada con espirales de los ecos, trípode de patas de hierro forjado
+    con garras curvas, lecho de ascuas y brasas de Asili incandescentes, y cenizas/nieve en la base."""
+    limpiar_escena()
+    tex_marmol = os.path.join(DIR_SIGILIA, "marmol_sigilia_tile.png")
+    mat_piedra = obtener_material_textura("Mat_Brasero_Piedra", tex_marmol, rugosidad=0.82)
+    mat_hierro = get_mat("metal_forja")
+    mat_brasas = obtener_material("Mat_Brasero_Fuego", "#DF9022", roughness=0.15, emission_hex="#FF6B00", emission_strength=4.0)
+    mat_nieve = obtener_material("Mat_Brasero_Nieve", "#F1F5F9", roughness=0.75)
+
+    # 1. Cuenco de piedra superior
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.75, depth=0.45, location=(0, 0, 0.95))
+    cuenco = bpy.context.active_object
+    asignar_material(cuenco, mat_piedra)
+    aplicar_uv_cilindro(cuenco, 1.5, 1.0)
+
+    # Moldura exterior del borde
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.78, minor_radius=0.06, major_segments=16, minor_segments=8, location=(0, 0, 1.15))
+    borde = bpy.context.active_object
+    asignar_material(borde, mat_hierro)
+
+    # 2. Lecho de carbones y brasas incandescentes
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.65, depth=0.15, location=(0, 0, 1.12))
+    carbon = bpy.context.active_object
+    asignar_material(carbon, mat_brasas)
+
+    for ang, dist in [(0.4, 0.35), (1.6, 0.45), (3.1, 0.38), (4.5, 0.42)]:
+        px = math.cos(ang) * dist
+        py = math.sin(ang) * dist
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.12, location=(px, py, 1.22))
+        chispa = bpy.context.active_object
+        asignar_material(chispa, mat_brasas)
+
+    # 3. Trípode de 3 patas de hierro forjado
+    for i in range(3):
+        ang = i * (math.pi * 2.0 / 3.0)
+        px = math.cos(ang) * 0.45
+        py = math.sin(ang) * 0.45
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.06, depth=1.05, location=(px, py, 0.48))
+        pata = bpy.context.active_object
+        pata.rotation_euler = (math.sin(ang) * 0.32, -math.cos(ang) * 0.32, 0)
+        asignar_material(pata, mat_hierro)
+
+        fx = math.cos(ang) * 0.72
+        fy = math.sin(ang) * 0.72
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(fx, fy, 0.04))
+        pie = bpy.context.active_object
+        pie.scale = (0.16, 0.16, 0.08)
+        asignar_material(pie, mat_hierro)
+
+    # 4. Escarcha y nieve en la base
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.92, depth=0.06, location=(0, 0, 0.03))
+    nieve = bpy.context.active_object
+    asignar_material(nieve, mat_nieve)
+
+    exportar_modelo("brasero", DIR_ENTORNO)
+
+def generar_maquina_campo():
+    """Genera la Máquina agrícola de vapor y trilla (Campo Segado) completa en 360°:
+    Caldera cilíndrica de hierro remachado con chimenea vertical y caperuza de latón, tolva de grano
+    con heno dorado, engranajes y poleas de transmisión de bronce, y grandes ruedas motrices de radios."""
+    limpiar_escena()
+    tex_paja = os.path.join(DIR_KITOVU, "tejado_paja_tile.png")
+    mat_paja = obtener_material_textura("Mat_Maquina_Paja", tex_paja, rugosidad=0.88)
+    mat_hierro = get_mat("metal_forja")
+    mat_cobre = obtener_material("Mat_Maquina_Cobre", "#DF9022", roughness=0.35, metallic=0.75)
+    mat_madera = get_mat("madera_viga")
+
+    # 1. Chasis / bancada de vigas
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.45))
+    chasis = bpy.context.active_object
+    chasis.scale = (3.2, 1.8, 0.22)
+    asignar_material(chasis, mat_madera)
+
+    # 2. Caldera cilíndrica horizontal
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.65, depth=2.4, location=(-0.35, 0, 1.15))
+    caldera = bpy.context.active_object
+    caldera.rotation_euler = (0, math.radians(90), 0)
+    asignar_material(caldera, mat_hierro)
+
+    for zx in [-1.2, -0.35, 0.5]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.68, depth=0.08, location=(zx, 0, 1.15))
+        zuncho = bpy.context.active_object
+        zuncho.rotation_euler = (0, math.radians(90), 0)
+        asignar_material(zuncho, mat_cobre)
+
+    # 3. Chimenea de escape vertical
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.14, depth=1.4, location=(0.6, 0, 2.3))
+    chimenea = bpy.context.active_object
+    asignar_material(chimenea, mat_hierro)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.22, depth=0.15, location=(0.6, 0, 3.0))
+    caperuza = bpy.context.active_object
+    asignar_material(caperuza, mat_cobre)
+
+    # 4. Tolva de alimentación de grano
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.1, 0, 1.35))
+    tolva = bpy.context.active_object
+    tolva.scale = (0.9, 1.4, 0.8)
+    asignar_material(tolva, mat_madera)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.1, 0, 1.75))
+    heno_tolva = bpy.context.active_object
+    heno_tolva.scale = (0.75, 1.25, 0.2)
+    asignar_material(heno_tolva, mat_paja)
+
+    # 5. Ruedas motrices
+    for sign in [-1, 1]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=14, radius=0.65, depth=0.14, location=(-0.85, sign * 1.05, 0.65))
+        rt = bpy.context.active_object
+        rt.rotation_euler = (math.radians(90), 0, 0)
+        asignar_material(rt, mat_hierro)
+
+        bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.45, depth=0.12, location=(0.85, sign * 1.02, 0.45))
+        rd = bpy.context.active_object
+        rd.rotation_euler = (math.radians(90), 0, 0)
+        asignar_material(rd, mat_hierro)
+
+    # 6. Volante de inercia
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.45, depth=0.08, location=(0.1, -0.72, 1.15))
+    volante = bpy.context.active_object
+    volante.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(volante, mat_cobre)
+
+    exportar_modelo("maquina_campo", DIR_ENTORNO)
+
+def generar_raiz_gigante():
+    """Genera la Raíz Gigante Ancestral (El Kitovu) completa en 360°:
+    Monumento natural de tronco fósil y raíces colosales curvadas que forman un arco sobre el terreno,
+    nódulos de ámbar petrificado con brillo dorado de Asili y corteza arrugada con líquenes."""
+    limpiar_escena()
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_raiz = obtener_material_textura("Mat_RaizGig_Madera", tex_troncos, rugosidad=0.88)
+    mat_asili = obtener_material("Mat_RaizGig_Asili", "#DF9022", roughness=0.15, emission_hex="#FFB300", emission_strength=3.5)
+    mat_musgo = obtener_material("Mat_RaizGig_Musgo", "#4A5D3E", roughness=0.92)
+
+    puntos_arco = [
+        (-2.8, -0.2, 0.5, 0.55),
+        (-1.5, 0.1, 1.35, 0.62),
+        (0.0, -0.1, 1.85, 0.68),
+        (1.5, 0.15, 1.45, 0.60),
+        (2.8, -0.2, 0.6, 0.52),
+    ]
+    for px, py, pz, r in puntos_arco:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=r, location=(px, py, pz))
+        nodo = bpy.context.active_object
+        asignar_material(nodo, mat_raiz)
+
+    for i in range(len(puntos_arco) - 1):
+        p1 = puntos_arco[i]
+        p2 = puntos_arco[i + 1]
+        mx = (p1[0] + p2[0]) * 0.5
+        my = (p1[1] + p2[1]) * 0.5
+        mz = (p1[2] + p2[2]) * 0.5
+        dx, dy, dz = p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]
+        dist = math.sqrt(dx * dx + dy * dy + dz * dz)
+        ang_y = math.atan2(dx, dz)
+        ang_x = math.atan2(-dy, math.sqrt(dx * dx + dz * dz))
+
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=(p1[3] + p2[3]) * 0.45, depth=dist, location=(mx, my, mz))
+        seg = bpy.context.active_object
+        seg.rotation_euler = (ang_x, ang_y, 0)
+        asignar_material(seg, mat_raiz)
+
+    for rx, ry in [(-2.2, 0.5), (0.2, -0.6), (2.1, 0.6)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.22, depth=1.6, location=(rx, ry, 0.6))
+        sub_r = bpy.context.active_object
+        sub_r.rotation_euler = (math.radians(20), math.radians(-15), 0)
+        asignar_material(sub_r, mat_raiz)
+
+    for ax, ay, az in [(-0.8, -0.4, 1.5), (0.8, -0.4, 1.6), (0.0, 0.45, 1.7)]:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.24, location=(ax, ay, az))
+        nodulo = bpy.context.active_object
+        nodulo.scale = (1.2, 0.6, 0.8)
+        asignar_material(nodulo, mat_asili)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 2.25))
+    musgo = bpy.context.active_object
+    musgo.scale = (2.4, 0.65, 0.12)
+    asignar_material(musgo, mat_musgo)
+
+    exportar_modelo("raiz_gigante", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -3824,6 +4008,9 @@ def main():
     generar_arco_ruinas()
     generar_altar_corteza()
     generar_balsa()
+    generar_brasero()
+    generar_maquina_campo()
+    generar_raiz_gigante()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

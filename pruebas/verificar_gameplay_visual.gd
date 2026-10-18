@@ -167,6 +167,19 @@ func _ready() -> void:
 		if m_portal:
 			_verificar_materiales_nodo(m_portal, "portal_raiz")
 
+		# Acercarse a la raíz gigante petrificada (N en col 41, fil 5 -> 656, 80)
+		maisha.global_position = Vector2(656, 100)
+		await _esperar(0.4)
+		modelos = esp.get("_modelos_blender_instanciados")
+		var m_raiz: Node3D = null
+		for m in modelos.values():
+			if is_instance_valid(m) and "raiz_gigante" in (m as Node3D).name:
+				m_raiz = m
+				break
+		_comprobar(m_raiz != null, "Raíz gigante petrificada 3D instanciada en El Kitovu")
+		if m_raiz:
+			_verificar_materiales_nodo(m_raiz, "raiz_gigante")
+
 	# -----------------------------------------------------------------------
 	# 2. CUNA DE MUSGO (Aldea)
 	# -----------------------------------------------------------------------
@@ -431,10 +444,23 @@ func _ready() -> void:
 	if m_arco:
 		_verificar_materiales_nodo(m_arco, "arco_ruinas")
 
+	# Acercarse a un brasero rúnico encendido en la nieve (col 48, fil 15 -> 768, 240)
+	maisha.global_position = Vector2(768, 260)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_brasero: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "brasero" in (m as Node3D).name:
+			m_brasero = m
+			break
+	_comprobar(m_brasero != null, "Brasero de fuego 3D instanciado en Sendero Olvidado")
+	if m_brasero:
+		_verificar_materiales_nodo(m_brasero, "brasero")
+
 	# -----------------------------------------------------------------------
 	# 10. GRUTA DE LAS RAÍCES (Santuario de Corteza)
 	# -----------------------------------------------------------------------
-	print("\n--- [10/11] GRUTA DE LAS RAÍCES ---")
+	print("\n--- [10/12] GRUTA DE LAS RAÍCES ---")
 	await _ir("gruta_raices", "")
 	esp = _espejo()
 	_comprobar(esp != null, "EspejoHD2D activo en Gruta de las Raíces")
@@ -456,7 +482,7 @@ func _ready() -> void:
 	# -----------------------------------------------------------------------
 	# 11. ORILLA DE JUNCOS (Balsa de Kasia)
 	# -----------------------------------------------------------------------
-	print("\n--- [11/11] ORILLA DE JUNCOS ---")
+	print("\n--- [11/12] ORILLA DE JUNCOS ---")
 	await _ir("orilla_juncos", "")
 	esp = _espejo()
 	_comprobar(esp != null, "EspejoHD2D activo en Orilla de Juncos")
@@ -474,6 +500,28 @@ func _ready() -> void:
 	_comprobar(m_balsa != null, "Balsa de juncos 3D instanciada en la orilla del río")
 	if m_balsa:
 		_verificar_materiales_nodo(m_balsa, "balsa")
+
+	# -----------------------------------------------------------------------
+	# 12. CAMPO SEGADO (Máquina trilladora de vapor)
+	# -----------------------------------------------------------------------
+	print("\n--- [12/12] CAMPO SEGADO ---")
+	await _ir("campo_segado", "")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Campo Segado")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse a la máquina trilladora (& en col 40, fil 34 -> 640, 544)
+	maisha.global_position = Vector2(640, 560)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_maquina: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "maquina" in (m as Node3D).name:
+			m_maquina = m
+			break
+	_comprobar(m_maquina != null, "Máquina trilladora agrícola 3D instanciada en Campo Segado")
+	if m_maquina:
+		_verificar_materiales_nodo(m_maquina, "maquina_campo")
 
 	# -----------------------------------------------------------------------
 	# RESUMEN FINAL
