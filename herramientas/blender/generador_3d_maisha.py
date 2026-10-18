@@ -4886,6 +4886,237 @@ def generar_seta_luz():
 
     exportar_modelo("seta_luz", DIR_ENTORNO)
 
+
+def generar_cartel_madera():
+    """Genera el Cartel Direccional de Madera (Universal en caminos y cruces de todos los biomas):
+    Poste vertical biselado de madera noble, travesaño indicador con flecha rústica biselada,
+    tablilla de dirección con remaches de hierro forjado y base de musgo."""
+    limpiar_escena()
+    mat_troncos = obtener_material_textura("Mat_Cartel_Madera", os.path.join(DIR_KITOVU, "pared_troncos_tile.png"), rugosidad=0.75)
+    mat_tabla = obtener_material("Mat_Cartel_Tabla", "#854D0E", roughness=0.7)
+    mat_clavo = obtener_material("Mat_Cartel_Hierro", "#1E293B", roughness=0.4, metallic=0.8)
+    mat_musgo = obtener_material("Mat_Cartel_Musgo", "#365314", roughness=0.9)
+
+    # 1. Base de anclaje de tierra y musgo
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.18, depth=0.08, location=(0, 0, 0.04))
+    base = bpy.context.active_object
+    asignar_material(base, mat_musgo)
+
+    # 2. Poste vertical de madera
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.065, depth=1.18, location=(0, 0, 0.59))
+    poste = bpy.context.active_object
+    aplicar_uv_caja(poste, 1.0, 2.5)
+    asignar_material(poste, mat_troncos)
+
+    # Remate superior piramidal del poste
+    bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=0.07, radius2=0.01, depth=0.12, location=(0, 0, 1.24))
+    remate = bpy.context.active_object
+    asignar_material(remate, mat_troncos)
+
+    # 3. Tablilla indicadora principal con flecha apuntando a la derecha
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.14, 0.04, 0.98))
+    tablilla = bpy.context.active_object
+    tablilla.scale = (0.58, 0.045, 0.16)
+    tablilla.rotation_euler = (0, math.radians(-2), 0)
+    asignar_material(tablilla, mat_tabla)
+
+    # Punta de flecha triangular en el extremo
+    bpy.ops.mesh.primitive_cone_add(vertices=4, radius1=0.13, radius2=0.01, depth=0.18, location=(0.49, 0.04, 0.97))
+    flecha = bpy.context.active_object
+    flecha.scale = (0.7, 0.35, 1.0)
+    flecha.rotation_euler = (0, 0, math.radians(-90))
+    asignar_material(flecha, mat_tabla)
+
+    # Segunda tablilla inferior orientada al sentido contrario
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.12, -0.04, 0.80))
+    tablilla_b = bpy.context.active_object
+    tablilla_b.scale = (0.50, 0.045, 0.14)
+    tablilla_b.rotation_euler = (0, math.radians(3), 0)
+    asignar_material(tablilla_b, mat_tabla)
+
+    bpy.ops.mesh.primitive_cone_add(vertices=4, radius1=0.11, radius2=0.01, depth=0.16, location=(-0.43, -0.04, 0.81))
+    flecha_b = bpy.context.active_object
+    flecha_b.scale = (0.7, 0.35, 1.0)
+    flecha_b.rotation_euler = (0, 0, math.radians(90))
+    asignar_material(flecha_b, mat_tabla)
+
+    # 4. Remaches de hierro forjado
+    for cx, cy, cz in [(0.0, 0.07, 0.98), (0.0, -0.07, 0.80)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.018, depth=0.03, location=(cx, cy, cz))
+        clavo = bpy.context.active_object
+        clavo.rotation_euler = (math.radians(90), 0, 0)
+        asignar_material(clavo, mat_clavo)
+
+    exportar_modelo("cartel_madera", DIR_ENTORNO)
+
+
+def generar_tronco_caido():
+    """Genera el Tronco Caído con Tablas (El Kitovu y Cañada del Eco):
+    Fuste horizontal derribado con corteza rugosa y hendidura, tocones de ramas,
+    anillos anuales en los extremos y 3 tablones de construcción apoyados en ángulo."""
+    limpiar_escena()
+    mat_troncos = obtener_material_textura("Mat_Tronco_Corteza", os.path.join(DIR_KITOVU, "pared_troncos_tile.png"), rugosidad=0.8)
+    mat_anillos = obtener_material("Mat_Tronco_Anillos", "#A16207", roughness=0.7)
+    mat_tablas = obtener_material("Mat_Madera_Tablas", "#854D0E", roughness=0.65)
+    mat_musgo = obtener_material("Mat_Tronco_Musgo", "#365314", roughness=0.9)
+    mat_interior = obtener_material("Mat_Tronco_Interior", "#2E1A0F", roughness=0.95)
+
+    # 1. Tronco principal horizontal acostado
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.28, depth=2.10, location=(0, 0, 0.28))
+    fuste = bpy.context.active_object
+    fuste.rotation_euler = (0, math.radians(90), 0)
+    fuste.scale = (1.0, 0.90, 1.0)
+    aplicar_uv_caja(fuste, 2.5, 1.2)
+    asignar_material(fuste, mat_troncos)
+
+    # 2. Testas con anillos de crecimiento en ambos extremos
+    for ex in [-1.055, 1.055]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.25, depth=0.02, location=(ex, 0, 0.28))
+        testa = bpy.context.active_object
+        testa.rotation_euler = (0, math.radians(90), 0)
+        asignar_material(testa, mat_anillos)
+
+    # 3. Hendidura y oquedad central carcomida
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.15, -0.14, 0.35))
+    grieta = bpy.context.active_object
+    grieta.scale = (0.75, 0.12, 0.16)
+    grieta.rotation_euler = (0, 0, math.radians(4))
+    asignar_material(grieta, mat_interior)
+
+    # 4. Tocón de rama rota emergente
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.08, depth=0.35, location=(0.42, 0.18, 0.44))
+    tocon = bpy.context.active_object
+    tocon.rotation_euler = (math.radians(35), math.radians(15), 0)
+    asignar_material(tocon, mat_troncos)
+
+    # Parche de musgo sobre el lomo del tronco
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.22, depth=0.60, location=(-0.35, 0.05, 0.48))
+    musgo = bpy.context.active_object
+    musgo.rotation_euler = (0, math.radians(90), 0)
+    musgo.scale = (0.4, 0.9, 0.5)
+    asignar_material(musgo, mat_musgo)
+
+    # 5. Pila de 3 tablones de construcción recién cortados apoyados contra el tronco
+    for idx, (tx, ty, tz, trot_z, trot_y) in enumerate([
+        (0.12, -0.28, 0.24, 6, 28),
+        (0.28, -0.30, 0.22, -4, 25),
+        (0.44, -0.26, 0.20, 10, 22),
+    ]):
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(tx, ty, tz))
+        tabla = bpy.context.active_object
+        tabla.scale = (0.16, 0.04, 0.72)
+        tabla.rotation_euler = (math.radians(trot_y), math.radians(trot_z), math.radians(-12))
+        asignar_material(tabla, mat_tablas)
+
+    exportar_modelo("tronco_caido", DIR_ENTORNO)
+
+
+def generar_pino_nevado():
+    """Genera el Pino Nevado Alpino (Sendero Olvidado):
+    Conífera perenne de alta montaña con 4 pisos escalonados de copas cónicas en 360°,
+    gruesos mantos de nieve esponjosa en las vertientes superiores y tronco vertical con corteza."""
+    limpiar_escena()
+    mat_troncos = obtener_material_textura("Mat_Pino_Corteza", os.path.join(DIR_KITOVU, "pared_troncos_tile.png"), rugosidad=0.85)
+    mat_agujas = obtener_material("Mat_Pino_Agujas", "#1E3A18", roughness=0.6)
+    mat_nieve = obtener_material("Mat_Pino_Nieve", "#F1F5F9", roughness=0.75)
+
+    # 1. Tronco vertical macizo
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.14, depth=1.40, location=(0, 0, 0.70))
+    tronco = bpy.context.active_object
+    aplicar_uv_caja(tronco, 1.0, 2.0)
+    asignar_material(tronco, mat_troncos)
+
+    # 2. Cuatro niveles escalonados de fronda cónica con sus mantos de nieve correspondientes
+    niveles = [
+        # (z_copa, r1_copa, alt_copa, z_nieve, r1_nieve, alt_nieve)
+        (0.95, 0.95, 0.75, 1.10, 0.88, 0.22),
+        (1.50, 0.78, 0.70, 1.62, 0.72, 0.20),
+        (2.05, 0.60, 0.65, 2.15, 0.54, 0.18),
+        (2.55, 0.40, 0.60, 2.65, 0.36, 0.16),
+    ]
+
+    for z_c, r_c, h_c, z_n, r_n, h_n in niveles:
+        # Follaje verde perenne del nivel
+        bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=r_c, radius2=0.06, depth=h_c, location=(0, 0, z_c))
+        copa = bpy.context.active_object
+        asignar_material(copa, mat_agujas)
+
+        # Manto de nieve compacta acumulada en la vertiente superior
+        bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=r_n, radius2=0.04, depth=h_n, location=(0, 0, z_n))
+        nieve = bpy.context.active_object
+        nieve.scale = (1.02, 1.02, 1.0)
+        asignar_material(nieve, mat_nieve)
+
+    # Copete supremo de nieve en la cúspide
+    bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=0.15, radius2=0.01, depth=0.22, location=(0, 0, 2.92))
+    punta_nieve = bpy.context.active_object
+    asignar_material(punta_nieve, mat_nieve)
+
+    exportar_modelo("pino_nevado", DIR_ENTORNO)
+
+
+def generar_sauce_pantano():
+    """Genera el Sauce de Pantano (Ciénaga Quieta y Las Pasarelas):
+    Tronco nudoso y retorcido que surge del fango, 3 ramas horizontales principales y
+    6 cortinas colgantes de lianas y follaje verde musgo sauce."""
+    limpiar_escena()
+    mat_corteza = obtener_material_textura("Mat_Sauce_Corteza", os.path.join(DIR_KITOVU, "pared_troncos_tile.png"), rugosidad=0.85)
+    mat_sauce_a = obtener_material("Mat_Sauce_FollajeA", "#3F5E30", roughness=0.65)
+    mat_sauce_b = obtener_material("Mat_Sauce_FollajeB", "#4D703B", roughness=0.65)
+
+    # 1. Base radicular en el fango
+    for r_ang in [0, 110, 230]:
+        rad = math.radians(r_ang)
+        rx = math.cos(rad) * 0.32
+        ry = math.sin(rad) * 0.32
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.09, depth=0.45, location=(rx, ry, 0.18))
+        raiz = bpy.context.active_object
+        raiz.rotation_euler = (math.sin(rad) * 0.45, -math.cos(rad) * 0.45, 0)
+        asignar_material(raiz, mat_corteza)
+
+    # 2. Tronco principal curvado
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.22, depth=1.35, location=(0, 0, 0.72))
+    tronco = bpy.context.active_object
+    tronco.rotation_euler = (math.radians(6), math.radians(-5), 0)
+    aplicar_uv_caja(tronco, 1.2, 2.2)
+    asignar_material(tronco, mat_corteza)
+
+    # 3. Ramas horizontales en abanico
+    ramas_coords = [
+        (0.48, 0.12, 1.48, 12, 45, 0.75),
+        (-0.45, 0.22, 1.55, -15, -40, 0.70),
+        (0.08, -0.52, 1.50, -35, 10, 0.72),
+    ]
+    for bx, by, bz, rx, ry, blen in ramas_coords:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.10, depth=blen, location=(bx, by, bz))
+        brazo = bpy.context.active_object
+        brazo.rotation_euler = (math.radians(rx), math.radians(ry), 0)
+        asignar_material(brazo, mat_corteza)
+
+    # 4. Domo superior de fronda
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.92, location=(0.02, 0.05, 2.05))
+    cupula = bpy.context.active_object
+    cupula.scale = (1.2, 1.1, 0.65)
+    asignar_material(cupula, mat_sauce_a)
+
+    # 5. Cortinas colgantes verticales de follaje llorón
+    cortinas_coords = [
+        (0.65, 0.25, 1.35, mat_sauce_a, 0.85),
+        (-0.60, 0.35, 1.40, mat_sauce_b, 0.80),
+        (0.15, -0.68, 1.30, mat_sauce_a, 0.90),
+        (0.45, -0.45, 1.25, mat_sauce_b, 0.82),
+        (-0.48, -0.40, 1.32, mat_sauce_a, 0.78),
+        (0.05, 0.70, 1.38, mat_sauce_b, 0.86),
+    ]
+    for cx, cy, cz, cmat, calt in cortinas_coords:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.18, depth=calt, location=(cx, cy, cz))
+        cortina = bpy.context.active_object
+        cortina.scale = (0.75, 0.75, 1.0)
+        cortina.rotation_euler = (math.radians((cx * 15)), math.radians((cy * 15)), 0)
+        asignar_material(cortina, cmat)
+
+    exportar_modelo("sauce_pantano", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -4967,6 +5198,10 @@ def main():
     generar_roca_pequena()
     generar_arbol_muerto()
     generar_seta_luz()
+    generar_cartel_madera()
+    generar_tronco_caido()
+    generar_pino_nevado()
+    generar_sauce_pantano()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

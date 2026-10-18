@@ -193,6 +193,19 @@ func _ready() -> void:
 		if m_muro:
 			_verificar_materiales_nodo(m_muro, "muro")
 
+		# Acercarse al tronco caído con tablas (Z en col 17, fil 24 -> 280, 398)
+		maisha.global_position = Vector2(280, 420)
+		await _esperar(0.4)
+		modelos = esp.get("_modelos_blender_instanciados")
+		var m_tronco: Node3D = null
+		for m in modelos.values():
+			if is_instance_valid(m) and ("tronco" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("tronco_caido.glb")):
+				m_tronco = m
+				break
+		_comprobar(m_tronco != null, "Tronco caído con tablas 3D instanciado en El Kitovu")
+		if m_tronco:
+			_verificar_materiales_nodo(m_tronco, "tronco_caido")
+
 	# -----------------------------------------------------------------------
 	# 2. CUNA DE MUSGO (Aldea)
 	# -----------------------------------------------------------------------
@@ -509,6 +522,20 @@ func _ready() -> void:
 	if m_brasero:
 		_verificar_materiales_nodo(m_brasero, "brasero")
 
+	# Acercarse a un pino nevado alpino 3D (ğ en col 18, fil 12 -> 288, 192)
+	maisha.global_position = Vector2(288, 210)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_pino_nev: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("pino_nevado" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("pino_nevado.glb")):
+			m_pino_nev = m
+			break
+	_comprobar(m_pino_nev != null, "Pino nevado alpino 3D instanciado en Sendero Olvidado")
+	if m_pino_nev:
+		_verificar_materiales_nodo(m_pino_nev, "pino_nevado")
+
 	# -----------------------------------------------------------------------
 	# 10. GRUTA DE LAS RAÍCES (Santuario de Corteza)
 	# -----------------------------------------------------------------------
@@ -814,10 +841,26 @@ func _ready() -> void:
 	if m_arbol_m:
 		_verificar_materiales_nodo(m_arbol_m, "arbol_muerto")
 
+	# Acercarse a un sauce de pantano 3D (s en 408, 110)
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(408, 130)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_sauce: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("sauce" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("sauce_pantano.glb")):
+			m_sauce = m
+			break
+	_comprobar(m_sauce != null, "Sauce de pantano 3D instanciado en Ciénaga Quieta")
+	if m_sauce:
+		_verificar_materiales_nodo(m_sauce, "sauce_pantano")
+
 	# -----------------------------------------------------------------------
 	# 21. SENDERO DEL PUENTE (Campamento de Msafiri y Columnas)
 	# -----------------------------------------------------------------------
-	print("\n--- [21/21] SENDERO DEL PUENTE ---")
+	print("\n--- [21/23] SENDERO DEL PUENTE ---")
 	await _ir("sendero_del_puente", "prados")
 	esp = _espejo()
 	_comprobar(esp != null, "EspejoHD2D activo en Sendero del Puente")
@@ -853,6 +896,100 @@ func _ready() -> void:
 	_comprobar(m_col_sendero != null, "Columna monumental 3D instanciada en Sendero del Puente")
 	if m_col_sendero:
 		_verificar_materiales_nodo(m_col_sendero, "columna")
+
+	# Verificar el cartel de madera 3D del cruce (L en 840, 302)
+	var m_cartel: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("cartel" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("cartel_madera.glb")):
+			m_cartel = m
+			break
+	_comprobar(m_cartel != null, "Cartel de madera 3D instanciado en Sendero del Puente")
+	if m_cartel:
+		_verificar_materiales_nodo(m_cartel, "cartel_madera")
+
+	# -----------------------------------------------------------------------
+	# 22. LAS PASARELAS (Palafito de Korongo y Árboles de Pantano)
+	# -----------------------------------------------------------------------
+	print("\n--- [22/23] LAS PASARELAS ---")
+	await _ir("las_pasarelas", "aldea")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Las Pasarelas")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse al palafito de Korongo ({ en col 64, fila 10 -> (1032, 174))
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(1032, 230)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_palafito: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("palafito" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("palafito.glb")):
+			m_palafito = m
+			break
+	_comprobar(m_palafito != null, "Palafito 3D instanciado en Las Pasarelas")
+	if m_palafito:
+		_verificar_materiales_nodo(m_palafito, "palafito")
+
+	# Acercarse al árbol podrido / muerto de las pasarelas (x en col 3, fila 20 -> (56, 334))
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(56, 350)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_arbol_pas: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("arbol_muerto" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("arbol_muerto.glb")):
+			m_arbol_pas = m
+			break
+	_comprobar(m_arbol_pas != null, "Árbol muerto 3D instanciado en Las Pasarelas")
+	if m_arbol_pas:
+		_verificar_materiales_nodo(m_arbol_pas, "arbol_muerto")
+
+	# -----------------------------------------------------------------------
+	# 23. LA TRAVESÍA (Transbordador de Bata y Eco de la Isla)
+	# -----------------------------------------------------------------------
+	print("\n--- [23/23] LA TRAVESÍA ---")
+	await _ir("la_travesia", "embarcadero")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en La Travesía")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	await _esperar(0.5)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_barco_travesia: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("transbordador" in (m as Node3D).name or "cubierta" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("transbordador.glb")):
+			m_barco_travesia = m
+			break
+	_comprobar(m_barco_travesia != null, "Gran Transbordador fluvial 3D instanciado en La Travesía")
+	if m_barco_travesia:
+		_verificar_materiales_nodo(m_barco_travesia, "transbordador")
+
+	# Trasladar el transbordador y Maisha junto a la isla del 7º eco para comprobar la Piedra del Eco 3D
+	var viaje = get_tree().current_scene.get_node_or_null("Entidades/Viaje")
+	if viaje:
+		viaje.recorrido = viaje._parada
+		viaje.position = viaje._punto(viaje._parada)
+		viaje.fase = viaje.Fase.PARADA
+		viaje._ultima_valida = viaje.position
+		if is_instance_valid(maisha):
+			maisha.global_position = viaje.position
+	await _esperar(0.5)
+
+	# Verificar la Piedra del Eco 3D en la isla del río (@ en col 35, fila 87 -> (568, 1406))
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_eco_isla: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("eco" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("piedra_eco.glb")):
+			m_eco_isla = m
+			break
+	_comprobar(m_eco_isla != null, "Piedra del Eco 3D instanciada en la isla de La Travesía")
+	if m_eco_isla:
+		_verificar_materiales_nodo(m_eco_isla, "piedra_eco")
 
 	# -----------------------------------------------------------------------
 	# RESUMEN FINAL
