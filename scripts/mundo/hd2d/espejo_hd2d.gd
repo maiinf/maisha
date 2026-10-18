@@ -1504,7 +1504,7 @@ func _preparar_materiales_modelo(nodo: Node) -> void:
 				sm.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 				sm.diffuse_mode = BaseMaterial3D.DIFFUSE_LAMBERT_WRAP
 				sm.roughness = 0.85
-				sm.specular = 0.10
+				sm.metallic_specular = 0.10
 				# Retención ambiental de color: asegura que en sombra las paredes mantengan su color cálido y nunca sean siluetas negras
 				var col_base := sm.albedo_color
 				if not sm.emission_enabled:
