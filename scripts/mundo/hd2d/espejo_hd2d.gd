@@ -96,7 +96,7 @@ void fragment() {
 	SPECULAR = 0.04;
 }
 """
-## El suelo lejano (todo el mapa): con desniveles suaves, agua cristalina HD-2D, lecho de arena/grava y oclusión perimetral
+## El suelo lejano (todo el mapa): base plana con desniveles, oclusión perimetral y lecho de fondo continuo
 const SOMBREADOR_LEJANO := """
 shader_type spatial;
 render_mode diffuse_lambert;
@@ -138,36 +138,82 @@ void fragment() {
 		ALBEDO = c;
 		ROUGHNESS = 0.96;
 		SPECULAR = 0.04;
-	} else if (hundido > 1.5) {
-		// Lecho continuo de guijarros/arena: elimina al 100% el vacío negro
+	} else {
+		// Lecho continuo de guijarros/arena: elimina al 100% el vacío negro bajo el agua
 		if (es_agua <= 0.10) { discard; }
 		vec3 c = texture(suelo, UV).rgb * tinte_2d;
 		vec3 color_grava = mix(vec3(0.24, 0.32, 0.28) * tinte_2d, c * 0.68, 0.70);
 		ALBEDO = color_grava;
 		ROUGHNESS = 0.95;
 		SPECULAR = 0.02;
-	} else {
-		// Lámina de agua cristalina HD-2D reflectante y transparente
-		if (es_agua <= 0.20) { discard; }
-		vec3 c = texture(suelo, UV).rgb * tinte_2d;
-		float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4 * f_calma) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0 * f_calma);
-		float onda2 = sin(px.x * 0.19 - px.y * 0.15 - TIME * 1.9 * f_calma) * 0.5 + 0.5;
-		float profundidad = smoothstep(0.22, 0.75, es_agua);
-		vec3 color_lecho = mix(vec3(0.24, 0.34, 0.32) * tinte_2d, c * 0.72, 0.65);
-		c = mix(color_lecho, c, 0.30 + profundidad * 0.55);
-		c = mix(c, vec3(0.12, 0.34, 0.50) * tinte_2d, 0.35 + profundidad * 0.28);
-		c = mix(c, vec3(0.20, 0.44, 0.64) * tinte_2d, calma_lago * 0.35 * profundidad);
-		c += vec3(0.08, 0.14, 0.18) * tinte_2d * smoothstep(0.68, 0.98, onda1) * f_calma;
-		c += vec3(0.04, 0.08, 0.12) * tinte_2d * smoothstep(0.76, 0.96, onda2) * profundidad * f_calma;
-		// Espuma blanca en la orilla
-		float pulso_orilla = sin(px.x * 0.34 + px.y * 0.29 - TIME * 2.3 * f_calma) * 0.5 + 0.5;
-		float franja_espuma = smoothstep(0.36, 0.24, es_agua) * smoothstep(0.20, 0.25, es_agua);
-		float espuma = smoothstep(0.24, 0.55, franja_espuma + pulso_orilla * 0.20);
-		c = mix(c, vec3(0.92, 0.96, 1.0) * tinte_2d, espuma * 0.75);
-		ALBEDO = c;
-		ROUGHNESS = mix(0.24, 0.05, calma_lago);
-		SPECULAR = mix(0.42, 0.78, calma_lago);
 	}
+}
+"""
+## Sombreador de agua cristalina HD-2D: translúcida continua, profundidad real, reflejos suaves, espuma en orillas y refracción
+const SOMBREADOR_AGUA := """
+shader_type spatial;
+render_mode blend_mix, depth_draw_always, diffuse_lambert, specular_schlick_ggx;
+uniform sampler2D suelo : filter_nearest, source_color;
+uniform sampler2D agua : filter_linear;
+uniform sampler2D mapa_ao : filter_linear;
+uniform vec2 casillas = vec2(60.0, 60.0);
+uniform vec3 tinte_2d = vec3(1.0);
+uniform float calma_lago = 0.0;
+uniform float fuerza_nubes = 0.14;
+
+void vertex() {
+	// Lámina de agua plana y estable
+}
+
+void fragment() {
+	vec2 px = UV * casillas * 16.0;
+	float f_calma = 1.0 - calma_lago * 0.85;
+	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.035 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.025) * f_calma;
+	float es_agua = texture(agua, UV).r + temblor;
+
+	if (es_agua < 0.14) { discard; }
+
+	// Refracción tenue en las ondas superficiales
+	vec2 refraccion = vec2(
+		cos(px.x * 0.15 + TIME * 1.2 * f_calma),
+		sin(px.y * 0.15 + TIME * 1.2 * f_calma)
+	) * 0.003 * f_calma;
+	vec3 c_refractado = texture(suelo, UV + refraccion).rgb * tinte_2d;
+
+	// Ondulación superficial multicapa
+	float onda1 = sin(px.x * 0.08 + px.y * 0.04 + TIME * 1.4 * f_calma) * sin(px.y * 0.11 - px.x * 0.03 - TIME * 1.0 * f_calma);
+	float onda2 = sin(px.x * 0.19 - px.y * 0.15 - TIME * 1.9 * f_calma) * 0.5 + 0.5;
+
+	// Profundidad continua graduada sin saltos bruscos
+	float profundidad = smoothstep(0.18, 0.72, es_agua);
+
+	// Gradiente acuático cinemático HD-2D: desde agua somera turquesa cristalina hasta azul profundo
+	vec3 agua_orilla = vec3(0.20, 0.55, 0.65) * tinte_2d;
+	vec3 agua_profunda = vec3(0.08, 0.26, 0.44) * tinte_2d;
+	vec3 c_agua = mix(agua_orilla, agua_profunda, profundidad);
+	if (calma_lago > 0.01) {
+		c_agua = mix(c_agua, vec3(0.16, 0.38, 0.58) * tinte_2d, calma_lago * 0.5);
+	}
+
+	// Destellos de luz y reflejos suaves en las crestas de ola
+	c_agua += vec3(0.10, 0.16, 0.20) * tinte_2d * smoothstep(0.65, 0.98, onda1) * f_calma;
+	c_agua += vec3(0.05, 0.10, 0.14) * tinte_2d * smoothstep(0.72, 0.95, onda2) * profundidad * f_calma;
+
+	// Franja de espuma blanca orgánica en contacto con la orilla
+	float pulso_orilla = sin(px.x * 0.34 + px.y * 0.29 - TIME * 2.3 * f_calma) * 0.5 + 0.5;
+	float franja_espuma = smoothstep(0.38, 0.22, es_agua) * smoothstep(0.14, 0.24, es_agua);
+	float espuma = smoothstep(0.20, 0.55, franja_espuma + pulso_orilla * 0.18);
+	c_agua = mix(c_agua, vec3(0.92, 0.97, 1.0) * tinte_2d, espuma * 0.85);
+
+	// Combinación de color con el lecho visible por refracción
+	ALBEDO = mix(c_refractado * 0.75, c_agua, 0.62 + profundidad * 0.30);
+
+	// Transparencia gradual: transparente cerca del borde del cauce para fundir con el lecho
+	float alfa = smoothstep(0.14, 0.28, es_agua) * clamp(0.55 + profundidad * 0.40, 0.0, 0.95);
+	ALPHA = alfa;
+
+	ROUGHNESS = mix(0.18, 0.04, calma_lago);
+	SPECULAR = mix(0.50, 0.85, calma_lago);
 }
 """
 ## Sombreador 3D para los gemelos con mapa de normales (*_n.png):
@@ -761,13 +807,16 @@ func _crear_suelo() -> void:
 	plano.subdivide_depth = clampi(int(alto), 24, 56)
 	var lejano := Shader.new()
 	lejano.code = SOMBREADOR_LEJANO
+	var shader_agua := Shader.new()
+	shader_agua.code = SOMBREADOR_AGUA
 	_suelos_lejanos.clear()
 	for hundido in [0.0, 1.0, 2.0]:
 		var m := ShaderMaterial.new()
-		m.shader = lejano
+		m.shader = shader_agua if is_equal_approx(hundido, 1.0) else lejano
 		m.set_shader_parameter("suelo", tex)
 		m.set_shader_parameter("casillas", Vector2(ancho, alto))
-		m.set_shader_parameter("hundido", hundido)
+		if not is_equal_approx(hundido, 1.0):
+			m.set_shader_parameter("hundido", hundido)
 		_suelos_lejanos.append(m)
 		var suelo := MeshInstance3D.new()
 		suelo.mesh = plano
