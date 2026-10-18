@@ -334,6 +334,19 @@ func _ready() -> void:
 	if m_poste:
 		_verificar_materiales_nodo(m_poste, "poste_amarre")
 
+	# Acercarse al gran transbordador fluvial de Bata (ß en col 69, fil 12 -> 1112, 206)
+	maisha.global_position = Vector2(1112, 220)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_transbordador: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "transbordador" in (m as Node3D).name:
+			m_transbordador = m
+			break
+	_comprobar(m_transbordador != null, "Gran transbordador fluvial 3D instanciado en el embarcadero")
+	if m_transbordador:
+		_verificar_materiales_nodo(m_transbordador, "transbordador")
+
 	# -----------------------------------------------------------------------
 	# 5. CAÑADA DEL ECO (Aprisco de Mbuzi)
 	# -----------------------------------------------------------------------
@@ -355,6 +368,19 @@ func _ready() -> void:
 	_comprobar(m_aprisco != null, "Aprisco comunal de cabras 3D instanciado")
 	if m_aprisco:
 		_verificar_materiales_nodo(m_aprisco, "aprisco")
+
+	# Acercarse a un bloque megalítico de piedra tallada (ñ en col 46, fil 9 -> 744, 158)
+	maisha.global_position = Vector2(744, 175)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_bloque: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "bloque" in (m as Node3D).name:
+			m_bloque = m
+			break
+	_comprobar(m_bloque != null, "Bloque megalítico tallado 3D instanciado en Cañada del Eco")
+	if m_bloque:
+		_verificar_materiales_nodo(m_bloque, "bloque_piedra")
 
 	# -----------------------------------------------------------------------
 	# 6. CAMINO COBRIZO (Madriguera de Fuko)
@@ -635,6 +661,110 @@ func _ready() -> void:
 	_comprobar(m_atril != null, "Atril de lectura de Sigilia 3D instanciado en Estanterías Colgantes")
 	if m_atril:
 		_verificar_materiales_nodo(m_atril, "atril_biblioteca")
+
+	# -----------------------------------------------------------------------
+	# 16. PASO DE PIEDRA (Casa de Nungu y Bloques Megalíticos)
+	# -----------------------------------------------------------------------
+	print("\n--- [16/18] PASO DE PIEDRA ---")
+	await _ir("paso_piedra", "campo")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Paso de Piedra")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse frente a la Casa de Nungu (ĥ en 936, 222, puerta ď en 936, 238 -> camino seguro en 936, 280)
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(936, 280)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_nungu: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "nungu" in (m as Node3D).name:
+			m_nungu = m
+			break
+	_comprobar(m_nungu != null, "Casa de Nungu 3D instanciada en Paso de Piedra")
+	if m_nungu:
+		_verificar_materiales_nodo(m_nungu, "casa_nungu")
+
+	# Acercarse a un bloque ciclópeo de peña (ñ en 1160, 158)
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(1160, 190)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_bloque_paso: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "bloque" in (m as Node3D).name:
+			m_bloque_paso = m
+			break
+	_comprobar(m_bloque_paso != null, "Bloque megalítico 3D instanciado en Paso de Piedra")
+	if m_bloque_paso:
+		_verificar_materiales_nodo(m_bloque_paso, "bloque_piedra")
+
+	# -----------------------------------------------------------------------
+	# 17. RUINAS DEL PRIMER ÁRBOL (Plaza Sagrada y Columnata)
+	# -----------------------------------------------------------------------
+	print("\n--- [17/18] RUINAS DEL PRIMER ÁRBOL ---")
+	await _ir("ruinas_primer_arbol", "sendero")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Ruinas del Primer Árbol")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Recorrer la columnata monumental (C en 440, 750)
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(440, 765)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_col_ruinas: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "columna" in (m as Node3D).name:
+			m_col_ruinas = m
+			break
+	_comprobar(m_col_ruinas != null, "Columna monumental 3D instanciada en Ruinas del Primer Árbol")
+	if m_col_ruinas:
+		_verificar_materiales_nodo(m_col_ruinas, "columna")
+
+	# Acercarse a una de las piedras del recuerdo que rodean al Primer Árbol (ǒ en 520, 558)
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(520, 565)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_piedra_eco: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "eco" in (m as Node3D).name:
+			m_piedra_eco = m
+			break
+	_comprobar(m_piedra_eco != null, "Piedra del Recuerdo / Eco 3D instanciada en la Plaza de las Ruinas")
+	if m_piedra_eco:
+		_verificar_materiales_nodo(m_piedra_eco, "piedra_eco")
+
+	# -----------------------------------------------------------------------
+	# 18. SENDA DE LOS SURCOS (Huertas y Arbolado Seco)
+	# -----------------------------------------------------------------------
+	print("\n--- [18/18] SENDA DE LOS SURCOS ---")
+	await _ir("senda_surcos", "aldea")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Senda de los Surcos")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Recorrer el camino de huertas
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(400, 300)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_arbol_surcos: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "arbol_seco" in (m as Node3D).name:
+			m_arbol_surcos = m
+			break
+	_comprobar(m_arbol_surcos != null, "Árbol seco / petrificado 3D instanciado en Senda de los Surcos")
+	if m_arbol_surcos:
+		_verificar_materiales_nodo(m_arbol_surcos, "arbol_seco")
 
 	# -----------------------------------------------------------------------
 	# RESUMEN FINAL

@@ -4330,6 +4330,339 @@ def generar_poste_amarre():
 
     exportar_modelo("poste_amarre", DIR_ENTORNO)
 
+
+def generar_arbol_seco():
+    """Genera el Árbol Seco / Petrificado (Kitovu, Campo Segado, Senda de los Surcos, Paso de Piedra):
+    Árbol milenario gnarled con raíces tabulares expuestas, tronco retorcido con fisura abierta,
+    4 ramas principales desnudas en abanico y ramaje estéril en puntas resecas."""
+    limpiar_escena()
+    tex_tronco = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_corteza = obtener_material_textura("Mat_ArbolSeco_Corteza", tex_tronco, rugosidad=0.92)
+    mat_madera_seca = obtener_material("Mat_ArbolSeco_Seca", "#4A3525", roughness=0.94)
+    mat_ramitas = obtener_material("Mat_ArbolSeco_Puntas", "#735741", roughness=0.88)
+    mat_falla = obtener_material("Mat_ArbolSeco_Falla", "#261A12", roughness=0.96)
+
+    # 1. Raíces tabulares en trípode clavadas en el sustrato
+    angulos_raices = [0.0, 2.1, 4.2]
+    longitudes_raices = [0.75, 0.68, 0.72]
+    for ang, l_raiz in zip(angulos_raices, longitudes_raices):
+        rx = math.cos(ang) * (l_raiz * 0.45)
+        ry = math.sin(ang) * (l_raiz * 0.45)
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.14, depth=l_raiz, location=(rx, ry, 0.12))
+        raiz = bpy.context.active_object
+        raiz.rotation_euler = (math.sin(ang) * 0.65, -math.cos(ang) * 0.65, ang)
+        raiz.scale = (0.7, 1.2, 0.5)
+        aplicar_uv_caja(raiz, 1.2, 1.5)
+        asignar_material(raiz, mat_corteza)
+
+    # 2. Base del tronco con ensanchamiento y fisura
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.25, depth=0.95, location=(0, 0, 0.48))
+    tronco_base = bpy.context.active_object
+    tronco_base.rotation_euler = (math.radians(2), math.radians(-3), 0)
+    aplicar_uv_caja(tronco_base, 1.6, 2.5)
+    asignar_material(tronco_base, mat_corteza)
+
+    # Fisura oscura central
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.04, -0.12, 0.55))
+    fisura = bpy.context.active_object
+    fisura.scale = (0.08, 0.15, 0.55)
+    fisura.rotation_euler = (0, math.radians(5), math.radians(12))
+    asignar_material(fisura, mat_falla)
+
+    # 3. Bifurcación del tronco (dos brazos principales retorcidos)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.17, depth=1.10, location=(0.14, 0.02, 1.35))
+    brazo_a = bpy.context.active_object
+    brazo_a.rotation_euler = (math.radians(-5), math.radians(18), math.radians(10))
+    aplicar_uv_caja(brazo_a, 1.4, 2.2)
+    asignar_material(brazo_a, mat_corteza)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.14, depth=0.95, location=(-0.16, -0.04, 1.25))
+    brazo_b = bpy.context.active_object
+    brazo_b.rotation_euler = (math.radians(6), math.radians(-22), math.radians(-15))
+    aplicar_uv_caja(brazo_b, 1.3, 2.0)
+    asignar_material(brazo_b, mat_madera_seca)
+
+    # 4. Ramas desnudas superiores retorcidas (4 ramas principales)
+    ramas = [
+        ((0.36, 0.08, 2.05), (math.radians(-12), math.radians(34), math.radians(15)), 0.09, 0.85, mat_madera_seca),
+        ((0.18, -0.16, 2.15), (math.radians(-30), math.radians(12), math.radians(-25)), 0.075, 0.78, mat_ramitas),
+        ((-0.34, 0.06, 1.95), (math.radians(15), math.radians(-38), math.radians(-10)), 0.08, 0.82, mat_madera_seca),
+        ((-0.18, -0.18, 1.85), (math.radians(-28), math.radians(-16), math.radians(35)), 0.07, 0.65, mat_ramitas),
+    ]
+    for loc, rot, rad, largo, mat in ramas:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=rad, depth=largo, location=loc)
+        rama = bpy.context.active_object
+        rama.rotation_euler = rot
+        aplicar_uv_caja(rama, 1.0, 1.8)
+        asignar_material(rama, mat)
+
+    # 5. Ramillas terminales resecas (puntas angulosas)
+    puntas = [
+        ((0.55, 0.18, 2.50), (math.radians(20), math.radians(45), 0), 0.04, 0.45),
+        ((0.38, 0.22, 2.40), (math.radians(-25), math.radians(25), 0), 0.035, 0.38),
+        ((-0.52, 0.12, 2.42), (math.radians(22), math.radians(-42), 0), 0.04, 0.42),
+        ((-0.40, -0.10, 2.30), (math.radians(-35), math.radians(-30), 0), 0.035, 0.35),
+        ((0.05, -0.28, 2.15), (math.radians(-45), math.radians(5), 0), 0.035, 0.36),
+    ]
+    for loc, rot, rad, largo in puntas:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=rad, depth=largo, location=loc)
+        punta = bpy.context.active_object
+        punta.rotation_euler = rot
+        asignar_material(punta, mat_ramitas)
+
+    exportar_modelo("arbol_seco", DIR_ENTORNO)
+
+
+def generar_piedra_eco():
+    """Genera la Piedra del Eco / Piedra del Recuerdo (9 Ecos Perdidos, 9 Piedras de las Ruinas):
+    Monolito ancestral esculpido en granito meteorizado con plinto escalonado, facetas achaflanadas,
+    hendidura en espiral rúnica en ambas caras y núcleo de cristal Asili con emisión bioluminiscente."""
+    limpiar_escena()
+    tex_ruina = os.path.join(DIR_ALDEA, "ruina_mamposteria_tile.png")
+    mat_piedra = obtener_material_textura("Mat_Eco_Piedra", tex_ruina, rugosidad=0.85)
+    mat_plinto = obtener_material("Mat_Eco_Plinto", "#373A3E", roughness=0.82)
+    mat_runa_asili = obtener_material("Mat_Eco_Runa", "#6DB0B0", roughness=0.2, emission_hex="#6DB0B0", emission_strength=4.5)
+    mat_nucleo_luz = obtener_material("Mat_Eco_Luz", "#D8F0EC", roughness=0.1, emission_hex="#D8F0EC", emission_strength=6.0)
+
+    # 1. Plinto basal escalonado
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.08))
+    plinto_inf = bpy.context.active_object
+    plinto_inf.scale = (0.94, 0.72, 0.16)
+    aplicar_uv_caja(plinto_inf, 1.8, 1.5)
+    asignar_material(plinto_inf, mat_plinto)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.22))
+    plinto_sup = bpy.context.active_object
+    plinto_sup.scale = (0.76, 0.54, 0.12)
+    aplicar_uv_caja(plinto_sup, 1.5, 1.2)
+    asignar_material(plinto_sup, mat_plinto)
+
+    # 2. Fuste del monolito (obelisco ahusado de 8 facetas)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.34, depth=1.85, location=(0, 0, 1.18))
+    fuste = bpy.context.active_object
+    fuste.scale = (1.1, 0.75, 1.0)
+    aplicar_uv_caja(fuste, 1.5, 3.2)
+    asignar_material(fuste, mat_piedra)
+
+    # Remate superior piramidal achaflanado
+    bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=0.32, radius2=0.06, depth=0.30, location=(0, 0, 2.22))
+    capitel = bpy.context.active_object
+    capitel.scale = (1.05, 0.72, 1.0)
+    asignar_material(capitel, mat_piedra)
+
+    # 3. Espiral rúnica Asili tallada en la cara frontal y posterior
+    for cara_y, rot_y_sign in [(-0.19, 1.0), (0.19, -1.0)]:
+        bpy.ops.mesh.primitive_torus_add(major_radius=0.18, minor_radius=0.024, location=(0, cara_y, 1.35))
+        anillo_ext = bpy.context.active_object
+        anillo_ext.rotation_euler = (math.radians(90), 0, 0)
+        anillo_ext.scale = (1.0, 1.15, 0.6)
+        asignar_material(anillo_ext, mat_runa_asili)
+
+        bpy.ops.mesh.primitive_torus_add(major_radius=0.09, minor_radius=0.020, location=(0.02 * rot_y_sign, cara_y, 1.37))
+        anillo_int = bpy.context.active_object
+        anillo_int.rotation_euler = (math.radians(90), 0, 0)
+        anillo_int.scale = (0.9, 1.1, 0.6)
+        asignar_material(anillo_int, mat_runa_asili)
+
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.048, location=(0.01 * rot_y_sign, cara_y + (0.01 * rot_y_sign), 1.36))
+        nucleo = bpy.context.active_object
+        asignar_material(nucleo, mat_nucleo_luz)
+
+    # 4. Cuñas de refuerzo geológico al pie
+    for bx, by, brad in [(-0.35, -0.22, 0.12), (0.33, 0.20, 0.14), (-0.32, 0.24, 0.10)]:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=brad, location=(bx, by, 0.18))
+        bloquecito = bpy.context.active_object
+        bloquecito.scale = (1.0, 0.9, 0.6)
+        asignar_material(bloquecito, mat_plinto)
+
+    exportar_modelo("piedra_eco", DIR_ENTORNO)
+
+
+def generar_bloque_piedra():
+    """Genera el Bloque Megalítico de Piedra Tallada (Cañada del Eco y Paso de Piedra):
+    Estructura de grandes sillares ciclópeos escalonados con aristas desgastadas,
+    estratificación geológica tallada y líquenes alpinos en grietas."""
+    limpiar_escena()
+    tex_mamposteria = os.path.join(DIR_ALDEA, "ruina_mamposteria_tile.png")
+    mat_bloque = obtener_material_textura("Mat_Bloque_Piedra", tex_mamposteria, rugosidad=0.88)
+    mat_piedra_corte = obtener_material("Mat_Bloque_Corte", "#5A524A", roughness=0.85)
+    mat_musgo = obtener_material("Mat_Bloque_Musgo", "#4E583E", roughness=0.95)
+    mat_sombra = obtener_material("Mat_Bloque_Sombra", "#332C26", roughness=0.92)
+
+    # 1. Bloque basal mayor (asiento de cimentación ciclópeo)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.28))
+    base = bpy.context.active_object
+    base.scale = (1.65, 1.05, 0.56)
+    aplicar_uv_caja(base, 2.2, 1.5)
+    asignar_material(base, mat_bloque)
+
+    # 2. Bloque intermedio escalonado
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.08, 0.06, 0.78))
+    bloque_mid = bpy.context.active_object
+    bloque_mid.scale = (1.30, 0.88, 0.52)
+    bloque_mid.rotation_euler = (0, 0, math.radians(2))
+    aplicar_uv_caja(bloque_mid, 1.8, 1.4)
+    asignar_material(bloque_mid, mat_bloque)
+
+    # 3. Losa de coronación superior achaflanada
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.05, -0.04, 1.22))
+    losa_sup = bpy.context.active_object
+    losa_sup.scale = (0.95, 0.68, 0.38)
+    losa_sup.rotation_euler = (math.radians(-2), math.radians(1), math.radians(-3))
+    aplicar_uv_caja(losa_sup, 1.4, 1.2)
+    asignar_material(losa_sup, mat_piedra_corte)
+
+    # Capa de musgo/líquenes en la repisa superior
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.05, -0.04, 1.42))
+    musgo_top = bpy.context.active_object
+    musgo_top.scale = (0.88, 0.60, 0.04)
+    asignar_material(musgo_top, mat_musgo)
+
+    # 4. Piedras de contrafuerte y fracturas en la base
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.72, -0.15, 0.22))
+    boulder_izq = bpy.context.active_object
+    boulder_izq.scale = (0.42, 0.38, 0.44)
+    boulder_izq.rotation_euler = (math.radians(10), math.radians(-8), math.radians(25))
+    asignar_material(boulder_izq, mat_bloque)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.68, 0.22, 0.18))
+    boulder_der = bpy.context.active_object
+    boulder_der.scale = (0.36, 0.32, 0.36)
+    boulder_der.rotation_euler = (math.radians(-12), math.radians(15), math.radians(-20))
+    asignar_material(boulder_der, mat_bloque)
+
+    # Hendidura horizontal de cantería
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, -0.48, 0.54))
+    grieta = bpy.context.active_object
+    grieta.scale = (1.50, 0.08, 0.06)
+    asignar_material(grieta, mat_sombra)
+
+    exportar_modelo("bloque_piedra", DIR_ENTORNO)
+
+
+def generar_transbordador():
+    """Genera el Gran Transbordador Fluvial de Bata (Embarcadero Junco y La Travesía):
+    Gran barcaza fluvial con casco de madera curvado, costillaje y cuadernas interiores,
+    cubierta de tablones estancos, bordas reforzadas con norays de amarre, timón de popa con caña,
+    y estolón de proa con farol de navegación de bronce y ámbar cálido."""
+    limpiar_escena()
+    tex_madera = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_casco = obtener_material_textura("Mat_Barge_Casco", tex_madera, rugosidad=0.85)
+    mat_cubierta = obtener_material("Mat_Barge_Cubierta", "#8B6245", roughness=0.82)
+    mat_tablones = obtener_material("Mat_Barge_Tablones", "#5E3D2B", roughness=0.86)
+    mat_bronce = obtener_material("Mat_Barge_Bronce", "#C28522", roughness=0.35, metallic=0.7)
+    mat_farol_luz = obtener_material("Mat_Barge_Luz", "#FFAA44", roughness=0.1, emission_hex="#FFAA44", emission_strength=4.0)
+    mat_hierro = obtener_material("Mat_Barge_Hierro", "#374151", roughness=0.6, metallic=0.6)
+    mat_juncos = obtener_material("Mat_Barge_Juncos", "#B3A469", roughness=0.92)
+
+    # 1. Fondo plano del casco de la barcaza
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, -0.06))
+    fondo = bpy.context.active_object
+    fondo.scale = (7.60, 2.80, 0.14)
+    aplicar_uv_caja(fondo, 8.0, 3.0)
+    asignar_material(fondo, mat_casco)
+
+    # 2. Rampa / roda de proa (inclinada hacia adelante)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-4.15, 0, 0.28))
+    proa = bpy.context.active_object
+    proa.scale = (1.20, 2.80, 0.14)
+    proa.rotation_euler = (0, math.radians(-24), 0)
+    aplicar_uv_caja(proa, 2.0, 3.0)
+    asignar_material(proa, mat_casco)
+
+    # 3. Espejo de popa (inclinado hacia atrás)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(4.15, 0, 0.28))
+    popa = bpy.context.active_object
+    popa.scale = (1.20, 2.80, 0.14)
+    popa.rotation_euler = (0, math.radians(24), 0)
+    aplicar_uv_caja(popa, 2.0, 3.0)
+    asignar_material(popa, mat_casco)
+
+    # 4. Bordas laterales (babor y estribor)
+    for y_borda, sign_y in [(1.42, 1), (-1.42, -1)]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, y_borda, 0.42))
+        borda = bpy.context.active_object
+        borda.scale = (7.80, 0.18, 0.88)
+        aplicar_uv_caja(borda, 8.0, 1.5)
+        asignar_material(borda, mat_casco)
+
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, y_borda, 0.88))
+        regala = bpy.context.active_object
+        regala.scale = (8.20, 0.26, 0.10)
+        asignar_material(regala, mat_tablones)
+
+    # 5. Cubierta plana de tablones transitables
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.30))
+    deck = bpy.context.active_object
+    deck.scale = (7.30, 2.60, 0.10)
+    aplicar_uv_caja(deck, 6.0, 3.0)
+    asignar_material(deck, mat_cubierta)
+
+    for x_t in range(-6, 7):
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x_t * 0.55, 0, 0.355))
+        liston = bpy.context.active_object
+        liston.scale = (0.04, 2.56, 0.02)
+        asignar_material(liston, mat_tablones)
+
+    # 6. Cuadernas / costillas de refuerzo en las bordas interiores
+    for x_c in [-2.5, -1.25, 0.0, 1.25, 2.5]:
+        for y_c in [1.32, -1.32]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x_c, y_c, 0.55))
+            cuaderna = bpy.context.active_object
+            cuaderna.scale = (0.16, 0.12, 0.58)
+            asignar_material(cuaderna, mat_tablones)
+
+    # 7. Norays / bitas de amarre de madera en proa y popa
+    for bx, by in [(-3.6, 1.22), (-3.6, -1.22), (3.6, 1.22), (3.6, -1.22)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.10, depth=0.45, location=(bx, by, 0.95))
+        bita = bpy.context.active_object
+        asignar_material(bita, mat_tablones)
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.03, depth=0.32, location=(bx, by, 1.08))
+        perno = bpy.context.active_object
+        perno.rotation_euler = (math.radians(90), 0, 0)
+        asignar_material(perno, mat_hierro)
+
+    # 8. Mástil de proa con farol de navegación de bronce y ámbar
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.07, depth=1.55, location=(-4.30, -0.90, 0.95))
+    mastil = bpy.context.active_object
+    asignar_material(mastil, mat_tablones)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.04, depth=0.55, location=(-4.15, -0.90, 1.62))
+    percha = bpy.context.active_object
+    percha.rotation_euler = (0, math.radians(90), 0)
+    asignar_material(percha, mat_tablones)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.12, depth=0.28, location=(-3.90, -0.90, 1.48))
+    farol_jaula = bpy.context.active_object
+    asignar_material(farol_jaula, mat_bronce)
+
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.075, location=(-3.90, -0.90, 1.48))
+    farol_nucleo = bpy.context.active_object
+    asignar_material(farol_nucleo, mat_farol_luz)
+
+    # 9. Timón y caña en popa
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.08, depth=1.10, location=(4.65, 0, 0.45))
+    eje_timon = bpy.context.active_object
+    asignar_material(eje_timon, mat_hierro)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(4.95, 0, 0.20))
+    pala_timon = bpy.context.active_object
+    pala_timon.scale = (0.55, 0.08, 0.85)
+    asignar_material(pala_timon, mat_tablones)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.045, depth=1.15, location=(4.15, 0, 0.95))
+    cana = bpy.context.active_object
+    cana.rotation_euler = (0, math.radians(75), 0)
+    asignar_material(cana, mat_tablones)
+
+    # 10. Reparación de juncos tejidos en el boquete
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.80, -1.45, 0.40))
+    parche_juncos = bpy.context.active_object
+    parche_juncos.scale = (1.40, 0.16, 0.55)
+    asignar_material(parche_juncos, mat_juncos)
+
+    exportar_modelo("transbordador", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -4403,6 +4736,10 @@ def main():
     generar_atril()
     generar_tocon_bosque()
     generar_poste_amarre()
+    generar_arbol_seco()
+    generar_piedra_eco()
+    generar_bloque_piedra()
+    generar_transbordador()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()
