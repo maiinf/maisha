@@ -767,6 +767,94 @@ func _ready() -> void:
 		_verificar_materiales_nodo(m_arbol_surcos, "arbol_seco")
 
 	# -----------------------------------------------------------------------
+	# 19. CUEVA DE LAS SETAS (Setas Bioluminiscentes de la Caverna)
+	# -----------------------------------------------------------------------
+	print("\n--- [19/21] CUEVA DE LAS SETAS ---")
+	await _ir("cueva_setas", "escalera")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Cueva de las Setas")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse al racimo de setas brillantes (ů en 456, 78)
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(456, 95)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_seta_luz: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "seta" in (m as Node3D).name:
+			m_seta_luz = m
+			break
+	_comprobar(m_seta_luz != null, "Racimo de setas bioluminiscentes 3D instanciado en Cueva de las Setas")
+	if m_seta_luz:
+		_verificar_materiales_nodo(m_seta_luz, "seta_luz")
+
+	# -----------------------------------------------------------------------
+	# 20. CIÉNAGA QUIETA (Árboles Muertos y Sauces del Humedal)
+	# -----------------------------------------------------------------------
+	print("\n--- [20/21] CIÉNAGA QUIETA ---")
+	await _ir("cienaga_quieta", "aldea")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Ciénaga Quieta")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse a un árbol podrido de pantano (x en 472, 478)
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(472, 495)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_arbol_m: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "arbol_muerto" in (m as Node3D).name:
+			m_arbol_m = m
+			break
+	_comprobar(m_arbol_m != null, "Árbol muerto / podrido 3D instanciado en Ciénaga Quieta")
+	if m_arbol_m:
+		_verificar_materiales_nodo(m_arbol_m, "arbol_muerto")
+
+	# -----------------------------------------------------------------------
+	# 21. SENDERO DEL PUENTE (Campamento de Msafiri y Columnas)
+	# -----------------------------------------------------------------------
+	print("\n--- [21/21] SENDERO DEL PUENTE ---")
+	await _ir("sendero_del_puente", "prados")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Sendero del Puente")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse al campamento de Msafiri (L en 840, 302)
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(840, 320)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_camp: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "campamento" in (m as Node3D).name:
+			m_camp = m
+			break
+	_comprobar(m_camp != null, "Campamento de viaje 3D instanciado en Sendero del Puente")
+	if m_camp:
+		_verificar_materiales_nodo(m_camp, "campamento")
+
+	# Acercarse a la columna monumental del sendero (C en 648, 398)
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(648, 412)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_col_sendero: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "columna" in (m as Node3D).name:
+			m_col_sendero = m
+			break
+	_comprobar(m_col_sendero != null, "Columna monumental 3D instanciada en Sendero del Puente")
+	if m_col_sendero:
+		_verificar_materiales_nodo(m_col_sendero, "columna")
+
+	# -----------------------------------------------------------------------
 	# RESUMEN FINAL
 	# -----------------------------------------------------------------------
 	print("\n==================================================")

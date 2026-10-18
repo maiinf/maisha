@@ -4663,6 +4663,229 @@ def generar_transbordador():
 
     exportar_modelo("transbordador", DIR_ENTORNO)
 
+
+def generar_roca_grande():
+    """Genera la Roca Grande / Peñasco de Granito y Musgo (presente en 306 enclaves del mundo):
+    Gran masa geológica de granito meteorizado con planos de estratificación achaflanados,
+    aristas facetadas, peñasco de asiento basal y capa de musgo verde en la cresta superior."""
+    limpiar_escena()
+    tex_mamposteria = os.path.join(DIR_ALDEA, "ruina_mamposteria_tile.png")
+    mat_roca = obtener_material_textura("Mat_RocaG_Piedra", tex_mamposteria, rugosidad=0.88)
+    mat_granito = obtener_material("Mat_RocaG_Granito", "#585C62", roughness=0.84)
+    mat_musgo = obtener_material("Mat_RocaG_Musgo", "#4E583E", roughness=0.95)
+    mat_sombra = obtener_material("Mat_RocaG_Sombra", "#33363B", roughness=0.90)
+
+    # 1. Cuerpo principal del peñasco
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.48))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (1.55, 1.15, 0.96)
+    cuerpo.rotation_euler = (math.radians(3), math.radians(-2), math.radians(5))
+    aplicar_uv_caja(cuerpo, 2.0, 1.6)
+    asignar_material(cuerpo, mat_roca)
+
+    # 2. Bloque superior de estrato geológico
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.08, 0.05, 0.88))
+    bloque_sup = bpy.context.active_object
+    bloque_sup.scale = (0.95, 0.78, 0.42)
+    bloque_sup.rotation_euler = (math.radians(-4), math.radians(6), math.radians(-8))
+    aplicar_uv_caja(bloque_sup, 1.5, 1.2)
+    asignar_material(bloque_sup, mat_granito)
+
+    # Capa de musgo en la cresta superior
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.08, 0.05, 1.08))
+    musgo = bpy.context.active_object
+    musgo.scale = (0.88, 0.70, 0.05)
+    musgo.rotation_euler = (math.radians(-4), math.radians(6), math.radians(-8))
+    asignar_material(musgo, mat_musgo)
+
+    # 3. Lares laterales y lascas de fractura
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.65, -0.22, 0.32))
+    lasca_der = bpy.context.active_object
+    lasca_der.scale = (0.55, 0.45, 0.52)
+    lasca_der.rotation_euler = (math.radians(12), math.radians(-15), math.radians(20))
+    asignar_material(lasca_der, mat_roca)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.62, 0.25, 0.26))
+    lasca_izq = bpy.context.active_object
+    lasca_izq.scale = (0.48, 0.42, 0.42)
+    lasca_izq.rotation_euler = (math.radians(-10), math.radians(12), math.radians(-18))
+    asignar_material(lasca_izq, mat_granito)
+
+    # Hendidura horizontal de sombra
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.02, -0.52, 0.44))
+    grieta = bpy.context.active_object
+    grieta.scale = (1.40, 0.08, 0.06)
+    asignar_material(grieta, mat_sombra)
+
+    exportar_modelo("roca_grande", DIR_ENTORNO)
+
+
+def generar_roca_pequena():
+    """Genera la Roca Pequeña / Guijarro de Río y Camino (presente en 498 enclaves del mundo):
+    Formación rocosa compacta redondeada por la erosión con facetas de exfoliación mineral."""
+    limpiar_escena()
+    tex_mamposteria = os.path.join(DIR_ALDEA, "ruina_mamposteria_tile.png")
+    mat_roca = obtener_material_textura("Mat_RocaP_Piedra", tex_mamposteria, rugosidad=0.85)
+    mat_granito = obtener_material("Mat_RocaP_Granito", "#60646B", roughness=0.82)
+    mat_liquen = obtener_material("Mat_RocaP_Liquen", "#6B7258", roughness=0.92)
+
+    # 1. Masa principal redondeada
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.26))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (0.88, 0.68, 0.52)
+    cuerpo.rotation_euler = (math.radians(5), math.radians(-6), math.radians(12))
+    aplicar_uv_caja(cuerpo, 1.2, 1.0)
+    asignar_material(cuerpo, mat_roca)
+
+    # 2. Resalte lateral menor
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.28, 0.14, 0.18))
+    flanco = bpy.context.active_object
+    flanco.scale = (0.42, 0.36, 0.30)
+    flanco.rotation_euler = (math.radians(-12), math.radians(15), math.radians(-25))
+    asignar_material(flanco, mat_granito)
+
+    # Parche de liquen
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.04, -0.06, 0.50))
+    liquen = bpy.context.active_object
+    liquen.scale = (0.50, 0.38, 0.04)
+    liquen.rotation_euler = (math.radians(5), math.radians(-6), math.radians(12))
+    asignar_material(liquen, mat_liquen)
+
+    exportar_modelo("roca_pequena", DIR_ENTORNO)
+
+
+def generar_arbol_muerto():
+    """Genera el Árbol Muerto / Podrido de la Ciénaga (Ciénaga Quieta y Las Pasarelas):
+    Tronco hueco gnarled con raíces aéreas zancudas adaptadas al lodo y agua pantanosa,
+    oquedad central carcomida, bifurcación astillada y racimos de hongos políporos en la corteza."""
+    limpiar_escena()
+    tex_madera = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_corteza = obtener_material_textura("Mat_ArbolM_Corteza", tex_madera, rugosidad=0.92)
+    mat_podrida = obtener_material("Mat_ArbolM_Podrida", "#382C22", roughness=0.95)
+    mat_hongo = obtener_material("Mat_ArbolM_Hongo", "#B86B30", roughness=0.75)
+    mat_falla = obtener_material("Mat_ArbolM_Falla", "#1E1712", roughness=0.96)
+
+    # 1. Cuatro raíces zancudas de pantano
+    angulos = [0.2, 1.7, 3.3, 4.9]
+    for ang in angulos:
+        rx = math.cos(ang) * 0.42
+        ry = math.sin(ang) * 0.42
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.12, depth=0.70, location=(rx, ry, 0.14))
+        raiz = bpy.context.active_object
+        raiz.rotation_euler = (math.sin(ang) * 0.65, -math.cos(ang) * 0.65, ang)
+        aplicar_uv_caja(raiz, 1.0, 1.2)
+        asignar_material(raiz, mat_podrida)
+
+    # 2. Tronco hueco principal
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.26, depth=1.40, location=(0, 0, 0.70))
+    tronco = bpy.context.active_object
+    tronco.rotation_euler = (math.radians(3), math.radians(-4), 0)
+    aplicar_uv_caja(tronco, 1.5, 2.5)
+    asignar_material(tronco, mat_corteza)
+
+    # Oquedad / pudrición central
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.02, -0.15, 0.75))
+    hueco = bpy.context.active_object
+    hueco.scale = (0.16, 0.18, 0.75)
+    hueco.rotation_euler = (0, math.radians(6), math.radians(10))
+    asignar_material(hueco, mat_falla)
+
+    # 3. Bifurcación astillada superior
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.12, depth=0.78, location=(0.18, 0.02, 1.62))
+    brazo_a = bpy.context.active_object
+    brazo_a.rotation_euler = (math.radians(-6), math.radians(24), 0)
+    aplicar_uv_caja(brazo_a, 1.2, 1.8)
+    asignar_material(brazo_a, mat_podrida)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.10, depth=0.98, location=(-0.16, -0.04, 1.70))
+    brazo_b = bpy.context.active_object
+    brazo_b.rotation_euler = (math.radians(8), math.radians(-32), math.radians(-15))
+    aplicar_uv_caja(brazo_b, 1.1, 1.9)
+    asignar_material(brazo_b, mat_podrida)
+
+    # Ramilla seca
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.04, depth=0.52, location=(-0.38, 0.08, 2.15))
+    ramilla = bpy.context.active_object
+    ramilla.rotation_euler = (math.radians(25), math.radians(-45), 0)
+    asignar_material(ramilla, mat_podrida)
+
+    # 4. Hongos yesqueros políporos en la corteza húmeda
+    for hx, hy, hz, hrot in [(0.24, -0.08, 0.55, 15), (-0.22, 0.12, 0.82, -140), (0.16, 0.18, 1.12, 60)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.11, depth=0.03, location=(hx, hy, hz))
+        hongo = bpy.context.active_object
+        hongo.rotation_euler = (math.radians(85), 0, math.radians(hrot))
+        hongo.scale = (1.2, 0.8, 1.0)
+        asignar_material(hongo, mat_hongo)
+
+    exportar_modelo("arbol_muerto", DIR_ENTORNO)
+
+
+def generar_seta_luz():
+    """Genera el Racimo de Setas Bioluminiscentes de la Cueva (Cueva de las Setas):
+    Agrupación orgánica de hongos subterráneos con tallos fibrosos curvos,
+    sombreros acampanados con láminas inferiores emisivas en tonos Asili turquesa y violeta."""
+    limpiar_escena()
+    mat_tallo = obtener_material("Mat_Seta_Tallo", "#E2E8F0", roughness=0.85)
+    mat_turquesa = obtener_material("Mat_Seta_Turquesa", "#2DD4BF", roughness=0.25, emission_hex="#2DD4BF", emission_strength=4.5)
+    mat_violeta = obtener_material("Mat_Seta_Violeta", "#A855F7", roughness=0.25, emission_hex="#A855F7", emission_strength=4.5)
+    mat_laminas = obtener_material("Mat_Seta_Laminas", "#F1F5F9", roughness=0.6, emission_hex="#CCFBF1", emission_strength=2.0)
+    mat_micelio = obtener_material("Mat_Seta_Micelio", "#2A2438", roughness=0.95)
+
+    # 1. Base de micelio en el suelo rocoso de la caverna
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.36, depth=0.08, location=(0, 0, 0.04))
+    micelio = bpy.context.active_object
+    micelio.scale = (1.1, 0.9, 1.0)
+    asignar_material(micelio, mat_micelio)
+
+    # 2. Seta principal central (turquesa esmeralda Asili)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.045, depth=0.74, location=(0, 0, 0.38))
+    tallo_1 = bpy.context.active_object
+    tallo_1.rotation_euler = (math.radians(5), math.radians(-3), 0)
+    asignar_material(tallo_1, mat_tallo)
+
+    bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=0.24, radius2=0.04, depth=0.18, location=(0.02, -0.03, 0.82))
+    sombrero_1 = bpy.context.active_object
+    asignar_material(sombrero_1, mat_turquesa)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.22, depth=0.03, location=(0.02, -0.03, 0.74))
+    laminas_1 = bpy.context.active_object
+    asignar_material(laminas_1, mat_laminas)
+
+    # 3. Seta lateral derecha (violeta místico)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.038, depth=0.54, location=(0.18, -0.08, 0.28))
+    tallo_2 = bpy.context.active_object
+    tallo_2.rotation_euler = (math.radians(-6), math.radians(20), 0)
+    asignar_material(tallo_2, mat_tallo)
+
+    bpy.ops.mesh.primitive_cone_add(vertices=10, radius1=0.18, radius2=0.03, depth=0.15, location=(0.28, -0.10, 0.58))
+    sombrero_2 = bpy.context.active_object
+    sombrero_2.rotation_euler = (0, math.radians(15), 0)
+    asignar_material(sombrero_2, mat_violeta)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.16, depth=0.025, location=(0.26, -0.10, 0.51))
+    laminas_2 = bpy.context.active_object
+    asignar_material(laminas_2, mat_laminas)
+
+    # 4. Seta lateral izquierda (turquesa)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.035, depth=0.46, location=(-0.16, 0.08, 0.24))
+    tallo_3 = bpy.context.active_object
+    tallo_3.rotation_euler = (math.radians(12), math.radians(-24), 0)
+    asignar_material(tallo_3, mat_tallo)
+
+    bpy.ops.mesh.primitive_cone_add(vertices=10, radius1=0.16, radius2=0.03, depth=0.13, location=(-0.25, 0.12, 0.50))
+    sombrero_3 = bpy.context.active_object
+    sombrero_3.rotation_euler = (0, math.radians(-18), 0)
+    asignar_material(sombrero_3, mat_turquesa)
+
+    # 5. Dos setitas jóvenes emergentes al pie
+    for sx, sy, sz, smat in [(0.10, 0.16, 0.12, mat_violeta), (-0.14, -0.12, 0.10, mat_turquesa)]:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.065, location=(sx, sy, sz))
+        botoncito = bpy.context.active_object
+        botoncito.scale = (1.0, 1.0, 0.8)
+        asignar_material(botoncito, smat)
+
+    exportar_modelo("seta_luz", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -4740,6 +4963,10 @@ def main():
     generar_piedra_eco()
     generar_bloque_piedra()
     generar_transbordador()
+    generar_roca_grande()
+    generar_roca_pequena()
+    generar_arbol_muerto()
+    generar_seta_luz()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()
