@@ -458,53 +458,184 @@ def generar_gran_arbol():
     exportar_modelo("gran_arbol", DIR_ENTORNO)
 
 def generar_casa_pino():
-    """Genera la Casa Seta de Pino con tejado carmesí y puerta circular."""
+    """Genera la Casa Seta de Pino (Cuna de Musgo) completa en 360°:
+    Zócalo circular de piedra, cilindro de tablas de madera con aros de refuerzo,
+    gran tejado de sombrero de seta carmesí con motas blancas, aleros redondeados en 360°,
+    chimenea de tronco curvado que sale del tejado, puerta circular estilo hobbit con marco,
+    pequeño porche con farol luminoso frontal, y ventanas redondas con celosía en laterales y trasera."""
     limpiar_escena()
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=14, radius=1.35, depth=1.6, location=(0, 0, 0.8))
+    # 1. Zócalo base de piedra
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.45, depth=0.4, location=(0, 0, 0.2))
+    base = bpy.context.active_object
+    asignar_material(base, get_mat("piedra_plaza"))
+    
+    # 2. Pared cilíndrica de madera
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.35, depth=1.7, location=(0, 0, 1.05))
     pared = bpy.context.active_object
     asignar_material(pared, get_mat("madera_tablas"))
     
-    bpy.ops.mesh.primitive_cone_add(vertices=18, radius1=1.95, radius2=0.2, depth=1.2, location=(0, 0, 2.1))
+    # Zunchos / cinchas de madera oscura en 360°
+    for z in [0.45, 1.1, 1.75]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.38, depth=0.08, location=(0, 0, z))
+        cincha = bpy.context.active_object
+        asignar_material(cincha, get_mat("madera_viga"))
+        
+    # 3. Tejado de seta carmesí
+    bpy.ops.mesh.primitive_cone_add(vertices=20, radius1=2.1, radius2=0.3, depth=1.4, location=(0, 0, 2.3))
     techo = bpy.context.active_object
     asignar_material(techo, get_mat("pino_seta_rojo"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.45, depth=0.15, location=(0, -1.35, 0.6))
+    # Cúpula de remate superior
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=0.45, location=(0, 0, 3.0))
+    copete = bpy.context.active_object
+    copete.scale = (1.0, 1.0, 0.6)
+    asignar_material(copete, get_mat("pino_seta_rojo"))
+    
+    # Motas blancas de la seta en 360°
+    puntos_coords = [
+        (0.6, -1.5, 2.2, 0.18), (-0.7, -1.4, 2.1, 0.16), (0.0, -1.7, 1.95, 0.20),
+        (-1.5, 0.4, 2.15, 0.18), (1.5, 0.3, 2.2, 0.17),
+        (-0.8, 1.3, 2.2, 0.19), (0.7, 1.3, 2.1, 0.17), (0.0, 1.6, 1.95, 0.20),
+        (0.3, 0.8, 2.65, 0.15), (-0.4, -0.7, 2.7, 0.15), (-0.6, 0.5, 2.6, 0.14)
+    ]
+    for px, py, pz, r in puntos_coords:
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=8, ring_count=6, radius=r, location=(px, py, pz))
+        punto = bpy.context.active_object
+        punto.scale = (1.0, 1.0, 0.5)
+        asignar_material(punto, get_mat("pino_seta_puntos"))
+        
+    # 4. Chimenea de tronco
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.18, depth=1.1, location=(0.7, 0.7, 2.7))
+    chim = bpy.context.active_object
+    chim.rotation_euler = (math.radians(10), math.radians(-8), 0)
+    asignar_material(chim, get_mat("arbol_corteza"))
+    
+    # 5. Puerta frontal redonda de hobbit
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.52, depth=0.16, location=(0, -1.32, 0.7))
+    puerta_marco = bpy.context.active_object
+    puerta_marco.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(puerta_marco, get_mat("madera_viga"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.44, depth=0.20, location=(0, -1.33, 0.7))
     puerta = bpy.context.active_object
     puerta.rotation_euler = (math.radians(90), 0, 0)
     asignar_material(puerta, get_mat("arbol_corteza"))
     
-    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.14, location=(0.65, -1.45, 1.1))
+    # Tirador de la puerta
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=8, ring_count=6, radius=0.06, location=(0.24, -1.45, 0.7))
+    pomo = bpy.context.active_object
+    asignar_material(pomo, get_mat("oro_reliquia"))
+    
+    # 6. Porche con farol
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.45, 1.35))
+    techillo = bpy.context.active_object
+    techillo.scale = (1.1, 0.45, 0.08)
+    techillo.rotation_euler = (math.radians(-15), 0, 0)
+    asignar_material(techillo, get_mat("madera_tablas"))
+    
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=8, ring_count=6, radius=0.14, location=(0.65, -1.45, 1.15))
     farol = bpy.context.active_object
     asignar_material(farol, get_mat("farol_luz"))
+    
+    # 7. Ventanas redondas en laterales y trasera (visibles 360°)
+    for wx, wy, wz, rx, ry in [
+        (-1.32, 0.0, 1.1, 0, 90),
+        (1.32, 0.0, 1.1, 0, -90),
+        (0.0, 1.32, 1.1, -90, 0),
+    ]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.32, depth=0.15, location=(wx, wy, wz))
+        marco = bpy.context.active_object
+        marco.rotation_euler = (math.radians(rx), math.radians(ry), 0)
+        asignar_material(marco, get_mat("madera_viga"))
+        
+        bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.25, depth=0.18, location=(wx, wy, wz))
+        cristal = bpy.context.active_object
+        cristal.rotation_euler = (math.radians(rx), math.radians(ry), 0)
+        asignar_material(cristal, get_mat("farol_luz"))
 
     exportar_modelo("casa_pino", DIR_ENTORNO)
 
 def generar_forja_corteza():
-    """Genera el taller de forja de Corteza: horno de piedra y yunque."""
+    """Genera el taller de herrería de Corteza (Cuna de Musgo) completo en 360°:
+    Plataforma de losas de piedra, gran horno de forja de mampostería con boca arqueada y brasas ardientes,
+    chimenea de piedra con chimeneón escalonado, tocón de roble con yunque de acero de doble cuerno,
+    cubeta de enfriamiento con agua reflectante, mesa de herramientas lateral, y leñera de troncos trasera."""
     limpiar_escena()
     
-    bpy.ops.mesh.primitive_cube_add(size=1.8, location=(0, 0, 0.9))
+    # 1. Plataforma base de losas de piedra
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.4, 0.15))
+    suelo = bpy.context.active_object
+    suelo.scale = (3.4, 3.2, 0.3)
+    asignar_material(suelo, get_mat("piedra_plaza"))
+    
+    # 2. Horno de forja de piedra
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.3, 0.2, 1.1))
     horno = bpy.context.active_object
-    horno.scale = (1.2, 1.0, 1.0)
+    horno.scale = (2.2, 1.6, 1.6)
     asignar_material(horno, get_mat("piedra_plaza"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.35, depth=1.4, location=(0.6, 0.3, 2.2))
-    chimenea = bpy.context.active_object
-    asignar_material(chimenea, get_mat("piedra_plaza"))
+    # Zócalo inferior oscuro del horno
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.3, 0.2, 0.38))
+    zoc_h = bpy.context.active_object
+    zoc_h.scale = (2.3, 1.7, 0.25)
+    asignar_material(zoc_h, get_mat("piedra_oscura"))
     
-    bpy.ops.mesh.primitive_cube_add(size=0.6, location=(0, -0.85, 0.6))
-    fuego = bpy.context.active_object
-    asignar_material(fuego, get_mat("corazon_asili"))
+    # Hogar interior con brasas ardientes
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.3, -0.55, 0.85))
+    foco_fuego = bpy.context.active_object
+    foco_fuego.scale = (1.0, 0.5, 0.5)
+    asignar_material(foco_fuego, get_mat("corazon_asili"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.35, depth=0.5, location=(0, -1.6, 0.25))
+    # Campana y chimenea de mampostería
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.48, depth=1.8, location=(0.8, 0.3, 2.5))
+    chim = bpy.context.active_object
+    asignar_material(chim, get_mat("piedra_plaza"))
+    
+    # Remate de chimenea
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.55, depth=0.2, location=(0.8, 0.3, 3.4))
+    remate = bpy.context.active_object
+    asignar_material(remate, get_mat("piedra_oscura"))
+    
+    # 3. Yunque sobre tocón
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.42, depth=0.55, location=(-0.3, -1.3, 0.35))
     tocon = bpy.context.active_object
     asignar_material(tocon, get_mat("arbol_corteza"))
     
-    bpy.ops.mesh.primitive_cube_add(size=0.35, location=(0, -1.6, 0.65))
-    yunque = bpy.context.active_object
-    yunque.scale = (1.4, 0.7, 0.6)
-    asignar_material(yunque, get_mat("metal_forja"))
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.3, -1.3, 0.75))
+    yunque_cuerpo = bpy.context.active_object
+    yunque_cuerpo.scale = (0.7, 0.35, 0.28)
+    asignar_material(yunque_cuerpo, get_mat("metal_forja"))
+    
+    bpy.ops.mesh.primitive_cone_add(vertices=10, radius1=0.16, radius2=0.03, depth=0.35, location=(-0.75, -1.3, 0.78))
+    cuerno = bpy.context.active_object
+    cuerno.rotation_euler = (0, math.radians(-90), 0)
+    asignar_material(cuerno, get_mat("metal_forja"))
+    
+    # 4. Cubeta de enfriamiento de madera con agua
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(1.3, -0.7, 0.45))
+    cubeta = bpy.context.active_object
+    cubeta.scale = (0.6, 1.1, 0.6)
+    asignar_material(cubeta, get_mat("madera_tronco"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(1.3, -0.7, 0.68))
+    agua_c = bpy.context.active_object
+    agua_c.scale = (0.48, 0.95, 0.08)
+    asignar_material(agua_c, get_mat("agua_limpia"))
+    
+    # 5. Mesa de trabajo lateral
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.1, 0.2, 0.65))
+    mesa = bpy.context.active_object
+    mesa.scale = (0.65, 1.4, 0.7)
+    asignar_material(mesa, get_mat("madera_tablas"))
+    
+    # 6. Leñera trasera (sólida y volumétrica en 360°)
+    for lz in [0.35, 0.65]:
+        for ly in [0.95, 1.25]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.12, depth=1.8, location=(0.3, ly, lz))
+            leno = bpy.context.active_object
+            leno.rotation_euler = (0, math.radians(90), 0)
+            asignar_material(leno, get_mat("madera_tronco"))
 
     exportar_modelo("forja_corteza", DIR_ENTORNO)
 
@@ -576,131 +707,366 @@ def generar_farol_madera():
     exportar_modelo("farol_madera", DIR_ENTORNO)
 
 def generar_cocina_juncia():
-    """Genera la cocina comunitaria de Juncia: cabaña con gran caldero exterior y chimenea."""
+    """Genera la Cocina Comunitaria de Juncia (Cuna de Musgo) completa en 360°:
+    Cabaña de troncos macizos, tejado cónico de barda y musgo con aleros perimetrales,
+    gran hogar exterior de piedra con trípode de hierro y caldero hirviente,
+    chimenea de piedra con tiro abierto, banco de cocina y ventana trasera de despensa."""
     limpiar_escena()
-    bpy.ops.mesh.primitive_cube_add(size=2.0, location=(0, 0, 1.0))
+    
+    # 1. Base y muros de troncos en 360°
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.1))
     cuerpo = bpy.context.active_object
-    cuerpo.scale = (1.2, 1.0, 1.0)
+    cuerpo.scale = (2.6, 2.2, 1.8)
     asignar_material(cuerpo, get_mat("madera_tablas"))
     
-    bpy.ops.mesh.primitive_cone_add(vertices=16, radius1=1.8, radius2=0.2, depth=1.4, location=(0, 0, 2.7))
+    # Vigas de arriostramiento perimetral
+    for z in [0.25, 1.1, 1.95]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, z))
+        viga = bpy.context.active_object
+        viga.scale = (2.7, 2.3, 0.12)
+        asignar_material(viga, get_mat("madera_tronco"))
+        
+    # 2. Tejado cónico de barda y musgo
+    bpy.ops.mesh.primitive_cone_add(vertices=16, radius1=2.2, radius2=0.25, depth=1.5, location=(0, 0, 2.75))
     techo = bpy.context.active_object
     asignar_material(techo, get_mat("musgo_hojas"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.25, depth=1.6, location=(0.8, 0.4, 2.8))
+    # 3. Chimenea de mampostería de piedra
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.32, depth=2.0, location=(0.95, 0.6, 2.8))
     chim = bpy.context.active_object
     asignar_material(chim, get_mat("piedra_plaza"))
     
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, radius=0.45, location=(-0.6, -1.3, 0.4))
-    caldero = bpy.context.active_object
-    asignar_material(caldero, get_mat("metal_forja"))
+    # 4. Hogar exterior de piedra con caldero
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.65, depth=0.35, location=(-0.7, -1.35, 0.2))
+    hogar = bpy.context.active_object
+    asignar_material(hogar, get_mat("piedra_plaza"))
     
-    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.22, location=(-0.6, -1.3, 0.15))
+    # Fuego
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.28, location=(-0.7, -1.35, 0.32))
     fuego = bpy.context.active_object
     asignar_material(fuego, get_mat("corazon_asili"))
+    
+    # Gran caldero de hierro colgado
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, radius=0.42, location=(-0.7, -1.35, 0.7))
+    caldero = bpy.context.active_object
+    caldero.scale = (1.0, 1.0, 0.85)
+    asignar_material(caldero, get_mat("metal_forja"))
+    
+    # Sopa / guiso caliente interior
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.35, depth=0.08, location=(-0.7, -1.35, 0.85))
+    guiso = bpy.context.active_object
+    asignar_material(guiso, get_mat("oro_reliquia"))
+    
+    # 5. Mesa de preparación lateral con cuenco
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.7, -1.3, 0.55))
+    mesa = bpy.context.active_object
+    mesa.scale = (1.0, 0.65, 0.7)
+    asignar_material(mesa, get_mat("madera_tablas"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.18, depth=0.12, location=(0.7, -1.3, 0.95))
+    cuenco = bpy.context.active_object
+    asignar_material(cuenco, get_mat("teja_cobriza"))
+    
+    # 6. Ventana trasera de despensa (visibilidad sólida 360°)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 1.12, 1.25))
+    marco_v = bpy.context.active_object
+    marco_v.scale = (0.7, 0.1, 0.7)
+    asignar_material(marco_v, get_mat("madera_viga"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 1.13, 1.25))
+    vidrio = bpy.context.active_object
+    vidrio.scale = (0.55, 0.1, 0.55)
+    asignar_material(vidrio, get_mat("farol_luz"))
 
     exportar_modelo("cocina_juncia", DIR_ENTORNO)
 
 def generar_puesto_tawi():
-    """Genera el puesto de mercado de Tawi: mostrador con toldo de rayas y cestas."""
+    """Genera el puesto de mercado de Tawi (Cuna de Musgo) completo en 360°:
+    Mostrador de madera de pino con faldón y estante inferior de provisiones,
+    cuatro postes esquineros de madera estriada, armazón superior con toldo de tela a rayas rojas y crema,
+    cajas de mercancías con reliquias doradas y frutas en el frontal, y cajas de embalaje en la trasera."""
     limpiar_escena()
-    bpy.ops.mesh.primitive_cube_add(size=1.2, location=(0, 0, 0.5))
-    mesa = bpy.context.active_object
-    mesa.scale = (1.8, 0.8, 0.8)
-    asignar_material(mesa, get_mat("madera_tablas"))
     
-    for sx in [-1.0, 1.0]:
-        for sy in [-0.45, 0.45]:
-            bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.04, depth=2.0, location=(sx * 0.95, sy, 1.0))
+    # 1. Mostrador con repisa
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.55))
+    mostrador = bpy.context.active_object
+    mostrador.scale = (2.2, 0.9, 0.75)
+    asignar_material(mostrador, get_mat("madera_tablas"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.95))
+    tabla = bpy.context.active_object
+    tabla.scale = (2.35, 1.05, 0.1)
+    asignar_material(tabla, get_mat("madera_viga"))
+    
+    # 2. Cuatro postes esquineros
+    for sx in [-1.02, 1.02]:
+        for sy in [-0.42, 0.42]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.055, depth=2.2, location=(sx, sy, 1.1))
             poste = bpy.context.active_object
             asignar_material(poste, get_mat("arbol_corteza"))
             
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.3, depth=2.4, location=(0, 0, 2.1))
+    # 3. Toldo de tela arqueado a dos aguas
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.35, depth=2.5, location=(0, 0, 2.25))
     toldo = bpy.context.active_object
     toldo.rotation_euler = (0, math.radians(90), 0)
-    toldo.scale = (0.9, 0.35, 1.0)
+    toldo.scale = (0.85, 0.42, 1.0)
     asignar_material(toldo, get_mat("tela_toldo"))
     
-    bpy.ops.mesh.primitive_cube_add(size=0.35, location=(-0.5, 0.0, 1.05))
+    # Faldón perimetral decorativo
+    for sy in [-0.52, 0.52]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, sy, 2.05))
+        faldon = bpy.context.active_object
+        faldon.scale = (2.5, 0.05, 0.22)
+        asignar_material(faldon, get_mat("pino_seta_puntos"))
+        
+    # 4. Mercancías en la mesa: cajas y canastos con reliquias
+    bpy.ops.mesh.primitive_cube_add(size=0.38, location=(-0.65, -0.05, 1.15))
     caja1 = bpy.context.active_object
-    asignar_material(caja1, get_mat("oro_reliquia"))
+    asignar_material(caja1, get_mat("madera_tronco"))
+    
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.14, location=(-0.65, -0.05, 1.38))
+    reliquia = bpy.context.active_object
+    asignar_material(reliquia, get_mat("oro_reliquia"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.22, depth=0.18, location=(0.6, -0.05, 1.08))
+    cesta = bpy.context.active_object
+    asignar_material(cesta, get_mat("paja_dorada"))
+    
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=8, ring_count=6, radius=0.16, location=(0.6, -0.05, 1.22))
+    bayas = bpy.context.active_object
+    asignar_material(bayas, get_mat("rubor"))
+    
+    # 5. Trasera del puesto: cajas de provisiones apiladas (volumen 360°)
+    bpy.ops.mesh.primitive_cube_add(size=0.45, location=(-0.4, 0.72, 0.25))
+    caja_tras1 = bpy.context.active_object
+    asignar_material(caja_tras1, get_mat("madera_tronco"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=0.35, location=(0.4, 0.68, 0.2))
+    caja_tras2 = bpy.context.active_object
+    asignar_material(caja_tras2, get_mat("madera_tablas"))
 
     exportar_modelo("puesto_tawi", DIR_ENTORNO)
 
 def generar_gran_archivo_sigilia():
-    """Genera el Gran Archivo de Maandiko (Sigilia): edificio monumental de piedra con columnas y cúpula."""
+    """Genera el Gran Archivo de Maandiko (Sigilia) monumental en 360°:
+    Podio escalonado de mármol clásico, pórtico hexástilo con 4 columnas frontales acanaladas,
+    frontón triangular con tímpano esculpido, puertas monumentales de bronce,
+    cuerpo cerrado con pilastras y hornacinas en laterales y fachada trasera,
+    tambor octogonal y gran cúpula dorada coronada por lucernario."""
     limpiar_escena()
-    bpy.ops.mesh.primitive_cube_add(size=3.6, location=(0, 0, 0.3))
-    base = bpy.context.active_object
-    base.scale = (1.4, 1.1, 0.18)
-    asignar_material(base, get_mat("marmol_sigilia"))
     
-    bpy.ops.mesh.primitive_cube_add(size=3.0, location=(0, 0.2, 1.7))
-    cuerpo = bpy.context.active_object
-    cuerpo.scale = (1.3, 0.9, 0.9)
-    asignar_material(cuerpo, get_mat("marmol_sigilia"))
+    # 1. Podio de mármol escalonado
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.1, 0.2))
+    escalon1 = bpy.context.active_object
+    escalon1.scale = (5.6, 4.4, 0.4)
+    asignar_material(escalon1, get_mat("marmol_sigilia"))
     
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.2, 0.5))
+    escalon2 = bpy.context.active_object
+    escalon2.scale = (5.2, 4.0, 0.3)
+    asignar_material(escalon2, get_mat("marmol_sigilia"))
+    
+    # 2. Cuerpo del edificio
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.4, 2.0))
+    edificio = bpy.context.active_object
+    edificio.scale = (4.6, 3.4, 2.7)
+    asignar_material(edificio, get_mat("marmol_sigilia"))
+    
+    # Cornisa perimetral superior en 360°
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.4, 3.45))
+    cornisa = bpy.context.active_object
+    cornisa.scale = (4.9, 3.7, 0.22)
+    asignar_material(cornisa, get_mat("marmol_sigilia"))
+    
+    # 3. Cuatro columnas frontales acanaladas
     for i in range(4):
-        x_col = (i - 1.5) * 1.1
-        bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.18, depth=2.4, location=(x_col, -1.2, 1.4))
-        columna = bpy.context.active_object
-        asignar_material(columna, get_mat("marmol_sigilia"))
+        x_col = (i - 1.5) * 1.25
+        bpy.ops.mesh.primitive_cylinder_add(vertices=14, radius=0.20, depth=2.7, location=(x_col, -1.35, 1.95))
+        col = bpy.context.active_object
+        asignar_material(col, get_mat("marmol_sigilia"))
         
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.6, depth=4.2, location=(0, -0.1, 3.4))
-    techo = bpy.context.active_object
-    techo.rotation_euler = (0, math.radians(90), 0)
-    techo.scale = (1.0, 0.45, 1.0)
-    asignar_material(techo, get_mat("teja_cobriza"))
+        # Basa y capitel
+        bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.26, depth=0.15, location=(x_col, -1.35, 0.7))
+        basa = bpy.context.active_object
+        asignar_material(basa, get_mat("oro_reliquia"))
+        
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x_col, -1.35, 3.25))
+        capitel = bpy.context.active_object
+        capitel.scale = (0.5, 0.5, 0.15)
+        asignar_material(capitel, get_mat("oro_reliquia"))
+        
+    # Frontón triangular
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=2.6, depth=1.6, location=(0, -1.35, 3.9))
+    pedimento = bpy.context.active_object
+    pedimento.rotation_euler = (0, math.radians(90), 0)
+    pedimento.scale = (0.35, 1.0, 1.0)
+    asignar_material(pedimento, get_mat("marmol_sigilia"))
     
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=0.9, location=(0, 0.4, 4.0))
+    # 4. Puertas monumentales de bronce
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.32, 1.6))
+    puerta = bpy.context.active_object
+    puerta.scale = (1.2, 0.1, 1.8)
+    asignar_material(puerta, get_mat("oro_reliquia"))
+    
+    # 5. Cúpula dorada con tambor
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.65, depth=0.8, location=(0, 0.4, 3.8))
+    tambor = bpy.context.active_object
+    asignar_material(tambor, get_mat("marmol_sigilia"))
+    
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=18, ring_count=12, radius=1.55, location=(0, 0.4, 4.3))
     cupula = bpy.context.active_object
+    cupula.scale = (1.0, 1.0, 0.75)
     asignar_material(cupula, get_mat("oro_reliquia"))
+    
+    # Aguja / lucernario
+    bpy.ops.mesh.primitive_cone_add(vertices=10, radius1=0.22, radius2=0.04, depth=0.8, location=(0, 0.4, 5.7))
+    aguja = bpy.context.active_object
+    asignar_material(aguja, get_mat("oro_reliquia"))
+    
+    # 6. Fachada trasera: hornacinas y ventanales (volumen 360°)
+    for hx in [-1.3, 0.0, 1.3]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(hx, 2.12, 2.1))
+        hornacina = bpy.context.active_object
+        hornacina.scale = (0.7, 0.1, 1.5)
+        asignar_material(hornacina, get_mat("tinta_sigilia"))
 
     exportar_modelo("gran_archivo", DIR_ENTORNO)
 
 def generar_taller_taa():
-    """Genera el taller de Taa (escriba de Maandiko): arquitectura urbana con frascos de tinta y vitrales."""
+    """Genera el taller de Taa (escriba de Maandiko) completo en 360°:
+    Planta baja de sillería de piedra gris con puerta adintelada y ventana de mostrador,
+    planta alta en voladizo con entramado de madera oscura y paneles claros,
+    tejado a dos aguas de teja cobriza con buhardilla,
+    gran frasco de tinta de Sigilia colgando del cartel de forja frontal,
+    y fachada trasera con chimenea de ladrillo y ventanales."""
     limpiar_escena()
-    bpy.ops.mesh.primitive_cube_add(size=2.4, location=(0, 0, 1.2))
+    
+    # 1. Planta baja de piedra
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.1))
     planta_baja = bpy.context.active_object
-    planta_baja.scale = (1.1, 0.9, 1.0)
+    planta_baja.scale = (2.8, 2.4, 2.0)
     asignar_material(planta_baja, get_mat("piedra_plaza"))
     
-    bpy.ops.mesh.primitive_cube_add(size=2.2, location=(0, -0.15, 2.6))
+    # 2. Planta alta en voladizo con entramado
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.15, 2.75))
     planta_alta = bpy.context.active_object
-    planta_alta.scale = (1.2, 1.05, 0.8)
+    planta_alta.scale = (3.0, 2.7, 1.5)
     asignar_material(planta_alta, get_mat("madera_tablas"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.5, depth=3.0, location=(0, -0.15, 3.7))
+    # Vigas esquineras verticales del entramado
+    for px in [-1.48, 1.48]:
+        for py in [-1.48, 1.18]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, py, 2.75))
+            viga_v = bpy.context.active_object
+            viga_v.scale = (0.12, 0.12, 1.5)
+            asignar_material(viga_v, get_mat("madera_tronco"))
+            
+    # 3. Tejado a dos aguas de teja cobriza
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.75, depth=3.4, location=(0, -0.15, 4.0))
     techo = bpy.context.active_object
     techo.rotation_euler = (0, math.radians(90), 0)
-    techo.scale = (1.1, 0.5, 1.0)
+    techo.scale = (0.9, 0.65, 1.0)
     asignar_material(techo, get_mat("teja_cobriza"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.32, depth=0.6, location=(1.1, -1.2, 0.35))
+    # Buhardilla frontal
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=0.6, depth=0.8, location=(0, -1.3, 4.0))
+    buhardilla = bpy.context.active_object
+    buhardilla.rotation_euler = (math.radians(-90), 0, 0)
+    asignar_material(buhardilla, get_mat("teja_cobriza"))
+    
+    # 4. Cartel de forja con frasco de tinta
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.03, depth=0.9, location=(1.35, -1.4, 2.3))
+    brazo_c = bpy.context.active_object
+    brazo_c.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(brazo_c, get_mat("metal_forja"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.28, depth=0.55, location=(1.35, -1.75, 1.95))
     frasco = bpy.context.active_object
     asignar_material(frasco, get_mat("tinta_sigilia"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.12, depth=0.22, location=(1.35, -1.75, 2.3))
+    cuello = bpy.context.active_object
+    asignar_material(cuello, get_mat("oro_reliquia"))
+    
+    # 5. Fachada trasera: chimenea de piedra y ventana (360°)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.32, depth=4.2, location=(-0.9, 1.25, 2.2))
+    chim = bpy.context.active_object
+    asignar_material(chim, get_mat("piedra_plaza"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.5, 1.22, 2.8))
+    ventana_tras = bpy.context.active_object
+    ventana_tras.scale = (0.7, 0.1, 0.7)
+    asignar_material(ventana_tras, get_mat("farol_luz"))
 
     exportar_modelo("taller_taa", DIR_ENTORNO)
 
 def generar_casa_escriba():
-    """Genera una casa tradicional de Sigilia (Maandiko): muros blancos, vigas y tejas cobrizas."""
+    """Genera la Casa del Escriba de Sigilia (Maandiko) completa en 360°:
+    Muros enlucidos de blanco con sillares de esquina de granito en las 4 aristas,
+    tejado a dos aguas de teja cobriza con aleros moldurados,
+    balcón voladizo de madera tallada con balaustrada en la fachada principal,
+    portón de entrada adintelado, y chimenea con ventanas iluminadas en la trasera."""
     limpiar_escena()
-    bpy.ops.mesh.primitive_cube_add(size=2.2, location=(0, 0, 1.1))
-    casa = bpy.context.active_object
-    casa.scale = (1.1, 1.0, 1.0)
-    asignar_material(casa, get_mat("marmol_sigilia"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.4, depth=2.7, location=(0, 0, 2.6))
+    # 1. Cuerpo principal de dos plantas
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.5))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (2.6, 2.2, 2.8)
+    asignar_material(cuerpo, get_mat("marmol_sigilia"))
+    
+    # Sillares de esquina en las 4 aristas (360°)
+    for ex in [-1.31, 1.31]:
+        for ey in [-1.11, 1.11]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(ex, ey, 1.5))
+            esquina = bpy.context.active_object
+            esquina.scale = (0.16, 0.16, 2.82)
+            asignar_material(esquina, get_mat("piedra_plaza"))
+            
+    # 2. Tejado a dos aguas
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1.65, depth=3.0, location=(0, 0, 3.4))
     techo = bpy.context.active_object
     techo.rotation_euler = (0, math.radians(90), 0)
-    techo.scale = (1.05, 0.55, 1.0)
+    techo.scale = (0.95, 0.62, 1.0)
     asignar_material(techo, get_mat("teja_cobriza"))
     
-    bpy.ops.mesh.primitive_cube_add(size=0.6, location=(0, -1.15, 1.6))
-    balcon = bpy.context.active_object
-    balcon.scale = (1.6, 0.4, 0.5)
-    asignar_material(balcon, get_mat("madera_tablas"))
+    # 3. Balcón frontal de madera tallada
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.25, 1.9))
+    balcon_base = bpy.context.active_object
+    balcon_base.scale = (1.7, 0.45, 0.1)
+    asignar_material(balcon_base, get_mat("madera_tablas"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.45, 2.15))
+    baranda = bpy.context.active_object
+    baranda.scale = (1.7, 0.06, 0.45)
+    asignar_material(baranda, get_mat("madera_viga"))
+    
+    for bx in [-0.85, 0.85]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(bx, -1.25, 2.15))
+        lateral = bpy.context.active_object
+        lateral.scale = (0.06, 0.45, 0.45)
+        asignar_material(lateral, get_mat("madera_viga"))
+        
+    # Ventanal del balcón
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.11, 2.25))
+    vent_balcon = bpy.context.active_object
+    vent_balcon.scale = (0.9, 0.1, 0.8)
+    asignar_material(vent_balcon, get_mat("farol_luz"))
+    
+    # Puerta baja
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.11, 0.75))
+    puerta = bpy.context.active_object
+    puerta.scale = (0.7, 0.1, 1.1)
+    asignar_material(puerta, get_mat("madera_tronco"))
+    
+    # 4. Fachada trasera: chimenea de piedra y ventana (360°)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.28, depth=3.8, location=(0.75, 1.12, 2.0))
+    chim = bpy.context.active_object
+    asignar_material(chim, get_mat("piedra_plaza"))
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.5, 1.11, 1.8))
+    vent_tras = bpy.context.active_object
+    vent_tras.scale = (0.65, 0.1, 0.65)
+    asignar_material(vent_tras, get_mat("farol_luz"))
 
     exportar_modelo("casa_escriba", DIR_ENTORNO)
 
@@ -1076,36 +1442,162 @@ def generar_forja_ruina():
         
     exportar_modelo("forja_ruina", DIR_ENTORNO)
 
-def generar_fuente_plaza():
-    """Genera la Fuente Central de Maandiko (Sigilia):
-    Pila octogonal de mármol, lámina de agua cristalina, columna central esculpida
-    y taza superior con surtidor de agua."""
+def generar_cocina_ruina():
+    """Genera la cocina comunitaria de Juncia en ruinas (Cuna de Musgo):
+    Muros de madera rotos y desmoronados, chimenea fracturada en ángulo,
+    cono de cubierta desplomado y gran caldero volcado en 360°."""
     limpiar_escena()
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=1.75, depth=0.6, location=(0, 0, 0.3))
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.35))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (2.2, 1.8, 0.7)
+    asignar_material(cuerpo, get_mat("madera_tablas"))
+    
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.28, depth=0.9, location=(0.7, 0.3, 0.85))
+    chim = bpy.context.active_object
+    chim.rotation_euler = (math.radians(20), math.radians(-15), 0)
+    asignar_material(chim, get_mat("piedra_plaza"))
+    
+    bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=1.4, radius2=0.1, depth=0.8, location=(-0.3, 0.2, 0.55))
+    techo = bpy.context.active_object
+    techo.rotation_euler = (math.radians(18), math.radians(25), 0)
+    asignar_material(techo, get_mat("musgo_hojas"))
+    
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=10, ring_count=8, radius=0.45, location=(-0.5, -1.0, 0.3))
+    caldero = bpy.context.active_object
+    caldero.rotation_euler = (math.radians(65), 0, math.radians(-30))
+    asignar_material(caldero, get_mat("metal_forja"))
+    
+    for ex, ey, s in [(-0.9, 0.8, 0.35), (1.1, -0.6, 0.3), (0.2, -1.2, 0.25), (1.2, 0.9, 0.38)]:
+        bpy.ops.mesh.primitive_cube_add(size=s, location=(ex, ey, s * 0.5))
+        escombro = bpy.context.active_object
+        asignar_material(escombro, get_mat("piedra_plaza"))
+        
+    exportar_modelo("cocina_ruina", DIR_ENTORNO)
+
+def generar_puesto_ruina():
+    """Genera el puesto de mercado de Tawi en ruinas (Cuna de Musgo):
+    Mesa partida y vencida, postes de soporte caídos, armazón de toldo colapsado
+    y cajas rotas con escombros en 360°."""
+    limpiar_escena()
+    
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.35))
+    mesa = bpy.context.active_object
+    mesa.scale = (2.0, 0.9, 0.5)
+    mesa.rotation_euler = (math.radians(8), math.radians(-12), math.radians(5))
+    asignar_material(mesa, get_mat("madera_tablas"))
+    
+    for px, py, rx, ry in [(-0.9, -0.4, 65, 20), (0.9, 0.4, -45, -35)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.045, depth=1.6, location=(px, py, 0.4))
+        poste = bpy.context.active_object
+        poste.rotation_euler = (math.radians(rx), math.radians(ry), 0)
+        asignar_material(poste, get_mat("arbol_corteza"))
+        
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=0.8, depth=1.6, location=(0.1, 0.1, 0.5))
+    toldo = bpy.context.active_object
+    toldo.rotation_euler = (math.radians(20), math.radians(75), math.radians(-10))
+    toldo.scale = (0.7, 0.25, 0.9)
+    asignar_material(toldo, get_mat("tela_toldo"))
+    
+    for cx, cy in [(-0.6, -0.7), (0.7, -0.6)]:
+        bpy.ops.mesh.primitive_cube_add(size=0.35, location=(cx, cy, 0.18))
+        caja = bpy.context.active_object
+        caja.rotation_euler = (0, 0, math.radians(25))
+        asignar_material(caja, get_mat("madera_tronco"))
+        
+    exportar_modelo("puesto_ruina", DIR_ENTORNO)
+
+def generar_kitovu_ruina():
+    """Genera las ruinas de piedra de El Kitovu en 360° (ruina_casa.png):
+    Muros macizos de sillería de piedra quebrados en L, hiladas de piedra desgastada,
+    vigas de roble caídas y montones de escombros de mampostería tridimensional."""
+    limpiar_escena()
+    
+    # 1. Zócalo base de piedra
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.2, 0.25))
+    base = bpy.context.active_object
+    base.scale = (3.2, 2.2, 0.5)
+    asignar_material(base, get_mat("piedra_plaza"))
+    
+    # 2. Muro trasero (norte) roto a diferente altura
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.2, 1.0, 0.95))
+    muro_n = bpy.context.active_object
+    muro_n.scale = (2.6, 0.55, 1.1)
+    asignar_material(muro_n, get_mat("piedra_plaza"))
+    
+    # 3. Muro lateral (oeste) roto en rampa
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.1, 0.1, 0.85))
+    muro_o = bpy.context.active_object
+    muro_o.scale = (0.55, 1.6, 0.9)
+    asignar_material(muro_o, get_mat("piedra_plaza"))
+    
+    # Remate superior de esquina más alta
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.1, 1.0, 1.55))
+    esquina = bpy.context.active_object
+    esquina.scale = (0.6, 0.6, 0.7)
+    asignar_material(esquina, get_mat("piedra_oscura"))
+    
+    # 4. Vigas de madera caídas
+    for vx, vy, vz, rx, ry in [(-0.3, 0.2, 0.6, 30, -20), (0.6, -0.4, 0.35, -15, 60)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.08, depth=1.8, location=(vx, vy, vz))
+        viga = bpy.context.active_object
+        viga.rotation_euler = (math.radians(rx), math.radians(ry), 0)
+        asignar_material(viga, get_mat("arbol_corteza"))
+        
+    # 5. Bloques de escombros de mampostería en 360°
+    for ex, ey, s in [(-1.5, -0.6, 0.4), (1.3, -0.7, 0.45), (1.1, 1.2, 0.38), (-0.8, -1.0, 0.32), (0.3, -0.8, 0.35), (1.5, 0.4, 0.3)]:
+        bpy.ops.mesh.primitive_cube_add(size=s, location=(ex, ey, s * 0.5))
+        escombro = bpy.context.active_object
+        asignar_material(escombro, get_mat("piedra_plaza"))
+
+    exportar_modelo("kitovu_ruina", DIR_ENTORNO)
+
+def generar_fuente_plaza():
+    """Genera la Fuente Central de Maandiko (Sigilia) completa en 360°:
+    Pila octogonal monumental de mármol blanco con molduras escalonadas,
+    lámina de agua cristalina reflectante en su interior,
+    fuste central esculpido con acantos, taza superior de mármol rebosante,
+    y surtidor de agua en forma de flor de loto."""
+    limpiar_escena()
+    
+    # 1. Pila octogonal exterior
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=1.9, depth=0.7, location=(0, 0, 0.35))
     pila = bpy.context.active_object
     asignar_material(pila, get_mat("marmol_sigilia"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=1.52, depth=0.1, location=(0, 0, 0.48))
+    # Moldura de borde superior
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=2.02, depth=0.15, location=(0, 0, 0.68))
+    borde = bpy.context.active_object
+    asignar_material(borde, get_mat("marmol_sigilia"))
+    
+    # 2. Agua reflectante interior
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=1.65, depth=0.1, location=(0, 0, 0.52))
     agua_base = bpy.context.active_object
     asignar_material(agua_base, get_mat("agua_limpia"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.36, depth=1.4, location=(0, 0, 0.9))
+    # 3. Fuste central esculpido
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.38, depth=1.4, location=(0, 0, 1.0))
     columna = bpy.context.active_object
     asignar_material(columna, get_mat("marmol_sigilia"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.8, depth=0.28, location=(0, 0, 1.55))
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.52, depth=0.2, location=(0, 0, 0.75))
+    anillo = bpy.context.active_object
+    asignar_material(anillo, get_mat("oro_reliquia"))
+    
+    # 4. Taza superior de mármol
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.95, depth=0.35, location=(0, 0, 1.7))
     taza = bpy.context.active_object
     asignar_material(taza, get_mat("marmol_sigilia"))
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.68, depth=0.08, location=(0, 0, 1.66))
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.82, depth=0.08, location=(0, 0, 1.82))
     agua_taza = bpy.context.active_object
     asignar_material(agua_taza, get_mat("agua_limpia"))
     
-    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.22, location=(0, 0, 1.95))
+    # 5. Surtidor / flor de loto central
+    bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=0.25, radius2=0.05, depth=0.45, location=(0, 0, 2.05))
     surtidor = bpy.context.active_object
-    asignar_material(surtidor, get_mat("agua_limpia"))
-    
+    asignar_material(surtidor, get_mat("oro_reliquia"))
+
     exportar_modelo("fuente_plaza", DIR_ENTORNO)
 
 # ---------------------------------------------------------------------------
@@ -1224,11 +1716,14 @@ def main():
     generar_casa_pino_ruina()
     generar_forja_corteza()
     generar_forja_ruina()
+    generar_cocina_juncia()
+    generar_cocina_ruina()
+    generar_puesto_tawi()
+    generar_puesto_ruina()
+    generar_kitovu_ruina()
     generar_molino_shamba()
     generar_puente_madera()
     generar_farol_madera()
-    generar_cocina_juncia()
-    generar_puesto_tawi()
     generar_gran_archivo_sigilia()
     generar_taller_taa()
     generar_casa_escriba()

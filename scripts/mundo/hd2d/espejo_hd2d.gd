@@ -307,7 +307,8 @@ const LUCES_3D := {
 	"casa_barcas.png": [["v", 55, 50], ["f", 113, 48]],
 	"casa_bata.png": [["v", 52, 43], ["f", 10, 51]],
 	"casa_juncos.png": [["v", 55, 43], ["v", 127, 43], ["f", 185, 37]],
-	"casa_shamba.png": [["v", 40, 96], ["v", 124, 96], ["f", 90, 95]],
+	"casa_shamba.png": [["v", 40, 96], ["v", 124, 96], ["f", 90, 95], ["h", 152, 28]],
+	"casa_granja.png": [["v", 40, 96], ["v", 124, 96], ["f", 90, 95], ["h", 152, 28]],
 	"almacen.png": [["v", 52, 42]],
 	"cubierta.png": [["f", 54, 34]],
 	"farol.png": [["f", 4, 4]],
@@ -329,6 +330,13 @@ const MODELOS_BLENDER := {
 		"ruta": "res://modelos/entorno/casa_granja.glb",
 		"escala": Vector3(1.0, 1.0, 1.0),
 		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"ruina_casa.png": {
+		"ruta": "res://modelos/entorno/kitovu_ruina.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.15),
 		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
@@ -406,6 +414,7 @@ const MODELOS_BLENDER := {
 	},
 	"cocina.png": {
 		"ruta": "res://modelos/entorno/cocina_juncia.glb",
+		"ruta_ruina": "res://modelos/entorno/cocina_ruina.glb",
 		"escala": Vector3(1.08, 1.08, 1.08),
 		"offset": Vector3(0.0, 0.0, -0.18),
 		"rot_y": 0.0,
@@ -413,6 +422,7 @@ const MODELOS_BLENDER := {
 	},
 	"puesto.png": {
 		"ruta": "res://modelos/entorno/puesto_tawi.glb",
+		"ruta_ruina": "res://modelos/entorno/puesto_ruina.glb",
 		"escala": Vector3(1.05, 1.05, 1.05),
 		"offset": Vector3(0.0, 0.0, -0.12),
 		"rot_y": 0.0,
@@ -493,6 +503,7 @@ const ZONAS_OTONO := ["bosque_cobrizo", "camino_cobrizo", "campo_segado"]
 const ZONAS_ESPORAS := ["gruta_raices", "cueva_setas", "cienaga_quieta", "las_pasarelas"]
 const NUM_MOTAS_3D := 40
 const NUM_POLVO_3D := 10
+const NUM_HUMO_3D := 24
 const ZONAS_NIEVE := ["sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko"]
 ## Postprocesado cinematográfico HD-2D:
 ##   1. Profundidad de campo Tilt-Shift (nítido en la banda de Maisha, desenfoque bokeh suave arriba y abajo).
@@ -630,6 +641,9 @@ var _motas_datos: Array[Dictionary] = []
 var _malla_polvo: MultiMeshInstance3D
 var _polvo_datos: Array[Dictionary] = []
 var _reloj_polvo := 0.0
+var _malla_humo: MultiMeshInstance3D
+var _humo_datos: Array[Dictionary] = []
+var _reloj_humo := 0.0
 static var _cache_normales := {}           # ruta -> Texture2D
 static var _escenas_blender_cache := {}     # ruta -> PackedScene
 var _modelos_blender_instanciados := {}     # id de Node2D -> Node3D (instancia de Blender)
@@ -1037,6 +1051,36 @@ func _crear_particulas_3d() -> void:
 		})
 		mm_p.set_instance_transform(i, Transform3D(Basis(), Vector3(0.0, -10.0, 0.0)))
 		mm_p.set_instance_color(i, Color(1, 1, 1, 0))
+	# 3. Humo y brasas 3D de chimeneas, calderos y fogatas
+	var mat_h := StandardMaterial3D.new()
+	mat_h.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat_h.vertex_color_use_as_albedo = true
+	mat_h.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat_h.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	mat_h.billboard_keep_scale = true
+	var quad_h := QuadMesh.new()
+	quad_h.size = Vector2(2.4 * PX, 2.4 * PX)
+	quad_h.material = mat_h
+	var mm_h := MultiMesh.new()
+	mm_h.transform_format = MultiMesh.TRANSFORM_3D
+	mm_h.use_colors = true
+	mm_h.mesh = quad_h
+	mm_h.instance_count = NUM_HUMO_3D
+	_malla_humo = MultiMeshInstance3D.new()
+	_malla_humo.multimesh = mm_h
+	_malla_humo.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(_malla_humo)
+	_humo_datos.clear()
+	for i in NUM_HUMO_3D:
+		_humo_datos.append({
+			"pos": Vector3(0.0, -20.0, 0.0),
+			"vel": Vector3.ZERO,
+			"vida": 0.0,
+			"max_vida": 1.8,
+			"es_chispa": false,
+		})
+		mm_h.set_instance_transform(i, Transform3D(Basis(), Vector3(0.0, -20.0, 0.0)))
+		mm_h.set_instance_color(i, Color(1, 1, 1, 0))
 
 
 func _actualizar_particulas_3d(delta: float, dia: float, en_penumbra: bool) -> void:
@@ -1112,6 +1156,54 @@ func _actualizar_particulas_3d(delta: float, dia: float, en_penumbra: bool) -> v
 			var esc_p := lerpf(1.35, 0.55, r_vida)
 			mm_p.set_instance_transform(i, Transform3D(Basis().scaled(Vector3(esc_p, esc_p, esc_p)), pos_p))
 			mm_p.set_instance_color(i, Color(col_polvo.r, col_polvo.g, col_polvo.b, r_vida * 0.58))
+	if _malla_humo and _malla_humo.multimesh:
+		var mm_h := _malla_humo.multimesh
+		_reloj_humo -= delta
+		if _reloj_humo <= 0.0:
+			_reloj_humo = randf_range(0.14, 0.32)
+			var emisores: Array[Vector3] = []
+			for dl in _luces_3d:
+				if bool(dl.get("fuego", false)):
+					var omni_l: OmniLight3D = dl["luz"]
+					if is_instance_valid(omni_l) and omni_l.visible:
+						emisores.append(dl["pos"])
+			if not emisores.is_empty():
+				var p_emis: Vector3 = emisores[randi() % emisores.size()]
+				for i in NUM_HUMO_3D:
+					if float(_humo_datos[i]["vida"]) <= 0.0:
+						var es_chispa := randf() < 0.22
+						var dura := randf_range(0.6, 1.1) if es_chispa else randf_range(1.6, 2.4)
+						_humo_datos[i]["pos"] = p_emis + Vector3(randf_range(-0.12, 0.12), randf_range(0.2, 0.4), randf_range(-0.12, 0.12))
+						_humo_datos[i]["vel"] = Vector3(randf_range(0.08, 0.24), randf_range(0.75, 1.25) if es_chispa else randf_range(0.35, 0.65), randf_range(-0.08, 0.08))
+						_humo_datos[i]["vida"] = dura
+						_humo_datos[i]["max_vida"] = dura
+						_humo_datos[i]["es_chispa"] = es_chispa
+						break
+		for i in NUM_HUMO_3D:
+			var dh: Dictionary = _humo_datos[i]
+			var vida := float(dh["vida"])
+			if vida <= 0.0:
+				continue
+			vida -= delta
+			dh["vida"] = vida
+			if vida <= 0.0:
+				mm_h.set_instance_color(i, Color(1, 1, 1, 0))
+				continue
+			var pos_h: Vector3 = dh["pos"] + dh["vel"] * delta
+			pos_h.x += sin(vida * 3.0 + i) * 0.08 * delta
+			dh["pos"] = pos_h
+			var max_v := float(dh["max_vida"])
+			var r_vida := clampf(vida / max_v, 0.0, 1.0)
+			var es_chispa: bool = dh["es_chispa"]
+			if es_chispa:
+				var esc_c := lerpf(0.5, 0.9, r_vida)
+				mm_h.set_instance_transform(i, Transform3D(Basis().scaled(Vector3(esc_c, esc_c, esc_c)), pos_h))
+				mm_h.set_instance_color(i, Color(1.0, 0.68, 0.28, r_vida * 0.95))
+			else:
+				var esc_h := lerpf(2.2, 0.8, 1.0 - r_vida)
+				var alfa_h := sin(r_vida * PI) * 0.38
+				mm_h.set_instance_transform(i, Transform3D(Basis().scaled(Vector3(esc_h, esc_h, esc_h)), pos_h))
+				mm_h.set_instance_color(i, Color(0.72, 0.74, 0.76, alfa_h))
 
 
 func _crear_postproceso() -> void:

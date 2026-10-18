@@ -131,6 +131,15 @@ graph TD
 19. **`casa_escriba.glb`**
     - Altura: $3.6\text{ m}$. Vivienda tradicional de Maandiko con muros encalados, balcón de madera y tejas cobrizas.
     - Vinculado a: `casa_escriba.png` y `casa_kalamu.png`.
+20. **`kitovu_ruina.glb` (El Kitovu - Ruinas de Granja)**
+    - Dimensiones: $3.2\times 2.2\times 1.6\text{ m}$. Zócalo de piedra masivo, muros rotos en escuadra a diferente altura, vigas de roble fracturadas y montones de escombros de mampostería en 360°.
+    - Vinculado a: `ruina_casa.png`.
+21. **`cocina_ruina.glb` (Cuna de Musgo - Cocina Derruida)**
+    - Altura: $1.8\text{ m}$. Muros de tablones quebrados, chimenea partida en ángulo, techo cónico colapsado y caldero de hierro volcado en el fango.
+    - Vinculado a: `cocina.png` (cuando `frame == 0`).
+22. **`puesto_ruina.glb` (Cuna de Musgo - Puesto Colapsado)**
+    - Altura: $1.5\text{ m}$. Mostrador inclinado y vencido, postes fracturados, toldo desfondado y cajas de madera desvencijadas en 360°.
+    - Vinculado a: `puesto.png` (cuando `frame == 0`).
 
 ---
 
@@ -161,4 +170,16 @@ El agua en Maisha presentaba fugas de vacío y cortes oscuros en acequias y bord
      $$c = \text{mix}(\text{color\_lecho}, c, 0.60 + \text{profundidad} \times 0.40)$$
 4. **Protección de Bordes de Mapa**:
    - El desvanecimiento perimetral (`d_borde`) nunca reduce la intensidad del agua por debajo de $0.88$ (evitando el oscurecimiento a $0.28$ que teñía de negro la acequia de El Kitovu).
+
+---
+
+## 6. Humo y Brasas Volumétricas 3D (`_malla_humo`)
+
+- **MultiMeshInstance3D Unshaded**: Malla de 24 cuads billboard orientados a la cámara con transparencia alfa y color vertex.
+- **Fuentes Emisoras**: Detecta automáticamente cualquier punto de luz `OmniLight3D` registrado con la propiedad `fuego: true` (chimenea de `casa_granja`, hogar de `taller`, caldero de `cocina_juncia`, campamento y fogatas).
+- **Dinámica Física**:
+  - Humo: Puffs que ascienden a $0.35$–$0.65\text{ m/s}$, oscilan lateralmente con el viento y se expanden de $0.8\text{ m}$ a $2.2\text{ m}$ mientras se desvanecen suavemente en $1.6$–$2.4\text{ s}$.
+  - Brasas y Chispas: 1 de cada 4 partículas es una chispa ámbar brillante (`Color(1.0, 0.68, 0.28)`) de alta velocidad ascendente ($0.75$–$1.25\text{ m/s}$) y vida corta ($0.6$–$1.1\text{ s}$).
+- **Desacoplamiento 100%**: Activo únicamente en modo HD-2D (tecla H encendida). Al apagar el HD-2D, el juego vuelve instantáneamente al canvas 2D nativo sin impacto en CPU ni memoria.
+
 
