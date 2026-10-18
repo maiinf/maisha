@@ -555,6 +555,30 @@ const MODELOS_BLENDER := {
 		"radio_occlusion": Vector2(3.5, 2.6),
 		"solo_reconstruido": false,
 	},
+	"horreo.png": {
+		"ruta": "res://modelos/entorno/horreo.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.2, 2.2),
+		"solo_reconstruido": false,
+	},
+	"campamento.png": {
+		"ruta": "res://modelos/entorno/campamento.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.4, 2.0),
+		"solo_reconstruido": false,
+	},
+	"puesto_tinta.png": {
+		"ruta": "res://modelos/entorno/puesto_tinta.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.12),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.0, 1.6),
+		"solo_reconstruido": false,
+	},
 }
 const TIPOS_LUZ_3D := {
 	"v": [4.6, 0.92, Color(1.0, 0.84, 0.55), false],

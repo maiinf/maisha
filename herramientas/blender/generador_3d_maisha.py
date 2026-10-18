@@ -2449,6 +2449,215 @@ def generar_palafito():
     
     exportar_modelo("palafito", DIR_ENTORNO)
 
+def generar_horreo():
+    """Genera el Hórreo tradicional elevado de Sungura (Senda de los Surcos) completo en 360°:
+    4 pilares de piedra con muelas/tornarratos antiroedores, plataforma de madera,
+    cuerpo de tablones con ranuras de ventilación, tejado a dos aguas de paja dorada,
+    escalera rústica y ventana cálida encendida."""
+    limpiar_escena()
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    tex_piedra = os.path.join(DIR_KITOVU, "mamposteria_tile.png")
+    tex_tejado = os.path.join(DIR_KITOVU, "tejado_paja_tile.png")
+    mat_troncos = obtener_material_textura("Mat_Horreo_Troncos", tex_troncos, rugosidad=0.85)
+    mat_piedra = obtener_material_textura("Mat_Horreo_Piedra", tex_piedra, rugosidad=0.90)
+    mat_tejado = obtener_material_textura("Mat_Horreo_Tejado", tex_tejado, rugosidad=0.92)
+    mat_madera = get_mat("madera_viga")
+    mat_luz = get_mat("farol_luz")
+
+    w, depth = 3.6, 2.4
+    # 1. 4 Pilares de piedra con tornarratos (muelas circulares)
+    for px in [-1.4, 1.4]:
+        for py in [-0.9, 0.9]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.14, depth=1.0, location=(px, py, 0.5))
+            pil = bpy.context.active_object
+            asignar_material(pil, mat_piedra)
+            bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.30, depth=0.10, location=(px, py, 1.05))
+            disco = bpy.context.active_object
+            asignar_material(disco, mat_piedra)
+
+    # 2. Plataforma de suelo de vigas y tablones
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.18))
+    suelo = bpy.context.active_object
+    suelo.scale = (w + 0.3, depth + 0.3, 0.16)
+    asignar_material(suelo, mat_troncos)
+    aplicar_uv_caja(suelo, 1.5, 1.0)
+
+    # 3. Cuerpo de tablones del hórreo
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 2.15))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (w, depth, 1.8)
+    asignar_material(cuerpo, mat_troncos)
+    aplicar_uv_caja(cuerpo, 1.5, 1.2)
+
+    # 4. Esquineros de refuerzo de madera
+    for ex in [-w * 0.5 + 0.05, w * 0.5 - 0.05]:
+        for ey in [-depth * 0.5 + 0.05, depth * 0.5 - 0.05]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(ex, ey, 2.15))
+            esq = bpy.context.active_object
+            esq.scale = (0.15, 0.15, 1.85)
+            asignar_material(esq, mat_madera)
+
+    # 5. Tejado a dos aguas de paja dorada
+    crear_prisma_tejado("Horreo_Techo", -w * 0.5 - 0.35, w * 0.5 + 0.35, -depth * 0.5 - 0.3, depth * 0.5 + 0.3, 3.0, 4.4, mat_tejado, u_rep=2.5, v_rep=1.8)
+
+    # 6. Ventana frontal cálida encendida (coincidente con ["v", 58, 58])
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -depth * 0.5 - 0.04, 2.15))
+    vent_f = bpy.context.active_object
+    vent_f.scale = (0.7, 0.1, 0.7)
+    asignar_material(vent_f, mat_luz)
+
+    # 7. Escalera de acceso exterior
+    for step in range(3):
+        sy = -depth * 0.5 - 0.25 - step * 0.28
+        sz = 0.85 - step * 0.26
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, sy, sz))
+        peld = bpy.context.active_object
+        peld.scale = (0.8, 0.26, 0.14)
+        asignar_material(peld, mat_madera)
+
+    # 8. Ventana trasera
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, depth * 0.5 + 0.04, 2.15))
+    vent_tras = bpy.context.active_object
+    vent_tras.scale = (0.6, 0.1, 0.6)
+    asignar_material(vent_tras, mat_luz)
+
+    exportar_modelo("horreo", DIR_ENTORNO)
+
+def generar_campamento():
+    """Genera el Campamento de explorador de Msafiri (Sendero del Puente) completo en 360°:
+    Tienda canadiense de lona verde oliva con mástiles, fogata de piedras con brasas incandescentes,
+    tocón de descanso, cajas de provisiones y petate enrollado."""
+    limpiar_escena()
+    mat_lona = obtener_material("Mat_Camp_Lona", "#4A5D3E", roughness=0.90)
+    mat_madera = get_mat("madera_viga")
+    mat_piedra = get_mat("piedra_plaza")
+    mat_brasas = obtener_material("Mat_Camp_Brasas", "#DF9022", roughness=0.3, emission_hex="#FF6B00", emission_strength=3.5)
+    mat_ceniza = get_mat("piedra_oscura")
+    mat_farol = get_mat("farol_luz")
+
+    # 1. Tienda canadiense (A-frame tent)
+    for y_mast in [-1.1, 1.1]:
+        for ang, sign in [(math.radians(28), -1), (-math.radians(28), 1)]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.04, depth=2.4, location=(sign * 0.65, y_mast, 1.05))
+            m = bpy.context.active_object
+            m.rotation_euler = (0, ang, 0)
+            asignar_material(m, mat_madera)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.04, depth=2.5, location=(0, 0, 2.1))
+    cumb = bpy.context.active_object
+    cumb.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(cumb, mat_madera)
+
+    crear_prisma_tejado("Tienda_Lona", -1.2, 1.2, -1.05, 1.05, 0.1, 2.05, mat_lona, u_rep=2.0, v_rep=1.5)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.0, 0.65))
+    interior = bpy.context.active_object
+    interior.scale = (1.4, 0.08, 1.1)
+    asignar_material(interior, mat_ceniza)
+
+    # 2. Fogata de piedras con brasas (coincidente con ["f", 52, 28])
+    pos_fuego = (1.8, -0.4)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.45, depth=0.12, location=(pos_fuego[0], pos_fuego[1], 0.06))
+    foso = bpy.context.active_object
+    asignar_material(foso, mat_ceniza)
+
+    for i in range(8):
+        ang = i * (math.pi * 2.0 / 8.0)
+        px = pos_fuego[0] + math.cos(ang) * 0.42
+        py = pos_fuego[1] + math.sin(ang) * 0.42
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.11, location=(px, py, 0.10))
+        piedra = bpy.context.active_object
+        asignar_material(piedra, mat_piedra)
+
+    for rot in [35, -45, 80]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.05, depth=0.55, location=(pos_fuego[0], pos_fuego[1], 0.14))
+        leno = bpy.context.active_object
+        leno.rotation_euler = (math.radians(18), math.radians(rot), math.radians(25))
+        asignar_material(leno, mat_madera)
+
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.20, location=(pos_fuego[0], pos_fuego[1], 0.16))
+    brasas = bpy.context.active_object
+    asignar_material(brasas, mat_brasas)
+
+    # 3. Tocón de asiento
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.26, depth=0.42, location=(pos_fuego[0] + 0.65, pos_fuego[1] - 0.35, 0.21))
+    tocon = bpy.context.active_object
+    asignar_material(tocon, mat_madera)
+
+    # 4. Cajas de provisiones
+    bpy.ops.mesh.primitive_cube_add(size=0.5, location=(-1.5, -0.3, 0.25))
+    caja1 = bpy.context.active_object
+    asignar_material(caja1, mat_madera)
+    bpy.ops.mesh.primitive_cube_add(size=0.42, location=(-1.5, 0.3, 0.21))
+    caja2 = bpy.context.active_object
+    asignar_material(caja2, mat_madera)
+
+    exportar_modelo("campamento", DIR_ENTORNO)
+
+def generar_puesto_tinta():
+    """Genera el Puesto de Venta de Tinta de Wino (Maandiko) completo en 360°:
+    Mostrador de mármol de Sigilia con molduras, 4 postes de bronce, toldo a rayas índigo y blancas,
+    estantería escalonada con frascos de tinta luminosa, pergaminos y farolillos dobles."""
+    limpiar_escena()
+    tex_marmol = os.path.join(DIR_SIGILIA, "marmol_sigilia_tile.png")
+    tex_bronce = os.path.join(DIR_SIGILIA, "bronce_sigilia_tile.png")
+    mat_marmol = obtener_material_textura("Mat_PuestoTinta_Marmol", tex_marmol, rugosidad=0.60)
+    mat_bronce = obtener_material_textura("Mat_PuestoTinta_Bronce", tex_bronce, rugosidad=0.45, metalicidad=0.85)
+    mat_toldo = obtener_material("Mat_PuestoTinta_Toldo", "#312E81", roughness=0.75)
+    mat_tinta_azul = obtener_material("Mat_Tinta_Azul", "#2563EB", roughness=0.2, emission_hex="#3B82F6", emission_strength=2.8)
+    mat_tinta_violeta = obtener_material("Mat_Tinta_Violeta", "#7C3AED", roughness=0.2, emission_hex="#8B5CF6", emission_strength=2.8)
+    mat_pergamino = get_mat("marmol_sigilia")
+    mat_luz = get_mat("farol_luz")
+
+    w, depth = 3.6, 1.8
+
+    # 1. Mostrador de mármol con repisa
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.5))
+    mostrador = bpy.context.active_object
+    mostrador.scale = (w, depth * 0.7, 1.0)
+    asignar_material(mostrador, mat_marmol)
+    aplicar_uv_caja(mostrador, 1.5, 0.8)
+
+    # 2. 4 Columnas / postes de bronce
+    for px in [-w * 0.5 + 0.12, w * 0.5 - 0.12]:
+        for py in [-depth * 0.5 + 0.12, depth * 0.5 - 0.12]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.06, depth=2.4, location=(px, py, 1.2))
+            col = bpy.context.active_object
+            asignar_material(col, mat_bronce)
+
+    # 3. Toldo de tela a dos aguas de Sigilia
+    crear_prisma_tejado("Toldo_Tinta", -w * 0.5 - 0.25, w * 0.5 + 0.25, -depth * 0.5 - 0.2, depth * 0.5 + 0.2, 2.3, 3.1, mat_toldo, u_rep=2.5, v_rep=1.5)
+
+    # 4. Estantes con frascos de tinta luminosa
+    for sz, col_mat in [(1.08, mat_tinta_azul), (1.35, mat_tinta_violeta)]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.15, sz - 0.05))
+        estante = bpy.context.active_object
+        estante.scale = (2.6, 0.35, 0.06)
+        asignar_material(estante, mat_bronce)
+
+        for fx in [-1.0, -0.5, 0.0, 0.5, 1.0]:
+            bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.10, location=(fx, 0.15, sz + 0.08))
+            frasco = bpy.context.active_object
+            asignar_material(frasco, col_mat)
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.035, depth=0.08, location=(fx, 0.15, sz + 0.20))
+            cuello = bpy.context.active_object
+            asignar_material(cuello, mat_bronce)
+
+    # 5. Rollos de pergamino sobre el mostrador
+    for rx in [-0.8, -0.5]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.04, depth=0.35, location=(rx, -0.22, 1.06))
+        perg = bpy.context.active_object
+        perg.rotation_euler = (math.radians(90), 0, math.radians(20))
+        asignar_material(perg, mat_pergamino)
+
+    # 6. Faroles laterales dobles (coincidentes con ["f", 28, 22] y ["f", 84, 22])
+    for fx, sign in [(-w * 0.5 + 0.12, -1), (w * 0.5 - 0.12, 1)]:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.13, location=(fx, -depth * 0.5 + 0.12, 1.85))
+        farol = bpy.context.active_object
+        asignar_material(farol, mat_luz)
+
+    exportar_modelo("puesto_tinta", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -2495,6 +2704,9 @@ def main():
     generar_casa_nungu()
     generar_granero()
     generar_palafito()
+    generar_horreo()
+    generar_campamento()
+    generar_puesto_tinta()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()
