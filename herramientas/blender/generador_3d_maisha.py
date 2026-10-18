@@ -3945,6 +3945,218 @@ def generar_raiz_gigante():
 
     exportar_modelo("raiz_gigante", DIR_ENTORNO)
 
+def generar_columna():
+    """Genera la Columna Ancestral de Piedra de las Ruinas (25 ubicaciones):
+    Plinto cuadrado escalonado, fuste cilíndrico estriado, collarino y capitel clásico
+    con aristas desgastadas, textura de mármol/mampostería y líquenes de musgo."""
+    limpiar_escena()
+    tex_marmol = os.path.join(DIR_SIGILIA, "marmol_sigilia_tile.png")
+    mat_piedra = obtener_material_textura("Mat_Columna_Piedra", tex_marmol, rugosidad=0.82)
+    mat_musgo = obtener_material("Mat_Columna_Musgo", "#4A5D3E", roughness=0.90)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.08))
+    plinto = bpy.context.active_object
+    plinto.scale = (0.76, 0.76, 0.16)
+    aplicar_uv_caja(plinto, 1.5, 0.5)
+    asignar_material(plinto, mat_piedra)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.34, depth=0.12, location=(0, 0, 0.22))
+    toro = bpy.context.active_object
+    aplicar_uv_caja(toro, 2.0, 0.5)
+    asignar_material(toro, mat_piedra)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=14, radius=0.26, depth=1.55, location=(0, 0, 1.05))
+    fuste = bpy.context.active_object
+    aplicar_uv_caja(fuste, 2.5, 3.0)
+    asignar_material(fuste, mat_piedra)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.32, depth=0.08, location=(0, 0, 1.86))
+    astragalo = bpy.context.active_object
+    aplicar_uv_caja(astragalo, 2.0, 0.4)
+    asignar_material(astragalo, mat_piedra)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=14, radius=0.36, depth=0.10, location=(0, 0, 1.95))
+    equino = bpy.context.active_object
+    aplicar_uv_caja(equino, 2.0, 0.5)
+    asignar_material(equino, mat_piedra)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 2.08))
+    abaco = bpy.context.active_object
+    abaco.scale = (0.74, 0.74, 0.16)
+    aplicar_uv_caja(abaco, 1.5, 0.5)
+    asignar_material(abaco, mat_piedra)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.22, -0.22, 2.18))
+    musgo_top = bpy.context.active_object
+    musgo_top.scale = (0.32, 0.32, 0.05)
+    asignar_material(musgo_top, mat_musgo)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.25, 0.25, 0.17))
+    musgo_bot = bpy.context.active_object
+    musgo_bot.scale = (0.28, 0.28, 0.04)
+    asignar_material(musgo_bot, mat_musgo)
+
+    exportar_modelo("columna", DIR_ENTORNO)
+
+def generar_muro():
+    """Genera el Muro de Cantería de las Ruinas (13 ubicaciones):
+    Tramo macizo de mampostería sillar con zócalo, albardilla biselada superior
+    y musgo en las juntas, 360° sólido sin aberturas."""
+    limpiar_escena()
+    tex_mamp = os.path.join(DIR_KITOVU, "mamposteria_tile.png")
+    mat_mamp = obtener_material_textura("Mat_Muro_Piedra", tex_mamp, rugosidad=0.85)
+    mat_musgo = obtener_material("Mat_Muro_Musgo", "#4A5D3E", roughness=0.90)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.36))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (1.44, 0.44, 0.72)
+    aplicar_uv_caja(cuerpo, 2.5, 1.8)
+    asignar_material(cuerpo, mat_mamp)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.78))
+    albardilla = bpy.context.active_object
+    albardilla.scale = (1.52, 0.52, 0.12)
+    aplicar_uv_caja(albardilla, 2.8, 0.8)
+    asignar_material(albardilla, mat_mamp)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.06))
+    zocalo = bpy.context.active_object
+    zocalo.scale = (1.48, 0.48, 0.12)
+    aplicar_uv_caja(zocalo, 2.6, 0.6)
+    asignar_material(zocalo, mat_mamp)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.3, -0.23, 0.45))
+    musgo1 = bpy.context.active_object
+    musgo1.scale = (0.35, 0.04, 0.4)
+    asignar_material(musgo1, mat_musgo)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.35, 0.05, 0.85))
+    musgo2 = bpy.context.active_object
+    musgo2.scale = (0.45, 0.38, 0.04)
+    asignar_material(musgo2, mat_musgo)
+
+    exportar_modelo("muro", DIR_ENTORNO)
+
+def generar_paca():
+    """Genera la Paca de Paja Tradicional (26 ubicaciones):
+    Rollo cilíndrico de paja dorada con textura de paja trenzada, remates circulares
+    en los extremos y dos anillas de cuerda de cáñamo oscuro."""
+    limpiar_escena()
+    tex_paja = os.path.join(DIR_KITOVU, "tejado_paja_tile.png")
+    mat_paja = obtener_material_textura("Mat_Paca_Paja", tex_paja, rugosidad=0.88)
+    mat_cuerda = obtener_material("Mat_Paca_Cuerda", "#5A3A22", roughness=0.75)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.45, depth=0.85, location=(0, 0, 0.45))
+    cilindro = bpy.context.active_object
+    cilindro.rotation_euler = (math.radians(90), 0, 0)
+    aplicar_uv_caja(cilindro, 2.2, 1.8)
+    asignar_material(cilindro, mat_paja)
+
+    for y_sign in [-1, 1]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.43, depth=0.04, location=(0, y_sign * 0.44, 0.45))
+        tapa = bpy.context.active_object
+        tapa.rotation_euler = (math.radians(90), 0, 0)
+        aplicar_uv_caja(tapa, 1.2, 1.2)
+        asignar_material(tapa, mat_paja)
+
+    for y_pos in [-0.22, 0.22]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.46, depth=0.03, location=(0, y_pos, 0.45))
+        cuerda = bpy.context.active_object
+        cuerda.rotation_euler = (math.radians(90), 0, 0)
+        asignar_material(cuerda, mat_cuerda)
+
+    exportar_modelo("paca", DIR_ENTORNO)
+
+def generar_molino_campo():
+    """Genera el Molino de Viento de Campo Segado en 360°:
+    Torre troncocónica de mampostería sillar, zócalo octogonal, portal rústico con dintel de madera,
+    galería/balcón superior con barandilla perimetral, tejado cónico de paja dorada con buhardilla,
+    eje de rotación frontal y 4 aspas gigantes con estructura de celosía de madera y velamen de lona."""
+    limpiar_escena()
+    tex_mamp = os.path.join(DIR_KITOVU, "mamposteria_tile.png")
+    tex_madera = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    tex_paja = os.path.join(DIR_KITOVU, "tejado_paja_tile.png")
+
+    mat_piedra = obtener_material_textura("Mat_MolCampo_Piedra", tex_mamp, rugosidad=0.82)
+    mat_madera = obtener_material_textura("Mat_MolCampo_Madera", tex_madera, rugosidad=0.85)
+    mat_paja = obtener_material_textura("Mat_MolCampo_Paja", tex_paja, rugosidad=0.88)
+    mat_hierro = obtener_material("Mat_MolCampo_Hierro", "#2D3748", roughness=0.45, metallic=0.7)
+    mat_lona = obtener_material("Mat_MolCampo_Lona", "#ECE0CA", roughness=0.78)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=2.2, depth=0.45, location=(0, 0, 0.225))
+    zocalo = bpy.context.active_object
+    aplicar_uv_caja(zocalo, 3.0, 0.8)
+    asignar_material(zocalo, mat_piedra)
+
+    bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=1.95, radius2=1.45, depth=3.8, location=(0, 0, 2.35))
+    torre = bpy.context.active_object
+    aplicar_uv_caja(torre, 4.0, 3.5)
+    asignar_material(torre, mat_piedra)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.95, 0.95))
+    puerta = bpy.context.active_object
+    puerta.scale = (0.75, 0.15, 1.45)
+    aplicar_uv_caja(puerta, 1.0, 1.5)
+    asignar_material(puerta, mat_madera)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=1.75, depth=0.15, location=(0, 0, 4.28))
+    plataforma = bpy.context.active_object
+    aplicar_uv_caja(plataforma, 3.5, 0.5)
+    asignar_material(plataforma, mat_madera)
+
+    for ang_deg in range(0, 360, 30):
+        rad = math.radians(ang_deg)
+        bx = math.sin(rad) * 1.68
+        by = math.cos(rad) * 1.68
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.035, depth=0.75, location=(bx, by, 4.7))
+        poste = bpy.context.active_object
+        asignar_material(poste, mat_madera)
+
+    bpy.ops.mesh.primitive_cone_add(vertices=16, radius1=1.65, radius2=0.08, depth=2.2, location=(0, 0, 5.45))
+    tejado = bpy.context.active_object
+    aplicar_uv_caja(tejado, 3.5, 2.5)
+    asignar_material(tejado, mat_paja)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.25, 5.2))
+    buhardilla = bpy.context.active_object
+    buhardilla.scale = (0.45, 0.45, 0.45)
+    aplicar_uv_caja(buhardilla, 1.0, 1.0)
+    asignar_material(buhardilla, mat_madera)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.22, depth=0.65, location=(0, -1.55, 5.45))
+    eje = bpy.context.active_object
+    eje.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(eje, mat_hierro)
+
+    longitud_aspa = 2.85
+    for ang in [0, 90, 180, 270]:
+        rad = math.radians(ang)
+        cos_a = math.cos(rad)
+        sin_a = math.sin(rad)
+
+        cx = sin_a * (longitud_aspa * 0.5)
+        cz = 5.45 + cos_a * (longitud_aspa * 0.5)
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(cx, -1.88, cz))
+        brazo = bpy.context.active_object
+        brazo.scale = (0.08, 0.08, longitud_aspa)
+        brazo.rotation_euler = (0, -rad, 0)
+        asignar_material(brazo, mat_madera)
+
+        lx = sin_a * (longitud_aspa * 0.65)
+        lz = 5.45 + cos_a * (longitud_aspa * 0.65)
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(lx, -1.90, lz))
+        tela = bpy.context.active_object
+        tela.scale = (0.42, 0.02, longitud_aspa * 0.60)
+        tela.rotation_euler = (0, -rad, 0)
+        asignar_material(tela, mat_lona)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.08, depth=3.6, location=(0, 1.25, 3.6))
+    timon = bpy.context.active_object
+    timon.rotation_euler = (math.radians(35), 0, 0)
+    asignar_material(timon, mat_madera)
+
+    exportar_modelo("molino_campo", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -4011,6 +4223,10 @@ def main():
     generar_brasero()
     generar_maquina_campo()
     generar_raiz_gigante()
+    generar_columna()
+    generar_muro()
+    generar_paca()
+    generar_molino_campo()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

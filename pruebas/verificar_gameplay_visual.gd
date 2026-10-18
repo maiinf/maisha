@@ -180,6 +180,19 @@ func _ready() -> void:
 		if m_raiz:
 			_verificar_materiales_nodo(m_raiz, "raiz_gigante")
 
+		# Acercarse al tramo de muro de cantería (W en col 18, fil 4 -> 288, 64)
+		maisha.global_position = Vector2(288, 80)
+		await _esperar(0.4)
+		modelos = esp.get("_modelos_blender_instanciados")
+		var m_muro: Node3D = null
+		for m in modelos.values():
+			if is_instance_valid(m) and "muro" in (m as Node3D).name:
+				m_muro = m
+				break
+		_comprobar(m_muro != null, "Muro de cantería 3D instanciado en El Kitovu")
+		if m_muro:
+			_verificar_materiales_nodo(m_muro, "muro")
+
 	# -----------------------------------------------------------------------
 	# 2. CUNA DE MUSGO (Aldea)
 	# -----------------------------------------------------------------------
@@ -522,6 +535,49 @@ func _ready() -> void:
 	_comprobar(m_maquina != null, "Máquina trilladora agrícola 3D instanciada en Campo Segado")
 	if m_maquina:
 		_verificar_materiales_nodo(m_maquina, "maquina_campo")
+
+	# Acercarse al molino de viento tradicional (] en col 53, fil 38 -> 848, 608) y pacas de paja
+	maisha.global_position = Vector2(848, 620)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_molino: Node3D = null
+	var m_paca: Node3D = null
+	for m in modelos.values():
+		if not is_instance_valid(m):
+			continue
+		var nm: String = (m as Node3D).name
+		if "molino" in nm:
+			m_molino = m
+		elif "paca" in nm:
+			m_paca = m
+	_comprobar(m_molino != null, "Molino de viento tradicional 3D instanciado en Campo Segado")
+	if m_molino:
+		_verificar_materiales_nodo(m_molino, "molino_campo")
+	_comprobar(m_paca != null, "Paca de paja cilíndrica 3D instanciada en Campo Segado")
+	if m_paca:
+		_verificar_materiales_nodo(m_paca, "paca")
+
+	# -----------------------------------------------------------------------
+	# 13. PRADOS DEL ECO (Columnas ancestrales de las Ruinas)
+	# -----------------------------------------------------------------------
+	print("\n--- [13/13] PRADOS DEL ECO ---")
+	await _ir("prados_del_eco", "")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Prados del Eco")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse a la columna ancestral (C en col 32, fil 8 -> 512, 128)
+	maisha.global_position = Vector2(512, 145)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_columna: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "columna" in (m as Node3D).name:
+			m_columna = m
+			break
+	_comprobar(m_columna != null, "Columna de piedra ancestral 3D instanciada en Prados del Eco")
+	if m_columna:
+		_verificar_materiales_nodo(m_columna, "columna")
 
 	# -----------------------------------------------------------------------
 	# RESUMEN FINAL

@@ -347,6 +347,7 @@ const LUCES_3D := {
 	"brasero.png": [["f", 11, 8]],
 	"maquina.png": [["f", 20, 12]],
 	"raiz_gigante.png": [["h", 50, 15]],
+	"molino.png": [["v", 48, 115]],
 }
 const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png", "puesto.png"]
 ## Modelos 3D de Blender 4.5 para arquitectura y accesorios:
@@ -722,6 +723,37 @@ const MODELOS_BLENDER := {
 		"offset": Vector3(0.0, 0.0, -0.20),
 		"rot_y": 0.0,
 		"radio_occlusion": Vector2(3.5, 2.0),
+		"solo_reconstruido": false,
+	},
+	"columna.png": {
+		"ruta": "res://modelos/entorno/columna.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.2, 1.2),
+		"solo_reconstruido": false,
+	},
+	"muro.png": {
+		"ruta": "res://modelos/entorno/muro.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.5, 1.2),
+		"solo_reconstruido": false,
+	},
+	"paca.png": {
+		"ruta": "res://modelos/entorno/paca.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
+	"molino.png": {
+		"ruta": "res://modelos/entorno/molino_campo.glb",
+		"escala": Vector3(1.10, 1.10, 1.10),
+		"offset": Vector3(0.0, 0.0, -0.25),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(3.5, 2.5),
 		"solo_reconstruido": false,
 	},
 }
@@ -1686,6 +1718,9 @@ func _config_volumen_3d(n: Node2D, ancla: Node2D, arch: String, ancho_px: float,
 func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: String, mod_final: Color) -> bool:
 	if not MODELOS_BLENDER.has(arch):
 		return false
+	if arch == "molino.png":
+		if ancla and (ancla.name.to_lower().contains("granja") or (ancla.get_script() and "granja" in ancla.get_script().resource_path)):
+			return false
 	var cfg: Dictionary = MODELOS_BLENDER[arch]
 	var ruta_b: String = cfg["ruta"]
 	if cfg.has("ruta_ruina"):
