@@ -154,6 +154,19 @@ func _ready() -> void:
 		if m_monumento:
 			_verificar_materiales_nodo(m_monumento, "monumento")
 
+		# Acercarse al portal ancestral de raíces (P = Vector2(912, 96))
+		maisha.global_position = Vector2(912, 110)
+		await _esperar(0.4)
+		modelos = esp.get("_modelos_blender_instanciados")
+		var m_portal: Node3D = null
+		for m in modelos.values():
+			if is_instance_valid(m) and "portal" in (m as Node3D).name:
+				m_portal = m
+				break
+		_comprobar(m_portal != null, "Portal ancestral de raíces 3D instanciado en El Kitovu")
+		if m_portal:
+			_verificar_materiales_nodo(m_portal, "portal_raiz")
+
 	# -----------------------------------------------------------------------
 	# 2. CUNA DE MUSGO (Aldea)
 	# -----------------------------------------------------------------------
@@ -395,6 +408,72 @@ func _ready() -> void:
 	_comprobar(m_estela != null, "Estela rúnica de refugio 3D instanciada en la ventisca")
 	if m_estela:
 		_verificar_materiales_nodo(m_estela, "estela")
+
+	# -----------------------------------------------------------------------
+	# 9. SENDERO OLVIDADO (Arco de las Ruinas)
+	# -----------------------------------------------------------------------
+	print("\n--- [9/11] SENDERO OLVIDADO ---")
+	await _ir("sendero_olvidado", "")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Sendero Olvidado")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse al arco de las ruinas (ŵ en col 32, fil 7 -> 512, 112)
+	maisha.global_position = Vector2(512, 130)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_arco: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "arco_ruinas" in (m as Node3D).name:
+			m_arco = m
+			break
+	_comprobar(m_arco != null, "Arco de las Ruinas 3D instanciado en el Sendero Olvidado")
+	if m_arco:
+		_verificar_materiales_nodo(m_arco, "arco_ruinas")
+
+	# -----------------------------------------------------------------------
+	# 10. GRUTA DE LAS RAÍCES (Santuario de Corteza)
+	# -----------------------------------------------------------------------
+	print("\n--- [10/11] GRUTA DE LAS RAÍCES ---")
+	await _ir("gruta_raices", "")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Gruta de las Raíces")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse al altar de corteza (ą en col 11, fil 39 -> 176, 624)
+	maisha.global_position = Vector2(176, 640)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_corteza_altar: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "altar_corteza" in (m as Node3D).name:
+			m_corteza_altar = m
+			break
+	_comprobar(m_corteza_altar != null, "Santuario de Corteza 3D instanciado en la Gruta")
+	if m_corteza_altar:
+		_verificar_materiales_nodo(m_corteza_altar, "altar_corteza")
+
+	# -----------------------------------------------------------------------
+	# 11. ORILLA DE JUNCOS (Balsa de Kasia)
+	# -----------------------------------------------------------------------
+	print("\n--- [11/11] ORILLA DE JUNCOS ---")
+	await _ir("orilla_juncos", "")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Orilla de Juncos")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse a la balsa de Kasia (embarcadero oeste: x=640, y=680)
+	maisha.global_position = Vector2(640, 680)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_balsa: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "balsa" in (m as Node3D).name:
+			m_balsa = m
+			break
+	_comprobar(m_balsa != null, "Balsa de juncos 3D instanciada en la orilla del río")
+	if m_balsa:
+		_verificar_materiales_nodo(m_balsa, "balsa")
 
 	# -----------------------------------------------------------------------
 	# RESUMEN FINAL

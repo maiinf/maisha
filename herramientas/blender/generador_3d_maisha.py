@@ -3503,6 +3503,264 @@ def generar_menhir():
 
     exportar_modelo("menhir", DIR_ENTORNO)
 
+def generar_portal_raiz():
+    """Genera el Portal Ancestral de Raíces (El Kitovu) completo en 360°:
+    Dos columnas monumentales de piedra labrada con zócalos escalonados, raíces vivientes del Primer Árbol
+    que trepan enroscadas por ambos fustes hasta unirse en arco superior, y la Semilla del Arco gigante
+    en el vértice superior con palpitación rúnica dorada de Asili."""
+    limpiar_escena()
+    tex_mamposteria = os.path.join(DIR_KITOVU, "mamposteria_tile.png")
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_piedra = obtener_material_textura("Mat_Portal_Piedra", tex_mamposteria, rugosidad=0.85)
+    mat_raiz = obtener_material_textura("Mat_Portal_Raiz", tex_troncos, rugosidad=0.88)
+    mat_semilla = obtener_material("Mat_Portal_Semilla", "#DF9022", roughness=0.15, emission_hex="#FFB300", emission_strength=3.8)
+    mat_runa = obtener_material("Mat_Portal_Runa", "#DF9022", roughness=0.2, emission_hex="#FFA000", emission_strength=2.6)
+    mat_base = get_mat("piedra_oscura")
+
+    span_x = 2.4
+
+    # 1. Zócalos escalonados de cada columna
+    for sign in [-1, 1]:
+        px = sign * span_x
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0, 0.22))
+        base1 = bpy.context.active_object
+        base1.scale = (1.5, 1.5, 0.44)
+        asignar_material(base1, mat_base)
+        aplicar_uv_caja(base1, 1.2, 0.4)
+
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0, 0.55))
+        base2 = bpy.context.active_object
+        base2.scale = (1.2, 1.2, 0.25)
+        asignar_material(base2, mat_piedra)
+
+        # Fuste de piedra octogonal de la columna
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.48, depth=4.6, location=(px, 0, 2.9))
+        fuste = bpy.context.active_object
+        asignar_material(fuste, mat_piedra)
+        aplicar_uv_cilindro(fuste, 1.5, 3.0)
+
+        # Capitel superior
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0, 5.3))
+        capitel = bpy.context.active_object
+        capitel.scale = (1.25, 1.25, 0.35)
+        asignar_material(capitel, mat_piedra)
+
+        # Runas doradas en la cara frontal
+        for rz in [2.0, 3.2, 4.4]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, -0.49, rz))
+            runa = bpy.context.active_object
+            runa.scale = (0.42, 0.05, 0.22)
+            asignar_material(runa, mat_runa)
+
+    # 2. Raíces trepadoras que se enroscan en las columnas
+    for sign in [-1, 1]:
+        px = sign * span_x
+        for i, ang in enumerate([0.3, 1.8, 3.4, 4.9]):
+            rx = px + math.cos(ang) * 0.52
+            ry = math.sin(ang) * 0.52
+            bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.12 - i * 0.015, depth=3.2, location=(rx, ry, 2.2))
+            raiz = bpy.context.active_object
+            raiz.rotation_euler = (math.sin(ang) * 0.22, -sign * math.cos(ang) * 0.22, math.radians(15 * (i % 2 * 2 - 1)))
+            asignar_material(raiz, mat_raiz)
+
+    # 3. Arco superior de raíces entrelazadas
+    bpy.ops.mesh.primitive_torus_add(major_radius=span_x, minor_radius=0.28, major_segments=16, minor_segments=8, location=(0, 0, 5.3))
+    arco_r = bpy.context.active_object
+    arco_r.rotation_euler = (math.radians(90), 0, 0)
+    arco_r.scale = (1.0, 1.0, 0.85)
+    asignar_material(arco_r, mat_raiz)
+
+    # 4. Semilla del Arco en el centro superior
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=3, radius=0.48, location=(0, 0, 5.85))
+    semilla = bpy.context.active_object
+    semilla.scale = (0.85, 0.85, 1.25)
+    asignar_material(semilla, mat_semilla)
+
+    for ang in [0, math.radians(60), math.radians(120), math.radians(180), math.radians(240), math.radians(300)]:
+        zx = math.cos(ang) * 0.42
+        zy = math.sin(ang) * 0.42
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.06, depth=0.75, location=(zx, zy, 5.85))
+        zarcillo = bpy.context.active_object
+        zarcillo.rotation_euler = (math.sin(ang) * 0.45, -math.cos(ang) * 0.45, ang)
+        asignar_material(zarcillo, mat_raiz)
+
+    exportar_modelo("portal_raiz", DIR_ENTORNO)
+
+def generar_arco_ruinas():
+    """Genera el Arco de las Ruinas de Sendero Olvidado completo en 360°:
+    Dos pilares fracturados de piedra clara con basa moldurada, raíces ancestrales del Primer Árbol
+    que abrazan el fuste, arquitrabe superior derruido con sección quebrada, las nueve espirales de los ecos
+    talladas en relieve luminoso, y sillares desprendidos caídos en la base."""
+    limpiar_escena()
+    tex_marmol = os.path.join(DIR_SIGILIA, "marmol_sigilia_tile.png")
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_piedra = obtener_material_textura("Mat_ArcoRuina_Piedra", tex_marmol, rugosidad=0.82)
+    mat_raiz = obtener_material_textura("Mat_ArcoRuina_Raiz", tex_troncos, rugosidad=0.88)
+    mat_espiral = obtener_material("Mat_ArcoRuina_Espiral", "#DF9022", roughness=0.2, emission_hex="#FFA500", emission_strength=2.8)
+    mat_base = get_mat("piedra_oscura")
+
+    sep_x = 2.12
+
+    alturas = [4.8, 4.2]
+    for idx, sign in enumerate([-1, 1]):
+        px = sign * sep_x
+        h = alturas[idx]
+
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0, 0.25))
+        basa = bpy.context.active_object
+        basa.scale = (1.4, 1.4, 0.50)
+        asignar_material(basa, mat_base)
+        aplicar_uv_caja(basa, 1.2, 0.5)
+
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0, 0.5 + h * 0.5))
+        fuste = bpy.context.active_object
+        fuste.scale = (1.05, 1.05, h)
+        asignar_material(fuste, mat_piedra)
+        aplicar_uv_caja(fuste, 1.2, 3.0)
+
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0, 0.5 + h))
+        capitel = bpy.context.active_object
+        capitel.scale = (1.35, 1.35, 0.35)
+        asignar_material(capitel, mat_piedra)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.65, 0, 5.0))
+    dintel_izq = bpy.context.active_object
+    dintel_izq.scale = (3.4, 1.1, 0.55)
+    asignar_material(dintel_izq, mat_piedra)
+    aplicar_uv_caja(dintel_izq, 2.0, 0.5)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(1.6, 0.4, 0.35))
+    sillar_caido = bpy.context.active_object
+    sillar_caido.scale = (0.9, 0.7, 0.6)
+    sillar_caido.rotation_euler = (math.radians(15), math.radians(-12), math.radians(28))
+    asignar_material(sillar_caido, mat_piedra)
+
+    for sign in [-1, 1]:
+        px = sign * sep_x
+        for i, ang in enumerate([0.4, 2.0, 3.6, 5.0]):
+            rx = px + math.cos(ang) * 0.58
+            ry = math.sin(ang) * 0.58
+            bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.11, depth=3.0, location=(rx, ry, 2.0))
+            raiz = bpy.context.active_object
+            raiz.rotation_euler = (math.sin(ang) * 0.25, -sign * math.cos(ang) * 0.25, math.radians(12))
+            asignar_material(raiz, mat_raiz)
+
+    espirales_pos = [
+        (-sep_x, -0.54, 1.2), (-sep_x, -0.54, 2.2), (-sep_x, -0.54, 3.4), (-sep_x, -0.54, 4.4),
+        (sep_x, -0.54, 1.4), (sep_x, -0.54, 2.5), (sep_x, -0.54, 3.7),
+        (-sep_x, 0.54, 2.0), (sep_x, 0.54, 2.8)
+    ]
+    for ex, ey, ez in espirales_pos:
+        bpy.ops.mesh.primitive_torus_add(major_radius=0.15, minor_radius=0.035, major_segments=12, minor_segments=6, location=(ex, ey, ez))
+        esp = bpy.context.active_object
+        esp.rotation_euler = (math.radians(90), 0, 0)
+        asignar_material(esp, mat_espiral)
+
+    exportar_modelo("arco_ruinas", DIR_ENTORNO)
+
+def generar_altar_corteza():
+    """Genera el Santuario de Corteza de Gruta de las Raíces completo en 360°:
+    Tocón colosal del Primer Árbol con contrafuertes y corteza profunda, estrado ritual superior
+    con anillos de crecimiento, el Escudo de Corteza reposando en el centro con incandescencia ambarina,
+    y racimos de setas y líquenes luminosos de caverna."""
+    limpiar_escena()
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_corteza = obtener_material_textura("Mat_AltarCorteza_Tronco", tex_troncos, rugosidad=0.90)
+    mat_escudo = get_mat("cuero_mochila")
+    mat_ambar = obtener_material("Mat_AltarCorteza_Ambar", "#DF9022", roughness=0.15, emission_hex="#FFB300", emission_strength=3.5)
+    mat_seta = obtener_material("Mat_AltarCorteza_Seta", "#50F8E0", roughness=0.3, emission_hex="#40D8C8", emission_strength=2.5)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.45, depth=1.8, location=(0, 0, 0.9))
+    tocon = bpy.context.active_object
+    asignar_material(tocon, mat_corteza)
+    aplicar_uv_cilindro(tocon, 2.5, 1.5)
+
+    for i in range(6):
+        ang = i * (math.pi * 2.0 / 6.0)
+        rx = math.cos(ang) * 1.55
+        ry = math.sin(ang) * 1.55
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(rx, ry, 0.45))
+        contra = bpy.context.active_object
+        contra.scale = (0.45, 0.75, 0.9)
+        contra.rotation_euler = (0, 0, ang)
+        asignar_material(contra, mat_corteza)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.25, depth=0.15, location=(0, 0, 1.82))
+    estrado = bpy.context.active_object
+    asignar_material(estrado, mat_corteza)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.15, 2.25))
+    escudo = bpy.context.active_object
+    escudo.scale = (0.75, 0.12, 1.15)
+    escudo.rotation_euler = (math.radians(-18), 0, 0)
+    asignar_material(escudo, mat_escudo)
+
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.18, location=(0, -0.23, 2.25))
+    gema = bpy.context.active_object
+    gema.scale = (0.7, 0.4, 1.2)
+    asignar_material(gema, mat_ambar)
+
+    for ang, dist, sz in [(0.8, 1.5, 0.16), (2.2, 1.6, 0.14), (3.9, 1.45, 0.18), (5.1, 1.55, 0.15)]:
+        sx = math.cos(ang) * dist
+        sy = math.sin(ang) * dist
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.03, depth=0.25, location=(sx, sy, 0.15))
+        pie = bpy.context.active_object
+        asignar_material(pie, mat_corteza)
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=sz, location=(sx, sy, 0.30))
+        sombrero = bpy.context.active_object
+        sombrero.scale = (1.0, 1.0, 0.55)
+        asignar_material(sombrero, mat_seta)
+
+    exportar_modelo("altar_corteza", DIR_ENTORNO)
+
+def generar_balsa():
+    """Genera la Balsa de juncos de Kasia (Orilla de Juncos) completa en 360°:
+    Plataforma de manojos de juncos y mimbre atados con soga trenzada, pontones laterales de flotación,
+    pértiga de empuje de madera apoyada en la borda y nasa / cesta de pesca artesanal en la popa."""
+    limpiar_escena()
+    tex_paja = os.path.join(DIR_KITOVU, "tejado_paja_tile.png")
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_juncos = obtener_material_textura("Mat_Balsa_Juncos", tex_paja, rugosidad=0.88)
+    mat_viga = obtener_material_textura("Mat_Balsa_Madera", tex_troncos, rugosidad=0.85)
+    mat_cuerda = get_mat("cuero_mochila")
+
+    length, width, height = 4.0, 1.8, 0.35
+
+    for i in range(7):
+        cx = -width * 0.5 + 0.15 + i * (width - 0.3) / 6.0
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.12, depth=length, location=(cx, 0, 0.14))
+        tronco = bpy.context.active_object
+        tronco.rotation_euler = (math.radians(90), 0, 0)
+        asignar_material(tronco, mat_juncos)
+
+    for sign in [-1, 1]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.20, depth=length * 1.05, location=(sign * (width * 0.5 + 0.05), 0, 0.20))
+        ponton = bpy.context.active_object
+        ponton.rotation_euler = (math.radians(90), 0, 0)
+        asignar_material(ponton, mat_juncos)
+
+    for ty in [-length * 0.35, 0.0, length * 0.35]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, ty, 0.28))
+        trav = bpy.context.active_object
+        trav.scale = (width + 0.35, 0.12, 0.08)
+        asignar_material(trav, mat_viga)
+
+        for sign in [-1, 1]:
+            bpy.ops.mesh.primitive_torus_add(major_radius=0.14, minor_radius=0.035, major_segments=10, minor_segments=6, location=(sign * width * 0.45, ty, 0.28))
+            atado = bpy.context.active_object
+            asignar_material(atado, mat_cuerda)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.035, depth=3.2, location=(0.35, 0.1, 0.34))
+    pertiga = bpy.context.active_object
+    pertiga.rotation_euler = (math.radians(85), math.radians(6), 0)
+    asignar_material(pertiga, mat_viga)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.28, depth=0.45, location=(-0.45, length * 0.4, 0.42))
+    cesta = bpy.context.active_object
+    asignar_material(cesta, mat_juncos)
+
+    exportar_modelo("balsa", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -3562,6 +3820,10 @@ def main():
     generar_barca()
     generar_estela()
     generar_menhir()
+    generar_portal_raiz()
+    generar_arco_ruinas()
+    generar_altar_corteza()
+    generar_balsa()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

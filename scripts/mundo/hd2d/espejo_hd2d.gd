@@ -342,6 +342,8 @@ const LUCES_3D := {
 	"piedra_eco.png": [["m", 8, 10]],
 	"estela.png": [["m", 33, 18]],
 	"grua.png": [["f", 36, 68]],
+	"portal.png": [["h", 48, 12]],
+	"altar_corteza.png": [["h", 24, 18]],
 }
 const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png", "puesto.png"]
 ## Modelos 3D de Blender 4.5 para arquitectura y accesorios:
@@ -663,6 +665,37 @@ const MODELOS_BLENDER := {
 		"offset": Vector3(0.0, 0.0, -0.08),
 		"rot_y": 0.0,
 		"radio_occlusion": Vector2(1.2, 1.2),
+		"solo_reconstruido": false,
+	},
+	"portal.png": {
+		"ruta": "res://modelos/entorno/portal_raiz.glb",
+		"escala": Vector3(1.08, 1.08, 1.08),
+		"offset": Vector3(0.0, 0.0, -0.25),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.5, 2.5),
+		"solo_reconstruido": false,
+	},
+	"arco_ruinas.png": {
+		"ruta": "res://modelos/entorno/arco_ruinas.glb",
+		"escala": Vector3(1.10, 1.10, 1.10),
+		"offset": Vector3(0.0, 0.0, -0.25),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.8, 2.5),
+		"solo_reconstruido": false,
+	},
+	"altar_corteza.png": {
+		"ruta": "res://modelos/entorno/altar_corteza.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.0, 2.0),
+		"solo_reconstruido": false,
+	},
+	"balsa.png": {
+		"ruta": "res://modelos/entorno/balsa.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
 		"solo_reconstruido": false,
 	},
 }
@@ -1676,7 +1709,8 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 				m3d.rotation.y = deg_to_rad(cfg["rot_y"])
 	if m3d and is_instance_valid(m3d):
 		var off: Vector3 = cfg.get("offset", Vector3.ZERO)
-		m3d.position = _al_suelo(ancla.global_position) + off
+		var pos_ref := ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position
+		m3d.position = _al_suelo(pos_ref) + off
 		m3d.visible = _visible(n)
 		g.visible = false
 		g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -1977,7 +2011,19 @@ func _registrar(n: Node) -> void:
 	if _de_pantalla(n):
 		ci.visibility_layer = CANAL_PANTALLA
 		return
-	if not (n is Sprite2D or n is AnimatedSprite2D) or _z(n) < SUELO_BAJO:
+	var es_modelo_blender := false
+	if n is Sprite2D and (n as Sprite2D).texture:
+		var tex_s := (n as Sprite2D).texture
+		var arch_b := tex_s.resource_path.get_file() if tex_s else ""
+		es_modelo_blender = MODELOS_BLENDER.has(arch_b)
+	elif n is AnimatedSprite2D and (n as AnimatedSprite2D).sprite_frames:
+		var sf := (n as AnimatedSprite2D).sprite_frames
+		if sf.has_animation("default") and sf.get_frame_count("default") > 0:
+			var tex_b := sf.get_frame_texture("default", 0)
+			if tex_b:
+				es_modelo_blender = MODELOS_BLENDER.has(tex_b.resource_path.get_file())
+
+	if not (n is Sprite2D or n is AnimatedSprite2D) or (_z(n) < SUELO_BAJO and not es_modelo_blender):
 		var dueno := _dueno_de_pie(n)
 		if _contenedor(n):
 			# un contenedor (no pinta nada): en todos los canales, para que sus hijos se vean en su capa
