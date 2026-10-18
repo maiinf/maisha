@@ -4157,6 +4157,179 @@ def generar_molino_campo():
 
     exportar_modelo("molino_campo", DIR_ENTORNO)
 
+def generar_atril():
+    """Genera el Atril Monumental de la Gran Biblioteca de Sigilia (Estanterías Colgantes):
+    Pedestal escalonado de mármol, fuste torneado con collarines de bronce, pupitre inclinado,
+    tomo ancestral abierto con sigilos de tinta luminosa índigo y candil de lectura."""
+    limpiar_escena()
+    tex_marmol = os.path.join(DIR_SIGILIA, "marmol_sigilia_tile.png")
+    tex_bronce = os.path.join(DIR_SIGILIA, "bronce_sigilia_tile.png")
+    tex_madera = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+
+    mat_marmol = obtener_material_textura("Mat_Atril_Marmol", tex_marmol, rugosidad=0.75)
+    mat_bronce = obtener_material_textura("Mat_Atril_Bronce", tex_bronce, rugosidad=0.35, metalicidad=0.85)
+    mat_nogal = obtener_material_textura("Mat_Atril_Nogal", tex_madera, rugosidad=0.65)
+    mat_paginas = obtener_material("Mat_Atril_Paginas", "#FAF5EA", roughness=0.85)
+    mat_runas = obtener_material("Mat_Atril_Runas", "#312E81", roughness=0.3, emission_hex="#4F46E5", emission_strength=2.8)
+    mat_farol = obtener_material("Mat_Atril_Farol", "#FEF08A", roughness=0.2, emission_hex="#FDE047", emission_strength=3.5)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.08))
+    base1 = bpy.context.active_object
+    base1.scale = (1.25, 0.95, 0.16)
+    aplicar_uv_caja(base1, 1.5, 1.0)
+    asignar_material(base1, mat_marmol)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.20))
+    base2 = bpy.context.active_object
+    base2.scale = (1.05, 0.78, 0.12)
+    aplicar_uv_caja(base2, 1.2, 0.8)
+    asignar_material(base2, mat_marmol)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.22, depth=0.82, location=(0, 0, 0.65))
+    fuste = bpy.context.active_object
+    aplicar_uv_caja(fuste, 1.5, 2.0)
+    asignar_material(fuste, mat_nogal)
+
+    for z_col in [0.26, 1.04]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=14, radius=0.26, depth=0.06, location=(0, 0, z_col))
+        col = bpy.context.active_object
+        asignar_material(col, mat_bronce)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.05, 1.22))
+    mesa = bpy.context.active_object
+    mesa.scale = (1.18, 0.74, 0.08)
+    mesa.rotation_euler = (math.radians(-22), 0, 0)
+    aplicar_uv_caja(mesa, 1.8, 1.2)
+    asignar_material(mesa, mat_nogal)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.38, 1.06))
+    tope = bpy.context.active_object
+    tope.scale = (1.18, 0.06, 0.06)
+    tope.rotation_euler = (math.radians(-22), 0, 0)
+    asignar_material(tope, mat_bronce)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.24, -0.05, 1.28))
+    pag_izq = bpy.context.active_object
+    pag_izq.scale = (0.42, 0.52, 0.035)
+    pag_izq.rotation_euler = (math.radians(-22), math.radians(6), 0)
+    asignar_material(pag_izq, mat_paginas)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.24, -0.05, 1.28))
+    pag_der = bpy.context.active_object
+    pag_der.scale = (0.42, 0.52, 0.035)
+    pag_der.rotation_euler = (math.radians(-22), math.radians(-6), 0)
+    asignar_material(pag_der, mat_paginas)
+
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.06, location=(0, -0.05, 1.30))
+    runa = bpy.context.active_object
+    asignar_material(runa, mat_runas)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.025, depth=0.45, location=(0.52, 0.15, 1.45))
+    brazo = bpy.context.active_object
+    brazo.rotation_euler = (math.radians(-15), math.radians(20), 0)
+    asignar_material(brazo, mat_bronce)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.06, depth=0.12, location=(0.46, -0.05, 1.62))
+    linterna = bpy.context.active_object
+    asignar_material(linterna, mat_farol)
+
+    exportar_modelo("atril_biblioteca", DIR_ENTORNO)
+
+def generar_tocon_bosque():
+    """Genera el Tocón Sagrado del Bosque Cobrizo:
+    Base con raíces contrafuerte ramificadas, corteza rojiza rugosa, superficie con anillos
+    de crecimiento anuales, hongos yesqueros de repisa y musgo verde."""
+    limpiar_escena()
+    tex_madera = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_corteza = obtener_material_textura("Mat_Tocon_Corteza", tex_madera, rugosidad=0.88)
+    mat_anillos = obtener_material("Mat_Tocon_Anillos", "#905C45", roughness=0.72)
+    mat_hongo1 = obtener_material("Mat_Tocon_Hongo1", "#D97706", roughness=0.65)
+    mat_hongo2 = obtener_material("Mat_Tocon_Hongo2", "#B45309", roughness=0.70)
+    mat_musgo = obtener_material("Mat_Tocon_Musgo", "#4A5D3E", roughness=0.90)
+
+    bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=0.68, radius2=0.52, depth=0.72, location=(0, 0, 0.36))
+    cuerpo = bpy.context.active_object
+    aplicar_uv_caja(cuerpo, 2.5, 1.8)
+    asignar_material(cuerpo, mat_corteza)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.50, depth=0.04, location=(0, 0, 0.72))
+    anillos = bpy.context.active_object
+    asignar_material(anillos, mat_anillos)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.15, depth=0.06, location=(0.04, -0.02, 0.73))
+    hueco = bpy.context.active_object
+    asignar_material(hueco, mat_corteza)
+
+    for ang, lx, ly in [(35, 0.55, 0.42), (120, -0.62, 0.35), (215, -0.45, -0.58), (305, 0.52, -0.48)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.16, depth=0.55, location=(lx, ly, 0.20))
+        raiz = bpy.context.active_object
+        raiz.rotation_euler = (math.radians(25), math.radians(ang), 0)
+        asignar_material(raiz, mat_corteza)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.18, depth=0.03, location=(0.48, 0.12, 0.46))
+    hongo1 = bpy.context.active_object
+    hongo1.scale = (1.0, 0.6, 1.0)
+    hongo1.rotation_euler = (math.radians(10), math.radians(-15), 0)
+    asignar_material(hongo1, mat_hongo1)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.14, depth=0.025, location=(0.44, 0.24, 0.35))
+    hongo2 = bpy.context.active_object
+    hongo2.scale = (1.0, 0.55, 1.0)
+    hongo2.rotation_euler = (math.radians(8), math.radians(-20), 0)
+    asignar_material(hongo2, mat_hongo2)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.25, 0.38, 0.15))
+    musgo = bpy.context.active_object
+    musgo.scale = (0.35, 0.28, 0.08)
+    asignar_material(musgo, mat_musgo)
+
+    exportar_modelo("tocon_bosque", DIR_ENTORNO)
+
+def generar_poste_amarre():
+    """Genera el Poste de Amarre Portuario de Embarcadero Junco:
+    Conjunto de 3 postes de madera náutica tratada a diferentes alturas,
+    caperuza de hierro protectora, triple vuelta de cabo grueso y argolla de bronce."""
+    limpiar_escena()
+    tex_madera = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_poste = obtener_material_textura("Mat_Poste_Madera", tex_madera, rugosidad=0.85)
+    mat_cuerda = obtener_material("Mat_Poste_Cuerda", "#705425", roughness=0.88)
+    mat_bronce = obtener_material("Mat_Poste_Bronce", "#C28522", roughness=0.35, metallic=0.8)
+    mat_hierro = obtener_material("Mat_Poste_Hierro", "#374151", roughness=0.55, metallic=0.6)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.20, depth=1.45, location=(0, 0, 0.725))
+    poste_c = bpy.context.active_object
+    aplicar_uv_caja(poste_c, 1.8, 3.0)
+    asignar_material(poste_c, mat_poste)
+
+    bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=0.21, radius2=0.12, depth=0.08, location=(0, 0, 1.49))
+    tapa_c = bpy.context.active_object
+    asignar_material(tapa_c, mat_hierro)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.16, depth=1.18, location=(-0.24, -0.06, 0.59))
+    poste_izq = bpy.context.active_object
+    poste_izq.rotation_euler = (0, math.radians(-4), 0)
+    aplicar_uv_caja(poste_izq, 1.5, 2.5)
+    asignar_material(poste_izq, mat_poste)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.17, depth=1.02, location=(0.22, 0.08, 0.51))
+    poste_der = bpy.context.active_object
+    poste_der.rotation_euler = (math.radians(3), math.radians(5), 0)
+    aplicar_uv_caja(poste_der, 1.5, 2.2)
+    asignar_material(poste_der, mat_poste)
+
+    for z_cuerda in [0.45, 0.65, 0.85]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.38, depth=0.06, location=(0, 0, z_cuerda))
+        cuerda = bpy.context.active_object
+        cuerda.scale = (1.05, 0.85, 1.0)
+        asignar_material(cuerda, mat_cuerda)
+
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.14, minor_radius=0.035, location=(0, -0.22, 1.15))
+    argolla = bpy.context.active_object
+    argolla.rotation_euler = (math.radians(35), 0, 0)
+    asignar_material(argolla, mat_bronce)
+
+    exportar_modelo("poste_amarre", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -4227,6 +4400,9 @@ def main():
     generar_muro()
     generar_paca()
     generar_molino_campo()
+    generar_atril()
+    generar_tocon_bosque()
+    generar_poste_amarre()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

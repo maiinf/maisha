@@ -321,6 +321,19 @@ func _ready() -> void:
 	if m_grua:
 		_verificar_materiales_nodo(m_grua, "grua")
 
+	# Acercarse al poste de amarre del muelle (ł en col 40, fil 54 -> 640, 864)
+	maisha.global_position = Vector2(640, 880)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_poste: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "poste" in (m as Node3D).name:
+			m_poste = m
+			break
+	_comprobar(m_poste != null, "Poste de amarre portuario 3D instanciado en el muelle")
+	if m_poste:
+		_verificar_materiales_nodo(m_poste, "poste_amarre")
+
 	# -----------------------------------------------------------------------
 	# 5. CAÑADA DEL ECO (Aprisco de Mbuzi)
 	# -----------------------------------------------------------------------
@@ -578,6 +591,50 @@ func _ready() -> void:
 	_comprobar(m_columna != null, "Columna de piedra ancestral 3D instanciada en Prados del Eco")
 	if m_columna:
 		_verificar_materiales_nodo(m_columna, "columna")
+
+	# -----------------------------------------------------------------------
+	# 14. BOSQUE COBRIZO (Tocón Sagrado Ancestral)
+	# -----------------------------------------------------------------------
+	print("\n--- [14/15] BOSQUE COBRIZO ---")
+	await _ir("bosque_cobrizo", "")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Bosque Cobrizo")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse al tocón sagrado (H en col 55, fil 44 -> 880, 704)
+	maisha.global_position = Vector2(880, 725)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_tocon: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "tocon" in (m as Node3D).name:
+			m_tocon = m
+			break
+	_comprobar(m_tocon != null, "Tocón sagrado del Bosque Cobrizo 3D instanciado")
+	if m_tocon:
+		_verificar_materiales_nodo(m_tocon, "tocon_bosque")
+
+	# -----------------------------------------------------------------------
+	# 15. ESTANTERÍAS COLGANTES (Atril de la Gran Biblioteca de Sigilia)
+	# -----------------------------------------------------------------------
+	print("\n--- [15/15] ESTANTERÍAS COLGANTES ---")
+	await _ir("estanterias_colgantes", "")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Estanterías Colgantes")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse al atril monumental de lectura (x=480, y=96)
+	maisha.global_position = Vector2(480, 115)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_atril: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "atril" in (m as Node3D).name:
+			m_atril = m
+			break
+	_comprobar(m_atril != null, "Atril de lectura de Sigilia 3D instanciado en Estanterías Colgantes")
+	if m_atril:
+		_verificar_materiales_nodo(m_atril, "atril_biblioteca")
 
 	# -----------------------------------------------------------------------
 	# RESUMEN FINAL

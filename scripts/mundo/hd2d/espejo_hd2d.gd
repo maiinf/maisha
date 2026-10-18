@@ -348,6 +348,7 @@ const LUCES_3D := {
 	"maquina.png": [["f", 20, 12]],
 	"raiz_gigante.png": [["h", 50, 15]],
 	"molino.png": [["v", 48, 115]],
+	"atril.png": [["f", 20, 12]],
 }
 const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png", "puesto.png"]
 ## Modelos 3D de Blender 4.5 para arquitectura y accesorios:
@@ -754,6 +755,30 @@ const MODELOS_BLENDER := {
 		"offset": Vector3(0.0, 0.0, -0.25),
 		"rot_y": 0.0,
 		"radio_occlusion": Vector2(3.5, 2.5),
+		"solo_reconstruido": false,
+	},
+	"atril.png": {
+		"ruta": "res://modelos/entorno/atril_biblioteca.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.10),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.8, 1.5),
+		"solo_reconstruido": false,
+	},
+	"tocon.png": {
+		"ruta": "res://modelos/entorno/tocon_bosque.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.5, 1.2),
+		"solo_reconstruido": false,
+	},
+	"poste.png": {
+		"ruta": "res://modelos/entorno/poste_amarre.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.2, 1.2),
 		"solo_reconstruido": false,
 	},
 }
