@@ -115,9 +115,7 @@ void vertex() {
 
 void fragment() {
 	vec2 px = UV * casillas * 16.0;
-	float f_calma = 1.0 - calma_lago * 0.85;
-	float temblor = (sin(px.x * 0.37 + px.y * 0.21 + TIME * 0.9) * 0.035 + sin(px.y * 0.53 - px.x * 0.17 - TIME * 0.7) * 0.025) * f_calma;
-	float es_agua = texture(agua, UV).r + temblor;
+	float es_agua = texture(agua, UV).r;
 
 	if (hundido < 0.5) {
 		// Capa de suelo base del mapa
@@ -353,6 +351,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.0, 1.0, 1.0),
 		"offset": Vector3(0.0, 0.0, 0.0),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(4.5, 3.0),
 		"solo_reconstruido": false,
 	},
 	"ruina_casa.png": {
@@ -368,6 +367,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.12, 1.12, 1.12),
 		"offset": Vector3(0.0, 0.0, -0.22),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.0, 2.5),
 		"solo_reconstruido": false,
 	},
 	"taller.png": {
@@ -376,6 +376,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.05, 1.05, 1.05),
 		"offset": Vector3(0.0, 0.0, -0.18),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.2, 2.5),
 		"solo_reconstruido": false,
 	},
 	"gran_arbol.png": {
@@ -440,6 +441,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.08, 1.08, 1.08),
 		"offset": Vector3(0.0, 0.0, -0.18),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.0, 2.2),
 		"solo_reconstruido": false,
 	},
 	"puesto.png": {
@@ -448,6 +450,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.05, 1.05, 1.05),
 		"offset": Vector3(0.0, 0.0, -0.12),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.8, 1.8),
 		"solo_reconstruido": false,
 	},
 	"gran_archivo.png": {
@@ -455,6 +458,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.15, 1.15, 1.15),
 		"offset": Vector3(0.0, 0.0, -0.35),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(4.2, 3.5),
 		"solo_reconstruido": false,
 	},
 	"taller_taa.png": {
@@ -462,6 +466,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.10, 1.10, 1.10),
 		"offset": Vector3(0.0, 0.0, -0.20),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.5, 2.5),
 		"solo_reconstruido": false,
 	},
 	"casa_escriba.png": {
@@ -469,6 +474,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.06, 1.06, 1.06),
 		"offset": Vector3(0.0, 0.0, -0.18),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.2, 2.2),
 		"solo_reconstruido": false,
 	},
 	"casa_kalamu.png": {
@@ -476,6 +482,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.06, 1.06, 1.06),
 		"offset": Vector3(0.0, 0.0, -0.18),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.2, 2.2),
 		"solo_reconstruido": false,
 	},
 	"fuente.png": {
@@ -497,6 +504,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.0, 1.0, 1.0),
 		"offset": Vector3(0.0, 0.0, 0.0),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(4.5, 3.0),
 		"solo_reconstruido": false,
 	},
 	"casa_juncos.png": {
@@ -504,6 +512,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.05, 1.05, 1.05),
 		"offset": Vector3(0.0, 0.0, -0.15),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.0, 2.0),
 		"solo_reconstruido": false,
 	},
 	"casa_barcas.png": {
@@ -511,6 +520,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.05, 1.05, 1.05),
 		"offset": Vector3(0.0, 0.0, -0.15),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.0, 2.0),
 		"solo_reconstruido": false,
 	},
 	"casa_bata.png": {
@@ -518,6 +528,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.05, 1.05, 1.05),
 		"offset": Vector3(0.0, 0.0, -0.15),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.8, 1.8),
 		"solo_reconstruido": false,
 	},
 	"palafito.png": {
@@ -525,6 +536,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.08, 1.08, 1.08),
 		"offset": Vector3(0.0, 0.0, -0.20),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.0, 2.0),
 		"solo_reconstruido": false,
 	},
 	"casa_nungu.png": {
@@ -532,6 +544,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.05, 1.05, 1.05),
 		"offset": Vector3(0.0, 0.0, -0.15),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.3, 2.2),
 		"solo_reconstruido": false,
 	},
 	"granero.png": {
@@ -539,6 +552,7 @@ const MODELOS_BLENDER := {
 		"escala": Vector3(1.10, 1.10, 1.10),
 		"offset": Vector3(0.0, 0.0, -0.25),
 		"rot_y": 0.0,
+		"radio_occlusion": Vector2(3.5, 2.6),
 		"solo_reconstruido": false,
 	},
 }
@@ -1002,6 +1016,7 @@ func _crear_capas() -> void:
 	mat.set_shader_parameter("agua", _mascara_agua)
 	mat.set_shader_parameter("casillas", Vector2(_mascara_agua.get_width(), _mascara_agua.get_height()) if _mascara_agua else Vector2.ONE)
 	mat.set_shader_parameter("lado", float(LADO_CAPA))
+	mat.render_priority = 1
 	_mats_capa.append(mat)
 	var p := MeshInstance3D.new()
 	p.mesh = plano
@@ -1541,6 +1556,7 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 			m3d = ps.instantiate() as Node3D
 			m3d.name = "Blender3D_%s_%d" % [arch.get_basename(), id]
 			m3d.set_meta("ruta_origen", ruta_b)
+			m3d.set_meta("radio_occlusion", cfg.get("radio_occlusion", Vector2.ZERO))
 			_preparar_materiales_modelo(m3d)
 			add_child(m3d)
 			_modelos_blender_instanciados[id] = m3d
@@ -1572,10 +1588,13 @@ func _actualizar_transparencias_edificios() -> void:
 		var m3d := m3d_var as Node3D
 		if not m3d.visible:
 			continue
+		var radio_occ: Vector2 = m3d.get_meta("radio_occlusion", Vector2.ZERO)
+		if radio_occ == Vector2.ZERO:
+			continue
 		var d_x := absf(pos_m.x - m3d.position.x)
 		var d_z := m3d.position.z - pos_m.z # positivo si Maisha está detrás (al norte del edificio)
 		# Rango de oclusión bajo la cámara en perspectiva (-48°):
-		var oculta := (d_x < 5.8) and (d_z > -0.3 and d_z < 5.5)
+		var oculta := (d_x < radio_occ.x) and (d_z > 0.15 and d_z < radio_occ.y)
 		var meta_a := 0.38 if oculta else 1.0
 		var alfa_actual: float = m3d.get_meta("alfa_transparencia", 1.0)
 		var nuevo_alfa := lerpf(alfa_actual, meta_a, 0.28)
@@ -1596,9 +1615,11 @@ func _aplicar_alfa_a_nodos(nodo: Node, a: float) -> void:
 				var sm := mat as StandardMaterial3D
 				if a < 0.98:
 					sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+					sm.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_ALWAYS
 					sm.albedo_color.a = a
 				else:
 					sm.transparency = BaseMaterial3D.TRANSPARENCY_DISABLED
+					sm.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_OPAQUE_ONLY
 					sm.albedo_color.a = 1.0
 	for h in nodo.get_children():
 		_aplicar_alfa_a_nodos(h, a)
