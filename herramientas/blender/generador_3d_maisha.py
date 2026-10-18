@@ -2974,6 +2974,202 @@ def generar_madriguera():
 
     exportar_modelo("madriguera", DIR_ENTORNO)
 
+def generar_torre():
+    """Genera la Torre Vigía Ancestral de El Kitovu completa en 360°:
+    Zócalo escalonado de mampostería, fuste octogonal con troneras y aspilleras iluminadas,
+    moldura intermedia de cantería, coronamiento almenado con parapeto y matacanes,
+    puerta de entrada de madera con dintel de piedra, y farol en la cima."""
+    limpiar_escena()
+    tex_mamposteria = os.path.join(DIR_KITOVU, "mamposteria_tile.png")
+    mat_piedra = obtener_material_textura("Mat_Torre_Piedra", tex_mamposteria, rugosidad=0.88)
+    mat_madera = get_mat("madera_viga")
+    mat_luz = get_mat("farol_luz")
+    mat_cornisa = get_mat("piedra_plaza")
+
+    # 1. Zócalo base octogonal
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=1.65, depth=0.45, location=(0, 0, 0.22))
+    zocalo = bpy.context.active_object
+    asignar_material(zocalo, mat_piedra)
+    aplicar_uv_cilindro(zocalo, 2.0, 0.5)
+
+    # 2. Fuste principal de la torre
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=1.40, depth=4.6, location=(0, 0, 2.7))
+    fuste = bpy.context.active_object
+    asignar_material(fuste, mat_piedra)
+    aplicar_uv_cilindro(fuste, 2.5, 3.0)
+
+    # 3. Moldura de imposta intermedia
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=1.52, depth=0.22, location=(0, 0, 2.8))
+    imposta = bpy.context.active_object
+    asignar_material(imposta, mat_cornisa)
+
+    # 4. Puerta de arco de madera al sur
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.35, 1.1))
+    puerta = bpy.context.active_object
+    puerta.scale = (0.9, 0.2, 1.7)
+    asignar_material(puerta, mat_madera)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.38, 2.05))
+    dintel = bpy.context.active_object
+    dintel.scale = (1.2, 0.24, 0.22)
+    asignar_material(dintel, mat_cornisa)
+
+    # 5. Aspilleras / troneras con luz interior en las 4 caras cardinales
+    for rot, (ox, oy) in [(0, (0, -1.38)), (90, (1.38, 0)), (180, (0, 1.38)), (270, (-1.38, 0))]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(ox, oy, 3.7))
+        tronera = bpy.context.active_object
+        tronera.scale = (0.28, 0.15, 0.75) if (rot % 180 == 0) else (0.15, 0.28, 0.75)
+        asignar_material(tronera, mat_luz)
+
+    # 6. Coronamiento con voladizo y almenas
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=1.70, depth=0.35, location=(0, 0, 5.15))
+    cornisa_sup = bpy.context.active_object
+    asignar_material(cornisa_sup, mat_cornisa)
+
+    for i in range(8):
+        ang = i * (math.pi * 2.0 / 8.0)
+        px = math.cos(ang) * 1.55
+        py = math.sin(ang) * 1.55
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, py, 5.7))
+        merlon = bpy.context.active_object
+        merlon.scale = (0.45, 0.45, 0.75)
+        merlon.rotation_euler = (0, 0, ang)
+        asignar_material(merlon, mat_piedra)
+
+    # 7. Plataforma superior de madera y mástil con farol
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=1.45, depth=0.15, location=(0, 0, 5.0))
+    tarima = bpy.context.active_object
+    asignar_material(tarima, mat_madera)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.06, depth=1.8, location=(0, 0, 5.9))
+    mastil = bpy.context.active_object
+    asignar_material(mastil, mat_madera)
+
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.20, location=(0, 0, 6.7))
+    faro = bpy.context.active_object
+    asignar_material(faro, mat_luz)
+
+    exportar_modelo("torre", DIR_ENTORNO)
+
+def generar_monumento():
+    """Genera el Monumento Ancestral de las Raíces (El Kitovu) completo en 360°:
+    Pedestal escalonado de mampostería, monolito megalítico vertical con runas grabadas,
+    raíces petrificadas curvadas que abrazan la roca y corazón de Asili con brillo ámbar dorado."""
+    limpiar_escena()
+    tex_mamposteria = os.path.join(DIR_KITOVU, "mamposteria_tile.png")
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_piedra = obtener_material_textura("Mat_Monumento_Piedra", tex_mamposteria, rugosidad=0.85)
+    mat_raiz = obtener_material_textura("Mat_Monumento_Raiz", tex_troncos, rugosidad=0.90)
+    mat_asili = obtener_material("Mat_Monumento_Asili", "#DF9022", roughness=0.2, emission_hex="#FFB300", emission_strength=3.5)
+    mat_pedestal = get_mat("piedra_plaza")
+
+    # 1. Base escalonada doble
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.18))
+    grada1 = bpy.context.active_object
+    grada1.scale = (2.6, 2.2, 0.36)
+    asignar_material(grada1, mat_pedestal)
+    aplicar_uv_caja(grada1, 1.5, 0.4)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.48))
+    grada2 = bpy.context.active_object
+    grada2.scale = (2.0, 1.7, 0.28)
+    asignar_material(grada2, mat_pedestal)
+    aplicar_uv_caja(grada2, 1.2, 0.3)
+
+    # 2. Monolito megalítico central de piedra
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 2.1))
+    monolito = bpy.context.active_object
+    monolito.scale = (1.3, 0.85, 3.2)
+    asignar_material(monolito, mat_piedra)
+    aplicar_uv_caja(monolito, 1.2, 2.4)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=4, radius=0.68, depth=0.6, location=(0, 0, 3.85))
+    cumbre = bpy.context.active_object
+    cumbre.rotation_euler = (0, 0, math.radians(45))
+    asignar_material(cumbre, mat_piedra)
+
+    # 3. Raíces petrificadas curvadas alrededor del monolito
+    for i, ang in enumerate([0.5, 2.2, 3.8, 5.2]):
+        rx = math.cos(ang) * 0.72
+        ry = math.sin(ang) * 0.52
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.14 - i * 0.015, depth=2.4, location=(rx, ry, 1.5))
+        rz = bpy.context.active_object
+        rz.rotation_euler = (math.sin(ang) * 0.25, math.cos(ang) * 0.25, math.radians(15 * (i % 2 * 2 - 1)))
+        asignar_material(rz, mat_raiz)
+
+    # 4. Corazón de Asili: Vena rúnica central incandescente
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.28, location=(0, -0.45, 2.3))
+    corazon_f = bpy.context.active_object
+    corazon_f.scale = (0.7, 0.3, 1.4)
+    asignar_material(corazon_f, mat_asili)
+
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.24, location=(0, 0.45, 2.3))
+    corazon_t = bpy.context.active_object
+    corazon_t.scale = (0.7, 0.3, 1.2)
+    asignar_material(corazon_t, mat_asili)
+
+    # 5. 4 Estelas satélite en las esquinas
+    for sx, sy in [(-1.05, -0.85), (1.05, -0.85), (-1.05, 0.85), (1.05, 0.85)]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(sx, sy, 0.8))
+        estela = bpy.context.active_object
+        estela.scale = (0.28, 0.28, 0.7)
+        asignar_material(estela, mat_piedra)
+
+    exportar_modelo("monumento", DIR_ENTORNO)
+
+def generar_altar():
+    """Genera el Altar Sagrado de Lago Espejo completo en 360°:
+    Grada circular de cantería sobre el agua, pila bautismal / estanque reflectante hexagonal
+    con aguas puras de brillo turquesa, 4 columnas con capiteles y farol votivo central."""
+    limpiar_escena()
+    tex_mamposteria = os.path.join(DIR_KITOVU, "mamposteria_tile.png")
+    mat_piedra = obtener_material_textura("Mat_Altar_Piedra", tex_mamposteria, rugosidad=0.85)
+    mat_marmol = get_mat("piedra_plaza")
+    mat_agua_sagrada = obtener_material("Mat_Altar_Agua", "#40D8C8", roughness=0.1, emission_hex="#50F8E0", emission_strength=2.8)
+    mat_luz = get_mat("farol_luz")
+
+    # 1. Grada circular escalonada
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.85, depth=0.25, location=(0, 0, 0.125))
+    grada_inf = bpy.context.active_object
+    asignar_material(grada_inf, mat_marmol)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.45, depth=0.25, location=(0, 0, 0.35))
+    grada_sup = bpy.context.active_object
+    asignar_material(grada_sup, mat_piedra)
+
+    # 2. Pila ritual hexagonal
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.95, depth=0.65, location=(0, 0, 0.75))
+    pila = bpy.context.active_object
+    asignar_material(pila, mat_marmol)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.82, depth=0.10, location=(0, 0, 1.05))
+    agua_altar = bpy.context.active_object
+    asignar_material(agua_altar, mat_agua_sagrada)
+
+    # 3. 4 Columnas con capiteles en los vértices diagonales
+    for px, py in [(-1.25, -1.05), (1.25, -1.05), (-1.25, 1.05), (1.25, 1.05)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.12, depth=1.6, location=(px, py, 1.15))
+        col = bpy.context.active_object
+        asignar_material(col, mat_marmol)
+
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, py, 1.95))
+        capitel = bpy.context.active_object
+        capitel.scale = (0.34, 0.34, 0.16)
+        asignar_material(capitel, mat_piedra)
+
+    # 4. Mesa / losa de ofrendas frontal
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.25, 0.55))
+    mesa = bpy.context.active_object
+    mesa.scale = (0.85, 0.45, 0.35)
+    asignar_material(mesa, mat_marmol)
+
+    # 5. Llama sagrada votiva sobre el centro del altar
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.18, location=(0, 0, 1.45))
+    llama = bpy.context.active_object
+    asignar_material(llama, mat_luz)
+
+    exportar_modelo("altar", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -3026,6 +3222,9 @@ def main():
     generar_almacen()
     generar_aprisco()
     generar_madriguera()
+    generar_torre()
+    generar_monumento()
+    generar_altar()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

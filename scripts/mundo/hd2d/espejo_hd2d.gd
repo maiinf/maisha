@@ -603,6 +603,29 @@ const MODELOS_BLENDER := {
 		"radio_occlusion": Vector2(2.6, 2.4),
 		"solo_reconstruido": false,
 	},
+	"torre.png": {
+		"ruta": "res://modelos/entorno/torre.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.8, 1.8),
+		"solo_reconstruido": false,
+	},
+	"monumento.png": {
+		"ruta": "res://modelos/entorno/monumento.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.8, 1.8),
+		"solo_reconstruido": false,
+	},
+	"altar.png": {
+		"ruta": "res://modelos/entorno/altar.glb",
+		"escala": Vector3(1.05, 1.05, 1.05),
+		"offset": Vector3(0.0, 0.0, -0.10),
+		"rot_y": 0.0,
+		"solo_reconstruido": false,
+	},
 }
 const TIPOS_LUZ_3D := {
 	"v": [4.6, 0.92, Color(1.0, 0.84, 0.55), false],

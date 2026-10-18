@@ -128,6 +128,32 @@ func _ready() -> void:
 		var alfa_frente: float = granja_3d.get_meta("alfa_transparencia", 1.0)
 		_comprobar(alfa_frente > 0.85, "Transparencia recuperada al volver al frente (alfa = %.2f)" % alfa_frente)
 
+		# Acercarse a la torre vigia ancestral (x=25*16, y=10*16)
+		maisha.global_position = Vector2(25 * 16, 10 * 16 + 20)
+		await _esperar(0.4)
+		modelos = esp.get("_modelos_blender_instanciados")
+		var m_torre: Node3D = null
+		for m in modelos.values():
+			if is_instance_valid(m) and "torre" in (m as Node3D).name:
+				m_torre = m
+				break
+		_comprobar(m_torre != null, "Torre vigía 3D instanciada en El Kitovu")
+		if m_torre:
+			_verificar_materiales_nodo(m_torre, "torre")
+
+		# Acercarse al monumento ancestral (x=36*16, y=12*16)
+		maisha.global_position = Vector2(36 * 16, 12 * 16 + 20)
+		await _esperar(0.4)
+		modelos = esp.get("_modelos_blender_instanciados")
+		var m_monumento: Node3D = null
+		for m in modelos.values():
+			if is_instance_valid(m) and "monumento" in (m as Node3D).name:
+				m_monumento = m
+				break
+		_comprobar(m_monumento != null, "Monumento ancestral 3D instanciado en El Kitovu")
+		if m_monumento:
+			_verificar_materiales_nodo(m_monumento, "monumento")
+
 	# -----------------------------------------------------------------------
 	# 2. CUNA DE MUSGO (Aldea)
 	# -----------------------------------------------------------------------
@@ -286,6 +312,28 @@ func _ready() -> void:
 	_comprobar(m_madriguera != null, "Madriguera de Fuko 3D instanciada")
 	if m_madriguera:
 		_verificar_materiales_nodo(m_madriguera, "madriguera")
+
+	# -----------------------------------------------------------------------
+	# 7. LAGO ESPEJO (Altar Sagrado)
+	# -----------------------------------------------------------------------
+	print("\n--- [7/7] LAGO ESPEJO ---")
+	await _ir("lago_espejo", "")
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Lago Espejo")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+
+	# Acercarse al altar sagrado del lago (x=24*16, y=8*16)
+	maisha.global_position = Vector2(24 * 16, 8 * 16 + 20)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_altar: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "altar" in (m as Node3D).name:
+			m_altar = m
+			break
+	_comprobar(m_altar != null, "Altar sagrado del lago 3D instanciado")
+	if m_altar:
+		_verificar_materiales_nodo(m_altar, "altar")
 
 	# -----------------------------------------------------------------------
 	# RESUMEN FINAL
