@@ -5914,6 +5914,434 @@ def generar_derrumbe_rocas():
 
     exportar_modelo("derrumbe_rocas", DIR_ENTORNO)
 
+
+def generar_casa_kalamu():
+    """Genera la Residencia y Observatorio del Archivero Kalamu (Maandiko, Sigilia):
+    Mansión señorial de piedra y mármol de Sigilia con sillares esquineros,
+    torreón cilíndrico anexo de 3 plantas para observación astronómica con chapitel cónico de cobre verdigrís,
+    ventanal ojival superior de estudio iluminado con cálida luz de pergamino,
+    balcón voladizo con barandilla y pergaminos inscritos colgando,
+    gran chimenea trasera con remates de arcilla y rótulo de pluma de escriba forjada en bronce."""
+    limpiar_escena()
+
+    tex_marmol = os.path.join(DIR_SIGILIA, "marmol_sigilia_tile.png")
+    tex_teja = os.path.join(DIR_SIGILIA, "teja_cobriza_tile.png")
+    tex_piedra = os.path.join(DIR_ALDEA, "forja_mamposteria_tile.png")
+    tex_troncos = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    tex_bronce = os.path.join(DIR_SIGILIA, "bronce_sigilia_tile.png")
+
+    mat_marmol = obtener_material_textura("Mat_Kalamu_Marmol", tex_marmol, rugosidad=0.68)
+    mat_teja = obtener_material_textura("Mat_Kalamu_Teja", tex_teja, rugosidad=0.78)
+    mat_piedra = obtener_material_textura("Mat_Kalamu_Piedra", tex_piedra, rugosidad=0.88)
+    mat_madera = obtener_material_textura("Mat_Kalamu_Madera", tex_troncos, rugosidad=0.80)
+    mat_bronce = obtener_material_textura("Mat_Kalamu_Bronce", tex_bronce, rugosidad=0.45, metalicidad=0.75)
+    mat_pergamino = obtener_material("Mat_Kalamu_Pergamino", "#FEF3C7", roughness=0.65)
+    mat_luz = obtener_material("Mat_Kalamu_LuzEstudio", "#FDE047", roughness=0.15, emission_hex="#F59E0B", emission_strength=2.8)
+    mat_cobre_torreon = obtener_material("Mat_Kalamu_CobreCúpula", "#0D9488", roughness=0.42, metallic=0.65)
+
+    # 1. Zócalo basal de sillería de piedra
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.35, 0.0, 0.15))
+    zocalo = bpy.context.active_object
+    zocalo.scale = (3.70, 2.70, 0.30)
+    asignar_material(zocalo, mat_piedra)
+    aplicar_uv_caja(zocalo, 1.5, 0.5)
+
+    # 2. Cuerpo principal de la mansión (dos plantas)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.35, 0.0, 1.80))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (3.40, 2.40, 3.00)
+    asignar_material(cuerpo, mat_marmol)
+    aplicar_uv_caja(cuerpo, 2.0, 2.0)
+
+    # Sillares de esquina en las 4 esquinas del cuerpo principal
+    for ex in [-1.98, 1.28]:
+        for ey in [-1.13, 1.13]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(ex, ey, 1.80))
+            esq = bpy.context.active_object
+            esq.scale = (0.18, 0.18, 3.02)
+            asignar_material(esq, mat_piedra)
+
+    # 3. Torreón cilíndrico de observación en el flanco derecho
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.95, depth=4.80, location=(1.45, 0.0, 2.40))
+    torreon = bpy.context.active_object
+    asignar_material(torreon, mat_piedra)
+    aplicar_uv_cilindro(torreon, 1.5, 3.0)
+
+    # Moldura/cornisa volada superior del torreón
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.08, depth=0.22, location=(1.45, 0.0, 4.85))
+    cornisa_t = bpy.context.active_object
+    asignar_material(cornisa_t, mat_bronce)
+
+    # Chapitel cónico de cobre verdigrís del observatorio
+    bpy.ops.mesh.primitive_cone_add(vertices=16, radius1=1.18, depth=2.10, location=(1.45, 0.0, 5.95))
+    chapitel = bpy.context.active_object
+    asignar_material(chapitel, mat_cobre_torreon)
+    aplicar_uv_cilindro(chapitel, 1.5, 1.5)
+
+    # Veleta y esfera armilar astronómica en el ápice del torreón
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, radius=0.14, location=(1.45, 0.0, 7.10))
+    esfera_arm = bpy.context.active_object
+    asignar_material(esfera_arm, mat_bronce)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.03, depth=0.60, location=(1.45, 0.0, 7.40))
+    aguja_t = bpy.context.active_object
+    asignar_material(aguja_t, mat_bronce)
+
+    # Ventana ojival superior de observación (iluminada con luz cálida de pergamino)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(1.45, -0.92, 4.10))
+    vent_torreon = bpy.context.active_object
+    vent_torreon.scale = (0.55, 0.12, 0.95)
+    asignar_material(vent_torreon, mat_luz)
+
+    # 4. Tejado a dos aguas del edificio principal
+    crear_prisma_tejado("Kalamu_Techo", -2.15, 1.35, -1.35, 1.35, 3.25, 4.60, mat_teja, u_rep=2.2, v_rep=1.6)
+
+    # Remate de cumbrera de plomo / bronce
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.40, 0.0, 4.62))
+    cumbrera = bpy.context.active_object
+    cumbrera.scale = (3.52, 0.16, 0.12)
+    asignar_material(cumbrera, mat_bronce)
+
+    # Buhardilla frontal con ventana
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.10, -0.95, 3.85))
+    buhardilla = bpy.context.active_object
+    buhardilla.scale = (0.80, 0.65, 0.70)
+    asignar_material(buhardilla, mat_marmol)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.10, -1.28, 3.85))
+    vent_buh = bpy.context.active_object
+    vent_buh.scale = (0.50, 0.05, 0.45)
+    asignar_material(vent_buh, mat_luz)
+
+    # 5. Entrada adintelada con pórtico de piedra y puerta tallada
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.60, -1.22, 0.85))
+    puerta_k = bpy.context.active_object
+    puerta_k.scale = (0.80, 0.08, 1.30)
+    asignar_material(puerta_k, mat_madera)
+
+    # Dintel y jambas del pórtico
+    for jx in [-1.05, -0.15]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(jx, -1.24, 0.88))
+        jamba = bpy.context.active_object
+        jamba.scale = (0.14, 0.14, 1.40)
+        asignar_material(jamba, mat_piedra)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.60, -1.24, 1.62))
+    dintel = bpy.context.active_object
+    dintel.scale = (1.10, 0.16, 0.16)
+    asignar_material(dintel, mat_piedra)
+
+    # Rótulo de pluma de escriba colgado en ménsula de forja
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.02, depth=0.55, location=(-1.40, -1.35, 2.20))
+    brazo_sign = bpy.context.active_object
+    brazo_sign.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(brazo_sign, mat_bronce)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.40, -1.55, 1.95))
+    placa_quill = bpy.context.active_object
+    placa_quill.scale = (0.32, 0.04, 0.38)
+    asignar_material(placa_quill, mat_bronce)
+
+    # 6. Balcón voladizo del segundo piso con pergaminos
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.60, -1.38, 2.05))
+    balcon_pl = bpy.context.active_object
+    balcon_pl.scale = (1.50, 0.55, 0.10)
+    asignar_material(balcon_pl, mat_madera)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.60, -1.63, 2.30))
+    barandilla_f = bpy.context.active_object
+    barandilla_f.scale = (1.50, 0.05, 0.42)
+    asignar_material(barandilla_f, mat_madera)
+
+    # Rollos de pergamino de archivo apoyados en la baranda
+    for px, py, rz in [(-0.85, -1.58, 25), (-0.45, -1.56, -15)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.06, depth=0.35, location=(px, py, 2.35))
+        perg = bpy.context.active_object
+        perg.rotation_euler = (math.radians(75), 0, math.radians(rz))
+        asignar_material(perg, mat_pergamino)
+
+    # Ventanal tras el balcón
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.60, -1.21, 2.45))
+    vent_balcon = bpy.context.active_object
+    vent_balcon.scale = (0.85, 0.05, 0.75)
+    asignar_material(vent_balcon, mat_luz)
+
+    # 7. Fachada trasera: Gran chimenea y ventana de biblioteca posterior (360°)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.32, depth=4.60, location=(-1.35, 1.25, 2.40))
+    chimenea = bpy.context.active_object
+    asignar_material(chimenea, mat_piedra)
+    aplicar_uv_cilindro(chimenea, 1.2, 3.0)
+
+    # Sombrerete / caperuza de la chimenea
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.35, 1.25, 4.80))
+    cap_chim = bpy.context.active_object
+    cap_chim.scale = (0.55, 0.55, 0.12)
+    asignar_material(cap_chim, mat_bronce)
+
+    # Ventana de estudio en la trasera
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.20, 1.21, 2.20))
+    vent_trasera = bpy.context.active_object
+    vent_trasera.scale = (0.75, 0.05, 0.70)
+    asignar_material(vent_trasera, mat_luz)
+
+    exportar_modelo("casa_kalamu", DIR_ENTORNO)
+
+
+def generar_farol_runico():
+    """Genera el Farol Rúnico de Sigilia y Paso de la Escarcha:
+    Columna octogonal esbelta de roca morada de Sigilia con plinto escalonado,
+    runas de fuego cinceladas en relieve que arden con resplandor ígneo dorado/ámbar,
+    fanal de cobre forjado con jaula curvada, brasa eterna viva,
+    tejadillo tipo pagoda nevado y argolla superior de suspensión."""
+    limpiar_escena()
+
+    mat_piedra_runica = obtener_material("Mat_Farol_Piedra", "#334155", roughness=0.88)
+    mat_plinto = obtener_material("Mat_Farol_Plinto", "#1E293B", roughness=0.90)
+    mat_bronce = obtener_material("Mat_Farol_Bronce", "#78350F", roughness=0.45, metallic=0.75)
+    mat_cobre = obtener_material("Mat_Farol_Cobre", "#9A3412", roughness=0.40, metallic=0.70)
+    mat_runa = obtener_material("Mat_Farol_RunaFuego", "#F59E0B", roughness=0.20, emission_hex="#EA580C", emission_strength=3.6)
+    mat_llama = obtener_material("Mat_Farol_LlamaEterna", "#FEF08A", roughness=0.10, emission_hex="#F97316", emission_strength=4.2)
+    mat_nieve = obtener_material("Mat_Farol_Nieve", "#F8FAFC", roughness=0.75)
+
+    # 1. Plinto escalonado basal
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.34, depth=0.14, location=(0.0, 0.0, 0.07))
+    plinto_inf = bpy.context.active_object
+    asignar_material(plinto_inf, mat_plinto)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.26, depth=0.16, location=(0.0, 0.0, 0.20))
+    plinto_sup = bpy.context.active_object
+    asignar_material(plinto_sup, mat_plinto)
+
+    # 2. Fuste/Columna octogonal de piedra morada
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.15, depth=1.12, location=(0.0, 0.0, 0.82))
+    fuste = bpy.context.active_object
+    asignar_material(fuste, mat_piedra_runica)
+
+    # Capitel/cornisa moldurada bajo el fanal
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.24, depth=0.12, location=(0.0, 0.0, 1.42))
+    capitel = bpy.context.active_object
+    asignar_material(capitel, mat_bronce)
+
+    # 3. Runas de fuego incisas/en relieve en las 4 caras cardinales
+    for rx, ry, rz in [(0.155, 0.0, 0), (-0.155, 0.0, 180), (0.0, 0.155, 90), (0.0, -0.155, -90)]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(rx, ry, 0.95))
+        runa = bpy.context.active_object
+        runa.scale = (0.02, 0.07, 0.26)
+        runa.rotation_euler = (0, 0, math.radians(rz))
+        asignar_material(runa, mat_runa)
+
+    # 4. Fanal de bronce y cobre
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.28, depth=0.06, location=(0.0, 0.0, 1.50))
+    base_fanal = bpy.context.active_object
+    asignar_material(base_fanal, mat_cobre)
+
+    # Barrotes de jaula curvada (6 varillas)
+    for i in range(6):
+        ang = math.radians(i * 60)
+        bx = math.cos(ang) * 0.23
+        by = math.sin(ang) * 0.23
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.022, depth=0.54, location=(bx, by, 1.78))
+        barrote = bpy.context.active_object
+        asignar_material(barrote, mat_bronce)
+
+    # Brasa/Núcleo ígneo eterno (llama facetada)
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.13, location=(0.0, 0.0, 1.78))
+    llama = bpy.context.active_object
+    llama.scale = (0.85, 0.85, 1.35)
+    asignar_material(llama, mat_llama)
+
+    # Anillo superior de sujeción
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.27, depth=0.06, location=(0.0, 0.0, 2.06))
+    anillo_sup = bpy.context.active_object
+    asignar_material(anillo_sup, mat_cobre)
+
+    # 5. Tejadillo tipo pagoda con aleros y manto de nieve
+    bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=0.38, depth=0.24, location=(0.0, 0.0, 2.20))
+    techo_pagoda = bpy.context.active_object
+    asignar_material(techo_pagoda, mat_bronce)
+
+    # Capa de nieve acumulada en el tejadillo
+    bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=0.34, depth=0.18, location=(0.0, 0.0, 2.25))
+    nieve = bpy.context.active_object
+    asignar_material(nieve, mat_nieve)
+
+    # Argolla superior de suspensión
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.065, minor_radius=0.02, location=(0.0, 0.0, 2.40))
+    argolla = bpy.context.active_object
+    argolla.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(argolla, mat_bronce)
+
+    exportar_modelo("farol_runico", DIR_ENTORNO)
+
+
+def generar_raiz_tapon():
+    """Genera la Maraña de Raíces Tapón (Gruta de las Raíces):
+    Gran barrera subterránea de raíces entrelazadas que bloquea el atajo,
+    compuesta por 5 troncos nudosos curvados en forma de rastrillo/portón vivo,
+    zarcillos que se clavan en la roca, corteza estriada profunda y nódulos
+    bioluminiscentes de savia de Asili que emiten pulsos púrpuras."""
+    limpiar_escena()
+
+    tex_corteza = os.path.join(DIR_KITOVU, "pared_troncos_tile.png")
+    mat_corteza = obtener_material_textura("Mat_RaizTapon_Corteza", tex_corteza, rugosidad=0.88)
+    mat_raiz_oscura = obtener_material("Mat_RaizTapon_Madera", "#3E1E0F", roughness=0.85)
+    mat_asili = obtener_material("Mat_RaizTapon_SaviaAsili", "#A855F7", roughness=0.25, emission_hex="#9333EA", emission_strength=2.8)
+
+    # 1. Raíz Principal 1: Gran arco diagonal izquierdo a derecho
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.22, depth=1.20, location=(-0.95, -0.08, 0.55))
+    r1a = bpy.context.active_object
+    r1a.rotation_euler = (math.radians(12), math.radians(35), math.radians(-10))
+    asignar_material(r1a, mat_corteza)
+    aplicar_uv_cilindro(r1a, 1.2, 1.5)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.18, depth=1.35, location=(-0.30, 0.05, 1.45))
+    r1b = bpy.context.active_object
+    r1b.rotation_euler = (math.radians(-8), math.radians(28), math.radians(15))
+    asignar_material(r1b, mat_corteza)
+    aplicar_uv_cilindro(r1b, 1.2, 1.5)
+
+    # 2. Raíz Principal 2: Arco cruzado en X
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.20, depth=1.25, location=(0.90, 0.08, 0.58))
+    r2a = bpy.context.active_object
+    r2a.rotation_euler = (math.radians(-10), math.radians(-32), math.radians(8))
+    asignar_material(r2a, mat_corteza)
+    aplicar_uv_cilindro(r2a, 1.2, 1.5)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.16, depth=1.30, location=(0.28, -0.06, 1.48))
+    r2b = bpy.context.active_object
+    r2b.rotation_euler = (math.radians(14), math.radians(-26), math.radians(-12))
+    asignar_material(r2b, mat_corteza)
+    aplicar_uv_cilindro(r2b, 1.2, 1.5)
+
+    # 3. Raíz Principal 3: Tronco vertical sinuoso central
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.19, depth=2.10, location=(-0.02, 0.12, 1.05))
+    r3 = bpy.context.active_object
+    r3.rotation_euler = (math.radians(-15), math.radians(6), math.radians(-8))
+    asignar_material(r3, mat_raiz_oscura)
+    aplicar_uv_cilindro(r3, 1.2, 2.5)
+
+    # 4. Raíz Principal 4: Viga transversal basal arqueada (soporte inferior)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.17, depth=2.40, location=(0.0, -0.12, 0.42))
+    r4 = bpy.context.active_object
+    r4.rotation_euler = (0, math.radians(90), math.radians(5))
+    asignar_material(r4, mat_corteza)
+    aplicar_uv_cilindro(r4, 2.0, 1.0)
+
+    # 5. Raíz Principal 5: Corona superior que cierra contra el techo de la cueva
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.15, depth=2.30, location=(0.0, 0.10, 2.05))
+    r5 = bpy.context.active_object
+    r5.rotation_euler = (0, math.radians(90), math.radians(-8))
+    asignar_material(r5, mat_raiz_oscura)
+
+    # 6. Zarcillos y raíces menores enclavadas en el suelo (anclaje orgánico)
+    zarcillos_data = [
+        (-1.25, 0.15, 0.28, 0.08, 0.70, (25, 45, 10)),
+        (1.22, -0.18, 0.30, 0.07, 0.75, (-20, -42, -15)),
+        (-0.55, -0.22, 0.25, 0.06, 0.65, (-35, 15, 30)),
+        (0.60, 0.20, 0.26, 0.07, 0.68, (30, -20, -25)),
+    ]
+    for zx, zy, zz, zr, zd, (zrx, zry, zrz) in zarcillos_data:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=zr, depth=zd, location=(zx, zy, zz))
+        zarc = bpy.context.active_object
+        zarc.rotation_euler = (math.radians(zrx), math.radians(zry), math.radians(zrz))
+        asignar_material(zarc, mat_raiz_oscura)
+
+    # 7. Nódulos bioluminiscentes de savia de Asili en las uniones de las raíces
+    nodulos = [
+        (-0.05, 0.02, 1.22, 0.14, (1.1, 0.9, 1.2)),
+        (-0.55, -0.04, 0.95, 0.11, (1.2, 1.0, 0.8)),
+        (0.48, 0.06, 1.35, 0.12, (0.9, 1.1, 1.1)),
+        (0.12, 0.14, 1.88, 0.10, (1.0, 0.9, 1.3)),
+        (-0.85, 0.08, 0.45, 0.09, (1.1, 1.1, 0.9)),
+    ]
+    for nx, ny, nz, nrad, nsc in nodulos:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=nrad, location=(nx, ny, nz))
+        nod = bpy.context.active_object
+        nod.scale = nsc
+        asignar_material(nod, mat_asili)
+        suavizar(nod)
+
+    exportar_modelo("raiz_tapon", DIR_ENTORNO)
+
+
+def generar_nudo_corrupcion():
+    """Genera el Nudo de Corrupción de Giza (Embarcadero Junco):
+    Espesura de zarzas y raíces petrificadas negras que sellan el almacén de Bata,
+    con un núcleo central palpitante de amatista abisal violeta brillante,
+    púas cristalinas afiladas y tentáculos de corrupción que reptan por el fango."""
+    limpiar_escena()
+
+    mat_brambles = obtener_material("Mat_Nudo_Zarzas", "#0F172A", roughness=0.85)
+    mat_corazon_giza = obtener_material("Mat_Nudo_CorazonGiza", "#7E22CE", roughness=0.20, emission_hex="#A855F7", emission_strength=3.8)
+    mat_cristal_pua = obtener_material("Mat_Nudo_CristalPua", "#C084FC", roughness=0.15, metallic=0.45, emission_hex="#9333EA", emission_strength=2.2)
+    mat_fango = obtener_material("Mat_Nudo_FangoBlight", "#1E1B4B", roughness=0.92)
+
+    # 1. Costra/charco de corrupción basal en el suelo
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.75, depth=0.06, location=(0.0, 0.0, 0.03))
+    costra = bpy.context.active_object
+    asignar_material(costra, mat_fango)
+
+    # 2. Núcleo palpitante central (icosaedro/corazón facetado)
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.34, location=(0.0, 0.0, 0.52))
+    corazon = bpy.context.active_object
+    corazon.scale = (0.95, 0.90, 1.15)
+    asignar_material(corazon, mat_corazon_giza)
+    suavizar(corazon)
+
+    # 3. Zarzas y raíces negras espinosas que estrangulan el núcleo
+    anillos_zarza = [
+        (0.0, 0.0, 0.42, 0.38, 0.055, 18, -25, 30),
+        (0.0, 0.0, 0.56, 0.36, 0.050, -22, 35, -45),
+        (0.0, 0.0, 0.68, 0.32, 0.045, 45, 15, 60),
+    ]
+    for zx, zy, zz, rmaj, rmin, rx, ry, rz in anillos_zarza:
+        bpy.ops.mesh.primitive_torus_add(major_radius=rmaj, minor_radius=rmin, location=(zx, zy, zz))
+        anillo = bpy.context.active_object
+        anillo.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(anillo, mat_brambles)
+
+    # 4. Puntas espinosas y zarcillos retorcidos que nacen del nudo
+    espinas = [
+        (-0.28, -0.22, 0.68, 0.045, 0.52, (35, -40, 20)),
+        (0.32, -0.18, 0.62, 0.042, 0.48, (-30, 45, -15)),
+        (-0.15, 0.28, 0.72, 0.040, 0.55, (48, 22, -60)),
+        (0.24, 0.25, 0.65, 0.038, 0.46, (-42, -35, 45)),
+        (0.0, 0.0, 0.88, 0.048, 0.42, (10, 5, 0)),
+    ]
+    for ex, ey, ez, erad, edep, (erx, ery, erz) in espinas:
+        bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=erad, depth=edep, location=(ex, ey, ez))
+        esp = bpy.context.active_object
+        esp.rotation_euler = (math.radians(erx), math.radians(ery), math.radians(erz))
+        asignar_material(esp, mat_brambles)
+
+    # 5. Espículas cristalinas violetas que emergen de la corrupción
+    cristales = [
+        (0.26, 0.08, 0.50, 0.065, 0.42, (-15, 60, 25)),
+        (-0.25, 0.12, 0.48, 0.058, 0.38, (20, -55, -40)),
+        (0.05, -0.28, 0.54, 0.062, 0.40, (-65, -15, 80)),
+        (-0.08, -0.12, 0.80, 0.050, 0.35, (15, -20, 10)),
+    ]
+    for cx, cy, cz, crad, cdep, (crx, cry, crz) in cristales:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=crad, depth=cdep, location=(cx, cy, cz))
+        cyp = bpy.context.active_object
+        cyp.scale = (1.0, 1.0, 1.3)
+        cyp.rotation_euler = (math.radians(crx), math.radians(cry), math.radians(crz))
+        asignar_material(cyp, mat_cristal_pua)
+
+    # 6. Tentáculos reptantes que se clavan en el suelo
+    tentaculos = [
+        (-0.45, -0.35, 0.10, 0.048, 0.65, (15, 65, 40)),
+        (0.50, -0.30, 0.10, 0.045, 0.60, (-10, -68, -35)),
+        (-0.40, 0.42, 0.10, 0.042, 0.58, (-62, 20, 110)),
+        (0.42, 0.38, 0.10, 0.046, 0.62, (55, -25, -75)),
+    ]
+    for tx, ty, tz, trad, tdep, (trx, try_, trz) in tentaculos:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=trad, depth=tdep, location=(tx, ty, tz))
+        tent = bpy.context.active_object
+        tent.rotation_euler = (math.radians(trx), math.radians(try_), math.radians(trz))
+        asignar_material(tent, mat_brambles)
+
+    exportar_modelo("nudo_corrupcion", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -6007,6 +6435,10 @@ def main():
     generar_estatua_olvidado()
     generar_casa_barcas()
     generar_derrumbe_rocas()
+    generar_casa_kalamu()
+    generar_farol_runico()
+    generar_raiz_tapon()
+    generar_nudo_corrupcion()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

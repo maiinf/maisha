@@ -299,6 +299,28 @@ func _ready() -> void:
 	if m_tinta:
 		_verificar_materiales_nodo(m_tinta, "puesto_tinta")
 
+	# Acercarse a la residencia y observatorio del Archivero Kalamu
+	maisha.global_position = Vector2(21 * 16, 20 * 16 + 30)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_kalamu: Node3D = null
+	var m_farol_runico: Node3D = null
+	for m in modelos.values():
+		if not is_instance_valid(m):
+			continue
+		var n_str: String = (m as Node3D).name
+		if "casa_kalamu" in n_str or (m as Node3D).get_meta("ruta_origen", "").ends_with("casa_kalamu.glb"):
+			m_kalamu = m
+		elif "farol_runico" in n_str or (m as Node3D).get_meta("ruta_origen", "").ends_with("farol_runico.glb"):
+			m_farol_runico = m
+
+	_comprobar(m_kalamu != null, "Residencia y observatorio de Kalamu 3D instanciado en Maandiko")
+	if m_kalamu:
+		_verificar_materiales_nodo(m_kalamu, "casa_kalamu")
+	_comprobar(m_farol_runico != null, "Farol rúnico de piedra morada y fanal de cobre 3D instanciado en Maandiko")
+	if m_farol_runico:
+		_verificar_materiales_nodo(m_farol_runico, "farol_runico")
+
 	# -----------------------------------------------------------------------
 	# 4. EMBARCADERO JUNCO (Almacén portuario y cabañas)
 	# -----------------------------------------------------------------------
@@ -313,13 +335,20 @@ func _ready() -> void:
 	await _esperar(0.4)
 	modelos = esp.get("_modelos_blender_instanciados")
 	var m_almacen: Node3D = null
+	var m_nudo_giza: Node3D = null
 	for m in modelos.values():
-		if is_instance_valid(m) and "almacen" in (m as Node3D).name:
+		if not is_instance_valid(m):
+			continue
+		if "almacen" in (m as Node3D).name:
 			m_almacen = m
-			break
+		elif "nudo_corrupcion" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("nudo_corrupcion.glb"):
+			m_nudo_giza = m
 	_comprobar(m_almacen != null, "Almacén portuario 3D instanciado en el muelle")
 	if m_almacen:
 		_verificar_materiales_nodo(m_almacen, "almacen")
+	_comprobar(m_nudo_giza != null, "Nudo de corrupción de Giza 3D instanciado en el almacén de Embarcadero")
+	if m_nudo_giza:
+		_verificar_materiales_nodo(m_nudo_giza, "nudo_corrupcion")
 
 	# Acercarse a la grúa de carga del muelle (å en col 55, fil 17 -> 880, 272)
 	maisha.global_position = Vector2(880, 280)
@@ -597,6 +626,19 @@ func _ready() -> void:
 	_comprobar(m_corteza_altar != null, "Santuario de Corteza 3D instanciado en la Gruta")
 	if m_corteza_altar:
 		_verificar_materiales_nodo(m_corteza_altar, "altar_corteza")
+
+	# Acercarse a la maraña de raíces tapón del atajo (x=48, y=638)
+	maisha.global_position = Vector2(48, 638)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_raiz_tapon: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("raiz_tapon" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("raiz_tapon.glb")):
+			m_raiz_tapon = m
+			break
+	_comprobar(m_raiz_tapon != null, "Maraña de raíces tapón 3D instanciada en la Gruta de las Raíces")
+	if m_raiz_tapon:
+		_verificar_materiales_nodo(m_raiz_tapon, "raiz_tapon")
 
 	# -----------------------------------------------------------------------
 	# 11. ORILLA DE JUNCOS (Balsa de Kasia)

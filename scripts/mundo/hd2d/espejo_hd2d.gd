@@ -489,11 +489,11 @@ const MODELOS_BLENDER := {
 		"solo_reconstruido": false,
 	},
 	"casa_kalamu.png": {
-		"ruta": "res://modelos/entorno/casa_escriba.glb",
-		"escala": Vector3(1.06, 1.06, 1.06),
-		"offset": Vector3(0.0, 0.0, -0.18),
+		"ruta": "res://modelos/entorno/casa_kalamu.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.20),
 		"rot_y": 0.0,
-		"radio_occlusion": Vector2(2.2, 2.2),
+		"radio_occlusion": Vector2(4.2, 3.2),
 		"solo_reconstruido": false,
 	},
 	"fuente.png": {
@@ -958,6 +958,22 @@ const MODELOS_BLENDER := {
 		"offset": Vector3(0.0, 0.0, 0.0),
 		"rot_y": 0.0,
 		"radio_occlusion": Vector2(1.0, 0.8),
+		"solo_reconstruido": false,
+	},
+	"raiz_tapon.png": {
+		"ruta": "res://modelos/entorno/raiz_tapon.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.15),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.4, 1.8),
+		"solo_reconstruido": false,
+	},
+	"nudo_giza.png": {
+		"ruta": "res://modelos/entorno/nudo_corrupcion.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.4, 1.2),
 		"solo_reconstruido": false,
 	},
 }
@@ -1930,6 +1946,16 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 			return true
 	var cfg: Dictionary = MODELOS_BLENDER[arch]
 	var ruta_b: String = cfg["ruta"]
+	if arch == "farol.png" or arch == "farol_apagado.png":
+		var es_runico := false
+		if ancla and ancla.get_script() and String(ancla.get_script().resource_path).ends_with("farol_runico.gd"):
+			es_runico = true
+		elif n is Sprite2D and (n as Sprite2D).texture:
+			var path_tex := (n as Sprite2D).texture.resource_path
+			if path_tex.contains("sigilia") or path_tex.contains("paso"):
+				es_runico = true
+		if es_runico:
+			ruta_b = "res://modelos/entorno/farol_runico.glb"
 	if cfg.has("ruta_ruina"):
 		var frame_act := 0
 		if n is Sprite2D:
@@ -1977,9 +2003,13 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 				m3d.rotation.y = deg_to_rad(cfg["rot_y"])
 	if m3d and is_instance_valid(m3d):
 		var off: Vector3 = cfg.get("offset", Vector3.ZERO)
-		var pos_ref := (n as Node2D).global_position if (arch == "escalera.png" or arch == "puerta.png") else (ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position)
+		var pos_ref := (n as Node2D).global_position if (arch == "escalera.png" or arch == "puerta.png" or arch == "raiz_tapon.png" or arch == "nudo_giza.png") else (ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position)
 		m3d.position = _al_suelo(pos_ref) + off
 		m3d.visible = _visible(n)
+		if mod_final.a < 0.05:
+			m3d.visible = false
+		elif mod_final.a < 0.98:
+			_aplicar_alfa_a_nodos(m3d, mod_final.a)
 		if arch == "puerta.png":
 			var frame_act := 0
 			if n is Sprite2D:
