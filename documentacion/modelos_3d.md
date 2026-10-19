@@ -300,6 +300,20 @@ graph TD
     - Dimensiones: $1.8\times 1.5\times 1.3\text{ m}$. Boca de la vieja mina colapsada que tapona el acceso al tercer eco. Cono basal de derrubios y cascotes de esquisto (`#64748B`), peñascos angulosos poligonales de esquisto y cobre meteorizado (`#525649` y `#475569`), vigas de entibación minera de madera astilladas y cruzadas en el desplome (`pared_troncos_tile.png`), y pico de minero antiguo semienterrado con mango de fresno (`#78350F`) y cabeza de hierro forjado (`#1E293B`).
     - Animación e Interacción Dinámica: Cuando Fuko despeja la galería, los montones se desvanecen y liberan el paso 3D instantáneamente.
     - Vinculado a: `derrumbe.png`.
+75. **`casa_kalamu.glb` (Maandiko - Residencia y Observatorio del Archivero Kalamu)**
+    - Dimensiones: $5.8\times 3.6\times 7.4\text{ m}$. Mansión señorial de sillería de piedra labrada (`forja_mamposteria_tile.png`) y mármol pulido de Sigilia (`marmol_sigilia_tile.png`), sillares esquineros de refuerzo en las 4 aristas, torreón cilíndrico anexo de 3 plantas en el flanco derecho coronado por un chapitel cónico de cobre verdigrís (`#0D9488`), veleta astronómica con esfera armilar de bronce noble en el ápice, gran ventanal ojival de estudio con cálida iluminación interior de pergamino (`#FDE047`, emisión 2.8), tejado a dos aguas de teja cobriza (`teja_cobriza_tile.png`) con cumbrera de bronce, buhardilla frontal, pórtico adintelado con rótulo de pluma de escriba forjada en bronce, balcón voladizo con barandilla y rollos de pergamino de archivo colgando, y monumental chimenea posterior de piedra con caperuza protectora.
+    - Vinculado a: `casa_kalamu.png`.
+76. **`farol_runico.glb` (Paso de la Escarcha / Sigilia - Farol Rúnico Ceremonial)**
+    - Dimensiones: $0.7\times 0.7\times 2.4\text{ m}$. Columna octogonal esbelta tallada en roca morada de Sigilia (`#334155`), plinto basal escalonado y biselado (`#1E293B`), collarino y capitel moldurados de bronce forjado (`#78350F`), runas de fuego sagradas cinceladas en relieve en las cuatro caras cardinales con incandescencia ígnea dorada/ámbar (`#F59E0B`, emisión 3.6), fanal de cobre con jaula de 6 barrotes curvados, núcleo de llama eterna viva facetada (`#FEF08A` / `#F97316`, emisión 4.2), tejadillo tipo pagoda protector contra la ventisca con manto de nieve acumulada (`#F8FAFC`) y argolla superior de suspensión.
+    - Vinculado a: `farol.png` en Paso de la Escarcha y Sigilia (detectado por script `farol_runico.gd`).
+77. **`raiz_tapon.glb` (Gruta de las Raíces - Maraña de Raíces Tapón)**
+    - Dimensiones: $3.0\times 1.2\times 2.4\text{ m}$. Gran portón vivo y barricada subterránea que bloquea el atajo hacia el fondo de la gruta. Entramado de 5 troncos de raíz colosales entrelazados con corteza rugosa estriada milenaria (`pared_troncos_tile.png` y madera oscura `#3E1E0F`), zarcillos y raíces menores enclavadas firmemente en el suelo rocoso, y 5 nódulos bioluminiscentes de savia de Asili pura en las uniones de las raíces que emiten pulsos púrpuras místicos (`#A855F7`, emisión `#9333EA` a 2.8).
+    - Animación e Interacción Dinámica: Se desvanece suavemente con modulación de alfa al despertar el Guardián de la Gruta.
+    - Vinculado a: `raiz_tapon.png`.
+78. **`nudo_corrupcion.glb` (Embarcadero Junco - Nudo de Corrupción de Giza)**
+    - Dimensiones: $1.6\times 1.5\times 1.4\text{ m}$. Espesura de corrupción de Giza que sella la puerta del almacén de Bata. Costra y charco de corrupción basal en el fango (`#1E1B4B`), núcleo palpitante central facetado de amatista abisal violeta (`#7E22CE` / `#A855F7`, emisión 3.8), tres anillos de zarzas y raíces petrificadas negras que estrangulan el núcleo (`#0F172A`), púas y zarcillos afilados que emergen del nudo, 4 espículas cristalinas violáceas reflectantes (`#C084FC`, emisión 2.2) y tentáculos reptantes anclados al terreno.
+    - Animación e Interacción Dinámica: Revienta y se disuelve en cenizas al impactar una semilla explosiva tras apartar los sacos con el latido del cetro.
+    - Vinculado a: `nudo_giza.png`.
 
 ---
 

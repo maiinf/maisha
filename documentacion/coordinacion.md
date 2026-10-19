@@ -135,10 +135,19 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
   - Catálogo global ampliado a **74 estructuras 3D sólidas**.
   - **Suite de verificación completada al 100% (23 mundos + 2 interiores clave)** en `pruebas/verificar_gameplay_visual.gd` incorporando Paso de la Escarcha (`puerta_sellada.glb`), Sendero Olvidado (`estatua_olvidado.glb`), Orilla de Juncos (`casa_barcas.glb`) y Camino Cobrizo (`derrumbe_rocas.glb`).
   - **Resultado: 100% PASS - CERO FALLOS VISUALES**.
+- [x] **Oleada 11 de Modelado 3D Sólido y Desvanecimientos Dinámicos de Misión (2026-10-19 - Commit `264b319`)**:
+  - Generados e integrados 4 modelos 3D sólidos clave:
+    - `casa_kalamu.glb`: Residencia señorial y observatorio del Archivero Kalamu en Maandiko con sillería de mármol, torreón cilíndrico anexo de 3 plantas con chapitel de cobre verdigrís, ventanal ojival de estudio con luz de pergamino (`#FDE047`, emisión 2.8), balcón voladizo con pergaminos manuscritos colgando, chimenea y rótulo de pluma de escriba forjada en bronce.
+    - `farol_runico.glb`: Farol rúnico ceremonial de Paso de la Escarcha y Sigilia con columna octogonal de roca morada (`#334155`), runas de fuego en relieve (`#F59E0B`, emisión 3.6), fanal de cobre con llama eterna viva facetada (`#FEF08A` / `#F97316`, emisión 4.2), tejadillo tipo pagoda nevado y argolla superior.
+    - `raiz_tapon.glb`: Maraña subterránea en Gruta de las Raíces con 5 troncos entrelazados como portón vivo, zarcillos anclados al suelo y nódulos bioluminiscentes de Asili (`#9333EA`, emisión 2.8) con desvanecimiento de alfa al despertar el Guardián.
+    - `nudo_corrupcion.glb`: Nudo de corrupción de Giza que sella el almacén en Embarcadero Junco con núcleo amatista abisal (`#7E22CE` / `#A855F7`, emisión 3.8), zarzas petrificadas negras (`#0F172A`), púas cristalinas (`#C084FC`) y tentáculos reptantes.
+  - Catálogo global ampliado a **78 estructuras 3D sólidas**.
+  - **Suite de verificación completada al 100% (23 mundos + 2 interiores clave)** en `pruebas/verificar_gameplay_visual.gd` incorporando Maandiko (`casa_kalamu.glb`, `farol_runico.glb`), Embarcadero Junco (`nudo_corrupcion.glb`) y Gruta de las Raíces (`raiz_tapon.glb`).
+  - **Resultado: 100% PASS - CERO FALLOS VISUALES**.
 - [x] **Verificación Integral Superada**:
   - `verificar_gameplay_visual`: 100 % de comprobaciones pasadas (**23 biomas + 2 interiores, 0 fallos**).
   - `prueba_hd2d`: 100 % de comprobaciones pasadas (0 fallos).
-- [x] **Sincronización remota y Pruebas**: Todas las pruebas automatizadas pasan con 0 errores. Ramas `hd2d/calidad-blender` y `hd2d/blender-piloto` sincronizadas hasta `aec7b70`.
+- [x] **Sincronización remota y Pruebas**: Todas las pruebas automatizadas pasan con 0 errores. Ramas `hd2d/calidad-blender` y `hd2d/blender-piloto` sincronizadas hasta `264b319`.
 
 
 
