@@ -235,6 +235,7 @@ se pasan.
 | Luz del sol (`luz_sol.gd`) | Se cachean los nodos de grupo `maisha` y `corrupcion` en lugar de buscarlos en cada fotograma |
 | Medición | `cuna_de_musgo` mejora de 7.81 ms/frame (128 FPS) a 7.08 ms/frame (141 FPS); `prados_del_eco` de 9.20 ms/frame (108 FPS) a 8.49 ms/frame (118 FPS) |
 | Sombras (`sombra.gd`, rama `optimizar`) | Sin `_process`: `Reloj` emite `luz_cambiada` cuando la luz cambia más de 0,01 (o cruza día/noche) y cada sombra hace la misma comprobación de antes. Scripts por fotograma: La Travesía de 4,32 a 0,38 ms, Bosque Cobrizo de 3,57 a 0,50 ms. Se ve igual. Plan y medidas en `documentacion/optimization.md` |
+| Árboles y rocas (`region.gd._fijo_sencillo`, rama `optimizar`) | Un solo `Sprite2D` con la sombra detrás (`show_behind_parent`, se pinta igual) y las cajas de colisión de todos en un único `StaticBody2D` («Fijos», con `create_shape_owner`). Nodos: La Travesía de 7928 a 4113, Bosque Cobrizo de 5915 a 3350. Los fijos con charla, los postes de Mamba, campamentos y edificios siguen igual |
 
 ### Revisión de interfaz (`revision/interfaz`)
 | Qué | Decisión |
