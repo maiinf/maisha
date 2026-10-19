@@ -6,10 +6,18 @@ extends Node2D
 var _ultimo_desp := Vector2.ZERO
 
 
-func _process(_delta: float) -> void:
-	var calidez := Reloj.calidez()
-	var dia := Reloj.luz_dia()
-	var desp := Vector2(1.2 + calidez * 1.8, 0.3) if dia > 0.25 else Vector2(-0.8, 0.2)
+func _ready() -> void:
+	_ultimo_desp = _desplazamiento()
+	# (sin _process: el reloj avisa cuando la luz cambia, y solo entonces se mira si hay que redibujar)
+	Reloj.luz_cambiada.connect(_al_cambiar_luz)
+
+
+func _desplazamiento() -> Vector2:
+	return Vector2(1.2 + Reloj.calidez() * 1.8, 0.3) if Reloj.luz_dia() > 0.25 else Vector2(-0.8, 0.2)
+
+
+func _al_cambiar_luz() -> void:
+	var desp := _desplazamiento()
 	if desp.distance_squared_to(_ultimo_desp) > 0.02:
 		_ultimo_desp = desp
 		queue_redraw()

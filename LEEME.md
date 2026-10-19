@@ -979,6 +979,7 @@ Cada uno tiene ahora **4 fotogramas** (`<id>_anim.png`): quieto, respira (todo b
 - En `scripts/mundo/aldea/aldeano.gd`: se cachea `_tiene_novedad` (evaluada cada 0.5 s o al actualizar marcas) para no evaluar misiones por cada aldeano 60 veces por segundo, y se evita llamar a `queue_redraw()` innecesariamente.
 - En `scripts/mundo/ambiente.gd`: se eliminan las llamadas a `.filter()` por fotograma usando eliminación in-place inversa para no generar objetos temporales en el GC; se descartan las nubes fuera de la vista y se dibujan con `draw_set_transform()` sin reservar arrays.
 - En `scripts/mundo/luz_sol.gd`: se cachean las referencias a los nodos de grupo `maisha` y `corrupcion`.
+- `scripts/personajes/sombra.gd` ya no tiene `_process`: escucha `Reloj.luz_cambiada` (hay mapas con casi 2000 sombras). Para medir: `godot --path . res://pruebas/ejecutar.tscn -- medir_rendimiento [hd2d] [noche] [mapas...]` (ver `documentacion/optimization.md`).
 ## Pulido de interfaz (`revision/interfaz`)
 
 - En `scripts/interfaz/menu_pausa.gd`, la ficha de objetos llevados muestra el icono de `arte/interfaz/objetos.png` para cualquier objeto y se organiza en dos columnas cuando hay más de tres para no desbordar `CAJA_INFO`.

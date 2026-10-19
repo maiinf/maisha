@@ -234,6 +234,7 @@ se pasan.
 | Ambiente (`ambiente.gd`) | Se sustituyen 5 llamadas a `.filter()` por fotograma con eliminación in-place inversa para no reservar nuevos arrays ni closures cada fotograma; se descarta el dibujo de nubes fuera de la vista y se dibujan con `draw_set_transform()` sin reservar `PackedVector2Array` |
 | Luz del sol (`luz_sol.gd`) | Se cachean los nodos de grupo `maisha` y `corrupcion` en lugar de buscarlos en cada fotograma |
 | Medición | `cuna_de_musgo` mejora de 7.81 ms/frame (128 FPS) a 7.08 ms/frame (141 FPS); `prados_del_eco` de 9.20 ms/frame (108 FPS) a 8.49 ms/frame (118 FPS) |
+| Sombras (`sombra.gd`, rama `optimizar`) | Sin `_process`: `Reloj` emite `luz_cambiada` cuando la luz cambia más de 0,01 (o cruza día/noche) y cada sombra hace la misma comprobación de antes. Scripts por fotograma: La Travesía de 4,32 a 0,38 ms, Bosque Cobrizo de 3,57 a 0,50 ms. Se ve igual. Plan y medidas en `documentacion/optimization.md` |
 
 ### Revisión de interfaz (`revision/interfaz`)
 | Qué | Decisión |
