@@ -976,6 +976,38 @@ const MODELOS_BLENDER := {
 		"radio_occlusion": Vector2(1.4, 1.2),
 		"solo_reconstruido": false,
 	},
+	"roca_mineral.png": {
+		"ruta": "res://modelos/entorno/roca_mineral.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.8, 0.6),
+		"solo_reconstruido": false,
+	},
+	"espino.png": {
+		"ruta": "res://modelos/enemigos/espino_giza.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.0, 0.8),
+		"solo_reconstruido": false,
+	},
+	"saco.png": {
+		"ruta": "res://modelos/entorno/saco_mercancias.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.6, 0.6),
+		"solo_reconstruido": false,
+	},
+	"sello_raices.png": {
+		"ruta": "res://modelos/entorno/sello_raices.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.22),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(3.0, 2.0),
+		"solo_reconstruido": false,
+	},
 }
 const TIPOS_LUZ_3D := {
 	"v": [4.6, 0.92, Color(1.0, 0.84, 0.55), false],
@@ -2003,7 +2035,7 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 				m3d.rotation.y = deg_to_rad(cfg["rot_y"])
 	if m3d and is_instance_valid(m3d):
 		var off: Vector3 = cfg.get("offset", Vector3.ZERO)
-		var pos_ref := (n as Node2D).global_position if (arch == "escalera.png" or arch == "puerta.png" or arch == "raiz_tapon.png" or arch == "nudo_giza.png") else (ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position)
+		var pos_ref := (n as Node2D).global_position if (arch == "escalera.png" or arch == "puerta.png" or arch == "raiz_tapon.png" or arch == "nudo_giza.png" or arch == "sello_raices.png") else (ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position)
 		m3d.position = _al_suelo(pos_ref) + off
 		m3d.visible = _visible(n)
 		if mod_final.a < 0.05:

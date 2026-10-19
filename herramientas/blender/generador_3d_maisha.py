@@ -6342,6 +6342,237 @@ def generar_nudo_corrupcion():
 
     exportar_modelo("nudo_corrupcion", DIR_ENTORNO)
 
+
+def generar_roca_mineral():
+    """Genera la Roca con Mineral de Cobre y Esquisto (Camino Cobrizo, galerías mineras):
+    Peñasco anguloso de esquisto y roca meteorizada con planos de exfoliación,
+    racimos de cristales hexagonales de cobre y cobalto relucientes que emergen de las fisuras,
+    astillas minerales y derrubios al pie."""
+    limpiar_escena()
+
+    mat_roca = obtener_material("Mat_RocaMin_Esquisto", "#525649", roughness=0.88)
+    mat_roca_oscura = obtener_material("Mat_RocaMin_Piedra", "#334155", roughness=0.90)
+    mat_grava = obtener_material("Mat_RocaMin_Grava", "#64748B", roughness=0.92)
+    mat_cristal = obtener_material("Mat_RocaMin_Cristal", "#38BDF8", roughness=0.18, metallic=0.70, emission_hex="#0EA5E9", emission_strength=2.6)
+    mat_cobre_vena = obtener_material("Mat_RocaMin_Cobre", "#F59E0B", roughness=0.25, metallic=0.85, emission_hex="#D97706", emission_strength=1.8)
+
+    # 1. Cono/plataforma basal de derrubios y gravilla
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.68, depth=0.10, location=(0.0, 0.0, 0.05))
+    base_grava = bpy.context.active_object
+    base_grava.scale = (1.25, 0.95, 1.0)
+    asignar_material(base_grava, mat_grava)
+
+    # 2. Bloque principal anguloso de roca
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, 0.0, 0.42))
+    bloque_ppal = bpy.context.active_object
+    bloque_ppal.scale = (0.95, 0.78, 0.75)
+    bloque_ppal.rotation_euler = (math.radians(10), math.radians(-8), math.radians(14))
+    asignar_material(bloque_ppal, mat_roca)
+
+    # Segundo bloque escalonado de contrafuerte
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.35, -0.18, 0.30))
+    bloque_sec = bpy.context.active_object
+    bloque_sec.scale = (0.55, 0.50, 0.52)
+    bloque_sec.rotation_euler = (math.radians(-12), math.radians(18), math.radians(-25))
+    asignar_material(bloque_sec, mat_roca_oscura)
+
+    # 3. Racimo de cristales minerales hexagonales prismáticos
+    cristales_data = [
+        (0.04, -0.10, 0.78, 0.075, 0.52, 22, -15, 25, mat_cristal),
+        (-0.16, -0.06, 0.72, 0.062, 0.44, -18, -30, -15, mat_cristal),
+        (0.20, 0.08, 0.68, 0.068, 0.46, 30, 22, 40, mat_cristal),
+        (-0.06, 0.14, 0.82, 0.045, 0.35, 15, 10, -35, mat_cobre_vena),
+        (0.10, -0.18, 0.58, 0.052, 0.38, 38, -25, 15, mat_cobre_vena),
+    ]
+    for cx, cy, cz, crad, cdep, rx, ry, rz, cmat in cristales_data:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=crad, depth=cdep, location=(cx, cy, cz))
+        cristal = bpy.context.active_object
+        cristal.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(cristal, cmat)
+
+    # 4. Vena mineral brillante incrustada en la grieta
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.05, 0.0, 0.50))
+    vena = bpy.context.active_object
+    vena.scale = (0.75, 0.06, 0.35)
+    vena.rotation_euler = (math.radians(15), math.radians(20), math.radians(-10))
+    asignar_material(vena, mat_cobre_vena)
+
+    exportar_modelo("roca_mineral", DIR_ENTORNO)
+
+
+def generar_espino_giza():
+    """Genera el Espino de Giza (Gruta de las Raíces):
+    Mata de tallos y zarcillos de piedra petrificada negra con capullo violeta
+    palpitante y afilada espina central cristalina que escupe proyectiles."""
+    limpiar_escena()
+
+    mat_tallos = obtener_material("Mat_Espino_Tallos", "#0F172A", roughness=0.85)
+    mat_bulbo = obtener_material("Mat_Espino_Bulbo", "#7E22CE", roughness=0.20, emission_hex="#9333EA", emission_strength=3.5)
+    mat_espina = obtener_material("Mat_Espino_Espina", "#C084FC", roughness=0.15, metallic=0.45, emission_hex="#A855F7", emission_strength=2.8)
+
+    # 1. Base y zarcillos anclados al suelo
+    zarcillos = [
+        (-0.35, -0.28, 0.12, 0.045, 0.55, 15, 55, 30),
+        (0.38, -0.24, 0.12, 0.042, 0.52, -12, -58, -25),
+        (-0.30, 0.32, 0.12, 0.040, 0.50, -52, 18, 95),
+        (0.32, 0.30, 0.12, 0.044, 0.54, 48, -22, -65),
+    ]
+    for tx, ty, tz, trad, tdep, rx, ry, rz in zarcillos:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=trad, depth=tdep, location=(tx, ty, tz))
+        zarc = bpy.context.active_object
+        zarc.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(zarc, mat_tallos)
+
+    # 2. Cáliz de tallos retorcidos envolventes
+    for i in range(5):
+        ang = math.radians(i * 72)
+        tx = math.cos(ang) * 0.22
+        ty = math.sin(ang) * 0.22
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.038, depth=0.72, location=(tx, ty, 0.42))
+        caliz_v = bpy.context.active_object
+        caliz_v.rotation_euler = (math.sin(ang) * math.radians(-24), math.cos(ang) * math.radians(24), ang)
+        asignar_material(caliz_v, mat_tallos)
+
+    # 3. Capullo/Bulbo central de Giza
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.26, location=(0.0, 0.0, 0.58))
+    bulbo = bpy.context.active_object
+    bulbo.scale = (0.92, 0.92, 1.25)
+    asignar_material(bulbo, mat_bulbo)
+    suavizar(bulbo)
+
+    # 4. Gran púa / espina central cristalina eyectora
+    bpy.ops.mesh.primitive_cone_add(vertices=6, radius1=0.075, depth=0.68, location=(0.0, 0.0, 1.05))
+    espina_ppal = bpy.context.active_object
+    asignar_material(espina_ppal, mat_espina)
+
+    # 5. Puntas espinosas laterales defensivas
+    for ang_deg in [30, 150, 270]:
+        ang = math.radians(ang_deg)
+        px = math.cos(ang) * 0.24
+        py = math.sin(ang) * 0.24
+        bpy.ops.mesh.primitive_cone_add(vertices=6, radius1=0.035, depth=0.32, location=(px, py, 0.70))
+        pua = bpy.context.active_object
+        pua.rotation_euler = (math.sin(ang) * math.radians(-45), math.cos(ang) * math.radians(45), ang)
+        asignar_material(pua, mat_tallos)
+
+    exportar_modelo("espino_giza", DIR_ENEMIGOS)
+
+
+def generar_saco_mercancias():
+    """Genera el Saco de Mercancías y Grano (Embarcadero Junco, almacenes):
+    Fardo abombado de tela de arpillera con base ancha asentada en el muelle,
+    cuello fruncido con cuerda de cáñamo anudada y boca de tela acampanada con pliegues."""
+    limpiar_escena()
+
+    mat_arpillera = obtener_material("Mat_Saco_Arpillera", "#B45309", roughness=0.88)
+    mat_cuerda = obtener_material("Mat_Saco_Cuerda", "#78350F", roughness=0.75)
+    mat_grano = obtener_material("Mat_Saco_Boca", "#D97706", roughness=0.92)
+
+    # 1. Base aplanada del saco contra el suelo
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.36, depth=0.12, location=(0.0, 0.0, 0.06))
+    base_saco = bpy.context.active_object
+    base_saco.scale = (1.08, 0.94, 1.0)
+    asignar_material(base_saco, mat_arpillera)
+
+    # 2. Vientre abombado principal del saco
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.36, location=(0.0, 0.0, 0.32))
+    vientre = bpy.context.active_object
+    vientre.scale = (1.05, 0.92, 0.88)
+    asignar_material(vientre, mat_arpillera)
+    suavizar(vientre)
+
+    # 3. Pecho y estrechamiento hacia el cuello
+    bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=0.30, radius2=0.18, depth=0.28, location=(0.0, 0.0, 0.56))
+    cuello_c = bpy.context.active_object
+    cuello_c.scale = (1.02, 0.94, 1.0)
+    asignar_material(cuello_c, mat_arpillera)
+
+    # 4. Cinchado con cuerda de cáñamo trenzada
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.185, minor_radius=0.032, location=(0.0, 0.0, 0.68))
+    cuerda = bpy.context.active_object
+    asignar_material(cuerda, mat_cuerda)
+
+    # Cabos sueltos de la cuerda anudada
+    for roff, rz in [(-0.06, 20), (0.05, -35)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.016, depth=0.16, location=(0.18, roff, 0.62))
+        cabo = bpy.context.active_object
+        cabo.rotation_euler = (math.radians(15), math.radians(20), math.radians(rz))
+        asignar_material(cabo, mat_cuerda)
+
+    # 5. Boca acampanada de arpillera con voladizo superior
+    bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=0.22, depth=0.18, location=(0.0, 0.0, 0.78))
+    boca = bpy.context.active_object
+    boca.rotation_euler = (math.radians(180), 0, 0)
+    boca.scale = (1.05, 0.92, 1.0)
+    asignar_material(boca, mat_grano)
+
+    exportar_modelo("saco_mercancias", DIR_ENTORNO)
+
+
+def generar_sello_raices():
+    """Genera el Sello de Raíces de Giza de la Casa de Bata (Embarcadero Junco):
+    Enorme maraña de raíces petrificadas negras que bloquea la fachada frontal,
+    cruzando en X por delante del portón y la ventana con púas y nódulo de venas violetas."""
+    limpiar_escena()
+
+    mat_raiz_giza = obtener_material("Mat_Sello_RaizNegra", "#0F172A", roughness=0.85)
+    mat_raiz_brambles = obtener_material("Mat_Sello_Brambles", "#1E1B4B", roughness=0.88)
+    mat_corazon = obtener_material("Mat_Sello_Corazon", "#7E22CE", roughness=0.20, emission_hex="#9333EA", emission_strength=3.6)
+    mat_pua = obtener_material("Mat_Sello_PuaCristal", "#C084FC", roughness=0.15, metallic=0.45, emission_hex="#A855F7", emission_strength=2.2)
+
+    # 1. Tronco principal diagonal 1
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.16, depth=3.40, location=(-0.25, 0.02, 1.55))
+    t1 = bpy.context.active_object
+    t1.rotation_euler = (math.radians(10), math.radians(48), math.radians(-8))
+    asignar_material(t1, mat_raiz_giza)
+
+    # 2. Tronco principal diagonal 2 en X
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.15, depth=3.30, location=(0.20, -0.04, 1.52))
+    t2 = bpy.context.active_object
+    t2.rotation_euler = (math.radians(-12), math.radians(-46), math.radians(12))
+    asignar_material(t2, mat_raiz_giza)
+
+    # 3. Raíz transversal inferior
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.14, depth=2.80, location=(-0.10, 0.06, 0.42))
+    t3 = bpy.context.active_object
+    t3.rotation_euler = (0, math.radians(90), math.radians(4))
+    asignar_material(t3, mat_raiz_brambles)
+
+    # 4. Ramificación secundaria sobre ventana
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.11, depth=1.85, location=(1.45, 0.04, 1.80))
+    t4 = bpy.context.active_object
+    t4.rotation_euler = (math.radians(-15), math.radians(35), math.radians(20))
+    asignar_material(t4, mat_raiz_brambles)
+
+    # 5. Nódulo central de corrupción en el cruce de las raíces
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.24, location=(-0.05, 0.08, 1.50))
+    nodulo = bpy.context.active_object
+    nodulo.scale = (1.1, 0.9, 1.2)
+    asignar_material(nodulo, mat_corazon)
+    suavizar(nodulo)
+
+    # 6. Espinas afiladas que apuntan hacia el exterior
+    espinas_sello = [
+        (-0.55, 0.12, 1.15, 0.040, 0.42, 25, 45, 10),
+        (0.48, 0.10, 1.25, 0.038, 0.40, -20, -42, -15),
+        (-0.20, 0.14, 2.10, 0.042, 0.45, 40, -15, 30),
+        (0.35, 0.12, 2.05, 0.036, 0.38, -35, 25, -20),
+    ]
+    for sx, sy, sz, srad, sdep, srx, sry, srz in espinas_sello:
+        bpy.ops.mesh.primitive_cone_add(vertices=6, radius1=srad, depth=sdep, location=(sx, sy, sz))
+        esp = bpy.context.active_object
+        esp.rotation_euler = (math.radians(srx), math.radians(sry), math.radians(srz))
+        asignar_material(esp, mat_pua)
+
+    # 7. Zarcillos anclados al suelo
+    for zx, zy, zz, zrx in [(-1.5, 0.08, 0.25, 30), (1.6, 0.06, 0.25, -28)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.08, depth=0.75, location=(zx, zy, zz))
+        zarc = bpy.context.active_object
+        zarc.rotation_euler = (0, math.radians(zrx), 0)
+        asignar_material(zarc, mat_raiz_giza)
+
+    exportar_modelo("sello_raices", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -6363,6 +6594,7 @@ def main():
     generar_mzizi_raiz()
     generar_babosa_oxido()
     generar_corazon_giza()
+    generar_espino_giza()
     
     print("\n[3/5] Generando Arquitectura de El Kitovu, Cuna de Musgo, Sigilia y Biomas...")
     generar_gran_arbol()
@@ -6439,6 +6671,9 @@ def main():
     generar_farol_runico()
     generar_raiz_tapon()
     generar_nudo_corrupcion()
+    generar_roca_mineral()
+    generar_saco_mercancias()
+    generar_sello_raices()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

@@ -350,6 +350,23 @@ func _ready() -> void:
 	if m_nudo_giza:
 		_verificar_materiales_nodo(m_nudo_giza, "nudo_corrupcion")
 
+	# Verificar los sacos de mercancías y el sello de raíces de Giza
+	var m_saco: Node3D = null
+	var m_sello: Node3D = null
+	for m in modelos.values():
+		if not is_instance_valid(m):
+			continue
+		if "saco" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("saco_mercancias.glb"):
+			m_saco = m
+		elif "sello_raices" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("sello_raices.glb"):
+			m_sello = m
+	_comprobar(m_saco != null, "Saco de mercancías 3D instanciado en el almacén de Embarcadero")
+	if m_saco:
+		_verificar_materiales_nodo(m_saco, "saco_mercancias")
+	_comprobar(m_sello != null, "Sello de raíces de Giza 3D instanciado en la casa de Bata")
+	if m_sello:
+		_verificar_materiales_nodo(m_sello, "sello_raices")
+
 	# Acercarse a la grúa de carga del muelle (å en col 55, fil 17 -> 880, 272)
 	maisha.global_position = Vector2(880, 280)
 	await _esperar(0.4)
@@ -458,6 +475,19 @@ func _ready() -> void:
 	_comprobar(m_derrumbe != null, "Derrumbe de rocas y maderos mineros 3D instanciado en Camino Cobrizo")
 	if m_derrumbe:
 		_verificar_materiales_nodo(m_derrumbe, "derrumbe_rocas")
+
+	# Acercarse a la veta de roca mineral de cobre (col 43, fil 9 -> 688, 144)
+	maisha.global_position = Vector2(688, 160)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_roca_min: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("roca_mineral" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("roca_mineral.glb")):
+			m_roca_min = m
+			break
+	_comprobar(m_roca_min != null, "Roca con mineral de cobre 3D instanciada en Camino Cobrizo")
+	if m_roca_min:
+		_verificar_materiales_nodo(m_roca_min, "roca_mineral")
 
 	# -----------------------------------------------------------------------
 	# 7. LAGO ESPEJO (Altar Sagrado, Barca y Menhir)
@@ -639,6 +669,19 @@ func _ready() -> void:
 	_comprobar(m_raiz_tapon != null, "Maraña de raíces tapón 3D instanciada en la Gruta de las Raíces")
 	if m_raiz_tapon:
 		_verificar_materiales_nodo(m_raiz_tapon, "raiz_tapon")
+
+	# Acercarse al espino de Giza en la galería (col 54, fil 39 -> 864, 624)
+	maisha.global_position = Vector2(864, 638)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_espino: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("espino" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("espino_giza.glb")):
+			m_espino = m
+			break
+	_comprobar(m_espino != null, "Espino de Giza 3D instanciado en la Gruta de las Raíces")
+	if m_espino:
+		_verificar_materiales_nodo(m_espino, "espino_giza")
 
 	# -----------------------------------------------------------------------
 	# 11. ORILLA DE JUNCOS (Balsa de Kasia)
