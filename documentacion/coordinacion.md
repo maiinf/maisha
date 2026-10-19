@@ -122,18 +122,24 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
     - `escalera_biblioteca.glb`: Escalera puente rodante de caoba barnizada con peldaños de bronce noble, carretón rodante sobre raíl y barandilla lateral de latón en Estanterías Colgantes, con sincronización dinámica 1:1 en `espejo_hd2d.gd`.
   - Catálogo global ampliado a **70 estructuras 3D sólidas**.
   - **Suite de verificación completada al 100% (23 mundos + 2 interiores clave)** en `pruebas/verificar_gameplay_visual.gd` incorporando Ruinas del Primer Árbol (`primer_arbol.glb`), Estanterías Colgantes (`escalera_biblioteca.glb`), Taller de Corteza (`yunque_forja.glb`) y Casa de Nungu (`armario_nungu.glb`).
+- [x] **Oleada 10 de Modelado 3D Sólido y Blindaje de Renderizado de Casas (2026-10-19 - Commit `aec7b70`)**:
+  - Generados e integrados 4 modelos 3D sólidos clave:
+    - `puerta_sellada.glb`: Monumental portal de acceso a Maandiko en Paso de la Escarcha con pilones de mármol, arco moldurado, clave con medallón rúnico, cancelas de hierro forjado y Sello de Tinta Quieta y Giza con animación de apertura al derretirse con fuego.
+    - `estatua_olvidado.glb`: Estatuas ancestrales de Sendero Olvidado con pedestal de granito, figura zoomorfa devota abrazando la reliquia y mantos de nieve alpina.
+    - `casa_barcas.glb`: Cabaña de ribera y astillero de Kasia en Orilla de Juncos con pilotes fluviales clavados en el agua, grada de varada y costillar de barca en construcción.
+    - `derrumbe_rocas.glb`: Colapso de la galería minera en Camino Cobrizo con peñascos angulosos, entibación astillada y pico de minero antiguo.
+  - **Blindaje de Renderizado de Casas y Estructuras HD-2D**:
+    - **CULL_BACK**: Sustituido `CULL_DISABLED` por `BaseMaterial3D.CULL_BACK` en todos los modelos sólidos, eliminando el Z-fighting y parpadeos oscuros en OpenGL Compatibility.
+    - **ALPHA_DEPTH_PRE_PASS**: Sustituida la transparencia simple por `BaseMaterial3D.TRANSPARENCY_ALPHA_DEPTH_PRE_PASS` en la oclusión de edificios, conservando el buffer de profundidad sin inversión de polígonos.
+    - **Fin de Lonchas Planas**: Desactivada por completo la creación de láminas multicapa (`capas_fondo`) para cualquier edificio arquitectónico o entidad con modelo Blender (`_config_volumen_3d` retorna `Vector2.ZERO`).
+  - Catálogo global ampliado a **74 estructuras 3D sólidas**.
+  - **Suite de verificación completada al 100% (23 mundos + 2 interiores clave)** en `pruebas/verificar_gameplay_visual.gd` incorporando Paso de la Escarcha (`puerta_sellada.glb`), Sendero Olvidado (`estatua_olvidado.glb`), Orilla de Juncos (`casa_barcas.glb`) y Camino Cobrizo (`derrumbe_rocas.glb`).
   - **Resultado: 100% PASS - CERO FALLOS VISUALES**.
 - [x] **Verificación Integral Superada**:
   - `verificar_gameplay_visual`: 100 % de comprobaciones pasadas (**23 biomas + 2 interiores, 0 fallos**).
   - `prueba_hd2d`: 100 % de comprobaciones pasadas (0 fallos).
-  - `prueba_kitovu`: 100 % (pesca en agua cristalina, huerto, Kuku, Mzizi).
-  - `prueba_aldea`: 100 % (Pino, Corteza, Gran Árbol).
-  - `prueba_maandiko`: 100 % (Gran Archivo, faroles rúnicos, Taa, Kalamu).
-  - `prueba_lago_espejo`: 100 % (agua turbia, Kambare, quietud del lago y puente reflejado).
-  - `prueba_cienaga`: 100 % (Konokono, niebla y poza de lodo).
-  - `prueba_embarcadero_junco`: 100 % (Mamba, dársena y transbordador).
-  - `prueba_orilla_juncos`: 100 % (Kasia, balsa y cangrejos).
-- [x] **Sincronización remota y Pruebas**: Todas las pruebas automatizadas pasan con 0 errores. Ramas `hd2d/calidad-blender` y `hd2d/blender-piloto` sincronizadas hasta `1495d30`.
+- [x] **Sincronización remota y Pruebas**: Todas las pruebas automatizadas pasan con 0 errores. Ramas `hd2d/calidad-blender` y `hd2d/blender-piloto` sincronizadas hasta `aec7b70`.
+
 
 
 
