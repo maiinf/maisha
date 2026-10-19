@@ -151,11 +151,19 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
     - `sello_raices.glb`: Gran sello de raíces de Giza en la fachada de la cabaña fluvial de Bata en Embarcadero Junco con dos grandes troncos cruzados en aspa (`#1E1B4B` y `#0F172A`), garras de amarre y gema central de amatista (`#7E22CE`, emisión `#A855F7` a 3.6) con desvanecimiento de opacidad suave (`TRANSPARENCY_ALPHA_DEPTH_PRE_PASS`).
   - Catálogo global ampliado a **82 estructuras 3D sólidas**.
   - **Suite de verificación completada al 100% (23 mundos + 2 interiores clave)** en `pruebas/verificar_gameplay_visual.gd` incorporando Camino Cobrizo (`roca_mineral.glb`), Gruta de las Raíces (`espino_giza.glb`) y Embarcadero Junco (`saco_mercancias.glb`, `sello_raices.glb`).
+- [x] **Oleada 13 de Modelado 3D Sólido y Barreras Biomecánicas de Mazmorra (2026-10-19 - Commit `e0783db`)**:
+  - Generados e integrados 4 modelos 3D sólidos clave:
+    - `crater_kitovu.glb`: Cráter del impacto primordial de Asili en El Kitovu con berma anular elevada de tierra calcinada (`#292524`), lajas angulosas de esquisto metamórfico (`#475569`), falla central fundida con núcleo de cristal Asili dorado incandescente (`#DF9022`, emisión `#FEF08A` a 3.2) y esquirlas brillantes (`#F59E0B`). Desempaquetado de `CanvasTexture` en `espejo_hd2d.gd` para elementos de suelo profundo.
+    - `cortina_micelio.glb`: Gran portón vivo de micelio e hifas en Cueva de las Setas flanqueado por estalagmitas y dintel de roca (`#334155`), 9 cordones trenzados de micelio blanco y hebras violetas (`#E2E8F0` y `#A78BFA`), y racimo de 7 vesículas de esporas bioluminiscentes (`#7E22CE`, emisión `#A855F7` a 3.2) con desvanecimiento de opacidad suave (`TRANSPARENCY_ALPHA_DEPTH_PRE_PASS`) al ser cortada con el cetro.
+    - `espinas_giza.glb`: Barrera universal de espinas petrificadas que sella atajos y pasos en Cuna de Musgo, Prados del Eco, Paso de Piedra y Cueva de las Setas con troncos retorcidos negros (`#0F172A`), núcleo de corrupción abisal (`#A855F7`, emisión 3.8) y corona de 12 agujas cristalinas afiladas (`#581C87`) con animación de marchitamiento y hundimiento al purificar la zona.
+    - `raiz_dormida.glb`: Raíz ancestral colosal de $3.8\text{ m}$ en Gruta de las Raíces tendida de pared a pared con corteza rugosa (`#3E1E0F`), 4 ramificaciones de anclaje, 6 nódulos bioluminiscentes turquesas de Asili (`#2DD4BF`, emisión 2.2) y prominente ojo durmiente central con párpado pétreo (`#1E1B4B`) y pupila abisal violeta que brilla en la oscuridad (`#7E22CE`, emisión `#C084FC` a 3.8).
+  - Catálogo global ampliado a **86 estructuras 3D sólidas**.
+  - **Suite de verificación completada al 100% (23 mundos + 2 interiores clave)** en `pruebas/verificar_gameplay_visual.gd` incorporando El Kitovu (`crater_kitovu.glb`), Gruta de las Raíces (`raiz_dormida.glb`) y Cueva de las Setas (`cortina_micelio.glb`, `espinas_giza.glb`).
   - **Resultado: 100% PASS - CERO FALLOS VISUALES**.
 - [x] **Verificación Integral Superada**:
   - `verificar_gameplay_visual`: 100 % de comprobaciones pasadas (**23 biomas + 2 interiores, 0 fallos**).
   - `prueba_hd2d`: 100 % de comprobaciones pasadas (0 fallos).
-- [x] **Sincronización remota y Pruebas**: Todas las pruebas automatizadas pasan con 0 errores. Ramas `hd2d/calidad-blender` y `hd2d/blender-piloto` sincronizadas hasta `4190d4e`.
+- [x] **Sincronización remota y Pruebas**: Todas las pruebas automatizadas pasan con 0 errores. Ramas `hd2d/calidad-blender` y `hd2d/blender-piloto` sincronizadas hasta `e0783db`.
 
 
 

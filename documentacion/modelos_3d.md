@@ -328,6 +328,20 @@ graph TD
     - Dimensiones: $2.4\times 0.5\times 2.0\text{ m}$. Entramado de raíces de Giza que clausura el vano y puerta de la cabaña fluvial de Bata. Dos grandes troncos gnarled cruzados en aspa (`#1E1B4B` y `#0F172A`), nudos de amarre laterales clavados en las jambas de madera, y núcleo de amatista de corrupción palpitante en el cruce central (`#7E22CE`, emisión `#A855F7` a 3.6).
     - Animación e Interacción Dinámica: Desvanecimiento de opacidad suave (`TRANSPARENCY_ALPHA_DEPTH_PRE_PASS`) al despertar el eco de Bata y purificar la ribera.
     - Vinculado a: `sello_raices.png`.
+83. **`crater_kitovu.glb` (El Kitovu - Cráter de Impacto de la Chispa de Vida)**
+    - Dimensiones: $3.4\times 1.8\times 0.5\text{ m}$. Hondonada elíptica donde cayó la chispa primordial de Asili al pie del Gran Árbol. Berma anular elevada de tierra calcinada y ceniza (`#292524`), fondo cóncavo aterrazado, 8 lajas angulosas de esquisto metamórfico fragmentadas por la onda de choque (`#475569` y `#334155`), falla central fundida con núcleo de cristal Asili dorado incandescente (`#DF9022`, emisión ámbar `#FEF08A` a 3.2) y esquirlas brillantes dispersas (`#F59E0B`, emisión 2.5).
+    - Vinculado a: `crater.png`.
+84. **`cortina_micelio.glb` (Cueva de las Setas - Gran Cortina de Micelio de Kuvu)**
+    - Dimensiones: $3.2\times 0.8\times 2.8\text{ m}$. Portón vivo de hifas y micelio ancestral que sella la entrada a la cámara del jefe Kuvu. Flanqueado por dos estalagmitas y jambas de roca de cueva (`#334155`) y dintel superior rocoso, velo denso de 9 cordones trenzados de micelio blanco y hebras violetas onduladas (`#E2E8F0` y `#A78BFA`), 3 tiradas transversales de unión, y racimo de 7 vesículas de esporas bioluminiscentes que palpitan con luz púrpura abisal (`#7E22CE`, emisión `#A855F7` a 3.2).
+    - Animación e Interacción Dinámica: Se desvanece suavemente con `TRANSPARENCY_ALPHA_DEPTH_PRE_PASS` tras cortar sus hilos con 3 golpes del cetro (`cortina_abierta`).
+    - Vinculado a: `cortina.png`.
+85. **`espinas_giza.glb` (Universal - Barrera de Espinas de Paso de Giza)**
+    - Dimensiones: $1.8\times 1.0\times 1.4\text{ m}$. Espesura de zarzas y espinas petrificadas que clausura atajos y veredas en Cuna de Musgo, Prados del Eco, Paso de Piedra y Cueva de las Setas. Tres troncos retorcidos negros entrelazados en cono (`#0F172A`), ramajes retorcidos secundarios (`#1E1B4B`), núcleo palpitante de corrupción violeta (`#A855F7`, emisión `#9333EA` a 3.8), corona de 12 púas y agujas cristalinas que apuntan hacia el exterior (`#581C87`, emisión `#7E22CE` a 1.8) y zarcillos basales de anclaje.
+    - Animación e Interacción Dinámica: Al purificar la zona o desbloquear el camino, las espinas se marchitan con modulación de color y se hunden en el suelo hasta desaparecer.
+    - Vinculado a: `espinas.png`.
+86. **`raiz_dormida.glb` (Gruta de las Raíces - Raíz Ancestral Durmiente del Pasillo)**
+    - Dimensiones: $3.8\times 1.0\times 1.4\text{ m}$. Colosal raíz milenaria que atraviesa el corredor subterráneo de pared a pared. Tronco horizontal ondulado de corteza rugosa y estriada (`#3E1E0F`), 4 ramificaciones de apoyo que se clavan en la roca del suelo y en el muro posterior, 6 nódulos bioluminiscentes de savia Asili turquesa (`#2DD4BF`, emisión 2.2) y prominente ojo durmiente central esculpido en relieve con párpado pétreo (`#1E1B4B`) y fisura de pupila abisal violeta que brilla en la oscuridad (`#7E22CE`, emisión `#C084FC` a 3.8).
+    - Vinculado a: `raiz_dormida.png`.
 
 ---
 
