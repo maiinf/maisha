@@ -206,6 +206,19 @@ func _ready() -> void:
 		if m_tronco:
 			_verificar_materiales_nodo(m_tronco, "tronco_caido")
 
+		# Acercarse al cráter místico de Asili (O en col 8, fil 41 -> 136, 670)
+		maisha.global_position = Vector2(136, 670)
+		await _esperar(0.4)
+		modelos = esp.get("_modelos_blender_instanciados")
+		var m_crater: Node3D = null
+		for m in modelos.values():
+			if is_instance_valid(m) and ("crater" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("crater_kitovu.glb")):
+				m_crater = m
+				break
+		_comprobar(m_crater != null, "Cráter de la chispa de Asili 3D instanciado en El Kitovu")
+		if m_crater:
+			_verificar_materiales_nodo(m_crater, "crater_kitovu")
+
 	# -----------------------------------------------------------------------
 	# 2. CUNA DE MUSGO (Aldea)
 	# -----------------------------------------------------------------------
@@ -683,6 +696,19 @@ func _ready() -> void:
 	if m_espino:
 		_verificar_materiales_nodo(m_espino, "espino_giza")
 
+	# Acercarse a la raíz dormida ancestral (ŕ en col 31, fil 49 -> 504, 798)
+	maisha.global_position = Vector2(504, 808)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_raiz_dorm: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("raiz_dormida" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("raiz_dormida.glb")):
+			m_raiz_dorm = m
+			break
+	_comprobar(m_raiz_dorm != null, "Raíz Dormida 3D instanciada en Gruta de las Raíces")
+	if m_raiz_dorm:
+		_verificar_materiales_nodo(m_raiz_dorm, "raiz_dormida")
+
 	# -----------------------------------------------------------------------
 	# 11. ORILLA DE JUNCOS (Balsa de Kasia)
 	# -----------------------------------------------------------------------
@@ -981,6 +1007,31 @@ func _ready() -> void:
 	_comprobar(m_seta_luz != null, "Racimo de setas bioluminiscentes 3D instanciado en Cueva de las Setas")
 	if m_seta_luz:
 		_verificar_materiales_nodo(m_seta_luz, "seta_luz")
+
+	# Acercarse a la cortina de micelio de Kuvu (ǫ en col 25, fil 45 -> 408, 734)
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(408, 740)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_cortina: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("cortina" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("cortina_micelio.glb")):
+			m_cortina = m
+			break
+	_comprobar(m_cortina != null, "Cortina de micelio 3D instanciada en Cueva de las Setas")
+	if m_cortina:
+		_verificar_materiales_nodo(m_cortina, "cortina_micelio")
+
+	# Comprobar espinas de Giza en la caverna
+	var m_espinas: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("espinas" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("espinas_giza.glb")):
+			m_espinas = m
+			break
+	_comprobar(m_espinas != null, "Espinas de Giza 3D instanciadas en Cueva de las Setas")
+	if m_espinas:
+		_verificar_materiales_nodo(m_espinas, "espinas_giza")
 
 	# -----------------------------------------------------------------------
 	# 20. CIÉNAGA QUIETA (Árboles Muertos y Sauces del Humedal)

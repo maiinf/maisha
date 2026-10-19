@@ -6573,6 +6573,306 @@ def generar_sello_raices():
 
     exportar_modelo("sello_raices", DIR_ENTORNO)
 
+
+def generar_crater_kitovu():
+    """Genera el Cráter del Impacto de la Chispa de Vida (El Kitovu):
+    Hondonada elíptica con reborde de tierra calcinada, lajas angulosas de esquisto,
+    falla de impacto central con núcleo de Asili dorado incandescente y esquirlas brillantes."""
+    limpiar_escena()
+
+    mat_tierra = obtener_material("Mat_Crater_Tierra", "#292524", roughness=0.92)
+    mat_roca = obtener_material("Mat_Crater_Roca", "#475569", roughness=0.80)
+    mat_asili = obtener_material("Mat_Crater_Asili", "#DF9022", roughness=0.20, emission_hex="#FEF08A", emission_strength=3.2)
+    mat_brasas = obtener_material("Mat_Crater_Brasas", "#F59E0B", roughness=0.30, emission_hex="#F97316", emission_strength=2.5)
+
+    # 1. Reborde del cráter (berma anular elíptica)
+    bpy.ops.mesh.primitive_torus_add(major_segments=16, minor_segments=8, major_radius=1.50, minor_radius=0.28, location=(0, 0, 0.12))
+    berma = bpy.context.active_object
+    berma.scale = (1.15, 0.65, 0.85)
+    asignar_material(berma, mat_tierra)
+    suavizar(berma)
+
+    # 2. Fondo cóncavo del cráter
+    bpy.ops.mesh.primitive_cylinder_add(vertices=14, radius=1.35, depth=0.20, location=(0, 0, 0.04))
+    fondo = bpy.context.active_object
+    fondo.scale = (1.10, 0.60, 0.80)
+    asignar_material(fondo, mat_tierra)
+
+    # 3. Lajas de esquisto fragmentadas proyectadas por el impacto en el reborde
+    lajas_data = [
+        (-1.60, 0.05, 0.18, 0.45, 0.35, 0.22, 10, 25, 15),
+        (1.55, -0.08, 0.16, 0.48, 0.38, 0.20, -12, -22, -10),
+        (-0.95, 0.75, 0.20, 0.40, 0.32, 0.24, 28, 12, 45),
+        (0.90, 0.70, 0.19, 0.42, 0.30, 0.22, 25, -15, -40),
+        (-0.85, -0.72, 0.17, 0.38, 0.28, 0.20, -30, 10, -35),
+        (0.80, -0.76, 0.18, 0.44, 0.32, 0.22, -26, -14, 30),
+        (0.00, 0.88, 0.22, 0.52, 0.32, 0.25, 32, 0, 0),
+        (0.00, -0.85, 0.20, 0.50, 0.30, 0.23, -30, 0, 0),
+    ]
+    for lx, ly, lz, sx, sy, sz, rx, ry, rz in lajas_data:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(lx, ly, lz))
+        laja = bpy.context.active_object
+        laja.scale = (sx, sy, sz)
+        laja.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(laja, mat_roca)
+
+    # 4. Núcleo central fundido de Asili en la grieta
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.35, location=(0, 0, 0.14))
+    core = bpy.context.active_object
+    core.scale = (1.45, 0.55, 0.35)
+    core.rotation_euler = (0, 0, math.radians(12))
+    asignar_material(core, mat_asili)
+    suavizar(core)
+
+    # 5. Esquirlas y cristales incandescentes dispersos en el lecho
+    esquirlas = [
+        (-0.45, 0.18, 0.12, 0.10, 0.08, 0.12, 15, -20),
+        (0.50, -0.15, 0.11, 0.09, 0.07, 0.14, -10, 25),
+        (-0.25, -0.22, 0.10, 0.08, 0.09, 0.10, 25, 10),
+        (0.35, 0.20, 0.13, 0.11, 0.07, 0.11, -15, -15),
+    ]
+    for ex, ey, ez, sx, sy, sz, rx, ry in esquirlas:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=1.0, location=(ex, ey, ez))
+        esq = bpy.context.active_object
+        esq.scale = (sx, sy, sz)
+        esq.rotation_euler = (math.radians(rx), math.radians(ry), 0)
+        asignar_material(esq, mat_brasas)
+
+    exportar_modelo("crater_kitovu", DIR_ENTORNO)
+
+
+def generar_cortina_micelio():
+    """Genera la Cortina de Micelio de la Cueva de las Setas:
+    Gran barrera viva de hifas y micelio blanco/violáceo entre dos jambas de roca,
+    con nódulos de esporas bioluminiscentes que sellan el acceso a la sala de Kuvu."""
+    limpiar_escena()
+
+    mat_roca = obtener_material("Mat_Cortina_Piedra", "#334155", roughness=0.85)
+    mat_micelio = obtener_material("Mat_Cortina_Micelio", "#E2E8F0", roughness=0.55)
+    mat_hifas = obtener_material("Mat_Cortina_Hifas", "#A78BFA", roughness=0.60)
+    mat_esporas = obtener_material("Mat_Cortina_Esporas", "#7E22CE", roughness=0.20, emission_hex="#A855F7", emission_strength=3.2)
+
+    # 1. Jambas laterales de roca de cueva
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.36, depth=2.70, location=(-1.45, 0, 1.35))
+    jamba_izq = bpy.context.active_object
+    jamba_izq.rotation_euler = (0, math.radians(4), 0)
+    asignar_material(jamba_izq, mat_roca)
+    suavizar(jamba_izq)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.36, depth=2.70, location=(1.45, 0, 1.35))
+    jamba_der = bpy.context.active_object
+    jamba_der.rotation_euler = (0, math.radians(-4), 0)
+    asignar_material(jamba_der, mat_roca)
+    suavizar(jamba_der)
+
+    # 2. Dintel superior rocoso
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 2.60))
+    dintel = bpy.context.active_object
+    dintel.scale = (3.20, 0.50, 0.35)
+    asignar_material(dintel, mat_roca)
+
+    # 3. Cordones verticales de micelio e hifas onduladas
+    cordones_x = [-1.15, -0.85, -0.58, -0.30, 0.0, 0.30, 0.58, 0.85, 1.15]
+    for i, cx in enumerate(cordones_x):
+        radio_c = 0.045 if i % 2 == 0 else 0.035
+        prof_c = 2.45 - (abs(cx) * 0.15)
+        pos_z = prof_c / 2.0 + 0.10
+        pos_y = (math.sin(i * 1.7) * 0.06)
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=radio_c, depth=prof_c, location=(cx, pos_y, pos_z))
+        cord = bpy.context.active_object
+        cord.rotation_euler = (math.radians(math.sin(i * 1.3) * 6), 0, math.radians(math.cos(i * 0.9) * 4))
+        mat_c = mat_micelio if i % 3 != 1 else mat_hifas
+        asignar_material(cord, mat_c)
+
+    # 4. Hebras transversales cruzadas en diagonal
+    hebras_data = [
+        (0.0, 0.04, 1.65, 2.40, 0.035, 12),
+        (0.0, -0.03, 1.05, 2.30, 0.032, -10),
+        (0.0, 0.02, 0.55, 2.10, 0.030, 8),
+    ]
+    for hx, hy, hz, hlen, hrad, hrz in hebras_data:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=hrad, depth=hlen, location=(hx, hy, hz))
+        heb = bpy.context.active_object
+        heb.rotation_euler = (0, math.radians(90), math.radians(hrz))
+        asignar_material(heb, mat_hifas)
+
+    # 5. Nódulos y vesículas de esporas bioluminiscentes palpitantes
+    vesiculas_data = [
+        (-0.60, 0.08, 1.85, 0.14, 0.12, 0.16),
+        (0.45, -0.06, 1.75, 0.15, 0.13, 0.18),
+        (-0.15, 0.07, 1.35, 0.18, 0.15, 0.20),
+        (0.70, 0.05, 1.20, 0.13, 0.11, 0.15),
+        (-0.40, -0.05, 0.85, 0.16, 0.14, 0.17),
+        (0.20, 0.06, 0.70, 0.15, 0.13, 0.16),
+        (0.00, -0.04, 0.35, 0.12, 0.10, 0.14),
+    ]
+    for vx, vy, vz, sx, sy, sz in vesiculas_data:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=1.0, location=(vx, vy, vz))
+        ves = bpy.context.active_object
+        ves.scale = (sx, sy, sz)
+        asignar_material(ves, mat_esporas)
+        suavizar(ves)
+
+    # 6. Raíces y flecos en la base
+    for fx, fz, fr in [(-1.1, 0.15, 25), (-0.5, 0.12, -15), (0.4, 0.14, 18), (1.0, 0.15, -22)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=5, radius=0.03, depth=0.35, location=(fx, 0.02, fz))
+        fl = bpy.context.active_object
+        fl.rotation_euler = (0, math.radians(fr), 0)
+        asignar_material(fl, mat_micelio)
+
+    exportar_modelo("cortina_micelio", DIR_ENTORNO)
+
+
+def generar_espinas_giza():
+    """Genera las Espinas de Giza que tapan pasos y atajos (espinas_paso.gd):
+    Barrera de zarzas petrificadas negras, púas cristalinas afiladas
+    y núcleo central abisal violeta que se marchita al purificar la zona."""
+    limpiar_escena()
+
+    mat_tronco = obtener_material("Mat_Espinas_Tronco", "#0F172A", roughness=0.88)
+    mat_brambles = obtener_material("Mat_Espinas_Brambles", "#1E1B4B", roughness=0.85)
+    mat_pincho = obtener_material("Mat_Espinas_Pinchos", "#581C87", roughness=0.25, metallic=0.35, emission_hex="#7E22CE", emission_strength=1.8)
+    mat_core = obtener_material("Mat_Espinas_Core", "#A855F7", roughness=0.15, emission_hex="#9333EA", emission_strength=3.8)
+
+    # 1. Tres troncos petrificados entrelazados en cono
+    troncos_data = [
+        (-0.35, -0.05, 0.65, 0.13, 1.45, 12, 22, -15),
+        (0.30, 0.04, 0.62, 0.12, 1.40, -10, -25, 20),
+        (0.00, 0.08, 0.70, 0.14, 1.55, -15, 8, 5),
+    ]
+    for tx, ty, tz, trad, tdep, rx, ry, rz in troncos_data:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=trad, depth=tdep, location=(tx, ty, tz))
+        tr = bpy.context.active_object
+        tr.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(tr, mat_tronco)
+
+    # 2. Ramajes retorcidos secundarios
+    for bx, by, bz, brad, bdep, rx, ry, rz in [
+        (-0.55, 0.08, 0.45, 0.08, 0.95, 25, 45, 10),
+        (0.50, -0.06, 0.48, 0.08, 0.90, -20, -42, -15),
+        (0.15, -0.12, 0.85, 0.07, 0.85, 35, 15, -25),
+    ]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=brad, depth=bdep, location=(bx, by, bz))
+        bram = bpy.context.active_object
+        bram.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(bram, mat_brambles)
+
+    # 3. Núcleo central de corrupción palpitante
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.22, location=(0, 0.02, 0.60))
+    core = bpy.context.active_object
+    core.scale = (1.1, 0.9, 1.2)
+    asignar_material(core, mat_core)
+    suavizar(core)
+
+    # 4. Corona de 12 espinas y púas cristalinas salientes
+    pinchos_data = [
+        (-0.50, 0.10, 0.85, 0.040, 0.42, 35, 40, 15),
+        (0.48, 0.08, 0.90, 0.038, 0.44, -30, -35, -20),
+        (-0.15, -0.15, 1.10, 0.042, 0.48, 45, -10, 30),
+        (0.20, -0.12, 1.15, 0.036, 0.45, -40, 15, -15),
+        (-0.65, -0.05, 0.50, 0.035, 0.38, 15, 60, -10),
+        (0.62, 0.05, 0.52, 0.036, 0.40, -15, -55, 15),
+        (-0.30, 0.14, 0.35, 0.038, 0.35, 25, 30, -35),
+        (0.32, -0.12, 0.38, 0.037, 0.36, -20, -30, 40),
+        (0.00, 0.12, 1.25, 0.040, 0.50, 60, 0, 0),
+        (-0.35, -0.08, 1.00, 0.035, 0.40, -25, 35, 10),
+        (0.38, 0.10, 0.95, 0.036, 0.42, 30, -30, -15),
+        (0.00, -0.15, 0.75, 0.040, 0.46, -55, 0, 0),
+    ]
+    for px, py, pz, prad, pdep, rx, ry, rz in pinchos_data:
+        bpy.ops.mesh.primitive_cone_add(vertices=6, radius1=prad, depth=pdep, location=(px, py, pz))
+        pua = bpy.context.active_object
+        pua.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(pua, mat_pincho)
+
+    # 5. Garras radiculares en el suelo
+    for gx, gy, gz, grx in [(-0.85, 0.05, 0.14, 35), (0.80, -0.06, 0.14, -32), (0.00, 0.45, 0.12, 15)]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.07, depth=0.55, location=(gx, gy, gz))
+        garra = bpy.context.active_object
+        garra.rotation_euler = (0, math.radians(grx), 0)
+        asignar_material(garra, mat_tronco)
+
+    exportar_modelo("espinas_giza", DIR_ENTORNO)
+
+
+def generar_raiz_dormida():
+    """Genera la Raíz Dormida de la Gruta de las Raíces (raiz_dormida.gd):
+    Colosal raíz ancestral de 3.8m extendida de pared a pared,
+    con corteza rugosa, nódulos bioluminiscentes de Asili y el ojo durmiente violeta."""
+    limpiar_escena()
+
+    mat_corteza = obtener_material("Mat_RaizDorm_Corteza", "#3E1E0F", roughness=0.86)
+    mat_parpado = obtener_material("Mat_RaizDorm_Parpado", "#1E1B4B", roughness=0.75)
+    mat_ojo = obtener_material("Mat_RaizDorm_Ojo", "#7E22CE", roughness=0.15, emission_hex="#C084FC", emission_strength=3.8)
+    mat_nodulo = obtener_material("Mat_RaizDorm_Nodulo", "#2DD4BF", roughness=0.30, emission_hex="#14B8A6", emission_strength=2.2)
+
+    # 1. Tronco horizontal principal con suave curvatura orgánica
+    # Segmento izquierdo
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.28, depth=1.90, location=(-0.95, -0.04, 0.36))
+    t_izq = bpy.context.active_object
+    t_izq.rotation_euler = (0, math.radians(88), math.radians(3))
+    asignar_material(t_izq, mat_corteza)
+    suavizar(t_izq)
+
+    # Segmento derecho
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.27, depth=1.90, location=(0.95, 0.03, 0.38))
+    t_der = bpy.context.active_object
+    t_der.rotation_euler = (0, math.radians(92), math.radians(-3))
+    asignar_material(t_der, mat_corteza)
+    suavizar(t_der)
+
+    # Segmento abombado central donde reposa el ojo
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.38, location=(0.0, 0.02, 0.36))
+    t_cen = bpy.context.active_object
+    t_cen.scale = (1.45, 1.05, 0.95)
+    asignar_material(t_cen, mat_corteza)
+    suavizar(t_cen)
+
+    # 2. Ramificaciones de anclaje a las paredes y suelo
+    anchors_data = [
+        (-1.75, 0.22, 0.50, 0.16, 1.20, 15, 45, 10),
+        (1.70, -0.20, 0.52, 0.15, 1.20, -18, -42, -15),
+        (-0.70, -0.25, 0.20, 0.14, 0.95, -25, 15, 35),
+        (0.65, 0.24, 0.22, 0.13, 0.90, 22, -20, -30),
+    ]
+    for ax, ay, az, arad, adep, rx, ry, rz in anchors_data:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=arad, depth=adep, location=(ax, ay, az))
+        anc = bpy.context.active_object
+        anc.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(anc, mat_corteza)
+
+    # 3. Ojo durmiente en la cara frontal central
+    # Párpado / montículo
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, -0.32, 0.38))
+    parpado = bpy.context.active_object
+    parpado.scale = (0.55, 0.14, 0.28)
+    parpado.rotation_euler = (math.radians(-12), 0, 0)
+    asignar_material(parpado, mat_parpado)
+    suavizar(parpado)
+
+    # Fisura / pupila horizontal del ojo que emite brillo abisal
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.045, depth=0.38, location=(0.0, -0.36, 0.38))
+    pupila = bpy.context.active_object
+    pupila.rotation_euler = (0, math.radians(90), 0)
+    asignar_material(pupila, mat_ojo)
+
+    # 4. Nódulos bioluminiscentes de Asili turquesa a lo largo del lomo
+    nodulos_data = [
+        (-1.20, 0.06, 0.52, 0.09),
+        (-0.55, -0.05, 0.55, 0.11),
+        (0.45, 0.08, 0.54, 0.10),
+        (1.15, -0.04, 0.50, 0.08),
+        (-0.15, 0.15, 0.48, 0.07),
+        (0.20, -0.12, 0.49, 0.08),
+    ]
+    for nx, ny, nz, nrad in nodulos_data:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=nrad, location=(nx, ny, nz))
+        nod = bpy.context.active_object
+        asignar_material(nod, mat_nodulo)
+        suavizar(nod)
+
+    exportar_modelo("raiz_dormida", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -6674,6 +6974,10 @@ def main():
     generar_roca_mineral()
     generar_saco_mercancias()
     generar_sello_raices()
+    generar_crater_kitovu()
+    generar_cortina_micelio()
+    generar_espinas_giza()
+    generar_raiz_dormida()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()
