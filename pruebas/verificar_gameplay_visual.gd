@@ -417,6 +417,19 @@ func _ready() -> void:
 	if m_madriguera:
 		_verificar_materiales_nodo(m_madriguera, "madriguera")
 
+	# Acercarse al derrumbe de la galería minera (x=54*16, y=23*16 -> 864, 368)
+	maisha.global_position = Vector2(864, 380)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_derrumbe: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("derrumbe" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("derrumbe_rocas.glb")):
+			m_derrumbe = m
+			break
+	_comprobar(m_derrumbe != null, "Derrumbe de rocas y maderos mineros 3D instanciado en Camino Cobrizo")
+	if m_derrumbe:
+		_verificar_materiales_nodo(m_derrumbe, "derrumbe_rocas")
+
 	# -----------------------------------------------------------------------
 	# 7. LAGO ESPEJO (Altar Sagrado, Barca y Menhir)
 	# -----------------------------------------------------------------------
@@ -487,6 +500,19 @@ func _ready() -> void:
 	if m_estela:
 		_verificar_materiales_nodo(m_estela, "estela")
 
+	# Acercarse a la Puerta Sellada de Maandiko (x=30*16, y=5*16 -> 480, 80)
+	maisha.global_position = Vector2(480, 100)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_puerta: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("puerta" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("puerta_sellada.glb")):
+			m_puerta = m
+			break
+	_comprobar(m_puerta != null, "Puerta Sellada monumental 3D instanciada en Paso de la Escarcha")
+	if m_puerta:
+		_verificar_materiales_nodo(m_puerta, "puerta_sellada")
+
 	# -----------------------------------------------------------------------
 	# 9. SENDERO OLVIDADO (Arco de las Ruinas)
 	# -----------------------------------------------------------------------
@@ -536,6 +562,20 @@ func _ready() -> void:
 	if m_pino_nev:
 		_verificar_materiales_nodo(m_pino_nev, "pino_nevado")
 
+	# Acercarse a una estatua petrificada ancestral en el rellano (x=22*16, y=50*16 -> 352, 800)
+	maisha.global_position = Vector2(352, 815)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_estatua: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("estatua" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("estatua_olvidado.glb")):
+			m_estatua = m
+			break
+	_comprobar(m_estatua != null, "Estatua ancestral petrificada 3D instanciada en Sendero Olvidado")
+	if m_estatua:
+		_verificar_materiales_nodo(m_estatua, "estatua_olvidado")
+
 	# -----------------------------------------------------------------------
 	# 10. GRUTA DE LAS RAÍCES (Santuario de Corteza)
 	# -----------------------------------------------------------------------
@@ -579,6 +619,16 @@ func _ready() -> void:
 	_comprobar(m_balsa != null, "Balsa de juncos 3D instanciada en la orilla del río")
 	if m_balsa:
 		_verificar_materiales_nodo(m_balsa, "balsa")
+
+	# Acercarse a la Casa de Barcas y astillero de Kasia
+	var m_casa_barcas: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("casa_barcas" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("casa_barcas.glb")):
+			m_casa_barcas = m
+			break
+	_comprobar(m_casa_barcas != null, "Casa de barcas y astillero 3D de Kasia instanciada en Orilla de Juncos")
+	if m_casa_barcas:
+		_verificar_materiales_nodo(m_casa_barcas, "casa_barcas")
 
 	# -----------------------------------------------------------------------
 	# 12. CAMPO SEGADO (Máquina trilladora de vapor)

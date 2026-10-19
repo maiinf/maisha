@@ -5540,6 +5540,380 @@ def generar_escalera_biblioteca():
 
     exportar_modelo("escalera_biblioteca", DIR_ENTORNO)
 
+
+def generar_puerta_sellada():
+    """Genera la Puerta Sellada de Maandiko (Paso de la Escarcha / Sigilia):
+    Monumental portal de paso tallado en piedra de Sigilia con dos grandes pilones laterales,
+    cornisas molduradas, arco triunfal con clave y medallón rúnico,
+    cancelas dobles de hierro forjado con celosía y el gran Sello de Tinta Quieta
+    con cristales de hielo y glifos violáceos de Giza."""
+    limpiar_escena()
+    mat_marmol = obtener_material_textura("Mat_PuertaSellada_Piedra", os.path.join(DIR_SIGILIA, "marmol_sigilia_tile.png"), rugosidad=0.60)
+    mat_piedra_base = obtener_material("Mat_PuertaSellada_Base", "#334155", roughness=0.85)
+    mat_bronce = obtener_material_textura("Mat_PuertaSellada_Bronce", os.path.join(DIR_SIGILIA, "bronce_sigilia_tile.png"), rugosidad=0.35, metalicidad=0.85)
+    mat_hierro = obtener_material("Mat_PuertaSellada_Hierro", "#1E293B", roughness=0.32, metallic=0.88)
+    mat_sello_tinta = obtener_material("Mat_PuertaSellada_SelloTinta", "#1E1B4B", roughness=0.25, metallic=0.35)
+    mat_glifo_giza = obtener_material("Mat_PuertaSellada_GlifoGiza", "#7C3AED", roughness=0.20, metallic=0.10, emission_hex="#C084FC", emission_strength=4.8)
+    mat_hielo = obtener_material("Mat_PuertaSellada_Hielo", "#93C5FD", roughness=0.18, metallic=0.05, emission_hex="#BAE6FD", emission_strength=1.6)
+    mat_nieve = obtener_material("Mat_PuertaSellada_Nieve", "#F1F5F9", roughness=0.75)
+
+    # 1. Pilones / Pilares laterales de cantería
+    for px in [-2.50, 2.50]:
+        # Plinto basal
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0, 0.45))
+        plinto = bpy.context.active_object
+        plinto.scale = (1.40, 1.50, 0.90)
+        asignar_material(plinto, mat_piedra_base)
+
+        # Fuste del pilón
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0, 2.70))
+        fuste = bpy.context.active_object
+        fuste.scale = (1.18, 1.30, 3.60)
+        aplicar_uv_caja(fuste, 1.5, 3.0)
+        asignar_material(fuste, mat_marmol)
+
+        # Cornisa de coronación
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0, 4.65))
+        cornisa = bpy.context.active_object
+        cornisa.scale = (1.38, 1.48, 0.32)
+        asignar_material(cornisa, mat_piedra_base)
+
+        # Remate piramidal con orbe de bronce
+        bpy.ops.mesh.primitive_cone_add(vertices=4, radius1=0.80, radius2=0.08, depth=0.60, location=(px, 0, 5.10))
+        remate_p = bpy.context.active_object
+        remate_p.rotation_euler = (0, 0, math.radians(45))
+        asignar_material(remate_p, mat_marmol)
+
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, radius=0.18, location=(px, 0, 5.50))
+        orbe = bpy.context.active_object
+        asignar_material(orbe, mat_bronce)
+
+        # Manto de nieve en la repisa del pilón
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0, 4.85))
+        nieve_p = bpy.context.active_object
+        nieve_p.scale = (1.34, 1.44, 0.12)
+        asignar_material(nieve_p, mat_nieve)
+
+    # 2. Arquitrabe / Entablamento superior
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 4.75))
+    arquitrabe = bpy.context.active_object
+    arquitrabe.scale = (4.40, 1.18, 0.52)
+    aplicar_uv_caja(arquitrabe, 3.0, 1.0)
+    asignar_material(arquitrabe, mat_marmol)
+
+    # Cornisa superior continua con nieve
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 5.08))
+    cornisa_sup = bpy.context.active_object
+    cornisa_sup.scale = (4.60, 1.30, 0.18)
+    asignar_material(cornisa_sup, mat_piedra_base)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 5.22))
+    nieve_sup = bpy.context.active_object
+    nieve_sup.scale = (4.56, 1.26, 0.14)
+    asignar_material(nieve_sup, mat_nieve)
+
+    # Clave central con medallón de bronce
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.62, 4.75))
+    clave = bpy.context.active_object
+    clave.scale = (0.58, 0.18, 0.68)
+    asignar_material(clave, mat_piedra_base)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.24, depth=0.10, location=(0, -0.72, 4.75))
+    medallon = bpy.context.active_object
+    medallon.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(medallon, mat_bronce)
+
+    # 3. Cancelas monumentales de hierro forjado
+    for gx in [-1.02, 1.02]:
+        lado = "Izq" if gx < 0 else "Der"
+        # Marco perimetral de la hoja
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(gx, 0, 2.25))
+        hoja = bpy.context.active_object
+        hoja.name = f"Cancela_{lado}"
+        hoja.scale = (1.92, 0.08, 4.40)
+        asignar_material(hoja, mat_hierro)
+
+        # Barrotaje de forja interior (4 barrotes verticales)
+        for b_idx, bx_off in enumerate([-0.65, -0.22, 0.22, 0.65]):
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.035, depth=4.20, location=(gx + bx_off, -0.06, 2.25))
+            barrote = bpy.context.active_object
+            barrote.name = f"Barrote_{lado}_{b_idx}"
+            asignar_material(barrote, mat_hierro)
+
+    # 4. El Sello de Tinta Quieta y Corrupción de Giza (Centro del portal)
+    # Gran disco de obsidiana de Tinta Quieta
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.78, depth=0.22, location=(0, -0.10, 2.30))
+    sello_centro = bpy.context.active_object
+    sello_centro.name = "Sello_Centro"
+    sello_centro.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(sello_centro, mat_sello_tinta)
+
+    # Glifo central rúnico brillante de Giza
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.38, location=(0, -0.22, 2.30))
+    glifo = bpy.context.active_object
+    glifo.name = "Sello_Glifo"
+    glifo.scale = (1.0, 0.35, 1.0)
+    asignar_material(glifo, mat_glifo_giza)
+
+    # Cristales de hielo y escarcha creciendo sobre la cancela
+    for c_idx, (hx, hz, hrot) in enumerate([(-0.55, 2.75, 25), (0.60, 2.80, -20), (-0.48, 1.80, -35), (0.52, 1.75, 30)]):
+        bpy.ops.mesh.primitive_cone_add(vertices=6, radius1=0.12, radius2=0.02, depth=0.68, location=(hx, -0.15, hz))
+        cristal_h = bpy.context.active_object
+        cristal_h.name = f"Sello_Cristal_{c_idx}"
+        cristal_h.rotation_euler = (0, 0, math.radians(hrot))
+        asignar_material(cristal_h, mat_hielo)
+
+    exportar_modelo("puerta_sellada", DIR_ENTORNO)
+
+
+def generar_estatua_olvidado():
+    """Genera las Estatuas Ancestrales del Sendero Olvidado:
+    Alguien de Raíz vuelto piedra por el miedo de Giza para no perder lo que amaba.
+    Pedestal escalonado de granito meteorizado con plinto tallado,
+    escultura zoomorfa petrificada en actitud devota sosteniendo la reliquia sagrada,
+    y gruesos mantos de nieve alpina acumulada sobre la cabeza, hombros y peana."""
+    limpiar_escena()
+    mat_pedestal = obtener_material("Mat_Estatua_Pedestal", "#475569", roughness=0.85)
+    mat_figura = obtener_material("Mat_Estatua_PiedraFigura", "#64748B", roughness=0.82)
+    mat_reliquia = obtener_material("Mat_Estatua_Reliquia", "#D97706", roughness=0.45, metallic=0.75)
+    mat_nieve = obtener_material("Mat_Estatua_Nieve", "#F1F5F9", roughness=0.75)
+
+    # 1. Pedestal de cantería escalonado
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.12))
+    base_baja = bpy.context.active_object
+    base_baja.scale = (1.50, 1.25, 0.24)
+    asignar_material(base_baja, mat_pedestal)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.34))
+    base_alta = bpy.context.active_object
+    base_alta.scale = (1.20, 0.98, 0.22)
+    asignar_material(base_alta, mat_pedestal)
+
+    # 2. Escultura zoomorfa petrificada
+    # Falda / Base del cuerpo
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.46, depth=0.68, location=(0, 0, 0.78))
+    manto = bpy.context.active_object
+    manto.scale = (1.10, 0.95, 1.0)
+    asignar_material(manto, mat_figura)
+    suavizar(manto)
+
+    # Torso inclinado en recogimiento
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.04, 1.35))
+    torso = bpy.context.active_object
+    torso.scale = (0.76, 0.62, 0.64)
+    asignar_material(torso, mat_figura)
+
+    # Brazos abrazando la reliquia contra el pecho
+    for bx in [-0.34, 0.34]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.10, depth=0.55, location=(bx, -0.16, 1.35))
+        brazo = bpy.context.active_object
+        brazo.rotation_euler = (math.radians(35), math.radians(bx * 45), 0)
+        asignar_material(brazo, mat_figura)
+
+    # La reliquia protegida (farol votivo / gavilla de Asili)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.16, depth=0.42, location=(0, -0.26, 1.32))
+    reliquia = bpy.context.active_object
+    asignar_material(reliquia, mat_reliquia)
+
+    # Cabeza esculpida con hocico y orejas
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, radius=0.28, location=(0, 0, 1.86))
+    cabeza = bpy.context.active_object
+    cabeza.scale = (0.95, 1.15, 0.95)
+    asignar_material(cabeza, mat_figura)
+    suavizar(cabeza)
+
+    # Orejas de guardián de Raíz
+    for ox in [-0.16, 0.16]:
+        bpy.ops.mesh.primitive_cone_add(vertices=6, radius1=0.08, radius2=0.02, depth=0.30, location=(ox, 0.08, 2.18))
+        oreja = bpy.context.active_object
+        oreja.rotation_euler = (math.radians(-15), math.radians(ox * 20), 0)
+        asignar_material(oreja, mat_figura)
+
+    # 3. Mantos de nieve acumulada
+    # Casquete de nieve sobre la cabeza
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.26, location=(0, 0, 2.14))
+    nieve_cab = bpy.context.active_object
+    nieve_cab.scale = (1.05, 1.10, 0.45)
+    asignar_material(nieve_cab, mat_nieve)
+
+    # Manto de nieve en hombros
+    for hx in [-0.32, 0.32]:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.18, location=(hx, 0.02, 1.66))
+        nieve_h = bpy.context.active_object
+        nieve_h.scale = (1.1, 0.9, 0.45)
+        asignar_material(nieve_h, mat_nieve)
+
+    # Nieve acumulada en la repisa del pedestal
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.47))
+    nieve_ped = bpy.context.active_object
+    nieve_ped.scale = (1.16, 0.94, 0.08)
+    asignar_material(nieve_ped, mat_nieve)
+
+    exportar_modelo("estatua_olvidado", DIR_ENTORNO)
+
+
+def generar_casa_barcas():
+    """Genera la Cabaña y Astillero de Barcas de Kasia (Orilla de Juncos):
+    Gran nave de ribera sobre pilotes de madera de fresno clavados en el agua,
+    grada de varada con raíles y durmientes, armazón de balsa en construcción sobre calzos,
+    muros de cañas y tablas con paños abiertos, amplio tejado a dos aguas de paja dorada
+    y pertrechos náuticos (redes, remos y cabos de amarre)."""
+    limpiar_escena()
+    mat_troncos = obtener_material_textura("Mat_CasaBarcas_Troncos", os.path.join(DIR_KITOVU, "pared_troncos_tile.png"), rugosidad=0.85)
+    mat_tablas = obtener_material("Mat_CasaBarcas_Tablas", "#854D0E", roughness=0.72)
+    mat_paja = obtener_material_textura("Mat_CasaBarcas_Paja", os.path.join(DIR_KITOVU, "tejado_paja_tile.png"), rugosidad=0.88)
+    mat_red = obtener_material("Mat_CasaBarcas_Redes", "#5A4838", roughness=0.85)
+    mat_bronce = obtener_material("Mat_CasaBarcas_Bronce", "#D97706", roughness=0.35, metallic=0.80)
+
+    # 1. Pilotes fluviales de cimentación en el agua (6 postes cilíndricos robustos)
+    for px in [-3.2, 0.0, 3.2]:
+        for py in [-2.4, 2.4]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.20, depth=1.80, location=(px, py, 0.45))
+            pilote = bpy.context.active_object
+            aplicar_uv_cilindro(pilote, 1.2, 2.0)
+            asignar_material(pilote, mat_troncos)
+
+    # 2. Tarima de madera del muelle / astillero
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.30))
+    tarima = bpy.context.active_object
+    tarima.scale = (7.40, 5.40, 0.22)
+    aplicar_uv_caja(tarima, 3.5, 2.5)
+    asignar_material(tarima, mat_tablas)
+
+    # 3. Muros perimetrales con amplio portal abierto hacia el río
+    # Pared trasera
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 2.60, 2.55))
+    pared_tras = bpy.context.active_object
+    pared_tras.scale = (7.20, 0.18, 2.30)
+    aplicar_uv_caja(pared_tras, 3.0, 1.5)
+    asignar_material(pared_tras, mat_troncos)
+
+    # Paredes laterales izquierda y derecha
+    for px in [-3.60, 3.60]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, 0.10, 2.55))
+        pared_lat = bpy.context.active_object
+        pared_lat.scale = (0.18, 5.10, 2.30)
+        aplicar_uv_caja(pared_lat, 2.5, 1.5)
+        asignar_material(pared_lat, mat_troncos)
+
+    # Fachada frontal: dos machones laterales dejando el vano central abierto (ancho 4.4m)
+    for px in [-2.70, 2.70]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, -2.60, 2.55))
+        machon = bpy.context.active_object
+        machon.scale = (1.80, 0.18, 2.30)
+        asignar_material(machon, mat_troncos)
+
+    # Dintel frontal sobre el portal
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -2.60, 3.58))
+    dintel = bpy.context.active_object
+    dintel.scale = (4.80, 0.24, 0.32)
+    asignar_material(dintel, mat_tablas)
+
+    # 4. Grada de varada inclinada hacia el agua (slipway)
+    for rx in [-1.0, 1.0]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(rx, -2.20, 0.85))
+        rail_grada = bpy.context.active_object
+        rail_grada.scale = (0.16, 4.40, 0.18)
+        rail_grada.rotation_euler = (math.radians(-14), 0, 0)
+        asignar_material(rail_grada, mat_tablas)
+
+    # 5. Casco de barca en construcción reposando sobre calzos
+    # Quilla curvada
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.30, 1.65))
+    quilla = bpy.context.active_object
+    quilla.scale = (0.18, 3.40, 0.22)
+    asignar_material(quilla, mat_tablas)
+
+    # Cuadernas transversales de costillar
+    for y_rib in [-1.4, -0.6, 0.2, 1.0]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, y_rib, 1.80))
+        cuaderna = bpy.context.active_object
+        cuaderna.scale = (1.50, 0.10, 0.35)
+        asignar_material(cuaderna, mat_tablas)
+
+    # 6. Gran tejado a dos aguas de paja dorada con aleros amplios
+    crear_prisma_tejado("CasaBarcas_Tejado", -4.20, 4.20, -3.30, 3.30, 3.65, 5.40, mat=mat_paja, u_rep=3.5, v_rep=2.0)
+
+    # 7. Redes de pesca colgadas en el lateral exterior
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-3.72, 0.40, 2.40))
+    redes = bpy.context.active_object
+    redes.scale = (0.06, 1.80, 1.20)
+    asignar_material(redes, mat_red)
+
+    # Remos apoyados contra el muro
+    for idx, roff in enumerate([1.2, 1.5]):
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.035, depth=2.40, location=(3.72, roff, 2.30))
+        remo = bpy.context.active_object
+        remo.rotation_euler = (math.radians(-12), 0, math.radians(10))
+        asignar_material(remo, mat_tablas)
+
+    exportar_modelo("casa_barcas", DIR_ENTORNO)
+
+
+def generar_derrumbe_rocas():
+    """Genera el Derrumbe de la Galería Minera (Camino Cobrizo):
+    Boca de la vieja mina colapsada tapada por peñascos angulosos de esquisto,
+    maderos de entibación astillados, cono de derrubios y pico de minero antiguo incrustado."""
+    limpiar_escena()
+    mat_roca_a = obtener_material("Mat_Derrumbe_RocaA", "#525649", roughness=0.88)
+    mat_roca_b = obtener_material("Mat_Derrumbe_RocaB", "#475569", roughness=0.85)
+    mat_grava = obtener_material("Mat_Derrumbe_Grava", "#64748B", roughness=0.92)
+    mat_maderos = obtener_material_textura("Mat_Derrumbe_Maderos", os.path.join(DIR_KITOVU, "pared_troncos_tile.png"), rugosidad=0.85)
+    mat_hierro = obtener_material("Mat_Derrumbe_Hierro", "#1E293B", roughness=0.35, metallic=0.85)
+    mat_mango = obtener_material("Mat_Derrumbe_MangoPico", "#78350F", roughness=0.70)
+
+    # 1. Cono de derrubios y cascotes basales
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.88, location=(0, 0, 0.22))
+    cono_base = bpy.context.active_object
+    cono_base.scale = (1.55, 1.25, 0.42)
+    asignar_material(cono_base, mat_grava)
+    suavizar(cono_base)
+
+    # 2. Bloques mayores de roca angulosa caídos
+    bloques_coords = [
+        # (x, y, z, rad, scale, mat, rot)
+        (-0.28, -0.18, 0.52, 0.44, (1.15, 0.95, 0.85), mat_roca_a, (15, -20, 35)),
+        (0.36, -0.12, 0.56, 0.40, (0.92, 1.10, 0.88), mat_roca_b, (-18, 25, -15)),
+        (0.04, 0.18, 0.82, 0.36, (1.08, 0.92, 0.82), mat_roca_a, (30, 10, -45)),
+        (-0.12, 0.02, 1.12, 0.32, (0.95, 0.90, 0.78), mat_roca_b, (-22, -15, 60)),
+        (0.46, 0.22, 0.38, 0.26, (1.05, 1.05, 0.90), mat_roca_a, (10, 40, 20)),
+    ]
+    for bx, by, bz, brad, bscale, bmat, (rx, ry, rz) in bloques_coords:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(bx, by, bz))
+        bloque = bpy.context.active_object
+        bloque.scale = (brad * bscale[0] * 1.8, brad * bscale[1] * 1.8, brad * bscale[2] * 1.8)
+        bloque.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(bloque, bmat)
+
+    # 3. Vigas de entibación astilladas cruzadas en el colapso
+    # Madero 1 diagonal izquierdo
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.075, depth=1.15, location=(-0.35, 0.15, 0.75))
+    viga1 = bpy.context.active_object
+    viga1.rotation_euler = (math.radians(35), math.radians(-28), math.radians(15))
+    asignar_material(viga1, mat_maderos)
+
+    # Madero 2 diagonal derecho
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.068, depth=0.98, location=(0.24, -0.25, 0.68))
+    viga2 = bpy.context.active_object
+    viga2.rotation_euler = (math.radians(-32), math.radians(24), math.radians(-40))
+    asignar_material(viga2, mat_maderos)
+
+    # 4. Pico de minero antiguo semienterrado
+    # Mango de fresno
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.022, depth=0.62, location=(0.14, 0.14, 0.92))
+    mango_p = bpy.context.active_object
+    mango_p.rotation_euler = (math.radians(48), math.radians(-35), math.radians(20))
+    asignar_material(mango_p, mat_mango)
+
+    # Cabeza de hierro de doble púa
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.28, 0.28, 1.15))
+    cabeza_p = bpy.context.active_object
+    cabeza_p.scale = (0.06, 0.36, 0.08)
+    cabeza_p.rotation_euler = (math.radians(48), math.radians(-35), math.radians(20))
+    asignar_material(cabeza_p, mat_hierro)
+
+    exportar_modelo("derrumbe_rocas", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -5629,6 +6003,10 @@ def main():
     generar_armario_nungu()
     generar_yunque_forja()
     generar_escalera_biblioteca()
+    generar_puerta_sellada()
+    generar_estatua_olvidado()
+    generar_casa_barcas()
+    generar_derrumbe_rocas()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

@@ -351,6 +351,7 @@ const LUCES_3D := {
 	"raiz_gigante.png": [["h", 50, 15]],
 	"molino.png": [["v", 48, 115]],
 	"atril.png": [["f", 20, 12]],
+	"puerta.png": [["m", 52, 44]],
 }
 const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png", "puesto.png"]
 ## Modelos 3D de Blender 4.5 para arquitectura y accesorios:
@@ -526,11 +527,11 @@ const MODELOS_BLENDER := {
 		"solo_reconstruido": false,
 	},
 	"casa_barcas.png": {
-		"ruta": "res://modelos/entorno/casa_juncos.glb",
-		"escala": Vector3(1.05, 1.05, 1.05),
-		"offset": Vector3(0.0, 0.0, -0.15),
+		"ruta": "res://modelos/entorno/casa_barcas.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.20),
 		"rot_y": 0.0,
-		"radio_occlusion": Vector2(2.0, 2.0),
+		"radio_occlusion": Vector2(4.2, 3.0),
 		"solo_reconstruido": false,
 	},
 	"casa_bata.png": {
@@ -933,6 +934,30 @@ const MODELOS_BLENDER := {
 		"offset": Vector3(1.0, 0.0, -2.1875),
 		"rot_y": 0.0,
 		"radio_occlusion": Vector2(1.2, 2.5),
+		"solo_reconstruido": false,
+	},
+	"puerta.png": {
+		"ruta": "res://modelos/entorno/puerta_sellada.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(3.5, 2.0),
+		"solo_reconstruido": false,
+	},
+	"estatua.png": {
+		"ruta": "res://modelos/entorno/estatua_olvidado.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.9, 0.7),
+		"solo_reconstruido": false,
+	},
+	"derrumbe.png": {
+		"ruta": "res://modelos/entorno/derrumbe_rocas.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.0, 0.8),
 		"solo_reconstruido": false,
 	},
 }
@@ -1880,12 +1905,14 @@ func _config_volumen_3d(n: Node2D, ancla: Node2D, arch: String, ancho_px: float,
 		return Vector2.ZERO
 	if n.get_parent() and n.get_parent().name == "Ropa":
 		return Vector2.ZERO
+	# Desactivado al 100% para edificios, arquitectura y modelos Blender (evita láminas de papel superpuestas)
+	if MODELOS_BLENDER.has(arch) or ancla.is_in_group("edificios") or (ancla.get_script() and "granja" in ancla.get_script().resource_path):
+		return Vector2.ZERO
 	var es_jefe := ancla.is_in_group("jefes") or (n.get_parent() and n.get_parent().is_in_group("jefes"))
-	var es_edificio := ancla.is_in_group("edificios") or LUCES_3D.has(arch)
 	if es_jefe:
 		var prof_j := clampf(minf(ancho_px, alto_px) * PX * 0.38, 0.44, 0.86)
 		return Vector2(5.0, prof_j)
-	if es_edificio or alto_px >= 40.0 or ancho_px >= 42.0:
+	if alto_px >= 40.0 or ancho_px >= 42.0:
 		var prof_e := clampf(minf(ancho_px, alto_px) * PX * 0.36, 0.48, 0.88)
 		return Vector2(5.0, prof_e)
 	if alto_px >= 22.0 or ancho_px >= 22.0:
@@ -1899,7 +1926,8 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 		return false
 	if arch == "molino.png":
 		if ancla and (ancla.name.to_lower().contains("granja") or (ancla.get_script() and "granja" in ancla.get_script().resource_path)):
-			return false
+			g.visible = false
+			return true
 	var cfg: Dictionary = MODELOS_BLENDER[arch]
 	var ruta_b: String = cfg["ruta"]
 	if cfg.has("ruta_ruina"):
@@ -1949,15 +1977,27 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 				m3d.rotation.y = deg_to_rad(cfg["rot_y"])
 	if m3d and is_instance_valid(m3d):
 		var off: Vector3 = cfg.get("offset", Vector3.ZERO)
-		var pos_ref := (n as Node2D).global_position if arch == "escalera.png" else (ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position)
+		var pos_ref := (n as Node2D).global_position if (arch == "escalera.png" or arch == "puerta.png") else (ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position)
 		m3d.position = _al_suelo(pos_ref) + off
 		m3d.visible = _visible(n)
+		if arch == "puerta.png":
+			var frame_act := 0
+			if n is Sprite2D:
+				frame_act = (n as Sprite2D).frame
+			elif n is AnimatedSprite2D:
+				frame_act = (n as AnimatedSprite2D).frame
+			var abierta := frame_act >= 3
+			for hijo in m3d.find_children("*", "Node3D"):
+				if hijo.name.begins_with("Sello_") or hijo.name.begins_with("Cancela_") or hijo.name.begins_with("Barrote_"):
+					(hijo as Node3D).visible = not abierta
 		g.visible = false
 		g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		if g.has_meta("capas_fondo"):
 			for c_ant in g.get_meta("capas_fondo"):
 				if is_instance_valid(c_ant):
 					(c_ant as Sprite3D).visible = false
+					(c_ant as Node).queue_free()
+			g.remove_meta("capas_fondo")
 		return true
 	return false
 
@@ -1998,7 +2038,7 @@ func _aplicar_alfa_a_nodos(nodo: Node, a: float) -> void:
 			if mat is StandardMaterial3D:
 				var sm := mat as StandardMaterial3D
 				if a < 0.98:
-					sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+					sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_DEPTH_PRE_PASS
 					sm.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_ALWAYS
 					sm.albedo_color.a = a
 				else:
@@ -2024,7 +2064,7 @@ func _preparar_materiales_modelo(nodo: Node) -> void:
 				sm.diffuse_mode = BaseMaterial3D.DIFFUSE_LAMBERT_WRAP
 				sm.roughness = 0.85
 				sm.metallic_specular = 0.10
-				sm.cull_mode = BaseMaterial3D.CULL_DISABLED
+				sm.cull_mode = BaseMaterial3D.CULL_BACK
 				# Retención ambiental de color: asegura que en sombra las paredes y tejados mantengan sus detalles pixel art
 				if sm.albedo_texture != null:
 					sm.emission_enabled = true
@@ -2052,6 +2092,8 @@ func _sincronizar_volumen_3d(n: Node2D, g: Sprite3D, ancla: Node2D, tex: Texture
 			for c_ant in g.get_meta("capas_fondo"):
 				if is_instance_valid(c_ant):
 					(c_ant as Sprite3D).visible = false
+					(c_ant as Node).queue_free()
+			g.remove_meta("capas_fondo")
 		return
 	var prof_z := cfg.y
 	var capas: Array = []
