@@ -143,11 +143,19 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
     - `nudo_corrupcion.glb`: Nudo de corrupción de Giza que sella el almacén en Embarcadero Junco con núcleo amatista abisal (`#7E22CE` / `#A855F7`, emisión 3.8), zarzas petrificadas negras (`#0F172A`), púas cristalinas (`#C084FC`) y tentáculos reptantes.
   - Catálogo global ampliado a **78 estructuras 3D sólidas**.
   - **Suite de verificación completada al 100% (23 mundos + 2 interiores clave)** en `pruebas/verificar_gameplay_visual.gd` incorporando Maandiko (`casa_kalamu.glb`, `farol_runico.glb`), Embarcadero Junco (`nudo_corrupcion.glb`) y Gruta de las Raíces (`raiz_tapon.glb`).
+- [x] **Oleada 12 de Modelado 3D Sólido y Props de Interacción Dinámica (2026-10-19 - Commit `4190d4e`)**:
+  - Generados e integrados 4 modelos 3D sólidos clave:
+    - `roca_mineral.glb`: Peñasco de esquisto mineralizado en Camino Cobrizo con facetas poligonales (`#475569`), cono de derrubios basales (`#1E293B`), tres cristales prismáticos hexagonales de cobalto/azurita translúcida (`#38BDF8`, emisión `#0EA5E9` a 2.6) y vetas de cobre nativo (`#F59E0B`, metallic 0.85).
+    - `espino_giza.glb`: Enemigo fijo escupe-espinas en Gruta de las Raíces con base de raíces negras petrificadas (`#0F172A`), bulbo glandular de corrupción central (`#7E22CE`, emisión abisal `#9333EA` a 3.5), corona de 5 sépalos y aguijón central de cristal violáceo en ristre (`#C084FC`).
+    - `saco_mercancias.glb`: Saco de mercancías y grano de arpillera gruesa (`#B45309`) en Embarcadero Junco con atadura de cáñamo (`#78350F`) y boca ondulada acampanada. Sincronización dinámica de posición tridimensional (`ancla.global_position`) al ser desplazado por el empuje del Latido del cetro.
+    - `sello_raices.glb`: Gran sello de raíces de Giza en la fachada de la cabaña fluvial de Bata en Embarcadero Junco con dos grandes troncos cruzados en aspa (`#1E1B4B` y `#0F172A`), garras de amarre y gema central de amatista (`#7E22CE`, emisión `#A855F7` a 3.6) con desvanecimiento de opacidad suave (`TRANSPARENCY_ALPHA_DEPTH_PRE_PASS`).
+  - Catálogo global ampliado a **82 estructuras 3D sólidas**.
+  - **Suite de verificación completada al 100% (23 mundos + 2 interiores clave)** en `pruebas/verificar_gameplay_visual.gd` incorporando Camino Cobrizo (`roca_mineral.glb`), Gruta de las Raíces (`espino_giza.glb`) y Embarcadero Junco (`saco_mercancias.glb`, `sello_raices.glb`).
   - **Resultado: 100% PASS - CERO FALLOS VISUALES**.
 - [x] **Verificación Integral Superada**:
   - `verificar_gameplay_visual`: 100 % de comprobaciones pasadas (**23 biomas + 2 interiores, 0 fallos**).
   - `prueba_hd2d`: 100 % de comprobaciones pasadas (0 fallos).
-- [x] **Sincronización remota y Pruebas**: Todas las pruebas automatizadas pasan con 0 errores. Ramas `hd2d/calidad-blender` y `hd2d/blender-piloto` sincronizadas hasta `264b319`.
+- [x] **Sincronización remota y Pruebas**: Todas las pruebas automatizadas pasan con 0 errores. Ramas `hd2d/calidad-blender` y `hd2d/blender-piloto` sincronizadas hasta `4190d4e`.
 
 
 

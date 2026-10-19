@@ -314,6 +314,20 @@ graph TD
     - Dimensiones: $1.6\times 1.5\times 1.4\text{ m}$. Espesura de corrupción de Giza que sella la puerta del almacén de Bata. Costra y charco de corrupción basal en el fango (`#1E1B4B`), núcleo palpitante central facetado de amatista abisal violeta (`#7E22CE` / `#A855F7`, emisión 3.8), tres anillos de zarzas y raíces petrificadas negras que estrangulan el núcleo (`#0F172A`), púas y zarcillos afilados que emergen del nudo, 4 espículas cristalinas violáceas reflectantes (`#C084FC`, emisión 2.2) y tentáculos reptantes anclados al terreno.
     - Animación e Interacción Dinámica: Revienta y se disuelve en cenizas al impactar una semilla explosiva tras apartar los sacos con el latido del cetro.
     - Vinculado a: `nudo_giza.png`.
+79. **`roca_mineral.glb` (Camino Cobrizo - Filón de Cobre y Cristal de Esquisto)**
+    - Dimensiones: $1.4\times 1.2\times 1.1\text{ m}$. Peñasco de esquisto mineralizado con facetas poligonales angulosas (`#475569` y `#334155`), cono de derrubios basales (`#1E293B`), tres cristales prismáticos hexagonales de cobalto/azurita translúcida que brotan de la roca (`#38BDF8`, roughness 0.20, metallic 0.70, emisión celeste `#0EA5E9` a 2.6) y vetas acintadas de cobre nativo pulido incrustadas en las fallas (`#F59E0B`, roughness 0.35, metallic 0.85).
+    - Vinculado a: `roca_mineral.png`.
+80. **`espino_giza.glb` (Gruta de las Raíces - Centinela Escupe-Espinas de Giza)**
+    - Dimensiones: $1.2\times 1.1\times 1.3\text{ m}$. Enemigo fijo biomecánico/corrupto enclavado en las cavernas. Base de raíces y rizomas petrificados negros retorcidos (`#0F172A`), bulbo glandular de corrupción central abombado y vascularizado (`#7E22CE`, emisión abisal `#9333EA` a 3.5), corona de 5 sépalos afilados en garra, y aguijón central proyectil cristalino en ristre dispuesto para el disparo (`#C084FC`, metallic 0.45).
+    - Vinculado a: `espino.png`.
+81. **`saco_mercancias.glb` (Embarcadero Junco - Saco de Grano y Mercancías Fluviales)**
+    - Dimensiones: $0.9\times 0.9\times 0.95\text{ m}$. Saco pesado de arpillera y cáñamo grueso (`#B45309`) que reposa en los muelles de Bata. Base aplastada y deformable por el peso del grano sobre las tablas de madera, costuras laterales marcadas, faja de cuello ceñida con soga de cáñamo anudada (`#78350F`) y boca ondulada acampanada con frunces.
+    - Animación e Interacción Dinámica: Se sincroniza 1:1 con `ancla.global_position` en `espejo_hd2d.gd`, desplazándose tridimensionalmente al ser empujado por el Latido del cetro de Maisha para despejar el camino hacia el nudo de corrupción.
+    - Vinculado a: `saco.png`.
+82. **`sello_raices.glb` (Embarcadero Junco - Sello de Raíces de la Fachada de Bata)**
+    - Dimensiones: $2.4\times 0.5\times 2.0\text{ m}$. Entramado de raíces de Giza que clausura el vano y puerta de la cabaña fluvial de Bata. Dos grandes troncos gnarled cruzados en aspa (`#1E1B4B` y `#0F172A`), nudos de amarre laterales clavados en las jambas de madera, y núcleo de amatista de corrupción palpitante en el cruce central (`#7E22CE`, emisión `#A855F7` a 3.6).
+    - Animación e Interacción Dinámica: Desvanecimiento de opacidad suave (`TRANSPARENCY_ALPHA_DEPTH_PRE_PASS`) al despertar el eco de Bata y purificar la ribera.
+    - Vinculado a: `sello_raices.png`.
 
 ---
 
