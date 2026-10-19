@@ -689,6 +689,20 @@ func _ready() -> void:
 	if m_atril:
 		_verificar_materiales_nodo(m_atril, "atril_biblioteca")
 
+	# Acercarse a la escalera rodante de biblioteca (ǝ en x=30, y=48 -> 480, 768)
+	maisha.global_position = Vector2(480, 768)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_escalera: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "escalera" in (m as Node3D).name:
+			m_escalera = m
+			break
+	_comprobar(m_escalera != null, "Escalera rodante de biblioteca 3D instanciada en Estanterías Colgantes")
+	if m_escalera:
+		_verificar_materiales_nodo(m_escalera, "escalera_biblioteca")
+
 	# -----------------------------------------------------------------------
 	# 16. PASO DE PIEDRA (Casa de Nungu y Bloques Megalíticos)
 	# -----------------------------------------------------------------------
@@ -768,6 +782,22 @@ func _ready() -> void:
 	_comprobar(m_piedra_eco != null, "Piedra del Recuerdo / Eco 3D instanciada en la Plaza de las Ruinas")
 	if m_piedra_eco:
 		_verificar_materiales_nodo(m_piedra_eco, "piedra_eco")
+
+	# Acercarse al Primer Árbol sagrado en el centro de la plaza (Ŧ en 512, 400)
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(512, 410)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_primer_arbol: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and "primer_arbol" in (m as Node3D).name:
+			m_primer_arbol = m
+			break
+	_comprobar(m_primer_arbol != null, "Primer Árbol sagrado monumental 3D instanciado en Ruinas del Primer Árbol")
+	if m_primer_arbol:
+		_verificar_materiales_nodo(m_primer_arbol, "primer_arbol")
 
 	# -----------------------------------------------------------------------
 	# 18. SENDA DE LOS SURCOS (Huertas y Arbolado Seco)
@@ -990,6 +1020,48 @@ func _ready() -> void:
 	_comprobar(m_eco_isla != null, "Piedra del Eco 3D instanciada en la isla de La Travesía")
 	if m_eco_isla:
 		_verificar_materiales_nodo(m_eco_isla, "piedra_eco")
+
+	# -----------------------------------------------------------------------
+	# 24. INTERIORES CLAVE (Taller de Corteza y Casa de Nungu)
+	# -----------------------------------------------------------------------
+	print("\n--- [24/24] INTERIORES CLAVE (Taller de Corteza y Casa de Nungu) ---")
+	await _ir("taller_corteza", "")
+	await _encender_hd2d()
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Taller de Corteza")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(160, 135)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_yunque: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("yunque" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("yunque_forja.glb")):
+			m_yunque = m
+			break
+	_comprobar(m_yunque != null, "Yunque de forja de Corteza 3D instanciado en Taller de Corteza")
+	if m_yunque:
+		_verificar_materiales_nodo(m_yunque, "yunque_forja")
+
+	await _ir("casa_nungu", "")
+	await _encender_hd2d()
+	esp = _espejo()
+	_comprobar(esp != null, "EspejoHD2D activo en Casa de Nungu")
+	maisha = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	if is_instance_valid(maisha):
+		maisha.global_position = Vector2(160, 95)
+	await _esperar(0.4)
+	esp = _espejo()
+	modelos = esp.get("_modelos_blender_instanciados") if is_instance_valid(esp) else {}
+	var m_armario: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("armario" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("armario_nungu.glb")):
+			m_armario = m
+			break
+	_comprobar(m_armario != null, "Armario alpino de Nungu 3D instanciado en Casa de Nungu")
+	if m_armario:
+		_verificar_materiales_nodo(m_armario, "armario_nungu")
 
 	# -----------------------------------------------------------------------
 	# RESUMEN FINAL

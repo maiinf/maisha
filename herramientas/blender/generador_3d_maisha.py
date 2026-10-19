@@ -5117,6 +5117,429 @@ def generar_sauce_pantano():
 
     exportar_modelo("sauce_pantano", DIR_ENTORNO)
 
+
+def generar_primer_arbol():
+    """Genera el Primer Árbol de las Ruinas (Boss Landmark de Ruinas del Primer Árbol):
+    Colosal árbol sagrado ancestral con raíces zancudas que surcan las losas de piedra,
+    tronco hueco con cavidad central que alberga el resplandeciente Corazón de Giza (amatista púrpura emisiva),
+    grandes ramas nudadas en abanico 360° y copas superpuestas de fronda milenaria con destellos dorados."""
+    limpiar_escena()
+    mat_corteza = obtener_material_textura("Mat_PrimerArbol_Corteza", os.path.join(DIR_KITOVU, "pared_troncos_tile.png"), rugosidad=0.88)
+    mat_interior = obtener_material("Mat_PrimerArbol_Interior", "#1A0F08", roughness=0.95)
+    mat_copa_a = obtener_material("Mat_PrimerArbol_FollajeA", "#2E481B", roughness=0.65)
+    mat_copa_b = obtener_material("Mat_PrimerArbol_FollajeB", "#3E5C24", roughness=0.65)
+    mat_copa_oro = obtener_material("Mat_PrimerArbol_HojasOro", "#D97706", roughness=0.55)
+    mat_corazon = obtener_material("Mat_PrimerArbol_CorazonGiza", "#9333EA", roughness=0.20, metallic=0.15, emission_hex="#C084FC", emission_strength=4.8)
+    mat_raiz_musgo = obtener_material("Mat_PrimerArbol_Musgo", "#365314", roughness=0.75)
+
+    # 1. Raíces zancudas colosales extendidas en 360°
+    raices_datos = [
+        (math.radians(35), 2.2, 0.42, 2.6),
+        (math.radians(110), 2.0, 0.38, 2.4),
+        (math.radians(175), 2.4, 0.45, 2.8),
+        (math.radians(240), 2.1, 0.40, 2.5),
+        (math.radians(305), 2.3, 0.44, 2.7),
+    ]
+    for ang, dist, rad_r, len_r in raices_datos:
+        rx = math.cos(ang) * (dist * 0.5)
+        ry = math.sin(ang) * (dist * 0.5)
+        bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=rad_r, depth=len_r, location=(rx, ry, 0.35))
+        raiz = bpy.context.active_object
+        raiz.rotation_euler = (math.sin(ang) * 0.70, -math.cos(ang) * 0.70, 0)
+        aplicar_uv_cilindro(raiz, 1.5, 3.0)
+        asignar_material(raiz, mat_corteza)
+
+    # 2. Tronco colosal con curvatura y conicidad natural
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=1.85, depth=4.80, location=(0, 0, 2.40))
+    tronco_bajo = bpy.context.active_object
+    tronco_bajo.scale = (1.15, 1.05, 1.0)
+    aplicar_uv_cilindro(tronco_bajo, 2.5, 5.0)
+    asignar_material(tronco_bajo, mat_corteza)
+    suavizar(tronco_bajo)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=14, radius=1.55, depth=3.80, location=(0.08, 0.10, 5.80))
+    tronco_alto = bpy.context.active_object
+    tronco_alto.scale = (1.05, 1.12, 1.0)
+    tronco_alto.rotation_euler = (math.radians(-3), math.radians(4), 0)
+    aplicar_uv_cilindro(tronco_alto, 2.0, 4.0)
+    asignar_material(tronco_alto, mat_corteza)
+    suavizar(tronco_alto)
+
+    # 3. Cavidad central hueca (El Hueco del Tronco)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.95, depth=1.90, location=(0.0, -1.25, 1.65))
+    cavidad = bpy.context.active_object
+    cavidad.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(cavidad, mat_interior)
+
+    # 4. El Corazón de Giza flotando y latiendo dentro del hueco
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.48, location=(0.0, -1.05, 1.70))
+    corazon = bpy.context.active_object
+    corazon.scale = (0.9, 0.9, 1.25)
+    asignar_material(corazon, mat_corazon)
+
+    # Cristales satélites de corrupción flotando alrededor del corazón
+    for c_ang, c_z, c_rad in [(0.4, 1.95, 0.16), (2.1, 1.55, 0.14), (3.9, 1.75, 0.15)]:
+        cx = math.cos(c_ang) * 0.38
+        cy = -1.05 + math.sin(c_ang) * 0.25
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=c_rad, location=(cx, cy, c_z))
+        cristal = bpy.context.active_object
+        cristal.rotation_euler = (0.3, 0.5, 0.8)
+        asignar_material(cristal, mat_corazon)
+
+    # 5. Grandes ramas principales en abanico 360°
+    ramas = [
+        (1.4, 0.8, 6.8, 25, 45, 3.2, 0.38),
+        (-1.3, 0.9, 6.6, -20, -42, 3.0, 0.36),
+        (1.2, -0.9, 6.4, -38, 20, 2.9, 0.36),
+        (-1.1, -0.8, 6.5, -35, -25, 2.8, 0.35),
+    ]
+    for bx, by, bz, rx, ry, blen, brad in ramas:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=brad, depth=blen, location=(bx, by, bz))
+        rama = bpy.context.active_object
+        rama.rotation_euler = (math.radians(rx), math.radians(ry), 0)
+        aplicar_uv_cilindro(rama, 1.2, 2.5)
+        asignar_material(rama, mat_corteza)
+
+    # 6. Copas superpuestas de fronda milenaria y hojas doradas
+    copas = [
+        ((0.0, 0.0, 8.8), 3.8, (1.25, 1.20, 0.70), mat_copa_a),
+        ((1.8, 1.2, 7.8), 2.4, (1.15, 1.10, 0.65), mat_copa_b),
+        ((-1.9, 1.3, 7.6), 2.3, (1.10, 1.15, 0.65), mat_copa_b),
+        ((1.7, -1.1, 7.5), 2.2, (1.15, 1.10, 0.65), mat_copa_b),
+        ((-1.8, -1.0, 7.7), 2.3, (1.10, 1.15, 0.65), mat_copa_b),
+        ((0.0, 0.0, 10.4), 2.5, (1.10, 1.05, 0.60), mat_copa_oro),
+    ]
+    for loc, rad, esc, cmat in copas:
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=rad, location=loc)
+        copa = bpy.context.active_object
+        copa.scale = esc
+        asignar_material(copa, cmat)
+        suavizar(copa)
+
+    # 7. Lianas de musgo colgantes
+    for lx, ly, lz, lalt in [
+        (1.5, 0.4, 6.2, 2.2),
+        (-1.6, 0.5, 6.0, 2.4),
+        (0.4, -1.4, 5.8, 2.0),
+        (-0.5, 1.5, 6.1, 2.3),
+    ]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.08, depth=lalt, location=(lx, ly, lz - lalt * 0.5))
+        liana = bpy.context.active_object
+        asignar_material(liana, mat_raiz_musgo)
+
+    exportar_modelo("primer_arbol", DIR_ENTORNO)
+
+
+def generar_armario_nungu():
+    """Genera el Armario de Nungu (Paso de la Escarcha):
+    Gran ropero alpino de madera maciza con puertas labradas, cornisa moldurada,
+    cerrojo de hierro forjado de Corteza con candado, y acceso inferior a la trampilla con escalera
+    que desciende a la Cueva de las Setas."""
+    limpiar_escena()
+    mat_madera = obtener_material_textura("Mat_Armario_Madera", os.path.join(DIR_KITOVU, "pared_troncos_tile.png"), rugosidad=0.78)
+    mat_tablas = obtener_material("Mat_Armario_Tablas", "#854D0E", roughness=0.70)
+    mat_moldura = obtener_material("Mat_Armario_Moldura", "#5C2B0B", roughness=0.75)
+    mat_hierro = obtener_material("Mat_Armario_Hierro", "#1E293B", roughness=0.35, metallic=0.85)
+    mat_oro_llave = obtener_material("Mat_Armario_OjoLlave", "#D97706", roughness=0.30, metallic=0.80)
+    mat_sotano = obtener_material("Mat_Armario_Sotano", "#334155", roughness=0.88)
+
+    # 1. Zócalo base con patas molduradas
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.12))
+    zocalo = bpy.context.active_object
+    zocalo.scale = (2.40, 1.10, 0.24)
+    asignar_material(zocalo, mat_moldura)
+
+    for px, py in [(-1.12, -0.48), (1.12, -0.48), (-1.12, 0.48), (1.12, 0.48)]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, py, 0.08))
+        pata = bpy.context.active_object
+        pata.scale = (0.24, 0.24, 0.16)
+        asignar_material(pata, mat_moldura)
+
+    # 2. Cuerpo principal del ropero
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.70))
+    cuerpo = bpy.context.active_object
+    cuerpo.scale = (2.25, 1.00, 2.92)
+    aplicar_uv_caja(cuerpo, 1.5, 2.5)
+    asignar_material(cuerpo, mat_madera)
+
+    # 3. Cornisa superior moldurada con voladizo alpino
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 3.24))
+    cornisa = bpy.context.active_object
+    cornisa.scale = (2.48, 1.18, 0.22)
+    asignar_material(cornisa, mat_moldura)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 3.40))
+    remate = bpy.context.active_object
+    remate.scale = (2.56, 1.24, 0.12)
+    asignar_material(remate, mat_moldura)
+
+    # 4. Puertas frontales dobles con casetones y molduras
+    for px, rot_y in [(-0.54, 0), (0.54, 0)]:
+        # Hoja de puerta
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, -0.52, 1.68))
+        puerta = bpy.context.active_object
+        puerta.scale = (1.02, 0.06, 2.60)
+        asignar_material(puerta, mat_tablas)
+
+        # Casetón superior e inferior
+        for pz in [1.15, 2.20]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(px, -0.56, pz))
+            caseton = bpy.context.active_object
+            caseton.scale = (0.84, 0.04, 0.88)
+            asignar_material(caseton, mat_moldura)
+
+    # 5. Herrajes de forja de Corteza: bisagras de pletina
+    for hx in [-1.08, 1.08]:
+        for hz in [0.70, 2.65]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(hx, -0.54, hz))
+            bisagra = bpy.context.active_object
+            bisagra.scale = (0.28, 0.04, 0.08)
+            asignar_material(bisagra, mat_hierro)
+
+    # 6. Pasador central y candado de hierro de Corteza
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.56, 1.68))
+    cerrojo = bpy.context.active_object
+    cerrojo.scale = (0.36, 0.05, 0.12)
+    asignar_material(cerrojo, mat_hierro)
+
+    # Candado
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.60, 1.58))
+    candado = bpy.context.active_object
+    candado.scale = (0.16, 0.06, 0.18)
+    asignar_material(candado, mat_hierro)
+
+    # Arco del candado
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.08, minor_radius=0.02, location=(0, -0.60, 1.70))
+    arco = bpy.context.active_object
+    asignar_material(arco, mat_hierro)
+
+    # Bocallave dorada
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.03, depth=0.03, location=(0, -0.64, 1.56))
+    ojo = bpy.context.active_object
+    ojo.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(ojo, mat_oro_llave)
+
+    # 7. Hueco inferior de trampilla y peldaños de sótano hacia Cueva de las Setas
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.05, 0.35))
+    trampilla_marco = bpy.context.active_object
+    trampilla_marco.scale = (1.40, 0.70, 0.10)
+    asignar_material(trampilla_marco, mat_moldura)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.05, 0.10))
+    foso = bpy.context.active_object
+    foso.scale = (1.20, 0.54, 0.40)
+    asignar_material(foso, mat_sotano)
+
+    for i, pz in enumerate([0.22, 0.12, 0.02]):
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.15 + i * 0.15, pz))
+        peldrano = bpy.context.active_object
+        peldrano.scale = (0.90, 0.16, 0.08)
+        asignar_material(peldrano, mat_tablas)
+
+    exportar_modelo("armario_nungu", DIR_ENTORNO)
+
+
+def generar_yunque_forja():
+    """Genera el Yunque de Herrero de Corteza (Taller de la Aldea y Forjas):
+    Tajo de tronco de roble zunchado con dos aros de hierro forjado y remaches,
+    yunque macizo de acero forjado con pie abocinado clavado al tajo, cintura esbelta,
+    mesa plana templada, cuerno cónico de curvar, talón con ojo cuadrado y martillo de forja apoyado."""
+    limpiar_escena()
+    mat_corteza = obtener_material_textura("Mat_Yunque_Tajo", os.path.join(DIR_KITOVU, "pared_troncos_tile.png"), rugosidad=0.85)
+    mat_roble_tapa = obtener_material("Mat_Yunque_RobleTapa", "#A16207", roughness=0.80)
+    mat_acero = obtener_material("Mat_Yunque_Acero", "#334155", roughness=0.28, metallic=0.90)
+    mat_mesa = obtener_material("Mat_Yunque_Mesa", "#475569", roughness=0.20, metallic=0.94)
+    mat_hierro_negro = obtener_material("Mat_Yunque_HierroNegro", "#1E293B", roughness=0.35, metallic=0.85)
+    mat_mango = obtener_material("Mat_Yunque_MangoMadera", "#78350F", roughness=0.70)
+
+    # 1. Tajo cilíndrico de madera (sección de tronco de roble)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.48, depth=0.62, location=(0, 0, 0.31))
+    tajo = bpy.context.active_object
+    aplicar_uv_cilindro(tajo, 1.8, 1.2)
+    asignar_material(tajo, mat_corteza)
+
+    # Tapa superior del tajo con madera cortada
+    bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.47, depth=0.04, location=(0, 0, 0.61))
+    tapa = bpy.context.active_object
+    asignar_material(tapa, mat_roble_tapa)
+
+    # Dos zunchos de hierro forjado reforzando el tronco con remaches
+    for pz in [0.15, 0.48]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.495, depth=0.06, location=(0, 0, pz))
+        zuncho = bpy.context.active_object
+        asignar_material(zuncho, mat_hierro_negro)
+
+        for ang_deg in [0, 60, 120, 180, 240, 300]:
+            rad = math.radians(ang_deg)
+            rx = math.cos(rad) * 0.505
+            ry = math.sin(rad) * 0.505
+            bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.022, depth=0.03, location=(rx, ry, pz))
+            remache = bpy.context.active_object
+            remache.rotation_euler = (math.sin(rad) * 1.57, -math.cos(rad) * 1.57, 0)
+            asignar_material(remache, mat_hierro_negro)
+
+    # 2. Base abocinada del yunque con 4 grapas de anclaje
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.68))
+    pie_yunque = bpy.context.active_object
+    pie_yunque.scale = (0.54, 0.44, 0.12)
+    asignar_material(pie_yunque, mat_acero)
+
+    for gx, gy in [(-0.25, -0.19), (0.25, -0.19), (-0.25, 0.19), (0.25, 0.19)]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(gx, gy, 0.66))
+        grapa = bpy.context.active_object
+        grapa.scale = (0.06, 0.06, 0.10)
+        asignar_material(grapa, mat_hierro_negro)
+
+    # 3. Cintura esbelta del yunque
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.81))
+    cintura = bpy.context.active_object
+    cintura.scale = (0.34, 0.28, 0.16)
+    asignar_material(cintura, mat_acero)
+
+    # 4. Cuerpo superior del yunque y mesa de trabajo rectificada
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.04, 0, 0.96))
+    cuerpo_sup = bpy.context.active_object
+    cuerpo_sup.scale = (0.58, 0.32, 0.16)
+    asignar_material(cuerpo_sup, mat_acero)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.04, 0, 1.05))
+    mesa = bpy.context.active_object
+    mesa.scale = (0.56, 0.30, 0.04)
+    asignar_material(mesa, mat_mesa)
+
+    # 5. Cuerno cónico de curvar (hacia la izquierda -X)
+    bpy.ops.mesh.primitive_cone_add(vertices=12, radius1=0.14, radius2=0.03, depth=0.38, location=(-0.41, 0, 0.98))
+    cuerno = bpy.context.active_object
+    cuerno.rotation_euler = (0, math.radians(90), 0)
+    asignar_material(cuerno, mat_acero)
+    suavizar(cuerno)
+
+    # 6. Talón trasero (hacia la derecha +X) con orificio cuadrado (hardy hole) y redondo
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.42, 0, 0.97))
+    talon = bpy.context.active_object
+    talon.scale = (0.24, 0.28, 0.14)
+    asignar_material(talon, mat_acero)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.40, 0, 1.055))
+    hardy = bpy.context.active_object
+    hardy.scale = (0.05, 0.05, 0.04)
+    asignar_material(hardy, mat_hierro_negro)
+
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.02, depth=0.04, location=(0.48, 0, 1.055))
+    pritchel = bpy.context.active_object
+    asignar_material(pritchel, mat_hierro_negro)
+
+    # 7. Martillo de forja de Corteza apoyado contra el tajo
+    # Mango
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.022, depth=0.56, location=(0.38, -0.32, 0.34))
+    mango = bpy.context.active_object
+    mango.rotation_euler = (math.radians(22), math.radians(-18), math.radians(15))
+    asignar_material(mango, mat_mango)
+
+    # Cabeza de mazo forjado
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.45, -0.40, 0.54))
+    cabeza_m = bpy.context.active_object
+    cabeza_m.scale = (0.10, 0.18, 0.09)
+    cabeza_m.rotation_euler = (math.radians(22), math.radians(-18), math.radians(15))
+    asignar_material(cabeza_m, mat_hierro_negro)
+
+    exportar_modelo("yunque_forja", DIR_ENTORNO)
+
+
+def generar_escalera_biblioteca():
+    """Genera la Escalera Rodante de Biblioteca (Estanterías Colgantes):
+    Escalera puente móvil horizontal sobre el abismo entre estantes con zancas robustas de caoba barnizada,
+    10 peldaños cilíndricos de bronce noble, carretón rodante inferior con dos ruedas de bronce embutidas en raíl,
+    carros de rodillos superiores con ganchos de latón y barandilla lateral de seguridad."""
+    limpiar_escena()
+    mat_tablas = obtener_material("Mat_Escalera_Zancas", "#78350F", roughness=0.65)
+    mat_bronce = obtener_material("Mat_Escalera_Bronce", "#D97706", roughness=0.32, metallic=0.82)
+    mat_laton = obtener_material("Mat_Escalera_Laton", "#F59E0B", roughness=0.25, metallic=0.88)
+    mat_hierro = obtener_material("Mat_Escalera_Hierro", "#1E293B", roughness=0.35, metallic=0.85)
+
+    # 1. Zancas laterales de caoba barnizada (vigas longitudinales de soporte)
+    # Longitud total en Y = 4.30m (de Y = -2.15 a Y = +2.15)
+    for zx in [-0.85, 0.85]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(zx, 0, 0.16))
+        zanca = bpy.context.active_object
+        zanca.scale = (0.14, 4.30, 0.22)
+        asignar_material(zanca, mat_tablas)
+
+        # Refuerzo de chapa de bronce en los extremos
+        for yy in [-2.10, 2.10]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(zx, yy, 0.16))
+            chapa = bpy.context.active_object
+            chapa.scale = (0.16, 0.14, 0.24)
+            asignar_material(chapa, mat_bronce)
+
+    # 2. 10 peldaños cilíndricos de bronce noble estriado
+    for i in range(10):
+        py = -1.80 + i * 0.40
+        bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.045, depth=1.60, location=(0, py, 0.18))
+        peldano = bpy.context.active_object
+        peldano.rotation_euler = (0, math.radians(90), 0)
+        asignar_material(peldano, mat_bronce)
+
+        # Arandelas de sujeción en ambos extremos
+        for ax in [-0.78, 0.78]:
+            bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.065, depth=0.04, location=(ax, py, 0.18))
+            arandela = bpy.context.active_object
+            arandela.rotation_euler = (0, math.radians(90), 0)
+            asignar_material(arandela, mat_laton)
+
+    # 3. Carretón rodante inferior (en Y = -2.15m en Blender, que corresponde a +Z en Godot, el sur/pie) con ruedas de bronce sobre raíl
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -2.15, 0.14))
+    eje_inf = bpy.context.active_object
+    eje_inf.scale = (1.96, 0.16, 0.18)
+    asignar_material(eje_inf, mat_hierro)
+
+    # Dos ruedas de fundición con pestaña de rodadura
+    for wx in [-0.85, 0.85]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=16, radius=0.18, depth=0.08, location=(wx, -2.15, 0.14))
+        rueda = bpy.context.active_object
+        rueda.rotation_euler = (0, math.radians(90), 0)
+        asignar_material(rueda, mat_bronce)
+
+        # Buje central de latón con remache
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.06, depth=0.12, location=(wx, -2.15, 0.14))
+        buje = bpy.context.active_object
+        buje.rotation_euler = (0, math.radians(90), 0)
+        asignar_material(buje, mat_laton)
+
+    # 4. Carros superiores con ganchos de sujeción al raíl de la estantería (en Y = +2.15m en Blender, que corresponde a -Z en Godot, el norte/cabecera)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 2.15, 0.16))
+    eje_sup = bpy.context.active_object
+    eje_sup.scale = (1.96, 0.14, 0.16)
+    asignar_material(eje_sup, mat_hierro)
+
+    for gx in [-0.85, 0.85]:
+        # Brazo de gancho
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(gx, 2.15, 0.28))
+        brazo_g = bpy.context.active_object
+        brazo_g.scale = (0.10, 0.12, 0.24)
+        asignar_material(brazo_g, mat_bronce)
+
+        # Rodillo superior
+        bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.10, depth=0.08, location=(gx, 2.15, 0.38))
+        rodillo = bpy.context.active_object
+        rodillo.rotation_euler = (0, math.radians(90), 0)
+        asignar_material(rodillo, mat_laton)
+
+    # 5. Barandilla lateral de protección en latón / bronce (en lado derecho x = 0.95)
+    # 3 balaustres verticales
+    for by in [-1.60, 0.0, 1.60]:
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.03, depth=0.52, location=(0.95, by, 0.42))
+        balaustre = bpy.context.active_object
+        asignar_material(balaustre, mat_bronce)
+
+    # Pasamanos superior longitudinal
+    bpy.ops.mesh.primitive_cylinder_add(vertices=10, radius=0.038, depth=3.60, location=(0.95, 0, 0.68))
+    pasamanos = bpy.context.active_object
+    pasamanos.rotation_euler = (math.radians(90), 0, 0)
+    asignar_material(pasamanos, mat_laton)
+
+    exportar_modelo("escalera_biblioteca", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -5202,6 +5625,10 @@ def main():
     generar_tronco_caido()
     generar_pino_nevado()
     generar_sauce_pantano()
+    generar_primer_arbol()
+    generar_armario_nungu()
+    generar_yunque_forja()
+    generar_escalera_biblioteca()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()

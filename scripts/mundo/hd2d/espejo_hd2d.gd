@@ -903,6 +903,38 @@ const MODELOS_BLENDER := {
 		"radio_occlusion": Vector2(1.2, 0.9),
 		"solo_reconstruido": false,
 	},
+	"primer_arbol.png": {
+		"ruta": "res://modelos/entorno/primer_arbol.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(4.5, 3.5),
+		"solo_reconstruido": false,
+	},
+	"armario.png": {
+		"ruta": "res://modelos/entorno/armario_nungu.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.10),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.8, 1.5),
+		"solo_reconstruido": false,
+	},
+	"yunque.png": {
+		"ruta": "res://modelos/entorno/yunque_forja.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.8, 0.6),
+		"solo_reconstruido": false,
+	},
+	"escalera.png": {
+		"ruta": "res://modelos/entorno/escalera_biblioteca.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(1.0, 0.0, -2.1875),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(1.2, 2.5),
+		"solo_reconstruido": false,
+	},
 }
 const TIPOS_LUZ_3D := {
 	"v": [4.6, 0.92, Color(1.0, 0.84, 0.55), false],
@@ -1917,7 +1949,7 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 				m3d.rotation.y = deg_to_rad(cfg["rot_y"])
 	if m3d and is_instance_valid(m3d):
 		var off: Vector3 = cfg.get("offset", Vector3.ZERO)
-		var pos_ref := ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position
+		var pos_ref := (n as Node2D).global_position if arch == "escalera.png" else (ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position)
 		m3d.position = _al_suelo(pos_ref) + off
 		m3d.visible = _visible(n)
 		g.visible = false
