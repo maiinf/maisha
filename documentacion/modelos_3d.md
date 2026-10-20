@@ -342,6 +342,22 @@ graph TD
 86. **`raiz_dormida.glb` (Gruta de las Raíces - Raíz Ancestral Durmiente del Pasillo)**
     - Dimensiones: $3.8\times 1.0\times 1.4\text{ m}$. Colosal raíz milenaria que atraviesa el corredor subterráneo de pared a pared. Tronco horizontal ondulado de corteza rugosa y estriada (`#3E1E0F`), 4 ramificaciones de apoyo que se clavan en la roca del suelo y en el muro posterior, 6 nódulos bioluminiscentes de savia Asili turquesa (`#2DD4BF`, emisión 2.2) y prominente ojo durmiente central esculpido en relieve con párpado pétreo (`#1E1B4B`) y fisura de pupila abisal violeta que brilla en la oscuridad (`#7E22CE`, emisión `#C084FC` a 3.8).
     - Vinculado a: `raiz_dormida.png`.
+87. **`semilla_dormida.glb` (Gruta de las Raíces - Sagrada Semilla Dormida Ancestral)**
+    - Dimensiones: $1.2\times 1.1\times 1.3\text{ m}$. Sagrado receptáculo ancestral en los nichos devocionales de la Gruta. Pedestal cilíndrico de esquisto oscuro labrado (`#423A4C`) con borde acampanado para ofrendas, cuna de 4 zarpas de raíces gudosas vivas (`#482B1B`) que sostienen la vaina, gran semilla ovoide de cáscara petrificada marrón terroso (`#4A3525`) con 4 venas de filigrana dorada de Asili (`#DF9022`, emisión 2.2), núcleo interior bioluminiscente esmeralda visible entre las fisuras (`#76C442`, emisión `#A3E635` a 3.8) y corona apical de 3 hojas germinales tiernas (`#365314`).
+    - Animación e Interacción Dinámica: Pulsa en sincronía con la respiración lumínica de la caverna mediante las variaciones de energía y frame de `oscuridad.gd`.
+    - Vinculado a: `semilla_dormida.png`.
+88. **`rescoldo_giza.glb` (Universal - Rescoldo Flamígero de Giza y Reavivación de Ecos)**
+    - Dimensiones: $1.4\times 1.4\times 1.5\text{ m}$. Remanente ritual que brota en las arenas de combate tras vencer a un jefe de zona. Lecho circular de ceniza densa humeante (`#3E3444`) con 4 parches de brasas ardientes anaranjadas (`#EA580C`, emisión 2.8), anillo perimetral de 8 monolitos de basalto oscuro quebrado (`#423A4E`), espira flamígera central con 4 lenguas arremolinadas de corrupción violeta de Giza (`#7E22CE`, emisión abisal `#C084FC` a 4.2) y núcleo ígneo interno de oro primordial (`#EAB308`, emisión `#FDE047` a 3.5).
+    - Animación e Interacción Dinámica: Al interactuar Maisha con él para reavivar el Eco del jefe, se deforma en escala y se desvanece suavemente antes de liberarse.
+    - Vinculado a: `rescoldo.png`.
+89. **`chatarra_oxidada.glb` (Campo Segado - Bloque de Chatarra Mecánica Oxidada)**
+    - Dimensiones: $1.0\times 0.7\times 0.65\text{ m}$. Montón de restos mecánicos desprendidos de la Cosechadora Oxidada. Base pesada de planchas de hierro laminado deformado (`#442A1D`, rugosidad 0.88) con doble hilada de remaches de forja (`#452A1E`), chapa doblada secundaria de refuerzo, rueda de engranaje de transmisión inclinada a 35° con 8 dientes fresados (`#854D27`), tuerca hexagonal maciza de bronce envejecido (`#A16207`) con oquedad central roscada y fragmento de biela de pistón doblado.
+    - Animación e Interacción Dinámica: Al romperse el bloque (`frame = 1`), la estructura superior `Chatarra_Superior` se oculta instantáneamente en 3D, quedando solo la base deformada antes de evaporarse en humo y astillas.
+    - Vinculado a: `chatarra.png`.
+90. **`zanahoria_huerto.glb` (El Kitovu - Huerto de Zanahorias de Mzee Shamba)**
+    - Dimensiones: $0.7\times 0.7\times 0.6\text{ m}$. Bancal hortícola de tierra fértil de labranza en los campos de Mzee Shamba. Montículo central de sustrato húmedo labrado (`#472C1A`, rugosidad 0.92) flanqueado por cordones de surcos paralelos (`#54331C`), pocillo de enraizamiento, cuello de raíz anaranjada asomando del suelo (`#EA580C`) con collarín verdoso (`#84CC16`) y frondoso penacho de 6 hojas plumosas desplegadas en abanico 360° (`#2F851D` y `#4ADE80`).
+    - Animación e Interacción Dinámica: Al ser cosechada por Maisha (`frame = 1`), los nodos `Zanahoria_Fruto` y `Zanahoria_Hojas` se ocultan automáticamente, dejando visible el surco con la hendidura cóncava de la cosecha.
+    - Vinculado a: `zanahoria.png`.
 
 ---
 

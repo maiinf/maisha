@@ -160,10 +160,19 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
   - Catálogo global ampliado a **86 estructuras 3D sólidas**.
   - **Suite de verificación completada al 100% (23 mundos + 2 interiores clave)** en `pruebas/verificar_gameplay_visual.gd` incorporando El Kitovu (`crater_kitovu.glb`), Gruta de las Raíces (`raiz_dormida.glb`) y Cueva de las Setas (`cortina_micelio.glb`, `espinas_giza.glb`).
   - **Resultado: 100% PASS - CERO FALLOS VISUALES**.
+- [x] **Oleada 14 de Modelado 3D Sólido y Elementos Interactivos de Huerto y Combate (2026-10-21 - Commit `e59a6d3`)**:
+  - Generados e integrados 4 modelos 3D sólidos clave:
+    - `semilla_dormida.glb`: Sagrado receptáculo ancestral en los nichos de la Gruta de las Raíces con pedestal de esquisto cilíndrico labrado (`#423A4C`), cuna de 4 raíces vivas abrazando la base (`#482B1B`), cáscara petrificada marrón (`#4A3525`), 4 venas de oro primordial de Asili (`#DF9022`, emisión 2.2), núcleo bioluminiscente esmeralda pulsante (`#76C442`, emisión `#A3E635` a 3.8) y corona apical de 3 hojas germinales (`#365314`).
+    - `rescoldo_giza.glb`: Rescoldo ritual en arenas de combate tras vencer a un jefe de zona con lecho de cenizas humeantes (`#3E3444`), 4 parches de brasas ardientes anaranjadas (`#EA580C`, emisión 2.8), anillo perimetral de 8 monolitos de basalto quebrado (`#423A4E`), espira flamígera de corrupción violeta (`#7E22CE`, emisión `#C084FC` a 4.2) y núcleo ígneo interno de oro primordial (`#EAB308`, emisión `#FDE047` a 3.5).
+    - `chatarra_oxidada.glb`: Bloque de restos mecánicos en Campo Segado con base de plancha deformada (`#442A1D`), remaches forjados (`#452A1E`), rueda de engranaje inclinada a 35° (`#854D27`), tuerca hexagonal maciza de bronce (`#A16207`) y biela de pistón doblada. Ocultación automática de la estructura superior `Chatarra_Superior` al desmoronarse (`frame = 1`).
+    - `zanahoria_huerto.glb`: Bancal hortícola de Mzee Shamba en El Kitovu con montículo de tierra húmeda (`#472C1A`), surcos de labranza paralelos (`#54331C`), cuello de raíz anaranjada asomando del suelo (`#EA580C`) y penacho de 6 hojas plumosas en abanico 360° (`#2F851D` y `#4ADE80`). Ocultación automática de fruto y hojas al cosecharse (`frame = 1`).
+  - Catálogo global ampliado a **90 estructuras 3D sólidas**.
+  - **Suite de verificación completada al 100% (23 mundos + 2 interiores clave)** en `pruebas/verificar_gameplay_visual.gd` incorporando El Kitovu (`zanahoria_huerto.glb`), Gruta de las Raíces (`semilla_dormida.glb`) y Campo Segado (`chatarra_oxidada.glb`, `rescoldo_giza.glb`).
+  - **Resultado: 100% PASS - CERO FALLOS VISUALES**.
 - [x] **Verificación Integral Superada**:
   - `verificar_gameplay_visual`: 100 % de comprobaciones pasadas (**23 biomas + 2 interiores, 0 fallos**).
   - `prueba_hd2d`: 100 % de comprobaciones pasadas (0 fallos).
-- [x] **Sincronización remota y Pruebas**: Todas las pruebas automatizadas pasan con 0 errores. Ramas `hd2d/calidad-blender` y `hd2d/blender-piloto` sincronizadas hasta `e0783db`.
+- [x] **Sincronización remota y Pruebas**: Todas las pruebas automatizadas pasan con 0 errores. Ramas `hd2d/calidad-blender` y `hd2d/blender-piloto` sincronizadas hasta `e59a6d3`.
 
 
 
