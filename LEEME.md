@@ -981,6 +981,7 @@ Cada uno tiene ahora **4 fotogramas** (`<id>_anim.png`): quieto, respira (todo b
 - En `scripts/mundo/luz_sol.gd`: se cachean las referencias a los nodos de grupo `maisha` y `corrupcion`.
 - `scripts/personajes/sombra.gd` ya no tiene `_process`: escucha `Reloj.luz_cambiada` (hay mapas con casi 2000 sombras). Para medir: `godot --path . res://pruebas/ejecutar.tscn -- medir_rendimiento [hd2d] [noche] [mapas...]` (ver `documentacion/optimization.md`).
 - Los árboles y rocas sencillos (`region.gd._fijo_sencillo`) son un solo `Sprite2D` (la sombra va detrás con `show_behind_parent`) y sus cajas de colisión van todas en un único cuerpo, `Entidades/Fijos`. El medidor tiene los modos `pelea` (zona cerrada con unos 10 enemigos) y mide también la carga y el `_draw`.
+- Las sombras de esos árboles y rocas van juntas en una malla por trozo de 256 px (`scripts/mundo/trozo_sombra.gd`, en `Region/SombrasFijas`): una llamada de dibujo por trozo en vez de una por sombra. Casi la mitad de llamadas de dibujo en los bosques.
 ## Pulido de interfaz (`revision/interfaz`)
 
 - En `scripts/interfaz/menu_pausa.gd`, la ficha de objetos llevados muestra el icono de `arte/interfaz/objetos.png` para cualquier objeto y se organiza en dos columnas cuando hay más de tres para no desbordar `CAJA_INFO`.

@@ -577,10 +577,14 @@ func _poner(nodo: Node2D, pos: Vector2) -> void:
 
 var _cuerpo_fijos: StaticBody2D           # un solo cuerpo con las cajas de todos los árboles y rocas sencillos
 var _cajas := {}                          # tamaño -> RectangleShape2D compartida
+var _sombras_fijas: Node2D                # las sombras de esos árboles y rocas, a ras de suelo, por trozos
+var _trozos_sombra := {}                  # trozo (Vector2i) -> su nodo
+const TROZO_SOMBRA := preload("res://scripts/mundo/trozo_sombra.gd")
+const LADO_TROZO := 256.0                 # píxeles de cada trozo de sombras (Godot salta los que no se ven)
 
 
-## Un árbol o una roca sin nada más (lo que más hay: casi 2000 en La Travesía): solo su dibujo, con la sombra
-## detrás (show_behind_parent: se pinta igual que antes, justo antes del dibujo), y su caja en el cuerpo común
+## Un árbol o una roca sin nada más (lo que más hay: casi 2000 en La Travesía): solo su dibujo, su sombra en el
+## trozo de sombras de su sitio (a ras de suelo: así no parte los lotes de dibujo) y su caja en el cuerpo común
 func _fijo_sencillo(def: Array, pos: Vector2, semilla: int) -> Sprite2D:
 	var sprite := Sprite2D.new()
 	sprite.position = pos
@@ -591,11 +595,7 @@ func _fijo_sencillo(def: Array, pos: Vector2, semilla: int) -> Sprite2D:
 	sprite.centered = false
 	sprite.offset = Vector2(-sprite.texture.get_width() / (2 * fotogramas), -sprite.texture.get_height() + 2)
 	if def[2] > 0.0:
-		var sombra := Node2D.new()
-		sombra.set_script(SOMBRA)
-		sombra.set("ancho", def[2])
-		sombra.show_behind_parent = true
-		sprite.add_child(sombra)
+		_sombra_fija(pos, def[2])
 	_gestor.aplicar_a(sprite)
 	_entidades.add_child(sprite)
 	if _cuerpo_fijos == null:
@@ -611,6 +611,23 @@ func _fijo_sencillo(def: Array, pos: Vector2, semilla: int) -> Sprite2D:
 	_cuerpo_fijos.shape_owner_add_shape(dueno, _cajas[tam_caja])
 	_cuerpo_fijos.shape_owner_set_transform(dueno, Transform2D(0.0, pos + Vector2(0, -tam_caja.y / 2.0 + 1)))
 	return sprite
+
+
+func _sombra_fija(pos: Vector2, ancho: float) -> void:
+	if _sombras_fijas == null:
+		_sombras_fijas = Node2D.new()
+		_sombras_fijas.name = "SombrasFijas"
+		_sombras_fijas.z_index = -1          # sobre el suelo, las zonas y las marcas; bajo todo lo que va de pie
+		add_child(_sombras_fijas)
+	var clave := Vector2i((pos / LADO_TROZO).floor())
+	if not _trozos_sombra.has(clave):
+		var trozo: Node2D = TROZO_SOMBRA.new()
+		trozo.position = Vector2(clave) * LADO_TROZO
+		_trozos_sombra[clave] = trozo
+		_sombras_fijas.add_child(trozo)
+	var t: Node2D = _trozos_sombra[clave]
+	t.centros.append(pos - t.position)
+	t.anchos.append(ancho)
 
 
 func _fijo(def: Array, pos: Vector2, semilla := 0) -> StaticBody2D:
