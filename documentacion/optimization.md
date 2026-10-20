@@ -102,6 +102,18 @@ Con la ventana delante (Mac M4, de día):
 | cienaga_quieta | 2,63 → **2,44** | 195 → **142** |
 | Pelea en bosque_cobrizo | 2,78 → **2,38** | 318 → **227** |
 
+### 5. Niebla y nubes en una sola llamada; las zonas lejanas no se redibujan
+
+Primero se midió qué `_draw` pesaba, apagando el redibujo de cada script (Ciénaga, Prados, Bosque):
+`ambiente.gd` ~0,5 ms en la Ciénaga (la niebla: 27 polígonos, uno por llamada de dibujo) y `zona_corrupta.gd`
+0,1-0,35 ms (se redibujaba en cada fotograma aunque estuviera lejísimos). `luz_sol`, `decorado` y `registro_brotes`: nada medible.
+
+| | |
+| --- | --- |
+| `ambiente.gd` | La niebla y las sombras de las nubes van en una sola lista de triángulos (`RenderingServer.canvas_item_add_triangle_array`), sacados con `Geometry2D.triangulate_polygon` como hace `draw_colored_polygon` por dentro: mismos triángulos, mismo orden. Capturas: igual (solo cambia lo que se mueve) |
+| `zona_corrupta.gd` | `_se_ve()`: solo se redibuja si está a menos de 512 px de lo que se ve (lo que ve la capa de suelo del HD-2D); al volver, se pinta con su hora de ahora |
+| Medido | Ciénaga 2,44 → **2,03 ms** y 142 → **122** llamadas de dibujo. Prados 2,06 → 2,01; Bosque igual (sus zonas están cerca del inicio) |
+
 ## Medidas de partida (Mac M4)
 
 Dibujo, de día, con la ventana delante (antes de los cambios 1 y 3):
@@ -124,7 +136,6 @@ Lo que falta necesita **la ventana a la vista** (llamadas de dibujo, ms/fotogram
 
 | # | Qué | Dónde | Cómo se mide | Estado |
 | --- | --- | --- | --- | --- |
-| 6 | **Redibujar solo lo que se ve**: `_draw` cuesta 0,14-0,77 ms por fotograma (lo más alto, la Ciénaga). Primero averiguar qué script lo gasta | `zona_corrupta.gd`, `registro_brotes.gd`, `ambiente.gd`, `decorado.gd`, `luz_sol.gd` | `_draw ms` apagando el redibujo de cada uno | En marcha |
 | 8 | **Tirones** en pelea (1 % peor hasta 4,7 ms) | — | Perfilador del editor; solo si salen, reciclar efectos de combate (`golpe_efecto`, `semilla`, `explosion`, `CHISPA` de `Impacto`) | Ya no hay tirones claros: ver abajo |
 | 9 | **HD-2D** (es de Gemini: aquí solo recomendaciones; ver abajo) | `espejo_hd2d.gd` | `medir_rendimiento hd2d` | Medido; aviso en `coordinacion.md` |
 

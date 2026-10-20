@@ -216,6 +216,12 @@ func _draw() -> void:
 				draw_rect(Rect2(sombra + Vector2(col, fila), Vector2.ONE), Color(0.02, 0.04, 0.02, 0.18))
 				var c := color.lightened(0.25) if ch == "+" else (color.darkened(0.3) if ch == "-" else color)
 				draw_rect(Rect2(p + Vector2(col, fila), Vector2.ONE), c)
+	# la niebla y las sombras de las nubes van juntas en UNA lista de triángulos: una sola llamada de dibujo (cada
+	# draw_colored_polygon era una). Son los mismos triángulos: draw_colored_polygon también los saca con
+	# Geometry2D.triangulate_polygon, y se pintan en el mismo orden.
+	_tri_puntos.clear()
+	_tri_colores.clear()
+	_tri_indices.clear()
 	# niebla: varias capas suaves por banco, que respiran un poco
 	if niebla > 0.0 and _espesor > 0.01:
 		var origen := vista.position
@@ -227,13 +233,35 @@ func _draw() -> void:
 				var puntos := PackedVector2Array()
 				for q in forma:
 					puntos.append((origen + b["pos"] + q * escala * respira).round())
-				draw_colored_polygon(puntos, Color(COLOR_NIEBLA, 0.075 * _espesor))
-	# sombras de nubes visibles en cámara (sin alojar arrays nuevos por nube)
+				_anadir_poligono(puntos, Color(COLOR_NIEBLA, 0.075 * _espesor))
+	# sombras de nubes visibles en cámara
 	var vista_nubes := vista.grow(140.0)
 	for n in _nubes:
 		var pos_n: Vector2 = n["pos"]
 		if not vista_nubes.has_point(pos_n):
 			continue
-		draw_set_transform(pos_n.round())
-		draw_colored_polygon(n["forma"], SOMBRA_NUBE)
-	draw_set_transform(Vector2.ZERO)
+		var forma_nube: PackedVector2Array = n["forma"]
+		var puntos_nube := PackedVector2Array()
+		var desvio := pos_n.round()
+		for q in forma_nube:
+			puntos_nube.append(q + desvio)
+		_anadir_poligono(puntos_nube, SOMBRA_NUBE)
+	if not _tri_indices.is_empty():
+		RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), _tri_indices, _tri_puntos, _tri_colores)
+
+
+var _tri_puntos := PackedVector2Array()
+var _tri_colores := PackedColorArray()
+var _tri_indices := PackedInt32Array()
+
+
+func _anadir_poligono(puntos: PackedVector2Array, color: Color) -> void:
+	var triangulos := Geometry2D.triangulate_polygon(puntos)
+	if triangulos.is_empty():
+		return
+	var base := _tri_puntos.size()
+	_tri_puntos.append_array(puntos)
+	for i in puntos.size():
+		_tri_colores.append(color)
+	for t in triangulos:
+		_tri_indices.append(base + t)
