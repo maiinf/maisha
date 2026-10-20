@@ -114,6 +114,14 @@ Primero se midió qué `_draw` pesaba, apagando el redibujo de cada script (Cié
 | `zona_corrupta.gd` | `_se_ve()`: solo se redibuja si está a menos de 512 px de lo que se ve (lo que ve la capa de suelo del HD-2D); al volver, se pinta con su hora de ahora |
 | Medido | Ciénaga 2,44 → **2,03 ms** y 142 → **122** llamadas de dibujo. Prados 2,06 → 2,01; Bosque igual (sus zonas están cerca del inicio) |
 
+### 6. Lago Espejo: solo los anillos del agua que se ven
+
+`espejo_lago.gd` pintaba, con el agua turbia, un anillo (`draw_arc`: una llamada de dibujo cada uno) en una de cada 13
+casillas de **todo** el lago (~130 de 1700), se vieran o no, y recorría todas las casillas cada fotograma. Ahora se
+salta las que están a más de 512 px de lo que se ve (el margen de la capa de suelo del HD-2D). En pantalla, idéntico.
+**Medida pendiente**: hay que repetir `medir_rendimiento lago_espejo` con la ventana a la vista (las dos veces que se
+intentó, la ventana estaba tapada).
+
 ## Medidas de partida (Mac M4)
 
 Dibujo, de día, con la ventana delante (antes de los cambios 1 y 3):
