@@ -119,8 +119,7 @@ Primero se midió qué `_draw` pesaba, apagando el redibujo de cada script (Cié
 `espejo_lago.gd` pintaba, con el agua turbia, un anillo (`draw_arc`: una llamada de dibujo cada uno) en una de cada 13
 casillas de **todo** el lago (~130 de 1700), se vieran o no, y recorría todas las casillas cada fotograma. Ahora se
 salta las que están a más de 512 px de lo que se ve (el margen de la capa de suelo del HD-2D). En pantalla, idéntico.
-**Medida pendiente**: hay que repetir `medir_rendimiento lago_espejo` con la ventana a la vista (las dos veces que se
-intentó, la ventana estaba tapada).
+Medido: 2,11 → **2,06 ms**, 285 → **275** llamadas de dibujo (poco: el resto son los árboles, el agua y los juncos).
 
 ## Medidas de partida (Mac M4)
 
