@@ -1040,6 +1040,38 @@ const MODELOS_BLENDER := {
 		"radio_occlusion": Vector2(3.0, 1.5),
 		"solo_reconstruido": false,
 	},
+	"semilla_dormida.png": {
+		"ruta": "res://modelos/entorno/semilla_dormida.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.8, 0.6),
+		"solo_reconstruido": false,
+	},
+	"rescoldo.png": {
+		"ruta": "res://modelos/entorno/rescoldo_giza.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.9, 0.7),
+		"solo_reconstruido": false,
+	},
+	"chatarra.png": {
+		"ruta": "res://modelos/entorno/chatarra_oxidada.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.8, 0.6),
+		"solo_reconstruido": false,
+	},
+	"zanahoria.png": {
+		"ruta": "res://modelos/entorno/zanahoria_huerto.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.5, 0.4),
+		"solo_reconstruido": false,
+	},
 }
 const TIPOS_LUZ_3D := {
 	"v": [4.6, 0.92, Color(1.0, 0.84, 0.55), false],
@@ -2067,7 +2099,7 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 				m3d.rotation.y = deg_to_rad(cfg["rot_y"])
 	if m3d and is_instance_valid(m3d):
 		var off: Vector3 = cfg.get("offset", Vector3.ZERO)
-		var pos_ref := (n as Node2D).global_position if (arch == "escalera.png" or arch == "puerta.png" or arch == "raiz_tapon.png" or arch == "nudo_giza.png" or arch == "sello_raices.png" or arch == "crater.png" or arch == "cortina.png" or arch == "espinas.png" or arch == "raiz_dormida.png") else (ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position)
+		var pos_ref := (n as Node2D).global_position if (arch == "escalera.png" or arch == "puerta.png" or arch == "raiz_tapon.png" or arch == "nudo_giza.png" or arch == "sello_raices.png" or arch == "crater.png" or arch == "cortina.png" or arch == "espinas.png" or arch == "raiz_dormida.png" or arch == "semilla_dormida.png" or arch == "zanahoria.png" or arch == "chatarra.png") else (ancla.global_position if ancla and is_instance_valid(ancla) and ancla.global_position != Vector2.ZERO else (n as Node2D).global_position)
 		m3d.position = _al_suelo(pos_ref) + off
 		m3d.visible = _visible(n)
 		if mod_final.a < 0.05:
@@ -2084,6 +2116,22 @@ func _sincronizar_modelo_blender(n: Node2D, g: Sprite3D, ancla: Node2D, arch: St
 			for hijo in m3d.find_children("*", "Node3D"):
 				if hijo.name.begins_with("Sello_") or hijo.name.begins_with("Cancela_") or hijo.name.begins_with("Barrote_"):
 					(hijo as Node3D).visible = not abierta
+		elif arch == "zanahoria.png":
+			var frame_act := 0
+			if n is Sprite2D:
+				frame_act = (n as Sprite2D).frame
+			var cosechada := frame_act >= 1
+			for hijo in m3d.find_children("*", "Node3D"):
+				if hijo.name.begins_with("Zanahoria_Fruto") or hijo.name.begins_with("Zanahoria_Hojas"):
+					(hijo as Node3D).visible = not cosechada
+		elif arch == "chatarra.png":
+			var frame_act := 0
+			if n is Sprite2D:
+				frame_act = (n as Sprite2D).frame
+			var aplastada := frame_act >= 1
+			for hijo in m3d.find_children("*", "Node3D"):
+				if hijo.name.begins_with("Chatarra_Superior"):
+					(hijo as Node3D).visible = not aplastada
 		g.visible = false
 		g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		if g.has_meta("capas_fondo"):

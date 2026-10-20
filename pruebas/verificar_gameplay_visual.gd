@@ -219,6 +219,19 @@ func _ready() -> void:
 		if m_crater:
 			_verificar_materiales_nodo(m_crater, "crater_kitovu")
 
+		# Acercarse al huerto de zanahorias de Mzee Shamba (x=40*16, y=23*16 -> 640, 368)
+		maisha.global_position = Vector2(640, 376)
+		await _esperar(0.4)
+		modelos = esp.get("_modelos_blender_instanciados")
+		var m_zanahoria: Node3D = null
+		for m in modelos.values():
+			if is_instance_valid(m) and ("zanahoria" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("zanahoria_huerto.glb")):
+				m_zanahoria = m
+				break
+		_comprobar(m_zanahoria != null, "Zanahoria del huerto de Shamba 3D instanciada en El Kitovu")
+		if m_zanahoria:
+			_verificar_materiales_nodo(m_zanahoria, "zanahoria_huerto")
+
 	# -----------------------------------------------------------------------
 	# 2. CUNA DE MUSGO (Aldea)
 	# -----------------------------------------------------------------------
@@ -709,6 +722,19 @@ func _ready() -> void:
 	if m_raiz_dorm:
 		_verificar_materiales_nodo(m_raiz_dorm, "raiz_dormida")
 
+	# Acercarse a la sagrada Semilla Dormida ancestral (ŝ en col 27, fil 77 -> 432, 1232)
+	maisha.global_position = Vector2(432, 1236)
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_semilla: Node3D = null
+	for m in modelos.values():
+		if is_instance_valid(m) and ("semilla_dormida" in (m as Node3D).name or (m as Node3D).get_meta("ruta_origen", "").ends_with("semilla_dormida.glb")):
+			m_semilla = m
+			break
+	_comprobar(m_semilla != null, "Semilla Dormida ancestral 3D instanciada en los nichos de la Gruta")
+	if m_semilla:
+		_verificar_materiales_nodo(m_semilla, "semilla_dormida")
+
 	# -----------------------------------------------------------------------
 	# 11. ORILLA DE JUNCOS (Balsa de Kasia)
 	# -----------------------------------------------------------------------
@@ -783,6 +809,39 @@ func _ready() -> void:
 	_comprobar(m_paca != null, "Paca de paja cilíndrica 3D instanciada en Campo Segado")
 	if m_paca:
 		_verificar_materiales_nodo(m_paca, "paca")
+
+	# Probar dinámicamente obstáculo de chatarra oxidada y rescoldo de Giza
+	var chatarra_script: Script = load("res://scripts/enemigos/chatarra.gd")
+	var rescoldo_script: Script = load("res://scripts/mundo/objetos/rescoldo.gd")
+	var chatarra_node: StaticBody2D = chatarra_script.new()
+	chatarra_node.position = maisha.global_position + Vector2(24, 0)
+	get_tree().current_scene.get_node("Entidades").add_child(chatarra_node)
+
+	var rescoldo_node: Node2D = rescoldo_script.new()
+	rescoldo_node.position = maisha.global_position + Vector2(-24, 0)
+	get_tree().current_scene.get_node("Entidades").add_child(rescoldo_node)
+
+	await _esperar(0.4)
+	modelos = esp.get("_modelos_blender_instanciados")
+	var m_chatarra: Node3D = null
+	var m_rescoldo: Node3D = null
+	for m in modelos.values():
+		if not is_instance_valid(m):
+			continue
+		var nm: String = (m as Node3D).name
+		if "chatarra" in nm or (m as Node3D).get_meta("ruta_origen", "").ends_with("chatarra_oxidada.glb"):
+			m_chatarra = m
+		elif "rescoldo" in nm or (m as Node3D).get_meta("ruta_origen", "").ends_with("rescoldo_giza.glb"):
+			m_rescoldo = m
+	_comprobar(m_chatarra != null, "Bloque de chatarra oxidada 3D instanciado en Campo Segado")
+	if m_chatarra:
+		_verificar_materiales_nodo(m_chatarra, "chatarra_oxidada")
+	_comprobar(m_rescoldo != null, "Rescoldo flamígero de Giza 3D instanciado en Campo Segado")
+	if m_rescoldo:
+		_verificar_materiales_nodo(m_rescoldo, "rescoldo_giza")
+
+	chatarra_node.queue_free()
+	rescoldo_node.queue_free()
 
 	# -----------------------------------------------------------------------
 	# 13. PRADOS DEL ECO (Columnas ancestrales de las Ruinas)

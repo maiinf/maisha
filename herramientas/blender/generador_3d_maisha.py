@@ -6873,6 +6873,333 @@ def generar_raiz_dormida():
 
     exportar_modelo("raiz_dormida", DIR_ENTORNO)
 
+def generar_semilla_dormida():
+    """Genera la sagrada Semilla Dormida ancestral (arte/mundos/raiz/gruta/semilla_dormida.png)
+    para los nichos de la Gruta de las Raíces.
+    Pedestal de esquisto tallado, cuna de raíces vivas y gran vaina cristalina con núcleo esmeralda pulsante."""
+    limpiar_escena()
+
+    mat_pedestal = obtener_material("Mat_Semilla_Pedestal", "#423A4C", roughness=0.88)
+    mat_raiz = obtener_material("Mat_Semilla_Raiz", "#482B1B", roughness=0.84)
+    mat_cascara = obtener_material("Mat_Semilla_Cascara", "#4A3525", roughness=0.72)
+    mat_oro = obtener_material("Mat_Semilla_Oro", "#DF9022", roughness=0.35, metallic=0.4, emission_hex="#FDE047", emission_strength=2.2)
+    mat_nucleo = obtener_material("Mat_Semilla_Nucleo", "#76C442", roughness=0.15, emission_hex="#A3E635", emission_strength=3.8)
+    mat_hoja = obtener_material("Mat_Semilla_Hoja", "#365314", roughness=0.65)
+
+    # 1. Pedestal de piedra tallada en el suelo
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.42, depth=0.18, location=(0.0, 0.0, 0.09))
+    ped = bpy.context.active_object
+    ped.name = "Semilla_Pedestal"
+    asignar_material(ped, mat_pedestal)
+
+    # Borde superior del cuenco de ofrendas
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.46, depth=0.08, location=(0.0, 0.0, 0.18))
+    borde = bpy.context.active_object
+    borde.name = "Semilla_Borde"
+    asignar_material(borde, mat_pedestal)
+
+    # 2. Cuna de 4 zarpas de raíces gudosas abrazando la base de la vaina
+    for i in range(4):
+        ang = i * (math.pi / 2.0) + 0.35
+        rx = math.cos(ang) * 0.32
+        ry = math.sin(ang) * 0.32
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.065, depth=0.38, location=(rx, ry, 0.28))
+        r_obj = bpy.context.active_object
+        r_obj.name = f"Semilla_Zarpa_{i}"
+        r_obj.rotation_euler = (math.sin(ang) * 0.35, -math.cos(ang) * 0.35, ang)
+        asignar_material(r_obj, mat_raiz)
+        suavizar(r_obj)
+
+    # 3. Núcleo interior bioluminiscente (brilla a través de las fisuras de la cáscara)
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.28, location=(0.0, 0.0, 0.52))
+    core = bpy.context.active_object
+    core.name = "Semilla_Nucleo"
+    core.scale = (0.9, 0.9, 1.35)
+    asignar_material(core, mat_nucleo)
+    suavizar(core)
+
+    # 4. Cáscara externa protectora (segmentos ovoides con fisuras orgánicas)
+    cascara_data = [
+        (0.0, -0.16, 0.54, 0.34, (0.85, 0.55, 1.25), 8, 0, 0),
+        (0.0, 0.16, 0.54, 0.34, (0.85, 0.55, 1.25), -8, 0, 0),
+        (-0.16, 0.0, 0.54, 0.34, (0.55, 0.85, 1.25), 0, -8, 0),
+        (0.16, 0.0, 0.54, 0.34, (0.55, 0.85, 1.25), 0, 8, 0),
+    ]
+    for idx, (cx, cy, cz, crad, cscale, crx, cry, crz) in enumerate(cascara_data):
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, radius=crad, location=(cx, cy, cz))
+        casc = bpy.context.active_object
+        casc.name = f"Semilla_Cascara_{idx}"
+        casc.scale = cscale
+        casc.rotation_euler = (math.radians(crx), math.radians(cry), math.radians(crz))
+        asignar_material(casc, mat_cascara)
+        suavizar(casc)
+
+    # 5. Filigranas doradas de Asili incrustadas a lo largo de las comisuras
+    for idx, rot in enumerate([0, 90, 180, 270]):
+        ang_rad = math.radians(rot)
+        ox = math.cos(ang_rad) * 0.22
+        oy = math.sin(ang_rad) * 0.22
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.022, depth=0.72, location=(ox, oy, 0.54))
+        oro_fil = bpy.context.active_object
+        oro_fil.name = f"Semilla_VenaOro_{idx}"
+        asignar_material(oro_fil, mat_oro)
+        suavizar(oro_fil)
+
+    # 6. Corona apical con 3 hojas germinales
+    for idx, h_ang in enumerate([0, 120, 240]):
+        h_rad = math.radians(h_ang)
+        hx = math.cos(h_rad) * 0.08
+        hy = math.sin(h_rad) * 0.08
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(hx, hy, 1.02))
+        hoja = bpy.context.active_object
+        hoja.name = f"Semilla_Hoja_{idx}"
+        hoja.scale = (0.05, 0.12, 0.22)
+        hoja.rotation_euler = (math.sin(h_rad) * 0.5, -math.cos(h_rad) * 0.5, h_rad)
+        asignar_material(hoja, mat_hoja)
+        suavizar(hoja)
+
+    exportar_modelo("semilla_dormida", DIR_ENTORNO)
+
+def generar_rescoldo_giza():
+    """Genera el rescoldo de Giza (arte/mundos/raiz/hechiceros/rescoldo.png).
+    Monolito residual tras derrotar a jefes de zona: anillo ritual de basalto fracturado,
+    lecho de cenizas humeantes y espira flamígera de corrupción violeta y oro primordial."""
+    limpiar_escena()
+
+    mat_basalto = obtener_material("Mat_Rescoldo_Basalto", "#423A4E", roughness=0.86)
+    mat_ceniza = obtener_material("Mat_Rescoldo_Ceniza", "#3E3444", roughness=0.95)
+    mat_brasa = obtener_material("Mat_Rescoldo_Brasa", "#EA580C", roughness=0.30, emission_hex="#F97316", emission_strength=2.8)
+    mat_llama_giza = obtener_material("Mat_Rescoldo_LlamaGiza", "#7E22CE", roughness=0.12, emission_hex="#C084FC", emission_strength=4.2)
+    mat_llama_oro = obtener_material("Mat_Rescoldo_LlamaOro", "#EAB308", roughness=0.15, emission_hex="#FDE047", emission_strength=3.5)
+
+    # 1. Lecho central de ceniza y brasas
+    bpy.ops.mesh.primitive_cylinder_add(vertices=14, radius=0.55, depth=0.10, location=(0.0, 0.0, 0.05))
+    ceniza = bpy.context.active_object
+    ceniza.name = "Rescoldo_Ceniza"
+    asignar_material(ceniza, mat_ceniza)
+    suavizar(ceniza)
+
+    # Manchas de brasas ardientes en el lecho
+    brasas_data = [
+        (-0.18, 0.12, 0.09, 0.14),
+        (0.20, -0.10, 0.09, 0.16),
+        (-0.08, -0.22, 0.09, 0.12),
+        (0.14, 0.18, 0.09, 0.13),
+    ]
+    for b_idx, (bx, by, bz, brad) in enumerate(brasas_data):
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=brad, depth=0.04, location=(bx, by, bz))
+        br = bpy.context.active_object
+        br.name = f"Rescoldo_Brasa_{b_idx}"
+        asignar_material(br, mat_brasa)
+
+    # 2. Anillo de 8 monolitos de basalto quebrado
+    monolitos_data = [
+        (0.0, 0.58, 0.22, 0.12, 0.12, 0.38, 12, 0, 5),
+        (0.42, 0.40, 0.18, 0.14, 0.10, 0.32, -8, 14, 35),
+        (0.58, 0.0, 0.26, 0.11, 0.13, 0.46, 0, 16, 85),
+        (0.38, -0.42, 0.20, 0.13, 0.11, 0.36, -14, -8, 130),
+        (-0.02, -0.56, 0.24, 0.12, 0.14, 0.42, -10, 0, 185),
+        (-0.44, -0.38, 0.17, 0.14, 0.10, 0.30, 6, -15, 220),
+        (-0.56, 0.02, 0.28, 0.10, 0.12, 0.50, 0, -18, 270),
+        (-0.39, 0.41, 0.21, 0.13, 0.11, 0.36, 15, 6, 315),
+    ]
+    for m_idx, (mx, my, mz, sx, sy, sz, rx, ry, rz) in enumerate(monolitos_data):
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(mx, my, mz))
+        mono = bpy.context.active_object
+        mono.name = f"Rescoldo_Monolito_{m_idx}"
+        mono.scale = (sx, sy, sz)
+        mono.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(mono, mat_basalto)
+        suavizar(mono)
+
+    # 3. Espira flamígera central de Giza (lenguas violetas arremolinadas)
+    llamas_giza_data = [
+        (0.0, 0.0, 0.52, 0.14, 0.14, 0.90, 4, -3, 0),
+        (-0.06, 0.05, 0.44, 0.10, 0.10, 0.70, -12, 10, 45),
+        (0.07, -0.04, 0.46, 0.09, 0.09, 0.74, 15, -8, 120),
+        (0.03, 0.06, 0.38, 0.08, 0.08, 0.60, -8, -14, 210),
+    ]
+    for l_idx, (lx, ly, lz, lsx, lsy, lsz, lrx, lry, lrz) in enumerate(llamas_giza_data):
+        bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=lsx, depth=lsz, location=(lx, ly, lz))
+        ll = bpy.context.active_object
+        ll.name = f"Rescoldo_LlamaGiza_{l_idx}"
+        ll.rotation_euler = (math.radians(lrx), math.radians(lry), math.radians(lrz))
+        asignar_material(ll, mat_llama_giza)
+        suavizar(ll)
+
+    # 4. Núcleo central ardiente de oro ancestral (el eco salvable del jefe)
+    bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=0.08, depth=0.55, location=(0.0, 0.0, 0.38))
+    oro_core = bpy.context.active_object
+    oro_core.name = "Rescoldo_LlamaOro"
+    asignar_material(oro_core, mat_llama_oro)
+    suavizar(oro_core)
+
+    exportar_modelo("rescoldo_giza", DIR_ENTORNO)
+
+def generar_chatarra_oxidada():
+    """Genera el obstáculo de chatarra oxidada (arte/mundos/raiz/campo/chatarra.png)
+    producido por la Cosechadora en Campo Segado.
+    Base de plancha deformada con remaches y estructura superior de rueda dentada inclinada y tuerca gigante."""
+    limpiar_escena()
+
+    mat_hierro_ox = obtener_material("Mat_Chatarra_HierroOx", "#442A1D", roughness=0.88)
+    mat_engranaje = obtener_material("Mat_Chatarra_Engranaje", "#854D27", roughness=0.78, metallic=0.3)
+    mat_bronce = obtener_material("Mat_Chatarra_Bronce", "#A16207", roughness=0.65, metallic=0.5)
+    mat_remache = obtener_material("Mat_Chatarra_Remache", "#452A1E", roughness=0.80)
+
+    # --- GRUPO 1: Chatarra_Base (permanece al romperse el bloque) ---
+    # Plancha inferior pesada doblada contra el suelo
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, 0.0, 0.07))
+    base = bpy.context.active_object
+    base.name = "Chatarra_Base"
+    base.scale = (0.88, 0.58, 0.12)
+    asignar_material(base, mat_hierro_ox)
+
+    # Rebordes y remaches en la placa base
+    remaches_pos = [
+        (-0.36, -0.22, 0.14),
+        (0.36, -0.22, 0.14),
+        (-0.36, 0.22, 0.14),
+        (0.36, 0.22, 0.14),
+    ]
+    for r_idx, (rx, ry, rz) in enumerate(remaches_pos):
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.035, depth=0.05, location=(rx, ry, rz))
+        rem = bpy.context.active_object
+        rem.name = f"Chatarra_Remache_{r_idx}"
+        asignar_material(rem, mat_remache)
+
+    # Chapa doblada secundaria en la base
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.15, 0.05, 0.14))
+    chapa_b = bpy.context.active_object
+    chapa_b.name = "Chatarra_Base_Chapa"
+    chapa_b.scale = (0.50, 0.35, 0.06)
+    chapa_b.rotation_euler = (math.radians(8), math.radians(-12), math.radians(15))
+    asignar_material(chapa_b, mat_hierro_ox)
+
+    # --- GRUPO 2: Chatarra_Superior (se oculta al desmoronarse en frame 1) ---
+    # Gran engranaje dentado oxidado e inclinado (rueda de transmisión rota)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.28, depth=0.08, location=(0.10, -0.04, 0.34))
+    engr = bpy.context.active_object
+    engr.name = "Chatarra_Superior_Engranaje"
+    engr.rotation_euler = (math.radians(35), math.radians(-20), math.radians(10))
+    asignar_material(engr, mat_engranaje)
+
+    # Dientes del engranaje
+    for d_idx in range(8):
+        d_ang = d_idx * (math.pi / 4.0)
+        dx = 0.10 + math.cos(d_ang) * 0.29
+        dy = -0.04 + math.sin(d_ang) * 0.24
+        dz = 0.34 + math.sin(d_ang) * 0.16
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(dx, dy, dz))
+        diente = bpy.context.active_object
+        diente.name = f"Chatarra_Superior_Diente_{d_idx}"
+        diente.scale = (0.05, 0.05, 0.06)
+        diente.rotation_euler = (math.radians(35), math.radians(-20), d_ang)
+        asignar_material(diente, mat_engranaje)
+
+    # Tuerca hexagonal masiva caída al lado
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.16, depth=0.12, location=(-0.24, -0.08, 0.24))
+    tuerca = bpy.context.active_object
+    tuerca.name = "Chatarra_Superior_Tuerca"
+    tuerca.rotation_euler = (math.radians(-15), math.radians(25), math.radians(40))
+    asignar_material(tuerca, mat_bronce)
+
+    # Orificio central de la tuerca
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.075, depth=0.14, location=(-0.24, -0.08, 0.24))
+    tuerca_hueco = bpy.context.active_object
+    tuerca_hueco.name = "Chatarra_Superior_Hueco"
+    tuerca_hueco.rotation_euler = (math.radians(-15), math.radians(25), math.radians(40))
+    asignar_material(tuerca_hueco, mat_hierro_ox)
+
+    # Eje de pistón doblado
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.04, depth=0.45, location=(-0.05, 0.15, 0.28))
+    eje = bpy.context.active_object
+    eje.name = "Chatarra_Superior_Eje"
+    eje.rotation_euler = (math.radians(50), math.radians(10), math.radians(-30))
+    asignar_material(eje, mat_hierro_ox)
+
+    exportar_modelo("chatarra_oxidada", DIR_ENTORNO)
+
+def generar_zanahoria_huerto():
+    """Genera la zanahoria del huerto de Mzee Shamba (arte/mundos/kitovu/zanahoria.png).
+    Surco de tierra fértil labrada, fruto cónico anaranjado asomando y penacho de hojas frondosas.
+    Al cosecharse (frame 1), se ocultan Zanahoria_Fruto y Zanahoria_Hojas."""
+    limpiar_escena()
+
+    mat_tierra = obtener_material("Mat_Zanahoria_Tierra", "#472C1A", roughness=0.92)
+    mat_tierra_surco = obtener_material("Mat_Zanahoria_Surco", "#54331C", roughness=0.90)
+    mat_fruto = obtener_material("Mat_Zanahoria_Fruto", "#EA580C", roughness=0.55)
+    mat_fruto_cuello = obtener_material("Mat_Zanahoria_Cuello", "#84CC16", roughness=0.60)
+    mat_hojas = obtener_material("Mat_Zanahoria_Hojas", "#2F851D", roughness=0.65)
+    mat_hojas_claro = obtener_material("Mat_Zanahoria_HojasClaro", "#4ADE80", roughness=0.60)
+
+    # --- BASE PERMANENTE: Surco de tierra de huerto ---
+    # Montículo redondeado de tierra labrada
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=8, radius=0.36, location=(0.0, 0.0, 0.04))
+    mound = bpy.context.active_object
+    mound.name = "Surco_Tierra_Base"
+    mound.scale = (1.0, 0.9, 0.32)
+    asignar_material(mound, mat_tierra)
+    suavizar(mound)
+
+    # Cordones de surco labrado laterales
+    for s_idx, sy in enumerate([-0.22, 0.22]):
+        bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.08, depth=0.65, location=(0.0, sy, 0.06))
+        surco = bpy.context.active_object
+        surco.name = f"Surco_Tierra_Cordon_{s_idx}"
+        surco.rotation_euler = (0, math.radians(90), 0)
+        asignar_material(surco, mat_tierra_surco)
+        suavizar(surco)
+
+    # Depresión / pocillo central donde brota la raíz (o queda el hueco tras recolectar)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.10, depth=0.06, location=(0.0, 0.0, 0.08))
+    pocillo = bpy.context.active_object
+    pocillo.name = "Surco_Tierra_Pocillo"
+    asignar_material(pocillo, mat_tierra)
+
+    # --- GRUPO RECOLECTABLE: Zanahoria_Fruto ---
+    # Hombro superior cónico de la zanahoria asomando de la tierra
+    bpy.ops.mesh.primitive_cone_add(vertices=10, radius1=0.085, depth=0.16, location=(0.0, 0.0, 0.14))
+    fruto = bpy.context.active_object
+    fruto.name = "Zanahoria_Fruto"
+    asignar_material(fruto, mat_fruto)
+    suavizar(fruto)
+
+    # Cuello verde-amarillento donde emergen los peciolos
+    bpy.ops.mesh.primitive_cylinder_add(vertices=8, radius=0.055, depth=0.04, location=(0.0, 0.0, 0.22))
+    cuello = bpy.context.active_object
+    cuello.name = "Zanahoria_Fruto_Cuello"
+    asignar_material(cuello, mat_fruto_cuello)
+    suavizar(cuello)
+
+    # --- GRUPO RECOLECTABLE: Zanahoria_Hojas ---
+    # Corona de 6 hojas plumosas desplegadas en abanico
+    hojas_data = [
+        (0.0, -0.06, 0.36, 0.26, 25, 0, -10, mat_hojas),
+        (0.0, 0.06, 0.36, 0.25, -25, 0, 10, mat_hojas),
+        (-0.06, 0.0, 0.38, 0.28, 0, -28, 90, mat_hojas_claro),
+        (0.06, 0.0, 0.38, 0.28, 0, 28, -90, mat_hojas_claro),
+        (-0.04, -0.04, 0.42, 0.32, 18, -18, 45, mat_hojas),
+        (0.04, 0.04, 0.44, 0.34, -18, 18, -135, mat_hojas_claro),
+    ]
+    for h_idx, (hx, hy, hz, hlen, rx, ry, rz, hmat) in enumerate(hojas_data):
+        bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=0.018, depth=hlen, location=(hx, hy, hz))
+        tallo_h = bpy.context.active_object
+        tallo_h.name = f"Zanahoria_Hojas_Tallo_{h_idx}"
+        tallo_h.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(tallo_h, hmat)
+
+        # Foliolos plumosos
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(hx * 1.35, hy * 1.35, hz + 0.06))
+        penacho = bpy.context.active_object
+        penacho.name = f"Zanahoria_Hojas_Penacho_{h_idx}"
+        penacho.scale = (0.08, 0.04, 0.14)
+        penacho.rotation_euler = (math.radians(rx), math.radians(ry), math.radians(rz))
+        asignar_material(penacho, hmat)
+        suavizar(penacho)
+
+    exportar_modelo("zanahoria_huerto", DIR_ENTORNO)
+
 # ---------------------------------------------------------------------------
 # EJECUCIÓN PRINCIPAL
 # ---------------------------------------------------------------------------
@@ -6978,6 +7305,10 @@ def main():
     generar_cortina_micelio()
     generar_espinas_giza()
     generar_raiz_dormida()
+    generar_semilla_dormida()
+    generar_rescoldo_giza()
+    generar_chatarra_oxidada()
+    generar_zanahoria_huerto()
     
     print("\n[4/5] Generando Módulos de Terreno y Props...")
     generar_pozo_antiguo()
