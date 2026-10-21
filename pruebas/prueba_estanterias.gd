@@ -114,6 +114,9 @@ func _ready() -> void:
 	print("El tintero rabioso:")
 	var tintero: CharacterBody2D = get_tree().get_nodes_in_group("tinteros")[0]
 	tintero.set_physics_process(true)
+	# siempre en el mismo sitio despejado: si no, donde lo haya dejado su paseo al azar Maisha podía caer junto a una
+	# pared o un hueco y el tintero no llegaba a verla (fallaba 1 de cada 4 veces)
+	tintero.global_position = Vector2(240, 446)
 	m.global_position = tintero.global_position + Vector2(-90, 0)
 	await _esperar(0.1)
 	var vida1: int = m.vida
