@@ -17,6 +17,7 @@ const FOTO_MUEVE := 3
 const FOTO_GOLPE := 4
 
 var zona: Node = null
+var variante := "raiz"           # (la pone la zona al invocarlo; el Quieto tiene un solo dibujo)
 var vida := VIDA
 var mirado := true
 var _empuje := Vector2.ZERO

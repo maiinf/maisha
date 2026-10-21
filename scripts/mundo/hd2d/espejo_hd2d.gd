@@ -367,10 +367,11 @@ func _mover_capas() -> void:
 	# las ventanitas: para los objetos de pie más cercanos a la cámara, cada una mirando su trocito de la escena
 	var cerca := []
 	for id in _de_pie.keys():
-		var c: Node2D = _de_pie[id]
-		if not is_instance_valid(c):
+		# (comprobarlo antes de guardarlo en una variable Node2D: guardar uno ya borrado da error y corta la función)
+		if not is_instance_valid(_de_pie[id]):
 			_de_pie.erase(id)
 			continue
+		var c: Node2D = _de_pie[id]
 		var d := _al_suelo(c.global_position).distance_to(_foco)
 		if d < LEJOS * 0.7:
 			cerca.append([d, c])
