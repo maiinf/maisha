@@ -147,9 +147,15 @@ func _draw() -> void:
 	# el agua turbia: las dos capas de barro se turnan despacio, con burbujas y algún brillo violeta de Giza
 	for k in _barro.size():
 		_barro[k].modulate.a = _turbio * (0.55 + 0.45 * sin(_tiempo * 0.4 + k * PI))
+	# (solo las casillas cerca de lo que se ve: cada anillo es una llamada de dibujo, y el lago tiene unas 1700 casillas;
+	# 512 px de margen, lo que ve la capa de suelo del HD-2D)
+	var inversa := get_viewport().get_canvas_transform().affine_inverse()
+	var vista := Rect2(inversa.origin, get_viewport().get_visible_rect().size).grow(512.0)
 	if _turbio > 0.01:
 		for c in _agua:
 			var p := Vector2(c) * R.CASILLA
+			if not vista.has_point(p):
+				continue
 			if (c.x * 7 + c.y * 13 + int(_tiempo * 2.0)) % 29 == 0:
 				draw_rect(Rect2(p + Vector2(6, 7), Vector2(3, 1)), Color(VIOLETA, _turbio * 0.6))
 			if (c.x * 5 + c.y * 3) % 13 == 0:
@@ -161,6 +167,8 @@ func _draw() -> void:
 			if (c.x + c.y * 3) % 5 != 0:
 				continue
 			var p := Vector2(c) * R.CASILLA
+			if not vista.has_point(p):
+				continue
 			var f := fmod(_tiempo * 0.15 + c.y * 0.07, 1.0)
 			draw_rect(Rect2(p + Vector2(f * 12.0, 6), Vector2(6, 1)), Color(0.9, 1.0, 0.98, calma * 0.35))
 

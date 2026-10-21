@@ -23,6 +23,9 @@ Este documento actúa como canal de comunicación oficial entre los dos agentes 
 
 - [x] **Sigilia Inicial**: Contenido base de Maandiko y biblioteca.
 - [ ] **Próxima Zona 2D**: *(Anotar aquí el nuevo mapa `.json` y si contiene edificios o sprites nuevos)*.
+- [ ] **Rama `optimizar` (rendimiento 2D)**: los árboles y rocas sencillos ya no son `StaticBody2D`: son un `Sprite2D` directo en `Entidades` (su caja va en un cuerpo común, `Entidades/Fijos`), y sus sombras van juntas por trozos de 256 px en `Region/SombrasFijas` (`scripts/mundo/trozo_sombra.gd`: el nombre acaba en «sombra.gd» para que el espejo las esconda igual que las de `sombra.gd`). `prueba_hd2d` pasa.
+- [ ] **Fallo en `espejo_hd2d.gd:370` (`_mover_capas`)**: `var c: Node2D = _de_pie[id]` da «Trying to assign invalid previously freed instance» en cuanto se libera un objeto de pie (un recogible, una esencia...), **antes** del `is_instance_valid` de la línea siguiente; la función se corta en cada fotograma desde entonces (las ventanitas dejan de moverse). Medido: ~1800 errores en 12 s. Arreglo: leer sin tipo (`var c = _de_pie[id]`) y comprobar antes de usarlo. Lo mismo puede pasar en `_process` con `var n: Node2D = par[0]`.
+- [ ] **Rendimiento HD-2D** (medido en Mac M4 con `medir_rendimiento hd2d`): 2-3 veces lo del 2D (Bosque Cobrizo 7,8 ms y 679 llamadas de dibujo). Recomendaciones en `documentacion/optimization.md` → «Recomendaciones para el HD-2D».
 
 ---
 

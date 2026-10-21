@@ -184,7 +184,7 @@ func _crear_nucleo() -> void:
 
 func _process(delta: float) -> void:
 	_tiempo += delta
-	if estado != Estado.PURGADA or _vida_raices > 0.0:
+	if (estado != Estado.PURGADA or _vida_raices > 0.0) and _se_ve():
 		queue_redraw()
 	if _maisha == null:
 		_maisha = get_tree().get_first_node_in_group("maisha") as Node2D
@@ -586,6 +586,18 @@ func _mancha(centro: Vector2, radios: Vector2, color: Color) -> void:
 		if ancho > 0.0:
 			draw_rect(Rect2(centro + Vector2(-ancho, y), Vector2(ancho * 2.0, 2.0)), color)
 		y += 2.0
+
+
+## ¿Está cerca de lo que se ve? Lejos de la cámara no hace falta redibujarla en cada fotograma (con un margen de
+## 512 px: lo que ve la capa de suelo del HD-2D alrededor de Maisha). Al volver a verse, se pinta con su hora de ahora.
+const MARGEN_VISTA := 512.0
+
+
+func _se_ve() -> bool:
+	var inversa := get_viewport().get_canvas_transform().affine_inverse()
+	var vista := Rect2(inversa.origin, get_viewport().get_visible_rect().size).grow(MARGEN_VISTA)
+	var r := (radios_umbral + Vector2.ONE * ancho_borde) * 1.5
+	return vista.intersects(Rect2(global_position - r, r * 2.0))
 
 
 func _otra_cerrada() -> bool:

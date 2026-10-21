@@ -20,11 +20,26 @@ const MARCA_INICIO := "visto/cuna_de_musgo"
 
 var oscuridad := 0.0
 
+## La luz del sol ha cambiado un poco (o ha pasado de día a noche): las sombras (sombra.gd) se miran entonces,
+## en vez de mirar el reloj cada una en cada fotograma (hay mapas con casi 2000)
+signal luz_cambiada
+const PASO_LUZ := 0.01                 # cuánto tiene que cambiar luz_dia() o calidez() para avisar
+var _ultima_luz := Vector2(-1.0, -1.0)
+
 
 func _process(delta: float) -> void:
+	_avisar_luz()
 	if not Estado.jugando or get_tree().paused or not Estado.tiene(MARCA_INICIO):
 		return
 	Estado.extra["hora"] = fposmod(hora() + delta / DURACION, 1.0)
+
+
+func _avisar_luz() -> void:
+	var luz := Vector2(luz_dia(), calidez())
+	var cruza := (luz.x > 0.25) != (_ultima_luz.x > 0.25)
+	if cruza or absf(luz.x - _ultima_luz.x) > PASO_LUZ or absf(luz.y - _ultima_luz.y) > PASO_LUZ:
+		_ultima_luz = luz
+		luz_cambiada.emit()
 
 
 func hora() -> float:
