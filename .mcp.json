@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "meshy": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@meshy-ai/meshy-mcp-server"
+      ],
+      "env": {
+        "MESHY_API_KEY": "${MESHY_API_KEY}"
+      }
+    },
+    "tripo": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "tripo-ai-mcp-server"
+      ],
+      "env": {
+        "TRIPO_API_KEY": "${TRIPO_API_KEY}"
+      }
+    }
+  }
+}

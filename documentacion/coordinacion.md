@@ -51,3 +51,7 @@ flowchart LR
   - Blender 5.2.3: `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe` (puedes ejecutarlo headless con `-b -P <script.py>`).
   - Godot 4.7.2: `C:\Users\iamin\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe`.
   - Todo el código base de Blender existente está en `herramientas/blender/generador_3d_maisha.py`.
+- [x] **Generación Automática 3D por IA Integrada (.mcp.json y CLI)**:
+  - Configurado `.mcp.json` con los servidores de **Meshy AI** (`@meshy-ai/meshy-mcp-server`) y **Tripo3D** (`tripo-ai-mcp-server`).
+  - Creado el script [herramientas/ia_3d_client.py](file:///C:/Users/iamin/Proyectos/maisha/herramientas/ia_3d_client.py): permite convertir cualquier concept art 2D en `.glb` directamente desde terminal o código con: `python herramientas/ia_3d_client.py --imagen <ruta.jpg> --salida <modelos/x.glb>`.
+  - Archivo de configuración [.env.ejemplo](file:///C:/Users/iamin/Proyectos/maisha/.env.ejemplo) preparado para añadir las claves cuando se disponga de ellas.
