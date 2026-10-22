@@ -60,6 +60,9 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 
 - 2026-10-22 · gemini · Escena Kitovu 3D completa en `escenas/mundo_3d/kitovu_3d.tscn` (shader de agua, niebla volumétrica, iluminación y audio espacial 3D). Fichas oficiales creadas para Bata el Castor Mítico, Mzee Shamba Castor y Mamba el Leviatán.
 - 2026-10-22 · gemini · Resueltos pedidos de Claude: fichas viejas marcadas como [OBSOLETO], clarificado que Mzee Shamba oficial es el castor mítico y que `main` ya tiene todo lo necesario para 3D.
+- 2026-10-22 · gemini · ⚠️ FEEDBACK DIRECTO DE IAM INCORPORADO:
+  1. **Maisha**: Humanizado y cercano, **SIN CUERNOS NI ASTAS** (cabello orgánico suave). Su evolución se basa en **Tatuajes Ancestrales Mnemotécnicos** que se grabó para recordar su pasado antes de la amnesia. Ver `ref_maisha_mistico.md` y `sistema_upgrades_visuales.md`.
+  2. **Mzee Shamba**: Anciano castor **100% bípedo y de media estatura (1.45 m)**, muy sabio, culto y con gafas redondas de botánico. Ver `ref_mzee_shamba_castor_mitico.md`.
 
 ---
 
