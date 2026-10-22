@@ -5,6 +5,7 @@ se pasan.
 
 | Fecha | Decisión | Motivo |
 | --- | --- | --- |
+| 2026-10-23 | **Maisha en 3D** (`modelos/personajes/maisha.glb`, por código en `herramientas/blender/modelar_maisha.py`): 1,70 m, humanizada y sin género marcado, sin astas, pelo ceniza recogido en la nuca, túnica asimétrica que deja al aire el hombro derecho y el Corazón de Asili, capa corta sobre el hombro izquierdo (pieza aparte), cinturón con bolsas y botas altas. **Tatuajes de la Memoria** en brazos, hombros, cuello y espalda (constelación, espiral, círculo de agua, bandas) en una textura de emisión: dormidos al empezar y encendidos por el juego con cada Eco. Esqueleto de 27 huesos con los nombres de la ficha; cetro anclado a `hand_R` y que se mantiene derecho al estar quieta, caminar y correr. 6 animaciones (`reposo`, `caminar_atento`, `correr`, `golpe_cetro`, `idle_mirar_tatuajes`, `eco_despertar`). ≈ 33 000 triángulos. | Ficha `ref_maisha_mistico.md` con el feedback de Iam (sin cuernos, tatuajes mnemotécnicos). Aún no hay concept art de esta versión: cara, pelo y ropa se ajustarán cuando llegue. |
 | 2026-10-11 | Bug: Maisha se quedaba celebrando si una zona se purgaba a mitad de un golpe. Arreglado: al empezar una expresión, el golpe a medias se da por acabado. | Lo encontró Iam en el Kitovu. |
 | 2026-10-11 | El proyecto tiene su propio git (dentro de `maisha`). | Antes no había ninguno propio. |
 | 2026-10-11 | Primero se hace la **Cañada del Eco** (el camino del Bosque Cobrizo al Lago Espejo, con el 5.º eco) y después el Lago Espejo. | Una cosa cada vez, como los otros caminos. |

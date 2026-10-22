@@ -57,6 +57,7 @@ Iam ha tomado la decisión firme y con todo el cariño al proyecto de que **Mais
 | Música | `componer_musica.py [nombres]` |
 | Interfaz de diario | `pintar_interfaz.py`, `pintar_inicio_mesa.py` |
 | Relieve de los dibujos (luz 2.5D) | `relieve.py --todo` (relanzar al repintar un dibujo del mundo) |
+| Modelos 3D por código (Blender 5.2, `-b --factory-startup -P <programa> [-- --vistas <carpeta>]`) | `blender/modelar_casa_granja.py`, `blender/modelar_maisha.py` (personaje con esqueleto, pesos y animaciones) |
 
 Para comprobar el arte, mira los PNG que salen (abrirlos con la herramienta de leer imágenes).
 

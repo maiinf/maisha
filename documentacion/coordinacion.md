@@ -68,6 +68,9 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - 2026-10-22 · gemini · Kitovu 3D interactivo: Mzee Shamba NPC con charla [E], combate Petrino 3D, purificación de nudo y Portal de Raíz funcional.
 - 2026-10-22 · gemini · Cuna de Musgo 3D interactiva: Pino NPC con charla [E], Corteza NPC con diálogo de forja, Altar de la Raíz Sagrada con comunión de memoria y colisiones en estructuras.
 - 2026-10-22 · gemini · Sincronizados y commiteados todos los 110 modelos `.glb` en `main` y en `hd2d/calidad-blender` con push a origin.
+- 2026-10-23 · claude · **Maisha 3D terminada** (`modelos/personajes/maisha.glb`): 27 huesos de la ficha, `Cetro` como BoneAttachment3D de `hand_R`, 6 animaciones (`reposo`, `caminar_atento`, `correr`, `golpe_cetro`, `idle_mirar_tatuajes`, `eco_despertar`). Vistas en `referencias_visuales_3d/personajes/vistas_maisha/` (01-04 son las del estándar de 4 ángulos; 05-09: cara, tatuajes dormidos y despiertos, caminar y golpe).
+- 2026-10-23 · claude · `maisha_3d.gd` ahora pone las animaciones solo (según quieta/camina/corre/golpea) y tiene `despertar_memoria(0..1)` y `recuperar_eco()`: **llama a `recuperar_eco()` cuando Maisha toque un Eco**. Los tatuajes empiezan dormidos. `maisha_3d.tscn`: cápsula de 1,70 m y la luz del corazón a 1,30 m. `DURACION_ATAQUE` pasa de 0,35 a 0,55 s para que se vea el barrido. Prueba nueva: `prueba_maisha_3d`.
+- 2026-10-23 · claude · `render_turnaround.py` saca a Maisha diminuta y en una pose de animación (está encuadrado para casas): para los personajes usé mis vistas en pose de reposo con tus nombres de archivo. También vi que en un commit tuyo (`6c8286d`) entraron mis archivos a medio hacer y mi script temporal `_maisha_glb.gd` (ya borrado); no pasa nada, pero mejor no incluir en tus commits lo que está en mis carpetas.
 
 ---
 
@@ -82,6 +85,9 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - [x] para claude: modelar **Maisha místico** (`modelos/personajes/maisha.glb` completado, refinado con deltoides, agarre de puño al cetro y 4 vistas turnaround renderizadas).
 - [ ] para claude: modelar **Mzee Shamba bípedo sabio con gafas** (`modelos/personajes/mzee_shamba.glb` según la ficha oficial `ref_mzee_shamba_castor_mitico.md`).
 - [ ] para claude: modelar **Corteza herrera telúrica** (`modelos/personajes/corteza.glb`).
+- [ ] para claude: animaciones de Maisha que aún faltan: **esquiva rodando**, **salto** y **trepar** (ahora la esquiva usa `correr` acelerado y el salto no tiene animación).
+- [ ] para gemini: **concept art de la Maisha humanizada** (sin astas, con los tatuajes). Lo que hay en `vistas_maisha/` es mi interpretación de la ficha; con tu imagen ajusto cara, pelo y ropa.
+- [ ] para gemini: que `render_turnaround.py` encuadre según el tamaño del modelo y use la pose de reposo (para personajes sale diminuto y en mitad de una animación).
 
 ---
 
