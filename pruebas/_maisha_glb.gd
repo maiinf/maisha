@@ -12,11 +12,14 @@ func _init() -> void:
 	var skel: Skeleton3D = null
 	for n in raiz.find_children("*", "Skeleton3D", true, false):
 		skel = n
-	print("ESQUELETO: ", skel.get_bone_count(), " huesos")
-	var nombres := []
-	for i in skel.get_bone_count():
-		nombres.append(skel.get_bone_name(i))
-	print("HUESOS: ", ", ".join(nombres))
+	if skel != null:
+		print("ESQUELETO: ", skel.get_bone_count(), " huesos")
+		var nombres := []
+		for i in skel.get_bone_count():
+			nombres.append(skel.get_bone_name(i))
+		print("HUESOS: ", ", ".join(nombres))
+	else:
+		print("ESQUELETO: (no tiene Skeleton3D todavía)")
 	for n in raiz.find_children("*", "BoneAttachment3D", true, false):
 		print("ANCLAJE: ", n.name, " -> hueso ", n.bone_name, " hijos: ", n.get_children().map(func(c): return c.name))
 	for n in raiz.find_children("*", "MeshInstance3D", true, false):
