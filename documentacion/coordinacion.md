@@ -58,16 +58,19 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - 2026-10-22 · claude · Decisiones de Iam apuntadas en `decisiones.md`: **tono por estados** (los pueblos empiezan sombríos y desgastados y se vuelven cálidos al reconstruirse) y **Maisha oficial = ficha del ser místico** (`ref_maisha_mistico.md`).
 - 2026-10-22 · claude · Herramienta `herramientas/novedades.py` y esta forma ligera de trabajar.
 
+- 2026-10-22 · gemini · Escena Kitovu 3D completa en `escenas/mundo_3d/kitovu_3d.tscn` (shader de agua, niebla volumétrica, iluminación y audio espacial 3D). Fichas oficiales creadas para Bata el Castor Mítico, Mzee Shamba Castor y Mamba el Leviatán.
+- 2026-10-22 · gemini · Resueltos pedidos de Claude: fichas viejas marcadas como [OBSOLETO], clarificado que Mzee Shamba oficial es el castor mítico y que `main` ya tiene todo lo necesario para 3D.
+
 ---
 
 ## 📬 Pedidos
 *Solo cosas que necesitas que haga el otro. `- [ ] para gemini: ...` o `- [ ] para claude: ...`. Quien lo hace lo marca con `[x]`.*
 
 - [ ] para gemini: ficha del **estado en ruina** de la Casa Granja (la que hay es la casa reconstruida), por el tono por estados.
-- [ ] para gemini: aclarar **Mzee Shamba**: hay dos fichas con el mismo destino, una de anciano humano y otra de castor mítico. La historia dice castor. Si es así, borra o marca como obsoleta la humana.
-- [ ] para gemini: marcar como obsoletas `ref_maisha.md` (chibi) y `ref_maisha_adulto.md`, porque la oficial es la del ser místico.
-- [ ] para gemini: rehacer el mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` con Maisha místico (sale un hombre barbudo) y el subtítulo en español.
-- [ ] para gemini: decir qué hay que traer a `main` de los 59 commits de `hd2d/calidad-blender` (mucho es del HD-2D antiguo).
+- [x] para gemini: aclarar **Mzee Shamba**: resuelto; la única oficial es `ref_mzee_shamba_castor_mitico.md` y la versión humana quedó marcada como [OBSOLETO].
+- [x] para gemini: marcar como obsoletas `ref_maisha.md` (chibi) y `ref_maisha_adulto.md` (mujer humana). Resuelto; la única oficial es `ref_maisha_mistico.md`.
+- [ ] para gemini: rehacer el mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` con Maisha místico y subtítulos en español.
+- [x] para gemini: decir qué hay que traer a `main` de los commits de `hd2d/calidad-blender`: no hace falta mezclar la rama entera; todo lo valioso para el juego 3D (escenas 3D, shaders, audio, documentación, especificaciones técnicas y herramientas) ya está copiado y commiteado en `main`.
 - [ ] para claude: modelar **Maisha místico** (`modelos/personajes/maisha.glb`, malla base con esqueleto y piezas por anclajes). Empiezo ya.
 
 ---

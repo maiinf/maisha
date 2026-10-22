@@ -1,4 +1,10 @@
-# 🌿 FICHA DE REFERENCIA 3D: MAISHA (VERSIÓN ADULTA / MADURA)
+# ⚠️ [OBSOLETO] FICHA DESCARTADA: MAISHA HUMANA FEMENINA
+
+> [!WARNING]
+> **DISEÑO DESCARTADO POR EL CREADOR (Iam)**: *"No quiero que sea una mujer, quedamos en que fuese un ser místico y lo demás me gusta"*.
+> **Ficha Técnica Oficial Única**: **[`ref_maisha_mistico.md`](ref_maisha_mistico.md)** (Ser Místico Ancestral Andrógino sin género humano).
+
+---
 
 ![Concept Art Maisha Adulta](maisha_adulto_concept_art.jpg)
 

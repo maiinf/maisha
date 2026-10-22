@@ -1,4 +1,10 @@
-# 🌿 FICHA DE REFERENCIA 3D: MAISHA (PROTAGONISTA)
+# ⚠️ [OBSOLETO] FICHA DESCARTADA: MAISHA INFANTIL (CHIBI)
+
+> [!WARNING]
+> **DISEÑO DESCARTADO POR EL CREADOR (Iam)**: El usuario rechazó el estilo infantil/chibi para buscar un tono de alta fantasía maduro y solemne (*God of War* / *Zelda: TotK* / *Mononoke*).
+> **Ficha Técnica Oficial Única**: **[`ref_maisha_mistico.md`](ref_maisha_mistico.md)** (Ser Místico Ancestral Andrógino).
+
+---
 
 ![Concept Art Maisha 3D](maisha_concept_art.jpg)
 

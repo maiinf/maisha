@@ -1,4 +1,10 @@
-# 🌾 FICHA DE REFERENCIA 3D: MZEE SHAMBA (EL AGRICULTOR SABIO)
+# ⚠️ [OBSOLETO] FICHA DESCARTADA: MZEE SHAMBA HUMANO
+
+> [!WARNING]
+> **DISEÑO DESCARTADO**: En el guion original del juego, Shamba pertenece al linaje sagrado de los Castores de Asili (*"Los castores Shamba cuidábamos sus huertos y sus raíces"*). A petición del creador, todos los personajes animales se elevan a criaturas de fantasía mítica seria.
+> **Ficha Técnica Oficial Única**: **[`ref_mzee_shamba_castor_mitico.md`](ref_mzee_shamba_castor_mitico.md)** (Patriarca Castor Mítico Bípedo).
+
+---
 
 ![Concept Art Mzee Shamba](mzee_shamba_concept_art.jpg)
 
