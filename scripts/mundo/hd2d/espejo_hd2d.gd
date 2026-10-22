@@ -1135,6 +1135,7 @@ const BIOMAS_HD2D := {
 }
 const ZONAS_OTONO := ["bosque_cobrizo", "camino_cobrizo", "campo_segado"]
 const ZONAS_ESPORAS := ["gruta_raices", "cueva_setas", "cienaga_quieta", "las_pasarelas"]
+const ZONAS_LLUVIA := ["lago_espejo", "orilla_juncos", "la_travesia"]
 const NUM_MOTAS_3D := 40
 const NUM_POLVO_3D := 10
 const NUM_HUMO_3D := 24
@@ -1629,7 +1630,13 @@ func _crear_particulas_3d() -> void:
 	mat_m.billboard_keep_scale = true
 	var quad_m := QuadMesh.new()
 	var es_hoja := _id_escena in ZONAS_OTONO
-	quad_m.size = Vector2(2.2 * PX, 1.5 * PX) if es_hoja else Vector2(1.4 * PX, 1.4 * PX)
+	var es_lluvia := _id_escena in ZONAS_LLUVIA
+	if es_hoja:
+		quad_m.size = Vector2(2.2 * PX, 1.5 * PX)
+	elif es_lluvia:
+		quad_m.size = Vector2(0.6 * PX, 4.2 * PX)
+	else:
+		quad_m.size = Vector2(1.4 * PX, 1.4 * PX)
 	quad_m.material = mat_m
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
@@ -1645,12 +1652,21 @@ func _crear_particulas_3d() -> void:
 		var ox := randf_range(-13.5, 13.5)
 		var oz := randf_range(-9.5, 9.5)
 		var oy := randf_range(0.35, 3.4)
+		var vx := randf_range(-0.35, 0.55)
+		var vy := randf_range(-0.08, 0.14)
+		if es_lluvia:
+			vx = randf_range(0.18, 0.38)
+			vy = randf_range(-4.2, -3.2)
+		elif _es_nieve > 0.5 or es_hoja:
+			vy = randf_range(-0.55, -0.22)
+			if es_hoja:
+				vx = randf_range(0.35, 0.95)
 		_motas_datos.append({
 			"ox": ox,
 			"oz": oz,
 			"oy": oy,
-			"vx": randf_range(-0.35, 0.55) if not es_hoja else randf_range(0.35, 0.95),
-			"vy": randf_range(-0.55, -0.22) if (_es_nieve > 0.5 or es_hoja) else randf_range(-0.08, 0.14),
+			"vx": vx,
+			"vy": vy,
 			"vz": randf_range(-0.25, 0.35),
 			"fase": randf() * TAU,
 			"escala": randf_range(0.75, 1.30),
@@ -1721,10 +1737,13 @@ func _actualizar_particulas_3d(delta: float, dia: float, en_penumbra: bool) -> v
 		var mm := _malla_motas.multimesh
 		var es_hoja := _id_escena in ZONAS_OTONO
 		var es_espora := _id_escena in ZONAS_ESPORAS
+		var es_lluvia := _id_escena in ZONAS_LLUVIA
 		var noche := 1.0 if en_penumbra else (1.0 - dia)
 		var col_base := Color(1.0, 0.94, 0.68, 0.62)
 		if _es_nieve > 0.5:
 			col_base = Color(0.92, 0.96, 1.0, 0.72)
+		elif es_lluvia:
+			col_base = Color(0.72, 0.86, 1.0, 0.48)
 		elif es_hoja:
 			col_base = Color(0.92, 0.52, 0.24, 0.78)
 		elif es_espora:
