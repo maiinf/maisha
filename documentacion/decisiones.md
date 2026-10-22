@@ -359,6 +359,9 @@ se pasan.
 | Dirección de UI / HUD | **Minimalismo extremo y diegético**: HUD casi invisible fuera de combate. Barra de vitalidad ultra-fina en bronce mate desgastado y pizarra rúnica, glifos geométricos sobrios y subtítulos cinematográficos editoriales. Cero elementos flotantes de cómic o dopamínicos. |
 | Reparto de roles entre agentes | **Gemini (Supervisión, Mapeado, Música y Concept Art)**: Genera las fotos y fichas de referencia visual de todos los modelos (personajes, construcciones, enemigos, props y mapeado entero en sí), diseña y ensambla los mapas/entornos 3D en Godot, compone la música y el sonido, y supervisa que todo fluya con armonía y sin errores en el proyecto.<br/>**Claude (Constructora y Modelado 3D en Blender)**: Modela en Blender (`herramientas/blender/`) a partir de las imágenes de referencia generadas por Gemini, exportando los modelos `.glb` a `modelos/`, y programa la lógica de juego, misiones, diálogos y eventos. |
 | Carpeta de intercambio de referencias | `documentacion/referencias_visuales_3d/`: Gemini deposita aquí las imágenes conceptuales, vistas (frente, perfil, perspectiva) y fichas de especificación técnica de cada elemento para que Claude modele con fidelidad absoluta. |
+| Rediseño de Maisha (Humanización y Tatuajes Mnemotécnicos) | **Sin cuernos ni astas**: Se humaniza la silueta con rostro expresivo y cabello orgánico suave para conectar emocionalmente con el público. **Evolución por Tatuajes del Olvido**: Maisha se grabó en la piel una cartografía rúnica antes de la amnesia para recordar quién era; los tatuajes despiertan e irradian oro líquido progresivamente al recuperar los 9 Ecos, revelando la memoria de su pasado. |
+| Rediseño de Mzee Shamba (Castor Culto con Gafas) | **Bípedo y de estatura media (1.45 m)**: Ni cuadrúpedo ni bestia gigante. Es un anciano sabio, culto y venerable, con gafas redondas de montura fina de botánico, chaleco rústico de pana con bolsillos y cuaderno botánico. |
+
 
 
 
