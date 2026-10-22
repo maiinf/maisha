@@ -19,6 +19,7 @@ Iam ha tomado la decisión firme y con todo el cariño al proyecto de que **Mais
 
 ### Canal de coordinación y referencias:
 - **Tablón de avisos**: Consulta siempre `documentacion/coordinacion.md` para ver los modelos listos para modelar y el estado de las escenas.
+- **Trabajo en pareja (versión ligera)**: cada uno manda en sus carpetas sin pedir permiso; callar es estar de acuerdo. Al empezar, `python herramientas/novedades.py claude` (a Claude se le lanza solo al abrir sesión). Cada cambio que le importe a Gemini, en una línea del **Diario** del tablón; lo que necesites de Gemini, en **Pedidos**. Commits con prefijo `[claude]`.
 - **Referencias visuales**: Consulta las imágenes y fichas en `documentacion/referencias_visuales_3d/` antes de modelar cada elemento en Blender.
 - **Entorno en Windows**:
   - **Godot 4.7.2**: `C:\Users\iamin\Godot\extraido\Godot_v4.7.2-stable_win64_console.exe` (en Descargas, `Godot_v4.7.2-stable_win64.exe` es una carpeta, no el programa)
