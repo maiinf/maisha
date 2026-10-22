@@ -1,533 +1,441 @@
 # -*- coding: utf-8 -*-
 """
-modelar_props_kitovu.py - Modelador AAA de los Props y Narrativa Ambiental de El Kitovu.
-Genera los modelos 3D según documentacion/referencias_visuales_3d/construcciones/ref_props_huerto_kitovu.md:
-1. Carretilla de madera volcada (carro_madera.glb)
-2. Pala de labranza oxidada (pala_oxidada.glb)
-3. Espantapájaros de sombras / maniquí de entrenamiento (espantapajaros.glb)
-4. Pozo megalítico antiguo (pozo_antiguo.glb)
+Atrezo del Huerto Asfixiado de El Kitovu (ficha construcciones/ref_props_huerto_kitovu.md, contrato del Kitovu).
+Narrativa ambiental: la granja abandonada a toda prisa ante la Purga de Giza.
 
-Uso:
-    blender -b --factory-startup -P herramientas/blender/modelar_props_kitovu.py
+  carro_madera.glb     carretilla volcada 28°, varales de roble agrietado, lateral roto, rueda con el aro
+                       de hierro partido, abono petrificado y hierbas secas dentro (1,45 x 0,75 x 0,60 m)
+  pala_oxidada.glb     mango de fresno con agarre en T y hoja triangular oxidada y mellada, clavada 20 cm
+                       en un surco seco a 22° (el origen es el suelo: lo enterrado queda bajo z = 0)
+  espantapajaros.glb   maniquí del tutorial (2,10 m, brazos de 1,60 m): cruceta de abedul descortezado
+                       atada con esparto, saco de cáñamo deshilachado con remiendos de cuero, cabeza de
+                       calabaza seca con capucha de arpillera y ojos de carbón, sombrero de paja caído.
+                       Lleva esqueleto (poste, torso, cabeza, brazos) y animaciones reposo y golpeado
+  pozo_antiguo.glb     brocal de 4 sillares curvos de caliza (1,70 / 1,15 m, 0,90 m de alto) con las
+                       marcas de la soga, musgo, pilastras de roble, tejadillo podrido, torno con manivela,
+                       soga que baja al fondo oscuro y cubo de cedro con aros de hierro (2,35 m en total)
+
+    blender -b --factory-startup -P herramientas/blender/modelar_props_kitovu.py [-- --vistas <carpeta>]
 """
 
 import math
 import os
+import random
 import sys
-import bpy
+
 import bmesh
-from mathutils import Matrix, Vector
-
-RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-CARPETA_SALIDA = os.path.join(RAIZ, "modelos", "entorno")
-os.makedirs(CARPETA_SALIDA, exist_ok=True)
-
-
-def _lineal(c):
-    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
-
-
-def rgb(hexa):
-    h = hexa.lstrip("#")
-    return [_lineal(int(h[i : i + 2], 16) / 255.0) for i in (0, 2, 4)]
-
-
-def crear_material(nombre, hexa, rugosidad=0.85, metal=0.0, emision=0.0):
-    m = bpy.data.materials.get(nombre)
-    if m is None:
-        m = bpy.data.materials.new(nombre)
-    m.use_nodes = True
-    bsdf = m.node_tree.nodes.get("Principled BSDF")
-    c = rgb(hexa) + [1.0]
-    bsdf.inputs["Base Color"].default_value = c
-    bsdf.inputs["Roughness"].default_value = rugosidad
-    bsdf.inputs["Metallic"].default_value = metal
-    if emision > 0.0:
-        bsdf.inputs["Emission Color"].default_value = c
-        bsdf.inputs["Emission Strength"].default_value = emision
-    return m
-
-
-def limpiar_escena():
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    for c in list(bpy.data.collections):
-        bpy.data.collections.remove(c)
-    col = bpy.data.collections.new("Coleccion_Props")
-    bpy.context.scene.collection.children.link(col)
-
-
-def crear_cilindro(bm, radius, depth, segments=16, matrix=Matrix()):
-    return bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        cap_tris=False,
-        segments=segments,
-        radius1=radius,
-        radius2=radius,
-        depth=depth,
-        matrix=matrix,
-    )
-
-
-def exportar_seleccion(ruta_glb):
-    bpy.ops.export_scene.gltf(
-        filepath=ruta_glb,
-        export_format="GLB",
-        use_selection=True,
-        export_apply=True,
-        export_yup=True,
-    )
-    print(f"[OK] Exportado: {ruta_glb}")
-
-
-# ===========================================================================
-# 1. CARRETILLA DE MADERA VOLCADA
-# ===========================================================================
-def modelar_carretilla():
-    limpiar_escena()
-    col = bpy.data.collections["Coleccion_Props"]
-    mat_madera = crear_material("madera_roble_desgastada", "#4a443c", rugosidad=0.88, metal=0.0)
-    mat_hierro = crear_material("hierro_herrumbre", "#7a3824", rugosidad=0.82, metal=0.35)
-    mat_tierra = crear_material("tierra_agrietada_surco", "#3c352a", rugosidad=0.95, metal=0.0)
-
-    bm = bmesh.new()
-
-    # Dos varales longitudinales de madera
-    for sx in (-0.28, 0.28):
-        bmesh.ops.create_cube(
-            bm,
-            size=1.0,
-            matrix=Matrix.Translation(Vector((sx, 0.0, 0.25)))
-            @ Matrix.Scale(0.08, 4, Vector((1, 0, 0)))
-            @ Matrix.Scale(1.45, 4, Vector((0, 1, 0)))
-            @ Matrix.Scale(0.08, 4, Vector((0, 0, 1))),
-        )
-
-    # Rueda delantera de madera con aro de hierro
-    crear_cilindro(
-        bm,
-        segments=24,
-        radius=0.22,
-        depth=0.07,
-        matrix=Matrix.Translation(Vector((0.0, 0.58, 0.22)))
-        @ Matrix.Rotation(math.radians(90), 4, "Y"),
-    )
-    # Eje de hierro de la rueda
-    crear_cilindro(
-        bm,
-        segments=12,
-        radius=0.025,
-        depth=0.45,
-        matrix=Matrix.Translation(Vector((0.0, 0.58, 0.22)))
-        @ Matrix.Rotation(math.radians(90), 4, "Y"),
-    )
-
-    # Cajón de madera (fondo y paredes)
-    # Fondo
-    bmesh.ops.create_cube(
-        bm,
-        size=1.0,
-        matrix=Matrix.Translation(Vector((0.0, -0.05, 0.32)))
-        @ Matrix.Scale(0.68, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.85, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.05, 4, Vector((0, 0, 1))),
-    )
-    # Pared frontal
-    bmesh.ops.create_cube(
-        bm,
-        size=1.0,
-        matrix=Matrix.Translation(Vector((0.0, 0.38, 0.46)))
-        @ Matrix.Rotation(math.radians(-15), 4, "X")
-        @ Matrix.Scale(0.68, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.04, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.32, 4, Vector((0, 0, 1))),
-    )
-    # Pared lateral derecha
-    bmesh.ops.create_cube(
-        bm,
-        size=1.0,
-        matrix=Matrix.Translation(Vector((0.34, -0.05, 0.46)))
-        @ Matrix.Rotation(math.radians(12), 4, "Y")
-        @ Matrix.Scale(0.04, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.85, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.32, 4, Vector((0, 0, 1))),
-    )
-    # Pared lateral izquierda (parcialmente rota y astillada)
-    bmesh.ops.create_cube(
-        bm,
-        size=1.0,
-        matrix=Matrix.Translation(Vector((-0.34, 0.05, 0.44)))
-        @ Matrix.Rotation(math.radians(-10), 4, "Y")
-        @ Matrix.Scale(0.04, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.60, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.28, 4, Vector((0, 0, 1))),
-    )
-    # Pared trasera
-    bmesh.ops.create_cube(
-        bm,
-        size=1.0,
-        matrix=Matrix.Translation(Vector((0.0, -0.48, 0.46)))
-        @ Matrix.Rotation(math.radians(10), 4, "X")
-        @ Matrix.Scale(0.68, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.04, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.32, 4, Vector((0, 0, 1))),
-    )
-    # Dos patas de apoyo traseras
-    for sx in (-0.24, 0.24):
-        bmesh.ops.create_cube(
-            bm,
-            size=1.0,
-            matrix=Matrix.Translation(Vector((sx, -0.38, 0.14)))
-            @ Matrix.Scale(0.06, 4, Vector((1, 0, 0)))
-            @ Matrix.Scale(0.06, 4, Vector((0, 1, 0)))
-            @ Matrix.Scale(0.26, 4, Vector((0, 0, 1))),
-        )
-
-    # Simular montículo de tierra/abono petrificado dentro del cajón
-    bmesh.ops.create_icosphere(
-        bm,
-        subdivisions=2,
-        radius=0.24,
-        matrix=Matrix.Translation(Vector((0.05, -0.05, 0.38)))
-        @ Matrix.Scale(1.0, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(1.4, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.4, 4, Vector((0, 0, 1))),
-    )
-
-    mesh = bpy.data.meshes.new("Carretilla_Volcada")
-    bm.to_mesh(mesh)
-    bm.free()
-
-    obj = bpy.data.objects.new("Carretilla_Volcada", mesh)
-    col.objects.link(obj)
-    obj.data.materials.append(mat_madera)
-
-    # Inclinarla 28 grados hacia un lado para que repose volcada en el suelo
-    obj.rotation_euler = (math.radians(12), math.radians(-28), math.radians(15))
-    bpy.context.view_layer.update()
-    z_min = min((obj.matrix_world @ Vector(v)).z for v in obj.bound_box)
-    obj.location.z -= z_min
-
-    bpy.ops.object.select_all(action="SELECT")
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-
-    ruta = os.path.join(CARPETA_SALIDA, "carro_madera.glb")
-    exportar_seleccion(ruta)
-
-
-# ===========================================================================
-# 2. PALA DE LABRANZA OXIDADA
-# ===========================================================================
-def modelar_pala():
-    limpiar_escena()
-    col = bpy.data.collections["Coleccion_Props"]
-    mat_madera = crear_material("madera_fresno_mango", "#5a5042", rugosidad=0.85, metal=0.0)
-    mat_hierro = crear_material("hierro_herrumbre", "#7a3824", rugosidad=0.80, metal=0.40)
-    mat_tierra = crear_material("tierra_agrietada_surco", "#3c352a", rugosidad=0.95, metal=0.0)
-
-    bm = bmesh.new()
-
-    # Pequeño montículo de surco de tierra donde está clavada la pala
-    bmesh.ops.create_icosphere(
-        bm,
-        subdivisions=2,
-        radius=0.35,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 0.02)))
-        @ Matrix.Scale(1.3, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.8, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.2, 4, Vector((0, 0, 1))),
-    )
-
-    # Hoja de pala triangular de hierro forjado
-    bm_hoja = bmesh.new()
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=4,
-        radius1=0.14,
-        radius2=0.02,
-        depth=0.28,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 0.16)))
-        @ Matrix.Rotation(math.radians(45), 4, "Z")
-        @ Matrix.Scale(1.0, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.12, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(1.0, 4, Vector((0, 0, 1))),
-    )
-
-    # Mango cilíndrico de fresno
-    crear_cilindro(
-        bm,
-        segments=12,
-        radius=0.022,
-        depth=1.15,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 0.78))),
-    )
-
-    # Agarre superior en forma de "T"
-    crear_cilindro(
-        bm,
-        segments=10,
-        radius=0.020,
-        depth=0.18,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 1.35)))
-        @ Matrix.Rotation(math.radians(90), 4, "Y"),
-    )
-
-    mesh = bpy.data.meshes.new("Pala_Oxidada")
-    bm.to_mesh(mesh)
-    bm.free()
-
-    obj = bpy.data.objects.new("Pala_Oxidada", mesh)
-    col.objects.link(obj)
-    obj.data.materials.append(mat_hierro)
-
-    # Inclinar 22 grados clavada en el surco
-    obj.rotation_euler = (math.radians(22), math.radians(6), 0.0)
-    bpy.context.view_layer.update()
-    z_min = min((obj.matrix_world @ Vector(v)).z for v in obj.bound_box)
-    obj.location.z -= z_min
-
-    bpy.ops.object.select_all(action="SELECT")
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-
-    ruta = os.path.join(CARPETA_SALIDA, "pala_oxidada.glb")
-    exportar_seleccion(ruta)
-
-
-# ===========================================================================
-# 3. ESPANTAPÁJAROS DE ENTRENAMIENTO
-# ===========================================================================
-def modelar_espantapajaros():
-    limpiar_escena()
-    col = bpy.data.collections["Coleccion_Props"]
-    mat_madera = crear_material("madera_abedul_estaca", "#4a4237", rugosidad=0.90, metal=0.0)
-    mat_saco = crear_material("saco_cañamo_parches", "#7c7462", rugosidad=0.92, metal=0.0)
-    mat_paja = crear_material("paja_seca_dorada", "#b89e58", rugosidad=0.88, metal=0.0)
-    mat_cuero = crear_material("cuero_remendado", "#443525", rugosidad=0.80, metal=0.0)
-
-    bm = bmesh.new()
-
-    # Poste vertical de madera clavado en el suelo (altura 2.10 m)
-    crear_cilindro(
-        bm,
-        segments=12,
-        radius=0.055,
-        depth=2.15,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 1.075))),
-    )
-
-    # Travesaño horizontal para los brazos (envergadura 1.60 m en z = 1.48)
-    crear_cilindro(
-        bm,
-        segments=10,
-        radius=0.040,
-        depth=1.60,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 1.48)))
-        @ Matrix.Rotation(math.radians(90), 4, "Y")
-        @ Matrix.Rotation(math.radians(4), 4, "Z"),
-    )
-
-    # Torso de saco de cáñamo relleno de paja
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=16,
-        radius1=0.28,
-        radius2=0.22,
-        depth=0.72,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 1.25))),
-    )
-
-    # Cinturón de soga de esparto
-    crear_cilindro(
-        bm,
-        segments=16,
-        radius=0.26,
-        depth=0.06,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 0.98))),
-    )
-
-    # Mechones de paja que sobresalen por las mangas y el bajo
-    for sx in (-0.72, 0.72):
-        bmesh.ops.create_cone(
-            bm,
-            cap_ends=True,
-            segments=8,
-            radius1=0.07,
-            radius2=0.01,
-            depth=0.25,
-            matrix=Matrix.Translation(Vector((sx, 0.0, 1.46)))
-            @ Matrix.Rotation(math.radians(90 if sx > 0 else -90), 4, "Y"),
-        )
-
-    # Cabeza de calabaza / saco de arpillera
-    bmesh.ops.create_uvsphere(
-        bm,
-        u_segments=16,
-        v_segments=12,
-        radius=0.19,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 1.76)))
-        @ Matrix.Scale(0.9, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.9, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(1.15, 4, Vector((0, 0, 1))),
-    )
-
-    # Sombrero cónico de paja trenzada de campesino inclinado
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=16,
-        radius1=0.38,
-        radius2=0.03,
-        depth=0.28,
-        matrix=Matrix.Translation(Vector((0.02, -0.02, 1.96)))
-        @ Matrix.Rotation(math.radians(-14), 4, "X")
-        @ Matrix.Rotation(math.radians(8), 4, "Y"),
-    )
-
-    mesh = bpy.data.meshes.new("Espantapajaros_Entrenamiento")
-    bm.to_mesh(mesh)
-    bm.free()
-
-    obj = bpy.data.objects.new("Espantapajaros_Entrenamiento", mesh)
-    col.objects.link(obj)
-    obj.data.materials.append(mat_saco)
-
-    bpy.ops.object.select_all(action="SELECT")
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-
-    ruta = os.path.join(CARPETA_SALIDA, "espantapajaros.glb")
-    exportar_seleccion(ruta)
-
-
-# ===========================================================================
-# 4. POZO MEGALÍTICO ANTIGUO
-# ===========================================================================
-def modelar_pozo():
-    limpiar_escena()
-    col = bpy.data.collections["Coleccion_Props"]
-    mat_caliza = crear_material("caliza_pozo_musgo", "#585954", rugosidad=0.88, metal=0.0)
-    mat_madera = crear_material("madera_roble_viga", "#42382e", rugosidad=0.88, metal=0.0)
-    mat_hierro = crear_material("hierro_herrumbre", "#7a3824", rugosidad=0.80, metal=0.35)
-    mat_agua = crear_material("agua_pozo_oscura", "#1b2a2e", rugosidad=0.10, metal=0.1)
-
-    bm = bmesh.new()
-
-    # Brocal cilíndrico de piedra caliza megalítica
-    # Radio ext: 0.85m, int: 0.58m, altura: 0.90m
-    crear_cilindro(
-        bm,
-        segments=24,
-        radius=0.88,
-        depth=0.90,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 0.45))),
-    )
-    # Superficie interior del agua oscura en el fondo
-    crear_cilindro(
-        bm,
-        segments=16,
-        radius=0.58,
-        depth=0.05,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 0.15))),
-    )
-
-    # Dos pilares de roble oscuro a los lados del brocal (x = -0.78 y +0.78)
-    for sx in (-0.78, 0.78):
-        bmesh.ops.create_cube(
-            bm,
-            size=1.0,
-            matrix=Matrix.Translation(Vector((sx, 0.0, 1.45)))
-            @ Matrix.Scale(0.14, 4, Vector((1, 0, 0)))
-            @ Matrix.Scale(0.14, 4, Vector((0, 1, 0)))
-            @ Matrix.Scale(1.80, 4, Vector((0, 0, 1))),
-        )
-
-    # Viga travesaño superior que une los dos pilares
-    bmesh.ops.create_cube(
-        bm,
-        size=1.0,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 2.25)))
-        @ Matrix.Scale(1.75, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.15, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.15, 4, Vector((0, 0, 1))),
-    )
-
-    # Tejadillo a dos aguas de tablas de cedro sobre la viga (z = 2.40 m)
-    # Ala izquierda
-    bmesh.ops.create_cube(
-        bm,
-        size=1.0,
-        matrix=Matrix.Translation(Vector((0.0, -0.32, 2.45)))
-        @ Matrix.Rotation(math.radians(35), 4, "X")
-        @ Matrix.Scale(1.90, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.68, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.04, 4, Vector((0, 0, 1))),
-    )
-    # Ala derecha
-    bmesh.ops.create_cube(
-        bm,
-        size=1.0,
-        matrix=Matrix.Translation(Vector((0.0, 0.32, 2.45)))
-        @ Matrix.Rotation(math.radians(-35), 4, "X")
-        @ Matrix.Scale(1.90, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.68, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.04, 4, Vector((0, 0, 1))),
-    )
-
-    # Cilindro de cabrestante/torno de madera con cuerda
-    crear_cilindro(
-        bm,
-        segments=16,
-        radius=0.10,
-        depth=1.20,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 1.82)))
-        @ Matrix.Rotation(math.radians(90), 4, "Y"),
-    )
-    # Manivela de hierro forjado
-    crear_cilindro(
-        bm,
-        segments=8,
-        radius=0.02,
-        depth=0.25,
-        matrix=Matrix.Translation(Vector((0.72, 0.0, 1.82)))
-        @ Matrix.Rotation(math.radians(90), 4, "Y"),
-    )
-
-    # Cubo de madera posado sobre el brocal del pozo
-    crear_cilindro(
-        bm,
-        segments=12,
-        radius=0.16,
-        depth=0.32,
-        matrix=Matrix.Translation(Vector((0.45, -0.42, 1.06))),
-    )
-
-    mesh = bpy.data.meshes.new("Pozo_Megalitico_Antiguo")
-    bm.to_mesh(mesh)
-    bm.free()
-
-    obj = bpy.data.objects.new("Pozo_Megalitico_Antiguo", mesh)
-    col.objects.link(obj)
-    obj.data.materials.append(mat_caliza)
-
-    bpy.ops.object.select_all(action="SELECT")
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-
-    ruta = os.path.join(CARPETA_SALIDA, "pozo_antiguo.glb")
-    exportar_seleccion(ruta)
+import bpy
+from mathutils import Matrix, Vector, noise
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import aparejo as ap  # noqa: E402
+from aparejo import X, Y, Z  # noqa: E402
+from modelar_mzee_shamba import Piezas  # noqa: E402
+
+CARPETA = os.path.join(ap.RAIZ, "modelos", "entorno")
+azar = random.Random(28)
+
+PALETA = {
+    "madera_roble_desgastada": ("#4a443c", 0.88, 0.0, 0.0),
+    "madera_veta_clara": ("#6b6255", 0.88, 0.0, 0.0),
+    "hierro_herrumbre": ("#7a3824", 0.82, 0.25, 0.0),
+    "oxido_hoja": ("#8a3a22", 0.85, 0.2, 0.0),
+    "fresno_mango": ("#7a6650", 0.80, 0.0, 0.0),
+    "saco_canamo_parches": ("#7c7462", 0.90, 0.0, 0.0),
+    "cuero_parche": ("#3b2a1c", 0.70, 0.0, 0.0),
+    "esparto_cuerda": ("#9c8a62", 0.90, 0.0, 0.0),
+    "abedul_descortezado": ("#cbbfa8", 0.80, 0.0, 0.0),
+    "calabaza_seca": ("#8a6a3a", 0.75, 0.0, 0.0),
+    "arpillera_gris": ("#6e6a62", 0.92, 0.0, 0.0),
+    "carbon": ("#121110", 0.50, 0.0, 0.0),
+    "paja_sombrero": ("#a8915e", 0.85, 0.0, 0.0),
+    "caliza_pozo_musgo": ("#585954", 0.85, 0.0, 0.0),
+    "musgo_humedo": ("#3d4a2a", 0.95, 0.0, 0.0),
+    "fondo_oscuro": ("#050506", 0.30, 0.0, 0.0),
+    "cedro_cubo": ("#5a3e28", 0.80, 0.0, 0.0),
+    "tierra_agrietada_surco": ("#3c352a", 0.95, 0.0, 0.0),
+    "abono_petrificado": ("#2e2a24", 0.95, 0.0, 0.0),
+    "hierba_seca": ("#8b7d55", 0.90, 0.0, 0.0),
+}
+
+
+def tabla(pz, a, b, ancho, grueso, mat, astillado=0.0, giro_x=0.0):
+    """Tablón de a a b (centros), con el canto irregular y, si astillado, el final roto en punta."""
+    a, b = Vector(a), Vector(b)
+    eje = b - a
+    largo = eje.length
+    t = eje.normalized()
+    lado = (Z.cross(t) if abs(t.z) < 0.9 else X.cross(t)).normalized()
+    lado = (Matrix.Rotation(giro_x, 3, t) @ lado)
+    arriba = t.cross(lado)
+    res = bmesh.ops.create_grid(pz.bm, x_segments=8, y_segments=1, size=0.5)
+    for v in res["verts"]:
+        u, w = v.co.x + 0.5, v.co.y * 2           # u 0..1 a lo largo, w -1..1 a lo ancho
+        borde = 1.0 + 0.06 * noise.noise(Vector((u * 7, w, a.x * 3 + a.y)))
+        if astillado and u > 1 - astillado:
+            borde *= 1.0 - 0.8 * (u - (1 - astillado)) / astillado * (0.5 + 0.5 * abs(math.sin(w * 3)))
+        v.co = a + t * (u * largo) + lado * (w * ancho / 2 * borde)
+    geom = bmesh.ops.extrude_face_region(pz.bm, geom=list({f for v in res["verts"] for f in v.link_faces}))
+    nuevos = [e for e in geom["geom"] if isinstance(e, bmesh.types.BMVert)]
+    for v in nuevos:
+        v.co -= arriba * grueso
+    i = pz._i(mat)
+    for f in {f for v in list(res["verts"]) + nuevos for f in v.link_faces}:
+        f.material_index = i
+
+
+def roca(pz, c, r, mat, semilla=0.0, aspereza=0.15):
+    res = bmesh.ops.create_icosphere(pz.bm, subdivisions=2, radius=1.0)
+    for v in res["verts"]:
+        d = v.co.normalized()
+        k = 1.0 + noise.fractal(d * 2.5 + Vector((semilla, 0, 0)), 0.6, 2.0, 3) * aspereza
+        v.co = Vector(c) + Vector((d.x * r[0] * k, d.y * r[1] * k, d.z * r[2] * k))
+    i = pz._i(mat)
+    for f in {f for v in res["verts"] for f in v.link_faces}:
+        f.material_index = i
+
+
+def girar_todo(ob, giro, apoyar=True):
+    """Gira la malla entera y, si apoyar, la deja tocando el suelo."""
+    ob.data.transform(giro.to_4x4())
+    if apoyar:
+        zmin = min(v.co.z for v in ob.data.vertices)
+        ob.data.transform(Matrix.Translation((0, 0, -zmin)))
+    ob.data.update()
+
+
+# ---------------------------------------------------------------------------
+
+def carretilla(mats):
+    """Carretilla de una rueda: cajón de tablas en trapecio, dos varales que acaban en mangos, dos patas
+    traseras y la rueda delante entre los varales. Se construye de pie y se vuelca 28° de lado."""
+    pz = Piezas("Carretilla", mats)
+    R, C = "madera_roble_desgastada", "madera_veta_clara"
+
+    def tablon(c, tam, rot=(0, 0, 0), mat=R):
+        giro = (Matrix.Rotation(math.radians(rot[2]), 3, "Z") @ Matrix.Rotation(math.radians(rot[1]), 3, "Y")
+                @ Matrix.Rotation(math.radians(rot[0]), 3, "X"))
+        pz.caja(c, tam, mat, giro)
+
+    # varales de roble: de los mangos (atrás, +Y) a la rueda (delante, -Y), bajando hacia delante
+    for s in (-1, 1):
+        tablon((s * 0.27, 0.05, 0.43), (0.055, 1.40, 0.055), (-9, 0, s * -4))
+        pz.tubo([(s * 0.30, 0.70, 0.55), (s * 0.31, 0.80, 0.57)], [0.024, 0.022], C, lados=8)       # mangos
+        tablon((s * 0.25, 0.42, 0.20), (0.05, 0.05, 0.40), (-8, 0, 0))                               # patas
+    # cajón en trapecio: fondo de tablas, laterales abiertos hacia arriba, frente inclinado y trasera
+    for k in range(4):
+        tablon((-0.18 + k * 0.12, 0.02, 0.47), (0.11, 0.80, 0.022), (-6, 0, 0))
+    for s in (-1, 1):
+        for k in range(3):
+            if s > 0 and k == 2:
+                tablon((s * 0.30, 0.14, 0.62), (0.022, 0.42, 0.075), (-6, s * -22, 0))    # tabla partida
+                continue
+            tablon((s * (0.26 + 0.035 * k), 0.02, 0.51 + 0.075 * k), (0.022, 0.84, 0.075), (-6, s * -22, 0))
+    for k in range(3):
+        tablon((0, -0.40, 0.52 + 0.075 * k), (0.52 + 0.07 * k, 0.022, 0.075), (35, 0, 0))   # frente inclinado
+        tablon((0, 0.43, 0.56 + 0.075 * k), (0.56 + 0.07 * k, 0.022, 0.075), (-8, 0, 0))
+    # remaches de hierro oxidado en las esquinas
+    for s in (-1, 1):
+        for y in (-0.36, 0.40):
+            for z in (0.55, 0.65):
+                pz.esfera((s * 0.30, y, z), (0.011, 0.011, 0.011), "hierro_herrumbre", seg=(8, 6))
+    # rueda de radios con el aro de hierro partido y el eje
+    centro = Vector((0, -0.62, 0.24))
+    giro_rueda = Matrix.Rotation(math.radians(90), 3, "Y")
+    pz.torno([(0.05, -0.04), (0.07, -0.04), (0.07, 0.04), (0.05, 0.04)], centro, C, lados=16, giro=giro_rueda)
+    llanta = [centro + Vector((0, 0.21 * math.cos(a), 0.21 * math.sin(a))) for a in
+              (2 * math.pi * k / 24 for k in range(24))]
+    pz.tubo(llanta, [(0.035, 0.022)] * 24, C, lados=6, cerrado=True, lateral=X)
+    for k in range(8):
+        a = 2 * math.pi * k / 8
+        d = Vector((0, math.cos(a), math.sin(a)))
+        pz.tubo([centro + d * 0.06, centro + d * 0.20], [0.012, 0.010], C, lados=6)
+    aro = [centro + Vector((0, 0.232 * math.cos(a), 0.232 * math.sin(a))) for a in
+           [math.radians(20 + 290 * k / 28) for k in range(29)]]
+    pz.tubo(aro, [(0.010, 0.026)] * 29, "hierro_herrumbre", lados=6, lateral=X)
+    pz.tubo([centro + Vector((-0.30, 0, 0)), centro + Vector((0.30, 0, 0))], [0.016, 0.016], "hierro_herrumbre",
+            lados=8)
+    # abono petrificado y hierbas secas dentro del cajón
+    for k in range(6):
+        roca(pz, (azar.uniform(-0.15, 0.15), azar.uniform(-0.2, 0.3), 0.52), (0.09, 0.11, 0.05),
+             "abono_petrificado", semilla=k, aspereza=0.3)
+    for k in range(14):
+        b = Vector((azar.uniform(-0.18, 0.18), azar.uniform(-0.25, 0.35), 0.54))
+        d = Vector((azar.uniform(-0.4, 0.4), azar.uniform(-0.4, 0.4), 1)).normalized()
+        pz.tubo([b, b + d * 0.10, b + d * 0.18 + Vector((0.03, 0, -0.04))], [0.004, 0.003, 0.001], "hierba_seca",
+                lados=4)
+    ob = pz.objeto()
+    girar_todo(ob, Matrix.Rotation(math.radians(28), 3, "Y"))      # volcada de lado, 28°
+    ob.name = "Carretilla"
+    return ob
+
+
+def pala(mats):
+    pz = Piezas("Pala", mats)
+    largo = 1.15
+    # se modela vertical: la hoja abajo; luego se inclina 22° y se entierra 20 cm
+    pz.tubo([(0, 0, 0.25), (0, 0, largo)], [0.018, 0.017], "fresno_mango", lados=10)
+    pz.tubo([(-0.08, 0, largo + 0.02), (0.08, 0, largo + 0.02)], [0.016, 0.016], "fresno_mango", lados=8)  # agarre T
+    pz.tubo([(0, 0, largo - 0.03), (0, 0, largo + 0.02)], [0.021, 0.021], "fresno_mango", lados=8)
+    pz.tubo([(0, 0, 0.22), (0, 0, 0.30)], [0.022, 0.020], "hierro_herrumbre", lados=10)            # cubo
+    hoja = bmesh.ops.create_grid(pz.bm, x_segments=6, y_segments=6, size=0.5)
+    for v in hoja["verts"]:
+        u, w = v.co.x * 2, v.co.y + 0.5            # u -1..1 ancho, w 0..1 de arriba (mango) a la punta
+        ancho = 0.11 * (1 - 0.65 * w ** 1.4)
+        mella = 0.012 * max(0.0, noise.noise(Vector((u * 9, w * 4, 0.3)))) * (w > 0.85)
+        v.co = Vector((u * ancho, 0.012 * (1 - u * u), 0.22 - w * 0.28 + mella))
+    geom = bmesh.ops.extrude_face_region(pz.bm, geom=list({f for v in hoja["verts"] for f in v.link_faces}))
+    for e in geom["geom"]:
+        if isinstance(e, bmesh.types.BMVert):
+            e.co.y -= 0.006
+    i = pz._i("oxido_hoja")
+    for f in {f for v in hoja["verts"] for f in v.link_faces}:
+        f.material_index = i
+    for e in geom["geom"]:
+        if isinstance(e, bmesh.types.BMFace):
+            e.material_index = i
+    ob = pz.objeto()
+    # inclinada 22° y con la hoja 20 cm bajo el suelo, como la soltaron al huir
+    ob.data.transform(Matrix.Translation((0, 0, -0.13)) @ Matrix.Rotation(math.radians(22), 4, "X"))
+    ob.data.update()
+    # montón de tierra seca alrededor del corte (a ras de suelo)
+    tierra = Piezas("Tierra", mats)
+    for k in range(5):
+        a = 2 * math.pi * k / 5
+        roca(tierra, (0.12 * math.cos(a), 0.12 * math.sin(a) - 0.05, 0.0), (0.10, 0.08, 0.035),
+             "tierra_agrietada_surco", semilla=k + 3, aspereza=0.35)
+    ob = ap.unir([ob, tierra.objeto()], "Pala")
+    return ob
+
+
+def espantapajaros(mats):
+    """Devuelve (objeto, huesos) — los vértices se pesan después por altura."""
+    pz = Piezas("Espantapajaros", mats)
+    H = 2.10
+    B = "abedul_descortezado"
+    # poste y travesaño de abedul, con nudos
+    poste = [Vector((0.01 * math.sin(k), 0.008 * math.cos(k * 1.3), H * 0.83 * k / 8)) for k in range(9)]
+    pz.tubo(poste, [0.045 - 0.008 * k / 8 for k in range(9)], B, lados=10)
+    brazo = [Vector((-0.80 + 1.60 * k / 8, 0.0, 1.42 + 0.02 * math.sin(k * 0.9))) for k in range(9)]
+    pz.tubo(brazo, [0.030 + 0.006 * abs(k - 4) / 4 for k in range(9)], B, lados=8)
+    for s in (-1, 1):     # ramitas en las puntas
+        pz.tubo([(s * 0.80, 0, 1.42), (s * 0.90, 0.02, 1.47), (s * 0.96, 0.03, 1.55)], [0.012, 0.008, 0.003], B,
+                lados=5)
+    # atadura de esparto en el cruce
+    for k in range(4):
+        a = math.radians(45 + 90 * k)
+        pz.tubo([(0.06 * math.cos(a), 0.06 * math.sin(a), 1.38), (-0.06 * math.cos(a), -0.06 * math.sin(a), 1.46)],
+                [0.010, 0.010], "esparto_cuerda", lados=6)
+    # saco de cáñamo: cuerpo con el bajo deshilachado
+    perfil = [(0.17, 1.47), (0.22, 1.38), (0.25, 1.20), (0.24, 1.00), (0.27, 0.86)]
+    pz.torno([(r, z) for r, z in perfil], Vector(), "saco_canamo_parches", lados=24,
+             ruido=lambda k, a: (0.05 * math.sin(a * 13) + 0.03 * math.sin(a * 29)) * (k == len(perfil) - 1)
+             + 0.03 * noise.noise(Vector((a * 2, k, 0))))
+    for (z, a) in ((1.18, 0.5), (1.02, -1.9), (1.30, 2.6)):     # remiendos de cuero cosidos
+        p = Vector((0.25 * math.sin(a), -0.25 * math.cos(a), z))
+        pz.caja(p, (0.09, 0.012, 0.08), "cuero_parche", Matrix.Rotation(-a, 3, "Z"))
+    # mangas de saco colgando del travesaño
+    for s in (-1, 1):
+        pz.torno([(0.06, 0.0), (0.075, -0.04), (0.08, -0.22), (0.09, -0.30)], Vector((s * 0.42, 0, 1.44)),
+                 "saco_canamo_parches", lados=12, giro=Matrix.Rotation(math.radians(-90 * s), 3, "Y") @
+                 Matrix.Rotation(math.radians(75), 3, "X"))
+    # cabeza: calabaza seca con capucha de arpillera y ojos de carbón
+    c = Vector((0, -0.01, 1.62))
+    for k in range(8):
+        a = 2 * math.pi * k / 8
+        pz.esfera(c + Vector((0.055 * math.cos(a), 0.055 * math.sin(a), 0)), (0.085, 0.085, 0.11), "calabaza_seca",
+                  seg=(12, 8))
+    pz.torno([(0.0, 0.17), (0.08, 0.15), (0.14, 0.08), (0.155, -0.02), (0.14, -0.10), (0.16, -0.14)], c,
+             "arpillera_gris", lados=24, ruido=lambda k, a: 0.04 * noise.noise(Vector((a * 3, k, 1)))
+             + (0.0 if math.sin(a) > -0.2 else -0.5) * (k in (2, 3)))
+    for s in (-1, 1):
+        pz.esfera(c + Vector((s * 0.05, -0.145, 0.02)), (0.022, 0.012, 0.018), "carbon", seg=(8, 6))
+    # sombrero de paja caído sobre un hombro
+    pz.torno([(0.30, 0.0), (0.28, 0.01), (0.13, 0.02), (0.11, 0.08), (0.06, 0.15), (0.0, 0.17)],
+             c + Vector((0.05, 0, 0.12)), "paja_sombrero", lados=32,
+             giro=Matrix.Rotation(math.radians(24), 3, "Y") @ Matrix.Rotation(math.radians(-8), 3, "X"),
+             ruido=lambda k, a: (0.06 * math.sin(a * 21) + 0.04 * math.sin(a * 37)) * (k == 0))
+    ob = pz.objeto()
+    ob.name = "Espantapajaros"
+    huesos = [("root", (0, 0, 0), (0, 0, 0.1), None),
+              ("poste", (0, 0, 0.0), (0, 0, 1.10), "root"),
+              ("torso", (0, 0, 1.10), (0, 0, 1.50), "poste"),
+              ("cabeza", (0, 0, 1.50), (0, 0, 1.85), "torso"),
+              ("brazo_L", (-0.05, 0, 1.42), (-0.85, 0, 1.42), "torso"),
+              ("brazo_R", (0.05, 0, 1.42), (0.85, 0, 1.42), "torso")]
+    return ob, huesos
+
+
+def pesar_espantapajaros(ob, arm):
+    grupos = {n: ob.vertex_groups.new(name=n) for n in ("poste", "torso", "cabeza", "brazo_L", "brazo_R")}
+    for v in ob.data.vertices:
+        p = v.co
+        if p.z > 1.50:
+            n = "cabeza"
+        elif abs(p.x) > 0.30 and p.z > 1.0:
+            n = "brazo_L" if p.x < 0 else "brazo_R"
+        elif p.z > 0.95:
+            n = "torso"
+        else:
+            n = "poste"
+        grupos[n].add([v.index], 1.0, "REPLACE")
+    mod = ob.modifiers.new("Esqueleto", "ARMATURE")
+    mod.object = arm
+    ob.parent = arm
+
+
+def animar_espantapajaros(arm):
+    an = ap.Animador(arm)
+    an.nueva("reposo")       # el viento lo mece despacio
+    for f in range(0, 91, 10):
+        t = 2 * math.pi * f / 90
+        an.fotograma(f, {"poste": [("Y", 1.2 * math.sin(t))], "torso": [("Y", 1.5 * math.sin(t + 0.6))],
+                         "cabeza": [("Y", 3 * math.sin(t + 1.2)), ("X", 2 * math.sin(t * 2))],
+                         "brazo_L": [("Z", 2 * math.sin(t + 0.3))], "brazo_R": [("Z", -2 * math.sin(t + 0.9))]})
+    an.cerrar("reposo")
+    an.nueva("golpeado")      # el báculo lo empuja hacia atrás y rebota amortiguándose
+    for f in range(0, 49, 2):
+        t = f / 48
+        k = math.exp(-4.0 * t) * math.cos(t * 18)
+        an.fotograma(f, {"poste": [("X", 9 * k)], "torso": [("X", 14 * k), ("Z", 6 * k)],
+                         "cabeza": [("X", 22 * k), ("Y", 10 * math.sin(t * 25) * math.exp(-4 * t))],
+                         "brazo_L": [("X", -10 * k)], "brazo_R": [("X", -12 * k)]})
+    an.cerrar("golpeado")
+
+
+def sillar(pz, a0, a1, r0, r1, alto, mat, semilla):
+    """Sillar curvo de caliza: sector de anillo con cantos gastados y las hendiduras de la soga arriba."""
+    n_a, n_r, n_z = 10, 3, 5
+    capa = {}
+    verts = {}
+    for i in range(n_a + 1):
+        a = a0 + (a1 - a0) * i / n_a
+        for j in range(n_r + 1):
+            r = r0 + (r1 - r0) * j / n_r
+            for k in range(n_z + 1):
+                z = alto * k / n_z
+                borde = 1.0
+                d = noise.noise(Vector((a * 3, r * 4, z * 4 + semilla))) * 0.012
+                if k == n_z and 0.15 < (i / n_a) < 0.85:   # hendiduras de la soga en lo alto
+                    d -= 0.020 * max(0.0, math.sin((i / n_a) * math.pi * 4)) ** 8
+                verts[(i, j, k)] = pz.bm.verts.new(Vector(((r + d) * math.cos(a), (r + d) * math.sin(a), z + d * 0.5)))
+    caras = []
+
+    def cara(c):
+        try:
+            caras.append(pz.bm.faces.new(c))
+        except ValueError:
+            pass
+    for i in range(n_a):
+        for k in range(n_z):
+            cara([verts[(i, 0, k)], verts[(i, 0, k + 1)], verts[(i + 1, 0, k + 1)], verts[(i + 1, 0, k)]])
+            cara([verts[(i, n_r, k)], verts[(i + 1, n_r, k)], verts[(i + 1, n_r, k + 1)], verts[(i, n_r, k + 1)]])
+        for j in range(n_r):
+            cara([verts[(i, j, n_z)], verts[(i, j + 1, n_z)], verts[(i + 1, j + 1, n_z)], verts[(i + 1, j, n_z)]])
+            cara([verts[(i, j, 0)], verts[(i + 1, j, 0)], verts[(i + 1, j + 1, 0)], verts[(i, j + 1, 0)]])
+    for j in range(n_r):
+        for k in range(n_z):
+            cara([verts[(0, j, k)], verts[(0, j + 1, k)], verts[(0, j + 1, k + 1)], verts[(0, j, k + 1)]])
+            cara([verts[(n_a, j, k)], verts[(n_a, j, k + 1)], verts[(n_a, j + 1, k + 1)], verts[(n_a, j + 1, k)]])
+    i_mat = pz._i(mat)
+    for f in caras:
+        f.material_index = i_mat
+
+
+def pozo(mats):
+    pz = Piezas("Pozo", mats)
+    r_in, r_out, alto = 0.575, 0.85, 0.90
+    for k in range(4):        # 4 sillares con juntas
+        a0 = math.radians(90 * k + 1.5)
+        sillar(pz, a0, a0 + math.radians(87), r_in, r_out, alto, "caliza_pozo_musgo", semilla=k)
+    for k in range(18):       # musgo en la base y en las juntas
+        a = 2 * math.pi * k / 18 + azar.uniform(-0.1, 0.1)
+        roca(pz, (0.87 * math.cos(a), 0.87 * math.sin(a), 0.04), (0.10, 0.10, 0.04), "musgo_humedo", semilla=k,
+             aspereza=0.4)
+    for k in range(4):
+        a = math.radians(90 * k)
+        roca(pz, (0.71 * math.cos(a), 0.71 * math.sin(a), alto - 0.15), (0.05, 0.05, 0.12), "musgo_humedo",
+             semilla=k + 30, aspereza=0.3)
+    # el hueco: pared interior que baja y fondo oscuro
+    pz.torno([(r_in - 0.005, 0.02), (r_in - 0.005, -1.40)], Vector(), "caliza_pozo_musgo", lados=32)
+    pz.torno([(0.0, -1.40), (r_in, -1.40)], Vector(), "fondo_oscuro", lados=32)
+    # pilastras de roble, travesaño y tejadillo a dos aguas de tablas podridas (le faltan algunas)
+    R = "madera_roble_desgastada"
+    for s in (-1, 1):
+        tabla(pz, (s * 0.80, 0.0, 0.0), (s * 0.80, 0.0, 2.05), 0.12, 0.10, R)
+    tabla(pz, (-0.92, 0.05, 2.05), (0.92, 0.05, 2.05), 0.10, 0.10, R)
+    for s in (-1, 1):
+        for k in range(7):
+            if (s, k) in ((1, 2), (-1, 5)):
+                continue      # tablas que ya se cayeron
+            x = -0.90 + k * 0.30
+            tabla(pz, (x, s * 0.02, 2.36), (x + azar.uniform(-0.02, 0.02), s * 0.62, 2.02), 0.28, 0.025, R,
+                  astillado=0.15 if k in (0, 6) else 0.0)
+    # torno con manivela de hierro y soga
+    pz.tubo([(-0.80, -0.02, 1.55), (0.80, -0.02, 1.55)], [0.06, 0.06], "madera_veta_clara", lados=14)
+    pz.tubo([(0.88, -0.02, 1.55), (0.95, -0.02, 1.55), (0.95, -0.02, 1.38), (1.02, -0.02, 1.38)],
+            [0.014] * 4, "hierro_herrumbre", lados=6)
+    for k in range(14):       # vueltas de soga en el carrete
+        x = -0.32 + k * 0.045
+        pz.tubo([(x, -0.02 + 0.072 * math.cos(a), 1.55 + 0.072 * math.sin(a)) for a in
+                 (2 * math.pi * j / 12 for j in range(13))], [0.012] * 13, "esparto_cuerda", lados=5)
+    pz.tubo([(0.0, -0.09, 1.55), (0.0, -0.10, 0.6), (0.01, -0.10, -0.6), (0.02, -0.09, -1.30)], [0.011] * 4,
+            "esparto_cuerda", lados=6)
+    # cubo de cedro con dos aros de hierro, sobre el brocal
+    cubo_c = Vector((0.70, -0.20, alto))
+    pz.torno([(0.0, 0.0), (0.11, 0.0), (0.13, 0.22), (0.12, 0.22), (0.10, 0.02), (0.0, 0.02)], cubo_c, "cedro_cubo",
+             lados=18)
+    for z in (0.05, 0.18):
+        pz.torno([(0.118 + 0.02 * z, z - 0.012), (0.122 + 0.02 * z, z + 0.012)], cubo_c, "hierro_herrumbre",
+                 lados=18)
+    pz.tubo([cubo_c + Vector((-0.13, 0, 0.21)), cubo_c + Vector((0, 0, 0.36)), cubo_c + Vector((0.13, 0, 0.21))],
+            [0.007] * 3, "hierro_herrumbre", lados=5)
+    ob = pz.objeto()
+    ob.name = "Pozo"
+    return ob
 
 
 def main():
-    print("=== MODELANDO PROPS DE EL KITOVU EN BLENDER ===")
-    modelar_carretilla()
-    modelar_pala()
-    modelar_espantapajaros()
-    modelar_pozo()
-    print("=== PROPS GENERADOS CON ÉXITO ===")
+    args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    resultados = []
+
+    def nuevo():
+        ap.escena_vacia()
+        return {n: ap.material(n, *v) for n, v in PALETA.items()}
+
+    mats = nuevo()
+    ob = carretilla(mats)
+    ap.exportar_estatico(os.path.join(CARPETA, "carro_madera.glb"), [ob])
+    resultados.append(("carro_madera", ob))
+    vistas = args[args.index("--vistas") + 1] if "--vistas" in args else None
+
+    def fotos(nombre, objetivo_z, dist):
+        if not vistas:
+            return
+        os.makedirs(vistas, exist_ok=True)
+        foto = ap.preparar_vistas(resolucion=(900, 800))
+        for vista, pos in (("frente", (0, -dist, objetivo_z + dist * 0.35)),
+                           ("tres_cuartos", (-dist * 0.7, -dist * 0.8, objetivo_z + dist * 0.45)),
+                           ("perfil", (dist, 0, objetivo_z + dist * 0.3))):
+            foto(os.path.join(vistas, f"{nombre}_{vista}.png"), pos, (0, 0, objetivo_z), 50)
+
+    fotos("carro_madera", 0.35, 3.2)
+    mats = nuevo()
+    ob = pala(mats)
+    ap.exportar_estatico(os.path.join(CARPETA, "pala_oxidada.glb"), [ob])
+    fotos("pala_oxidada", 0.55, 2.6)
+    mats = nuevo()
+    ob, huesos = espantapajaros(mats)
+    arm = ap.crear_esqueleto("Espantapajaros_Esqueleto", huesos)
+    pesar_espantapajaros(ob, arm)
+    animar_espantapajaros(arm)
+    ap.exportar(os.path.join(CARPETA, "espantapajaros.glb"), arm, [ob])
+    fotos("espantapajaros", 1.05, 4.6)
+    mats = nuevo()
+    ob = pozo(mats)
+    ap.exportar_estatico(os.path.join(CARPETA, "pozo_antiguo.glb"), [ob])
+    fotos("pozo_antiguo", 1.0, 5.0)
+    print("\n=== ATREZO DEL HUERTO: carro_madera, pala_oxidada, espantapajaros, pozo_antiguo exportados ===")
 
 
 if __name__ == "__main__":

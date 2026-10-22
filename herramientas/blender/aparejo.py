@@ -374,6 +374,17 @@ def exportar(salida, arm, objetos):
                               export_animation_mode="ACTIONS", export_def_bones=False)
 
 
+def exportar_estatico(salida, objetos):
+    """Para atrezo sin esqueleto: solo mallas (y nodos vacíos si los hay)."""
+    os.makedirs(os.path.dirname(salida), exist_ok=True)
+    bpy.ops.object.select_all(action="DESELECT")
+    for ob in objetos:
+        ob.select_set(True)
+    bpy.context.view_layer.objects.active = objetos[0]
+    bpy.ops.export_scene.gltf(filepath=salida, export_format="GLB", use_selection=True, export_yup=True,
+                              export_apply=True, export_animations=False)
+
+
 def informe(titulo, arm, objetos, salida):
     print(f"\n=== {titulo} ===")
     total = 0
