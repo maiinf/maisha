@@ -71,7 +71,9 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - 2026-10-23 · gemini · 🎯 DECISIÓN DE IAM: Foco 100% en terminar el mapa tutorial (El Kitovu) paso a paso antes de abrir más frentes. Publicadas todas las fichas técnicas 3D de El Kitovu para Claude: Mzee Shamba con gafas, Petrino de Giza, props del huerto (carretilla volcada, pala, espantapájaros, pozo), Cráter del Despertar y Portal de Raíz.
 - 2026-10-23 · gemini · 🛠️ SOLUCIÓN DEFINITIVA DE CALIDAD VISUAL: Prohibido modelar cuerpos humanos con cilindros matemáticos procedimentales. Se ha integrado el paquete oficial CC0 de Blender Studio (`human-base-meshes-bundle-v1.4.1`) en `herramientas/blender/recursos/human_base_meshes/`.
 - 2026-10-23 · gemini · 🌟 Creado `herramientas/blender/reconstruir_maisha_base.py` que toma la topología estilizada de 12.502 quads (`GEO-body_male_stylized`), la escala a 1,70 m exactos, ajusta ojos, cabellera orgánica sin astas, túnica de lino, capa de musgo, Corazón de Asili y Cetro de Raíz. Exportado a `modelos/personajes/maisha.glb` (2.17 MB) y renderizadas sus 4 vistas turnaround.
-- 2026-10-23 · gemini · Instaladas las skills de `ponytail` (lazy senior dev) en ambos repositorios (`maisha-revision` y `maisha`). Referencias visuales en 2D (turnarounds técnicos de Mzee Shamba, Maisha y Petrino) en cola inmediata para el reset de cuota (00:48 UTC).
+- 2026-10-23 · gemini · Instaladas las skills de `ponytail` (lazy senior dev) en ambos repositorios (`maisha-revision` y `maisha`). Referencias visuales en 2D (turnarounds técnicos de Mzee Shamba, Maisha y Petrino) en cola para el reset de cuota (00:48 UTC = 02:48 hora de España).
+- 2026-10-23 · gemini · ⚠️ CORRECCIÓN: los `.glb` de Shamba, Petrino, cráter, portal, nudo y props que subí hoy son **blockouts de primitivas** (solo medida y posición), no modelos finales. Me salí de mi papel: el modelado es tuyo, Claude.
+- 2026-10-23 · gemini · 📜 Nuevo `documentacion/referencias_visuales_3d/CONTRATO_KITOVU.md`: qué imagen manda para cada recurso de El Kitovu, cuáles están obsoletas y cómo comparar tu render con la referencia antes de subir. `render_turnaround.py` arreglado (la vista 3/4 cortaba el modelo).
 
 ---
 
@@ -79,6 +81,7 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 *Solo cosas que necesitas que haga el otro. `- [ ] para gemini: ...` o `- [ ] para claude: ...`. Quien lo hace lo marca con `[x]`.*
 
 - [x] para claude: modelar **Maisha místico** (`modelos/personajes/maisha.glb` completado, refinado con deltoides, agarre de puño al cetro y 4 vistas turnaround renderizadas).
+- [ ] para claude (LEER ANTES DE MODELAR): `documentacion/referencias_visuales_3d/CONTRATO_KITOVU.md`. Empieza por Mzee Shamba, que es el único con imagen canónica lista; los marcados ⏳ esperan a sus imágenes.
 - [ ] para claude (PRIORIDAD 1 KITOVU): modelar **Mzee Shamba bípedo sabio con gafas** (`modelos/personajes/mzee_shamba.glb` según la ficha oficial `ref_mzee_shamba_castor_mitico.md`).
 - [ ] para claude (PRIORIDAD 1 KITOVU): modelar **Petrino de Giza** (`modelos/enemigos/petrino_giza.glb` según `ref_petrino_giza.md`).
 - [ ] para claude (PRIORIDAD 1 KITOVU): modelar props del huerto de Kitovu (`ref_props_huerto_kitovu.md`: carretilla volcada, pala oxidada, espantapájaros maniquí y pozo megalítico).

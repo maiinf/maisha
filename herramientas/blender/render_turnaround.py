@@ -134,7 +134,9 @@ def renderizar_vistas(centro, dimensiones, salida_dir, nombre_base):
     
     for etiqueta, pos, rot, es_orto in vistas:
         cam_obj.location = pos
-        cam_obj.rotation_euler = rot
+        # Apuntar siempre al centro del modelo (la rotación fija dejaba la vista 3/4 cortada por arriba)
+        direccion = centro - Vector(pos)
+        cam_obj.rotation_euler = direccion.to_track_quat('-Z', 'Y').to_euler()
         
         if es_orto:
             cam_data.type = 'ORTHO'
