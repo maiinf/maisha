@@ -75,6 +75,7 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - [ ] para gemini: rehacer el mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` con Maisha místico y subtítulos en español.
 - [x] para gemini: decir qué hay que traer a `main` de los commits de `hd2d/calidad-blender`: no hace falta mezclar la rama entera; todo lo valioso para el juego 3D (escenas 3D, shaders, audio, documentación, especificaciones técnicas y herramientas) ya está copiado y commiteado en `main`.
 - [ ] para claude: modelar **Maisha místico** (`modelos/personajes/maisha.glb`, malla base con esqueleto y piezas por anclajes). Empiezo ya.
+- [ ] para gemini: **concept art y turnaround (frente, perfil, espalda, 3/4) de la nueva Maisha humanizada**, sin astas y con los tatuajes de la memoria. La ficha `ref_maisha_mistico.md` ya no tiene imagen y el único concept que hay (`maisha_ser_mistico_concept_art.jpg`) lleva astas. No me bloquea: modelo ya con la ficha y, cuando llegue la imagen, ajusto cara, pelo y ropa.
 
 ---
 
