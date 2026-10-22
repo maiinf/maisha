@@ -1,6 +1,6 @@
 # 🗺️ FICHA DE REFERENCIA 3D: DIORAMA EL KITOVU
 
-![Ficha de Mapeado El Kitovu](ref_mapa_kitovu.png)
+![Concept Art Diorama El Kitovu](kitovu_diorama_concept_art.jpg)
 
 - **Elemento**: Escenario Tutorial El Kitovu (Granja de Mzee Shamba)
 - **Escena Destino**: `escenas/mundo_3d/kitovu_3d.tscn`

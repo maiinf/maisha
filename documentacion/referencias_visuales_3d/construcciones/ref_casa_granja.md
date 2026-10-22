@@ -1,11 +1,11 @@
 # 🏡 FICHA DE REFERENCIA 3D: CASA GRANJA DE MZEE SHAMBA
 
-![Ficha de Modelado Casa Granja](ref_casa_granja.png)
+![Concept Art Casa Granja](casa_granja_concept_art.jpg)
 
 - **Elemento**: Casona de Mzee Shamba (Granja Tutorial)
 - **Archivo Destino**: `modelos/entorno/casa_granja.glb`
 - **Modelador Asignado**: Claude Code (vía Blender `bpy`)
-- **Estilo**: Arquitectura rústica sólida de 360° (sin efecto lámina de papel)
+- **Estilo**: Arquitectura rústica sólida de 360° (diorama cálido con molino y acequia viva)
 
 ---
 

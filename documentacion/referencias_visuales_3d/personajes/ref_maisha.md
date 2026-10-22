@@ -1,11 +1,11 @@
 # 🌿 FICHA DE REFERENCIA 3D: MAISHA (PROTAGONISTA)
 
-![Ficha de Modelado Maisha](ref_maisha.png)
+![Concept Art Maisha 3D](maisha_concept_art.jpg)
 
 - **Elemento**: Maisha, Espíritu de la Vida
 - **Archivo Destino**: `modelos/personajes/maisha.glb`
 - **Modelador Asignado**: Claude Code (vía Blender `bpy`)
-- **Estilo**: Chibi estilizado / Diorama de cuento (curvas suaves, silueta limpia y expresiva)
+- **Estilo**: Chibi estilizado / Diorama de cuento (curvas suaves, silueta limpia y expresiva, estética Ghibli / Link's Awakening)
 
 ---
 
