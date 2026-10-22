@@ -18,6 +18,9 @@
 [ext_resource type="AudioStream" path="res://audio/musica/kitovu.ogg" id="16_musica"]
 [ext_resource type="AudioStream" path="res://audio/ambiente/agua.ogg" id="17_sonido_agua"]
 [ext_resource type="PackedScene" path="res://escenas/enemigos/petrino_3d.tscn" id="18_petrino"]
+[ext_resource type="Script" path="res://scripts/mundo/portal_raiz_3d.gd" id="20_portal_script"]
+[ext_resource type="Script" path="res://scripts/mundo/mzee_shamba_npc_3d.gd" id="21_shamba_script"]
+[ext_resource type="PackedScene" path="res://escenas/interfaz/dialogo_cinematico_3d.tscn" id="22_dialogo"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.24, 0.32, 0.40, 1)
@@ -141,6 +144,7 @@ omni_range = 7.0
 
 [node name="PortalRaiz" parent="." instance=ExtResource("11_portal_raiz")]
 transform = Transform3D(0.965926, 0, -0.258819, 0, 1, 0, 0.258819, 0, 0.965926, 6.5, 0, -6.0)
+script = ExtResource("20_portal_script")
 
 [node name="LuzPortal" type="OmniLight3D" parent="PortalRaiz"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
@@ -162,6 +166,9 @@ transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 7.8, 0.02,
 
 [node name="MzeeShambaNPC" parent="." instance=ExtResource("15_shamba")]
 transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 2.8, 0, -2.6)
+script = ExtResource("21_shamba_script")
+
+[node name="DialogoCinematico3D" parent="." instance=ExtResource("22_dialogo")]
 
 [node name="MusicaAmbiente" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("16_musica")
