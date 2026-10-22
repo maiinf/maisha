@@ -41,6 +41,34 @@ func _init() -> void:
 		return
 	print("  bien: La Forja de Corteza cargada con éxito")
 
+	var pino: Node3D = instancia.get_node_or_null("PinoNPC")
+	if not pino:
+		print("FALLO: No se encontró PinoNPC")
+		quit(1)
+		return
+	print("  bien: Pino NPC presente")
+
+	var corteza: Node3D = instancia.get_node_or_null("CortezaNPC")
+	if not corteza:
+		print("FALLO: No se encontró CortezaNPC")
+		quit(1)
+		return
+	print("  bien: Corteza NPC presente")
+
+	var altar: Node3D = instancia.get_node_or_null("AltarRaiz")
+	if not altar:
+		print("FALLO: No se encontró AltarRaiz")
+		quit(1)
+		return
+	print("  bien: Altar de la Raíz Sagrada presente")
+
+	var dialogo: CanvasLayer = instancia.get_node_or_null("DialogoCinematico3D")
+	if not dialogo:
+		print("FALLO: No se encontró DialogoCinematico3D")
+		quit(1)
+		return
+	print("  bien: Diálogo Cinemático 3D listo")
+
 	instancia.queue_free()
 	print("\nRESULTADO: todo correcto en Cuna de Musgo 3D (0.1s)")
 	quit(0)

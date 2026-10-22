@@ -963,6 +963,417 @@ def montar():
 
 
 # ---------------------------------------------------------------------------
+# Esqueleto (nombres de la ficha) y pesos
+# ---------------------------------------------------------------------------
+
+def huesos():
+    """(nombre, cabeza, cola, padre) en la pose de reposo (pose A)."""
+    lista = [
+        ("root", (0, 0, 0), (0, 0, 0.12), None),
+        ("hips", (0, 0, 0.90), (0, 0, 1.00), "root"),
+        ("spine_01", (0, 0, 1.00), (0, 0, 1.10), "hips"),
+        ("spine_02", (0, 0, 1.10), (0, 0, 1.22), "spine_01"),
+        ("chest", (0, 0, 1.22), (0, 0, 1.40), "spine_02"),
+        ("neck", (0, 0, 1.40), (0, -0.004, 1.48), "chest"),
+        ("head", (0, -0.004, 1.48), (0, -0.004, 1.70), "neck"),
+        ("jaw", (0, 0.0, 1.525), (0, -0.062, 1.488), "head"),
+        ("eyes_look", (0, -0.040, 1.595), (0, -0.100, 1.595), "head"),
+        ("hair_back_01", (0, 0.080, 1.585), (0, 0.105, 1.525), "head"),
+        ("hair_back_02", (0, 0.105, 1.525), (0, 0.115, 1.455), "hair_back_01"),
+        ("cloak_L_01", (-0.085, 0.080, 1.430), (-0.130, 0.150, 1.150), "chest"),
+        ("cloak_L_02", (-0.130, 0.150, 1.150), (-0.150, 0.185, 0.870), "cloak_L_01"),
+    ]
+    for lado in ("L", "R"):
+        s = -1 if lado == "L" else 1
+        hombro, codo, muneca, d = puntos_brazo(lado)
+        lista += [
+            (f"shoulder_{lado}", (s * 0.020, 0.0, 1.390), tuple(hombro), "chest"),
+            (f"arm_{lado}", tuple(hombro), tuple(codo), f"shoulder_{lado}"),
+            (f"forearm_{lado}", tuple(codo), tuple(muneca), f"arm_{lado}"),
+            (f"hand_{lado}", tuple(muneca), tuple(muneca + d * 0.10), f"forearm_{lado}"),
+        ]
+        cadera, rodilla, tobillo, punta = puntos_pierna(lado)
+        lista += [
+            (f"thigh_{lado}", tuple(cadera), tuple(rodilla), "hips"),
+            (f"calf_{lado}", tuple(rodilla), tuple(tobillo), f"thigh_{lado}"),
+            (f"foot_{lado}", tuple(tobillo), tuple(punta), f"calf_{lado}"),
+        ]
+    return lista
+
+
+def crear_esqueleto():
+    datos = bpy.data.armatures.new("Maisha_Esqueleto")
+    arm = bpy.data.objects.new("Maisha", datos)
+    bpy.context.collection.objects.link(arm)
+    activar(arm)
+    bpy.ops.object.mode_set(mode="EDIT")
+    for nombre, cab, cola, padre in huesos():
+        eb = datos.edit_bones.new(nombre)
+        eb.head, eb.tail = Vector(cab), Vector(cola)
+        eje = (eb.tail - eb.head).normalized()
+        eb.align_roll(Vector((0, -1, 0)) if abs(eje.y) < 0.8 else Z)
+        if padre:
+            eb.parent = datos.edit_bones[padre]
+            eb.use_connect = (eb.head - datos.edit_bones[padre].tail).length < 1e-4 and nombre != "hips"
+    bpy.ops.object.mode_set(mode="OBJECT")
+    for pb in arm.pose.bones:
+        pb.rotation_mode = "QUATERNION"
+    return arm
+
+
+def _dist_segmento(p, a, b):
+    ab = b - a
+    t = max(0.0, min(1.0, (p - a).dot(ab) / (ab.length_squared or 1e-12)))
+    return (p - (a + ab * t)).length
+
+
+def pesar(ob, arm, permitidos, regla=None):
+    """Pesos por cercanía a los huesos permitidos (se mezclan los dos más cercanos, suave en las articulaciones).
+    regla(nombre_hueso, punto) -> factor (0 quita el hueso para ese punto)."""
+    segs = {b.name: (b.head_local.copy(), b.tail_local.copy()) for b in arm.data.bones if b.name in permitidos}
+    grupos = {n: ob.vertex_groups.new(name=n) for n in segs}
+    for v in ob.data.vertices:
+        p = v.co
+        cand = []
+        for n, (a, b) in segs.items():
+            f = regla(n, p) if regla else 1.0
+            if f <= 0:
+                continue
+            d = _dist_segmento(p, a, b)
+            cand.append((f / (d ** 4 + 1e-7), n))
+        cand.sort(reverse=True)
+        cand = cand[:2]
+        total = sum(w for w, _ in cand) or 1.0
+        for w, n in cand:
+            grupos[n].add([v.index], w / total, "REPLACE")
+    mod = ob.modifiers.new("Esqueleto", "ARMATURE")
+    mod.object = arm
+    ob.parent = arm
+
+
+def rigging(partes, arm):
+    cuerpo_ok = ["hips", "spine_01", "spine_02", "chest", "neck", "head", "jaw"] + \
+                [f"{h}_{l}" for h in ("shoulder", "arm", "forearm", "hand") for l in "LR"]
+
+    def regla_cuerpo(n, p):
+        if n == "jaw":   # solo la barbilla y el labio de abajo
+            return 1.0 if (p.z < CABEZA_C.z - 0.040 and p.z > 1.46 and p.y < CABEZA_C.y - 0.030) else 0.0
+        if n == "head":
+            return 1.0 if p.z > 1.44 else 0.0
+        return 1.0
+
+    pesar(partes["cuerpo"], arm, cuerpo_ok, regla_cuerpo)
+
+    def regla_pelo(n, p):
+        if n.startswith("hair_back"):
+            return 1.0 if (p.z < 1.555 and p.y > 0.040) else 0.0
+        return 1.0
+    pesar(partes["pelo"], arm, ["head", "hair_back_01", "hair_back_02"], regla_pelo)
+
+    def regla_tunica(n, p):
+        if n.startswith("thigh"):
+            return 0.55 if p.z < 0.86 else 0.0
+        return 1.0
+    pesar(partes["tunica"], arm, ["hips", "spine_01", "spine_02", "chest", "shoulder_L", "shoulder_R",
+                                  "thigh_L", "thigh_R"], regla_tunica)
+
+    def regla_ropa(n, p):
+        if n.startswith("thigh") or n.startswith("calf") or n.startswith("foot"):
+            return 1.0 if p.z < 0.93 else 0.0
+        return 1.0
+    pesar(partes["ropa"], arm, ["hips", "spine_01", "thigh_L", "thigh_R", "calf_L", "calf_R", "foot_L", "foot_R"],
+          regla_ropa)
+    pesar(partes["capa"], arm, ["chest", "neck", "shoulder_L", "cloak_L_01", "cloak_L_02"])
+
+    # el cetro va en la mano derecha (en Godot queda como BoneAttachment3D de hand_R)
+    cetro_ob = partes["cetro"]
+    activar(cetro_ob)
+    arm.select_set(True)
+    bpy.context.view_layer.objects.active = arm
+    arm.data.bones.active = arm.data.bones["hand_R"]
+    bpy.ops.object.parent_set(type="BONE", keep_transform=True)
+
+
+# ---------------------------------------------------------------------------
+# Animaciones (30 fps). Las rotaciones se dan sobre ejes del mundo en la pose de reposo:
+#   X+ en una pierna o un brazo caído = hacia atrás (X- = hacia delante); X+ en la columna o la cabeza = inclinar
+#   hacia delante; Z+ = girar hacia la derecha de Maisha; Y- baja el brazo izquierdo, Y+ el derecho.
+# ---------------------------------------------------------------------------
+
+EJES = {"X": X, "Y": Y, "Z": Z}
+FPS = 30
+
+
+class Animador:
+    def __init__(self, arm, eje_cetro):
+        self.arm = arm
+        self.rest = {b.name: b.matrix_local.to_3x3() for b in arm.data.bones}
+        mano = arm.data.bones["hand_R"].matrix_local.to_3x3()
+        self.cetro_local = (mano.inverted() @ eje_cetro).normalized()
+        arm.animation_data_create()
+
+    def q(self, nombre, rotaciones):
+        qw = Quaternion()
+        for eje, grados in rotaciones:
+            qw = Quaternion(EJES[eje], math.radians(grados)) @ qw
+        R = self.rest[nombre]
+        return (R.inverted() @ qw.to_matrix() @ R).to_quaternion()
+
+    def nueva(self, nombre):
+        act = bpy.data.actions.new(nombre)
+        act.use_fake_user = True
+        self.arm.animation_data.action = act
+        for pb in self.arm.pose.bones:
+            pb.rotation_quaternion = Quaternion()
+            pb.location = Vector()
+        return act
+
+    def fotograma(self, f, pose, cadera=(0.0, 0.0, 0.0), cetro=None):
+        """pose: {hueso: [(eje, grados), ...]}; cadera: desplazamiento (x, y, z) en el mundo;
+        cetro: dirección del mundo a la que debe apuntar el cetro (None = dejarlo como vaya la mano)."""
+        for pb in self.arm.pose.bones:
+            pb.rotation_quaternion = self.q(pb.name, pose.get(pb.name, []))
+            pb.location = Vector()
+        hips = self.arm.pose.bones["hips"]
+        hips.location = self.rest["hips"].inverted() @ Vector(cadera)
+        if cetro is not None:
+            bpy.context.view_layer.update()
+            pb = self.arm.pose.bones["hand_R"]
+            M = pb.matrix.copy()
+            actual = (M.to_3x3() @ self.cetro_local).normalized()
+            delta = actual.rotation_difference(Vector(cetro).normalized())
+            nueva = Matrix.Translation(M.translation) @ (delta.to_matrix() @ M.to_3x3()).to_4x4()
+            pb.matrix = nueva
+            bpy.context.view_layer.update()
+        for pb in self.arm.pose.bones:
+            pb.keyframe_insert("rotation_quaternion", frame=f)
+        hips.keyframe_insert("location", frame=f)
+
+    def cerrar(self, nombre, ciclica):
+        act = self.arm.animation_data.action
+        for fc in _curvas(act):
+            for k in fc.keyframe_points:
+                k.interpolation = "BEZIER"
+        pista = self.arm.animation_data.nla_tracks.new()
+        pista.name = nombre
+        pista.strips.new(nombre, int(act.frame_range[0]), act)
+        pista.mute = True
+        self.arm.animation_data.action = None
+
+
+def _curvas(act):
+    """Curvas de una acción (Blender 5 guarda las curvas en capas y ranuras)."""
+    if hasattr(act, "fcurves") and len(getattr(act, "fcurves", [])):
+        return list(act.fcurves)
+    curvas = []
+    for capa_ in getattr(act, "layers", []):
+        for tira in capa_.strips:
+            for bolsa in tira.channelbags:
+                curvas.extend(bolsa.fcurves)
+    return curvas
+
+
+def pose_reposo(respira=0.0, balanceo=0.0):
+    """Erguida, brazos caídos (el derecho con el cetro delante), mirada al frente."""
+    return {
+        "spine_01": [("X", 1.5 + 0.4 * respira)],
+        "chest": [("X", -1.0 - 1.2 * respira)],
+        "neck": [("X", 2.0)],
+        "head": [("X", 2.0 + 0.6 * respira), ("Z", 1.5 * balanceo)],
+        "shoulder_L": [("Y", -2.0 * respira)],
+        "shoulder_R": [("Y", 2.0 * respira)],
+        "arm_L": [("Y", -36.0), ("X", -4.0 + 1.5 * balanceo)],
+        "forearm_L": [("X", -12.0)],
+        "hand_L": [("Z", 6.0)],
+        "arm_R": [("Y", 34.0), ("X", -14.0)],
+        "forearm_R": [("X", -38.0)],
+        "thigh_L": [("Y", 1.5)],
+        "thigh_R": [("Y", -1.5)],
+        "cloak_L_01": [("X", 2.0 + 1.5 * balanceo)],
+        "cloak_L_02": [("X", 1.5 + 2.5 * balanceo)],
+        "hair_back_01": [("X", 1.0 * balanceo)],
+    }
+
+
+CETRO_ARRIBA = (0.0, -0.10, 1.0)        # el cetro, casi vertical y un poco adelantado
+
+
+def anim_reposo(an):
+    an.nueva("reposo")
+    n = 60
+    for f in range(0, n + 1, 6):
+        t = 2 * math.pi * f / n
+        an.fotograma(f, pose_reposo(math.sin(t), math.sin(t + 0.8)), cadera=(0, 0, -0.004 * (1 - math.cos(t)) / 2),
+                     cetro=CETRO_ARRIBA)
+    an.cerrar("reposo", True)
+
+
+def _paso(fase, amplitud):
+    """Ángulos de una pierna en el ciclo de paso: muslo (+ = adelante), rodilla y pie."""
+    muslo = amplitud * math.sin(fase)
+    rodilla = 6 + amplitud * 1.55 * max(0.0, math.cos(fase)) ** 1.5 + 4 * max(0.0, -math.sin(fase))
+    pie = muslo - rodilla * 0.85 + (8 if math.sin(fase) < -0.6 else 0)
+    return muslo, rodilla, pie
+
+
+def anim_andar(an, nombre, n, amplitud, inclinacion, brazos, bote, codo):
+    an.nueva(nombre)
+    for f in range(0, n + 1, 2):
+        p = 2 * math.pi * f / n
+        mL, rL, pL = _paso(p, amplitud)
+        mR, rR, pR = _paso(p + math.pi, amplitud)
+        giro = math.sin(p)
+        pose = {
+            "hips": [("Z", 5 * giro), ("Y", 2.0 * giro)],
+            "spine_01": [("X", inclinacion * 0.4)],
+            "spine_02": [("Z", -4 * giro), ("X", inclinacion * 0.3)],
+            "chest": [("Z", -3 * giro), ("X", inclinacion * 0.3)],
+            "neck": [("X", -inclinacion * 0.4)],
+            "head": [("X", -inclinacion * 0.3 + 2), ("Z", 2 * giro)],
+            "thigh_L": [("X", -mL)],
+            "calf_L": [("X", rL)],
+            "foot_L": [("X", -pL)],
+            "thigh_R": [("X", -mR)],
+            "calf_R": [("X", rR)],
+            "foot_R": [("X", -pR)],
+            "arm_L": [("Y", -38.0), ("X", brazos * mL * 0.9)],
+            "forearm_L": [("X", -codo - 8 * max(0.0, -math.sin(p)))],
+            "arm_R": [("Y", 34.0), ("X", -14.0 + brazos * mR * 0.35)],
+            "forearm_R": [("X", -38.0 - codo * 0.4)],
+            "cloak_L_01": [("X", 4 + inclinacion * 0.6 + 2 * math.sin(2 * p))],
+            "cloak_L_02": [("X", 6 + inclinacion + 4 * math.sin(2 * p + 0.6))],
+            "hair_back_01": [("X", 3 + 2 * math.sin(2 * p + 0.4))],
+            "hair_back_02": [("X", 2 + 3 * math.sin(2 * p + 0.9))],
+        }
+        z = -bote * (1 - abs(math.cos(p)))
+        an.fotograma(f, pose, cadera=(0.006 * giro, 0, z),
+                     cetro=(0.0, -0.10 - inclinacion / 60, 1.0))
+    an.cerrar(nombre, True)
+
+
+def anim_golpe(an):
+    """Barrido con el cetro: carga a la derecha, golpe cruzado con peso, seguimiento y vuelta a la guardia."""
+    an.nueva("golpe_cetro")
+    claves = [
+        # (fotograma, giro del tronco, brazo der. (Y, X), codo der., brazo izq. (Y, X), codo izq., agachar)
+        (0, 0, (34, -14), -38, (-36, -4), -12, 0),
+        (8, 30, (5, -10), -70, (-20, -40), -75, 6),      # carga: tronco a la derecha, cetro atrás
+        (12, 36, (-5, -15), -80, (-15, -50), -85, 8),
+        (16, -30, (40, -60), -20, (-10, -65), -50, 10),   # golpe: cruza por delante con todo el peso
+        (20, -42, (55, -45), -15, (-25, -40), -35, 12),
+        (26, -30, (45, -30), -25, (-30, -20), -25, 8),    # seguimiento
+        (36, 0, (34, -14), -38, (-36, -4), -12, 0),       # guardia
+    ]
+    for f, giro, (bY, bX), codo, (lY, lX), codo_l, agacha in claves:
+        pose = {
+            "hips": [("Z", giro * 0.35)],
+            "spine_01": [("X", agacha * 0.3), ("Z", giro * 0.25)],
+            "spine_02": [("Z", giro * 0.3), ("X", agacha * 0.3)],
+            "chest": [("Z", giro * 0.3), ("X", agacha * 0.2)],
+            "head": [("Z", -giro * 0.5), ("X", 4)],
+            "arm_R": [("Y", bY), ("X", bX)],
+            "forearm_R": [("X", codo)],
+            "arm_L": [("Y", lY), ("X", lX)],
+            "forearm_L": [("X", codo_l)],
+            "thigh_L": [("X", -12 * agacha / 12), ("Y", 4)],
+            "calf_L": [("X", 14 * agacha / 12)],
+            "foot_L": [("X", -2)],
+            "thigh_R": [("X", 10 * agacha / 12), ("Y", -4)],
+            "calf_R": [("X", 10 * agacha / 12)],
+            "cloak_L_01": [("X", 4), ("Z", -giro * 0.3)],
+            "cloak_L_02": [("X", 6), ("Z", -giro * 0.4)],
+        }
+        an.fotograma(f, pose, cadera=(0, 0, -0.012 * agacha / 12))
+    an.cerrar("golpe_cetro", False)
+
+
+def anim_mirar_tatuajes(an):
+    """Se detiene, alza el antebrazo izquierdo, baja la mirada y lo recorre como quien busca recordar."""
+    an.nueva("idle_mirar_tatuajes")
+    for f, k, traza in ((0, 0.0, 0), (18, 0.8, 0), (26, 1.0, 0), (40, 1.0, 1), (55, 1.0, -1), (70, 1.0, 0),
+                        (78, 0.8, 0), (90, 0.0, 0)):
+        pose = pose_reposo()
+        pose.update({
+            "arm_L": [("Y", -36 + 20 * k), ("X", -4 - 34 * k)],
+            "forearm_L": [("X", -12 - 98 * k), ("Z", 30 * k)],
+            "hand_L": [("Z", 6 - 30 * k)],
+            "neck": [("X", 2 + 10 * k), ("Z", -8 * k)],
+            "head": [("X", 2 + 14 * k + 2 * traza), ("Z", -10 * k + 3 * traza)],
+            "arm_R": [("Y", 34 - 6 * k), ("X", -14 - 8 * k)],
+            "forearm_R": [("X", -38 - 18 * k + 4 * traza)],
+            "chest": [("X", -1 + 3 * k), ("Z", -4 * k)],
+        })
+        an.fotograma(f, pose, cetro=CETRO_ARRIBA)
+    an.cerrar("idle_mirar_tatuajes", False)
+
+
+def anim_eco(an):
+    """Al tocar un Eco: el pecho se abre, la cabeza se alza y los brazos se separan un poco (el brillo lo pone el
+    juego subiendo la emisión de los tatuajes)."""
+    an.nueva("eco_despertar")
+    for f, k in ((0, 0.0), (14, 0.7), (22, 1.0), (44, 1.0), (60, 0.0)):
+        pose = pose_reposo()
+        pose.update({
+            "spine_02": [("X", -5 * k)],
+            "chest": [("X", -1 - 11 * k)],
+            "neck": [("X", 2 - 8 * k)],
+            "head": [("X", 2 - 14 * k)],
+            "arm_L": [("Y", -36 + 14 * k), ("X", -4 - 10 * k)],
+            "forearm_L": [("X", -12 - 10 * k)],
+            "hand_L": [("Z", 6 + 20 * k)],
+            "arm_R": [("Y", 34 - 6 * k), ("X", -14 - 6 * k)],
+            "cloak_L_01": [("X", 2 + 6 * k)],
+            "cloak_L_02": [("X", 1.5 + 10 * k)],
+            "hair_back_01": [("X", 4 * k)],
+        })
+        an.fotograma(f, pose, cadera=(0, 0, 0.006 * k), cetro=CETRO_ARRIBA)
+    an.cerrar("eco_despertar", False)
+
+
+def animar(arm, eje_cetro):
+    bpy.context.scene.render.fps = FPS
+    an = Animador(arm, eje_cetro)
+    anim_reposo(an)
+    anim_andar(an, "caminar_atento", 32, amplitud=24, inclinacion=4, brazos=1.0, bote=0.018, codo=14)
+    anim_andar(an, "correr", 20, amplitud=38, inclinacion=14, brazos=1.5, bote=0.035, codo=60)
+    anim_golpe(an)
+    anim_mirar_tatuajes(an)
+    anim_eco(an)
+    return an
+
+
+# ---------------------------------------------------------------------------
+# Exportación
+# ---------------------------------------------------------------------------
+
+def exportar(arm, partes):
+    os.makedirs(CARPETA, exist_ok=True)
+    bpy.ops.object.select_all(action="DESELECT")
+    arm.select_set(True)
+    for clave in ("cuerpo", "pelo", "tunica", "ropa", "capa", "cetro"):
+        partes[clave].select_set(True)
+    bpy.context.view_layer.objects.active = arm
+    bpy.ops.export_scene.gltf(filepath=SALIDA, export_format="GLB", use_selection=True, export_yup=True,
+                              export_apply=False, export_skins=True, export_animations=True,
+                              export_animation_mode="ACTIONS", export_def_bones=False)
+
+
+def informe(arm, partes):
+    print("\n=== MAISHA ===")
+    total = 0
+    for clave in ("cuerpo", "pelo", "tunica", "ropa", "capa", "cetro"):
+        ob = partes[clave]
+        tris = sum(len(p.vertices) - 2 for p in ob.data.polygons)
+        total += tris
+        print(f"  {ob.name:15s} {tris:6d} triángulos  [{', '.join(m.name for m in ob.data.materials)}]")
+    print(f"  Triángulos en total: {total}")
+    print(f"  Huesos: {len(arm.data.bones)}  ({', '.join(b.name for b in arm.data.bones)})")
+    acts = [a for a in bpy.data.actions if a.use_fake_user]
+    print(f"  Animaciones: " + ", ".join(f"{a.name} ({int(a.frame_range[1] - a.frame_range[0])} f)" for a in acts))
+    print(f"  Exportado a {SALIDA}")
+
+
+# ---------------------------------------------------------------------------
 # Vistas
 # ---------------------------------------------------------------------------
 
@@ -1000,19 +1411,49 @@ def vistas(carpeta, planos=None):
         "5_cara": ((-0.22, -0.75, 1.62), (0, 0, 1.58), 70),
         "6_brazo": ((1.0, -0.9, 1.3), (0.38, 0, 1.08), 60),
     }
-    for nombre, (pos, obj, lente) in planos.items():
+    def foto(nombre, pos, obj, lente):
         cam.data.lens = lente
         cam.location = pos
         cam.rotation_euler = (Vector(obj) - Vector(pos)).to_track_quat("-Z", "Y").to_euler()
         esc.render.filepath = os.path.join(carpeta, f"maisha_{nombre}.png")
         bpy.ops.render.render(write_still=True)
 
+    for nombre, (pos, obj, lente) in planos.items():
+        foto(nombre, pos, obj, lente)
+    return foto
+
+
+def vistas_animadas(foto, arm):
+    """Fotogramas sueltos de las animaciones, para revisarlas sin abrir Godot."""
+    tomas = [
+        ("reposo", 0, "a_reposo_frente", ((0.0, -4.6, 1.0), (0, 0, 0.88), 50)),
+        ("reposo", 0, "b_reposo_tres_cuartos", ((-3.0, -3.6, 1.6), (0, 0, 0.88), 50)),
+        ("caminar_atento", 8, "c_caminar_perfil", ((4.6, 0.0, 1.0), (0, 0, 0.88), 50)),
+        ("correr", 5, "d_correr_perfil", ((4.6, 0.0, 1.0), (0, 0, 0.88), 50)),
+        ("golpe_cetro", 8, "e_golpe_carga", ((-2.2, -4.0, 1.4), (0, 0, 0.95), 50)),
+        ("golpe_cetro", 16, "f_golpe_impacto", ((-2.2, -4.0, 1.4), (0, 0, 0.95), 50)),
+        ("idle_mirar_tatuajes", 40, "g_mirar_tatuajes", ((-1.4, -2.2, 1.5), (0, 0, 1.25), 55)),
+        ("eco_despertar", 30, "h_eco_despertar", ((-2.4, -3.6, 1.4), (0, 0, 1.0), 50)),
+    ]
+    for accion, f, nombre, (pos, obj, lente) in tomas:
+        arm.animation_data.action = bpy.data.actions[accion]
+        bpy.context.scene.frame_set(f)
+        foto(nombre, pos, obj, lente)
+    arm.animation_data.action = None
+
 
 def main():
     args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     partes = montar()
+    arm = crear_esqueleto()
+    rigging(partes, arm)
+    _, eje = agarre_cetro()
+    animar(arm, eje)
+    exportar(arm, partes)
+    informe(arm, partes)
     if "--vistas" in args:
-        vistas(args[args.index("--vistas") + 1])
+        foto = vistas(args[args.index("--vistas") + 1])
+        vistas_animadas(foto, arm)
 
 
 if __name__ == "__main__":
