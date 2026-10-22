@@ -5,6 +5,7 @@ se pasan.
 
 | Fecha | Decisión | Motivo |
 | --- | --- | --- |
+| 2026-10-22 | **Blender 5.2.3 LTS como única versión del pipeline 3D**: el generador `herramientas/blender/generador_3d_maisha.py` se probó en Blender 5.2.3 en una copia aislada: genera los 104 `.glb` sin errores (solo avisos de `Material.use_nodes`, que se retirará en Blender 6.0). Se desinstala la descarga de 4.5.15. Las entradas anteriores que citan 4.5 se dejan como historial. | Petición de Iam: usar siempre la versión más nueva y no mezclar versiones. |
 | 2026-10-18 | **Oleada 7 y 8 HD-2D: 66 Estructuras 3D Sólidas y Suite Completa de 23 Biomas**: Modelados proceduralmente en Blender 4.5 e integrados en `MODELOS_BLENDER`: `roca_grande.glb`, `roca_pequena.glb`, `arbol_muerto.glb`, `seta_luz.glb`, `cartel_madera.glb`, `tronco_caido.glb`, `pino_nevado.glb` y `sauce_pantano.glb`. Erradicación de más de 1,500 billboards planos en todo el mundo. Suite de verificación `verificar_gameplay_visual.gd` ampliada a los 23 mundos completos del juego (100% cobertura) con 0 fallos visuales y 0 regresiones. | Eliminación integral de billboards de papel, garantía de estabilidad 360° y validación continua del gameplay sin tocar lógica 2D. |
 | 2026-10-11 | Bug: Maisha se quedaba celebrando si una zona se purgaba a mitad de un golpe. Arreglado: al empezar una expresión, el golpe a medias se da por acabado. | Lo encontró Iam en el Kitovu. |
 | 2026-10-11 | El proyecto tiene su propio git (dentro de `maisha`). | Antes no había ninguno propio. |

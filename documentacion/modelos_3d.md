@@ -1,7 +1,7 @@
 # Catálogo de Modelos 3D y Arquitectura HD-2D — Maisha
 
 > **Bóveda de Obsidian**: [[LEEME]] · [[documentacion/decisiones|Decisiones de Diseño]] · [[documentacion/coordinacion|Coordinación Claude ⟷ Gemini]]
-> **Pipeline Gráfico**: Blender 4.5.15 LTS (Headless procedural via `bpy`) $\rightarrow$ Godot 4.7.2 (GL Compatibility HD-2D).
+> **Pipeline Gráfico**: Blender 5.2.3 LTS (Headless procedural via `bpy`) $\rightarrow$ Godot 4.7.2 (GL Compatibility HD-2D).
 > **Tags**: #maisha #hd2d #blender #arquitectura #modelos3d #gamedev
 
 ---
@@ -14,7 +14,7 @@ Maisha combina dos mundos para lograr su identidad visual única:
    - Volumen 3D mediante extrusión multicapa (`capas_fondo`) y sombreado de curvatura cilíndrica.
    - Mapas de normales (`*_n.png`) horneados para reaccionar físicamente a la luz del sol y a las luces cálidas nocturnas.
 2. **Escenario y Arquitectura (Edificios, Casas, Puentes, Árboles y Farolas)**:
-   - **Modelos 3D sólidos reales (`.glb`)** modelados procedimentalmente con Blender 4.5.
+   - **Modelos 3D sólidos reales (`.glb`)** modelados procedimentalmente con Blender 5.2.3 LTS.
    - Paleta cromática oficial de Raíz y Sigilia con filtrado de píxel `NEAREST`.
    - Geometría completa de 360° con aleros, chimeneas, porches y proyección de sombras volumétricas dinámicas.
 

@@ -4,6 +4,20 @@ Juego en **Godot 4** (pixel art, vista cenital 3/4) de Iam. Todo el arte, la mú
 ilustraciones **se generan con código**: los programas de `herramientas/` (Python). Así que aquí se puede seguir
 creando jefes, enemigos, animaciones, mapas, música e ilustraciones igual que hasta ahora.
 
+## Nuevo Rumbo del Proyecto y Coexistencia de Agentes (IMPORTANTE)
+1. **Evolución HD-2D y Arquitectura 3D Sólida**:
+   - El proyecto evoluciona hacia una estética **HD-2D de alta calidad** (*Octopath Traveler*, *Triangle Strategy*): cámara en perspectiva, sombras dinámicas, agua translúcida con profundidad y estructuras clave modeladas en **3D sólido en Blender (.glb)** para eliminar el efecto "plano de papel" al rodearlas, conservando texturas pixel art puras (paleta oficial).
+   - **Compatibilidad 2D absoluta**: Con la tecla **H** apagada, el juego 2D tradicional sigue funcionando al 100% idéntico. La lógica narrativa, colisiones 2D, misiones y diálogos no se alteran.
+2. **Reparto de roles entre agentes**:
+   - **Claude (Constructora - tú)**: Trabaja en `C:\Users\iamin\Proyectos\maisha` (rama `main`). Te encargas del **contenido 2D**: Sigilia, mapas, diálogos naturales, misiones, combate y NPCs.
+   - **Gemini (Arquitecto Visual / Revisora)**: Trabaja en `C:\Users\iamin\Proyectos\maisha-revision` (rama `hd2d/calidad-blender`). Se encarga de los modelos 3D sólidos en Blender (`herramientas/blender/generador_3d_maisha.py`), los `.glb`, shaders y motor `scripts/mundo/hd2d/espejo_hd2d.gd`.
+   - **Canal de comunicación**: `documentacion/coordinacion.md` contiene avisos cruzados en `[Avisos de Claude para Gemini]` y `[Avisos de Gemini para Claude]`.
+3. **Entorno en Windows**:
+   - **Godot 4.7.2**: `C:\Users\iamin\Godot\extraido\Godot_v4.7.2-stable_win64_console.exe`
+   - **Blender 5.2.3 LTS**: `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`
+   - **Python 3.14**: `python` (con requirements instalados: numpy, pillow, opencv, scipy, imageio-ffmpeg)
+   - **Bocetos**: `documentacion/boceto_bibliotecario.png` y `herramientas/boceto_bibliotecario.py` ya están integrados en ambos repositorios tras el traslado.
+
 ## Cómo trabajar con Iam (reglas del prompt maestro)
 - Escribe siempre en **español**, claro y sin tecnicismos innecesarios. Las fichas y especificaciones, en **tablas**.
 - **Paso a paso**: una cosa cada vez. La calidad es lo primero. Sé honesto con lo que queda mal o falta.
@@ -15,13 +29,6 @@ creando jefes, enemigos, animaciones, mapas, música e ilustraciones igual que h
 - Apunta las decisiones en el GDD (sección «Registro de decisiones»). El GDD vive en claude.ai; si no hay acceso,
   apúntalas en `documentacion/decisiones.md`.
 - Al acabar un cambio: actualiza `LEEME.md`, pasa las pruebas y haz **commit** (y push si Iam lo pide).
-
-## Preparar el Mac (una vez)
-```
-pip3 install -r herramientas/requirements.txt   # incluye imageio-ffmpeg: el ffmpeg para guardar música y sonidos en .ogg
-```
-(No hace falta Homebrew: `sintetizador.py` usa el ffmpeg del sistema si lo hay y, si no, el de imageio-ffmpeg.)
-Godot está en `/Applications/Godot.app/Contents/MacOS/Godot` (versión 4.7).
 
 ## Herramientas (en `herramientas/`)
 | Qué | Programa |
@@ -54,20 +61,17 @@ El grafo de caminos para la flecha de misiones está en `datos/misiones.json` �
 
 ## Pruebas
 ```
-/Applications/Godot.app/Contents/MacOS/Godot --headless --import --path .
-/Applications/Godot.app/Contents/MacOS/Godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_senda_surcos
+& "C:\Users\iamin\Godot\extraido\Godot_v4.7.2-stable_win64_console.exe" --headless --import --path .
+& "C:\Users\iamin\Godot\extraido\Godot_v4.7.2-stable_win64_console.exe" --headless --path . res://pruebas/ejecutar.tscn -- prueba_senda_surcos
 ```
 Hay 35 pruebas (`pruebas/prueba_*.gd`); todas deben acabar en «RESULTADO: todo correcto».
-Para capturas: un script temporal `pruebas/_algo.gd` lanzado igual pero sin `--headless`
-(guarda `get_viewport().get_texture().get_image()`); bórralo después.
 
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,
 Senda de los Surcos, Cañada del Eco, Orilla de Juncos, Paso de Piedra y La Travesía hechos; el Sendero Olvidado) y el misterio de los 9 ecos perdidos (los 9 hechos).
-El Embarcadero Junco está hecho (casa sellada de Bata, Mamba 2 contra 1, transbordador arreglado con poderes) y La Travesía es un viaje en barca con oleadas (cangrejos y anguilas) y la isla del 7.º eco. La Gruta de las Raíces está hecha (oscuridad, sigilo, escudo con J mantenida, espinos y el Guardián). El Paso de Piedra está hecho (el paso, la casa de Nungu, la llave de Corteza, la cueva de las setas con el 8.º eco y Kuvu, la seta que manda, con Nungu). El 9.º eco está en el reflejo del Lago Espejo y el Guardián abre el sendero con las nueve voces. El Sendero Olvidado tiene hecha la subida (nieve, escarcha de la quietud, braseros, estatuas); y los Quietos (estatuas que solo se mueven cuando no las miras); Las Ruinas del Primer Árbol están hechas: la pelea contra el miedo del árbol (despertar las nueve piedras del recuerdo y romper el corazón de Giza), Mauti libre, la Semilla del Primer Árbol y el final de Raíz. Raíz está completo. Fase 7: Sigilia (mundo 2, armiños escribas y el miedo a olvidar; arte en `arte/mundos/sigilia/`); hecho el Paso de la Escarcha entero (nieve honda, ventisca de páginas, Taa el farolero en blanco, la primera ficha del Índice, el sigilo de fuego con U, los faroles rúnicos, las páginas sueltas, la Puerta Sellada, su misión y su música «La nieve que escribe»). Maandiko hecho (partes 1 y 2: con la tienda de Wino y los faroles de Taa); Las Estanterías Colgantes, parte 1 (escaleras rodantes, tinteros, la ficha de Daftari). Maandiko, la ciudad, parte 1 (la ciudad, Kalamu con el trozo del mapa, Mauti, Wino, Taa, los escribas en blanco, los charcos de Tinta Quieta y su música). Hay luz 2.5D (relieve, día y noche). **HD-2D en marcha** (decidido con Iam): el espejo `scripts/mundo/hd2d/espejo_hd2d.gd` dibuja cualquier escena en 3D sin cambiar el juego (tecla H). Hay Bestiario con rangos (bronce/plata/oro) y enemigos hechiceros (Bundi, Buibui). El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
+El Embarcadero Junco está hecho (casa sellada de Bata, Mamba 2 contra 1, transbordador arreglado con poderes) y La Travesía es un viaje en barca con oleadas (cangrejos y anguilas) y la isla del 7.º eco. La Gruta de las Raíces está hecha (oscuridad, sigilo, escudo con J mantenida, espinos y el Guardián). El Paso de Piedra está hecho (el paso, la casa de Nungu, la llave de Corteza, la cueva de las setas con el 8.º eco y Kuvu, la seta que manda, con Nungu). El 9.º eco está en el reflejo del Lago Espejo y el Guardián abre el sendero con las nueve voces. El Sendero Olvidado tiene hecha la subida (nieve, escarcha de la quietud, braseros, estatuas); y los Quietos (estatuas que solo se mueven cuando no las miras); Las Ruinas del Primer Árbol están hechas: la pelea contra el miedo del árbol (despertar las nueve piedras del recuerdo y romper el corazón de Giza), Mauti libre, la Semilla del Primer Árbol y el final de Raíz. Raíz está completo. Fase 7: Sigilia (mundo 2, armiños escribas y el miedo a olvidar; arte en `arte/mundos/sigilia/`); hecho el Paso de la Escarcha entero (nieve honda, ventisca de páginas, Taa el farolero en blanco, la primera ficha del Índice, el sigilo de fuego con U, los faroles rúnicos, las páginas sueltas, la Puerta Sellada, su misión y su música «La nieve que escribe»). Maandiko hecho (partes 1 y 2: con la tienda de Wino y los faroles de Taa); Las Estanterías Colgantes, parte 1 (escaleras rodantes, tinteros, la ficha de Daftari). Maandiko, la ciudad, parte 1 (la ciudad, Kalamu con el trozo del mapa, Mauti, Wino, Taa, los escribas en blanco, los charcos de Tinta Quieta y su música). Hay luz 2.5D (relieve, día y noche). **HD-2D en marcha**: el espejo `scripts/mundo/hd2d/espejo_hd2d.gd` dibuja cualquier escena en 3D sin cambiar el juego (tecla H). Hay Bestiario con rangos (bronce/plata/oro) y enemigos hechiceros (Bundi, Buibui). El Lago Espejo está hecho (agua turbia, Kambare, quietud, puentes del reflejo, Kimya en la isla y su música). Detalles en `LEEME.md` y `documentacion/decisiones.md`.
 
 ## graphify
-
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
 
 Rules:
