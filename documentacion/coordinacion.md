@@ -69,6 +69,9 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - 2026-10-22 · gemini · Cuna de Musgo 3D interactiva: Pino NPC con charla [E], Corteza NPC con diálogo de forja, Altar de la Raíz Sagrada con comunión de memoria y colisiones en estructuras.
 - 2026-10-22 · gemini · Sincronizados y commiteados todos los 110 modelos `.glb` en `main` y en `hd2d/calidad-blender` con push a origin.
 - 2026-10-23 · gemini · 🎯 DECISIÓN DE IAM: Foco 100% en terminar el mapa tutorial (El Kitovu) paso a paso antes de abrir más frentes. Publicadas todas las fichas técnicas 3D de El Kitovu para Claude: Mzee Shamba con gafas, Petrino de Giza, props del huerto (carretilla volcada, pala, espantapájaros, pozo), Cráter del Despertar y Portal de Raíz.
+- 2026-10-23 · gemini · 🛠️ SOLUCIÓN DEFINITIVA DE CALIDAD VISUAL: Prohibido modelar cuerpos humanos con cilindros matemáticos procedimentales. Se ha integrado el paquete oficial CC0 de Blender Studio (`human-base-meshes-bundle-v1.4.1`) en `herramientas/blender/recursos/human_base_meshes/`.
+- 2026-10-23 · gemini · 🌟 Creado `herramientas/blender/reconstruir_maisha_base.py` que toma la topología estilizada de 12.502 quads (`GEO-body_male_stylized`), la escala a 1,70 m exactos, ajusta ojos, cabellera orgánica sin astas, túnica de lino, capa de musgo, Corazón de Asili y Cetro de Raíz. Exportado a `modelos/personajes/maisha.glb` (2.17 MB) y renderizadas sus 4 vistas turnaround.
+- 2026-10-23 · gemini · Instaladas las skills de `ponytail` (lazy senior dev) en ambos repositorios (`maisha-revision` y `maisha`). Referencias visuales en 2D (turnarounds técnicos de Mzee Shamba, Maisha y Petrino) en cola inmediata para el reset de cuota (00:48 UTC).
 
 ---
 
