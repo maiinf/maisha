@@ -349,6 +349,13 @@ se pasan.
 | Arquitectura sólida de 360° en Cuna y Sigilia | Modelado exhaustivo en Blender 4.5 con geometría cerrada en las 4 caras: `casa_pino.glb` (sombrero con motas, chimenea curva, porche con farol, zócalo de piedra y ventanas traseras redondas), `forja_corteza.glb` (horno con boca arqueada, yunque de doble cuerno sobre tocón, cubeta con agua, leñera trasera), `cocina_juncia.glb`, `puesto_tawi.glb`, `gran_archivo.glb` (podio escalonado, 4 columnas con capiteles, frontón, cúpula y hornacinas traseras), `taller_taa.glb` (entramado en voladizo, gran frasco de tinta, chimenea trasera), `casa_escriba.glb` (muros blancos, sillares de esquina de granito, balcón y chimenea trasera) y `fuente_plaza.glb` (pila octogonal moldurada, fuste de acantos y surtidor de loto). |
 | Humo y brasas volumétricas 3D (`_malla_humo`) | Sistema de partículas 3D basado en `MultiMeshInstance3D` que genera bocanadas de humo ascendente suave y chispas/brasas ardientes en chimeneas, calderos y fogatas (reutilizando las posiciones de luz de tipo `fuego`). Totalmente desacoplado de la lógica 2D, con cero coste de rendimiento. |
 
+### Transición hacia un Juego Completamente en 3D (2026-10-22, Decisión Estratégica de Iam)
+| Qué | Decisión |
+| --- | --- |
+| Visión general | Maisha evoluciona a un **juego completamente en 3D** (estética de cuento/diorama estilizado, cálido y táctil, con sombreadores toon/cel-shading suaves, iluminación física, materiales con alma y mundo que respira con la naturaleza). No importa que tarde más tiempo o suponga un esfuerzo mayor: se creará de una manera especial y bonita. |
+| Nuevo reparto de roles entre agentes | **Gemini (Supervisión, Mapeado, Música y Concept Art)**: Genera las fotos y fichas de referencia visual de todos los modelos (personajes, construcciones, enemigos, props y mapeado entero en sí), diseña y ensambla los mapas/entornos 3D en Godot, compone la música y el sonido, y supervisa que todo fluya con armonía y sin errores en el proyecto.<br/>**Claude (Constructora y Modelado 3D en Blender)**: Modela en Blender (`herramientas/blender/`) a partir de las imágenes de referencia generadas por Gemini, exportando los modelos `.glb` a `modelos/`, y programa la lógica de juego, misiones, diálogos y eventos. |
+| Carpeta de intercambio de referencias | `documentacion/referencias_visuales_3d/`: Gemini deposita aquí las imágenes conceptuales, vistas (frente, perfil, perspectiva) y fichas de especificación técnica de cada elemento para que Claude modele con fidelidad absoluta. |
+
 
 
 
