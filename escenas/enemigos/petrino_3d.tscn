@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://petrino3d_01"]
+
+[ext_resource type="Script" path="res://scripts/enemigos/petrino_3d.gd" id="1_petrino"]
+[ext_resource type="PackedScene" path="res://modelos/enemigos/petrino_giza.glb" id="2_mesh"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_p1"]
+size = Vector3(1.1, 0.95, 1.2)
+
+[node name="Petrino3D" type="CharacterBody3D" groups=["enemigos"]]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_petrino")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.48, 0)
+shape = SubResource("BoxShape3D_p1")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="petrino_giza" parent="Visual" instance=ExtResource("2_mesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)

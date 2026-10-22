@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://kitovu3d_diorama_01"]
 
-[ext_resource type="Script" path="res://scripts/mundo/camara_diorama_3d.gd" id="1_cam"]
+[ext_resource type="Script" path="res://scripts/mundo/camara_tercera_persona_3d.gd" id="1_cam"]
 [ext_resource type="PackedScene" path="res://escenas/personajes/maisha_3d.tscn" id="2_maisha"]
 [ext_resource type="PackedScene" path="res://modelos/entorno/casa_granja.glb" id="3_granja"]
 [ext_resource type="PackedScene" path="res://modelos/entorno/pozo_antiguo.glb" id="4_pozo"]
@@ -13,10 +13,11 @@
 [ext_resource type="PackedScene" path="res://modelos/entorno/portal_raiz.glb" id="11_portal_raiz"]
 [ext_resource type="PackedScene" path="res://modelos/entorno/arbol_seco.glb" id="12_arbol_seco"]
 [ext_resource type="PackedScene" path="res://modelos/entorno/crater_kitovu.glb" id="13_crater"]
-[ext_resource type="PackedScene" path="res://modelos/entorno/nudo_corrupcion.glb" id="14_nudo"]
+[ext_resource type="PackedScene" path="res://escenas/mundo_3d/nudo_corrupcion_3d.tscn" id="14_nudo"]
 [ext_resource type="PackedScene" path="res://modelos/personajes/mzee_shamba.glb" id="15_shamba"]
 [ext_resource type="AudioStream" path="res://audio/musica/kitovu.ogg" id="16_musica"]
 [ext_resource type="AudioStream" path="res://audio/ambiente/agua.ogg" id="17_sonido_agua"]
+[ext_resource type="PackedScene" path="res://escenas/enemigos/petrino_3d.tscn" id="18_petrino"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.24, 0.32, 0.40, 1)
@@ -100,13 +101,12 @@ shape = SubResource("BoxShape3D_suelo")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 3.8)
 mesh = SubResource("PlaneMesh_rio")
 
-[node name="CamaraDiorama" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.788011, 0.615661, 0, -0.615661, 0.788011, 0, 7.2, 9.2)
-fov = 32.0
-script = ExtResource("1_cam")
-
 [node name="Maisha3D" parent="." instance=ExtResource("2_maisha")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 1.2)
+
+[node name="CamaraTerceraPersona" type="Node3D" parent="."]
+script = ExtResource("1_cam")
+objetivo_path = NodePath("../Maisha3D")
 
 [node name="CasaGranja" parent="." instance=ExtResource("3_granja")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0, -2.4)
@@ -156,6 +156,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 0, 3.4)
 
 [node name="NudoCorrupcion" parent="." instance=ExtResource("14_nudo")]
 transform = Transform3D(0.939693, 0, 0.34202, 0, 1, 0, -0.34202, 0, 0.939693, -8.2, 0, -6.5)
+
+[node name="Petrino" parent="." instance=ExtResource("18_petrino")]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 7.8, 0.02, 2.6)
 
 [node name="MzeeShambaNPC" parent="." instance=ExtResource("15_shamba")]
 transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 2.8, 0, -2.6)

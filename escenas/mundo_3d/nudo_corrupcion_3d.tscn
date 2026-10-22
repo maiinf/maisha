@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://nudo_corrupcion3d_01"]
+
+[ext_resource type="Script" path="res://scripts/mundo/nudo_corrupcion_3d.gd" id="1_nudo"]
+[ext_resource type="PackedScene" path="res://modelos/entorno/nudo_corrupcion.glb" id="2_mesh"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_n1"]
+height = 2.2
+radius = 1.4
+
+[node name="NudoCorrupcion3D" type="StaticBody3D" groups=["corrupcion", "interactuable"]]
+collision_layer = 5
+collision_mask = 3
+script = ExtResource("1_nudo")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+shape = SubResource("CylinderShape3D_n1")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="nudo_corrupcion" parent="Visual" instance=ExtResource("2_mesh")]

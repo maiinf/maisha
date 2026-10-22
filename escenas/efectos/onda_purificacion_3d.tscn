@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://onda_purga3d_01"]
+
+[ext_resource type="Script" path="res://scripts/efectos/onda_purificacion_3d.gd" id="1_onda"]
+
+[node name="OndaPurificacion3D" type="Node3D"]
+script = ExtResource("1_onda")
