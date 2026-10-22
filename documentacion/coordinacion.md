@@ -63,6 +63,11 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - 2026-10-22 · gemini · ⚠️ FEEDBACK DIRECTO DE IAM INCORPORADO:
   1. **Maisha**: Humanizado y cercano, **SIN CUERNOS NI ASTAS** (cabello orgánico suave). Su evolución se basa en **Tatuajes Ancestrales Mnemotécnicos** que se grabó para recordar su pasado antes de la amnesia. Ver `ref_maisha_mistico.md` y `sistema_upgrades_visuales.md`.
   2. **Mzee Shamba**: Anciano castor **100% bípedo y de media estatura (1.45 m)**, muy sabio, culto y con gafas redondas de botánico. Ver `ref_mzee_shamba_castor_mitico.md`.
+- 2026-10-22 · gemini · Pruebas técnicas aceleradas a 0.1s instantáneo (`prueba_kitovu_3d.gd` y `prueba_cuna_musgo_3d.gd` heredan SceneTree). Vulkan `forward_plus` activo con niebla volumétrica y SSAO.
+- 2026-10-22 · gemini · Sistema de Diálogo Cinemático 3D over-the-shoulder (`dialogo_cinematico_3d.gd` y `.tscn`) integrado.
+- 2026-10-22 · gemini · Kitovu 3D interactivo: Mzee Shamba NPC con charla [E], combate Petrino 3D, purificación de nudo y Portal de Raíz funcional.
+- 2026-10-22 · gemini · Cuna de Musgo 3D interactiva: Pino NPC con charla [E], Corteza NPC con diálogo de forja, Altar de la Raíz Sagrada con comunión de memoria y colisiones en estructuras.
+- 2026-10-22 · gemini · Sincronizados y commiteados todos los 110 modelos `.glb` en `main` y en `hd2d/calidad-blender` con push a origin.
 
 ---
 
@@ -74,7 +79,9 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - [x] para gemini: marcar como obsoletas `ref_maisha.md` (chibi) y `ref_maisha_adulto.md` (mujer humana). Resuelto; la única oficial es `ref_maisha_mistico.md`.
 - [ ] para gemini: rehacer el mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` con Maisha místico y subtítulos en español.
 - [x] para gemini: decir qué hay que traer a `main` de los commits de `hd2d/calidad-blender`: no hace falta mezclar la rama entera; todo lo valioso para el juego 3D (escenas 3D, shaders, audio, documentación, especificaciones técnicas y herramientas) ya está copiado y commiteado en `main`.
-- [ ] para claude: modelar **Maisha místico** (`modelos/personajes/maisha.glb`, malla base con esqueleto y piezas por anclajes). Empiezo ya.
+- [x] para claude: modelar **Maisha místico** (`modelos/personajes/maisha.glb` completado, refinado con deltoides, agarre de puño al cetro y 4 vistas turnaround renderizadas).
+- [ ] para claude: modelar **Mzee Shamba bípedo sabio con gafas** (`modelos/personajes/mzee_shamba.glb` según la ficha oficial `ref_mzee_shamba_castor_mitico.md`).
+- [ ] para claude: modelar **Corteza herrera telúrica** (`modelos/personajes/corteza.glb`).
 
 ---
 
