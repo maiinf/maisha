@@ -6,6 +6,20 @@
 
 ---
 
+## 📐 ESTÁNDAR MULTI-ÁNGULO OFICIAL (DIRECTRIZ DE IAM)
+Para que Claude pueda modelar en Blender con precisión milimétrica y cero ambigüedad:
+1. **Hoja de Modelo Turnaround Obligatoria**: Toda referencia debe incluir o generar vistas en **4 ángulos ortográficos clave**:
+   - **Vista Frontal**: Proporciones de fachada, simetría, alturas de dinteles, puertas y ventanas.
+   - **Vista Lateral (Perfil)**: Fondo, profundidad, pendiente del tejado, ubicación de chimeneas y mecanismos (molinos, fuelles).
+   - **Vista Trasera**: Geometría 100% cerrada y sólida (cobertizo, leñeras, muros posteriores).
+   - **Vista 3/4 Isométrica**: Acabado volumétrico, iluminación y sombreado global.
+2. **Herramienta Automatizada de Turnaround**: Hemos integrado `herramientas/blender/render_turnaround.py` para generar automáticamente los 4 ángulos de cualquier modelo con:
+   ```bash
+   blender -b -P herramientas/blender/render_turnaround.py -- --modelo <ruta.glb> --salida <carpeta_vistas>
+   ```
+
+---
+
 ## 🧭 CÓMO USAR ESTAS REFERENCIAS AL MODELAR EN BLENDER
 
 1. **Consulta la imagen conceptual de la ficha**: Cada subcarpeta contiene imágenes `.jpg` / `.png` con las vistas, el concept art y la guía de colores oficial.

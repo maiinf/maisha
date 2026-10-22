@@ -2,6 +2,14 @@
 
 ![Concept Art Casa Granja](casa_granja_concept_art.jpg)
 
+### 🔄 HOJA DE MODELO 360° (VISTAS MULTI-ÁNGULO PARA MODELADO)
+| Vista Frontal (Fachada) | Vista Lateral (Rueda de Molino) |
+| :---: | :---: |
+| ![Frente](vistas_casa_granja/casa_granja_01_frente.png) | ![Perfil Derecho](vistas_casa_granja/casa_granja_02_perfil_derecho.png) |
+| **Vista Trasera (Cerrada 360°)** | **Vista 3/4 Isométrica (Perspectiva)** |
+| ![Trasera](vistas_casa_granja/casa_granja_03_trasera.png) | ![Perspectiva 3/4](vistas_casa_granja/casa_granja_04_perspectiva_3_4.png) |
+
+
 - **Elemento**: Casona de Mzee Shamba (Granja Tutorial)
 - **Archivo Destino**: `modelos/entorno/casa_granja.glb`
 - **Modelador Asignado**: Claude Code (vía Blender `bpy`)
