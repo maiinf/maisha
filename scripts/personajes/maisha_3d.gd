@@ -1,11 +1,12 @@
 extends CharacterBody3D
 ## MAISHA 3D: Controlador en tercera persona AAA (God of War / Zelda TotK).
 ## Movimiento relativo a cámara orbital, salto libre con peso, esquiva rodando,
-## combate táctico de cetro y latido de luz del Corazón de Asili.
+## combate táctico de cetro con hit-box y latido de luz del Corazón de Asili.
 
 signal danio(vida_actual: int)
 signal paso(posicion: Vector3)
 signal purificacion_lanzada(posicion: Vector3)
+signal cetro_golpe(impacto: Vector3)
 
 # Parámetros físicos de movimiento
 const VELOCIDAD := 4.5              # m/s al caminar
@@ -21,7 +22,7 @@ const ROTACION_SUAVE := 14.0
 var vida := 5
 @export var puede_moverse := true
 
-# Estados
+# Estados de acción
 var en_salto := false
 var esquivando := false
 var tiempo_esquiva := 0.0
@@ -30,20 +31,38 @@ var cooldown_esquiva := 0.0
 
 var atacando := false
 var tiempo_ataque := 0.0
-const DURACION_ATAQUE := 0.42
+const DURACION_ATAQUE := 0.35
+var cooldown_ataque := 0.0
 
 var _dir_esquiva := Vector3.ZERO
 var _tiempo_paso := 0.0
 var _visual: Node3D = null
 var _luz_corazon: OmniLight3D = null
+var _audio_cetro: AudioStreamPlayer3D = null
 
 
 func _ready() -> void:
+	add_to_group("jugador")
 	vida = vida_maxima
 	_visual = get_node_or_null("Visual")
 	_luz_corazon = get_node_or_null("LuzCorazon")
 	if not _luz_corazon and _visual:
 		_luz_corazon = _visual.get_node_or_null("LuzCorazon")
+
+	_audio_cetro = AudioStreamPlayer3D.new()
+	var snd := load("res://audio/sonidos/cetro_golpe.ogg")
+	if snd:
+		_audio_cetro.stream = snd
+	_audio_cetro.max_distance = 25.0
+	add_child(_audio_cetro)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	# Ataque con Click Izquierdo del ratón o tecla J
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		_intentar_ataque()
+	elif event is InputEventKey and event.keycode == KEY_J and event.pressed:
+		_intentar_ataque()
 
 
 func _physics_process(delta: float) -> void:
@@ -57,6 +76,8 @@ func _physics_process(delta: float) -> void:
 	# Cooldowns
 	if cooldown_esquiva > 0.0:
 		cooldown_esquiva -= delta
+	if cooldown_ataque > 0.0:
+		cooldown_ataque -= delta
 
 	# 1. Manejo de Esquiva rodando
 	if esquivando:
@@ -146,9 +167,41 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 
+func _intentar_ataque() -> void:
+	if atacando or esquivando or cooldown_ataque > 0.0 or not puede_moverse:
+		return
+
+	atacando = true
+	tiempo_ataque = DURACION_ATAQUE
+	cooldown_ataque = 0.45
+
+	if _audio_cetro:
+		_audio_cetro.play()
+
+	# Detección de impacto en abanico frontal (1.7 metros)
+	var espacio := get_world_3d().direct_space_state
+	var frente := -global_transform.basis.z if not _visual else Vector3(sin(_visual.rotation.y), 0, cos(_visual.rotation.y))
+	var centro_golpe := global_position + frente * 1.35 + Vector3(0, 0.7, 0)
+
+	var query := PhysicsShapeQueryParameters3D.new()
+	var esfera := SphereShape3D.new()
+	esfera.radius = 1.2
+	query.shape = esfera
+	query.transform = Transform3D(Basis(), centro_golpe)
+	query.collision_mask = 4 | 1 # Capa de enemigos y objetos interactuables
+
+	var resultados := espacio.intersect_shape(query, 8)
+	for r in resultados:
+		var collider: Object = r.collider
+		if collider and collider != self:
+			if collider.has_method("recibir_ataque"):
+				collider.recibir_ataque(1, global_position)
+				emit_signal("cetro_golpe", centro_golpe)
+
+
 func recibir_golpe(cantidad: int, origen: Vector3 = Vector3.ZERO) -> void:
 	if esquivando:
-		return # Invulnerabilidad en la esquiva
+		return # Invulnerabilidad durante la esquiva
 	vida = maxi(0, vida - cantidad)
 	emit_signal("danio", vida)
 
