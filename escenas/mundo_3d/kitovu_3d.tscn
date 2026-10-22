@@ -16,7 +16,7 @@
 [ext_resource type="PackedScene" path="res://modelos/entorno/nudo_corrupcion.glb" id="14_nudo"]
 [ext_resource type="PackedScene" path="res://modelos/personajes/mzee_shamba.glb" id="15_shamba"]
 [ext_resource type="AudioStream" path="res://audio/musica/kitovu.ogg" id="16_musica"]
-[ext_resource type="AudioStream" path="res://audio/sonidos/agua.ogg" id="17_sonido_agua"]
+[ext_resource type="AudioStream" path="res://audio/ambiente/agua.ogg" id="17_sonido_agua"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.24, 0.32, 0.40, 1)

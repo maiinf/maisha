@@ -21,7 +21,7 @@ Iam ha tomado la decisión firme y con todo el cariño al proyecto de que **Mais
 - **Tablón de avisos**: Consulta siempre `documentacion/coordinacion.md` para ver los modelos listos para modelar y el estado de las escenas.
 - **Referencias visuales**: Consulta las imágenes y fichas en `documentacion/referencias_visuales_3d/` antes de modelar cada elemento en Blender.
 - **Entorno en Windows**:
-  - **Godot 4.7.2**: `C:\Users\iamin\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe`
+  - **Godot 4.7.2**: `C:\Users\iamin\Godot\extraido\Godot_v4.7.2-stable_win64_console.exe` (en Descargas, `Godot_v4.7.2-stable_win64.exe` es una carpeta, no el programa)
   - **Blender 5.2.3 LTS**: `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`
   - **Python 3.14**: `python` con soporte bpy y libreta de herramientas en `herramientas/`.
 

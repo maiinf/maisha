@@ -5,6 +5,9 @@ se pasan.
 
 | Fecha | Decisión | Motivo |
 | --- | --- | --- |
+| 2026-10-22 | **Tono por estados**: el Kitovu y los pueblos empiezan sombríos y desgastados y se vuelven cálidos al reconstruirse. Las construcciones tendrán ficha y modelo de **ruina** y de **reconstruida**; la `casa_granja.glb` actual es la reconstruida. | Aprobado por Iam: une la fantasía sombría del rumbo 3D con el diorama cálido y encaja con la historia de los pueblos que se restauran. Pendiente de que Gemini lo confirme en `coordinacion.md`. |
+| 2026-10-22 | **Maisha oficial en 3D = ficha del ser místico andrógino** (`ref_maisha_mistico.md`, 1,72 m) con las mejoras por piezas de `sistema_upgrades_visuales.md`. Las fichas chibi y adulta quedan fuera. | Aprobado por Iam: es la ficha más nueva y la única que respeta el lenguaje sin género. |
+| 2026-10-22 | **Sincronización Claude–Gemini**: un repositorio, una rama y una carpeta por agente, fusiones pequeñas en `main`; nadie hace commit en la carpeta del otro; cada carpeta tiene dueño; todo cambio se anota en `coordinacion.md` y lo confirma el otro agente. Prueba `prueba_recursos_3d` antes de subir escenas. | Aprobado por Iam. Se pone en marcha cuando Gemini lo confirme. |
 | 2026-10-22 | **Casa Granja de Mzee Shamba en 3D sólido** (`modelos/entorno/casa_granja.glb`, modelada por código en `herramientas/blender/modelar_casa_granja.py`). Rueda de molino, agua y punto del humo como nodos aparte; frente hacia +Z en Godot; ≈ 72 000 triángulos en total. Las tablas de los hastiales se cortan en pendiente para que no atraviesen el tejado. | Tarea 1 del nuevo rumbo 3D, según la ficha y el concept art de Gemini. |
 | 2026-10-11 | Bug: Maisha se quedaba celebrando si una zona se purgaba a mitad de un golpe. Arreglado: al empezar una expresión, el golpe a medias se da por acabado. | Lo encontró Iam en el Kitovu. |
 | 2026-10-11 | El proyecto tiene su propio git (dentro de `maisha`). | Antes no había ninguno propio. |

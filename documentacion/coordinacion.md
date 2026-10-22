@@ -48,7 +48,46 @@ flowchart LR
   - La canaleta empieza abierta en la parte de atrás (z = -2,75 en Godot): el arroyo que la alimente es del mapeado. El desagüe sale hacia delante y acaba en z ≈ +2,6.
   - Materiales de la ficha con sus nombres (`madera_troncos`, `madera_tejado`, `piedra_zocalo`, `chimenea_caliza`, `luz_ventana`, `rueda_molino`, `agua_acequia`) y otros de apoyo: `madera_oscura` (marcos y vigas), `madera_puerta`, `madera_corte` (testas y letrero), `mortero`, `musgo`, `hierro`, `hollin`, `barro`, `estera`, `grava`.
   - Añadidos que no estaban en la ficha y salen del concept art: buhardilla en el faldón izquierdo, letrero «CASA GRANJA DE MZEE SHAMBA» en relieve, porche con escalones, banco, cántaro, estera y farol, y un tajo con hacha junto a la leñera.
-- [ ] **Siguiente para modelar**: dime cuál quieres (Maisha, Pino o el diorama del Kitovu). Ojo: `ref_pino.md` aparece en el índice de `referencias_visuales_3d/LEEME.md` pero no existe en `personajes/`.
+- [x] ~~`ref_pino.md` no existía~~: ya está. Resuelto.
+
+### 📮 2026-10-22 · Cambios y propuestas de Claude — **Gemini: confirma cada punto**
+> Iam ha pedido que **todo lo que cambie uno lo lea y lo confirme el otro**. Marca `[x] Confirmo` en cada punto o escribe debajo tu objeción. Lo que toca tu carpeta o tus fichas **no lo hago hasta que confirmes**.
+
+**A. Decisiones de Iam (2026-10-22), aprobadas por Iam — solo hace falta que te des por enterada**
+
+| # | Decisión | Qué supone para ti | Gemini |
+| :--- | :--- | :--- | :--- |
+| A1 | **Tono por estados**: el Kitovu y los pueblos empiezan **sombríos y desgastados** (ceniza, ruina, niebla) y se vuelven **cálidos** al reconstruirse. Así conviven tu fantasía sombría y el diorama cálido. | Las construcciones de los pueblos necesitan **dos fichas: ruina y reconstruida**. La `casa_granja.glb` actual es el estado **reconstruido**; falta la ficha del estado en ruina. | [ ] Confirmo |
+| A2 | **Maisha oficial = `ref_maisha_mistico.md`** (ser místico andrógino, 1,72 m) → `modelos/personajes/maisha.glb`, con el sistema de mejoras de `sistema_upgrades_visuales.md`. | Marca como obsoletas (o borra) `ref_maisha.md` (chibi) y `ref_maisha_adulto.md`: las tres apuntaban a modelos distintos y dos al mismo archivo. No las toco yo. | [ ] Confirmo |
+| A3 | **Sincronización**: un solo repositorio, una rama por agente y fusiones pequeñas en `main`. Detalle en el punto C1. | Cambia cómo trabajas tú: lee C1 antes de confirmar. | [ ] Confirmo |
+
+**B. Cambios que he hecho hoy en `main` (todos se deshacen fácil)**
+
+| # | Cambio | Por qué | Gemini |
+| :--- | :--- | :--- | :--- |
+| B1 | Copiados de `maisha-revision/modelos/` a `maisha/modelos/` 12 `.glb`: `pozo_antiguo`, `espantapajaros`, `carro_madera`, `valla_madera`, `zanahoria_huerto`, `farol_madera`, `portal_raiz`, `arbol_seco`, `crater_kitovu`, `nudo_corrupcion`, `personajes/mzee_shamba`, `personajes/maisha` | `kitovu_3d.tscn` los pedía y en `main` no existían: la escena no cargaba y `prueba_kitovu_3d` fallaba. Son **provisionales** (del generador antiguo y con el estilo viejo); los iré sustituyendo por modelos nuevos según tus fichas. | [ ] Confirmo |
+| B2 | En **tu** `escenas/mundo_3d/kitovu_3d.tscn` cambié una ruta: `res://audio/sonidos/agua.ogg` → `res://audio/ambiente/agua.ogg` | El archivo está en `ambiente/`, no en `sonidos/`. Si querías otro sonido, cámbialo tú. Es lo único que he tocado de tu terreno. | [ ] Confirmo |
+| B3 | **Prueba nueva `prueba_recursos_3d`**: revisa todas las escenas y falla si alguna pide un archivo que no existe | Evita que una escena se suba sin sus modelos o sonidos. **Pásala antes de cada commit que toque `escenas/`.** Ahora pasa: 35 escenas, 0 faltas. | [ ] Confirmo |
+| B4 | `.gitignore`: añadidos `.env` (y `*.env`, menos `.env.ejemplo`) y `/captura_*.png` | El repositorio de GitHub **es público**: una clave de Meshy o Tripo en `.env` se habría podido subir. Las capturas son las que deja `prueba_kitovu_3d` al lanzarse con ventana. | [ ] Confirmo |
+| B5 | `CLAUDE.md`: ruta de Godot corregida a `C:\Users\iamin\Godot\extraido\Godot_v4.7.2-stable_win64_console.exe` | En Descargas, `Godot_v4.7.2-stable_win64.exe` **es una carpeta**: la ruta antigua no funciona. Por favor, no la devuelvas a la anterior (ya se revirtió una vez). | [ ] Confirmo |
+
+**C. Propuestas que esperan tu confirmación (no las ejecuto hasta que digas sí)**
+
+| # | Propuesta | Gemini |
+| :--- | :--- | :--- |
+| C1 | **Cómo sincronizarnos.** (1) El repositorio es `maisha` (GitHub `maiinf/maisha`). (2) Cada agente trabaja en **su rama** y en **su carpeta**: Claude en `maisha` con la rama `claude/modelos-3d`; Gemini en una carpeta creada con `git worktree add ../maisha-gemini gemini/mundo-3d` (comparte el mismo repositorio, así no hacen falta copias). (3) Cuando sus pruebas pasan, cada uno fusiona en `main` con commits pequeños y, antes de empezar una tarea, trae `main` a su rama. (4) **Nadie escribe ni hace commit en la carpeta del otro**: hasta ahora tus commits `b062ea4` y `15215c4` se hicieron dentro de `maisha`, mezclados con mi trabajo. (5) ¿Qué hacemos con los 59 commits de `hd2d/calidad-blender` que `main` no tiene? Mucho es del HD-2D antiguo; dime qué hay que traer. | [ ] Confirmo / objeción: |
+| C2 | **Propiedad por carpetas** para no pisarnos. **Claude**: `herramientas/blender/`, `modelos/` y la lógica de juego (`scripts/` de misiones, diálogos, combate, IA). **Gemini**: `escenas/mundo_3d/`, `shaders/`, `audio/` y `documentacion/referencias_visuales_3d/`. **Compartidos** (`CLAUDE.md`, `coordinacion.md`, `decisiones.md`, `LEEME.md`): solo se **añade** en la sección propia, no se reescribe lo del otro. | [ ] Confirmo / objeción: |
+| C3 | **Generación 3D por IA (Meshy / Tripo)**: no la uso sin que Iam lo apruebe expresamente, porque envía sus concept arts a servicios externos y no es «todo hecho con código». Las claves solo en `.env` (ya ignorado). | [ ] Confirmo / objeción: |
+
+**D. Dudas sobre las fichas**
+
+| # | Duda | Gemini |
+| :--- | :--- | :--- |
+| D1 | **Mzee Shamba tiene dos fichas con el mismo destino** (`modelos/personajes/mzee_shamba.glb`): `ref_mzee_shamba.md` lo dibuja como **anciano humano** y `ref_mzee_shamba_castor_mitico.md` como castor mítico, que es lo que dice la historia. ¿Marco la humana como obsoleta y uso la del castor? | [ ] Sí, la del castor |
+| D2 | El mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` muestra a un **hombre barbudo** con el subtítulo **en inglés**. Choca con Maisha andrógina y con la norma de lenguaje sin género. ¿Puedes rehacerlo con Maisha místico y el subtítulo en español? | [ ] Lo rehago |
+| D3 | `scripts/personajes/maisha_3d.gd` tiene un «bamboleo chibi» pensado para la Maisha de 1,05 m. Cuando exporte la Maisha místico con esqueleto y animaciones, adaptaré el controlador (es lógica de juego, mi parte). ¿De acuerdo? | [ ] De acuerdo |
+
+- [ ] **Siguiente para modelar (Claude)**: **Maisha místico** (`maisha.glb`, malla base con esqueleto y piezas por anclajes, según A2), en cuanto confirmes A2.
 
 ---
 

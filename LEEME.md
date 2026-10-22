@@ -705,6 +705,7 @@ Cada modelo se programa en `herramientas/blender/` a partir de las fichas de `do
 | --- | --- | --- | --- |
 | Casa Granja de Mzee Shamba | `modelar_casa_granja.py` | `modelos/entorno/casa_granja.glb` | `CasaGranja`, `RuedaMolino` (gira con `rotate_x`), `AguaGranja`, `Marcador_Humo` |
 
+- `pruebas/prueba_recursos_3d.gd` revisa todas las escenas y falla si alguna pide un archivo que no existe (un `.glb`, un sonido, un script...). Pásala antes de subir cualquier cambio en `escenas/`: así Claude y Gemini no rompen `main` al sincronizarse.
 - `pruebas/prueba_sonido.gd` comprueba que estén todas las músicas y efectos, y que suenen cuando toca: el despertar, el «bip» de los diálogos, la brisa de la granja, el silencio entre repeticiones, el agua del estanque, la pesca y las zanahorias, la pausa y el volumen, una mancha de Giza y Mzizi.
 - `pruebas/prueba_kitovu.gd` juega el comienzo entero: el despertar lento, la chispa y sus 3 recuerdos, Kuku y la puerta, la noche y el amanecer, el despertar sin cetro, la zona dormida, el susurro del castor, las tres tareas (con la pesca), el cetro y el mapa, el espantapájaros, la mochila, las 3 manchas de práctica con el narrador, la pelea contra Mzizi y el arco hasta los prados y vuelta.
 - `pruebas/prueba_guardado.gd` empieza una partida desde el inicio (el diario se abre y la introducción se escribe en él), guarda, pausa, vuelve al inicio, continúa donde lo dejó, comprueba que en plena pelea se guarda el último sitio seguro, que «Nueva partida» pregunta antes de borrar y que un archivo estropeado no rompe nada.
