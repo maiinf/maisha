@@ -18,6 +18,14 @@ graphify-out/
 .agents/
 skills-lock.json
 
+# Claves de API (Meshy, Tripo...): nunca a GitHub, que el repositorio es público. El ejemplo sí se sube.
+.env
+*.env
+!.env.ejemplo
+
+# Capturas que dejan las pruebas al lanzarse con ventana
+/captura_*.png
+
 # Blender
 *.blend
 *.blend1

@@ -26,6 +26,10 @@ func _ready() -> void:
 		and anclajes[0].find_child("Cetro", true, false) != null, "el cetro va anclado a la mano derecha")
 	var anim: AnimationPlayer = maisha._anim
 	comprobar(anim != null, "el controlador encuentra el AnimationPlayer")
+	if anim == null:   # sin animaciones no hay más que comprobar (y no hay que quedarse colgada)
+		print("\nRESULTADO: %d fallos" % fallos)
+		get_tree().quit(1)
+		return
 	for nombre in ["reposo", "caminar_atento", "correr", "golpe_cetro", "idle_mirar_tatuajes", "eco_despertar"]:
 		comprobar(anim.has_animation(nombre), "animación %s" % nombre)
 	comprobar(anim.get_animation("caminar_atento").loop_mode == Animation.LOOP_LINEAR, "caminar se repite en bucle")

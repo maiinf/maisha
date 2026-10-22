@@ -704,6 +704,7 @@ Cada modelo se programa en `herramientas/blender/` a partir de las fichas de `do
 | Modelo | Programa | Archivo | Nodos |
 | --- | --- | --- | --- |
 | Casa Granja de Mzee Shamba | `modelar_casa_granja.py` | `modelos/entorno/casa_granja.glb` | `CasaGranja`, `RuedaMolino` (gira con `rotate_x`), `AguaGranja`, `Marcador_Humo` |
+| Mzee Shamba (castor bípedo de 1,45 m, sobre la malla base de Blender Studio) | `modelar_mzee_shamba.py` | `modelos/personajes/mzee_shamba.glb` | 30 huesos (con `jaw`, `beard_root`, `hat_bone`, bigotes y cola); `Baston` anclado a `hand_R` y `Cuenco` a su hueso (escala 0 salvo al ofrecerlo). Animaciones: `idle_labranza`, `hablar_afable`, `cavar_tierra`, `ofrecer_cuenco` |
 | Maisha (1,70 m, sin astas, con los Tatuajes de la Memoria) | `modelar_maisha.py` | `modelos/personajes/maisha.glb` (+ `maisha_tatuajes_mascara.png`) | Esqueleto de 27 huesos con los nombres de la ficha; mallas `Maisha_Cuerpo`, `Maisha_Pelo`, `Maisha_Tunica`, `Maisha_Ropa`, `Maisha_Capa` (se puede ocultar) y el `Cetro` anclado a `hand_R`. Animaciones: `reposo`, `caminar_atento`, `correr`, `golpe_cetro`, `idle_mirar_tatuajes`, `eco_despertar` |
 
 **Maisha en el juego** (`scripts/personajes/maisha_3d.gd`): elige sola la animación (quieta, caminando, corriendo, golpeando; a los 8 s quieta se mira los tatuajes) y ajusta su velocidad a la del paso para que los pies no patinen. Los tatuajes empiezan dormidos: `despertar_memoria(0..1)` los enciende y `recuperar_eco()` hace la animación del despertar y suma un noveno de brillo. Las vistas de revisión están en `documentacion/referencias_visuales_3d/personajes/vistas_maisha/`.
@@ -719,6 +720,7 @@ python herramientas/novedades.py gemini     # lo que ha hecho Claude
 
 Los commits llevan delante `[claude]` o `[gemini]`.
 
+- `pruebas/prueba_shamba_3d.gd` carga a Mzee Shamba en 3D y comprueba sus huesos, que el bastón y el cuenco van anclados a su sitio, sus 4 animaciones y su altura.
 - `pruebas/prueba_maisha_3d.gd` carga a Maisha en 3D y comprueba el esqueleto, el cetro en la mano, las 6 animaciones, qué animación suena al estar quieta, caminar, correr y golpear, y que los tatuajes empiezan dormidos y se encienden con cada Eco.
 - `pruebas/prueba_recursos_3d.gd` revisa todas las escenas y falla si alguna pide un archivo que no existe (un `.glb`, un sonido, un script...). Pásala antes de subir cualquier cambio en `escenas/`: así Claude y Gemini no rompen `main` al sincronizarse.
 - `pruebas/prueba_sonido.gd` comprueba que estén todas las músicas y efectos, y que suenen cuando toca: el despertar, el «bip» de los diálogos, la brisa de la granja, el silencio entre repeticiones, el agua del estanque, la pesca y las zanahorias, la pausa y el volumen, una mancha de Giza y Mzizi.
