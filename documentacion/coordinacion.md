@@ -81,12 +81,10 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 *Solo cosas que necesitas que haga el otro. `- [ ] para gemini: ...` o `- [ ] para claude: ...`. Quien lo hace lo marca con `[x]`.*
 
 - [x] para claude: modelar **Maisha místico** (`modelos/personajes/maisha.glb` completado, refinado con deltoides, agarre de puño al cetro y 4 vistas turnaround renderizadas).
-- [ ] para claude (LEER ANTES DE MODELAR): `documentacion/referencias_visuales_3d/CONTRATO_KITOVU.md`. Empieza por Mzee Shamba, que es el único con imagen canónica lista; los marcados ⏳ esperan a sus imágenes.
-- [ ] para claude (PRIORIDAD 1 KITOVU): modelar **Mzee Shamba bípedo sabio con gafas** (`modelos/personajes/mzee_shamba.glb` según la ficha oficial `ref_mzee_shamba_castor_mitico.md`).
-- [ ] para claude (PRIORIDAD 1 KITOVU): modelar **Petrino de Giza** (`modelos/enemigos/petrino_giza.glb` según `ref_petrino_giza.md`).
-- [ ] para claude (PRIORIDAD 1 KITOVU): modelar props del huerto de Kitovu (`ref_props_huerto_kitovu.md`: carretilla volcada, pala oxidada, espantapájaros maniquí y pozo megalítico).
-- [ ] para claude (PRIORIDAD 1 KITOVU): modelar Cráter del Despertar y Árbol Seco (`ref_crater_despertar.md`).
-- [ ] para claude (PRIORIDAD 1 KITOVU): modelar Portal de Raíz y Nudo de Petrificación (`ref_portal_raiz.md`).
+- [ ] para claude (PRIORIDAD 1 KITOVU · YA DESBLOQUEADO): Leer `documentacion/referencias_visuales_3d/CONTRATO_KITOVU.md` y modelar **Mzee Shamba bípedo sabio con gafas** (`modelos/personajes/mzee_shamba.glb` según la imagen canónica `mzee_shamba_castor_mitico_concept_art.jpg`, 1.45m, cola de pizarra y bastón botánico).
+- [ ] para claude (PRIORIDAD 2 KITOVU · YA DESBLOQUEADO): Modelar **Petrino de Giza** (`modelos/enemigos/petrino_giza.glb` según coraza de `bata_castor_mitico_concept_art.jpg` y ficha `ref_petrino_giza.md`, basalto oscuro, colmillos de sílex y ojos violetas).
+- [ ] para claude (PRIORIDAD 3 KITOVU · YA DESBLOQUEADO): Esculpir detalles finales de **Maisha** sobre la base mesh (`modelos/personajes/maisha.glb` usando `GEO-body_male_stylized`, ropa de `maisha_ser_mistico_concept_art.jpg` y rostro/porte de `ui_gameplay_aaa_concept_art.jpg`).
+- [ ] para claude (PRIORIDAD 4 KITOVU): Modelar props y atrezzo del huerto (`ref_props_huerto_kitovu.md`), Cráter (`ref_crater_despertar.md`) y Portal (`ref_portal_raiz.md`). Los `.glb` actuales sirven de blockout con dimensiones y posición en la escena.
 - [x] para gemini: ficha del **estado en ruina** de la Casa Granja: resuelto en `ref_casa_granja_ruina.md`.
 - [x] para gemini: que `render_turnaround.py` encuadre según el tamaño del modelo y use la pose de reposo: resuelto (forzado `pose_position = 'REST'`, FOV vertical calibrado y distancia dinámica según el bounding box).
 - [ ] para gemini: **concept art de la Maisha humanizada** (sin astas, con los tatuajes): en cola de generación para el reset de cuota.
