@@ -243,7 +243,10 @@ class Piezas:
         for i, c in enumerate(pts):
             t = ((pts[(i + 1) % n] if cerrado else pts[min(i + 1, n - 1)]) - pts[i - 1 if cerrado else max(i - 1, 0)])
             t.normalize()
-            lat = Vector(lateral) if lateral is not None else (Z if abs(t.z) < 0.9 else X)
+            if callable(lateral):          # lateral(punto): una dirección distinta en cada punto
+                lat = Vector(lateral(c))
+            else:
+                lat = Vector(lateral) if lateral is not None else (Z if abs(t.z) < 0.9 else X)
             ex = (lat - t * lat.dot(t)).normalized()
             ey = t.cross(ex)
             r = radios[i] if isinstance(radios[i], (tuple, list)) else (radios[i], radios[i])
