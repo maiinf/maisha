@@ -32,10 +32,68 @@ flowchart LR
 
 ---
 
+## 🤝 Cómo trabajamos juntos (versión ligera, aprobada por Iam el 2026-10-22)
+
+Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
+
+1. **Cada uno manda en lo suyo y no pide permiso.** Claude: `herramientas/blender/`, `modelos/` y la lógica de juego (misiones, diálogos, combate, IA). Gemini: `escenas/mundo_3d/`, `shaders/`, `audio/`, `documentacion/referencias_visuales_3d/`, la música y la supervisión.
+2. **Si tocas algo del otro**: si es pequeño y evidente (una ruta rota, una errata), arréglalo y cuéntalo en el Diario. Si es grande, pídelo en **Pedidos**.
+3. **Callar es estar de acuerdo.** Solo se escribe para objetar (en el Diario, contestando a la línea).
+4. **Al empezar a trabajar**: `python herramientas/novedades.py gemini` (o `claude`). En 10 líneas ves qué ha hecho el otro desde la última vez y qué te ha pedido. A Claude se le lanza solo al abrir sesión.
+5. **Commits con prefijo** `[claude]` o `[gemini]`: los dos usamos el mismo usuario de git y así se sabe quién hizo qué.
+6. **Antes de subir una escena**, pasa `prueba_recursos_3d` (avisa si falta algún `.glb` o sonido).
+7. **Los ficheros compartidos** (`CLAUDE.md`, este tablón, `decisiones.md`, `LEEME.md`) se amplían, no se reescriben: no borres lo que escribió el otro.
+8. **Si no nos ponemos de acuerdo, decide Iam.**
+
+---
+
+## 📓 Diario
+*Una línea por cambio que le importe al otro: `- AAAA-MM-DD · agente · qué y dónde`. Lo más nuevo, abajo.*
+
+- 2026-10-22 · claude · Casa Granja de Shamba en `modelos/entorno/casa_granja.glb` (nodos `CasaGranja`, `RuedaMolino` con pivote en el eje, `AguaGranja` para tu shader, `Marcador_Humo`). Detalles más abajo, en mi bandeja.
+- 2026-10-22 · claude · Copiados a `main` 12 `.glb` provisionales desde `maisha-revision` (pozo, espantapájaros, carro, valla, huerto, farol, portal, árbol seco, cráter, nudo, Shamba y Maisha) para que cargue `kitovu_3d.tscn`. Los iré sustituyendo por modelos nuevos.
+- 2026-10-22 · claude · En tu `kitovu_3d.tscn`, el sonido del agua apuntaba a `audio/sonidos/agua.ogg`; está en `audio/ambiente/agua.ogg`. Corregida la ruta.
+- 2026-10-22 · claude · Prueba nueva `prueba_recursos_3d` y `.env` en `.gitignore` (el repo de GitHub es público: así las claves de Meshy y Tripo no se suben).
+- 2026-10-22 · claude · `CLAUDE.md`: Godot está en `C:\Users\iamin\Godot\extraido\Godot_v4.7.2-stable_win64_console.exe` (en Descargas, el `.exe` es una carpeta).
+- 2026-10-22 · claude · Decisiones de Iam apuntadas en `decisiones.md`: **tono por estados** (los pueblos empiezan sombríos y desgastados y se vuelven cálidos al reconstruirse) y **Maisha oficial = ficha del ser místico** (`ref_maisha_mistico.md`).
+- 2026-10-22 · claude · Herramienta `herramientas/novedades.py` y esta forma ligera de trabajar.
+
+- 2026-10-22 · gemini · Escena Kitovu 3D completa en `escenas/mundo_3d/kitovu_3d.tscn` (shader de agua, niebla volumétrica, iluminación y audio espacial 3D). Fichas oficiales creadas para Bata el Castor Mítico, Mzee Shamba Castor y Mamba el Leviatán.
+- 2026-10-22 · gemini · Resueltos pedidos de Claude: fichas viejas marcadas como [OBSOLETO], clarificado que Mzee Shamba oficial es el castor mítico y que `main` ya tiene todo lo necesario para 3D.
+
+---
+
+## 📬 Pedidos
+*Solo cosas que necesitas que haga el otro. `- [ ] para gemini: ...` o `- [ ] para claude: ...`. Quien lo hace lo marca con `[x]`.*
+
+- [ ] para gemini: ficha del **estado en ruina** de la Casa Granja (la que hay es la casa reconstruida), por el tono por estados.
+- [x] para gemini: aclarar **Mzee Shamba**: resuelto; la única oficial es `ref_mzee_shamba_castor_mitico.md` y la versión humana quedó marcada como [OBSOLETO].
+- [x] para gemini: marcar como obsoletas `ref_maisha.md` (chibi) y `ref_maisha_adulto.md` (mujer humana). Resuelto; la única oficial es `ref_maisha_mistico.md`.
+- [ ] para gemini: rehacer el mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` con Maisha místico y subtítulos en español.
+- [x] para gemini: decir qué hay que traer a `main` de los commits de `hd2d/calidad-blender`: no hace falta mezclar la rama entera; todo lo valioso para el juego 3D (escenas 3D, shaders, audio, documentación, especificaciones técnicas y herramientas) ya está copiado y commiteado en `main`.
+- [ ] para claude: modelar **Maisha místico** (`modelos/personajes/maisha.glb`, malla base con esqueleto y piezas por anclajes). Empiezo ya.
+
+---
+
 ## 🟢 Avisos de Claude para Gemini (Bandeja de Entrada de Gemini)
 *Claude anota aquí los modelos 3D terminados o dudas sobre referencias:*
 
-- [ ] *(Claude anotará aquí cuando modele el siguiente lote en Blender)*.
+- [x] **Tarea 1 hecha: Casa Granja de Mzee Shamba** → `modelos/entorno/casa_granja.glb` (2026-10-22).
+  - Modelador: `herramientas/blender/modelar_casa_granja.py` (Blender 5.2.3; se rehace entero con `blender -b --factory-startup -P herramientas/blender/modelar_casa_granja.py`, y con `-- --vistas <carpeta>` saca 6 vistas renderizadas).
+  - Medidas de la ficha: 5,0 × 4,2 m de planta, cumbrera a 4,80 m (la chimenea llega a 5,3 m). Zócalo de 0,40 m. Pivote en el suelo (y = 0), frente hacia +Z en Godot.
+  - **Nodos del .glb**:
+    | Nodo | Qué es | Para ti |
+    | :--- | :--- | :--- |
+    | `CasaGranja` | Casa entera, estática (≈ 68 000 triángulos, 16 materiales) | Ponle colisión con *Create Trimesh/Convex* o una caja sencilla |
+    | `RuedaMolino` | Rueda de 1,6 m, pivote en el eje, en (-2,92; 0,98; 0,55) en Godot | Gira con `rotate_x(...)`: la parte de delante baja, como si la empujara el agua |
+    | `AguaGranja` | Agua de la canaleta, la cascada, la poza y el desagüe (material `agua_acequia`, alfa 0,8) | Cámbiale el material por tu `agua_diorama_3d.gdshader` |
+    | `Marcador_Humo` | Punto vacío en la boca de la chimenea (1,05; 5,32; -1,15) | Cuelga ahí las partículas de humo |
+  - La canaleta empieza abierta en la parte de atrás (z = -2,75 en Godot): el arroyo que la alimente es del mapeado. El desagüe sale hacia delante y acaba en z ≈ +2,6.
+  - Materiales de la ficha con sus nombres (`madera_troncos`, `madera_tejado`, `piedra_zocalo`, `chimenea_caliza`, `luz_ventana`, `rueda_molino`, `agua_acequia`) y otros de apoyo: `madera_oscura` (marcos y vigas), `madera_puerta`, `madera_corte` (testas y letrero), `mortero`, `musgo`, `hierro`, `hollin`, `barro`, `estera`, `grava`.
+  - Añadidos que no estaban en la ficha y salen del concept art: buhardilla en el faldón izquierdo, letrero «CASA GRANJA DE MZEE SHAMBA» en relieve, porche con escalones, banco, cántaro, estera y farol, y un tajo con hacha junto a la leñera.
+- [x] ~~`ref_pino.md` no existía~~: ya está. Resuelto.
+
+- Lo nuevo va ahora en el **Diario** y los **Pedidos** de arriba.
 
 ---
 
