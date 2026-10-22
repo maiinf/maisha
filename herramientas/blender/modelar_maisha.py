@@ -161,6 +161,11 @@ class Malla:
                 anillo.append(self.bm.verts.new(p))
             anillos.append(anillo)
         u0, v0, u1, v1 = uv
+        # v proporcional a la longitud recorrida, para que la textura no se estire
+        largo = [0.0]
+        for i in range(1, n + (1 if cerrado else 0)):
+            largo.append(largo[-1] + (centros[i % n] - centros[i - 1]).length)
+        total = largo[-1] or 1.0
         caras = []
         pares = range(n) if cerrado else range(n - 1)
         for i in pares:
@@ -170,8 +175,8 @@ class Malla:
                 f = self.bm.faces.new((a[j], a[j2], b[j2], b[j]))
                 caras.append(f)
                 us = (j / lados, (j + 1) / lados, (j + 1) / lados, j / lados)
-                vs = (i / (n - 1), i / (n - 1), (i + 1) / (n - 1), (i + 1) / (n - 1)) if not cerrado else \
-                     (i / n, i / n, (i + 1) / n, (i + 1) / n)
+                va, vb = largo[i] / total, largo[i + 1] / total
+                vs = (va, va, vb, vb)
                 for l, uu, vv in zip(f.loops, us, vs):
                     l[self.uv].uv = (u0 + (u1 - u0) * uu, v0 + (v1 - v0) * vv)
         if not cerrado:
@@ -261,11 +266,12 @@ TORSO = [
     (1.08, 0.130, 0.090, 0.000),
     (1.16, 0.143, 0.096, -0.004),
     (1.24, 0.153, 0.100, -0.006),
-    (1.31, 0.160, 0.098, -0.004),
-    (1.36, 0.166, 0.092, 0.000),
-    (1.395, 0.150, 0.085, 0.004),
-    (1.418, 0.105, 0.070, 0.006),
-    (1.435, 0.060, 0.056, 0.000),
+    (1.30, 0.158, 0.098, -0.004),
+    (1.345, 0.158, 0.093, 0.000),
+    (1.38, 0.145, 0.086, 0.004),
+    (1.405, 0.118, 0.076, 0.006),
+    (1.425, 0.082, 0.064, 0.004),
+    (1.442, 0.058, 0.055, 0.000),
     (1.47, 0.052, 0.052, -0.006),
     (1.51, 0.048, 0.050, -0.006),
     (1.54, 0.042, 0.046, -0.004),
@@ -302,11 +308,13 @@ def brazo(m, lado):
     hombro, codo, muneca, d2 = puntos_brazo(lado)
     s = -1 if lado == "L" else 1
     centros, radios = [], []
-    inicio = hombro - (codo - hombro).normalized() * 0.03
-    tramo = [(inicio, 0.050), (hombro, 0.050)]
+    # empieza dentro del torso y es más grueso en el hombro: hace de deltoides (y conserva los tatuajes)
+    d1 = (codo - hombro).normalized()
+    inicio = hombro - d1 * 0.055 + Vector((0, 0, -0.012))
+    tramo = [(inicio, 0.040), (hombro - d1 * 0.022, 0.056), (hombro + d1 * 0.012, 0.058)]
     for k in range(1, 6):
         t = k / 6
-        tramo.append((hombro.lerp(codo, t), 0.048 - 0.012 * t + 0.004 * math.sin(math.pi * t)))
+        tramo.append((hombro.lerp(codo, t), 0.056 - 0.020 * t + 0.003 * math.sin(math.pi * t)))
     tramo.append((codo, 0.034))
     for k in range(1, 6):
         t = k / 6
@@ -318,36 +326,60 @@ def brazo(m, lado):
     m.tubo(centros, radios, "piel_humanizada", Vector((0, -1, 0)), lados=16, tapas=(False, True), uv=UV_BRAZO[lado])
 
 
-def mano(m, lado, cerrada=0.25):
-    """Palma, cuatro dedos y pulgar. cerrada: 0 abierta, 1 puño (la derecha agarra el cetro)."""
+def marco_mano(lado):
+    """Ejes de la mano en la pose de reposo: d (hacia los dedos), ancho (del meñique al índice) y la normal de
+    la palma. La izquierda cuelga con la palma hacia el cuerpo; la derecha tiene el ancho lo más vertical
+    posible, porque agarra el cetro."""
     hombro, codo, muneca, d = puntos_brazo(lado)
     s = -1 if lado == "L" else 1
-    ancho = Vector((0, -1, 0))                             # la palma se extiende de delante a atrás
-    palma_n = d.cross(ancho).normalized() * (-s)           # la palma mira hacia el cuerpo
-    if palma_n.x * s > 0:
-        palma_n = -palma_n
-    base = muneca + d * 0.008
-    nudillos = muneca + d * 0.085
-    m.tubo([base, muneca + d * 0.045, nudillos], [(0.026, 0.012), (0.032, 0.013), (0.031, 0.011)],
+    if lado == "L":
+        ancho = Vector((0, -1, 0))
+        ancho = (ancho - d * ancho.dot(d)).normalized()
+        palma_n = d.cross(ancho).normalized()
+        if palma_n.x * s > 0:
+            palma_n = -palma_n
+    else:
+        ancho = (Z - d * Z.dot(d)).normalized()
+        palma_n = d.cross(ancho).normalized()
+        if palma_n.y < 0:
+            palma_n = -palma_n
+    return muneca, d, ancho, palma_n
+
+
+def agarre_cetro():
+    """Centro y eje del puño derecho: por ahí pasa el cetro."""
+    muneca, d, ancho, palma_n = marco_mano("R")
+    nudillos = muneca + d * 0.095
+    return nudillos + palma_n * 0.026 - d * 0.006, ancho
+
+
+def mano(m, lado, cerrada=0.25):
+    """Palma, cuatro dedos y pulgar. cerrada: 0 abierta, 1 puño cerrado alrededor del cetro."""
+    muneca, d, ancho, palma_n = marco_mano(lado)
+    giro_dedos = d.cross(palma_n).normalized()        # girar sobre este eje lleva los dedos hacia la palma
+    base = muneca + d * 0.006
+    nudillos = muneca + d * 0.095
+    m.tubo([base, muneca + d * 0.050, nudillos], [(0.021, 0.012), (0.025, 0.0135), (0.024, 0.012)],
            "piel_humanizada", ancho, lados=12, uv=UV_LISO)
-    for k, (off, largo) in enumerate(((-0.020, 0.068), (-0.007, 0.078), (0.007, 0.074), (0.020, 0.060))):
-        p0 = nudillos + ancho * off
-        pts = [p0]
-        dir_ = d.copy()
+    doblez = math.radians(35 + 150 * cerrada)          # cuánto se cierran los dedos en total
+    for k, (off, largo) in enumerate(((0.021, 0.080), (0.007, 0.088), (-0.007, 0.083), (-0.021, 0.068))):
+        p = nudillos + ancho * off
+        pts = [p]
         for f in range(3):
-            ang = (0.25 + 0.85 * cerrada) * (0.6 + 0.4 * f)
-            dir_ = (dir_ * math.cos(ang * 0.6) + palma_n * math.sin(ang * 0.6)).normalized()
-            pts.append(pts[-1] + dir_ * largo / 3)
-        r = 0.0085 - 0.0007 * abs(k - 1.5)
-        m.tubo(pts, [(r, r), (r * 0.95, r * 0.95), (r * 0.88, r * 0.88), (r * 0.78, r * 0.78)],
+            dir_ = Quaternion(giro_dedos, doblez * (f + 0.5) / 3) @ d
+            p = p + dir_ * largo / 3
+            pts.append(p)
+        r = 0.0100 - 0.0008 * abs(k - 1.5)
+        m.tubo(pts, [(r, r * 0.92), (r * 0.96, r * 0.9), (r * 0.9, r * 0.85), (r * 0.78, r * 0.74)],
                "piel_humanizada", palma_n, lados=8, uv=UV_LISO)
-    p0 = muneca + d * 0.03 + ancho * (-0.024) + palma_n * 0.006
-    dir_ = (d * 0.6 + ancho * (-0.6) + palma_n * (0.3 + 0.5 * cerrada)).normalized()
-    pts = [p0, p0 + dir_ * 0.03]
-    dir2 = (dir_ + palma_n * (0.4 + 0.6 * cerrada) + d * 0.3).normalized()
-    pts.append(pts[-1] + dir2 * 0.03)
-    m.tubo(pts, [(0.011, 0.010), (0.0095, 0.009), (0.0082, 0.0078)], "piel_humanizada", palma_n, lados=8,
-           uv=UV_LISO)
+    # pulgar, en el lado del índice
+    p0 = muneca + d * 0.030 + ancho * 0.024 + palma_n * 0.008
+    dir1 = (d * 0.55 + ancho * 0.55 + palma_n * (0.35 + 0.4 * cerrada)).normalized()
+    p1 = p0 + dir1 * 0.032
+    dir2 = (dir1 + palma_n * (0.3 + 0.9 * cerrada) - ancho * (0.6 * cerrada)).normalized()
+    p2 = p1 + dir2 * 0.030
+    m.tubo([p0, p1, p2], [(0.0125, 0.011), (0.0108, 0.0098), (0.0090, 0.0084)], "piel_humanizada", palma_n,
+           lados=8, uv=UV_LISO)
 
 
 def corazon(m):
@@ -366,8 +398,7 @@ def corazon(m):
 # ---------------------------------------------------------------------------
 
 def cabeza(m):
-    verts, caras = m.esfera((0, 0, 0), (1, 1, 1), "piel_humanizada", seg=(40, 30), uv=UV_LISO)
-    labios = m.indice("labios")
+    verts, caras = m.esfera((0, 0, 0), (1, 1, 1), "piel_humanizada", seg=(64, 48), uv=UV_LISO)
     for v in verts:
         p = v.co.copy()                               # punto de la esfera unidad
         x, y, z = p
@@ -383,24 +414,23 @@ def cabeza(m):
         frente = -1.0 if p.y < 0 else 0.0
         # rasgos (desplazamientos en metros sobre la cara, que mira a -Y)
         d = 0.0
-        d += 0.018 * gauss(p.x, 0.10) * gauss(p.z + 0.08, 0.16) * max(0.0, -p.y) ** 4      # nariz
-        d += 0.006 * gauss(p.x, 0.07) * gauss(p.z - 0.12, 0.14) * max(0.0, -p.y) ** 4      # puente
-        d += 0.009 * gauss(p.x, 0.22) * gauss(p.z + 0.80, 0.14) * max(0.0, -p.y) ** 2      # barbilla
-        d += 0.003 * gauss(p.x, 0.16) * gauss(p.z + 0.40, 0.035) * max(0.0, -p.y) ** 4     # labio sup.
-        d += 0.004 * gauss(p.x, 0.15) * gauss(p.z + 0.50, 0.035) * max(0.0, -p.y) ** 4     # labio inf.
-        d -= 0.002 * gauss(p.x, 0.18) * gauss(p.z + 0.45, 0.012) * max(0.0, -p.y) ** 4     # boca
-        d += 0.004 * gauss(p.z - 0.30, 0.10) * max(0.0, -p.y) ** 3                          # cejas
+        cara = max(0.0, -p.y) ** 4
+        # nariz: cresta suave desde el entrecejo y punta redondeada
+        d += 0.0045 * gauss(p.x, 0.075) * suavizar(0.18, -0.20, p.z) * suavizar(-0.32, -0.12, p.z) * cara
+        d += 0.0110 * gauss(p.x, 0.11) * gauss(p.z + 0.22, 0.09) * cara
         for sx in (-1, 1):
-            d -= 0.009 * gauss(p.x - sx * 0.36, 0.13) * gauss(p.z - 0.10, 0.11) * max(0.0, -p.y) ** 2  # cuencas
-            d += 0.004 * gauss(p.x - sx * 0.62, 0.17) * gauss(p.z + 0.12, 0.14) * max(0.0, -p.y)       # pómulos
+            d += 0.0030 * gauss(p.x - sx * 0.10, 0.06) * gauss(p.z + 0.27, 0.05) * cara      # aletas
+        d += 0.008 * gauss(p.x, 0.22) * gauss(p.z + 0.78, 0.13) * max(0.0, -p.y) ** 2      # barbilla
+        d += 0.0035 * gauss(p.x, 0.17) * gauss(p.z + 0.43, 0.040) * cara                    # labio sup.
+        d += 0.0042 * gauss(p.x, 0.15) * gauss(p.z + 0.53, 0.040) * cara                    # labio inf.
+        d -= 0.0028 * gauss(p.x, 0.19) * gauss(p.z + 0.48, 0.016) * cara                    # comisura
+        d -= 0.0020 * gauss(p.x, 0.10) * gauss(p.z + 0.36, 0.030) * cara                    # surco nasolabial
+        d += 0.0035 * gauss(p.z - 0.30, 0.09) * max(0.0, -p.y) ** 3                         # arco de las cejas
+        for sx in (-1, 1):
+            d -= 0.0085 * gauss(p.x - sx * 0.36, 0.13) * gauss(p.z - 0.10, 0.11) * max(0.0, -p.y) ** 2  # cuencas
+            d += 0.0045 * gauss(p.x - sx * 0.62, 0.17) * gauss(p.z + 0.12, 0.14) * max(0.0, -p.y)       # pómulos
         n = q.normalized()
         v.co = CABEZA_C + q + n * d
-    # labios con su color
-    for f in caras:
-        c = f.calc_center_median() - CABEZA_C
-        cz = c.z / CABEZA_R.z
-        if c.y < -0.07 and abs(c.x) < 0.024 and -0.56 < cz < -0.36:
-            f.material_index = labios
     # ojos
     for sx in (-1, 1):
         dirn = Vector((sx * 0.36, -0.93, 0.10)).normalized()
@@ -449,38 +479,67 @@ def pelo(m):
         if p.z < limite:
             quitar.append(v)
             continue
-        mech = 1.0 + 0.045 * max(0.0, math.sin(az * 7 + p.z * 3)) * (0.5 + 0.5 * (1 - abs(p.z)))
-        k = 1.085 * mech
-        v.co = CABEZA_C + Vector((p.x * CABEZA_R.x * k, p.y * CABEZA_R.y * k, p.z * CABEZA_R.z * 1.06 * mech))
+        mech = 1.0 + 0.020 * max(0.0, math.sin(az * 7 + p.z * 3))
+        k = 1.07 * mech
+        v.co = CABEZA_C + Vector((p.x * CABEZA_R.x * k, p.y * CABEZA_R.y * k, p.z * CABEZA_R.z * 1.05 * mech))
     bmesh.ops.delete(m.bm, geom=quitar, context="VERTS")
-    # mechones que caen
-    def mechon(dir_ini, caida, largo, grosor, lados_=8, curva=0.0):
-        a = CABEZA_C + Vector((dir_ini.x * CABEZA_R.x, dir_ini.y * CABEZA_R.y, dir_ini.z * CABEZA_R.z)) * 1.04
-        pts = [a]
-        d = caida.normalized()
-        for k in range(1, 6):
-            t = k / 5
-            p = a + caida * (largo * t) + Vector((0, 0, -largo * 0.25 * t * t)) + \
-                Vector((dir_ini.x, dir_ini.y, 0)).normalized() * curva * math.sin(math.pi * t)
-            pts.append(p)
-        rad = [(grosor * (1 - 0.82 * k / 5) + 0.002, grosor * 0.55 * (1 - 0.8 * k / 5) + 0.0015) for k in range(6)]
-        lat = Vector((dir_ini.x, dir_ini.y, 0)).normalized().cross(Z)
-        m.tubo(pts, rad, "cabello_viajero", lat, lados=lados_)
-    # flequillo ladeado y mechones laterales que enmarcan la cara
-    mechon(Vector((-0.30, -0.80, 0.55)), Vector((0.35, -0.10, -0.55)), 0.11, 0.020)
-    mechon(Vector((-0.05, -0.85, 0.55)), Vector((0.45, -0.12, -0.40)), 0.10, 0.018)
-    mechon(Vector((0.25, -0.80, 0.55)), Vector((0.30, -0.10, -0.55)), 0.08, 0.016)
-    for sx in (-1, 1):
-        mechon(Vector((sx * 0.75, -0.45, 0.25)), Vector((sx * 0.06, -0.05, -1.0)), 0.13, 0.020, curva=0.004)
-        mechon(Vector((sx * 0.85, -0.10, 0.20)), Vector((sx * 0.05, 0.08, -1.0)), 0.14, 0.022, curva=0.005)
-    # detrás: mechones que bajan a la nuca y el recogido
-    for k, ax in enumerate((-0.6, -0.3, 0.0, 0.3, 0.6)):
-        mechon(Vector((ax, 0.75, 0.40)), Vector((-ax * 0.15, 0.25, -1.0)), 0.16, 0.024, curva=0.004)
-    nuca = CABEZA_C + Vector((0, CABEZA_R.y * 0.95, -0.085))
-    m.esfera(nuca, (0.034, 0.026, 0.030), "cabello_viajero", seg=(16, 12))
-    m.tubo([nuca + Vector((0, -0.010, 0.028)), nuca + Vector((0, 0.004, 0.034)), nuca + Vector((0, 0.020, 0.028))],
-           [(0.022, 0.006)] * 3, "cuero_cinturon", Z, lados=10, tapas=(False, False))
-    mechon(Vector((0.0, 0.95, -0.80)), Vector((0.0, 0.25, -1.0)), 0.07, 0.020)
+
+    # Mechones: cintas gruesas que siguen la superficie de la cabeza y luego caen
+    def sobre(az, el, k):
+        """Punto sobre el cráneo: az en grados (0 = frente, 90 = derecha, 180 = nuca), el en grados (90 = arriba)."""
+        a, e = math.radians(az), math.radians(el)
+        d = Vector((math.sin(a) * math.cos(e), -math.cos(a) * math.cos(e), math.sin(e)))
+        return CABEZA_C + Vector((d.x * CABEZA_R.x * k, d.y * CABEZA_R.y * k, d.z * CABEZA_R.z * 1.04 * k))
+
+    def normal(p):
+        q = p - CABEZA_C
+        return Vector((q.x / CABEZA_R.x ** 2, q.y / CABEZA_R.y ** 2, q.z / CABEZA_R.z ** 2)).normalized()
+
+    def mechon(az0, el0, az1, el1, ancho, grueso=0.009, caida=0.0, capa=1.10, curva=0.0):
+        pts = []
+        for k in range(9):
+            t = k / 8
+            ease = t * t * (3 - 2 * t)
+            pts.append(sobre(az0 + (az1 - az0) * ease, el0 + (el1 - el0) * t, capa + 0.015 * math.sin(math.pi * t)))
+        if caida > 0:
+            fin = pts[-1]
+            fuera = normal(fin)
+            fuera.z = 0
+            for k in range(1, 5):
+                t = k / 4
+                pts.append(fin + Vector((0, 0, -caida * t)) + fuera.normalized() * (curva * t * t))
+        n = len(pts)
+        rad = []
+        for k in range(n):
+            t = k / (n - 1)
+            afila = 1.0 - 0.85 * suavizar(0.55, 1.0, t)
+            rad.append((grueso * (0.6 + 0.4 * afila), ancho * afila + 0.002))
+        m.tubo(pts, rad, "cabello_viajero", lambda i, c: normal(c), lados=8)
+
+    # flequillo con raya a la izquierda, que barre la frente hacia la derecha
+    for k, (az1, el1, ancho) in enumerate(((38, 24, 0.030), (55, 16, 0.026), (68, 8, 0.022), (22, 32, 0.026))):
+        mechon(-22 + k * 4, 72 - k * 3, az1, el1, ancho, capa=1.11 + 0.008 * k)
+    # lado izquierdo (desde la raya hacia la sien y la mandíbula)
+    for k, (az0, az1) in enumerate(((-30, -62), (-40, -80), (-55, -95))):
+        mechon(az0, 74 - 4 * k, az1, -18 - 6 * k, 0.030, caida=0.035 + 0.01 * k, curva=0.006, capa=1.10)
+    # lado derecho, detrás del flequillo
+    for k, (az0, az1) in enumerate(((60, 78), (78, 98), (95, 112))):
+        mechon(az0, 58 - 6 * k, az1, -22 - 4 * k, 0.030, caida=0.04, curva=0.006, capa=1.095)
+    # coronilla y nuca: bajan juntándose hacia el recogido
+    for k in range(9):
+        az0 = 115 + k * 16
+        az1 = 180 + (az0 - 180) * 0.35
+        mechon(az0, 70, az1, -40, 0.034, grueso=0.010, capa=1.09 + 0.004 * (k % 2))
+    for az in (-8, 8, 30, -30):
+        mechon(az + 180, 88, az * 0.5 + 180, 40, 0.032, capa=1.10)
+    # recogido bajo en la nuca, atado con una tira de cuero, y la coleta corta
+    nuca = sobre(180, -42, 1.12)
+    m.esfera(nuca, (0.032, 0.026, 0.028), "cabello_viajero", seg=(16, 12))
+    m.tubo([nuca + Vector((-0.024, -0.006, 0.006)), nuca + Vector((0, -0.004, 0.012)),
+            nuca + Vector((0.024, -0.006, 0.006))], [(0.009, 0.006)] * 3, "cuero_cinturon", Y, lados=8)
+    cola = [nuca + Vector((0, 0.010, -0.010)), nuca + Vector((0, 0.022, -0.045)), nuca + Vector((0, 0.020, -0.080)),
+            nuca + Vector((0, 0.012, -0.105))]
+    m.tubo(cola, [(0.016, 0.020), (0.014, 0.018), (0.010, 0.013), (0.003, 0.004)], "cabello_viajero", X, lados=10)
 
 
 # ---------------------------------------------------------------------------
@@ -506,7 +565,7 @@ def tunica(m):
             abajo = 0.60 + 0.07 * math.cos(fase + 0.6) - dientes
             z = arriba + (abajo - arriba) * s
             rx, ry, dy = radio_torso(z)
-            holgura = 0.013
+            holgura = 0.004 + 0.009 * suavizar(0.0, 0.25, s)      # pegada al cuerpo en el borde de arriba
             if z < 0.99:
                 vuelo = (0.99 - z) * 0.30
                 rx, ry = max(rx, 0.146) + vuelo, max(ry, 0.108) + vuelo * 0.85
@@ -528,47 +587,53 @@ def tunica(m):
             Vector((-0.10, 0.085, 1.31))], [(0.032, 0.006)] * 4, "tunica_lino_arena", X, lados=8)
 
 
+def _catmull(pts, t):
+    """Curva suave que pasa por los puntos (t de 0 a 1)."""
+    n = len(pts) - 1
+    x = min(max(t, 0.0), 1.0) * n
+    i = min(int(x), n - 1)
+    f = x - i
+    p0, p1, p2, p3 = pts[max(i - 1, 0)], pts[i], pts[i + 1], pts[min(i + 2, n)]
+    return 0.5 * ((2 * p1) + (-p0 + p2) * f + (2 * p0 - 5 * p1 + 4 * p2 - p3) * f * f
+                  + (-p0 + 3 * p1 - 3 * p2 + p3) * f * f * f)
+
+
+# Capa: borde de arriba (del cuello por la espalda hasta encima del hombro izquierdo) y bajo
+CAPA_ARRIBA = [Vector(p) for p in ((0.060, 0.072, 1.405), (-0.010, 0.082, 1.418), (-0.085, 0.074, 1.432),
+                                   (-0.150, 0.045, 1.458), (-0.215, 0.030, 1.432), (-0.250, 0.060, 1.372))]
+CAPA_ABAJO = [Vector(p) for p in ((0.115, 0.160, 1.030), (-0.010, 0.205, 0.955), (-0.150, 0.205, 0.930),
+                                  (-0.255, 0.140, 0.960), (-0.300, 0.105, 1.020), (-0.300, 0.090, 1.090))]
+
+
 def capa(m):
-    """Capa corta de viaje sobre el hombro izquierdo: cuelga por la espalda y el costado, con pliegues."""
-    lados, filas = 30, 20
-    a0, a1 = math.radians(55), math.radians(245)     # de la espalda-derecha al frente-izquierda (0 = +X)
-    anillos = []
+    """Capa corta de viaje sobre el hombro izquierdo: por encima del hombro y cayendo por la espalda y el
+    costado, sin tapar el pecho; pliegues verticales y el bajo curvo. Se puede quitar (pieza aparte)."""
+    columnas, filas = 34, 22
+    rejilla = []
     for i in range(filas):
         s = i / (filas - 1)
         fila = []
-        for j in range(lados):
-            t = j / (lados - 1)
-            fase = a0 + (a1 - a0) * t
-            cx, cy = math.cos(fase), math.sin(fase)
-            # arriba: sobre el hombro izquierdo, más baja hacia la espalda-derecha
-            izq = suavizar(0.15, 0.62, t)
-            arriba = 1.37 + 0.06 * izq - 0.02 * gauss(t - 0.95, 0.08)
-            abajo = 0.97 - 0.06 * gauss(t - 0.30, 0.25) + 0.05 * suavizar(0.8, 1.0, t)
-            z = arriba + (abajo - arriba) * s
-            rx, ry, dy = radio_torso(min(z, 1.36))
-            hueco = 0.035 + 0.06 * s + (0.03 if z > 1.30 and izq > 0.5 else 0.0)
-            ondas = 1.0 + 0.05 * math.sin(fase * 10) * s
-            r_x = (rx + hueco) * ondas
-            r_y = (ry + hueco) * ondas
-            if z > 1.36:      # sobre el hombro: se acerca al cuello
-                k = suavizar(1.36, 1.43, z)
-                r_x = r_x * (1 - k) + 0.085 * k
-                r_y = r_y * (1 - k) + 0.075 * k
-            fila.append(m.bm.verts.new(Vector((r_x * cx, dy + r_y * cy, z))))
-        anillos.append(fila)
+        for j in range(columnas):
+            u = j / (columnas - 1)
+            a = _catmull(CAPA_ARRIBA, u)
+            b = _catmull(CAPA_ABAJO, u)
+            p = a.lerp(b, s)
+            fuera = Vector((p.x, p.y - 0.01, 0.0))
+            fuera = fuera.normalized() if fuera.length > 1e-6 else Y
+            pliegue = (0.022 * math.sin(u * math.pi * 5.0 + 0.4) + 0.010 * math.sin(u * math.pi * 11.0)) * s ** 0.8
+            bulto = 0.028 * math.sin(math.pi * min(s * 1.4, 1.0))
+            p += fuera * (pliegue + bulto)
+            fila.append(m.bm.verts.new(p))
+        rejilla.append(fila)
     caras = []
     for i in range(filas - 1):
-        for j in range(lados - 1):
-            caras.append(m.bm.faces.new((anillos[i][j], anillos[i][j + 1], anillos[i + 1][j + 1], anillos[i + 1][j])))
+        for j in range(columnas - 1):
+            caras.append(m.bm.faces.new((rejilla[i][j], rejilla[i][j + 1], rejilla[i + 1][j + 1], rejilla[i + 1][j])))
     m.poner_mat(caras, "capa_viaje_musgo")
     m.uv_fijo(caras, UV_LISO)
-    # cuello vuelto de la capa
-    pts = []
-    for k in range(13):
-        a = math.radians(-20 + 240 * k / 12)
-        pts.append(Vector((0.078 * math.cos(a + math.pi / 2) * 1.05, 0.004 + 0.070 * math.sin(a + math.pi / 2),
-                           1.425 - 0.02 * math.sin(math.radians(240 * k / 12)))))
-    m.tubo(pts, [(0.018, 0.012)] * 13, "capa_viaje_musgo", Z, lados=10)
+    # dobladillo enrollado a lo largo del borde de arriba
+    borde = [_catmull(CAPA_ARRIBA, k / 15) + Vector((0, 0, 0.004)) for k in range(16)]
+    m.tubo(borde, [(0.013, 0.010)] * 16, "capa_viaje_musgo", Z, lados=10)
 
 
 def cinturon(m):
@@ -628,32 +693,40 @@ def piernas(m):
 # Cetro de Raíz: bastón de 1,75 m con espiral que abraza la semilla
 # ---------------------------------------------------------------------------
 
-def cetro(m, agarre):
-    """Construido vertical, con el agarre (la mano) en el punto dado."""
-    abajo, arriba = agarre.z - 0.78, agarre.z + 0.97
+LARGO_CETRO = 1.75
+AGARRE_DESDE_ABAJO = 0.78      # el puño queda a 78 cm de la contera: con el brazo caído, la contera toca el suelo
+
+
+def cetro(m, agarre, eje):
+    """Bastón de roble a lo largo de «eje» (de la contera a la punta), con el puño en «agarre»."""
+    eje = eje.normalized()
+    a1 = eje.cross(X if abs(eje.x) < 0.9 else Y).normalized()
+    a2 = eje.cross(a1)
+    abajo = agarre - eje * AGARRE_DESDE_ABAJO
     pts, rad = [], []
-    n = 26
+    n = 30
     for k in range(n):
         t = k / (n - 1)
-        z = abajo + (arriba - 0.10 - abajo) * t
-        dx = 0.006 * math.sin(t * 17) + 0.004 * math.sin(t * 41)
-        dy = 0.006 * math.cos(t * 13)
-        pts.append(Vector((agarre.x + dx, agarre.y + dy, z)))
-        nudo = 0.004 * max(0.0, math.sin(t * 29)) ** 6
-        rad.append((0.0175 - 0.004 * t + nudo, 0.0165 - 0.004 * t + nudo))
-    m.tubo(pts, rad, "cetro_madera", X, lados=10)
-    # espiral de la punta
-    centro = Vector((agarre.x, agarre.y, arriba - 0.03))
+        p = abajo + eje * ((LARGO_CETRO - 0.10) * t)
+        p += a1 * (0.0035 * math.sin(t * 13) + 0.0015 * math.sin(t * 37)) + a2 * (0.003 * math.cos(t * 11))
+        pts.append(p)
+        nudo = 0.0035 * max(0.0, math.sin(t * 29 + 1.0)) ** 8
+        rad.append((0.0175 - 0.0035 * t + nudo, 0.0165 - 0.0035 * t + nudo))
+    m.tubo(pts, rad, "cetro_madera", a1, lados=10)
+    # contera algo más ancha
+    m.tubo([abajo - eje * 0.004, abajo + eje * 0.03], [(0.019, 0.019), (0.018, 0.018)], "cuero_cinturon", a1, lados=10)
+    # espiral de la punta que abraza la semilla
+    centro = abajo + eje * (LARGO_CETRO - 0.035)
     pts, rad = [], []
-    vueltas = 1.25
-    for k in range(30):
-        t = k / 29
-        a = 2 * math.pi * vueltas * t
+    for k in range(32):
+        t = k / 31
+        a = 2 * math.pi * 1.3 * t
         r = 0.040 * (1 - 0.35 * t)
-        pts.append(centro + Vector((r * math.cos(a), r * math.sin(a), -0.075 + 0.13 * t)))
+        pts.append(centro + a1 * (r * math.cos(a)) + a2 * (r * math.sin(a)) + eje * (-0.080 + 0.135 * t))
         rad.append((0.011 * (1 - 0.55 * t) + 0.002, 0.010 * (1 - 0.55 * t) + 0.002))
-    m.tubo(pts, rad, "cetro_madera", Z, lados=8)
-    m.esfera(centro + Vector((0, 0, 0.0)), (0.024, 0.024, 0.030), "semilla_esmeralda", seg=(16, 12))
+    m.tubo(pts, rad, "cetro_madera", eje, lados=8)
+    giro = Z.rotation_difference(eje).to_matrix()
+    m.esfera(centro, (0.024, 0.024, 0.030), "semilla_esmeralda", giro, seg=(16, 12))
 
 
 # ---------------------------------------------------------------------------
@@ -669,7 +742,9 @@ class Lienzo:
         self.mascara = np.zeros((TAM, TAM), np.float32)
 
     def trazo(self, zona, puntos, grueso):
-        (u0, v0, u1, v1), (wm, hm) = zona
+        (u0, v0, u1, v1), (wm, hm) = zona[:2]
+        ox, oy = zona[2] if len(zona) > 2 else (0.0, 0.0)          # desplazamiento de la zona (metros)
+        puntos = [(x + ox, y + oy) for x, y in puntos]
         kx, ky = (u1 - u0) * TAM / wm, (v1 - v0) * TAM / hm       # píxeles por metro
         aa = 0.8 / min(kx, ky)
         for a, b in zip(puntos, puntos[1:]):
@@ -706,8 +781,10 @@ def dibujar_tatuajes():
     lz = Lienzo()
     G = 0.0026   # grosor de las líneas (2,6 mm)
     for lado in ("R", "L"):
-        # zona del brazo: alrededor ~0,22 m, a lo largo 0,56 m (del hombro a la muñeca)
-        zona = (UV_BRAZO[lado], (0.22, 0.56))
+        # zona del brazo: alrededor ~0,22 m; a lo largo, desde dentro del torso (5 cm) hasta la muñeca
+        hombro, codo, muneca, _ = puntos_brazo(lado)
+        largo = 0.057 + (codo - hombro).length + (muneca - codo).length
+        zona = (UV_BRAZO[lado], (0.22, largo), (0.0, 0.050))
         W, H = 0.22, 0.56
         # el hombro: arcos concéntricos
         for k, r in enumerate((0.030, 0.045, 0.060)):
@@ -840,7 +917,7 @@ def montar():
     torso(cuerpo)
     for lado in ("L", "R"):
         brazo(cuerpo, lado)
-        mano(cuerpo, lado, cerrada=0.25 if lado == "L" else 0.85)
+        mano(cuerpo, lado, cerrada=0.20 if lado == "L" else 1.0)
     corazon(cuerpo)
     cabeza(cuerpo)
     ob_cuerpo = a_objeto(cuerpo, mats)
@@ -862,10 +939,9 @@ def montar():
     capa(m_capa)
     ob_capa = a_objeto(m_capa, mats, grosor=0.008)
 
-    hombro, codo, muneca, d = puntos_brazo("R")
-    agarre = muneca + d * 0.055 + Vector((0, 0, 0)) + d.cross(Vector((0, -1, 0))).normalized() * 0.0
+    agarre, eje = agarre_cetro()
     m_cetro = Malla("Cetro")
-    cetro(m_cetro, agarre)
+    cetro(m_cetro, agarre, eje)
     ob_cetro = a_objeto(m_cetro, mats)
 
     return {"cuerpo": ob_cuerpo, "pelo": ob_pelo, "tunica": ob_tunica, "ropa": ob_ropa, "capa": ob_capa,
