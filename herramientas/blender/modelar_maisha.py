@@ -595,10 +595,6 @@ def tunica(m):
     # dobladillo del borde de arriba: se lee como tela y no como un escalón
     m.tubo([v.co.copy() for v in anillos[0]], [(0.0055, 0.0045)] * lados, "tunica_lino_arena", Z, lados=6,
            cerrado=True)
-    # tirante sobre el hombro izquierdo hasta la espalda
-    hombro = Vector((-HOMBRO + 0.06, 0.0, 1.405))
-    m.tubo([Vector((-0.11, -0.085, 1.33)), hombro + Vector((0, -0.04, 0.012)), hombro + Vector((0, 0.04, 0.010)),
-            Vector((-0.10, 0.085, 1.31))], [(0.032, 0.006)] * 4, "tunica_lino_arena", X, lados=8)
 
 
 def _catmull(pts, t):
@@ -877,10 +873,8 @@ def imagenes_tatuajes(mascara):
     piel = np.array(rgb(PALETA["piel_humanizada"][0]), np.float32)
     tinta = np.array(rgb(COLOR_TATUAJE_DORMIDO), np.float32)
     oro = np.array(rgb(COLOR_TATUAJE_ACTIVO), np.float32)
-    # leve variación de tono en la piel para que no sea plana
-    ruido = np.random.default_rng(7).normal(0, 0.008, (TAM, TAM)).astype(np.float32)
     k = (mascara * 0.88)[..., None]
-    base = piel[None, None, :] * (1 + ruido[..., None]) * (1 - k) + tinta[None, None, :] * k
+    base = piel[None, None, :] * (1 - k) + tinta[None, None, :] * k
     emis = oro[None, None, :] * mascara[..., None]
     def a_imagen(nombre, rgb_arr):
         img = bpy.data.images.new(nombre, TAM, TAM, alpha=False)
@@ -931,7 +925,7 @@ def montar():
     torso(cuerpo)
     for lado in ("L", "R"):
         brazo(cuerpo, lado)
-        mano(cuerpo, lado, cerrada=0.20 if lado == "L" else 1.0)
+        mano(cuerpo, lado, cerrada=0.45 if lado == "L" else 1.0)
     corazon(cuerpo)
     cabeza(cuerpo)
     ob_cuerpo = a_objeto(cuerpo, mats)
@@ -1209,10 +1203,13 @@ def anim_reposo(an):
 
 
 def _paso(fase, amplitud):
-    """Ángulos de una pierna en el ciclo de paso: muslo (+ = adelante), rodilla y pie."""
+    """Ángulos de una pierna en el ciclo de paso: muslo (+ = adelante), rodilla (+ = doblar) y pie (+ = bajar la
+    punta). Adelantar el muslo levanta la punta y doblar la rodilla la baja; el pie corrige para quedar con el
+    talón arriba al apoyar, plano al pisar y empujando con la punta al despegar."""
     muslo = amplitud * math.sin(fase)
     rodilla = 6 + amplitud * 1.55 * max(0.0, math.cos(fase)) ** 1.5 + 4 * max(0.0, -math.sin(fase))
-    pie = muslo - rodilla * 0.85 + (8 if math.sin(fase) < -0.6 else 0)
+    punta_arriba = 14 * max(0.0, math.sin(fase)) - 24 * max(0.0, -math.sin(fase)) * max(0.0, math.cos(fase))
+    pie = muslo - rodilla - punta_arriba
     return muslo, rodilla, pie
 
 
@@ -1232,10 +1229,10 @@ def anim_andar(an, nombre, n, amplitud, inclinacion, brazos, bote, codo):
             "head": [("X", -inclinacion * 0.3 + 2), ("Z", 2 * giro)],
             "thigh_L": [("X", -mL)],
             "calf_L": [("X", rL)],
-            "foot_L": [("X", -pL)],
+            "foot_L": [("X", pL)],
             "thigh_R": [("X", -mR)],
             "calf_R": [("X", rR)],
-            "foot_R": [("X", -pR)],
+            "foot_R": [("X", pR)],
             "arm_L": [("Y", -38.0), ("X", brazos * mL * 0.9)],
             "forearm_L": [("X", -codo - 8 * max(0.0, -math.sin(p)))],
             "arm_R": [("Y", 34.0), ("X", -14.0 + brazos * mR * 0.35)],
@@ -1254,36 +1251,41 @@ def anim_andar(an, nombre, n, amplitud, inclinacion, brazos, bote, codo):
 def anim_golpe(an):
     """Barrido con el cetro: carga a la derecha, golpe cruzado con peso, seguimiento y vuelta a la guardia."""
     an.nueva("golpe_cetro")
+    # Signos comprobados: brazo X- = adelante, X+ = atrás; brazo der. Y- = subir, Y+ = bajar; brazo izq. al revés;
+    # tronco Z+ = girar a la derecha de Maisha; muslo X- = adelantar.
     claves = [
-        # (fotograma, giro del tronco, brazo der. (Y, X), codo der., brazo izq. (Y, X), codo izq., agachar)
-        (0, 0, (34, -14), -38, (-36, -4), -12, 0),
-        (8, 30, (5, -10), -70, (-20, -40), -75, 6),      # carga: tronco a la derecha, cetro atrás
-        (12, 36, (-5, -15), -80, (-15, -50), -85, 8),
-        (16, -30, (40, -60), -20, (-10, -65), -50, 10),   # golpe: cruza por delante con todo el peso
-        (20, -42, (55, -45), -15, (-25, -40), -35, 12),
-        (26, -30, (45, -30), -25, (-30, -20), -25, 8),    # seguimiento
-        (36, 0, (34, -14), -38, (-36, -4), -12, 0),       # guardia
+        # f, giro, inclina, brazo der. [(eje, g)], codo der., brazo izq., codo izq., zancada, cetro (hacia dónde)
+        (0, 0, 0, [("Y", 34), ("X", -14)], -38, [("Y", -36), ("X", -4)], -12, 0.0, CETRO_ARRIBA),
+        (9, 32, -4, [("Y", -25), ("X", 40)], -45, [("Y", 15), ("X", -55)], -55, 0.3, (0.35, 0.55, 0.76)),   # carga
+        (13, 38, -6, [("Y", -32), ("X", 48)], -50, [("Y", 20), ("X", -60)], -60, 0.4, (0.25, 0.70, 0.67)),
+        (17, -28, 10, [("Y", 20), ("X", -72)], -10, [("Y", -25), ("X", 25)], -25, 1.0, (-0.42, -0.89, 0.18)),  # golpe
+        (21, -42, 12, [("Y", 32), ("X", -55), ("Z", -15)], -12, [("Y", -30), ("X", 30)], -20, 1.0,
+         (-0.85, 0.25, 0.05)),                                                                             # sigue
+        (28, -25, 6, [("Y", 30), ("X", -35)], -25, [("Y", -34), ("X", 10)], -15, 0.6, (-0.3, -0.2, 0.9)),
+        (36, 0, 0, [("Y", 34), ("X", -14)], -38, [("Y", -36), ("X", -4)], -12, 0.0, CETRO_ARRIBA),        # guardia
     ]
-    for f, giro, (bY, bX), codo, (lY, lX), codo_l, agacha in claves:
+    for f, giro, inclina, brazo_r, codo, brazo_l, codo_l, zancada, cetro_dir in claves:
         pose = {
-            "hips": [("Z", giro * 0.35)],
-            "spine_01": [("X", agacha * 0.3), ("Z", giro * 0.25)],
-            "spine_02": [("Z", giro * 0.3), ("X", agacha * 0.3)],
-            "chest": [("Z", giro * 0.3), ("X", agacha * 0.2)],
-            "head": [("Z", -giro * 0.5), ("X", 4)],
-            "arm_R": [("Y", bY), ("X", bX)],
+            "hips": [("Z", giro * 0.30)],
+            "spine_01": [("X", inclina * 0.4), ("Z", giro * 0.20)],
+            "spine_02": [("Z", giro * 0.25), ("X", inclina * 0.3)],
+            "chest": [("Z", giro * 0.25), ("X", inclina * 0.3)],
+            "head": [("Z", -giro * 0.45), ("X", 3 - inclina * 0.4)],
+            "arm_R": brazo_r,
             "forearm_R": [("X", codo)],
-            "arm_L": [("Y", lY), ("X", lX)],
+            "arm_L": brazo_l,
             "forearm_L": [("X", codo_l)],
-            "thigh_L": [("X", -12 * agacha / 12), ("Y", 4)],
-            "calf_L": [("X", 14 * agacha / 12)],
-            "foot_L": [("X", -2)],
-            "thigh_R": [("X", 10 * agacha / 12), ("Y", -4)],
-            "calf_R": [("X", 10 * agacha / 12)],
-            "cloak_L_01": [("X", 4), ("Z", -giro * 0.3)],
-            "cloak_L_02": [("X", 6), ("Z", -giro * 0.4)],
+            "thigh_L": [("X", -18 * zancada), ("Y", 3)],
+            "calf_L": [("X", 22 * zancada)],
+            "foot_L": [("X", 4 * zancada)],
+            "thigh_R": [("X", 14 * zancada), ("Y", -3)],
+            "calf_R": [("X", 16 * zancada)],
+            "foot_R": [("X", -6 * zancada)],
+            "cloak_L_01": [("X", 4 + 4 * zancada), ("Z", -giro * 0.3)],
+            "cloak_L_02": [("X", 6 + 8 * zancada), ("Z", -giro * 0.45)],
+            "hair_back_01": [("Z", -giro * 0.2)],
         }
-        an.fotograma(f, pose, cadera=(0, 0, -0.012 * agacha / 12))
+        an.fotograma(f, pose, cadera=(0, 0, -0.035 * zancada), cetro=cetro_dir)
     an.cerrar("golpe_cetro", False)
 
 
@@ -1430,8 +1432,10 @@ def vistas_animadas(foto, arm):
         ("reposo", 0, "b_reposo_tres_cuartos", ((-3.0, -3.6, 1.6), (0, 0, 0.88), 50)),
         ("caminar_atento", 8, "c_caminar_perfil", ((4.6, 0.0, 1.0), (0, 0, 0.88), 50)),
         ("correr", 5, "d_correr_perfil", ((4.6, 0.0, 1.0), (0, 0, 0.88), 50)),
-        ("golpe_cetro", 8, "e_golpe_carga", ((-2.2, -4.0, 1.4), (0, 0, 0.95), 50)),
-        ("golpe_cetro", 16, "f_golpe_impacto", ((-2.2, -4.0, 1.4), (0, 0, 0.95), 50)),
+        ("caminar_atento", 0, "c2_caminar_pies", ((1.6, -0.4, 0.35), (0, -0.05, 0.15), 45)),
+        ("golpe_cetro", 12, "e_golpe_carga", ((-2.2, -4.0, 1.4), (0, 0, 0.95), 45)),
+        ("golpe_cetro", 17, "f_golpe_impacto", ((-2.2, -4.0, 1.4), (0, 0, 0.95), 45)),
+        ("golpe_cetro", 21, "f2_golpe_sigue", ((-2.2, -4.0, 1.4), (0, 0, 0.95), 45)),
         ("idle_mirar_tatuajes", 40, "g_mirar_tatuajes", ((-1.4, -2.2, 1.5), (0, 0, 1.25), 55)),
         ("eco_despertar", 30, "h_eco_despertar", ((-2.4, -3.6, 1.4), (0, 0, 1.0), 50)),
     ]
@@ -1439,6 +1443,13 @@ def vistas_animadas(foto, arm):
         arm.animation_data.action = bpy.data.actions[accion]
         bpy.context.scene.frame_set(f)
         foto(nombre, pos, obj, lente)
+    # los tatuajes dormidos (como al despertar en el Kitovu), para comparar
+    piel = bpy.data.materials["piel_humanizada"].node_tree.nodes["Principled BSDF"]
+    piel.inputs["Emission Strength"].default_value = 0.0
+    arm.animation_data.action = bpy.data.actions["idle_mirar_tatuajes"]
+    bpy.context.scene.frame_set(40)
+    foto("i_tatuajes_dormidos", (-1.4, -2.2, 1.5), (0, 0, 1.25), 55)
+    piel.inputs["Emission Strength"].default_value = 1.5
     arm.animation_data.action = None
 
 

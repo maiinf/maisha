@@ -21,14 +21,15 @@
 [ext_resource type="Script" path="res://scripts/mundo/portal_raiz_3d.gd" id="20_portal_script"]
 [ext_resource type="Script" path="res://scripts/mundo/mzee_shamba_npc_3d.gd" id="21_shamba_script"]
 [ext_resource type="PackedScene" path="res://escenas/interfaz/dialogo_cinematico_3d.tscn" id="22_dialogo"]
+[ext_resource type="Script" path="res://scripts/mundo/crater_despertar_3d.gd" id="23_crater_script"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
-sky_top_color = Color(0.24, 0.32, 0.40, 1)
-sky_horizon_color = Color(0.50, 0.54, 0.58, 1)
+sky_top_color = Color(0.20, 0.28, 0.35, 1)
+sky_horizon_color = Color(0.44, 0.48, 0.52, 1)
 sky_curve = 0.12
-ground_bottom_color = Color(0.12, 0.16, 0.14, 1)
-ground_horizon_color = Color(0.35, 0.38, 0.36, 1)
-sun_angle_max = 25.0
+ground_bottom_color = Color(0.10, 0.14, 0.12, 1)
+ground_horizon_color = Color(0.30, 0.34, 0.32, 1)
+sun_angle_max = 24.0
 
 [sub_resource type="Sky" id="Sky_env"]
 sky_material = SubResource("ProceduralSkyMaterial_sky")
@@ -37,8 +38,8 @@ sky_material = SubResource("ProceduralSkyMaterial_sky")
 background_mode = 2
 sky = SubResource("Sky_env")
 ambient_light_source = 3
-ambient_light_color = Color(0.60, 0.65, 0.72, 1)
-ambient_light_energy = 0.45
+ambient_light_color = Color(0.55, 0.60, 0.66, 1)
+ambient_light_energy = 0.42
 tonemap_mode = 3
 tonemap_exposure = 1.05
 ssao_enabled = true
@@ -46,15 +47,15 @@ glow_enabled = true
 glow_bloom = 0.16
 glow_blend_mode = 1
 fog_enabled = true
-fog_light_color = Color(0.48, 0.52, 0.58, 1)
-fog_density = 0.012
+fog_light_color = Color(0.42, 0.46, 0.52, 1)
+fog_density = 0.014
 volumetric_fog_enabled = true
-volumetric_fog_density = 0.018
-volumetric_fog_albedo = Color(0.58, 0.62, 0.68, 1)
+volumetric_fog_density = 0.022
+volumetric_fog_albedo = Color(0.52, 0.56, 0.62, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cesped"]
-albedo_color = Color(0.26, 0.34, 0.22, 1)
-roughness = 0.88
+albedo_color = Color(0.23, 0.30, 0.19, 1)
+roughness = 0.90
 
 [sub_resource type="BoxMesh" id="BoxMesh_terreno"]
 material = SubResource("StandardMaterial3D_cesped")
@@ -78,6 +79,16 @@ material = SubResource("ShaderMaterial_agua")
 size = Vector2(26, 3.4)
 subdivide_width = 32
 subdivide_depth = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_luciernaga"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.90, 0.45, 0.85)
+
+[sub_resource type="SphereMesh" id="SphereMesh_luciernaga"]
+material = SubResource("StandardMaterial3D_luciernaga")
+radius = 0.045
+height = 0.09
 
 [node name="Kitovu3D" type="Node3D"]
 
@@ -105,7 +116,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 3.8)
 mesh = SubResource("PlaneMesh_rio")
 
 [node name="Maisha3D" parent="." instance=ExtResource("2_maisha")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.02, 1.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 0.02, 3.4)
 
 [node name="CamaraTerceraPersona" type="Node3D" parent="."]
 script = ExtResource("1_cam")
@@ -118,10 +129,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 0, -2.4)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 0, 0.4)
 
 [node name="Espantapajaros" parent="." instance=ExtResource("5_espantapajaros")]
-transform = Transform3D(0.939693, 0, 0.34202, 0, 1, 0, -0.34202, 0, 0.939693, 5.0, 0, -1.8)
+transform = Transform3D(0.939693, 0, 0.34202, 0, 1, 0, -0.34202, 0, 0.939693, 4.4, 0, -2.2)
 
 [node name="CarroMadera" parent="." instance=ExtResource("6_carro")]
-transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -6.5, 0, 0.8)
+transform = Transform3D(0.939693, 0, -0.34202, 0.116978, 0.939693, 0.321394, 0.321394, -0.34202, 0.883022, 5.2, 0.12, -3.8)
 
 [node name="HuertoZanahorias" parent="." instance=ExtResource("8_huerto")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.8, 0, -3.2)
@@ -157,6 +168,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.8, 0, 1.8)
 
 [node name="CraterKitovu" parent="." instance=ExtResource("13_crater")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 0, 3.4)
+script = ExtResource("23_crater_script")
+
+[node name="LuzCrater" type="OmniLight3D" parent="CraterKitovu"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+light_color = Color(1, 0.76, 0.38, 1)
+light_energy = 1.3
+omni_range = 3.6
 
 [node name="NudoCorrupcion" parent="." instance=ExtResource("14_nudo")]
 transform = Transform3D(0.939693, 0, 0.34202, 0, 1, 0, -0.34202, 0, 0.939693, -8.2, 0, -6.5)
@@ -169,6 +187,18 @@ transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 2.8, 0, -2
 script = ExtResource("21_shamba_script")
 
 [node name="DialogoCinematico3D" parent="." instance=ExtResource("22_dialogo")]
+
+[node name="Luciernagas" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+amount = 4
+lifetime = 6.0
+preprocess = 2.0
+mesh = SubResource("SphereMesh_luciernaga")
+emission_shape = 3
+emission_box_extents = Vector3(9, 1.2, 8)
+gravity = Vector3(0, 0.04, 0)
+radial_accel_min = -0.15
+radial_accel_max = 0.15
 
 [node name="MusicaAmbiente" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("16_musica")

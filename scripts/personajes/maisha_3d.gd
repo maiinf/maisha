@@ -31,14 +31,28 @@ var cooldown_esquiva := 0.0
 
 var atacando := false
 var tiempo_ataque := 0.0
-const DURACION_ATAQUE := 0.35
+const DURACION_ATAQUE := 0.55       # lo que dura el barrido del cetro (la animación va acelerada a ese tiempo)
 var cooldown_ataque := 0.0
+
+## Tatuajes de la Memoria: 0 = dormidos (al despertar en el Kitovu), 1 = despiertos del todo (los 9 Ecos).
+@export_range(0.0, 1.0) var memoria := 0.0
+const BRILLO_TATUAJES := 1.5        # emisión de los tatuajes despiertos (ficha: tatuajes_memoria_activos)
+const ECOS_TOTALES := 9
+
+# Animaciones del modelo (modelos/personajes/maisha.glb): reposo, caminar_atento, correr, golpe_cetro,
+# idle_mirar_tatuajes y eco_despertar. Velocidades naturales de cada ciclo, para que los pies no patinen.
+const PASO_CAMINAR := 1.35          # m/s a los que el ciclo de caminar va a velocidad 1
+const PASO_CORRER := 3.3            # m/s a los que el ciclo de correr va a velocidad 1
+const QUIETO_PARA_MIRAR := 8.0      # segundos sin moverse antes de mirarse los tatuajes
 
 var _dir_esquiva := Vector3.ZERO
 var _tiempo_paso := 0.0
 var _visual: Node3D = null
 var _luz_corazon: OmniLight3D = null
 var _audio_cetro: AudioStreamPlayer3D = null
+var _anim: AnimationPlayer = null
+var _piel: BaseMaterial3D = null
+var _tiempo_quieto := 0.0
 
 
 func _ready() -> void:
@@ -55,6 +69,75 @@ func _ready() -> void:
 		_audio_cetro.stream = snd
 	_audio_cetro.max_distance = 25.0
 	add_child(_audio_cetro)
+
+	if _visual:
+		var reproductores := _visual.find_children("*", "AnimationPlayer", true, false)
+		if not reproductores.is_empty():
+			_anim = reproductores[0]
+			for ciclo in ["reposo", "caminar_atento", "correr"]:
+				if _anim.has_animation(ciclo):
+					_anim.get_animation(ciclo).loop_mode = Animation.LOOP_LINEAR
+		_preparar_piel()
+	despertar_memoria(memoria)
+	_animar("reposo")
+
+
+## Cada Maisha lleva su propia copia del material de piel, para encender sus tatuajes sin tocar el modelo.
+func _preparar_piel() -> void:
+	for nodo in _visual.find_children("*", "MeshInstance3D", true, false):
+		var malla := nodo as MeshInstance3D
+		for i in malla.mesh.get_surface_count():
+			var mat := malla.mesh.surface_get_material(i) as BaseMaterial3D
+			if mat and mat.resource_name == "piel_humanizada":
+				_piel = mat.duplicate()
+				malla.set_surface_override_material(i, _piel)
+				return
+
+
+## Enciende los tatuajes: 0 = dormidos, 1 = toda la cartografía en oro.
+func despertar_memoria(valor: float) -> void:
+	memoria = clampf(valor, 0.0, 1.0)
+	if _piel:
+		_piel.emission_energy_multiplier = BRILLO_TATUAJES * memoria
+
+
+## Al recuperar un Eco: la animación del despertar y un noveno más de brillo en los tatuajes.
+func recuperar_eco() -> void:
+	_animar("eco_despertar", 1.0, 0.3)
+	var meta := minf(1.0, memoria + 1.0 / ECOS_TOTALES)
+	create_tween().tween_method(despertar_memoria, memoria, meta, 1.2).set_delay(0.4)
+
+
+func _animar(nombre: String, velocidad := 1.0, mezcla := 0.25) -> void:
+	if not _anim or not _anim.has_animation(nombre):
+		return
+	_anim.speed_scale = velocidad
+	if _anim.current_animation != nombre:
+		_anim.play(nombre, mezcla)
+
+
+func _process(delta: float) -> void:
+	if not _anim or atacando:
+		return
+	var rapidez := Vector2(velocity.x, velocity.z).length()
+	var unica := _anim.current_animation in ["idle_mirar_tatuajes", "eco_despertar"]
+	if unica and _anim.is_playing() and rapidez < 0.3:
+		return
+	if esquivando:
+		_animar("correr", 1.6, 0.1)
+	elif rapidez > 0.3:
+		_tiempo_quieto = 0.0
+		if rapidez > 2.2:
+			_animar("correr", clampf(rapidez / PASO_CORRER, 0.8, 2.2), 0.2)
+		else:
+			_animar("caminar_atento", clampf(rapidez / PASO_CAMINAR, 0.6, 1.6), 0.2)
+	else:
+		_tiempo_quieto += delta
+		if _tiempo_quieto > QUIETO_PARA_MIRAR:
+			_tiempo_quieto = -QUIETO_PARA_MIRAR  # no repetirlo enseguida
+			_animar("idle_mirar_tatuajes", 1.0, 0.4)
+		else:
+			_animar("reposo", 1.0, 0.3)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -174,6 +257,10 @@ func _intentar_ataque() -> void:
 	atacando = true
 	tiempo_ataque = DURACION_ATAQUE
 	cooldown_ataque = 0.45
+	if _anim and _anim.has_animation("golpe_cetro"):
+		_anim.speed_scale = _anim.get_animation("golpe_cetro").length / DURACION_ATAQUE
+		_anim.play("golpe_cetro", 0.08)
+		_anim.seek(0.0, true)
 
 	if _audio_cetro:
 		_audio_cetro.play()
