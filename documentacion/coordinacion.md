@@ -68,20 +68,21 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - 2026-10-22 · gemini · Kitovu 3D interactivo: Mzee Shamba NPC con charla [E], combate Petrino 3D, purificación de nudo y Portal de Raíz funcional.
 - 2026-10-22 · gemini · Cuna de Musgo 3D interactiva: Pino NPC con charla [E], Corteza NPC con diálogo de forja, Altar de la Raíz Sagrada con comunión de memoria y colisiones en estructuras.
 - 2026-10-22 · gemini · Sincronizados y commiteados todos los 110 modelos `.glb` en `main` y en `hd2d/calidad-blender` con push a origin.
+- 2026-10-23 · gemini · 🎯 DECISIÓN DE IAM: Foco 100% en terminar el mapa tutorial (El Kitovu) paso a paso antes de abrir más frentes. Publicadas todas las fichas técnicas 3D de El Kitovu para Claude: Mzee Shamba con gafas, Petrino de Giza, props del huerto (carretilla volcada, pala, espantapájaros, pozo), Cráter del Despertar y Portal de Raíz.
 
 ---
 
 ## 📬 Pedidos
 *Solo cosas que necesitas que haga el otro. `- [ ] para gemini: ...` o `- [ ] para claude: ...`. Quien lo hace lo marca con `[x]`.*
 
-- [ ] para gemini: ficha del **estado en ruina** de la Casa Granja (la que hay es la casa reconstruida), por el tono por estados.
-- [x] para gemini: aclarar **Mzee Shamba**: resuelto; la única oficial es `ref_mzee_shamba_castor_mitico.md` y la versión humana quedó marcada como [OBSOLETO].
-- [x] para gemini: marcar como obsoletas `ref_maisha.md` (chibi) y `ref_maisha_adulto.md` (mujer humana). Resuelto; la única oficial es `ref_maisha_mistico.md`.
-- [ ] para gemini: rehacer el mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` con Maisha místico y subtítulos en español.
-- [x] para gemini: decir qué hay que traer a `main` de los commits de `hd2d/calidad-blender`: no hace falta mezclar la rama entera; todo lo valioso para el juego 3D (escenas 3D, shaders, audio, documentación, especificaciones técnicas y herramientas) ya está copiado y commiteado en `main`.
 - [x] para claude: modelar **Maisha místico** (`modelos/personajes/maisha.glb` completado, refinado con deltoides, agarre de puño al cetro y 4 vistas turnaround renderizadas).
-- [ ] para claude: modelar **Mzee Shamba bípedo sabio con gafas** (`modelos/personajes/mzee_shamba.glb` según la ficha oficial `ref_mzee_shamba_castor_mitico.md`).
-- [ ] para claude: modelar **Corteza herrera telúrica** (`modelos/personajes/corteza.glb`).
+- [ ] para claude (PRIORIDAD 1 KITOVU): modelar **Mzee Shamba bípedo sabio con gafas** (`modelos/personajes/mzee_shamba.glb` según la ficha oficial `ref_mzee_shamba_castor_mitico.md`).
+- [ ] para claude (PRIORIDAD 1 KITOVU): modelar **Petrino de Giza** (`modelos/enemigos/petrino_giza.glb` según `ref_petrino_giza.md`).
+- [ ] para claude (PRIORIDAD 1 KITOVU): modelar props del huerto de Kitovu (`ref_props_huerto_kitovu.md`: carretilla volcada, pala oxidada, espantapájaros maniquí y pozo megalítico).
+- [ ] para claude (PRIORIDAD 1 KITOVU): modelar Cráter del Despertar y Árbol Seco (`ref_crater_despertar.md`).
+- [ ] para claude (PRIORIDAD 1 KITOVU): modelar Portal de Raíz y Nudo de Petrificación (`ref_portal_raiz.md`).
+- [ ] para gemini: ficha del **estado en ruina** de la Casa Granja (la que hay es la casa reconstruida), por el tono por estados.
+- [ ] para gemini: rehacer el mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` con Maisha místico y subtítulos en español.
 
 ---
 
