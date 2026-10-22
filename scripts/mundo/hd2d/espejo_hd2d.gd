@@ -354,7 +354,7 @@ const LUCES_3D := {
 	"puerta.png": [["m", 52, 44]],
 }
 const CAMBIAN_AL_RECONSTRUIRSE_3D := ["casa_seta.png", "taller.png", "cocina.png", "puesto.png"]
-## Modelos 3D de Blender 4.5 para arquitectura y accesorios:
+## Modelos 3D de Blender 5.2.3 para arquitectura y accesorios:
 ## Sustituyen al sprite plano por una malla 3D completa (.glb) con aleros, volumen sólido y sombras reales
 const MODELOS_BLENDER := {
 	"casa_granja.png": {
@@ -1070,6 +1070,38 @@ const MODELOS_BLENDER := {
 		"offset": Vector3(0.0, 0.0, 0.0),
 		"rot_y": 0.0,
 		"radio_occlusion": Vector2(0.5, 0.4),
+		"solo_reconstruido": false,
+	},
+	"charco.png": {
+		"ruta": "res://modelos/entorno/charco_tinta.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(2.5, 1.2),
+		"solo_reconstruido": false,
+	},
+	"ficha.png": {
+		"ruta": "res://modelos/entorno/ficha_indice.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.8, 0.8),
+		"solo_reconstruido": false,
+	},
+	"pagina.png": {
+		"ruta": "res://modelos/entorno/pagina_suelta.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, 0.0),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.5, 0.5),
+		"solo_reconstruido": false,
+	},
+	"tintero.png": {
+		"ruta": "res://modelos/enemigos/tintero_rabioso.glb",
+		"escala": Vector3(1.0, 1.0, 1.0),
+		"offset": Vector3(0.0, 0.0, -0.05),
+		"rot_y": 0.0,
+		"radio_occlusion": Vector2(0.7, 0.7),
 		"solo_reconstruido": false,
 	},
 }

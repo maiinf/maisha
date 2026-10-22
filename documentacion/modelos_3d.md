@@ -1,7 +1,7 @@
 # Catálogo de Modelos 3D y Arquitectura HD-2D — Maisha
 
 > **Bóveda de Obsidian**: [[LEEME]] · [[documentacion/decisiones|Decisiones de Diseño]] · [[documentacion/coordinacion|Coordinación Claude ⟷ Gemini]]
-> **Pipeline Gráfico**: Blender 4.5.15 LTS (Headless procedural via `bpy`) $\rightarrow$ Godot 4.7.2 (GL Compatibility HD-2D).
+> **Pipeline Gráfico**: Blender 5.2.3 LTS (Headless procedural via `bpy`) $\rightarrow$ Godot 4.7.2 (GL Compatibility HD-2D).
 > **Tags**: #maisha #hd2d #blender #arquitectura #modelos3d #gamedev
 
 ---
@@ -14,7 +14,7 @@ Maisha combina dos mundos para lograr su identidad visual única:
    - Volumen 3D mediante extrusión multicapa (`capas_fondo`) y sombreado de curvatura cilíndrica.
    - Mapas de normales (`*_n.png`) horneados para reaccionar físicamente a la luz del sol y a las luces cálidas nocturnas.
 2. **Escenario y Arquitectura (Edificios, Casas, Puentes, Árboles y Farolas)**:
-   - **Modelos 3D sólidos reales (`.glb`)** modelados procedimentalmente con Blender 4.5.
+   - **Modelos 3D sólidos reales (`.glb`)** modelados procedimentalmente con Blender 5.2.3 LTS.
    - Paleta cromática oficial de Raíz y Sigilia con filtrado de píxel `NEAREST`.
    - Geometría completa de 360° con aleros, chimeneas, porches y proyección de sombras volumétricas dinámicas.
 
@@ -140,6 +140,18 @@ graph TD
 22. **`puesto_ruina.glb` (Cuna de Musgo - Puesto Colapsado)**
     - Altura: $1.5\text{ m}$. Mostrador inclinado y vencido, postes fracturados, toldo desfondado y cajas de madera desvencijadas en 360°.
     - Vinculado a: `puesto.png` (cuando `frame == 0`).
+23. **`charco_tinta.glb` (Sigilia - Charcos de Tinta Quieta)**
+    - Dimensiones: $3.1\times 1.4\times 0.2\text{ m}$. Bordillo elíptico en gajos de mármol de Sigilia, lecho cóncavo de piedra oscura, lámina de tinta violeta con emisión cálida, cristales de escarcha en los bordes y burbujas de corrupción de Giza.
+    - Vinculado a: `charco.png`.
+24. **`ficha_indice.glb` (Sigilia - Ficha Rúnica del Índice)**
+    - Dimensiones: $0.65\times 0.65\times 1.5\text{ m}$. Pedestal hexagonal de mármol y bronce, tableta vertical biselada con runas caligráficas incisas y emisión de tinta azulada, rematada por copete de nieve.
+    - Vinculado a: `ficha.png`.
+25. **`pagina_suelta.glb` (Sigilia - Página de Ventisca)**
+    - Dimensiones: $0.65\times 0.45\times 0.45\text{ m}$. Lámina de pergamino envejecido con doblez aerodinámico en S, trazos caligráficos rúnicos y cristal de escarcha.
+    - Vinculado a: `pagina.png` y enemigo `pagina_suelta`.
+26. **`tintero_rabioso.glb` (Las Estanterías - Cazador Tintero)**
+    - Dimensiones: $0.7\times 0.7\times 0.85\text{ m}$. Frasco octogonal de cristal oscuro con tinta viva en el interior, cuello con refuerzo de latón, tapón inclinado de corcho, etiqueta con ojos enfadados y 4 patitas mecánicas articuladas de latón.
+    - Vinculado a: `tintero.png`.
 
 ---
 
