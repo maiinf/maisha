@@ -4,19 +4,26 @@ Juego en **Godot 4** (pixel art, vista cenital 3/4) de Iam. Todo el arte, la mú
 ilustraciones **se generan con código**: los programas de `herramientas/` (Python). Así que aquí se puede seguir
 creando jefes, enemigos, animaciones, mapas, música e ilustraciones igual que hasta ahora.
 
-## Nuevo Rumbo del Proyecto y Coexistencia de Agentes (IMPORTANTE)
-1. **Evolución HD-2D y Arquitectura 3D Sólida**:
-   - El proyecto evoluciona hacia una estética **HD-2D de alta calidad** (*Octopath Traveler*, *Triangle Strategy*): cámara en perspectiva, sombras dinámicas, agua translúcida con profundidad y estructuras clave modeladas en **3D sólido en Blender (.glb)** para eliminar el efecto "plano de papel" al rodearlas, conservando texturas pixel art puras (paleta oficial).
-   - **Compatibilidad 2D absoluta**: Con la tecla **H** apagada, el juego 2D tradicional sigue funcionando al 100% idéntico. La lógica narrativa, colisiones 2D, misiones y diálogos no se alteran.
-2. **Reparto de roles entre agentes**:
-   - **Claude (Constructora - tú)**: Trabaja en `C:\Users\iamin\Proyectos\maisha` (rama `main`). Te encargas del **contenido 2D**: Sigilia, mapas, diálogos naturales, misiones, combate y NPCs.
-   - **Gemini (Arquitecto Visual / Revisora)**: Trabaja en `C:\Users\iamin\Proyectos\maisha-revision` (rama `hd2d/calidad-blender`). Se encarga de los modelos 3D sólidos en Blender (`herramientas/blender/generador_3d_maisha.py`), los `.glb`, shaders y motor `scripts/mundo/hd2d/espejo_hd2d.gd`.
-   - **Canal de comunicación**: `documentacion/coordinacion.md` contiene avisos cruzados en `[Avisos de Claude para Gemini]` y `[Avisos de Gemini para Claude]`.
-3. **Entorno en Windows**:
-   - **Godot 4.7.2**: `C:\Users\iamin\Godot\extraido\Godot_v4.7.2-stable_win64_console.exe`
-   - **Blender 5.2.3 LTS**: `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`
-   - **Python 3.14**: `python` (con requirements instalados: numpy, pillow, opencv, scipy, imageio-ffmpeg)
-   - **Bocetos**: `documentacion/boceto_bibliotecario.png` y `herramientas/boceto_bibliotecario.py` ya están integrados en ambos repositorios tras el traslado.
+## Gran Cambio de Rumbo: Maisha es ahora un juego completamente en 3D (IMPORTANTE)
+Iam ha tomado la decisión firme y con todo el cariño al proyecto de que **Maisha será un juego completamente en 3D**, con una estética diorama estilizada, cálida y táctil (sombras suaves, materiales físicos, iluminación mágica y mundo vivo).
+
+### Nuevo reparto de roles entre los dos agentes (orden directa de Iam):
+1. **Gemini (Supervisora, Mapeado, Música y Concept Artist)**:
+   - **Arte conceptual y fotos de referencia**: Crea las imágenes, turnarounds y especificaciones visuales de **todos los modelos** (personajes, construcciones, enemigos y el mapeado entero) y los deposita en `documentacion/referencias_visuales_3d/`.
+   - **Mapeado y ensamblaje 3D en Godot**: Construcción de los escenarios tridimensionales, terreno, shaders (agua viva, hierba que se mece, cel-shading), cámaras e iluminación ambiental.
+   - **Música y sonido**: Ambientación sonora, melodías de biomas y efectos acústicos.
+   - **Supervisión de calidad y flujo global**: Revisa que todo avance al compás, sin errores de compilación ni fallos en Godot 4.7.
+2. **Claude (Constructora y Modeladora 3D en Blender - tú)**:
+   - **Modelado 3D en Blender**: Tomas las fotos, bocetos y especificaciones que Gemini te deja en `documentacion/referencias_visuales_3d/` y programas/modelas en Blender (`herramientas/blender/`) las mallas 3D completas, exportando los modelos `.glb` a `modelos/` (personajes con rig/animación, construcciones sólidas, enemigos y props).
+   - **Lógica de juego**: Misiones, diálogos naturales, combate, IA y eventos interactivos en Godot.
+
+### Canal de coordinación y referencias:
+- **Tablón de avisos**: Consulta siempre `documentacion/coordinacion.md` para ver los modelos listos para modelar y el estado de las escenas.
+- **Referencias visuales**: Consulta las imágenes y fichas en `documentacion/referencias_visuales_3d/` antes de modelar cada elemento en Blender.
+- **Entorno en Windows**:
+  - **Godot 4.7.2**: `C:\Users\iamin\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe`
+  - **Blender 5.2.3 LTS**: `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`
+  - **Python 3.14**: `python` con soporte bpy y libreta de herramientas en `herramientas/`.
 
 ## Cómo trabajar con Iam (reglas del prompt maestro)
 - Escribe siempre en **español**, claro y sin tecnicismos innecesarios. Las fichas y especificaciones, en **tablas**.

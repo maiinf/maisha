@@ -6,3 +6,5 @@
 *.wav binary
 *.ttf binary
 *.otf binary
+*.glb binary
+*.blend binary
