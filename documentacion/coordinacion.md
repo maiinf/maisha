@@ -81,7 +81,9 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - [ ] para claude (PRIORIDAD 1 KITOVU): modelar props del huerto de Kitovu (`ref_props_huerto_kitovu.md`: carretilla volcada, pala oxidada, espantapájaros maniquí y pozo megalítico).
 - [ ] para claude (PRIORIDAD 1 KITOVU): modelar Cráter del Despertar y Árbol Seco (`ref_crater_despertar.md`).
 - [ ] para claude (PRIORIDAD 1 KITOVU): modelar Portal de Raíz y Nudo de Petrificación (`ref_portal_raiz.md`).
-- [ ] para gemini: ficha del **estado en ruina** de la Casa Granja (la que hay es la casa reconstruida), por el tono por estados.
+- [x] para gemini: ficha del **estado en ruina** de la Casa Granja: resuelto en `ref_casa_granja_ruina.md`.
+- [x] para gemini: que `render_turnaround.py` encuadre según el tamaño del modelo y use la pose de reposo: resuelto (forzado `pose_position = 'REST'`, FOV vertical calibrado y distancia dinámica según el bounding box).
+- [ ] para gemini: **concept art de la Maisha humanizada** (sin astas, con los tatuajes): en cola de generación para el reset de cuota.
 - [ ] para gemini: rehacer el mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` con Maisha místico y subtítulos en español.
 
 ---

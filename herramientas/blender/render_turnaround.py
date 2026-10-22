@@ -2,7 +2,7 @@
 render_turnaround.py
 Generador automatizado de hojas de modelo (Turnaround Model Sheets) multi-ángulo desde Blender.
 Renderiza 4 vistas ortográficas y de perspectiva (Frente, Perfil, Trasera, 3/4) de cualquier modelo .glb
-para que tanto Gemini como Claude puedan verificar el volumen 360° sin puntos ciegos.
+adaptando dinámicamente el encuadre al tamaño del modelo y asegurando la pose de reposo (REST).
 
 Uso:
     blender -b --factory-startup -P herramientas/blender/render_turnaround.py -- --modelo <ruta.glb> --salida <carpeta_salida>
@@ -46,6 +46,14 @@ def importar_glb(ruta):
         raise FileNotFoundError(f"No se encontró el modelo: {ruta}")
     bpy.ops.import_scene.gltf(filepath=ruta)
     
+    # Asegurar pose de reposo (REST) en todas las armaduras y anular acciones activas
+    for obj in bpy.context.scene.objects:
+        if obj.type == 'ARMATURE':
+            obj.data.pose_position = 'REST'
+            if obj.animation_data:
+                obj.animation_data.action = None
+    bpy.context.view_layer.update()
+    
     # Calcular bounding box global
     objs = [obj for obj in bpy.context.scene.objects if obj.type == 'MESH']
     if not objs:
@@ -77,7 +85,7 @@ def configurar_estudio(centro, dimensiones):
     scene.render.film_transparent = True
     scene.render.image_settings.file_format = 'PNG'
     
-    # Luz principal
+    # Luz principal cálida
     luz_key_data = bpy.data.lights.new(name="LuzKey", type='SUN')
     luz_key_data.energy = 3.5
     luz_key_data.color = (1.0, 0.96, 0.88)
@@ -85,7 +93,7 @@ def configurar_estudio(centro, dimensiones):
     luz_key.rotation_euler = (math.radians(45), math.radians(15), math.radians(35))
     scene.collection.objects.link(luz_key)
     
-    # Luz de relleno (fill light)
+    # Luz de relleno fría
     luz_fill_data = bpy.data.lights.new(name="LuzFill", type='SUN')
     luz_fill_data.energy = 1.8
     luz_fill_data.color = (0.75, 0.85, 0.95)
@@ -98,21 +106,29 @@ def renderizar_vistas(centro, dimensiones, salida_dir, nombre_base):
     os.makedirs(salida_dir, exist_ok=True)
     scene = bpy.context.scene
     
-    radio_max = max(dimensiones.x, dimensiones.y, dimensiones.z)
-    distancia = max(radio_max * 2.2, 3.0)
+    alto = max(dimensiones.z, 0.1)
+    ancho_max = max(dimensiones.x, dimensiones.y, 0.1)
+    tamano_encuadre = max(alto, ancho_max) * 1.15
     
-    vistas = [
-        ("01_frente", (centro.x, centro.y - distancia, centro.z), (math.radians(90), 0, 0), True),
-        ("02_perfil_derecho", (centro.x + distancia, centro.y, centro.z), (math.radians(90), 0, math.radians(90)), True),
-        ("03_trasera", (centro.x, centro.y + distancia, centro.z), (math.radians(90), 0, math.radians(180)), True),
-        ("04_perspectiva_3_4", (centro.x + distancia * 0.75, centro.y - distancia * 0.75, centro.z + distancia * 0.6), (math.radians(60), 0, math.radians(45)), False)
-    ]
-    
-    # Crear cámara
+    # Cámara ajustada al tamaño exacto del modelo
     cam_data = bpy.data.cameras.new("CamaraTurnaround")
+    cam_data.lens = 50.0
     cam_obj = bpy.data.objects.new("CamaraTurnaround", cam_data)
     scene.collection.objects.link(cam_obj)
     scene.camera = cam_obj
+    
+    # Para perspectiva: calcular distancia exacta para encuadrar al 85% de la ventana
+    sensor_h = cam_data.sensor_height if hasattr(cam_data, 'sensor_height') else 24.0
+    fov_vertical = 2.0 * math.atan(sensor_h / (2.0 * cam_data.lens))
+    distancia_persp = (tamano_encuadre * 0.5) / math.tan(fov_vertical * 0.5) * 1.12
+    distancia_orto = tamano_encuadre * 1.5
+    
+    vistas = [
+        ("01_frente", (centro.x, centro.y - distancia_orto, centro.z), (math.radians(90), 0, 0), True),
+        ("02_perfil_derecho", (centro.x + distancia_orto, centro.y, centro.z), (math.radians(90), 0, math.radians(90)), True),
+        ("03_trasera", (centro.x, centro.y + distancia_orto, centro.z), (math.radians(90), 0, math.radians(180)), True),
+        ("04_perspectiva_3_4", (centro.x + distancia_persp * 0.70, centro.y - distancia_persp * 0.70, centro.z + tamano_encuadre * 0.35), (math.radians(65), 0, math.radians(45)), False)
+    ]
     
     rutas_generadas = []
     
@@ -122,10 +138,9 @@ def renderizar_vistas(centro, dimensiones, salida_dir, nombre_base):
         
         if es_orto:
             cam_data.type = 'ORTHO'
-            cam_data.ortho_scale = radio_max * 1.35
+            cam_data.ortho_scale = tamano_encuadre
         else:
             cam_data.type = 'PERSP'
-            cam_data.lens = 50.0
             
         nombre_archivo = f"{nombre_base}_{etiqueta}.png"
         ruta_salida = os.path.join(salida_dir, nombre_archivo)
