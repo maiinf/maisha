@@ -13,6 +13,15 @@
 
 ---
 
+### 🔄 HOJA DE MODELO 360° (VISTAS MULTI-ÁNGULO DEL MODELO BLENDER)
+| Vista Frontal | Vista Lateral (Perfil) |
+| :---: | :---: |
+| ![Frente](vistas_maisha/maisha_01_frente.png) | ![Perfil Derecho](vistas_maisha/maisha_02_perfil_derecho.png) |
+| **Vista Trasera (Capa y Espalda)** | **Vista 3/4 (Perspectiva y Cetro)** |
+| ![Trasera](vistas_maisha/maisha_03_trasera.png) | ![Perspectiva 3/4](vistas_maisha/maisha_04_perspectiva_3_4.png) |
+
+---
+
 ## 📏 PROPORCIONES Y ANATOMÍA HUMANIZADA
 - **Estatura y Silueta**: $1.70\text{ m}$ de altura (silueta humana estilizada de unas 6.5 a 7 cabezas, ágil y elegante).
 - **Rostro y Mirada**:
