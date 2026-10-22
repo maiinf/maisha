@@ -362,6 +362,14 @@ se pasan.
 | Rediseño de Maisha (Humanización y Tatuajes Mnemotécnicos) | **Sin cuernos ni astas**: Se humaniza la silueta con rostro expresivo y cabello orgánico suave para conectar emocionalmente con el público. **Evolución por Tatuajes del Olvido**: Maisha se grabó en la piel una cartografía rúnica antes de la amnesia para recordar quién era; los tatuajes despiertan e irradian oro líquido progresivamente al recuperar los 9 Ecos, revelando la memoria de su pasado. |
 | Rediseño de Mzee Shamba (Castor Culto con Gafas) | **Bípedo y de estatura media (1.45 m)**: Ni cuadrúpedo ni bestia gigante. Es un anciano sabio, culto y venerable, con gafas redondas de montura fina de botánico, chaleco rústico de pana con bolsillos y cuaderno botánico. |
 
+### El Kitovu: Diseño de Nivel Tutorial y Narrativa Ambiental (2026-10-23, Decisión de Iam)
+| Qué | Decisión |
+| --- | --- |
+| Enfoque paso a paso | Foco total en **El Kitovu** (mapa tutorial inicial) antes de avanzar a otras zonas, elevándolo al estándar AAA (*God of War* / *Shadow of the Colossus*). |
+| Atmósfera y Fauna | Claro sombrío encajonado entre riscos de pizarra y pinos ciclópeos con niebla baja a ras de suelo. **Luciérnagas muy esporádicas** (de 1 a 3 motas doradas aisladas, sin saturar) para recordar que la vida aún late en secreto. |
+| Narrativa Ambiental del Abandono | Evidencias del avance progresivo de la Purga de Giza en la granja: el huerto tiene la mayoría de surcos secos y agrietados (solo 2 o 3 brotes vivos), una **carretilla de madera volcada** con abono seco y una **pala oxidada clavada y olvidada** a medio surco. Espantapájaros rústico como maniquí de entrenamiento táctico. |
+| Cráter del Despertar y Tatuajes Mnemotécnicos | El cráter de impacto tiene **glifos ancestrales en espiral grabados en la roca madre**. Al despertar Maisha, **la simbología del cráter y los tatuajes de sus brazos se iluminan en sincronía**: es la tierra misma hablándole a Maisha (*Vida*). Este recurso diegético de comunicación telúrica se repite en cada altar sagrado. |
+
 
 
 
