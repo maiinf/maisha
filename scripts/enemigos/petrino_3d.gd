@@ -22,6 +22,15 @@ var _dir_embestida := Vector3.ZERO
 var _visual: Node3D = null
 var _audio: AudioStreamPlayer3D = null
 var _luz_ojos: OmniLight3D = null
+var _anim: AnimationPlayer = null
+
+## Animación de cada fase (modelos/enemigos/petrino_giza.glb) y su velocidad.
+const ANIMACION_DE := {
+	FasePetrino.IDLE: ["reposo", 1.0], FasePetrino.ALERTA: ["reposo", 2.2],
+	FasePetrino.EMBESTIDA: ["embestida", 1.3], FasePetrino.ATURDIDO: ["aturdido", 1.0],
+	FasePetrino.MUERTE: ["muerte_fractura", 1.0],
+}
+const DURACION_FRACTURA := 1.35     # lo que tarda en romperse antes de desvanecerse
 
 
 func _ready() -> void:
@@ -31,13 +40,23 @@ func _ready() -> void:
 	_audio.max_distance = 25.0
 	add_child(_audio)
 
-	# Luz violeta de corrupción en los ojos
+	# Luz violeta de corrupción en las cuencas (sigue a la cabeza al girar)
 	_luz_ojos = OmniLight3D.new()
 	_luz_ojos.light_color = Color(0.75, 0.25, 0.95)
 	_luz_ojos.light_energy = 1.8
 	_luz_ojos.omni_range = 3.5
-	_luz_ojos.transform.origin = Vector3(0, 0.7, 0.4)
-	add_child(_luz_ojos)
+	_luz_ojos.transform.origin = Vector3(0, 0.88, 1.0)
+	if _visual:
+		_visual.add_child(_luz_ojos)
+		var reproductores := _visual.find_children("*", "AnimationPlayer", true, false)
+		if not reproductores.is_empty():
+			_anim = reproductores[0]
+			for ciclo in ["reposo", "caminar", "embestida"]:
+				if _anim.has_animation(ciclo):
+					_anim.get_animation(ciclo).loop_mode = Animation.LOOP_LINEAR
+	else:
+		add_child(_luz_ojos)
+	_animar_fase()
 
 
 func _physics_process(delta: float) -> void:
@@ -143,11 +162,13 @@ func _morir() -> void:
 		onda.radio_maximo = 6.0
 		get_parent().add_child(onda)
 
-	# Desvanecer visual
+	# Se rompe en bloques (animación muerte_fractura) y luego se desvanece
+	_animar_fase()
 	if _luz_ojos:
 		_luz_ojos.queue_free()
 
 	var tween := create_tween()
+	tween.tween_interval(DURACION_FRACTURA if _anim else 0.0)
 	tween.tween_property(self, "scale", Vector3.ZERO, 0.45).set_ease(Tween.EASE_IN)
 	tween.tween_callback(queue_free)
 
@@ -155,6 +176,19 @@ func _morir() -> void:
 func _cambiar_fase(nueva: FasePetrino) -> void:
 	fase = nueva
 	_tiempo_estado = 0.0
+	_animar_fase()
+
+
+func _animar_fase() -> void:
+	if not _anim or not ANIMACION_DE.has(fase):
+		return
+	var nombre: String = ANIMACION_DE[fase][0]
+	if not _anim.has_animation(nombre):
+		return
+	_anim.speed_scale = ANIMACION_DE[fase][1]
+	if _anim.current_animation != nombre or fase in [FasePetrino.ATURDIDO, FasePetrino.MUERTE]:
+		_anim.play(nombre, 0.15)
+		_anim.seek(0.0, true)
 
 
 func _reproducir_sonido(ruta: String) -> void:
