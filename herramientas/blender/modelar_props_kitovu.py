@@ -54,6 +54,7 @@ PALETA = {
     "fondo_oscuro": ("#050506", 0.30, 0.0, 0.0),
     "cedro_cubo": ("#5a3e28", 0.80, 0.0, 0.0),
     "tierra_agrietada_surco": ("#3c352a", 0.95, 0.0, 0.0),
+    "tierra_seca_clara": ("#7d6c52", 0.97, 0.0, 0.0),
     "abono_petrificado": ("#2e2a24", 0.95, 0.0, 0.0),
     "hierba_seca": ("#8b7d55", 0.90, 0.0, 0.0),
 }
@@ -90,6 +91,42 @@ def roca(pz, c, r, mat, semilla=0.0, aspereza=0.15):
         d = v.co.normalized()
         k = 1.0 + noise.fractal(d * 2.5 + Vector((semilla, 0, 0)), 0.6, 2.0, 3) * aspereza
         v.co = Vector(c) + Vector((d.x * r[0] * k, d.y * r[1] * k, d.z * r[2] * k))
+    i = pz._i(mat)
+    for f in {f for v in res["verts"] for f in v.link_faces}:
+        f.material_index = i
+
+
+def costra(pz, radio, alto, mat, semilla=0.0, grietas=9):
+    """Parche de tierra seca y cuarteada: disco irregular algo abombado con grietas oscuras."""
+    res = bmesh.ops.create_circle(pz.bm, cap_ends=True, segments=40, radius=1.0)
+    centro = bmesh.ops.poke(pz.bm, faces=[f for f in pz.bm.faces if all(v in res["verts"] for v in f.verts)])
+    for v in res["verts"]:
+        a = math.atan2(v.co.y, v.co.x)
+        k = 1 + 0.18 * noise.noise(Vector((math.cos(a) * 2, math.sin(a) * 2, semilla)))
+        v.co = Vector((v.co.x * radio * k, v.co.y * radio * k, 0.004))
+    for v in centro["verts"]:
+        v.co = Vector((0, 0, alto))
+    i = pz._i(mat)
+    for f in {f for v in res["verts"] for f in v.link_faces}:
+        f.material_index = i
+    for k in range(grietas):     # grietas: cintas oscuras quebradas
+        a = 2 * math.pi * k / grietas + semilla
+        pts = []
+        for j in range(5):
+            r = radio * (0.15 + 0.75 * j / 4)
+            aa = a + 0.25 * math.sin(j * 2.1 + k)
+            z = alto * (1 - (r / radio)) + 0.006
+            pts.append(Vector((r * math.cos(aa), r * math.sin(aa), z)))
+        pz.tubo(pts, [(0.006, 0.002)] * 5, "abono_petrificado", lados=4, lateral=Z)
+
+
+def montón(pz, c, radio, alto, mat, semilla=0.0):
+    """Montón de tierra: cúpula irregular."""
+    res = bmesh.ops.create_icosphere(pz.bm, subdivisions=3, radius=1.0)
+    for v in res["verts"]:
+        d = v.co.normalized()
+        k = 1 + 0.12 * noise.fractal(d * 2.0 + Vector((semilla, 0, 0)), 0.6, 2.0, 3)
+        v.co = Vector(c) + Vector((d.x * radio * k, d.y * radio * k, max(d.z, -0.05) * alto * k))
     i = pz._i(mat)
     for f in {f for v in res["verts"] for f in v.link_faces}:
         f.material_index = i
@@ -165,8 +202,11 @@ def carretilla(mats):
         pz.tubo([b, b + d * 0.10, b + d * 0.18 + Vector((0.03, 0, -0.04))], [0.004, 0.003, 0.001], "hierba_seca",
                 lados=4)
     ob = pz.objeto()
-    girar_todo(ob, Matrix.Rotation(math.radians(28), 3, "Y"))      # volcada de lado, 28°
-    ob.name = "Carretilla"
+    # hoja canónica: abandonada de morros sobre la rueda, los varales en alto (28°) y algo ladeada
+    girar_todo(ob, Matrix.Rotation(math.radians(6), 3, "Y") @ Matrix.Rotation(math.radians(28), 3, "X"))
+    suelo = Piezas("Costra", mats)
+    costra(suelo, 0.72, 0.02, "tierra_seca_clara", semilla=1.0)
+    ob = ap.unir([ob, suelo.objeto()], "Carretilla")
     return ob
 
 
@@ -200,10 +240,15 @@ def pala(mats):
     ob.data.update()
     # montón de tierra seca alrededor del corte (a ras de suelo)
     tierra = Piezas("Tierra", mats)
-    for k in range(5):
-        a = 2 * math.pi * k / 5
-        roca(tierra, (0.12 * math.cos(a), 0.12 * math.sin(a) - 0.05, 0.0), (0.10, 0.08, 0.035),
-             "tierra_agrietada_surco", semilla=k + 3, aspereza=0.35)
+    montón(tierra, (0, -0.05, 0.0), 0.34, 0.20, "tierra_seca_clara", semilla=3.0)
+    for k in range(7):        # terrones sueltos y grietas sobre el montón
+        a = 2 * math.pi * k / 7 + 0.3
+        roca(tierra, (0.36 * math.cos(a), 0.36 * math.sin(a) - 0.05, 0.02), (0.06, 0.05, 0.03),
+             "tierra_seca_clara", semilla=k + 3, aspereza=0.35)
+        rr = [0.06 + 0.07 * j for j in range(4)]
+        tierra.tubo([Vector((x * math.cos(a + 0.2 * j), x * math.sin(a + 0.2 * j) - 0.05,
+                             0.20 * (1 - (x / 0.34) ** 2) + 0.004)) for j, x in enumerate(rr)],
+                    [(0.005, 0.002)] * 4, "abono_petrificado", lados=4, lateral=Z)
     ob = ap.unir([ob, tierra.objeto()], "Pala")
     return ob
 
@@ -234,26 +279,45 @@ def espantapajaros(mats):
     for (z, a) in ((1.18, 0.5), (1.02, -1.9), (1.30, 2.6)):     # remiendos de cuero cosidos
         p = Vector((0.25 * math.sin(a), -0.25 * math.cos(a), z))
         pz.caja(p, (0.09, 0.012, 0.08), "cuero_parche", Matrix.Rotation(-a, 3, "Z"))
-    # mangas de saco colgando del travesaño
+    # mangas de saco a lo largo del travesaño, atadas con esparto y con la paja asomando por los puños
+    def paja(base, direccion, n, largo):
+        for k in range(n):
+            d = (Vector(direccion) + Vector((azar.uniform(-0.5, 0.5), azar.uniform(-0.5, 0.5),
+                                             azar.uniform(-0.5, 0.5)))).normalized()
+            pz.tubo([base, base + d * largo * azar.uniform(0.6, 1.1)], [0.004, 0.0015], "paja_sombrero", lados=3)
     for s in (-1, 1):
-        pz.torno([(0.06, 0.0), (0.075, -0.04), (0.08, -0.22), (0.09, -0.30)], Vector((s * 0.42, 0, 1.44)),
-                 "saco_canamo_parches", lados=12, giro=Matrix.Rotation(math.radians(-90 * s), 3, "Y") @
-                 Matrix.Rotation(math.radians(75), 3, "X"))
-    # cabeza: calabaza seca con capucha de arpillera y ojos de carbón
+        manga = [Vector((s * (0.16 + 0.48 * k / 6), 0, 1.42 - 0.03 * k / 6)) for k in range(7)]
+        pz.tubo(manga, [(0.085 - 0.012 * k / 6) * (1 + 0.06 * math.sin(k * 2.3)) for k in range(7)],
+                "saco_canamo_parches", lados=12)
+        for x in (0.30, 0.60):
+            pz.tubo([Vector((s * x, 0.075 * math.cos(a), 1.42 - 0.02 * x + 0.075 * math.sin(a))) for a in
+                     (2 * math.pi * j / 10 for j in range(11))], [0.008] * 11, "esparto_cuerda", lados=5)
+        paja(Vector((s * 0.64, 0, 1.40)), (s, 0, -0.2), 26, 0.12)
+        pz.tubo([Vector((s * 0.60, 0, 1.39)), Vector((s * 0.62, -0.02, 1.25))], [0.004, 0.003], "esparto_cuerda",
+                lados=4)
+    paja(Vector((0, -0.02, 1.47)), (0, -0.2, 0.4), 18, 0.08)              # paja del cuello
+    paja(Vector((0, -0.02, 0.90)), (0, -0.2, -1.0), 22, 0.10)             # paja bajo el saco
+    # cabeza: saco de arpillera relleno, atado al cuello, con ojos en cruz y boca cosida
     c = Vector((0, -0.01, 1.62))
-    for k in range(8):
-        a = 2 * math.pi * k / 8
-        pz.esfera(c + Vector((0.055 * math.cos(a), 0.055 * math.sin(a), 0)), (0.085, 0.085, 0.11), "calabaza_seca",
-                  seg=(12, 8))
-    pz.torno([(0.0, 0.17), (0.08, 0.15), (0.14, 0.08), (0.155, -0.02), (0.14, -0.10), (0.16, -0.14)], c,
-             "arpillera_gris", lados=24, ruido=lambda k, a: 0.04 * noise.noise(Vector((a * 3, k, 1)))
-             + (0.0 if math.sin(a) > -0.2 else -0.5) * (k in (2, 3)))
-    for s in (-1, 1):
-        pz.esfera(c + Vector((s * 0.05, -0.145, 0.02)), (0.022, 0.012, 0.018), "carbon", seg=(8, 6))
-    # sombrero de paja caído sobre un hombro
-    pz.torno([(0.30, 0.0), (0.28, 0.01), (0.13, 0.02), (0.11, 0.08), (0.06, 0.15), (0.0, 0.17)],
-             c + Vector((0.05, 0, 0.12)), "paja_sombrero", lados=32,
-             giro=Matrix.Rotation(math.radians(24), 3, "Y") @ Matrix.Rotation(math.radians(-8), 3, "X"),
+    pz.esfera(c, (0.125, 0.12, 0.14), "saco_canamo_parches", seg=(20, 14))
+    pz.tubo([c + Vector((0.11 * math.cos(a), 0.11 * math.sin(a), -0.12)) for a in
+             (2 * math.pi * j / 12 for j in range(13))], [0.010] * 13, "esparto_cuerda", lados=5)
+    frente = c + Vector((0, -0.118, 0))
+    for s in (-1, 1):     # ojos: dos puntadas en cruz
+        o = frente + Vector((s * 0.045, 0.004, 0.03))
+        for d in ((1, 1), (1, -1)):
+            pz.tubo([o + Vector((-0.018 * d[0], 0, -0.018 * d[1])), o + Vector((0.018 * d[0], 0, 0.018 * d[1]))],
+                    [0.0045, 0.0045], "carbon", lados=4)
+    boca = [frente + Vector((-0.06 + 0.12 * k / 8, 0.006 + 0.004 * (1 - abs(k - 4) / 4),
+                             -0.04 - 0.012 * (1 - ((k - 4) / 4) ** 2))) for k in range(9)]
+    pz.tubo(boca, [0.003] * 9, "carbon", lados=4)
+    for k in range(1, 8):     # puntadas cruzando la boca
+        p = boca[k]
+        pz.tubo([p + Vector((0, 0, -0.012)), p + Vector((0, 0, 0.012))], [0.0025, 0.0025], "carbon", lados=4)
+    # sombrero cónico de paja, algo ladeado
+    pz.torno([(0.27, -0.01), (0.25, 0.0), (0.18, 0.04), (0.10, 0.10), (0.03, 0.17), (0.0, 0.185)],
+             c + Vector((0.01, 0, 0.10)), "paja_sombrero", lados=36,
+             giro=Matrix.Rotation(math.radians(8), 3, "Y") @ Matrix.Rotation(math.radians(-6), 3, "X"),
              ruido=lambda k, a: (0.06 * math.sin(a * 21) + 0.04 * math.sin(a * 37)) * (k == 0))
     ob = pz.objeto()
     ob.name = "Espantapajaros"
@@ -272,7 +336,7 @@ def pesar_espantapajaros(ob, arm):
         p = v.co
         if p.z > 1.50:
             n = "cabeza"
-        elif abs(p.x) > 0.30 and p.z > 1.0:
+        elif abs(p.x) > 0.22 and p.z > 1.2:
             n = "brazo_L" if p.x < 0 else "brazo_R"
         elif p.z > 0.95:
             n = "torso"
@@ -342,12 +406,43 @@ def sillar(pz, a0, a1, r0, r1, alto, mat, semilla):
         f.material_index = i_mat
 
 
+def sillar_recto(pz, c, tam, giro, semilla, musgo=0.0):
+    """Sillar labrado: caja con caras algo abombadas y cantos gastados; musgo en la cara de fuera."""
+    n0 = len(pz.bm.verts)        # los vértices nuevos se añaden al final
+    res = bmesh.ops.create_cube(pz.bm, size=1.0)
+    bmesh.ops.subdivide_edges(pz.bm, edges=list({e for v in res["verts"] for e in v.link_edges}), cuts=2,
+                              use_grid_fill=True)
+    pz.bm.verts.ensure_lookup_table()
+    verts = [pz.bm.verts[i] for i in range(n0, len(pz.bm.verts))]
+    for v in verts:
+        q = v.co.copy()
+        canto = sum(1 for x in q if abs(x) > 0.49)
+        q *= 1 - 0.06 * max(0, canto - 1)
+        q += q.normalized() * 0.03 * noise.noise(q * 3 + Vector((semilla, 0, 0)))
+        v.co = Vector(c) + giro @ Vector((q.x * tam[0], q.y * tam[1], q.z * tam[2]))
+    i_p, i_m = pz._i("caliza_pozo_musgo"), pz._i("musgo_humedo")
+    fuera = giro @ Y
+    for f in {f for v in verts for f in v.link_faces}:
+        f.material_index = i_p
+        if musgo and f.calc_center_median().z < 0.75 and noise.noise(f.calc_center_median() * 4) + musgo > 0.35 \
+                and f.normal.dot(fuera) > -0.3:
+            f.material_index = i_m
+    return verts
+
+
 def pozo(mats):
     pz = Piezas("Pozo", mats)
     r_in, r_out, alto = 0.575, 0.85, 0.90
-    for k in range(4):        # 4 sillares con juntas
-        a0 = math.radians(90 * k + 1.5)
-        sillar(pz, a0, a0 + math.radians(87), r_in, r_out, alto, "caliza_pozo_musgo", semilla=k)
+    for hilada in range(3):   # hoja canónica: tres hiladas de sillares a matajunta
+        n = 11
+        for k in range(n):
+            a = 2 * math.pi * (k + 0.5 * (hilada % 2)) / n
+            rm = (r_in + r_out) / 2
+            giro = Matrix.Rotation(a - math.pi / 2, 3, "Z") @ Matrix.Rotation(math.radians(azar.uniform(-2, 2)), 3,
+                                                                                "Y")
+            sillar_recto(pz, (rm * math.cos(a), rm * math.sin(a), 0.15 + 0.30 * hilada),
+                         (2 * math.pi * rm / n - 0.02, r_out - r_in, 0.285), giro, semilla=hilada * 20 + k,
+                         musgo=0.35 - 0.2 * hilada)
     for k in range(18):       # musgo en la base y en las juntas
         a = 2 * math.pi * k / 18 + azar.uniform(-0.1, 0.1)
         roca(pz, (0.87 * math.cos(a), 0.87 * math.sin(a), 0.04), (0.10, 0.10, 0.04), "musgo_humedo", semilla=k,
