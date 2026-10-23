@@ -9,6 +9,13 @@ esquinas cruzadas, tejado de tablillas a dos aguas, chimenea de caliza abierta y
 Se lanza con Blender 5.2 sin ventana:
     blender -b --factory-startup -P herramientas/blender/modelar_casa_granja.py
     blender -b --factory-startup -P herramientas/blender/modelar_casa_granja.py -- --vistas <carpeta>
+    blender -b --factory-startup -P herramientas/blender/modelar_casa_granja.py -- --ruina [--vistas <carpeta>]
+
+Con --ruina sale modelos/entorno/casa_granja_ruina.glb (ficha ref_casa_granja_ruina.md): la misma casa con las
+mismas medidas, pero apagada por la ceniza de Giza: tablones caídos del faldón izquierdo con las vigas negras al
+aire, ceniza en las canales, chimenea fría tapada de telarañas, rueda atascada por un zarcillo petrificado (dos
+paletas partidas), canaleta agrietada que solo gotea agua turbia, troncos con manchas de podredumbre, musgo seco,
+ventanas y farol apagados (el farol con el cristal roto) y un escalón partido. Sin Marcador_Humo.
 
 Sale modelos/entorno/casa_granja.glb con estos nodos:
     CasaGranja      la casa entera (estática)
@@ -27,10 +34,11 @@ import sys
 
 import bmesh
 import bpy
-from mathutils import Matrix, Vector
+from mathutils import Matrix, Vector, noise
 
 RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SALIDA = os.path.join(RAIZ, "modelos", "entorno", "casa_granja.glb")
+RUINA = False            # lo pone main() con --ruina
 
 azar = random.Random(1907)
 Z = Vector((0.0, 0.0, 1.0))
@@ -59,6 +67,26 @@ PALETA = {
     "barro":           ("#b8794a", 0.85, 0.0, 0.0, 1.0),
     "estera":          ("#9c7a4a", 0.95, 0.0, 0.0, 1.0),
     "grava":           ("#4a4a44", 0.95, 0.0, 0.0, 1.0),
+    # solo para la ruina
+    "madera_podrida":  ("#3a2e25", 0.95, 0.0, 0.0, 1.0),
+    "ceniza":          ("#8c8a85", 0.98, 0.0, 0.0, 1.0),
+    "telarana":        ("#c8c6c0", 0.90, 0.0, 0.0, 0.45),
+    "zarcillo_petrificado": ("#2e2c2a", 0.95, 0.0, 0.0, 1.0),
+}
+
+# En la ruina, los mismos sitios con los materiales apagados de la ficha (nombre nuevo para que Godot los distinga)
+PALETA_RUINA = {
+    "madera_troncos":  ("madera_troncos_ceniza", "#5a483a", 0.90, 0.0, 0.0, 1.0),
+    "madera_tejado":   ("madera_tejado_roto", "#6b4b38", 0.88, 0.0, 0.0, 1.0),
+    "piedra_zocalo":   ("piedra_zocalo_seco", "#45484d", 0.92, 0.0, 0.0, 1.0),
+    "luz_ventana":     ("ventana_apagada", "#282a2e", 0.60, 0.1, 0.0, 1.0),
+    "rueda_molino":    ("rueda_atascada", "#35281e", 0.85, 0.0, 0.0, 1.0),
+    "chimenea_caliza": ("chimenea_caliza_hollin", "#6c6f75", 0.92, 0.0, 0.0, 1.0),
+    "madera_puerta":   ("madera_puerta_ceniza", "#4e3a2c", 0.88, 0.0, 0.0, 1.0),
+    "madera_corte":    ("madera_corte_ceniza", "#8f7a62", 0.90, 0.0, 0.0, 1.0),
+    "madera_oscura":   ("madera_oscura_ceniza", "#3d2e24", 0.88, 0.0, 0.0, 1.0),
+    "musgo":           ("musgo_seco", "#6e6a48", 0.97, 0.0, 0.0, 1.0),
+    "agua_acequia":    ("agua_turbia", "#4d4936", 0.15, 0.0, 0.0, 0.85),
 }
 
 
@@ -73,8 +101,12 @@ def _rgba(hexa):
 
 def crear_materiales():
     mats = {}
-    for nombre, (hexa, rugosidad, metal, emision, alfa) in PALETA.items():
-        m = bpy.data.materials.new(nombre)
+    for nombre, valores in PALETA.items():
+        nombre_mat = nombre
+        if RUINA and nombre in PALETA_RUINA:
+            nombre_mat, *valores = PALETA_RUINA[nombre]
+        hexa, rugosidad, metal, emision, alfa = valores
+        m = bpy.data.materials.new(nombre_mat)
         if m.node_tree is None:
             m.use_nodes = True
         bsdf = m.node_tree.nodes.get("Principled BSDF")
@@ -441,9 +473,11 @@ def hastiales(m):
             ventana(m, desvan, *ventana_desvan, alfeizar=True, marco=0.07)
 
 
-def faldon(m, R0, u, eje, largo, ancho, grosor, paso=0.23, teja=(0.34, 0.27, 0.035), canecillos=()):
+def faldon(m, R0, u, eje, largo, ancho, grosor, paso=0.23, teja=(0.34, 0.27, 0.035), canecillos=(), hueco=None):
     """Un faldón: tablero macizo con tablillas escalonadas encima.
-    R0 = punto alto (cara inferior) en el centro del faldón, u = dirección cuesta abajo, eje = a lo largo."""
+    R0 = punto alto (cara inferior) en el centro del faldón, u = dirección cuesta abajo, eje = a lo largo.
+    hueco = (t0, t1, e0, e1): tramo sin tablas (cuesta abajo de t0 a t1, a lo largo del eje de e0 a e1),
+    con los cabios negros al aire y astillas colgando."""
     u, eje = Vector(u).normalized(), Vector(eje).normalized()
     n = u.cross(eje)
     if n.z < 0:
@@ -452,7 +486,28 @@ def faldon(m, R0, u, eje, largo, ancho, grosor, paso=0.23, teja=(0.34, 0.27, 0.0
     if R.determinant() < 0:
         R = base(u, -eje, n)
     R0 = Vector(R0)
-    m.caja(R0 + u * (largo / 2) + n * (grosor / 2), (largo, ancho, grosor), "madera_tejado", R)
+    if hueco:   # a lo largo del eje se mide con R.col[1], que puede ir al revés que eje
+        signo = R.col[1].dot(eje)
+        t0, t1 = hueco[0], hueco[1]
+        h0, h1 = sorted((hueco[2] * signo, hueco[3] * signo))
+        trozos = [(0.0, t0, -ancho / 2, ancho / 2), (t1, largo, -ancho / 2, ancho / 2),
+                  (t0, t1, -ancho / 2, h0), (t0, t1, h1, ancho / 2)]
+        for a0, a1, b0, b1 in trozos:
+            m.caja(R0 + u * ((a0 + a1) / 2) + R.col[1] * ((b0 + b1) / 2) + n * (grosor / 2),
+                   (a1 - a0, b1 - b0, grosor), "madera_tejado", R)
+        e = h0 + 0.12
+        while e < h1:      # cabios ennegrecidos que asoman
+            m.caja(R0 + u * ((t0 + t1) / 2) + R.col[1] * e + n * (-0.05), (t1 - t0 + 0.3, 0.08, 0.1), "hollin", R)
+            e += 0.4
+        m.caja(R0 + u * ((t0 + t1) / 2) + R.col[1] * ((h0 + h1) / 2) + n * (-0.16),
+               (0.1, h1 - h0 + 0.3, 0.1), "hollin", R)
+        for k in range(3):  # tablas partidas que cuelgan del borde del hueco
+            e = h0 + (h1 - h0) * (k + 0.5) / 3
+            giro = R @ Matrix.Rotation(math.radians(-35 - 10 * k), 3, "Y")
+            m.caja(R0 + u * (t0 + 0.12) + R.col[1] * e + n * (grosor - 0.08), (0.24, teja[1] * 0.8, teja[2]),
+                   "madera_tejado", giro)
+    else:
+        m.caja(R0 + u * (largo / 2) + n * (grosor / 2), (largo, ancho, grosor), "madera_tejado", R)
     # Tablillas de abajo arriba, a matacán
     fila = 0
     tc = largo - teja[0] / 2 + 0.04
@@ -461,6 +516,9 @@ def faldon(m, R0, u, eje, largo, ancho, grosor, paso=0.23, teja=(0.34, 0.27, 0.0
         while pos < ancho / 2:
             w = teja[1] * azar.uniform(0.85, 1.12)
             s, e = max(pos, -ancho / 2), min(pos + w, ancho / 2)
+            if hueco and t0 - 0.1 < tc < t1 + 0.1 and h0 - 0.05 < (s + e) / 2 < h1 + 0.05:
+                pos += w
+                continue
             if e - s > 0.05:
                 beta = math.radians(azar.uniform(5, 9))
                 e1 = u * math.cos(beta) + n * math.sin(beta)
@@ -488,11 +546,32 @@ def tejado(m):
     fondo = 2 * (1.9 + ALERO)
     for s in (-1, 1):
         u = (s * math.cos(ANG), 0, -math.sin(ANG))
-        faldon(m, (0, 0, Z_CUMBRE), u, (0, 1, 0), largo, fondo, GROSOR_TEJADO,
-               canecillos=(-fondo / 2 - 0.035, fondo / 2 + 0.035))
+        # En la ruina, el faldón izquierdo ha perdido tres hileras de tablas detrás de la buhardilla
+        hueco = (0.95, 1.85, 0.35, 1.45) if RUINA and s < 0 else None
+        n = faldon(m, (0, 0, Z_CUMBRE), u, (0, 1, 0), largo, fondo, GROSOR_TEJADO,
+                   canecillos=(-fondo / 2 - 0.035, fondo / 2 + 0.035), hueco=hueco)
         # Tabla del alero a lo largo del borde bajo
         borde = Vector((0, 0, Z_CUMBRE)) + Vector(u) * largo
         m.caja(borde + Vector((s * 0.02, 0, -0.03)), (0.06, fondo + 0.1, 0.16), "madera_oscura")
+        if RUINA:   # ceniza acumulada en la canal (junto al alero) y a manchas sobre las tablas
+            giro = base(Vector(u), Vector((0, 1, 0)), n)
+            if giro.determinant() < 0:
+                giro = base(Vector(u), Vector((0, -1, 0)), n)
+            yy = -fondo / 2 + 0.15
+            while yy < fondo / 2 - 0.15:     # la canal: montoncitos sueltos, no una tira
+                largo_c = azar.uniform(0.25, 0.6)
+                m.piedra(Vector((0, 0, Z_CUMBRE)) + Vector(u) * (largo - azar.uniform(0.18, 0.3))
+                         + Vector((0, yy + largo_c / 2, 0)) + n * (GROSOR_TEJADO + 0.06),
+                         (azar.uniform(0.16, 0.3), largo_c, 0.028), "ceniza", giro, sub=2)
+                yy += largo_c * azar.uniform(0.8, 1.6)
+            for k in range(9):
+                tt = azar.uniform(0.4, largo - 0.5)
+                yy = azar.uniform(-fondo / 2 + 0.3, fondo / 2 - 0.3)
+                if hueco and 0.8 < tt < 2.0 and 0.2 < yy < 1.6:
+                    continue
+                m.piedra(Vector((0, 0, Z_CUMBRE)) + Vector(u) * tt + Vector((0, yy, 0)) + n * (GROSOR_TEJADO + 0.07),
+                         (azar.uniform(0.15, 0.35), azar.uniform(0.2, 0.5), 0.018), "ceniza",
+                         giro @ Matrix.Rotation(azar.uniform(0, 3), 3, "Z"), sub=2)
     # Cumbrera
     z_top = Z_CUMBRE + GROSOR_TEJADO / math.cos(ANG)
     m.caja((0, 0, z_top + 0.03), (0.30, fondo + 0.14, 0.12), "madera_oscura")
@@ -571,6 +650,16 @@ def chimenea(m):
         m.caja((cx, cy + sy * 0.3, 5.24), (0.82, 0.22, 0.08), "chimenea_caliza")
     for sx in (-1, 1):
         m.caja((cx + sx * 0.3, cy, 5.24), (0.22, 0.38, 0.08), "chimenea_caliza")
+    if RUINA:   # boca tapada de telarañas sobre hollín cuarteado
+        m.caja((cx, cy, 5.18), (interior + 0.02, interior + 0.02, 0.004), "telarana",
+               Matrix.Rotation(math.radians(4), 3, "X"))
+        for k in range(5):
+            m.caja((cx + azar.uniform(-0.12, 0.12), cy + azar.uniform(-0.12, 0.12), 5.05),
+                   (azar.uniform(0.1, 0.18), azar.uniform(0.08, 0.16), 0.03), "hollin",
+                   Matrix.Rotation(azar.uniform(-0.3, 0.3), 3, "X") @ Matrix.Rotation(azar.uniform(0, 3), 3, "Z"))
+        for k in range(4):  # hilos que bajan por la corona
+            a = k * math.pi / 2 + 0.4
+            m.caja((cx + 0.33 * math.cos(a), cy + 0.33 * math.sin(a), 5.1), (0.006, 0.006, 0.3), "telarana")
     return Vector((cx, cy, 5.32))
 
 
@@ -593,6 +682,11 @@ def porche(m):
     # Escalones frente a la puerta
     for k, (zt, ya, yb) in enumerate(((0.27, -3.0, -3.32), (0.135, -3.32, -3.64))):
         m.caja((-0.1, (ya + yb) / 2, zt / 2), (1.3, abs(yb - ya), zt), "madera_oscura")
+        if RUINA and k == 0:    # la tabla del escalón de arriba, partida y hundida por un lado
+            m.caja((-0.45, (ya + yb) / 2 - 0.01, zt + 0.02), (0.62, abs(yb - ya) + 0.03, 0.04), "madera_troncos")
+            m.caja((0.27, (ya + yb) / 2 - 0.01, zt - 0.01), (0.6, abs(yb - ya) + 0.03, 0.04), "madera_troncos",
+                   Matrix.Rotation(math.radians(-9), 3, "Y"))
+            continue
         m.caja((-0.1, (ya + yb) / 2 - 0.01, zt + 0.02), (1.36, abs(yb - ya) + 0.03, 0.04), "madera_troncos")
     # Estera
     m.caja((-0.1, -2.32, ZOCALO + 0.028), (0.62, 0.36, 0.016), "estera")
@@ -614,7 +708,16 @@ def porche(m):
     m.caja((fx, -2.16, 2.18), (0.03, 0.28, 0.03), "hierro")
     m.caja((fx, -2.3, 2.12), (0.02, 0.02, 0.06), "hierro")
     m.caja((fx, -2.3, 2.07), (0.17, 0.17, 0.035), "hierro")
-    m.caja((fx, -2.3, 1.94), (0.12, 0.12, 0.2), "luz_ventana")
+    if RUINA:   # cristal roto: quedan dos esquirlas en el marco y el resto en el suelo del porche
+        m.caja((fx - 0.04, -2.3 - 0.055, 1.89), (0.05, 0.006, 0.09), "luz_ventana",
+               Matrix.Rotation(math.radians(12), 3, "Y"))
+        m.caja((fx + 0.055, -2.3, 2.0), (0.006, 0.07, 0.06), "luz_ventana")
+        for k in range(4):
+            m.caja((fx + azar.uniform(-0.25, 0.25), -2.4 + azar.uniform(-0.15, 0.15), ZOCALO + 0.024),
+                   (azar.uniform(0.02, 0.05), azar.uniform(0.02, 0.04), 0.004), "luz_ventana",
+                   Matrix.Rotation(azar.uniform(0, 3), 3, "Z"))
+    else:
+        m.caja((fx, -2.3, 1.94), (0.12, 0.12, 0.2), "luz_ventana")
     for sx in (-1, 1):
         for sy in (-1, 1):
             m.caja((fx + sx * 0.065, -2.3 + sy * 0.065, 1.94), (0.018, 0.018, 0.22), "hierro")
@@ -650,9 +753,18 @@ def canaleta_y_poza(m):
     """Canaleta sobre caballetes, cojinetes de la rueda, poza de piedra y desagüe (la estructura; el agua aparte)."""
     xc = -2.92
     z_fondo = 1.88
-    m.caja((xc, 1.06, z_fondo), (0.4, 3.4, 0.04), "rueda_molino")
-    for sx in (-1, 1):
-        m.caja((xc + sx * 0.18, 1.06, z_fondo + 0.1), (0.04, 3.4, 0.2), "rueda_molino")
+    if RUINA:   # la canaleta se ha partido en y = 1,5: el tramo de delante cede un poco
+        for (y0, y1, giro) in ((1.52, 2.76, 0.0), (-0.64, 1.48, math.radians(-2.5))):
+            G = Matrix.Rotation(giro, 3, "X")
+            yc = (y0 + y1) / 2
+            m.caja((xc, yc, z_fondo - (1.5 - yc) * math.sin(giro)), (0.4, y1 - y0, 0.04), "rueda_molino", G)
+            for sx in (-1, 1):
+                m.caja((xc + sx * 0.18, yc, z_fondo + 0.1 - (1.5 - yc) * math.sin(giro)), (0.04, y1 - y0, 0.2),
+                       "rueda_molino", G)
+    else:
+        m.caja((xc, 1.06, z_fondo), (0.4, 3.4, 0.04), "rueda_molino")
+        for sx in (-1, 1):
+            m.caja((xc + sx * 0.18, 1.06, z_fondo + 0.1), (0.04, 3.4, 0.2), "rueda_molino")
     for yy in (2.4, 0.95):
         for sx in (-1, 1):
             m.caja((xc + sx * 0.26, yy, z_fondo / 2), (0.1, 0.1, z_fondo), "rueda_molino")
@@ -687,6 +799,12 @@ def canaleta_y_poza(m):
 
 def agua(m):
     xc = -2.92
+    if RUINA:   # apenas un hilo turbio: lámina fina en la canaleta, goteo por la grieta y la poza baja
+        m.caja((xc, 2.1, 1.91), (0.3, 1.2, 0.015), "agua_acequia")
+        m.caja((xc, 1.5, 0.95), (0.025, 0.025, 1.9), "agua_acequia")
+        m.caja((xc, 1.5, 0.01), (0.35, 0.3, 0.01), "agua_acequia")
+        m.caja((-2.9, -0.55, 0.04), (0.86, 2.0, 0.07), "agua_acequia")
+        return
     m.caja((xc, 1.06, 1.94), (0.32, 3.4, 0.08), "agua_acequia")
     # Cascada sobre los cangilones de delante de la rueda
     m.caja((xc, -0.7, 1.86), (0.3, 0.26, 0.03), "agua_acequia", Matrix.Rotation(math.radians(55), 3, "X"))
@@ -712,6 +830,10 @@ def rueda(m):
     for i in range(16):
         th = 2 * math.pi * i / 16
         R = Matrix.Rotation(th, 3, "X") @ Matrix.Rotation(0.35, 3, "X")
+        if RUINA and i in (5, 6):   # partidas por el zarcillo: queda medio cangilón astillado
+            m.caja(Matrix.Rotation(th, 3, "X") @ Vector((0.08, 0, 0.66)), (0.17, 0.04, 0.12), "rueda_molino",
+                   R @ Matrix.Rotation(math.radians(18), 3, "Y"))
+            continue
         m.caja(Matrix.Rotation(th, 3, "X") @ Vector((0, 0, 0.69)), (0.34, 0.04, 0.2), "rueda_molino", R)
     m.cilindro((-0.23, 0, 0), (0.23, 0, 0), 0.15, "rueda_molino", lados=16)
     for x in (-0.2, 0.2):
@@ -722,6 +844,42 @@ def rueda(m):
 # ---------------------------------------------------------------------------
 # Montaje, exportación y vistas
 # ---------------------------------------------------------------------------
+
+def ruina_extra(m):
+    """Zarcillo petrificado que sale del suelo, se mete entre los radios y atasca la rueda; tablones caídos."""
+    pts = [Vector(p) for p in ((-3.55, -0.05, -0.05), (-3.35, -0.35, 0.35), (-3.05, -0.62, 0.62),
+                               (-2.9, -0.70, 0.95), (-2.78, -0.62, 1.35), (-2.62, -0.45, 1.62),
+                               (-2.5, -0.25, 1.78))]
+    for i in range(len(pts) - 1):
+        r0, r1 = 0.11 * (1 - i / 7) + 0.02, 0.11 * (1 - (i + 1) / 7) + 0.02
+        m.cilindro(pts[i], pts[i + 1], r0, "zarcillo_petrificado", lados=9, radio2=r1)
+        m.piedra(pts[i + 1], (r1 * 2.1, r1 * 2.1, r1 * 2.1), "zarcillo_petrificado")
+        d = (pts[i + 1] - pts[i]).normalized()
+        lado = d.cross(Z).normalized()
+        for s in (-1, 1):   # espinas
+            base_ = pts[i] + d * 0.12 + lado * s * r0
+            m.cilindro(base_, base_ + (lado * s + d * 0.4).normalized() * 0.12, r0 * 0.35, "zarcillo_petrificado",
+                       lados=5, radio2=0.004)
+    # tres tablones del tejado caídos delante del porche, a la izquierda de los escalones
+    for k, (x, y, giro, incl) in enumerate(((-1.55, -3.35, 20, 0), (-1.75, -3.55, -12, 0), (-1.3, -3.0, 70, 14))):
+        G = Matrix.Rotation(math.radians(giro), 3, "Z") @ Matrix.Rotation(math.radians(incl), 3, "Y")
+        m.caja((x, y, 0.03 + 0.1 * (incl > 0) + 0.04 * k), (0.62 - 0.12 * k, 0.26, 0.035), "madera_tejado", G)
+
+
+def manchas_de_podredumbre(malla):
+    """Manchas de humedad podrida en los troncos, más abajo que arriba (en la ruina)."""
+    if "madera_troncos" not in malla.mats:
+        return
+    i_t = malla.mats.index("madera_troncos")
+    i_p = malla._indice("madera_podrida")
+    for f in malla.bm.faces:
+        if f.material_index != i_t:
+            continue
+        c = f.calc_center_median()
+        mancha = noise.noise(c * 1.3) + 0.4 * noise.noise(c * 4.0) - c.z * 0.12
+        if mancha > 0.12:
+            f.material_index = i_p
+
 
 def limpiar_escena():
     bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -741,6 +899,9 @@ def montar():
     porche(casa)
     leñera(casa)
     canaleta_y_poza(casa)
+    if RUINA:
+        ruina_extra(casa)
+        manchas_de_podredumbre(casa)
     ob_casa = a_objeto(casa, mats)
 
     texto = letrero("CASA GRANJA DE\nMZEE SHAMBA", (0, -2.061, 2.97), 0.13, mats["madera_oscura"])
@@ -765,6 +926,9 @@ def montar():
     humo.location = boca
     bpy.context.collection.objects.link(humo)
 
+    if RUINA:   # chimenea fría: sin punto de humo
+        bpy.data.objects.remove(humo)
+        return [ob_casa, ob_rueda, ob_agua]
     return [ob_casa, ob_rueda, ob_agua, humo]
 
 
@@ -856,13 +1020,17 @@ def vistas(carpeta):
         objetivo = cerca.get(nombre, Vector((-0.3, -0.3, 1.9)))
         cam.location = pos
         cam.rotation_euler = (objetivo - Vector(pos)).to_track_quat("-Z", "Y").to_euler()
-        escena.render.filepath = os.path.join(carpeta, f"casa_granja_{nombre}.png")
+        escena.render.filepath = os.path.join(carpeta, f"casa_granja{'_ruina' if RUINA else ''}_{nombre}.png")
         bpy.ops.render.render(write_still=True)
         print(f"  Vista: {escena.render.filepath}")
 
 
 def main():
+    global RUINA, SALIDA
     args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    if "--ruina" in args:
+        RUINA = True
+        SALIDA = SALIDA.replace("casa_granja.glb", "casa_granja_ruina.glb")
     limpiar_escena()
     objetos = montar()
     exportar(objetos)
