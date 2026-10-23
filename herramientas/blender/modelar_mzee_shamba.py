@@ -34,18 +34,18 @@ from aparejo import X, Y, Z  # noqa: E402
 SALIDA = os.path.join(ap.RAIZ, "modelos", "personajes", "mzee_shamba.glb")
 
 PALETA = {
-    "pelaje_castor_anciano": ("#5b534b", 0.88, 0.0, 0.0),   # plateado gastado (imagen) sobre el pardo de la ficha
-    "pelaje_hocico": ("#8f8579", 0.88, 0.0, 0.0),
+    "pelaje_castor_anciano": ("#6b4a33", 0.90, 0.0, 0.0),   # hoja canónica: pardo cálido
+    "pelaje_hocico": ("#9a7a5e", 0.90, 0.0, 0.0),
     "barba_espigas_musgo": ("#b8ad9c", 0.85, 0.0, 0.0),
     "piel_manos_pies": ("#3a332e", 0.70, 0.0, 0.0),
     "garras": ("#1f1b18", 0.40, 0.0, 0.0),
     "nariz": ("#141110", 0.30, 0.0, 0.0),
-    "ojos_dorados": ("#b5832b", 0.15, 0.1, 0.35),
+    "ojos_dorados": ("#1c120c", 0.10, 0.0, 0.0),           # ojillos oscuros y brillantes
     "incisivos_ambar": ("#d4882e", 0.25, 0.0, 0.6),
     "espigas": ("#c9a75a", 0.80, 0.0, 0.0),
     "camisa_algodon": ("#e3d7bd", 0.90, 0.0, 0.0),
-    "chaleco_pana": ("#9a6b2e", 0.92, 0.0, 0.0),
-    "peto_saco_cuero": ("#594a38", 0.88, 0.0, 0.0),
+    "chaleco_pana": ("#a8642a", 0.92, 0.0, 0.0),
+    "peto_saco_cuero": ("#5e5a3d", 0.90, 0.0, 0.0),        # pantalón oliva
     "remiendo": ("#3f342a", 0.90, 0.0, 0.0),
     "cuero": ("#3b2a1c", 0.65, 0.05, 0.0),
     "sombrero_paja": ("#c9b07a", 0.85, 0.0, 0.0),
@@ -165,7 +165,7 @@ class Cuerpo:
         n = Vector(((q.x - CABEZA.x) / CABEZA_R.x, (q.y - CABEZA.y) / CABEZA_R.y, (q.z - CABEZA.z) / CABEZA_R.z))
         delante = suave(0.0, -0.75, n.y)
         # los ojos quedan en n.z ≈ -0,28: el hocico va por debajo, de los ojos a la barbilla
-        q.y -= 0.080 * gauss(n.x, 0.40) * gauss(n.z + 0.66, 0.30) * delante                 # hocico
+        q.y -= 0.105 * gauss(n.x, 0.42) * gauss(n.z + 0.64, 0.30) * delante                 # hocico
         q.x += math.copysign(0.026, n.x) * gauss(abs(n.x) - 0.60, 0.25) * gauss(n.z + 0.60, 0.28)   # carrillos
         q.z -= 0.028 * max(0.0, n.z - 0.55)                                                  # cráneo chato
         q.y += 0.012 * suave(0.2, 0.9, n.y) * gauss(n.z - 0.1, 0.5)                           # nuca redonda
@@ -390,6 +390,16 @@ def construir():
                   (2 * math.pi * k / 32 for k in range(32))]
         acc.tubo(anillo, [(0.022, 0.006)] * 32, "cuero", lados=6, cerrado=True, lateral=Z)
         acc.caja(Vector((0, ry0 - 0.004, zc)), (0.05, 0.012, 0.042), "laton_gafas")
+        for s in (-1, 1):     # bolsillos de pana con tapeta
+            pts_b = [forma.cuerpo(p) for i, p in base.items() if zona[i] == "torso" and abs(p.z - 0.97) < 0.01
+                     and abs(p.x - s * 0.10) < 0.02 and p.y < Y_CENTRO]
+            if pts_b:
+                f = min(pts_b, key=lambda q: q.y)
+                acc.caja(f + Vector((0, -0.024, 0)), (0.085, 0.010, 0.075), "chaleco_pana")
+                acc.caja(f + Vector((0, -0.030, 0.033)), (0.090, 0.012, 0.022), "chaleco_pana")
+        zurron = Vector((rx + 0.02, cy - ry * 0.4, zc - 0.07))
+        acc.esfera(zurron, (0.035, 0.055, 0.065), "cuero", seg=(14, 10))
+        acc.caja(zurron + Vector((0.02, 0, 0.04)), (0.03, 0.10, 0.06), "cuero")
     # remiendos del pantalón en las rodillas
     for lado in (-1, 1):
         rod = forma.centro("pierna", 0.38, lado)
@@ -407,7 +417,10 @@ def construir():
                 and abs((q.x - CABEZA.x) / CABEZA_R.x - nx) < 0.08]
         return min(cand, key=lambda q: q.y) if cand else CABEZA + Vector((0, -CABEZA_R.y, 0))
     nariz = frontal(-0.50)
-    acc.esfera(nariz + Vector((0, -0.004, 0.006)), (0.026, 0.017, 0.017), "nariz", seg=(16, 10))
+    acc.esfera(nariz + Vector((0, -0.006, 0.006)), (0.034, 0.022, 0.022), "nariz", seg=(16, 10))
+    for s in (-1, 1):     # almohadillas de los bigotes, claras y abultadas
+        acc.esfera(frontal(-0.66, s * 0.22) + Vector((s * 0.004, -0.012, 0)), (0.042, 0.030, 0.034),
+                   "pelaje_hocico", seg=(14, 10))
     boca = frontal(-0.84)
     for s in (-1, 1):
         acc.caja(boca + Vector((s * 0.0065, 0.004, -0.012)), (0.011, 0.006, 0.024), "incisivos_ambar")
@@ -429,6 +442,22 @@ def construir():
         c = barbilla + Vector((math.sin(a) * 0.060, 0.030 + 0.012 * abs(k - 3), -0.045 - 0.012 * (k % 2)))
         acc.esfera(c, (0.024, 0.020, 0.040), "barba_espigas_musgo",
                    Matrix.Rotation(a * 0.4, 3, "Y") @ Matrix.Rotation(math.radians(-15), 3, "X"), seg=(10, 8))
+    trenza = barbilla + Vector((0, 0.02, -0.07))
+    for k in range(9):     # trenza: eslabones alternos que bajan hasta el pecho
+        s = 1 if k % 2 else -1
+        cc = trenza + Vector((s * 0.010, -0.004 * k, -0.026 * k))
+        acc.esfera(cc, (0.022 - 0.0012 * k, 0.018 - 0.001 * k, 0.020), "barba_espigas_musgo",
+                   Matrix.Rotation(math.radians(25 * s), 3, "Y"), seg=(10, 8))
+    acc.tubo([trenza + Vector((0, -0.01, -0.235)), trenza + Vector((0, -0.012, -0.25))], [0.012, 0.012], "cuero",
+             lados=8)
+    for s in (-1, 1):      # espigas largas a los lados de la trenza
+        raiz_e = barbilla + Vector((s * 0.05, 0.0, -0.04))
+        tallo = [raiz_e + Vector((s * 0.012 * u, -0.01 * u, -0.17 * u)) for u in (0, 0.5, 1.0)]
+        acc.tubo(tallo, [0.002] * 3, "espigas", lados=4)
+        for g in range(7):
+            p = tallo[-1] + Vector((s * 0.002 * (g % 2), -0.004, 0.012 * g))
+            acc.esfera(p + Vector((s * 0.006 * (1 if g % 2 else -1), 0, 0)), (0.0055, 0.0045, 0.010), "espigas",
+                       seg=(8, 6))
     for k, s in enumerate((-1, 1, -1)):   # espigas de trigo enredadas en la barba
         tallo = barbilla + Vector((s * (0.025 + 0.012 * k), -0.03, -0.035 - 0.01 * k))
         for g in range(5):
@@ -437,7 +466,7 @@ def construir():
 
     # gafas redondas de latón apoyadas en el hocico
     for c in centros_ojo:
-        centro = c + Vector((0, -0.046, -0.020))
+        centro = c + Vector((math.copysign(-0.004, c.x), -0.068, -0.030))
         aro = [centro + Vector((0.024 * math.cos(a), 0, 0.024 * math.sin(a))) for a in
                (2 * math.pi * k / 24 for k in range(24))]
         acc.tubo(aro, [0.0028] * 24, "laton_gafas", lados=6, cerrado=True, lateral=Y)
@@ -446,7 +475,8 @@ def construir():
         oreja = CABEZA + Vector((math.copysign(CABEZA_R.x * 0.95, c.x), CABEZA_R.y * 0.15, CABEZA_R.z * 0.15))
         acc.tubo([patilla_ini, patilla_ini.lerp(oreja, 0.5) + Vector((math.copysign(0.012, c.x), 0, 0.004)), oreja],
                  [0.0018] * 3, "laton_gafas", lados=5)
-    a, b = centros_ojo[0] + Vector((0, -0.046, -0.020)), centros_ojo[1] + Vector((0, -0.046, -0.020))
+    a = centros_ojo[0] + Vector((math.copysign(-0.004, centros_ojo[0].x), -0.068, -0.030))
+    b = centros_ojo[1] + Vector((math.copysign(-0.004, centros_ojo[1].x), -0.068, -0.030))
     if a.x > b.x:
         a, b = b, a
     medio = (a + b) / 2 + Vector((0, -0.010, 0.010))
@@ -454,12 +484,14 @@ def construir():
 
     # sombrero de paja con el ala deshilachada
     copa = CABEZA + Vector((0, 0.010, CABEZA_R.z * 0.62))
-    perfil = [(0.265, -0.010), (0.255, 0.004), (0.200, 0.010), (0.145, 0.020), (0.140, 0.075), (0.120, 0.120),
-              (0.070, 0.150), (0.0, 0.158)]
-    acc.torno(perfil, copa, "sombrero_paja", lados=40, giro=Matrix.Rotation(math.radians(-7), 3, "X"),
-              ruido=lambda k, a: (0.05 * math.sin(a * 23) + 0.03 * math.sin(a * 41)) if k == 0 else 0.0)
-    acc.torno([(0.147, 0.020), (0.146, 0.045)], copa, "cuero", lados=40,
-              giro=Matrix.Rotation(math.radians(-7), 3, "X"))
+    perfil = [(0.30, -0.035), (0.29, -0.028), (0.24, -0.005), (0.17, 0.045), (0.10, 0.115), (0.04, 0.185),
+              (0.012, 0.215), (0.0, 0.222)]
+    acc.torno(perfil, copa, "sombrero_paja", lados=48, giro=Matrix.Rotation(math.radians(-6), 3, "X"),
+              ruido=lambda k, a: (0.06 * math.sin(a * 29) + 0.04 * math.sin(a * 53)) if k == 0
+              else 0.012 * math.sin(a * 60 + k))
+    for s in (-1, 1):     # barboquejo de cordel
+        acc.tubo([copa + Vector((s * 0.15, 0.0, 0.0)), copa + Vector((s * 0.12, -0.04, -0.20)),
+                  barbilla + Vector((s * 0.03, 0.02, 0.02))], [0.0025] * 3, "cuero", lados=4)
 
     accesorios = acc.objeto()
 
@@ -512,15 +544,24 @@ def construir():
     # bastón de roble con azadilla de hierro rúnico en la base
     baston = Piezas("Baston", mats)
     eje = Z
-    largo = 0.82
-    pts = [Vector((0, 0, largo * t)) + Vector((0.004 * math.sin(t * 11), 0.003 * math.cos(t * 7), 0))
-           for t in [k / 14 for k in range(15)]]
-    baston.tubo(pts, [0.017 - 0.003 * k / 14 + 0.003 * max(0.0, math.sin(k * 1.7)) ** 6 for k in range(15)],
+    largo = 1.45          # hoja canónica: más alto que él, nudoso, con la azada arriba
+    pts = [Vector((0, 0, largo * t)) + Vector((0.010 * math.sin(t * 9), 0.008 * math.cos(t * 6), 0))
+           for t in [k / 24 for k in range(25)]]
+    baston.tubo(pts, [0.019 - 0.004 * k / 24 + 0.005 * max(0.0, math.sin(k * 1.3)) ** 8 for k in range(25)],
                 "baston_roble", lados=10)
-    baston.caja((0, -0.045, 0.035), (0.010, 0.085, 0.060), "hierro_azada_runas",
-                Matrix.Rotation(math.radians(-12), 3, "X"))
-    baston.caja((0, 0.030, 0.050), (0.014, 0.050, 0.020), "hierro_azada_runas")
-    baston.tubo([(0, 0, 0.02), (0, 0, 0.09)], [0.021, 0.019], "hierro_azada_runas", lados=10)
+    tope = pts[-1]
+    baston.tubo([tope - Vector((0, 0, 0.09)), tope + Vector((0, 0, 0.005))], [0.021, 0.019], "hierro_azada_runas",
+                lados=10)
+    hoja = bmesh.ops.create_grid(baston.bm, x_segments=3, y_segments=3, size=0.5)
+    for v in hoja["verts"]:
+        u, w = v.co.x + 0.5, v.co.y + 0.5          # u: del mango a la punta; w: de arriba abajo
+        v.co = tope + Vector((0.02 + 0.15 * u, 0, -0.025 - 0.07 * w * (1 - 0.35 * u) + 0.02 * u))   # hacia fuera
+    geom = bmesh.ops.extrude_face_region(baston.bm, geom=list({f for v in hoja["verts"] for f in v.link_faces}))
+    for e in geom["geom"]:
+        if isinstance(e, bmesh.types.BMVert):
+            e.co.y += 0.006
+    baston._poner(list(hoja["verts"]) + [e for e in geom["geom"] if isinstance(e, bmesh.types.BMVert)],
+                  "hierro_azada_runas")
     baston_ob = baston.objeto()
 
     # cuenco de sopa de zanahoria (aparece solo en ofrecer_cuenco)
@@ -729,10 +770,10 @@ def animar(arm, p):
     an.nueva("cavar_tierra")
     # (fotograma, dónde va la mano derecha respecto al pomo, dirección del bastón, agacharse)
     claves = [(0, Vector(), BASTON_ARRIBA, 0.0),
-              # la azadilla está abajo: al golpear, la hoja va delante y el palo apunta atrás y arriba
-              (14, Vector((0.0, 0.02, 0.20)), (0.0, -0.25, 1.0), 0.0),      # alza la azadilla por delante
-              (22, Vector((0.0, -0.16, -0.10)), (0.0, 0.55, 0.83), 1.0),    # golpe en el surco
-              (30, Vector((0.0, -0.10, -0.06)), (0.0, 0.40, 0.92), 0.8),    # tira de la tierra hacia sí
+              # la azada está arriba: la alza sobre el hombro y la baja de punta contra el surco
+              (14, Vector((0.0, 0.02, 0.20)), (0.0, 0.35, 0.94), 0.0),      # alza la azada por detrás
+              (22, Vector((0.0, -0.16, -0.10)), (0.0, -0.62, -0.78), 1.0),  # golpe en el surco
+              (30, Vector((0.0, -0.06, -0.06)), (0.0, -0.45, -0.89), 0.8),  # tira de la tierra hacia sí
               (40, Vector(), BASTON_ARRIBA, 0.0), (48, Vector(), BASTON_ARRIBA, 0.0)]
     for f, d, dir_b, baja in claves:
         r = pomo + d
