@@ -41,8 +41,8 @@ PALETA = {
     "tierra_vidriada": ("#2c2925", 0.35, 0.0, 0.0),
     "pizarra_reborde": ("#3a3a3e", 0.85, 0.05, 0.0),
     "glifos_ambar_crater": ("#e8aa42", 0.40, 0.1, 1.4),
-    "madera_petrificada_seco": ("#2e2c2a", 0.95, 0.0, 0.0),
-    "ceniza_incrustada": ("#8c8a85", 0.98, 0.0, 0.0),
+    "madera_petrificada_seco": ("#7d7a74", 0.95, 0.0, 0.0),   # concepto canónico: gris ceniza claro
+    "ceniza_incrustada": ("#b9b6b0", 0.98, 0.0, 0.0),
     "madera_raiz_portal": ("#453324", 0.85, 0.0, 0.0),
     "musgo_fresco_portal": ("#2d4822", 0.90, 0.0, 0.0),
     "savia_dorada_raiz": ("#f5be42", 0.40, 0.1, 1.5),
@@ -166,6 +166,30 @@ def crater(mats):
         cinta(pz, [c + Vector((0.025 * math.cos(b), 0.025 * math.sin(b), 0)) for b in
                    (2 * math.pi * j / 12 for j in range(13))], 0.012, "glifos_ambar_crater")
         cinta(pz, [en_fondo(0.44 * 1.1 * math.cos(a), 0.44 * math.sin(a)), c], 0.010, "glifos_ambar_crater")
+    # concepto canónico: anillos de runas y espirales pequeñas alrededor de la grande
+    for anillo_r, n in ((0.78, 26), (1.10, 34)):
+        for k in range(n):
+            a = 2 * math.pi * k / n
+            base_p = en_fondo(anillo_r * 1.1 * math.cos(a), anillo_r * math.sin(a))
+            tang = Vector((-math.sin(a), math.cos(a), 0))
+            radial = Vector((math.cos(a), math.sin(a), 0))
+            forma_runa = k % 4
+            trazos = [((0, -0.04), (0, 0.04))]
+            trazos += [((0, 0.04), (0.03, 0.01))] if forma_runa in (0, 2) else [((0, 0.0), (0.03, 0.03))]
+            if forma_runa >= 2:
+                trazos.append(((0, -0.01), (-0.03, -0.04)))
+            for (u0, v0), (u1, v1) in trazos:
+                p0 = base_p + tang * u0 + radial * v0
+                p1 = base_p + tang * u1 + radial * v1
+                p0.z = altura_crater(p0.x, p0.y)
+                p1.z = altura_crater(p1.x, p1.y)
+                cinta(pz, [p0, p1], 0.012, "glifos_ambar_crater")
+    for k in range(4):
+        a = 2 * math.pi * k / 4 + 0.6
+        cx, cy = 0.95 * 1.1 * math.cos(a) * 0.62, 0.95 * math.sin(a) * 0.62
+        cinta(pz, [en_fondo(cx + (0.012 + 0.02 * b / (2 * math.pi)) * math.cos(b),
+                            cy + (0.012 + 0.02 * b / (2 * math.pi)) * math.sin(b)) for b in
+                   (j / 40 * 2.2 * 2 * math.pi for j in range(41))], 0.010, "glifos_ambar_crater")
     # vetas de ámbar en las grietas
     for k in range(9):
         a = k * 2 * math.pi / 9 + 0.3 * math.sin(k * 7)
@@ -233,17 +257,34 @@ def arbol(mats):
         z = -0.15 + 2.55 * t
         pts.append(Vector((0.10 * math.sin(t * 2.6), 0.08 * math.cos(t * 2.2) - 0.08, z)))
         rad.append(0.35 - 0.125 * t + 0.10 * max(0.0, 0.25 - t) / 0.25)
-    tubo_organico(pz, pts, rad, "madera_petrificada_seco", lobulos=7, giro_lobulo=-0.35, fisura=0.12, lados=18)
+    tubo_organico(pz, [Vector((p.x * 0.5, p.y * 0.5 - 0.04, p.z)) for p in pts], [r_ * 0.55 for r_ in rad],
+                  "madera_petrificada_seco", lobulos=5, fisura=0.10, lados=14)      # alma del tronco
+    for h in range(3):        # tres hebras que se retuercen en espiral (sentido horario)
+        hebra = []
+        for k in range(13):
+            tt = k / 12
+            a = h * 2 * math.pi / 3 - tt * 2 * math.pi * 0.9
+            rr = rad[k] * 0.55
+            hebra.append(pts[k] + Vector((rr * math.cos(a), rr * math.sin(a), 0)))
+        tubo_organico(pz, hebra, [r_ * 0.55 for r_ in rad], "madera_petrificada_seco", lobulos=4, fisura=0.10,
+                      lados=12)
     copa = pts[-1]
     for k, ang in enumerate((0.3, 2.4, 4.4)):            # tres ramas maestras como garras
         d = Vector((math.cos(ang), math.sin(ang), 0.40)).normalized()
         rama(pz, copa - Vector((0, 0, 0.45)) + d * 0.05, d, 1.80, 0.19, 0, "madera_petrificada_seco", rnd)
-    for k, ang in enumerate((-0.9, 0.9)):                # raíces que abrazan el borde del cráter (hacia -Y)
+    for k, ang in enumerate((-1.3, -0.75, -0.25, 0.25, 0.75, 1.3, 2.6, 3.6)):   # raíces, casi todas hacia el cráter
         d = Vector((math.sin(ang), -math.cos(ang), 0))
-        pts_r = [Vector((0, 0, 0.35)) + d * 0.1, Vector((0, 0, 0.12)) + d * 0.45, d * 0.95 + Vector((0, 0, 0.02)),
-                 d * 1.45 + Vector((0, 0, -0.08))]
-        tubo_organico(pz, pts_r, [0.20, 0.15, 0.10, 0.05], "madera_petrificada_seco", lobulos=5, fisura=0.10,
-                      lados=12)
+        largo = 1.6 if abs(ang) < 1.4 else 0.9
+        pts_r = [Vector((0, 0, 0.45)) + d * 0.12, Vector((0, 0, 0.18)) + d * 0.45,
+                 d * largo * 0.55 + Vector((0, 0, 0.06)), d * largo * 0.8 + Vector((0.05 * math.cos(k), 0, 0.0)),
+                 d * largo + Vector((0, 0, -0.12))]
+        tubo_organico(pz, pts_r, [0.17, 0.13, 0.09, 0.06, 0.03], "madera_petrificada_seco", lobulos=5, fisura=0.10,
+                      lados=10)
+        for h in (-1, 1):     # raicillas que se agarran a las piedras
+            b = pts_r[2]
+            tubo_organico(pz, [b, b + (d + Vector((h * 0.6, 0, 0))).normalized() * 0.35 + Vector((0, 0, -0.06)),
+                               b + (d + Vector((h * 0.9, 0, 0))).normalized() * 0.55 + Vector((0, 0, -0.14))],
+                          [0.05, 0.03, 0.012], "madera_petrificada_seco", lobulos=3, fisura=0.08, lados=6)
     ob = pz.objeto()
     # ceniza en lo alto de las ramas y en las caras que miran al cielo
     i_c = list(ob.data.materials).index(mats["ceniza_incrustada"]) if mats["ceniza_incrustada"].name in \
@@ -252,7 +293,7 @@ def arbol(mats):
         ob.data.materials.append(mats["ceniza_incrustada"])
         i_c = len(ob.data.materials) - 1
     for pol in ob.data.polygons:
-        if pol.normal.z > 0.75 and pol.center.z > 2.7 and azar.random() < 0.8:
+        if pol.normal.z > 0.6 and pol.center.z > 1.0 and azar.random() < 0.8:
             pol.material_index = i_c
     ob.name = "ArbolSeco"
     return ob
@@ -263,22 +304,27 @@ def arbol(mats):
 # ---------------------------------------------------------------------------
 
 def raiz_arco(s, t_max=1.0):
-    """Recorrido de la raíz del lado s: sube por el lado y se curva hasta cruzar al otro lado arriba."""
+    """Recorrido de la raíz del lado s: arco ojival (de círculo) que sube recto desde el suelo y se junta con
+    el del otro lado en la punta, a 4,6 m (con su grosor, el arco llega a 4,8 m)."""
+    w, alto = 1.75, 4.6
+    R = (w * w + alto * alto) / (2 * w)
+    cx = w - R
+    tope = math.acos(-cx / R)
     pts = []
     for k in range(25):
-        t = k / 24 * t_max
-        c, sn = math.cos(t * math.pi * 0.62), math.sin(t * math.pi * 0.52)
-        x = s * (1.75 * math.copysign(abs(c) ** 0.9, c) - 0.25 * t)
-        z = 4.55 * math.copysign(abs(sn) ** 1.1, sn)
-        y = 0.20 * math.sin(t * 7 + s) * (0.5 + t)
-        pts.append(Vector((x, y, z - 0.10)))
+        u = k / 24 * t_max
+        th = u * tope
+        x = s * (cx + R * math.cos(th))
+        z = R * math.sin(th)
+        y = 0.12 * math.sin(u * 7 + s) * (0.5 + u)
+        pts.append(Vector((x, y, z - 0.05)))
     return pts
 
 
 def portal(mats):
     pz = Piezas("PortalRaiz", mats)
     for s in (-1, 1):
-        pts = raiz_arco(s, 1.08)
+        pts = raiz_arco(s, 1.0)      # hoja canónica: las dos raíces se juntan en punta, sin cruzarse
         rad = [0.42 - 0.18 * (k / 24) for k in range(25)]
         tubo_organico(pz, pts, rad, "madera_raiz_portal", lobulos=5, giro_lobulo=0.45 * s, fisura=0.11, lados=18)
         # raíces secundarias que se enroscan a la principal y pies de raíz en el suelo
@@ -309,6 +355,13 @@ def portal(mats):
                 a = h * math.pi / 2 + 0.4
                 pz.esfera(c + Vector((0.06 * math.cos(a), -0.02, 0.06 * math.sin(a))), (0.045, 0.012, 0.022),
                           "hoja_brote", Matrix.Rotation(a, 3, "Y"), seg=(8, 6))
+        # runas de savia talladas en la cara delantera de la pata (hoja canónica)
+        delante = Vector((0, -1, 0))
+        for k in range(5):
+            base_r = pts[3 + k] + delante * (rad[3 + k] * 0.95)
+            for p0, p1 in ((Vector((0, 0, -0.05)), Vector((0, 0, 0.05))), (Vector((-0.03, 0, 0.03)), Vector((0.03, 0, -0.01))),
+                           (Vector((-0.03, 0, -0.04)), Vector((0.03, 0, -0.02)))):
+                cinta(pz, [base_r + p0, base_r + p1], 0.016, "savia_dorada_raiz", normal=delante, alto=0.03)
         # musgo en la base húmeda
         for k in range(6):
             roca(pz, (s * 1.75 + azar.uniform(-0.3, 0.3), azar.uniform(-0.45, 0.45), azar.uniform(0.15, 0.9)),
@@ -322,64 +375,101 @@ def portal(mats):
     return ob
 
 
-def nudo(mats):
-    """Devuelve las piezas por hueso (bulbo, cristales, zarcillos) y el suelo de ceniza."""
-    piezas = {}
-    pb = Piezas("Nudo_Bulbo", mats)
-    res = bmesh.ops.create_icosphere(pb.bm, subdivisions=4, radius=1.0)
-    for v in res["verts"]:
-        d = v.co.normalized()
-        k = 1 + 0.18 * noise.fractal(d * 2.2, 0.6, 2.0, 4) + 0.08 * abs(noise.noise(d * 6))
-        v.co = Vector((0, 0, 0.62)) + Vector((d.x * 0.80 * k, d.y * 0.72 * k, d.z * 0.70 * k))
-        v.co.z = max(v.co.z, -0.05)
-    i_m = pb._i("madera_corrupta_nudo")
-    for f in {f for v in res["verts"] for f in v.link_faces}:
-        f.material_index = i_m
-    for k in range(10):          # grietas violeta sobre el bulbo
-        a = 2 * math.pi * k / 10
-        pts = [Vector((0.80 * math.cos(a) * (1 - t * 0.3), 0.72 * math.sin(a) * (1 - t * 0.3), 0.30 + t * 0.85))
-               for t in (0.0, 0.25, 0.5, 0.75)]
-        cinta(pb, pts, 0.03, "cristal_giza_violeta", normal=Vector((math.cos(a), math.sin(a), 0.3)).normalized(),
-              alto=0.03)
-    piezas["bulbo"] = pb.objeto()
-    pc = Piezas("Nudo_Cristales", mats)
-    rnd = random.Random(3)
-    for k in range(14):          # agujas de cuarzo violeta que brotan del corazón
-        a = rnd.uniform(0, 2 * math.pi)
-        incl = rnd.uniform(0.0, 0.6)
-        d = Vector((math.sin(incl) * math.cos(a), math.sin(incl) * math.sin(a), math.cos(incl)))
-        base = Vector((0, 0, 1.05)) + d * 0.15
-        largo = rnd.uniform(0.35, 0.80)
-        res = bmesh.ops.create_cone(pc.bm, cap_ends=True, segments=6, radius1=rnd.uniform(0.04, 0.08), radius2=0.0,
-                                    depth=largo, matrix=Matrix.Translation(base + d * largo / 2)
+def pata_portal(s, z):
+    """Centro de la pata del portal (lado s) a la altura z, para atarle el nudo."""
+    pts = raiz_arco(s, 1.0)
+    return min(pts[:16], key=lambda p: abs(p.z - z))
+
+
+def zarzal(pz, pts, r0, mat, rnd, espinas=True):
+    """Zarcillo negro con espinas."""
+    n = len(pts)
+    rad = [r0 * (1 - 0.6 * k / (n - 1)) + 0.01 for k in range(n)]
+    tubo_organico(pz, pts, rad, mat, lobulos=3, fisura=0.15, lados=7)
+    if espinas:
+        for k in range(1, n - 1):
+            d = Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-1, 1))).normalized()
+            res = bmesh.ops.create_cone(pz.bm, cap_ends=True, segments=4, radius1=0.018, radius2=0.0, depth=0.11,
+                                        matrix=Matrix.Translation(Vector(pts[k]) + d * (rad[k] + 0.04))
+                                        @ Z.rotation_difference(d).to_matrix().to_4x4())
+            i_m = pz._i(mat)
+            for f in {f for v in res["verts"] for f in v.link_faces}:
+                f.material_index = i_m
+
+
+def racimo(pz, centro, n, tam, rnd, hacia=None):
+    """Racimo de agujas de cuarzo violeta que brotan hacia fuera."""
+    hacia = Vector(hacia) if hacia else Z
+    for k in range(n):
+        d = (hacia + Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-1, 1))) * 0.9).normalized()
+        largo = tam * rnd.uniform(0.5, 1.0)
+        base = Vector(centro) + d * 0.05
+        res = bmesh.ops.create_cone(pz.bm, cap_ends=True, segments=6, radius1=largo * rnd.uniform(0.12, 0.2),
+                                    radius2=0.0, depth=largo, matrix=Matrix.Translation(base + d * largo / 2)
                                     @ Z.rotation_difference(d).to_matrix().to_4x4())
-        i_c = pc._i("cristal_giza_violeta")
+        i_c = pz._i("cristal_giza_violeta")
         for f in {f for v in res["verts"] for f in v.link_faces}:
             f.material_index = i_c
-    piezas["cristales"] = pc.objeto(suave_=False)
+
+
+def nudo(mats):
+    """Hoja canónica: el nudo envuelve el portal a media altura. Zarzas negras atadas a las dos patas, un
+    puente de zarcillos entre ellas con cortina de espinas que cierra el paso hasta el suelo, y racimos de
+    cuarzo violeta (el grande en la pata derecha). Se coloca en el mismo sitio que portal_raiz.glb."""
+    rnd = random.Random(3)
+    piezas = {}
+    M = "madera_corrupta_nudo"
     for lado, s in (("L", -1), ("R", 1)):
-        pzz = Piezas(f"Nudo_Zarcillos_{lado}", mats)
-        for h in range(5):        # zarcillos negros que salen del suelo y cierran el paso
-            a0 = rnd.uniform(-0.6, 0.6)
+        pz = Piezas(f"Nudo_Zarcillos_{lado}", mats)
+        for h in range(3):        # espirales de zarza alrededor de la pata
             pts = []
-            for k in range(14):
-                t = k / 13
-                x = s * (0.45 + 1.15 * t)
-                pts.append(Vector((x, a0 * 0.6 + 0.25 * math.sin(t * 6 + h), 0.15 + 1.1 * math.sin(t * math.pi) *
-                                   (0.6 + 0.4 * rnd.random()) * (0.4 + 0.15 * h))))
-            tubo_organico(pzz, pts, [0.09 - 0.07 * k / 13 for k in range(14)], "madera_corrupta_nudo", lobulos=3,
-                          fisura=0.15, lados=8)
-            for k in range(2, 13, 2):   # espinas
-                c = pts[k]
-                d = Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-0.3, 1))).normalized()
-                r0 = 0.09 - 0.07 * k / 13
-                res = bmesh.ops.create_cone(pzz.bm, cap_ends=True, segments=4, radius1=0.022, radius2=0.0, depth=0.14,
-                                            matrix=Matrix.Translation(c + d * (r0 + 0.06))
-                                            @ Z.rotation_difference(d).to_matrix().to_4x4())
-                i_m = pzz._i("madera_corrupta_nudo")
-                for f in {f for v in res["verts"] for f in v.link_faces}:
-                    f.material_index = i_m
-        piezas[f"zarcillos_{lado}"] = pzz.objeto()
+            for k in range(22):
+                t = k / 21
+                z = 1.35 + 1.45 * t
+                c = pata_portal(s, z)
+                a = 2 * math.pi * (1.4 * t) + h * 2.1
+                r = 0.50 + 0.06 * math.sin(t * 9 + h)
+                pts.append(Vector((c.x + r * math.cos(a), c.y + r * math.sin(a), z + 0.05 * math.sin(a * 2))))
+            zarzal(pz, pts, 0.06, M, rnd)
+        piezas[f"zarcillos_{lado}"] = pz.objeto()
+    pb = Piezas("Nudo_Bulbo", mats)       # puente y cortina
+    izq, der = pata_portal(-1, 2.25), pata_portal(1, 2.25)
+    for h in range(4):
+        pts = []
+        for k in range(18):
+            t = k / 17
+            x = izq.x + 0.35 + (der.x - izq.x - 0.70) * t
+            pts.append(Vector((x, 0.12 * math.sin(t * 7 + h * 1.6), 2.25 - 0.45 * math.sin(math.pi * t) + 0.12 * h
+                               + 0.08 * math.sin(t * 11 + h))))
+        zarzal(pb, pts, 0.07, M, rnd)
+    for k in range(9):           # cortina: zarcillos que cuelgan del puente hasta el suelo
+        t = (k + 0.5) / 9
+        x = izq.x + 0.45 + (der.x - izq.x - 0.9) * t
+        arriba = 2.25 - 0.45 * math.sin(math.pi * (0.1 + 0.8 * t))
+        pts = [Vector((x + 0.08 * math.sin(j * 1.7 + k), 0.10 * math.sin(j + k), arriba - arriba * j / 9))
+               for j in range(10)]
+        zarzal(pb, pts, 0.045, M, rnd)
+    # corazón podrido en el centro del puente, con grietas violetas
+    c = Vector((0, 0, 1.90))
+    res = bmesh.ops.create_icosphere(pb.bm, subdivisions=3, radius=1.0)
+    for v in res["verts"]:
+        d = v.co.normalized()
+        k = 1 + 0.2 * noise.fractal(d * 2.2, 0.6, 2.0, 4)
+        v.co = c + Vector((d.x * 0.42 * k, d.y * 0.36 * k, d.z * 0.40 * k))
+    i_m = pb._i(M)
+    for f in {f for v in res["verts"] for f in v.link_faces}:
+        f.material_index = i_m
+    for k in range(8):
+        a = 2 * math.pi * k / 8
+        cinta(pb, [c + Vector((0.42 * math.cos(a) * (1 - u * 0.3), 0.36 * math.sin(a) * (1 - u * 0.3), -0.3 + 0.6 * u))
+                   for u in (0.0, 0.33, 0.66, 1.0)], 0.03, "cristal_giza_violeta",
+              normal=Vector((math.cos(a), math.sin(a), 0.2)).normalized(), alto=0.03)
+    piezas["bulbo"] = pb.objeto()
+    pc = Piezas("Nudo_Cristales", mats)
+    racimo(pc, pata_portal(1, 2.35) + Vector((-0.30, -0.25, 0)), 24, 1.10, rnd, hacia=(-0.4, -0.6, 0.5))
+    racimo(pc, pata_portal(-1, 2.05) + Vector((0.30, -0.25, 0)), 12, 0.65, rnd, hacia=(0.4, -0.6, 0.4))
+    racimo(pc, c + Vector((0, -0.25, 0.25)), 7, 0.45, rnd, hacia=(0, -0.5, 0.8))
+    piezas["cristales"] = pc.objeto(suave_=False)
     ps = Piezas("SueloMarchito", mats)       # ceniza cuarteada alrededor (Gemini puede quitarla)
     res = bmesh.ops.create_circle(ps.bm, cap_ends=True, segments=48, radius=3.0)
     bmesh.ops.triangulate(ps.bm, faces=ps.bm.faces[:])
@@ -393,12 +483,13 @@ def nudo(mats):
 
 
 def aparejar_nudo(piezas):
+    izq, der = pata_portal(-1, 2.0), pata_portal(1, 2.0)
     arm = ap.crear_esqueleto("NudoCorrupcion", [
         ("root", (0, 0, 0), (0, 0, 0.1), None),
-        ("bulbo", (0, 0, 0.0), (0, 0, 1.0), "root"),
-        ("cristales", (0, 0, 1.0), (0, 0, 1.6), "bulbo"),
-        ("zarcillos_L", (-0.4, 0, 0.1), (-1.6, 0, 0.1), "root"),
-        ("zarcillos_R", (0.4, 0, 0.1), (1.6, 0, 0.1), "root"),
+        ("bulbo", (0, 0, 1.9), (0, 0, 2.3), "root"),
+        ("cristales", (0, 0, 2.3), (0, 0, 2.6), "bulbo"),
+        ("zarcillos_L", (izq.x, 0, 1.3), (izq.x, 0, 2.8), "root"),
+        ("zarcillos_R", (der.x, 0, 1.3), (der.x, 0, 2.8), "root"),
     ])
     for clave, hueso in (("bulbo", "bulbo"), ("cristales", "cristales"), ("zarcillos_L", "zarcillos_L"),
                          ("zarcillos_R", "zarcillos_R")):
@@ -418,9 +509,9 @@ def aparejar_nudo(piezas):
     an.cerrar("latido")
     an.nueva("purificar")     # las agujas se quiebran, los zarcillos se recogen y el bulbo se deshace
     for f, k in ((0, 0.0), (6, 0.15), (14, 0.5), (24, 0.85), (36, 1.0)):
-        an.fotograma(f, {"zarcillos_L": [("Y", -40 * k)], "zarcillos_R": [("Y", 40 * k)]},
+        an.fotograma(f, {},
                      mover={"zarcillos_L": (0, 0, -0.6 * k), "zarcillos_R": (0, 0, -0.6 * k),
-                            "bulbo": (0, 0, -0.5 * k * k)},
+                            "bulbo": (0, 0, -1.2 * k * k)},
                      escalas={"cristales": max(0.001, 1 - k * 1.6), "bulbo": max(0.001, 1 - 0.95 * k),
                               "zarcillos_L": max(0.001, 1 - k), "zarcillos_R": max(0.001, 1 - k)})
     an.cerrar("purificar")
@@ -458,7 +549,10 @@ def main():
     arm = aparejar_nudo(piezas)
     ap.exportar(os.path.join(CARPETA, "nudo_corrupcion.glb"), arm,
                 [piezas[k] for k in ("bulbo", "cristales", "zarcillos_L", "zarcillos_R", "suelo")])
-    fotos("nudo_corrupcion", (0, 0, 0.7), 7.0, 2.6)
+    fotos("nudo_corrupcion", (0, 0, 1.8), 10.0, 3.0)
+    if vistas:     # el nudo puesto en el portal, como lo verá el jugador
+        portal(mats)
+        fotos("portal_con_nudo", (0, 0, 2.2), 10.0, 3.0)
     print("\n=== CRÁTER, ÁRBOL SECO, PORTAL DE RAÍZ Y NUDO exportados ===")
 
 
