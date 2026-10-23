@@ -1,477 +1,465 @@
 # -*- coding: utf-8 -*-
 """
-modelar_crater_y_portal.py - Modelador AAA del Cráter del Despertar, Árbol Seco, Portal de Raíz y Nudo de Corrupción.
-Según documentacion/referencias_visuales_3d/construcciones/ref_crater_despertar.md
-y documentacion/referencias_visuales_3d/construcciones/ref_portal_raiz.md:
+El Cráter del Despertar, el Árbol Seco, el Portal de Raíz y el Nudo de Corrupción (El Kitovu).
+Fichas: construcciones/ref_crater_despertar.md y construcciones/ref_portal_raiz.md (contrato del Kitovu).
 
-1. crater_kitovu.glb (Cráter del impacto de Asili con glifos en espiral emisivos)
-2. arbol_seco.glb (Roble milenario petrificado por la ceniza de Giza)
-3. portal_raiz.glb (Arco monumental de raíces colosales vivas entrelazadas)
-4. nudo_corrupcion.glb (Nudo de zarcillos espinosos y cristales de cuarzo violeta)
+  crater_kitovu.glb    cuenco elíptico de 3,40 x 3,00 m y 0,45 m de hondo: tierra calcinada vidriada con
+                       grietas radiales, reborde de lajas de pizarra levantadas por el choque, vetas de ámbar
+                       que laten y los glifos en espiral de los tatuajes de Maisha en el fondo (emisión: el
+                       juego puede hacerlos latir a la vez que los tatuajes)
+  arbol_seco.glb       roble milenario petrificado de 4,60 m: tronco retorcido en espiral con fisuras, tres
+                       ramas maestras como garras, raíces que abrazan el borde del cráter, ceniza en lo alto
+  portal_raiz.glb      arco ojival de 4,80 m (2,80 m de paso, 1,40 m de umbral): dos raíces vivas de 0,75 m
+                       que se retuercen y se entrelazan arriba, musgo, vetas de savia dorada y brotes
+  nudo_corrupcion.glb  bulbo podrido de 1,60 m con zarcillos negros espinosos que cierran el paso (3,20 m) y
+                       agujas de cuarzo violeta; suelo de ceniza alrededor (nodo aparte, SueloMarchito).
+                       Esqueleto (bulbo, cristales, zarcillos) y animaciones latido y purificar
 
-Uso:
-    blender -b --factory-startup -P herramientas/blender/modelar_crater_y_portal.py
+    blender -b --factory-startup -P herramientas/blender/modelar_crater_y_portal.py [-- --vistas <carpeta>]
 """
 
 import math
 import os
+import random
 import sys
-import bpy
+
 import bmesh
-from mathutils import Matrix, Vector
+import bpy
+from mathutils import Matrix, Vector, noise
 
-RAIZ = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-CARPETA_SALIDA = os.path.join(RAIZ, "modelos", "entorno")
-os.makedirs(CARPETA_SALIDA, exist_ok=True)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import aparejo as ap  # noqa: E402
+from aparejo import X, Y, Z  # noqa: E402
+from modelar_mzee_shamba import Piezas  # noqa: E402
+from modelar_props_kitovu import roca  # noqa: E402
 
+CARPETA = os.path.join(ap.RAIZ, "modelos", "entorno")
+azar = random.Random(4)
 
-def _lineal(c):
-    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
-
-
-def rgb(hexa):
-    h = hexa.lstrip("#")
-    return [_lineal(int(h[i : i + 2], 16) / 255.0) for i in (0, 2, 4)]
-
-
-def crear_material(nombre, hexa, rugosidad=0.85, metal=0.0, emision=0.0, color_emision=None):
-    m = bpy.data.materials.get(nombre)
-    if m is None:
-        m = bpy.data.materials.new(nombre)
-    m.use_nodes = True
-    bsdf = m.node_tree.nodes.get("Principled BSDF")
-    c = rgb(hexa) + [1.0]
-    bsdf.inputs["Base Color"].default_value = c
-    bsdf.inputs["Roughness"].default_value = rugosidad
-    bsdf.inputs["Metallic"].default_value = metal
-    if emision > 0.0:
-        c_em = rgb(color_emision) + [1.0] if color_emision else c
-        bsdf.inputs["Emission Color"].default_value = c_em
-        bsdf.inputs["Emission Strength"].default_value = emision
-    return m
+PALETA = {
+    "roca_calcinada_crater": ("#22201e", 0.90, 0.0, 0.0),
+    "tierra_vidriada": ("#2c2925", 0.35, 0.0, 0.0),
+    "pizarra_reborde": ("#3a3a3e", 0.85, 0.05, 0.0),
+    "glifos_ambar_crater": ("#e8aa42", 0.40, 0.1, 1.4),
+    "madera_petrificada_seco": ("#2e2c2a", 0.95, 0.0, 0.0),
+    "ceniza_incrustada": ("#8c8a85", 0.98, 0.0, 0.0),
+    "madera_raiz_portal": ("#453324", 0.85, 0.0, 0.0),
+    "musgo_fresco_portal": ("#2d4822", 0.90, 0.0, 0.0),
+    "savia_dorada_raiz": ("#f5be42", 0.40, 0.1, 1.5),
+    "hoja_brote": ("#5d9a3a", 0.60, 0.0, 0.0),
+    "roca_desfiladero": ("#45433f", 0.88, 0.0, 0.0),
+    "madera_corrupta_nudo": ("#1c181d", 0.95, 0.0, 0.0),
+    "cristal_giza_violeta": ("#7b2292", 0.25, 0.1, 2.2),
+    "ceniza_cuarteada": ("#5d5b57", 0.98, 0.0, 0.0),
+}
 
 
-def limpiar_escena():
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    for c in list(bpy.data.collections):
-        bpy.data.collections.remove(c)
-    col = bpy.data.collections.new("Coleccion_Entorno")
-    bpy.context.scene.collection.children.link(col)
+def nuevo():
+    ap.escena_vacia()
+    return {n: ap.material(n, *v) for n, v in PALETA.items()}
 
 
-def exportar_seleccion(ruta_glb):
-    bpy.ops.export_scene.gltf(
-        filepath=ruta_glb,
-        export_format="GLB",
-        use_selection=True,
-        export_apply=True,
-        export_yup=True,
-    )
-    print(f"[OK] Exportado: {ruta_glb}")
+def cinta(pz, pts, ancho, mat, normal=Z, alto=0.004):
+    """Cinta plana pegada a una superficie (glifos, vetas): un poco por encima para que se vea."""
+    verts = []
+    for i in range(len(pts) - 1):
+        a, b = Vector(pts[i]), Vector(pts[i + 1])
+        d = (b - a).normalized()
+        lado = d.cross(normal).normalized() * ancho / 2
+        fila = [pz.bm.verts.new(a - lado + normal * alto), pz.bm.verts.new(a + lado + normal * alto),
+                pz.bm.verts.new(b + lado + normal * alto), pz.bm.verts.new(b - lado + normal * alto)]
+        pz.bm.faces.new(fila)
+        verts += fila
+    i = pz._i(mat)
+    for f in {f for v in verts for f in v.link_faces}:
+        f.material_index = i
 
 
-def crear_cilindro(bm, radius, depth, segments=16, matrix=Matrix()):
-    return bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        cap_tris=False,
-        segments=segments,
-        radius1=radius,
-        radius2=radius,
-        depth=depth,
-        matrix=matrix,
-    )
+def losa(pz, c, tam, mat, giro):
+    res = bmesh.ops.create_grid(pz.bm, x_segments=5, y_segments=4, size=0.5)
+    for v in res["verts"]:
+        x, y = v.co.x * 2, v.co.y * 2
+        borde = 1.0 + 0.15 * noise.noise(Vector((x * 2.1, y * 2.1, c[0] * 3 + c[1])))
+        v.co = Vector((x * tam[0] / 2 * borde, y * tam[1] / 2 * borde, 0.0))
+    geom = bmesh.ops.extrude_face_region(pz.bm, geom=list({f for v in res["verts"] for f in v.link_faces}))
+    nuevos = [e for e in geom["geom"] if isinstance(e, bmesh.types.BMVert)]
+    for v in nuevos:
+        v.co.z -= tam[2]
+    M = Matrix.Translation(Vector(c)) @ giro.to_4x4()
+    todos = list(res["verts"]) + nuevos
+    for v in todos:
+        v.co = M @ v.co
+    i = pz._i(mat)
+    for f in {f for v in todos for f in v.link_faces}:
+        f.material_index = i
 
 
-# ===========================================================================
-# 1. CRÁTER DEL DESPERTAR
-# ===========================================================================
-def modelar_crater():
-    limpiar_escena()
-    col = bpy.data.collections["Coleccion_Entorno"]
-    mat_roca = crear_material("roca_calcinada_crater", "#22201e", rugosidad=0.90, metal=0.0)
-    mat_glifos = crear_material(
-        "glifos_ambar_crater",
-        "#d89b38",
-        rugosidad=0.35,
-        metal=0.1,
-        emision=1.8,
-        color_emision="#e8aa42",
-    )
+# ---------------------------------------------------------------------------
+# Cráter y árbol seco
+# ---------------------------------------------------------------------------
 
-    bm_roca = bmesh.new()
-
-    # Cuenco elíptico exterior (3.40 x 3.00 m)
-    # Creamos un anillo exterior levantado (labio del cráter)
-    bmesh.ops.create_circle(
-        bm_roca,
-        cap_ends=False,
-        segments=32,
-        radius=1.70,
-        matrix=Matrix.Scale(1.0, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.88, 4, Vector((0, 1, 0))),
-    )
-    # Reborde rocoso fracturado: lajas de pizarra levantadas alrededor del cráter
-    for i in range(16):
-        angulo = i * (2 * math.pi / 16)
-        rx = math.cos(angulo) * 1.65
-        ry = math.sin(angulo) * 1.45
-        bmesh.ops.create_cube(
-            bm_roca,
-            size=1.0,
-            matrix=Matrix.Translation(Vector((rx, ry, 0.12)))
-            @ Matrix.Rotation(angulo, 4, "Z")
-            @ Matrix.Rotation(math.radians(25), 4, "Y")
-            @ Matrix.Scale(0.35, 4, Vector((1, 0, 0)))
-            @ Matrix.Scale(0.25, 4, Vector((0, 1, 0)))
-            @ Matrix.Scale(0.18, 4, Vector((0, 0, 1))),
-        )
-
-    # Fondo cóncavo del cráter
-    bmesh.ops.create_cone(
-        bm_roca,
-        cap_ends=True,
-        segments=24,
-        radius1=1.60,
-        radius2=0.40,
-        depth=0.45,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 0.20)))
-        @ Matrix.Rotation(math.radians(180), 4, "X")
-        @ Matrix.Scale(1.0, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.88, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(1.0, 4, Vector((0, 0, 1))),
-    )
-
-    mesh_roca = bpy.data.meshes.new("Crater_Roca")
-    bm_roca.to_mesh(mesh_roca)
-    bm_roca.free()
-
-    obj_roca = bpy.data.objects.new("Crater_Roca", mesh_roca)
-    col.objects.link(obj_roca)
-    obj_roca.data.materials.append(mat_roca)
-
-    # Glifos rúnicos en espiral en el fondo del cráter (material emisivo ámbar)
-    bm_runas = bmesh.new()
-    pasos_espiral = 48
-    radio_max = 0.95
-    for p in range(pasos_espiral):
-        t = p / pasos_espiral
-        ang = t * (math.pi * 5.0)  # 2.5 vueltas
-        r = t * radio_max
-        gx = math.cos(ang) * r
-        gy = math.sin(ang) * r * 0.88
-        gz = 0.04 + (r * 0.08)  # adaptado a la pendiente cóncava
-
-        bmesh.ops.create_cube(
-            bm_runas,
-            size=1.0,
-            matrix=Matrix.Translation(Vector((gx, gy, gz)))
-            @ Matrix.Rotation(ang, 4, "Z")
-            @ Matrix.Scale(0.06, 4, Vector((1, 0, 0)))
-            @ Matrix.Scale(0.04, 4, Vector((0, 1, 0)))
-            @ Matrix.Scale(0.02, 4, Vector((0, 0, 1))),
-        )
-
-    mesh_runas = bpy.data.meshes.new("Glifos_Espiral_Ambar")
-    bm_runas.to_mesh(mesh_runas)
-    bm_runas.free()
-
-    obj_runas = bpy.data.objects.new("Glifos_Espiral_Ambar", mesh_runas)
-    col.objects.link(obj_runas)
-    obj_runas.data.materials.append(mat_glifos)
-
-    bpy.ops.object.select_all(action="SELECT")
-    ruta = os.path.join(CARPETA_SALIDA, "crater_kitovu.glb")
-    exportar_seleccion(ruta)
+RX, RY, HONDO = 1.70, 1.50, 0.45
 
 
-# ===========================================================================
-# 2. ÁRBOL SECO ANCESTRAL
-# ===========================================================================
-def modelar_arbol_seco():
-    limpiar_escena()
-    col = bpy.data.collections["Coleccion_Entorno"]
-    mat_petrificado = crear_material("madera_petrificada_seco", "#2e2c2a", rugosidad=0.95, metal=0.0)
-    mat_ceniza = crear_material("ceniza_incrustada", "#8c8a85", rugosidad=0.98, metal=0.0)
-
-    bm = bmesh.new()
-
-    # Tronco principal nudoso retorcido en espiral (altura 4.60 m)
-    # Base ancha (0.70 m radio 0.35) a cuello (0.45 m radio 0.225)
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=16,
-        radius1=0.38,
-        radius2=0.22,
-        depth=2.80,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 1.40)))
-        @ Matrix.Rotation(math.radians(6), 4, "Y"),
-    )
-
-    # 3 Grandes ramas maestras desnudas que se alzan como garras
-    # Rama 1 (hacia +X y +Z)
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=12,
-        radius1=0.18,
-        radius2=0.06,
-        depth=1.90,
-        matrix=Matrix.Translation(Vector((0.45, 0.10, 3.40)))
-        @ Matrix.Rotation(math.radians(28), 4, "Y")
-        @ Matrix.Rotation(math.radians(15), 4, "X"),
-    )
-    # Rama 2 (hacia -X y +Z)
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=12,
-        radius1=0.16,
-        radius2=0.05,
-        depth=1.85,
-        matrix=Matrix.Translation(Vector((-0.42, -0.15, 3.35)))
-        @ Matrix.Rotation(math.radians(-32), 4, "Y")
-        @ Matrix.Rotation(math.radians(-10), 4, "X"),
-    )
-    # Rama 3 (hacia +Y y +Z, más vertical)
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=12,
-        radius1=0.15,
-        radius2=0.04,
-        depth=1.75,
-        matrix=Matrix.Translation(Vector((0.05, 0.40, 3.55)))
-        @ Matrix.Rotation(math.radians(-26), 4, "X"),
-    )
-
-    # Raíces superficiales gruesas que abrazan el borde rocoso del cráter
-    for ang in (math.radians(35), math.radians(160), math.radians(-85)):
-        bmesh.ops.create_cone(
-            bm,
-            cap_ends=True,
-            segments=10,
-            radius1=0.22,
-            radius2=0.08,
-            depth=1.20,
-            matrix=Matrix.Translation(Vector((math.cos(ang) * 0.45, math.sin(ang) * 0.45, 0.25)))
-            @ Matrix.Rotation(ang, 4, "Z")
-            @ Matrix.Rotation(math.radians(70), 4, "Y"),
-        )
-
-    mesh = bpy.data.meshes.new("Arbol_Seco_Ancestral")
-    bm.to_mesh(mesh)
-    bm.free()
-
-    obj = bpy.data.objects.new("Arbol_Seco_Ancestral", mesh)
-    col.objects.link(obj)
-    obj.data.materials.append(mat_petrificado)
-
-    bpy.ops.object.select_all(action="SELECT")
-    ruta = os.path.join(CARPETA_SALIDA, "arbol_seco.glb")
-    exportar_seleccion(ruta)
+def altura_crater(x, y):
+    r = math.sqrt((x / RX) ** 2 + (y / RY) ** 2)       # 1 = labio
+    if r < 1.0:
+        z = -HONDO * (1 - r * r) ** 1.3 + 0.10 * r ** 6
+    else:
+        z = 0.10 * math.exp(-((r - 1.0) / 0.18) ** 2)
+    ang = math.atan2(y, x)
+    grieta = 0.0
+    for k in range(9):                              # grietas radiales del choque
+        a = k * 2 * math.pi / 9 + 0.3 * math.sin(k * 7)
+        d = abs(math.atan2(math.sin(ang - a), math.cos(ang - a)))
+        grieta -= 0.035 * max(0.0, 1 - d / 0.035) * (0.25 < r < 1.15)
+    return z + grieta + 0.012 * noise.noise(Vector((x * 4, y * 4, 0.5)))
 
 
-# ===========================================================================
-# 3. PORTAL DE RAÍZ MONUMENTAL
-# ===========================================================================
-def modelar_portal_raiz():
-    limpiar_escena()
-    col = bpy.data.collections["Coleccion_Entorno"]
-    mat_raiz = crear_material("madera_raiz_portal", "#453324", rugosidad=0.85, metal=0.0)
-    mat_savia = crear_material(
-        "savia_dorada_raiz",
-        "#dfa838",
-        rugosidad=0.35,
-        metal=0.1,
-        emision=1.6,
-        color_emision="#f5be42",
-    )
-
-    bm = bmesh.new()
-
-    # Pilar izquierdo: Raíz viva retorcida que asciende hacia la derecha
-    # Altura 4.80 m, vano interior 2.80 m
-    # Segmento bajo izquierdo (x = -1.50)
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=16,
-        radius1=0.45,
-        radius2=0.35,
-        depth=2.60,
-        matrix=Matrix.Translation(Vector((-1.55, 0.0, 1.30)))
-        @ Matrix.Rotation(math.radians(-10), 4, "Y"),
-    )
-    # Segmento arqueado superior izquierdo
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=16,
-        radius1=0.35,
-        radius2=0.25,
-        depth=2.40,
-        matrix=Matrix.Translation(Vector((-0.80, 0.0, 3.65)))
-        @ Matrix.Rotation(math.radians(-42), 4, "Y"),
-    )
-
-    # Pilar derecho: Raíz viva que asciende hacia la izquierda
-    # Segmento bajo derecho (x = +1.50)
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=16,
-        radius1=0.45,
-        radius2=0.35,
-        depth=2.60,
-        matrix=Matrix.Translation(Vector((1.55, 0.0, 1.30)))
-        @ Matrix.Rotation(math.radians(10), 4, "Y"),
-    )
-    # Segmento arqueado superior derecho
-    bmesh.ops.create_cone(
-        bm,
-        cap_ends=True,
-        segments=16,
-        radius1=0.35,
-        radius2=0.25,
-        depth=2.40,
-        matrix=Matrix.Translation(Vector((0.80, 0.0, 3.65)))
-        @ Matrix.Rotation(math.radians(42), 4, "Y"),
-    )
-
-    # Clave del arco: Nudo superior entrelazado en z = 4.70 m
-    bmesh.ops.create_icosphere(
-        bm,
-        subdivisions=2,
-        radius=0.45,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 4.65)))
-        @ Matrix.Scale(1.3, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.8, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(0.8, 4, Vector((0, 0, 1))),
-    )
-
-    # Zarcillos entrelazados secundarios que abrazan el arco
-    for sx in (-1.1, 1.1):
-        bmesh.ops.create_cone(
-            bm,
-            cap_ends=True,
-            segments=10,
-            radius1=0.14,
-            radius2=0.05,
-            depth=2.80,
-            matrix=Matrix.Translation(Vector((sx, 0.15, 2.40)))
-            @ Matrix.Rotation(math.radians(-18 if sx < 0 else 18), 4, "Y")
-            @ Matrix.Rotation(math.radians(12), 4, "X"),
-        )
-
-    mesh = bpy.data.meshes.new("Portal_Raiz_Monumental")
-    bm.to_mesh(mesh)
-    bm.free()
-
-    obj = bpy.data.objects.new("Portal_Raiz_Monumental", mesh)
-    col.objects.link(obj)
-    obj.data.materials.append(mat_raiz)
-
-    bpy.ops.object.select_all(action="SELECT")
-    ruta = os.path.join(CARPETA_SALIDA, "portal_raiz.glb")
-    exportar_seleccion(ruta)
+def crater(mats):
+    pz = Piezas("Crater", mats)
+    anillos, lados = 26, 64
+    filas = []
+    centro = pz.bm.verts.new(Vector((0, 0, altura_crater(0, 0))))
+    for i in range(1, anillos + 1):
+        r = 1.35 * i / anillos
+        fila = []
+        for j in range(lados):
+            a = 2 * math.pi * j / lados
+            x, y = RX * r * math.cos(a), RY * r * math.sin(a)
+            fila.append(pz.bm.verts.new(Vector((x, y, altura_crater(x, y)))))
+        filas.append(fila)
+    caras = []
+    for j in range(lados):
+        caras.append(pz.bm.faces.new((centro, filas[0][j], filas[0][(j + 1) % lados])))
+    for i in range(anillos - 1):
+        for j in range(lados):
+            caras.append(pz.bm.faces.new((filas[i][j], filas[i + 1][j], filas[i + 1][(j + 1) % lados],
+                                          filas[i][(j + 1) % lados])))
+    i_v, i_c = pz._i("tierra_vidriada"), pz._i("roca_calcinada_crater")
+    for f in caras:
+        c = f.calc_center_median()
+        r = math.sqrt((c.x / RX) ** 2 + (c.y / RY) ** 2)
+        f.material_index = i_v if r < 0.75 else i_c
+    # reborde de lajas de pizarra levantadas hacia fuera por el choque
+    for k in range(22):
+        a = 2 * math.pi * k / 22 + azar.uniform(-0.08, 0.08)
+        x, y = RX * 1.02 * math.cos(a), RY * 1.02 * math.sin(a)
+        giro = Matrix.Rotation(a, 3, "Z") @ Matrix.Rotation(math.radians(azar.uniform(25, 60)), 3, "Y")
+        losa(pz, (x, y, altura_crater(x, y) + 0.06), (0.36 + azar.uniform(0, 0.2), 0.30 + azar.uniform(0, 0.15),
+                                                       0.05), "pizarra_reborde", giro)
+    # glifos de ámbar en espiral (los de los tatuajes de Maisha) en el fondo
+    def en_fondo(x, y):
+        return Vector((x, y, altura_crater(x, y)))
+    pts = []
+    for k in range(140):
+        a = k / 139 * 3.2 * 2 * math.pi
+        r = 0.04 + 0.075 * a / (2 * math.pi)
+        pts.append(en_fondo(r * math.cos(a), r * math.sin(a)))
+    cinta(pz, pts, 0.018, "glifos_ambar_crater")
+    for r in (0.36, 0.42):
+        cinta(pz, [en_fondo(r * 1.1 * math.cos(a), r * math.sin(a)) for a in
+                   (2 * math.pi * k / 72 for k in range(73))], 0.014, "glifos_ambar_crater")
+    for k in range(9):              # nodos de la constelación alrededor
+        a = 2 * math.pi * k / 9
+        c = en_fondo(0.55 * math.cos(a), 0.50 * math.sin(a))
+        cinta(pz, [c + Vector((0.025 * math.cos(b), 0.025 * math.sin(b), 0)) for b in
+                   (2 * math.pi * j / 12 for j in range(13))], 0.012, "glifos_ambar_crater")
+        cinta(pz, [en_fondo(0.44 * 1.1 * math.cos(a), 0.44 * math.sin(a)), c], 0.010, "glifos_ambar_crater")
+    # vetas de ámbar en las grietas
+    for k in range(9):
+        a = k * 2 * math.pi / 9 + 0.3 * math.sin(k * 7)
+        pts = [en_fondo(RX * t * math.cos(a), RY * t * math.sin(a)) + Vector((0, 0, -0.02))
+               for t in (0.30, 0.45, 0.62, 0.80, 0.95)]
+        cinta(pz, pts, 0.012, "glifos_ambar_crater", alto=0.0)
+    ob = pz.objeto()
+    ob.name = "Crater"
+    return ob
 
 
-# ===========================================================================
-# 4. NUDO DE CORRUPCIÓN DE GIZA
-# ===========================================================================
-def modelar_nudo_corrupcion():
-    limpiar_escena()
-    col = bpy.data.collections["Coleccion_Entorno"]
-    mat_madera_corrupta = crear_material("madera_corrupta_nudo", "#1c181d", rugosidad=0.95, metal=0.0)
-    mat_cristal_giza = crear_material(
-        "cristal_giza_violeta",
-        "#4a1856",
-        rugosidad=0.20,
-        metal=0.1,
-        emision=2.5,
-        color_emision="#7b2292",
-    )
+def tubo_organico(pz, pts, radios, mat, lobulos=6, giro_lobulo=0.0, fisura=0.10, lados=14):
+    """Tronco o raíz: anillos con lóbulos (fisuras de la corteza) que se retuercen a lo largo."""
+    n = len(pts)
+    anillos = []
+    for i, c in enumerate(pts):
+        c = Vector(c)
+        t = (Vector(pts[min(i + 1, n - 1)]) - Vector(pts[max(i - 1, 0)])).normalized()
+        ref = X if abs(t.x) < 0.9 else Y
+        e1 = (ref - t * ref.dot(t)).normalized()
+        e2 = t.cross(e1)
+        fila = []
+        for j in range(lados):
+            a = 2 * math.pi * j / lados
+            k = 1 + fisura * math.sin(lobulos * a + giro_lobulo * i) \
+                + 0.04 * noise.noise(Vector((c.x * 3 + a, c.y * 3, c.z * 3)))
+            fila.append(pz.bm.verts.new(c + (e1 * math.cos(a) + e2 * math.sin(a)) * radios[i] * k))
+        anillos.append(fila)
+    caras = []
+    for i in range(n - 1):
+        for j in range(lados):
+            caras.append(pz.bm.faces.new((anillos[i][j], anillos[i][(j + 1) % lados], anillos[i + 1][(j + 1) % lados],
+                                          anillos[i + 1][j])))
+    caras.append(pz.bm.faces.new(list(reversed(anillos[0]))))
+    caras.append(pz.bm.faces.new(anillos[-1]))
+    i_m = pz._i(mat)
+    for f in caras:
+        f.material_index = i_m
+    return caras
 
-    bm_nudo = bmesh.new()
 
-    # Bulbo central petrificado podrido (diámetro 1.60 m)
-    bmesh.ops.create_icosphere(
-        bm_nudo,
-        subdivisions=2,
-        radius=0.75,
-        matrix=Matrix.Translation(Vector((0.0, 0.0, 0.72)))
-        @ Matrix.Scale(1.15, 4, Vector((1, 0, 0)))
-        @ Matrix.Scale(0.90, 4, Vector((0, 1, 0)))
-        @ Matrix.Scale(1.05, 4, Vector((0, 0, 1))),
-    )
+def rama(pz, base, direccion, largo, radio, nivel, mat, rnd):
+    """Rama que se curva hacia el cielo como una garra y se divide."""
+    pts, rad = [Vector(base)], [radio]
+    d = Vector(direccion).normalized()
+    pasos = 8
+    for k in range(1, pasos + 1):
+        d = (d + Vector((rnd.uniform(-0.25, 0.25), rnd.uniform(-0.25, 0.25), 0.18))).normalized()
+        pts.append(pts[-1] + d * largo / pasos)
+        rad.append(radio * (1 - 0.75 * k / pasos) + 0.006)
+    tubo_organico(pz, pts, rad, mat, lobulos=4, fisura=0.06, lados=8 if nivel > 1 else 10)
+    if nivel < 3:
+        for h in range(2 if nivel > 0 else 3):
+            i = rnd.randint(4, 7)
+            lateral = Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), 0.6)).normalized()
+            rama(pz, pts[i], (d + lateral).normalized(), largo * 0.55, rad[i] * 0.75, nivel + 1, mat, rnd)
 
-    # Zarcillos espinosos que sellan el paso (envergadura 3.20 m)
-    for i, ang in enumerate((0, 30, 65, 115, 150, 180, 210, 250, 300, 335)):
-        rad = math.radians(ang)
-        longitud = 1.35 if i % 2 == 0 else 1.70
-        bmesh.ops.create_cone(
-            bm_nudo,
-            cap_ends=True,
-            segments=8,
-            radius1=0.12,
-            radius2=0.02,
-            depth=longitud,
-            matrix=Matrix.Translation(Vector((math.cos(rad) * 1.10, math.sin(rad) * 0.40, 0.65)))
-            @ Matrix.Rotation(rad, 4, "Z")
-            @ Matrix.Rotation(math.radians(55), 4, "Y"),
-        )
 
-    mesh_nudo = bpy.data.meshes.new("Nudo_Madera_Corrupta")
-    bm_nudo.to_mesh(mesh_nudo)
-    bm_nudo.free()
+def arbol(mats):
+    pz = Piezas("ArbolSeco", mats)
+    rnd = random.Random(9)
+    pts, rad = [], []
+    for k in range(13):
+        t = k / 12
+        z = -0.15 + 2.55 * t
+        pts.append(Vector((0.10 * math.sin(t * 2.6), 0.08 * math.cos(t * 2.2) - 0.08, z)))
+        rad.append(0.35 - 0.125 * t + 0.10 * max(0.0, 0.25 - t) / 0.25)
+    tubo_organico(pz, pts, rad, "madera_petrificada_seco", lobulos=7, giro_lobulo=-0.35, fisura=0.12, lados=18)
+    copa = pts[-1]
+    for k, ang in enumerate((0.3, 2.4, 4.4)):            # tres ramas maestras como garras
+        d = Vector((math.cos(ang), math.sin(ang), 0.40)).normalized()
+        rama(pz, copa - Vector((0, 0, 0.45)) + d * 0.05, d, 1.80, 0.19, 0, "madera_petrificada_seco", rnd)
+    for k, ang in enumerate((-0.9, 0.9)):                # raíces que abrazan el borde del cráter (hacia -Y)
+        d = Vector((math.sin(ang), -math.cos(ang), 0))
+        pts_r = [Vector((0, 0, 0.35)) + d * 0.1, Vector((0, 0, 0.12)) + d * 0.45, d * 0.95 + Vector((0, 0, 0.02)),
+                 d * 1.45 + Vector((0, 0, -0.08))]
+        tubo_organico(pz, pts_r, [0.20, 0.15, 0.10, 0.05], "madera_petrificada_seco", lobulos=5, fisura=0.10,
+                      lados=12)
+    ob = pz.objeto()
+    # ceniza en lo alto de las ramas y en las caras que miran al cielo
+    i_c = list(ob.data.materials).index(mats["ceniza_incrustada"]) if mats["ceniza_incrustada"].name in \
+        [m.name for m in ob.data.materials] else None
+    if i_c is None:
+        ob.data.materials.append(mats["ceniza_incrustada"])
+        i_c = len(ob.data.materials) - 1
+    for pol in ob.data.polygons:
+        if pol.normal.z > 0.75 and pol.center.z > 2.7 and azar.random() < 0.8:
+            pol.material_index = i_c
+    ob.name = "ArbolSeco"
+    return ob
 
-    obj_nudo = bpy.data.objects.new("Nudo_Madera_Corrupta", mesh_nudo)
-    col.objects.link(obj_nudo)
-    obj_nudo.data.materials.append(mat_madera_corrupta)
 
-    # Agujas y cristales afilados de cuarzo violeta de Giza (emisivos)
-    bm_cristal = bmesh.new()
-    for cx, cy, cz, rx, ry in [
-        (0.0, 0.15, 1.25, 15, -20),
-        (-0.35, -0.10, 1.10, -25, 30),
-        (0.40, 0.05, 1.05, 10, -35),
-        (-0.15, 0.25, 0.85, 30, 15),
-        (0.20, -0.20, 0.90, -15, -15),
-    ]:
-        bmesh.ops.create_cone(
-            bm_cristal,
-            cap_ends=True,
-            segments=6,
-            radius1=0.08,
-            radius2=0.01,
-            depth=0.55,
-            matrix=Matrix.Translation(Vector((cx, cy, cz)))
-            @ Matrix.Rotation(math.radians(rx), 4, "X")
-            @ Matrix.Rotation(math.radians(ry), 4, "Y"),
-        )
+# ---------------------------------------------------------------------------
+# Portal de raíz y nudo de corrupción
+# ---------------------------------------------------------------------------
 
-    mesh_cristal = bpy.data.meshes.new("Cristales_Giza_Violeta")
-    bm_cristal.to_mesh(mesh_cristal)
-    bm_cristal.free()
+def raiz_arco(s, t_max=1.0):
+    """Recorrido de la raíz del lado s: sube por el lado y se curva hasta cruzar al otro lado arriba."""
+    pts = []
+    for k in range(25):
+        t = k / 24 * t_max
+        c, sn = math.cos(t * math.pi * 0.62), math.sin(t * math.pi * 0.52)
+        x = s * (1.75 * math.copysign(abs(c) ** 0.9, c) - 0.25 * t)
+        z = 4.55 * math.copysign(abs(sn) ** 1.1, sn)
+        y = 0.20 * math.sin(t * 7 + s) * (0.5 + t)
+        pts.append(Vector((x, y, z - 0.10)))
+    return pts
 
-    obj_cristal = bpy.data.objects.new("Cristales_Giza_Violeta", mesh_cristal)
-    col.objects.link(obj_cristal)
-    obj_cristal.data.materials.append(mat_cristal_giza)
 
-    bpy.ops.object.select_all(action="SELECT")
-    ruta = os.path.join(CARPETA_SALIDA, "nudo_corrupcion.glb")
-    exportar_seleccion(ruta)
+def portal(mats):
+    pz = Piezas("PortalRaiz", mats)
+    for s in (-1, 1):
+        pts = raiz_arco(s, 1.08)
+        rad = [0.42 - 0.18 * (k / 24) for k in range(25)]
+        tubo_organico(pz, pts, rad, "madera_raiz_portal", lobulos=5, giro_lobulo=0.45 * s, fisura=0.11, lados=18)
+        # raíces secundarias que se enroscan a la principal y pies de raíz en el suelo
+        for h in range(2):
+            fase = h * math.pi
+            sec = []
+            for k in range(0, 22):
+                t = k / 21
+                c = pts[k]
+                sec.append(c + Vector((math.cos(t * 14 + fase) * 0.36, math.sin(t * 14 + fase) * 0.36, 0)))
+            tubo_organico(pz, sec, [0.11 - 0.07 * k / 21 for k in range(22)], "madera_raiz_portal", lobulos=3,
+                          fisura=0.08, lados=8)
+        for k, ang in enumerate((-0.7, 0.0, 0.8)):
+            d = Vector((s * math.cos(ang), math.sin(ang), 0))
+            base = Vector((s * 1.75, 0, 0.25))
+            tubo_organico(pz, [base, base + d * 0.5 + Vector((0, 0, -0.15)), base + d * 1.0 + Vector((0, 0, -0.28))],
+                          [0.22, 0.13, 0.05], "madera_raiz_portal", lobulos=4, fisura=0.10, lados=10)
+        # vetas de savia dorada en los surcos y brotes con hojas en las uniones
+        for k in range(3, 20, 2):
+            c = pts[k]
+            ap_ = (pts[k + 1] - pts[k - 1]).normalized()
+            lado = ap_.cross(Y).normalized()
+            cinta(pz, [c + lado * rad[k] * 1.02 + ap_ * 0.0, c + lado * rad[k] * 1.03 + ap_ * 0.15,
+                       c + lado * rad[k] * 1.02 + ap_ * 0.30], 0.02, "savia_dorada_raiz", normal=lado, alto=0.004)
+        for k in (8, 14, 19):
+            c = pts[k] + Vector((0, -0.38, 0.05))
+            for h in range(4):
+                a = h * math.pi / 2 + 0.4
+                pz.esfera(c + Vector((0.06 * math.cos(a), -0.02, 0.06 * math.sin(a))), (0.045, 0.012, 0.022),
+                          "hoja_brote", Matrix.Rotation(a, 3, "Y"), seg=(8, 6))
+        # musgo en la base húmeda
+        for k in range(6):
+            roca(pz, (s * 1.75 + azar.uniform(-0.3, 0.3), azar.uniform(-0.45, 0.45), azar.uniform(0.15, 0.9)),
+                 (0.22, 0.14, 0.10), "musgo_fresco_portal", semilla=k + s * 10, aspereza=0.4)
+        # rocas del desfiladero de donde nacen
+        for k in range(3):
+            roca(pz, (s * (2.3 + 0.3 * k), azar.uniform(-0.6, 0.6), 0.3 + 0.4 * k), (0.55, 0.65, 0.5 + 0.2 * k),
+                 "roca_desfiladero", semilla=20 + k + s * 5, aspereza=0.25)
+    ob = pz.objeto()
+    ob.name = "PortalRaiz"
+    return ob
+
+
+def nudo(mats):
+    """Devuelve las piezas por hueso (bulbo, cristales, zarcillos) y el suelo de ceniza."""
+    piezas = {}
+    pb = Piezas("Nudo_Bulbo", mats)
+    res = bmesh.ops.create_icosphere(pb.bm, subdivisions=4, radius=1.0)
+    for v in res["verts"]:
+        d = v.co.normalized()
+        k = 1 + 0.18 * noise.fractal(d * 2.2, 0.6, 2.0, 4) + 0.08 * abs(noise.noise(d * 6))
+        v.co = Vector((0, 0, 0.62)) + Vector((d.x * 0.80 * k, d.y * 0.72 * k, d.z * 0.70 * k))
+        v.co.z = max(v.co.z, -0.05)
+    i_m = pb._i("madera_corrupta_nudo")
+    for f in {f for v in res["verts"] for f in v.link_faces}:
+        f.material_index = i_m
+    for k in range(10):          # grietas violeta sobre el bulbo
+        a = 2 * math.pi * k / 10
+        pts = [Vector((0.80 * math.cos(a) * (1 - t * 0.3), 0.72 * math.sin(a) * (1 - t * 0.3), 0.30 + t * 0.85))
+               for t in (0.0, 0.25, 0.5, 0.75)]
+        cinta(pb, pts, 0.03, "cristal_giza_violeta", normal=Vector((math.cos(a), math.sin(a), 0.3)).normalized(),
+              alto=0.03)
+    piezas["bulbo"] = pb.objeto()
+    pc = Piezas("Nudo_Cristales", mats)
+    rnd = random.Random(3)
+    for k in range(14):          # agujas de cuarzo violeta que brotan del corazón
+        a = rnd.uniform(0, 2 * math.pi)
+        incl = rnd.uniform(0.0, 0.6)
+        d = Vector((math.sin(incl) * math.cos(a), math.sin(incl) * math.sin(a), math.cos(incl)))
+        base = Vector((0, 0, 1.05)) + d * 0.15
+        largo = rnd.uniform(0.35, 0.80)
+        res = bmesh.ops.create_cone(pc.bm, cap_ends=True, segments=6, radius1=rnd.uniform(0.04, 0.08), radius2=0.0,
+                                    depth=largo, matrix=Matrix.Translation(base + d * largo / 2)
+                                    @ Z.rotation_difference(d).to_matrix().to_4x4())
+        i_c = pc._i("cristal_giza_violeta")
+        for f in {f for v in res["verts"] for f in v.link_faces}:
+            f.material_index = i_c
+    piezas["cristales"] = pc.objeto(suave_=False)
+    for lado, s in (("L", -1), ("R", 1)):
+        pzz = Piezas(f"Nudo_Zarcillos_{lado}", mats)
+        for h in range(5):        # zarcillos negros que salen del suelo y cierran el paso
+            a0 = rnd.uniform(-0.6, 0.6)
+            pts = []
+            for k in range(14):
+                t = k / 13
+                x = s * (0.45 + 1.15 * t)
+                pts.append(Vector((x, a0 * 0.6 + 0.25 * math.sin(t * 6 + h), 0.15 + 1.1 * math.sin(t * math.pi) *
+                                   (0.6 + 0.4 * rnd.random()) * (0.4 + 0.15 * h))))
+            tubo_organico(pzz, pts, [0.09 - 0.07 * k / 13 for k in range(14)], "madera_corrupta_nudo", lobulos=3,
+                          fisura=0.15, lados=8)
+            for k in range(2, 13, 2):   # espinas
+                c = pts[k]
+                d = Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-0.3, 1))).normalized()
+                r0 = 0.09 - 0.07 * k / 13
+                res = bmesh.ops.create_cone(pzz.bm, cap_ends=True, segments=4, radius1=0.022, radius2=0.0, depth=0.14,
+                                            matrix=Matrix.Translation(c + d * (r0 + 0.06))
+                                            @ Z.rotation_difference(d).to_matrix().to_4x4())
+                i_m = pzz._i("madera_corrupta_nudo")
+                for f in {f for v in res["verts"] for f in v.link_faces}:
+                    f.material_index = i_m
+        piezas[f"zarcillos_{lado}"] = pzz.objeto()
+    ps = Piezas("SueloMarchito", mats)       # ceniza cuarteada alrededor (Gemini puede quitarla)
+    res = bmesh.ops.create_circle(ps.bm, cap_ends=True, segments=48, radius=3.0)
+    bmesh.ops.triangulate(ps.bm, faces=ps.bm.faces[:])
+    for v in res["verts"]:
+        v.co.z = 0.008
+    i_s = ps._i("ceniza_cuarteada")
+    for f in ps.bm.faces:
+        f.material_index = i_s
+    piezas["suelo"] = ps.objeto()
+    return piezas
+
+
+def aparejar_nudo(piezas):
+    arm = ap.crear_esqueleto("NudoCorrupcion", [
+        ("root", (0, 0, 0), (0, 0, 0.1), None),
+        ("bulbo", (0, 0, 0.0), (0, 0, 1.0), "root"),
+        ("cristales", (0, 0, 1.0), (0, 0, 1.6), "bulbo"),
+        ("zarcillos_L", (-0.4, 0, 0.1), (-1.6, 0, 0.1), "root"),
+        ("zarcillos_R", (0.4, 0, 0.1), (1.6, 0, 0.1), "root"),
+    ])
+    for clave, hueso in (("bulbo", "bulbo"), ("cristales", "cristales"), ("zarcillos_L", "zarcillos_L"),
+                         ("zarcillos_R", "zarcillos_R")):
+        ob = piezas[clave]
+        g = ob.vertex_groups.new(name=hueso)
+        g.add([v.index for v in ob.data.vertices], 1.0, "REPLACE")
+        mod = ob.modifiers.new("Esqueleto", "ARMATURE")
+        mod.object = arm
+        ob.parent = arm
+    an = ap.Animador(arm)
+    an.nueva("latido")
+    for f in range(0, 41, 4):
+        t = 2 * math.pi * f / 40
+        late = 1.0 + 0.035 * max(0.0, math.sin(t)) ** 3
+        an.fotograma(f, {"zarcillos_L": [("Y", 1.5 * math.sin(t))], "zarcillos_R": [("Y", -1.5 * math.sin(t))]},
+                     escalas={"bulbo": late, "cristales": 1.0 + 0.06 * max(0.0, math.sin(t - 0.4)) ** 3})
+    an.cerrar("latido")
+    an.nueva("purificar")     # las agujas se quiebran, los zarcillos se recogen y el bulbo se deshace
+    for f, k in ((0, 0.0), (6, 0.15), (14, 0.5), (24, 0.85), (36, 1.0)):
+        an.fotograma(f, {"zarcillos_L": [("Y", -40 * k)], "zarcillos_R": [("Y", 40 * k)]},
+                     mover={"zarcillos_L": (0, 0, -0.6 * k), "zarcillos_R": (0, 0, -0.6 * k),
+                            "bulbo": (0, 0, -0.5 * k * k)},
+                     escalas={"cristales": max(0.001, 1 - k * 1.6), "bulbo": max(0.001, 1 - 0.95 * k),
+                              "zarcillos_L": max(0.001, 1 - k), "zarcillos_R": max(0.001, 1 - k)})
+    an.cerrar("purificar")
+    return arm
 
 
 def main():
-    print("=== MODELANDO CRÁTER, ÁRBOL Y PORTAL DE EL KITOVU ===")
-    modelar_crater()
-    modelar_arbol_seco()
-    modelar_portal_raiz()
-    modelar_nudo_corrupcion()
-    print("=== MODELOS DE ENTORNO GENERADOS CON ÉXITO ===")
+    args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    vistas = args[args.index("--vistas") + 1] if "--vistas" in args else None
+
+    def fotos(nombre, objetivo, dist, alto):
+        if not vistas:
+            return
+        os.makedirs(vistas, exist_ok=True)
+        foto = ap.preparar_vistas(resolucion=(900, 800))
+        for vista, pos in (("frente", (0, -dist, alto)), ("tres_cuartos", (-dist * 0.7, -dist * 0.75, alto * 1.2))):
+            foto(os.path.join(vistas, f"{nombre}_{vista}.png"), pos, objetivo, 50)
+
+    mats = nuevo()
+    ob = crater(mats)
+    ap.exportar_estatico(os.path.join(CARPETA, "crater_kitovu.glb"), [ob])
+    ob.location.z = 0.5        # solo para la foto: el cuenco queda bajo el suelo de las vistas
+    fotos("crater_kitovu", (0, 0, 0.3), 5.0, 3.8)
+    mats = nuevo()
+    ob = arbol(mats)
+    ap.exportar_estatico(os.path.join(CARPETA, "arbol_seco.glb"), [ob])
+    print("ALTO ARBOL", round(max(v.co.z for v in ob.data.vertices), 2), "ANCHO", round(max(v.co.x for v in ob.data.vertices) - min(v.co.x for v in ob.data.vertices), 2))
+    fotos("arbol_seco", (0, 0, 2.4), 12.0, 3.6)
+    mats = nuevo()
+    ob = portal(mats)
+    ap.exportar_estatico(os.path.join(CARPETA, "portal_raiz.glb"), [ob])
+    fotos("portal_raiz", (0, 0, 2.2), 10.0, 3.0)
+    mats = nuevo()
+    piezas = nudo(mats)
+    arm = aparejar_nudo(piezas)
+    ap.exportar(os.path.join(CARPETA, "nudo_corrupcion.glb"), arm,
+                [piezas[k] for k in ("bulbo", "cristales", "zarcillos_L", "zarcillos_R", "suelo")])
+    fotos("nudo_corrupcion", (0, 0, 0.7), 7.0, 2.6)
+    print("\n=== CRÁTER, ÁRBOL SECO, PORTAL DE RAÍZ Y NUDO exportados ===")
 
 
 if __name__ == "__main__":
