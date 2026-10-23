@@ -4,11 +4,13 @@ Petrino de Giza en 3D: la bestia pétrea cenicienta (enemigo de choque del pról
 
 Ficha: documentacion/referencias_visuales_3d/enemigos/ref_petrino_giza.md; coraza inspirada en el blindaje
 de lajas de personajes/bata_castor_mitico_concept_art.jpg (contrato del Kitovu).
-  - cuadrúpedo bajo y denso: 1,85 m de largo, 1,15 m a la cruz, 0,85 m de pecho;
-  - cuerpo de basalto poroso, cabeza en cuña de pedernal sin ojos (cuencas con resplandor violeta),
-    mandíbula con dos colmillos de sílex;
-  - coraza dorsal de 5 lajas de pizarra superpuestas y cortantes;
-  - patas cortas y anchas con garras de sílex; grietas de corrupción violeta en pecho y flancos.
+  - jabalí de piedra (hoja canónica enemigos/petrino_giza_turnaround_sheet.jpg): 1,85 m de largo y
+    1,15 m a la cruz, con la joroba alta en los hombros;
+  - cuerpo de placas de basalto pardo grisáceo y, debajo, un núcleo violeta que brilla por las juntas
+    (la red de grietas de corrupción de Giza);
+  - cabeza de jabalí con hocico y disco, ojos violetas bajo la ceja, orejas cortas y colmillos curvos de
+    cuarzo ferruginoso;
+  - cresta de lajas de pizarra en abanico (más altas en la cruz), cola corta con espinas, pezuñas partidas.
 
 Es una criatura de roca: cada bloque va rígido a su hueso (no se dobla como la carne), y así puede
 romperse en pedazos al morir. Los bloques se esculpen por código: roca con relieve de ruido y facetas.
@@ -37,10 +39,10 @@ SALIDA = os.path.join(ap.RAIZ, "modelos", "enemigos", "petrino_giza.glb")
 azar = random.Random(77)
 
 PALETA = {
-    "roca_basalto_cuerpo": ("#252528", 0.92, 0.0, 0.0),
-    "pizarra_coraza_lomo": ("#3c3b42", 0.85, 0.05, 0.0),
-    "colmillos_silex": ("#6a6258", 0.45, 0.1, 0.0),
-    "vetas_giza_violacea": ("#9b30b0", 0.60, 0.0, 1.8),
+    "roca_basalto_cuerpo": ("#4d4842", 0.92, 0.0, 0.0),
+    "pizarra_coraza_lomo": ("#3b3a40", 0.85, 0.05, 0.0),
+    "colmillos_silex": ("#b49a7c", 0.45, 0.1, 0.0),
+    "vetas_giza_violacea": ("#8a2fc0", 0.60, 0.0, 2.2),
     "musgo_seco_grietas": ("#353826", 0.95, 0.0, 0.0),
     "cuenca_oscura": ("#0d0b10", 0.95, 0.0, 0.0),
 }
@@ -165,71 +167,128 @@ class Roca:
         return ob
 
 
+def placas(r, c, radios, hueso, n, semilla, mat="roca_basalto_cuerpo", grosor=0.55, debajo=True):
+    """Cuerpo de placas: n trozos de basalto repartidos por un elipsoide y, debajo, un núcleo violeta que
+    brilla por las juntas (las grietas de Giza de la hoja canónica)."""
+    c, radios = Vector(c), Vector(radios)
+    n = max(6, int(n * 0.6))     # placas grandes, como músculos de piedra
+    if debajo:
+        r.bloque(c, radios * 0.88, "vetas_giza_violacea", hueso, sub=2, aspereza=0.04, tallas=0, semilla=semilla)
+    area = 4 * math.pi * ((radios.x * radios.y) ** 1.6 + (radios.x * radios.z) ** 1.6 + (radios.y * radios.z) ** 1.6
+                          / 3) ** (1 / 1.6)
+    lado = math.sqrt(area / n) * 0.50
+    for i in range(n):
+        z = 1 - 2 * (i + 0.5) / n
+        rr = math.sqrt(max(0.0, 1 - z * z))
+        fi = i * 2.399963 + semilla
+        d = Vector((rr * math.cos(fi), rr * math.sin(fi), z))
+        p = c + Vector((d.x * radios.x, d.y * radios.y, d.z * radios.z)) * 0.93
+        normal = Vector((d.x / radios.x, d.y / radios.y, d.z / radios.z)).normalized()
+        giro = Z.rotation_difference(normal).to_matrix() @ Matrix.Rotation(azar.uniform(0, 3), 3, "Z")
+        k = azar.uniform(0.85, 1.15)
+        r.bloque(p, (lado * k, lado * k * azar.uniform(0.8, 1.1), lado * grosor), mat, hueso, giro=giro, sub=2,
+                 aspereza=0.18, semilla=semilla + i * 0.37, tallas=6)
+
+
+def lasca(r, base, alto, ancho, inclinacion, hueso, mat="pizarra_coraza_lomo", semilla=0.0, lado=0.0):
+    """Laja de la cresta: sale del lomo hacia arriba, afilada en punta e inclinada hacia atrás."""
+    def punta(q):
+        t = min(1.0, max(0.0, (q.z / alto) + 0.5))
+        return Vector((q.x * (1 - 0.6 * t), q.y * (1 - 0.55 * t) - 0.35 * t * t * abs(q.y), q.z))
+    giro = Matrix.Rotation(math.radians(lado), 3, "Y") @ Matrix.Rotation(math.radians(-inclinacion), 3, "X")
+    r.bloque(Vector(base) + giro @ Vector((0, 0, alto * 0.45)), (0.05, ancho / 2, alto / 2), mat, hueso, giro=giro,
+             sub=2, aspereza=0.08, recorte=punta, semilla=semilla, tallas=4)
+
+
+def colmillo(r, pts, r0, mat, hueso):
+    """Colmillo curvo: tubo que se afila hasta la punta."""
+    pts = [Vector(p) for p in pts]
+    anillos = []
+    for i, c in enumerate(pts):
+        t = (pts[min(i + 1, len(pts) - 1)] - pts[max(i - 1, 0)]).normalized()
+        e1 = (X - t * X.dot(t)).normalized() if abs(t.x) < 0.9 else (Y - t * Y.dot(t)).normalized()
+        e2 = t.cross(e1)
+        rad = r0 * (1 - i / (len(pts) - 1)) + 0.002
+        anillos.append([r.bm.verts.new(c + (e1 * math.cos(a) + e2 * math.sin(a)) * rad)
+                        for a in (2 * math.pi * j / 8 for j in range(8))])
+    for i in range(len(anillos) - 1):
+        for j in range(8):
+            r.bm.faces.new((anillos[i][j], anillos[i][(j + 1) % 8], anillos[i + 1][(j + 1) % 8], anillos[i + 1][j]))
+    r.bm.faces.new(list(reversed(anillos[0])))
+    r.bm.faces.new(anillos[-1])
+    r._marcar([v for a in anillos for v in a], mat, hueso)
+
+
 def construir():
     ap.escena_vacia()
     mats = {n: ap.material(n, *v) for n, v in PALETA.items()}
     r = Roca("Petrino_Cuerpo", mats)
-    B, P, V, S, M = "roca_basalto_cuerpo", "pizarra_coraza_lomo", "vetas_giza_violacea", "colmillos_silex", \
-        "musgo_seco_grietas"
+    B, P, V, S = "roca_basalto_cuerpo", "pizarra_coraza_lomo", "vetas_giza_violacea", "colmillos_silex"
 
-    # tronco: grupa, vientre, lomo y pecho macizo, con bloques sueltos que rompen la silueta
-    r.bloque((0, 0.47, 0.74), (0.31, 0.30, 0.29), B, "Pelvis", semilla=1)
-    r.bloque((0, 0.13, 0.72), (0.35, 0.34, 0.30), B, "Spine_01", semilla=2)
-    r.bloque((0, -0.17, 0.78), (0.39, 0.30, 0.33), B, "Spine_02", semilla=3)
-    r.bloque((0, -0.40, 0.79), (0.42, 0.27, 0.37), B, "Chest", semilla=4)
-    r.bloque((0, -0.36, 0.53), (0.30, 0.22, 0.17), B, "Chest", semilla=4.5)          # quilla del pecho
-    for s in (-1, 1):
-        r.bloque((s * 0.26, -0.05, 0.88), (0.14, 0.18, 0.12), B, "Spine_02", semilla=20 + s)
-        r.bloque((s * 0.27, 0.36, 0.84), (0.13, 0.15, 0.12), B, "Pelvis", semilla=22 + s)
-    r.bloque((0, -0.62, 0.85), (0.24, 0.19, 0.22), B, "Neck", semilla=5)
+    # tronco de jabalí: la joroba alta en la cruz y el lomo que baja hacia la grupa
+    placas(r, (0, 0.44, 0.70), (0.29, 0.28, 0.27), "Pelvis", 26, 1.0)
+    placas(r, (0, 0.14, 0.72), (0.33, 0.28, 0.29), "Spine_01", 28, 2.0)
+    placas(r, (0, -0.14, 0.79), (0.37, 0.27, 0.33), "Spine_02", 30, 3.0)
+    placas(r, (0, -0.38, 0.84), (0.39, 0.26, 0.37), "Chest", 32, 4.0)
+    placas(r, (0, -0.60, 0.79), (0.29, 0.18, 0.28), "Neck", 18, 5.0)
 
-    def cuña(q):      # la cabeza se estrecha y se aplana hacia delante, como una punta de pedernal
-        k = 1.0 - 0.50 * max(0.0, -q.y) / 0.25
-        return Vector((q.x * k, q.y * 1.05, q.z * (0.55 + 0.45 * k) - 0.02 * max(0.0, -q.y) / 0.25))
-    r.bloque((0, -0.85, 0.82), (0.21, 0.25, 0.15), B, "Head", sub=3, aspereza=0.10, semilla=6, recorte=cuña,
-             tallas=9)
-    r.bloque((0, -0.80, 0.93), (0.20, 0.13, 0.05), B, "Head", sub=2, aspereza=0.15, semilla=6.5)      # ceja de roca
-    r.bloque((0, -0.85, 0.67), (0.17, 0.21, 0.06), B, "Jaw_Tusk", sub=2, aspereza=0.12, semilla=7, recorte=cuña)
+    # cabeza: cráneo macizo, ceja de piedra, hocico de cerdo con su disco y orejas cortas
+    def cuña(q):
+        k = 1.0 - 0.30 * max(0.0, -q.y) / 0.25
+        return Vector((q.x * k, q.y, q.z * k))
+    for k, (c, rad) in enumerate((((0, -0.80, 0.86), (0.20, 0.20, 0.12)), ((-0.12, -0.84, 0.72), (0.10, 0.17, 0.12)),
+                                  ((0.12, -0.84, 0.72), (0.10, 0.17, 0.12)), ((0, -0.72, 0.70), (0.17, 0.12, 0.14)))):
+        r.bloque(c, rad, B, "Head", sub=3, aspereza=0.12, semilla=30 + k, recorte=cuña, tallas=8)
+    for pts in (((0.0, -0.95, 0.93), (0.03, -0.90, 0.97), (-0.02, -0.82, 0.99), (0.02, -0.74, 0.98)),
+                ((0.10, -0.92, 0.80), (0.15, -0.86, 0.76), (0.17, -0.78, 0.79)),
+                ((-0.10, -0.92, 0.80), (-0.15, -0.86, 0.76), (-0.17, -0.78, 0.79)),
+                ((0.05, -1.05, 0.76), (0.0, -0.99, 0.80), (-0.05, -0.95, 0.85))):
+        r.veta([(x * 1.08, y, z) for x, y, z in pts], V, "Head", ancho=0.010)
+    r.bloque((0, -0.93, 0.89), (0.19, 0.07, 0.05), B, "Head", sub=2, aspereza=0.15, semilla=36)        # ceja
+    r.bloque((0, -1.00, 0.70), (0.12, 0.14, 0.11), B, "Head", sub=3, aspereza=0.10, semilla=37, tallas=6)  # hocico
+    r.bloque((0, -1.12, 0.67), (0.105, 0.035, 0.085), B, "Head", sub=2, aspereza=0.03, tallas=0)          # disco
     for s in (-1, 1):
         lado = "L" if s < 0 else "R"
-        # cuencas hondas bajo la ceja, con la luz violeta de Giza dentro
-        r.bloque((s * 0.095, -0.93, 0.875), (0.045, 0.030, 0.030), "cuenca_oscura", "Head", sub=2, aspereza=0.05,
+        r.bloque((s * 0.04, -1.15, 0.665), (0.022, 0.012, 0.03), "cuenca_oscura", "Head", sub=2, aspereza=0.0,
                  tallas=0)
-        r.bloque((s * 0.095, -0.955, 0.873), (0.022, 0.012, 0.014), V, "Head", sub=2, aspereza=0.0, tallas=0)
-        # colmillos de sílex desde la mandíbula hacia arriba y delante
-        r.cono((s * 0.11, -0.94, 0.68), (s * 0.15, -1.07, 0.85), 0.028, S, "Jaw_Tusk")
-        # patas: hombro, pata que baja hasta la pezuña (solapadas) y pezuña ancha con garras
-        r.bloque((s * 0.33, -0.33, 0.74), (0.18, 0.20, 0.21), B, f"Shoulder_{lado}", semilla=8 + s)
-        r.bloque((s * 0.345, -0.36, 0.42), (0.125, 0.135, 0.30), B, f"LegFront_{lado}", semilla=10 + s)
-        r.bloque((s * 0.355, -0.42, 0.10), (0.15, 0.20, 0.10), B, f"FootFront_{lado}", semilla=12 + s)
-        r.bloque((s * 0.28, 0.47, 0.64), (0.17, 0.21, 0.21), B, f"LegBack_{lado}", semilla=14 + s)
-        r.bloque((s * 0.30, 0.49, 0.38), (0.125, 0.135, 0.25), B, f"LegBack_{lado}", semilla=16 + s)
-        r.bloque((s * 0.315, 0.44, 0.10), (0.15, 0.19, 0.10), B, f"FootBack_{lado}", semilla=18 + s)
-        for k in (-1, 0, 1):
-            for pata, (py, hueso) in (("d", (-0.56, f"FootFront_{lado}")), ("t", (0.28, f"FootBack_{lado}"))):
-                base = Vector((s * 0.355 + k * 0.06, py + (0.0 if pata == "d" else 0.0), 0.05))
-                r.cono(base, base + Vector((k * 0.01, -0.07, -0.035)), 0.022, S, hueso, lados=5)
-        # grietas de Giza en los flancos
-        y0 = -0.30
-        pts = [(s * 0.40, y0 - 0.05, 0.92), (s * 0.43, y0, 0.84), (s * 0.41, y0 + 0.06, 0.78),
-               (s * 0.43, y0 + 0.12, 0.70), (s * 0.40, y0 + 0.20, 0.64)]
-        r.veta(pts, V, "Chest")
-        r.veta([(s * 0.34, 0.05, 0.86), (s * 0.37, 0.12, 0.78), (s * 0.35, 0.20, 0.72)], V, "Spine_01")
-        # líquenes muertos en las juntas
-        r.bloque((s * 0.30, -0.20, 0.92), (0.06, 0.05, 0.02), M, "Spine_02", sub=2, aspereza=0.3)
-        r.bloque((s * 0.24, 0.32, 0.86), (0.05, 0.06, 0.02), M, "Pelvis", sub=2, aspereza=0.3)
-    # grieta del pecho
-    r.veta([(0.0, -0.66, 0.93), (0.05, -0.665, 0.85), (-0.03, -0.665, 0.77), (0.04, -0.66, 0.69)], V, "Chest")
+        r.bloque((s * 0.105, -0.95, 0.835), (0.045, 0.03, 0.03), "cuenca_oscura", "Head", sub=2, aspereza=0.05,
+                 tallas=0)
+        r.bloque((s * 0.105, -0.972, 0.835), (0.026, 0.012, 0.016), V, "Head", sub=2, aspereza=0.0, tallas=0)
+        r.cono((s * 0.13, -0.70, 0.94), (s * 0.20, -0.62, 1.08), 0.055, B, "Head", lados=4)            # oreja
+        # colmillos curvos de cuarzo ferruginoso: salen de la mandíbula hacia fuera, delante y arriba
+        colmillo(r, [(s * 0.09, -1.00, 0.60), (s * 0.15, -1.06, 0.62), (s * 0.20, -1.09, 0.70),
+                     (s * 0.21, -1.07, 0.80), (s * 0.18, -1.02, 0.87)], 0.036, S, "Jaw_Tusk")
+        # patas gruesas de placas y pezuñas partidas en dos dedos
+        placas(r, (s * 0.31, -0.34, 0.70), (0.15, 0.17, 0.19), f"Shoulder_{lado}", 12, 8 + s)
+        placas(r, (s * 0.33, -0.37, 0.40), (0.11, 0.12, 0.24), f"LegFront_{lado}", 12, 10 + s)
+        placas(r, (s * 0.27, 0.45, 0.62), (0.15, 0.19, 0.19), f"LegBack_{lado}", 12, 14 + s)
+        placas(r, (s * 0.29, 0.50, 0.36), (0.10, 0.11, 0.21), f"LegBack_{lado}", 10, 16 + s)
+        for pie, py in ((f"FootFront_{lado}", -0.42), (f"FootBack_{lado}", 0.44)):
+            r.bloque((s * (0.33 if "Front" in pie else 0.30), py, 0.13), (0.10, 0.11, 0.08), B, pie, sub=2,
+                     aspereza=0.12, semilla=18 + s, tallas=5)
+            for dedo in (-1, 1):
+                x = s * (0.33 if "Front" in pie else 0.30) + dedo * 0.045
+                r.bloque((x, py - 0.06, 0.045), (0.042, 0.075, 0.045), P, pie, sub=2, aspereza=0.1,
+                         semilla=40 + dedo, tallas=4)
+    r.bloque((0, -0.93, 0.60), (0.12, 0.16, 0.06), B, "Jaw_Tusk", sub=2, aspereza=0.12, semilla=7, tallas=5)
 
-    # coraza: 5 lajas de pizarra superpuestas, de la cruz a la grupa, con cresta cortante
-    lajas = [(-0.42, 1.06, "Chest", 0.62), (-0.22, 1.08, "Spine_02", 0.66), (0.00, 1.05, "Spine_01", 0.64),
-             (0.22, 1.02, "Spine_01", 0.60), (0.42, 0.98, "Pelvis", 0.54)]
-    for k, (y, z, hueso, ancho) in enumerate(lajas):
-        giro = Matrix.Rotation(math.radians(-14), 3, "X") @ Matrix.Rotation(math.radians(azar.uniform(-4, 4)), 3, "Z")
-        r.losa((0, y, z), (ancho, 0.30, 0.045), P, hueso, giro, cresta=0.10)
-        for s in (-1, 1):   # lajas laterales que bajan por los costados
-            g2 = Matrix.Rotation(math.radians(s * 48), 3, "Y") @ giro
-            r.losa((s * ancho * 0.42, y + 0.02, z - 0.16), (0.24, 0.26, 0.035), P, hueso, g2, cresta=0.04)
+    # cresta: lajas de pizarra en abanico, más altas en la cruz, en dos filas al tresbolillo
+    for k in range(8):
+        t = k / 7
+        y = -0.55 + 1.05 * t
+        hueso = "Chest" if y < -0.27 else "Spine_02" if y < -0.02 else "Spine_01" if y < 0.28 else "Pelvis"
+        alto = 0.50 * (1 - t) ** 0.8 + 0.12
+        z = 1.12 - 0.20 * t
+        for fila in (-1, 1):
+            lasca(r, (fila * 0.05, y + fila * 0.04, z - 0.04), alto * (1.0 if fila < 0 else 0.85), 0.42 - 0.12 * t,
+                  48 + 10 * t, hueso, semilla=50 + k * 2 + fila, lado=fila * 8)
+    # cola corta de placas con espinas
+    for k in range(5):
+        t = k / 4
+        c = (0, 0.70 + 0.22 * t, 0.78 - 0.20 * t)
+        r.bloque(c, (0.06 - 0.03 * t, 0.07, 0.06 - 0.03 * t), B, "Pelvis", sub=2, aspereza=0.15, semilla=60 + k)
+        if k < 4:
+            r.cono((0, c[1], c[2] + 0.04), (0, c[1] + 0.06, c[2] + 0.12 - 0.04 * t), 0.025, P, "Pelvis", lados=4)
     return r.objeto(), mats
 
 
