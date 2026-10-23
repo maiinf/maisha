@@ -39,9 +39,11 @@ ESCALA = 1.70 / 1.794
 
 PALETA = {
     "piel_humanizada": ("#e8ded0", 0.60, 0.0, 0.0),
-    "cabello_viajero": ("#4e443b", 0.70, 0.0, 0.0),      # contrato: pelo suave y oscuro
+    "cabello_viajero": ("#2e2621", 0.65, 0.0, 0.0),      # hoja canónica: melena oscura ondulada
     "tunica_lino_arena": ("#eae3d2", 0.85, 0.0, 0.0),
-    "capa_viaje_musgo": ("#46543b", 0.85, 0.0, 0.0),
+    "capa_viaje_musgo": ("#3f5a2c", 0.85, 0.0, 0.0),
+    "capa_forro_pardo": ("#4f3a28", 0.88, 0.0, 0.0),
+    "calabaza_seca": ("#7a5a34", 0.55, 0.0, 0.0),
     "cuero_cinturon": ("#4a3828", 0.70, 0.1, 0.0),
     "tela_pantalon": ("#7d735f", 0.90, 0.0, 0.0),
     "cuero_botas": ("#5a4534", 0.75, 0.05, 0.0),
@@ -49,7 +51,7 @@ PALETA = {
     "engaste_corazon": ("#b8a58a", 0.55, 0.0, 0.0),
     "cetro_madera": ("#4e3b2b", 0.80, 0.0, 0.0),
     "semilla_esmeralda": ("#2ecc8a", 0.15, 0.0, 1.8),
-    "iris_ambar": ("#6b4a24", 0.20, 0.0, 0.3),
+    "iris_ambar": ("#d4e2da", 0.20, 0.0, 0.6),          # hoja canónica: ojos claros que brillan
 }
 TINTA = "#3d3835"      # tatuajes dormidos
 ORO = "#ffd766"        # tatuajes despiertos
@@ -366,7 +368,8 @@ def falda(pz, tabla, z_cintura, z_bajo):
             f = 2 * math.pi * j / lados
             cx, cy = math.cos(f), math.sin(f)
             dientes = 0.010 * abs(((f * 44 / (2 * math.pi)) % 1.0) - 0.5) * 2
-            abajo = z_bajo + 0.07 * math.cos(f + 0.6) - dientes
+            picos = 0.07 * abs(math.sin(f * 1.5 + 0.3)) ** 3      # bajo en picos, como la hoja
+            abajo = z_bajo + 0.09 * math.cos(f + 0.6) - dientes - picos
             z = z_cintura + (abajo - z_cintura) * s
             rx, ry, cy0 = radio(tabla, max(z, tabla[0][0]))
             vuelo = max(0.0, z_cintura - z) * 0.32
@@ -384,39 +387,49 @@ def falda(pz, tabla, z_cintura, z_bajo):
         c.material_index = k
 
 
-def capa(pz, tabla, z_hombro):
-    """Capa corta sobre el hombro izquierdo: cae por la espalda y el costado, sin tapar el pecho."""
+def capa(pz, tabla, z_hombro, z_cuello, mat, largo_atras, largo_delante, holgura=0.0):
+    """Capa de viaje: rodea el cuello, cae por los hombros y llega larga por la espalda; por delante queda
+    abierta y corta (una esclavina sobre el pecho), y los brazos salen por debajo por los costados."""
     rx_h, ry_h, cy_h = radio(tabla, z_hombro - 0.02)
-    arriba = [Vector(p) for p in ((0.06, cy_h + ry_h * 0.85, z_hombro + 0.03), (-0.01, cy_h + ry_h * 0.95, z_hombro + 0.04),
-                                  (-0.09, cy_h + ry_h * 0.85, z_hombro + 0.055), (-rx_h * 0.85, cy_h + ry_h * 0.45, z_hombro + 0.085),
-                                  (-rx_h * 1.18, cy_h + 0.02, z_hombro + 0.055), (-rx_h * 1.32, cy_h + 0.05, z_hombro - 0.01))]
-    abajo = [Vector(p) for p in ((0.15, cy_h + 0.17, z_hombro - 0.42), (0.0, cy_h + 0.21, z_hombro - 0.51),
-                                 (-0.16, cy_h + 0.20, z_hombro - 0.53), (-0.28, cy_h + 0.13, z_hombro - 0.49),
-                                 (-0.33, cy_h + 0.09, z_hombro - 0.41), (-0.33, cy_h + 0.08, z_hombro - 0.31))]
-    columnas, filas = 34, 22
+    columnas, filas = 48, 26
     rejilla = []
-    for i in range(filas):
-        s = i / (filas - 1)
-        fila = []
-        for j in range(columnas):
-            u = j / (columnas - 1)
-            p = _catmull(arriba, u).lerp(_catmull(abajo, u), s)
-            fuera = Vector((p.x, p.y - cy_h, 0.0))
-            fuera = fuera.normalized() if fuera.length > 1e-6 else Y
-            pl = (0.022 * math.sin(u * math.pi * 5.0 + 0.4) + 0.010 * math.sin(u * math.pi * 11.0)) * s ** 0.8
-            p += fuera * (pl + 0.012 * math.sin(math.pi * min(s * 1.4, 1.0)))
-            fila.append(pz.bm.verts.new(p))
-        rejilla.append(fila)
+    for j in range(columnas):
+        u = j / (columnas - 1)
+        fi = math.radians(-160 + 320 * u)              # 0 = espalda (+Y); ±160 = bordes delanteros
+        a = abs(math.degrees(fi))
+        corto = suave(62.0, 100.0, a)                  # costados y delante: esclavina (los brazos salen por debajo)
+        z_bajo = largo_atras + (largo_delante - largo_atras) * corto
+        z_bajo -= 0.035 * abs(math.sin(fi * 2.5)) ** 2  # bajo en picos
+        col = []
+        for i in range(filas):
+            s = i / (filas - 1)
+            hombro = suave(0.0, 0.16, s)
+            z = z_cuello + (z_hombro - z_cuello) * hombro
+            if s > 0.16:
+                z = z_hombro + (z_bajo - z_hombro) * (s - 0.16) / 0.84
+            rx = 0.085 + (rx_h * 1.30 - 0.085) * hombro + holgura
+            ry = 0.075 + (ry_h * 1.55 - 0.075) * hombro + holgura
+            vuelo = max(0.0, s - 0.16) * (0.13 + 0.05 * (1 - corto))
+            pl = (0.020 * math.sin(fi * 6 + 0.4) + 0.009 * math.sin(fi * 13)) * max(0.0, s - 0.2)
+            k = 1 + pl
+            col.append(pz.bm.verts.new(Vector(((rx + vuelo) * math.sin(fi) * k,
+                                               cy_h + (ry + vuelo) * math.cos(fi) * k - 0.01, z))))
+        rejilla.append(col)
     caras = []
-    for i in range(filas - 1):
-        for j in range(columnas - 1):
-            caras.append(pz.bm.faces.new((rejilla[i][j], rejilla[i][j + 1], rejilla[i + 1][j + 1], rejilla[i + 1][j])))
-    k = pz._i("capa_viaje_musgo")
-    for c in caras:
-        c.material_index = k
-    pz.tubo([_catmull(arriba, k / 15) + Vector((0, 0, 0.004)) for k in range(16)], [(0.013, 0.010)] * 16,
-            "capa_viaje_musgo", lados=10, lateral=Z)
-    return arriba
+    for j in range(columnas - 1):
+        for i in range(filas - 1):
+            caras.append(pz.bm.faces.new((rejilla[j][i], rejilla[j + 1][i], rejilla[j + 1][i + 1], rejilla[j][i + 1])))
+    k = pz._i(mat)
+    for f in caras:
+        f.material_index = k
+
+
+def capucha(pz, z_cuello, cy):
+    """Capucha caída sobre la espalda: un rollo de tela bajo la nuca y la bolsa que cuelga."""
+    pz.tubo([Vector((x, cy + 0.07 + 0.05 * (1 - (x / 0.16) ** 2), z_cuello - 0.01 - 0.02 * (x / 0.16) ** 2))
+             for x in (-0.16 + 0.32 * k / 12 for k in range(13))], [(0.030, 0.022)] * 13, "capa_viaje_musgo",
+            lados=10, lateral=Z)
+    pz.esfera(Vector((0, cy + 0.13, z_cuello - 0.10)), (0.12, 0.05, 0.11), "capa_viaje_musgo", seg=(16, 12))
 
 
 def cetro(pz, agarre, eje, largo=1.75, desde_abajo=0.78):
@@ -455,7 +468,7 @@ def construir():
     ap.escena_vacia()
     mats = {n: ap.material(n, *v) for n, v in PALETA.items() if n != "piel_humanizada"}   # la piel va aparte
     mats["ojo_blanco"] = ap.material("ojo_blanco", "#f1ece4", 0.30)
-    mats["pupila"] = ap.material("pupila", "#140d08", 0.15)
+    mats["pupila"] = ap.material("pupila", "#a9b8b0", 0.15, 0.0, 0.6)     # hoja canónica: sin pupila oscura
     cuerpo, ojos = ap.cargar_malla_base("GEO-body_male_stylized")
     forma = Cuerpo(cuerpo)
     dar_forma(cuerpo, forma)
@@ -495,23 +508,30 @@ def construir():
     bpy.ops.object.shade_smooth()
 
     # ropa que sigue al cuerpo: cuerpo de la túnica (deja al aire el hombro derecho y el esternón), pantalón y botas
+    # (hoja canónica: descalza y sin pantalón; mangas de lino hasta el codo y escote en V hasta el corazón)
     def tunica_dentro(i, p):
         b = base[i]
+        if zona[i] == "brazo":
+            return b.z > 1.00
         if zona[i] != "torso" or not (0.88 < b.z < 1.44):
             return False
-        hombro_der = b.x > 0.05 and b.z > 1.26 - 0.10 * suave(0.05, 0.20, b.x)
-        escote = abs(b.x) < 0.045 + 0.04 * suave(1.18, 1.40, b.z) and b.y < -0.02 and b.z > 1.17
-        return not (hombro_der or escote)
+        escote = abs(b.x) < 0.02 + 0.075 * suave(1.16, 1.42, b.z) and b.y < -0.02 and b.z > 1.15
+        return not escote
     tunica = ap.concha(cuerpo, "Maisha_Tunica", tunica_dentro, 0.009, 0.005, mats["tunica_lino_arena"])
-    pantalon = ap.concha(cuerpo, "Maisha_Pantalon",
-                         lambda i, p: zona[i] in ("pierna", "torso") and 0.30 < base[i].z < 0.92,
-                         0.008, 0.004, mats["tela_pantalon"])
-    botas = ap.concha(cuerpo, "Maisha_Botas", lambda i, p: zona[i] in ("pierna", "pie") and base[i].z < 0.42,
-                      0.012, 0.005, mats["cuero_botas"])
+
+    # faja verde cruzada del hombro derecho a la cadera izquierda, por delante y por detrás
+    def faja_dentro(i, p):
+        b = base[i]
+        if zona[i] != "torso" or not (0.92 < b.z < 1.44):
+            return False
+        d = b.x - (0.17 - (1.42 - b.z) * 0.62)
+        return abs(d) < 0.055 and not (abs(b.x) < 0.02 + 0.075 * suave(1.16, 1.42, b.z) and b.y < -0.02 and b.z > 1.15)
+    faja = ap.concha(cuerpo, "Maisha_Faja", faja_dentro, 0.016, 0.005, mats["capa_viaje_musgo"])
+    tunica = ap.unir([tunica, faja], "Maisha_Tunica")
 
     pz = Piezas("Maisha_Ropa", mats)
     z_cintura = 0.95 * ESCALA
-    falda(pz, tabla, z_cintura, 0.60 * ESCALA)
+    falda(pz, tabla, z_cintura, 0.40 * ESCALA)
     # cinturón con hebilla, bolsas de semillas y saquito
     rx, ry, cy = radio(tabla, z_cintura)
     anillo = [Vector(((rx + 0.03) * math.cos(a), cy + (ry + 0.03) * math.sin(a), z_cintura - 0.02 * math.cos(a - 0.4)))
@@ -524,6 +544,16 @@ def construir():
         pz.esfera(c, (0.042, 0.026, 0.050), "cuero_cinturon", giro, seg=(14, 10))
         pz.caja(c + Vector((0, 0, 0.032)), (0.075, 0.050, 0.012), "cuero_botas", giro)
         pz.esfera(c + Vector((0, 0, 0.018)), (0.008, 0.008, 0.008), "corazon_asili_oro", seg=(8, 6))
+    # dos calabazas colgadas a la derecha del cinturón, y la punta del cinto que cuelga por delante
+    for k, (dx, dz) in enumerate(((0.05, -0.12), (0.10, -0.10))):
+        cc = Vector((rx * 0.75 + dx, cy - ry * 0.55, z_cintura + dz))
+        pz.esfera(cc, (0.040, 0.040, 0.046), "calabaza_seca", seg=(14, 10))
+        pz.tubo([cc + Vector((0, 0, 0.040)), cc + Vector((0, 0, 0.072))], [(0.012, 0.012), (0.009, 0.009)],
+                "calabaza_seca", lados=8)
+        pz.tubo([cc + Vector((0, 0, 0.07)), Vector((cc.x - 0.02, cc.y + 0.01, z_cintura - 0.01))],
+                [(0.003, 0.003)] * 2, "cuero_cinturon", lados=5)
+    pz.tubo([Vector((0.04, cy - ry - 0.036, z_cintura - 0.03)), Vector((0.045, cy - ry - 0.05, z_cintura - 0.20))],
+            [(0.016, 0.004), (0.014, 0.004)], "cuero_cinturon", lados=6, lateral=Y)
     # Corazón de Asili en el esternón
     rxc, ryc, cyc = radio(tabla, z_corazon)
     frente = Vector((0, cyc - ryc + 0.004, z_corazon))
@@ -533,8 +563,12 @@ def construir():
     ropa = pz.objeto()
 
     pc = Piezas("Maisha_Capa", mats)
-    capa(pc, tabla, 1.40 * ESCALA)
-    capa_ob = pc.objeto(grosor=0.008)
+    z_cuello_capa = 1.47 * ESCALA
+    capa(pc, tabla, 1.36 * ESCALA, z_cuello_capa, "capa_forro_pardo", 0.36 * ESCALA, 1.02 * ESCALA, holgura=0.012)
+    capa(pc, tabla, 1.38 * ESCALA, z_cuello_capa + 0.008, "capa_viaje_musgo", 0.58 * ESCALA, 1.14 * ESCALA,
+         holgura=0.028)
+    capucha(pc, z_cuello_capa, radio(tabla, 1.36 * ESCALA)[2])
+    capa_ob = pc.objeto(grosor=0.006)
 
     pelo_ob = pelo(mats, cuerpo, forma)
 
@@ -546,7 +580,7 @@ def construir():
     cetro(pcet, agarre, eje)
     cetro_ob = pcet.objeto()
 
-    return {"cuerpo": cuerpo, "ojos": ojos_ob, "tunica": tunica, "pantalon": pantalon, "botas": botas, "ropa": ropa,
+    return {"cuerpo": cuerpo, "ojos": ojos_ob, "tunica": tunica, "ropa": ropa,
             "capa": capa_ob, "pelo": pelo_ob, "cetro": cetro_ob, "forma": forma, "brazos": brazos, "eje_cetro": eje,
             "agarre": agarre}
 
@@ -596,12 +630,14 @@ def pelo(mats, cuerpo, forma):
     for k, (az1, el1, ancho) in enumerate(((38, 22, 0.030), (55, 14, 0.026), (68, 6, 0.022), (22, 30, 0.026))):
         mechon(-22 + k * 4, 72 - k * 3, az1, el1, ancho, capa_=1.10 + 0.008 * k)
     for k, (az0, az1) in enumerate(((-30, -62), (-40, -80), (-55, -95))):
-        mechon(az0, 74 - 4 * k, az1, -20 - 6 * k, 0.030, caida=0.035 + 0.01 * k, curva=0.006)
+        mechon(az0, 74 - 4 * k, az1, -20 - 6 * k, 0.030, caida=0.12 + 0.03 * k, curva=0.025)
     for k, (az0, az1) in enumerate(((60, 78), (78, 98), (95, 112))):
-        mechon(az0, 58 - 6 * k, az1, -24 - 4 * k, 0.030, caida=0.04, curva=0.006, capa_=1.095)
+        mechon(az0, 58 - 6 * k, az1, -24 - 4 * k, 0.030, caida=0.17 + 0.03 * k, curva=0.03, capa_=1.095)
+        mechon(-az0, 58 - 6 * k, -az1, -24 - 4 * k, 0.028, caida=0.15 + 0.03 * k, curva=0.03, capa_=1.10)
     for k in range(9):
         az0 = 115 + k * 16
-        mechon(az0, 70, 180 + (az0 - 180) * 0.35, -40, 0.034, grueso=0.010, capa_=1.09 + 0.004 * (k % 2))
+        mechon(az0, 70, 180 + (az0 - 180) * 0.35, -40, 0.036, grueso=0.011, capa_=1.09 + 0.004 * (k % 2),
+               caida=0.20 + 0.04 * math.sin(k * 1.7), curva=0.02)
     nuca = sobre(180, -42, 1.12)
     pz.esfera(nuca, (0.032, 0.026, 0.028), "cabello_viajero", seg=(16, 12))
     pz.tubo([nuca + Vector((-0.024, -0.006, 0.006)), nuca + Vector((0, -0.004, 0.012)),
@@ -690,14 +726,16 @@ def aparejar(p):
 
     huesos_cuerpo = [b.name for b in arm.data.bones if not b.name.startswith(("cloak", "hair"))]
     ap.pesar(p["cuerpo"], arm, huesos_cuerpo, regla)
-    for k in ("tunica", "pantalon", "botas"):
-        ap.copiar_pesos(p["cuerpo"], p[k], arm)
+    ap.copiar_pesos(p["cuerpo"], p["tunica"], arm)
     ap.pesar(p["ojos"], arm, ["head"])
     # falda, cinturón y corazón: la cadera y la columna mandan; los muslos, a medias y solo bajo la cadera
     # (si la falda copiara el peso del muslo que tiene al lado, sacaría picos al andar)
     ap.pesar(p["ropa"], arm, ["hips", "spine_01", "spine_02", "chest", "thigh_L", "thigh_R"],
              lambda n, i, co: (0.45 if co.z < 0.80 * ESCALA else 0.0) if n.startswith("thigh") else 1.0)
-    ap.pesar(p["capa"], arm, ["chest", "neck", "shoulder_L", "cloak_L_01", "cloak_L_02"])
+    ap.pesar(p["capa"], arm, ["chest", "neck", "shoulder_L", "shoulder_R", "spine_02", "cloak_L_01", "cloak_L_02"],
+             lambda n, i, co: (1.0 if co.z > 1.24 * ESCALA else 0.0) if n in ("chest", "neck", "shoulder_L",
+                                                                          "shoulder_R")
+             else (1.0 if co.y > 0.0 or n == "spine_02" else 0.3))
     ap.pesar(p["pelo"], arm, ["head", "hair_back_01", "hair_back_02"],
              lambda n, i, co: (1.0 if (co.z < 1.60 * ESCALA and co.y > 0.04) else 0.0) if n.startswith("hair") else 1.0)
     ap.anclar(p["cetro"], arm, "hand_R")
@@ -971,7 +1009,7 @@ def main():
     p = construir()
     arm = aparejar(p)
     animar(arm, p)
-    objetos = [p[k] for k in ("cuerpo", "ojos", "tunica", "pantalon", "botas", "ropa", "capa", "pelo", "cetro")]
+    objetos = [p[k] for k in ("cuerpo", "ojos", "tunica", "ropa", "capa", "pelo", "cetro")]
     ap.exportar(SALIDA, arm, objetos)
     ap.informe("MAISHA", arm, objetos, SALIDA)
     if "--vistas" in args:

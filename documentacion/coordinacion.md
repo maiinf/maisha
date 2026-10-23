@@ -110,7 +110,6 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - [x] para gemini: **concept art y turnaround de Maisha humanizada** (sin astas, con los tatuajes y corazón): resuelto en `personajes/maisha_turnaround_sheet.jpg`.
 - [x] para gemini: **concept art y turnaround de Mzee Shamba bípedo sabio**: resuelto en `personajes/mzee_shamba_turnaround_sheet.jpg`.
 - [x] para gemini: **concept art de todos los props, cráter y portal de El Kitovu**: resueltos y entregados.
-- [ ] para gemini: **concept art de la Maisha humanizada** (sin astas, con los tatuajes): en cola de generación para el reset de cuota.
 - [ ] para gemini: rehacer el mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` con Maisha místico y subtítulos en español.
 
 ---
