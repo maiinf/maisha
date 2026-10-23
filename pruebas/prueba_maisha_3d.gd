@@ -30,7 +30,8 @@ func _ready() -> void:
 		print("\nRESULTADO: %d fallos" % fallos)
 		get_tree().quit(1)
 		return
-	for nombre in ["reposo", "caminar_atento", "correr", "golpe_cetro", "idle_mirar_tatuajes", "eco_despertar"]:
+	for nombre in ["reposo", "caminar_atento", "correr", "golpe_cetro", "idle_mirar_tatuajes", "eco_despertar",
+			"esquivar_rodando", "saltar", "aterrizar", "trepar"]:
 		comprobar(anim.has_animation(nombre), "animación %s" % nombre)
 	comprobar(anim.get_animation("caminar_atento").loop_mode == Animation.LOOP_LINEAR, "caminar se repite en bucle")
 
@@ -46,6 +47,27 @@ func _ready() -> void:
 	maisha._process(0.016)
 	comprobar(anim.current_animation == "correr", "a 6 m/s corre")
 	maisha.velocity = Vector3.ZERO
+
+	# esquiva: la voltereta, acelerada para que dure lo mismo que el impulso
+	maisha.esquivando = true
+	maisha._process(0.016)
+	comprobar(anim.current_animation == "esquivar_rodando", "al esquivar: voltereta")
+	comprobar(is_equal_approx(anim.speed_scale * maisha.DURACION_ESQUIVA, anim.current_animation_length),
+		"la voltereta dura lo que el impulso de la esquiva")
+	maisha.esquivando = false
+
+	# salto: en el aire, la pose de vuelo; al volver al suelo, el aterrizaje
+	maisha.velocity = Vector3(0, maisha.FUERZA_SALTO, 0)
+	await esperar(3)
+	maisha._process(0.016)
+	comprobar(not maisha.is_on_floor() and anim.current_animation == "saltar",
+		"en el aire: salto (va: %s)" % anim.current_animation)
+	await esperar(int(Engine.physics_ticks_per_second * 1.2))
+	comprobar(maisha.is_on_floor(), "vuelve al suelo")
+	maisha._process(0.016)
+	comprobar(anim.current_animation == "aterrizar", "al caer: aterriza (va: %s)" % anim.current_animation)
+	await esperar(int(Engine.physics_ticks_per_second * 0.8))
+	comprobar(anim.current_animation == "reposo", "y vuelve al reposo (va: %s)" % anim.current_animation)
 
 	# golpe con el cetro
 	maisha._intentar_ataque()

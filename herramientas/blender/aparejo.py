@@ -295,6 +295,7 @@ class Animador:
         act = bpy.data.actions.new(nombre)
         act.use_fake_user = True
         self.arm.animation_data.action = act
+        self._previo = {}
         return act
 
     def _ik(self, objetivos):
@@ -345,6 +346,12 @@ class Animador:
             pb.matrix = Matrix.Translation(M.translation) @ (delta.to_matrix() @ M.to_3x3()).to_4x4()
             bpy.context.view_layer.update()
         for pb in self.arm.pose.bones:
+            # mismo hemisferio que el fotograma anterior: si no, una vuelta entera (rodar) da un tirón
+            previo = getattr(self, "_previo", {}).get(pb.name)
+            if previo is not None and previo.dot(pb.rotation_quaternion) < 0:
+                pb.rotation_quaternion = -pb.rotation_quaternion
+            if hasattr(self, "_previo"):
+                self._previo[pb.name] = pb.rotation_quaternion.copy()
             pb.keyframe_insert("rotation_quaternion", frame=f)
             pb.keyframe_insert("location", frame=f)
             pb.keyframe_insert("scale", frame=f)

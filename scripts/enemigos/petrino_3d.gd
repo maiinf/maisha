@@ -158,9 +158,9 @@ func _morir() -> void:
 	var escena_onda := load("res://escenas/efectos/onda_purificacion_3d.tscn")
 	if escena_onda:
 		var onda: Node3D = escena_onda.instantiate()
-		onda.global_position = global_position
 		onda.radio_maximo = 6.0
 		get_parent().add_child(onda)
+		onda.global_position = global_position   # una vez dentro de la escena; antes no tiene sitio
 
 	# Se rompe en bloques (animación muerte_fractura) y luego se desvanece
 	_animar_fase()

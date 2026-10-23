@@ -40,7 +40,8 @@ const BRILLO_TATUAJES := 1.5        # emisión de los tatuajes despiertos (ficha
 const ECOS_TOTALES := 9
 
 # Animaciones del modelo (modelos/personajes/maisha.glb): reposo, caminar_atento, correr, golpe_cetro,
-# idle_mirar_tatuajes y eco_despertar. Velocidades naturales de cada ciclo, para que los pies no patinen.
+# idle_mirar_tatuajes, eco_despertar, esquivar_rodando, saltar, aterrizar y trepar (esta, para cuando haya
+# escalada). Velocidades naturales de cada ciclo, para que los pies no patinen.
 const PASO_CAMINAR := 1.35          # m/s a los que el ciclo de caminar va a velocidad 1
 const PASO_CORRER := 3.3            # m/s a los que el ciclo de correr va a velocidad 1
 const QUIETO_PARA_MIRAR := 8.0      # segundos sin moverse antes de mirarse los tatuajes
@@ -53,6 +54,7 @@ var _audio_cetro: AudioStreamPlayer3D = null
 var _anim: AnimationPlayer = null
 var _piel: BaseMaterial3D = null
 var _tiempo_quieto := 0.0
+var _en_el_aire := false
 
 
 func _ready() -> void:
@@ -74,7 +76,7 @@ func _ready() -> void:
 		var reproductores := _visual.find_children("*", "AnimationPlayer", true, false)
 		if not reproductores.is_empty():
 			_anim = reproductores[0]
-			for ciclo in ["reposo", "caminar_atento", "correr"]:
+			for ciclo in ["reposo", "caminar_atento", "correr", "trepar"]:
 				if _anim.has_animation(ciclo):
 					_anim.get_animation(ciclo).loop_mode = Animation.LOOP_LINEAR
 		_preparar_piel()
@@ -120,12 +122,24 @@ func _process(delta: float) -> void:
 	if not _anim or atacando:
 		return
 	var rapidez := Vector2(velocity.x, velocity.z).length()
-	var unica := _anim.current_animation in ["idle_mirar_tatuajes", "eco_despertar"]
+	var en_suelo := is_on_floor()
+	if esquivando:
+		# la voltereta entera dura lo que dura el impulso de la esquiva
+		var largo := _anim.get_animation("esquivar_rodando").length if _anim.has_animation("esquivar_rodando") else 1.0
+		_animar("esquivar_rodando", largo / DURACION_ESQUIVA, 0.05)
+		return
+	if not en_suelo:
+		_en_el_aire = true
+		_animar("saltar", 1.0, 0.1)   # se agacha, se impulsa y se queda en la pose de vuelo
+		return
+	if _en_el_aire:
+		_en_el_aire = false
+		_animar("aterrizar", 1.0, 0.05)
+		return
+	var unica := _anim.current_animation in ["idle_mirar_tatuajes", "eco_despertar", "aterrizar"]
 	if unica and _anim.is_playing() and rapidez < 0.3:
 		return
-	if esquivando:
-		_animar("correr", 1.6, 0.1)
-	elif rapidez > 0.3:
+	if rapidez > 0.3:
 		_tiempo_quieto = 0.0
 		if rapidez > 2.2:
 			_animar("correr", clampf(rapidez / PASO_CORRER, 0.8, 2.2), 0.2)

@@ -855,6 +855,113 @@ def animar(arm, p):
         })
         an.fotograma(f, pose, mover={"hips": (0, 0, 0.006 * k)}, baston=CETRO_ARRIBA)
     an.cerrar("eco_despertar")
+    animar_acrobacias(an, ps)
+
+
+def _agachar(muslo, rodilla):
+    """Cuánto baja la cadera con el muslo adelantado `muslo` grados y la rodilla doblada `rodilla` grados
+    (pies en el suelo). Las medidas son las de la pierna de la malla base."""
+    lt, lc = 0.29, 0.26
+    return lt * math.cos(math.radians(muslo)) + lc * math.cos(math.radians(rodilla - muslo)) - (lt + lc)
+
+
+def _piernas(mL, rL, mR=None, rR=None, punta=0.0):
+    mR = mL if mR is None else mR
+    rR = rL if rR is None else rR
+    return {"thigh_L": [("X", -mL)], "calf_L": [("X", rL)], "foot_L": [("X", mL - rL + punta)],
+            "thigh_R": [("X", -mR)], "calf_R": [("X", rR)], "foot_R": [("X", mR - rR + punta)]}
+
+
+def _tramos(claves, f):
+    """Interpola linealmente una tabla [(fotograma, valores...)] en el fotograma f."""
+    for (f0, *a), (f1, *b) in zip(claves, claves[1:]):
+        if f0 <= f <= f1:
+            t = (f - f0) / (f1 - f0)
+            return [x + (y - x) * t for x, y in zip(a, b)]
+    return list(claves[-1][1:])
+
+
+def animar_acrobacias(an, ps):
+    """esquivar_rodando, saltar, aterrizar y trepar. En el sitio: el juego mueve el cuerpo."""
+    # Voltereta hacia delante: se agacha, se hace un ovillo, da la vuelta entera y se levanta.
+    # Columnas: vuelta (grados), ovillo (0-1), agachada (0-1)
+    claves = [(0, 0, 0.0, 0.2), (3, 10, 0.4, 0.8), (6, 70, 1.0, 0.6), (9, 150, 1.0, 0.4), (12, 220, 1.0, 0.4),
+              (15, 290, 1.0, 0.5), (18, 345, 0.8, 0.8), (21, 360, 0.3, 0.8), (24, 360, 0.0, 0.25)]
+    an.nueva("esquivar_rodando")
+    for f in range(0, 25):
+        vuelta, k, c = _tramos(claves, f)
+        m, r = 50 * c + 75 * k, 90 * c + 60 * k
+        pose = _piernas(min(m, 125), min(r, 145))
+        pose.update({
+            "hips": [("X", vuelta)],
+            "spine_01": [("X", 12 * k + 6 * c)], "spine_02": [("X", 20 * k + 6 * c)], "chest": [("X", 15 * k)],
+            "neck": [("X", 18 * k)], "head": [("X", 12 * k)],
+            "arm_L": ps.brazo("L", 75, 15 * c + 55 * k), "forearm_L": [("X", -15 - 70 * k)],
+            "arm_R": ps.brazo("R", 75, 20 * c + 55 * k), "forearm_R": [("X", -38 - 45 * k)],
+            "cloak_L_01": [("X", 4 + 12 * k)], "cloak_L_02": [("X", 6 + 18 * k)],
+            "hair_back_01": [("X", 6 * k)],
+        })
+        de_pie = 0.88 * ESCALA
+        # el ovillo rueda pegado al suelo: cadera más baja con el cuerpo tumbado (90° y 270°)
+        ovillo = 0.21 + 0.24 * math.cos(math.radians(vuelta)) ** 2
+        alto = (de_pie + _agachar(50 * c, 90 * c)) * (1 - k) + ovillo * k
+        an.fotograma(f, pose, mover={"hips": (0, 0, alto - de_pie)})
+    an.cerrar("esquivar_rodando")
+
+    # Salto: se agacha, se impulsa con los brazos y se queda en el aire (la última pose se mantiene)
+    an.nueva("saltar")
+    for f, c, impulso, aire in ((0, 0.0, 0.0, 0.0), (5, 1.0, 0.0, 0.0), (8, 0.0, 1.0, 0.0), (13, 0.0, 0.3, 1.0),
+                                (20, 0.0, 0.0, 1.0)):
+        m, r = 55 * c, 95 * c
+        pose = _piernas(m + 45 * aire, r + 70 * aire, m + 15 * aire, r + 35 * aire, punta=25 * impulso)
+        pose.update({
+            "spine_01": [("X", 14 * c - 4 * impulso)], "chest": [("X", 6 * c - 6 * impulso + 4 * aire)],
+            "head": [("X", 4 - 8 * impulso)],
+            "arm_L": ps.brazo("L", 82 - 35 * aire, -35 * c + 80 * impulso + 15 * aire),
+            "forearm_L": [("X", -15 - 25 * aire)],
+            "arm_R": ps.brazo("R", 82 - 30 * aire, 14 - 30 * c + 60 * impulso + 15 * aire),
+            "forearm_R": [("X", -38 - 10 * aire)],
+            "cloak_L_01": [("X", 4 - 14 * impulso + 10 * aire)], "cloak_L_02": [("X", 6 - 20 * impulso + 16 * aire)],
+            "hair_back_01": [("X", -8 * impulso + 6 * aire)], "hair_back_02": [("X", -6 * impulso + 8 * aire)],
+        })
+        an.fotograma(f, pose, mover={"hips": (0, 0, _agachar(m, r))}, baston=CETRO_ARRIBA)
+    an.cerrar("saltar")
+
+    # Aterrizaje: cae con las rodillas, amortigua y se levanta
+    an.nueva("aterrizar")
+    for f, c, aire in ((0, 0.0, 1.0), (3, 1.0, 0.0), (6, 0.8, 0.0), (14, 0.0, 0.0)):
+        m, r = 60 * c, 105 * c
+        pose = ps.reposo() if c == 0 and aire == 0 else {}
+        pose.update(_piernas(m + 45 * aire, r + 70 * aire, m + 15 * aire, r + 35 * aire))
+        pose.update({
+            "spine_01": [("X", 16 * c + 1.5)], "chest": [("X", 6 * c - 1)], "head": [("X", 2 - 6 * c)],
+            "arm_L": ps.brazo("L", 82 - 35 * aire - 25 * c, 4 + 15 * aire + 25 * c),
+            "forearm_L": [("X", -12 - 25 * aire - 20 * c)],
+            "arm_R": ps.brazo("R", 82 - 30 * aire - 15 * c, 14 + 15 * aire + 10 * c),
+            "forearm_R": [("X", -38 - 10 * aire)],
+            "cloak_L_01": [("X", 4 + 10 * aire + 8 * c)], "cloak_L_02": [("X", 6 + 16 * aire + 14 * c)],
+        })
+        an.fotograma(f, pose, mover={"hips": (0, 0, _agachar(m, r))}, baston=CETRO_ARRIBA)
+    an.cerrar("aterrizar")
+
+    # Trepar (en bucle): de cara a la pared (-Y); mano izquierda arriba con el pie derecho arriba y al revés
+    an.nueva("trepar")
+    for f in range(0, 41, 2):
+        fase = 2 * math.pi * f / 40
+        arriba_l = 0.5 + 0.5 * math.sin(fase)
+        arriba_r = 1 - arriba_l
+        mL, mR = 20 + 55 * arriba_r, 20 + 55 * arriba_l
+        pose = _piernas(mL, 30 + 75 * arriba_r, mR, 30 + 75 * arriba_l, punta=-10)
+        pose.update({
+            "spine_01": [("X", 8)], "spine_02": [("X", 4)], "chest": [("X", -2), ("Z", 4 * math.sin(fase))],
+            "neck": [("X", -10)], "head": [("X", -14), ("Z", 5 * math.sin(fase))],
+            "hips": [("Z", -3 * math.sin(fase))],
+            "cloak_L_01": [("X", 6)], "cloak_L_02": [("X", 8 + 3 * math.sin(2 * fase))],
+        })
+        manos = {"forearm_L": Vector((-0.20, -0.30, 1.42 + 0.30 * arriba_l)),
+                 "forearm_R": Vector((0.20, -0.30, 1.42 + 0.30 * arriba_r))}
+        an.fotograma(f, pose, mover={"hips": (0, 0, -0.03 + 0.03 * abs(math.sin(fase)))}, ik=manos)
+    an.cerrar("trepar")
 
 
 # ---------------------------------------------------------------------------
@@ -884,7 +991,16 @@ def main():
                 ("golpe_cetro", 13, "c_golpe_carga", (-2.2, -4.0, 1.4), (0, 0, 0.95)),
                 ("golpe_cetro", 17, "d_golpe_impacto", (-2.2, -4.0, 1.4), (0, 0, 0.95)),
                 ("idle_mirar_tatuajes", 40, "e_mirar_tatuajes", (-1.4, -2.2, 1.5), (0, 0, 1.25)),
-                ("eco_despertar", 30, "f_eco", (-2.4, -3.6, 1.4), (0, 0, 1.0))):
+                ("eco_despertar", 30, "f_eco", (-2.4, -3.6, 1.4), (0, 0, 1.0)),
+                ("esquivar_rodando", 3, "g_rodar_entrada", (4.6, 0, 1.0), (0, 0, 0.6)),
+                ("esquivar_rodando", 9, "h_rodar_ovillo", (4.6, 0, 1.0), (0, 0, 0.5)),
+                ("esquivar_rodando", 15, "i_rodar_vuelta", (4.6, 0, 1.0), (0, 0, 0.5)),
+                ("saltar", 5, "j_salto_carga", (-3.0, -3.6, 1.4), (0, 0, 0.8)),
+                ("saltar", 8, "k_salto_impulso", (-3.0, -3.6, 1.4), (0, 0, 0.9)),
+                ("saltar", 20, "l_salto_aire", (-3.0, -3.6, 1.4), (0, 0, 0.9)),
+                ("aterrizar", 3, "m_aterrizar", (-3.0, -3.6, 1.4), (0, 0, 0.7)),
+                ("trepar", 0, "n_trepar_a", (3.4, 3.0, 1.6), (0, 0, 1.0)),
+                ("trepar", 20, "o_trepar_b", (3.4, 3.0, 1.6), (0, 0, 1.0))):
             arm.animation_data.action = bpy.data.actions[accion]
             bpy.context.scene.frame_set(f)
             foto(os.path.join(carpeta, f"maisha_{nombre}.png"), pos, obj, 50)
