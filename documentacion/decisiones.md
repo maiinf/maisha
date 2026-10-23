@@ -5,6 +5,7 @@ se pasan.
 
 | Fecha | Decisión | Motivo |
 | --- | --- | --- |
+| 2026-10-23 | **El Petrino es un jabalí de placas** (hoja canónica de Gemini): las grietas violetas son un núcleo que brilla bajo placas de basalto separadas, así brillan justo por las juntas y se mueven con el cuerpo. | Lo pide la hoja canónica; el modelo anterior (bloques negros, cabeza de oso) salía de la ficha de texto. |
 | 2026-10-23 | **La casa granja en ruina sale del mismo programa que la viva** (`--ruina`), con las mismas medidas y nodos, y materiales con nombre propio. Se cambia un modelo por otro al purificar el nudo. | Así no se mueve nada al cambiar de estado y cada arreglo de la casa vale para las dos versiones. |
 | 2026-10-23 | **El nudo de corrupción lleva esqueleto** (bulbo, cristales, zarcillos) con animaciones `latido` y `purificar` (las agujas se quiebran, los zarcillos se hunden y el bulbo se deshace); el suelo de ceniza va en un nodo aparte (`SueloMarchito`) para poder cambiarlo por césped al purificar. Los glifos del cráter son de material emisivo propio (`glifos_ambar_crater`) para que el juego los haga latir con los tatuajes. | La ficha pide que se purifique con una onda y que los glifos se enciendan a la vez que Maisha despierta. |
 | 2026-10-23 | **El espantapájaros del tutorial lleva esqueleto** y animaciones `reposo` (el viento lo mece) y `golpeado` (rebote amortiguado); el resto del atrezo del huerto es estático. | Es el maniquí con el que se aprende a golpear: tiene que reaccionar. |
