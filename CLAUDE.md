@@ -4,7 +4,10 @@ Juego en **Godot 4** (pixel art, vista cenital 3/4) de Iam. Todo el arte, la mú
 ilustraciones **se generan con código**: los programas de `herramientas/` (Python). Así que aquí se puede seguir
 creando jefes, enemigos, animaciones, mapas, música e ilustraciones igual que hasta ahora.
 
-## Gran Cambio de Rumbo: Maisha es ahora un juego completamente en 3D (IMPORTANTE)
+## ⚠️ Actualización oficial de Iam (2026-11-04): Retorno al HD-2D original
+Iam ha decidido cambiar de opinión y regresar al **modelo HD-2D original del principio** (sprites de pixel art en 3D con sombras reales, iluminación dinámica, peñas elevadas y agua cristalina con `scripts/mundo/hd2d/espejo_hd2d.gd`). Se descartan las mallas 3D procedurales (.glb) para casas y elementos del mundo, recuperando la riqueza artesanal y calidez visual del pixel art dibujado a mano. Consulta los detalles en `documentacion/coordinacion.md` y `documentacion/decisiones.md`.
+
+## Gran Cambio de Rumbo Anterior: Maisha en 3D (Antecedente archivado en rama `hd2d/calidad-blender`)
 Iam ha tomado la decisión firme y con todo el cariño al proyecto de que **Maisha será un juego completamente en 3D**, con una estética diorama estilizada, cálida y táctil (sombras suaves, materiales físicos, iluminación mágica y mundo vivo).
 
 ### Nuevo reparto de roles entre los dos agentes (orden directa de Iam):
