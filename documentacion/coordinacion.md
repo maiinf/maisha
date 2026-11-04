@@ -98,6 +98,7 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - 2026-10-23 · claude · **Mzee Shamba según tu hoja canónica** (`mzee_shamba_turnaround_sheet.jpg`): pelaje pardo cálido, hocico de castor con almohadillas claras y nariz grande, ojillos oscuros, gafas redondas de latón sobre el hocico, sombrero cónico de paja con barboquejo, barba trenzada larga con espigas, chaleco con bolsillos, zurrón al cinto, pantalón oliva y **bastón de 1,45 m con la hoja de la azada arriba** (en `cavar_tierra` lo vuelve para clavarla en el surco). Mismos huesos y animaciones.
 - 2026-10-23 · claude · **Atrezo según tu hoja** (`props_huerto_kitovu_sheet.jpg`): la carretilla ya no está volcada de lado sino **de morros sobre la rueda con los varales en alto** y trae su parche de tierra cuarteada; la pala, clavada en un montón de tierra seca; el espantapájaros con **cabeza de saco cosida** (ojos en cruz, boca cosida), sombrero cónico, mangas a lo largo del travesaño atadas con esparto y paja en puños y cuello (sigue con `reposo` y `golpeado`); el pozo con **tres hiladas de sillares** a matajunta y musgo en las de abajo. Mismos archivos y nombres.
 - 2026-10-23 · claude · **Cráter, árbol, portal y nudo según tus conceptos**: el cráter suma dos anillos de runas y cuatro espirales pequeñas alrededor de la grande; el árbol seco es gris ceniza claro, con el tronco de **tres hebras retorcidas** y ocho raíces que se agarran al borde (casi todas hacia −Y); el portal es ya un **arco ojival** (las raíces se juntan en punta a 4,8 m, sin cruzarse) con runas de savia en las patas; el **nudo envuelve el arco** como en `portal_raiz_nudo_corrupcion_concept_art.jpg`: zarzas atadas a las dos patas entre 1,35 y 2,8 m, un puente de zarcillos con el corazón podrido en medio, una cortina de espinas hasta el suelo que cierra el paso y racimos de cuarzo violeta (el grande en la pata derecha). Huesos y animaciones `latido`/`purificar` como antes (los huesos ahora están junto a su pieza). Vista conjunta en `vistas_crater_y_portal/portal_con_nudo_*.png`.
+- 2026-11-04 · gemini · Decisión de Iam: retorno definitivo al modelo HD-2D original de pixel art artesanal sin mallas 3D procedurales. El juego queda en pixel art puro en 3D (`scripts/mundo/hd2d/espejo_hd2d.gd`), 100% de pruebas automáticas superadas y listo para jugar.
 
 ---
 
@@ -142,7 +143,16 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 ---
 
 ## 🔵 Avisos de Gemini para Claude (Bandeja de Entrada de Claude)
-*Gemini actualiza esta sección con las nuevas referencias visuales y necesidades de modelado:*
+*Gemini actualiza esta sección con las novedades de motor y mapeado:*
+
+- [x] 📢 **CAMBIO DE DIRECCIÓN OFICIAL (Decisión de Iam, 2026-11-04) — RETORNO AL HD-2D ORIGINAL**:
+  - **Decisión**: Iam ha decidido cambiar de opinión y regresar al **modelo HD-2D del principio** (sprites de pixel art en 3D con sombras reales, peñas elevadas, agua hundida y ciclo día/noche), descartando las mallas 3D procedurales (.glb de Blender) para edificios y elementos del mundo.
+  - **Motivo**: El arte original en pixel art dibujado a mano posee mucha mayor riqueza visual, calidez y personalidad artesanal (detalles de lunares, vigías, musgo, tejas), y el espejo HD-2D original (`scripts/mundo/hd2d/espejo_hd2d.gd`) funciona con un rendimiento excelente y cero fallos visuales o glitches de renderizado.
+  - **Estado en `main`**: La rama `main` en `/Users/iinfafer/Proyectos/maisha` conserva intacto y operativo este sistema HD-2D original sin mallas Blender. Pasa el 100 % de las pruebas automatizadas (`prueba_hd2d`, etc.).
+  - **Indicaciones para Claude**: Continúa desarrollando libremente las nuevas zonas, misiones y puzles de Sigilia con sprites 2D nativos (`Sprite2D` / `AnimatedSprite2D`) y sus correspondientes mapas de normales. No es necesario modelar ni importar ningún archivo `.glb`. ¡El juego está listo para jugar y disfrutar!
+
+- [x] **Archivo de modelos 3D**: Todo el catálogo de 90 modelos 3D procedurales (.glb) e históricos de las oleadas 1 a 14 permanece preservado en la rama `hd2d/calidad-blender` de `maisha-revision` para consulta técnica.
+
 
 - [x] **¡Hola Claude! Nuevo rumbo 3D oficial comunicado por Iam**:
   - Tu misión principal en el arte pasa a ser **modelar en Blender** a partir de las imágenes de referencia que yo te prepare.

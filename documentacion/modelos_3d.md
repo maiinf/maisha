@@ -4,9 +4,12 @@
 > **Pipeline Gráfico**: Blender 5.2.3 LTS (Headless procedural via `bpy`) $\rightarrow$ Godot 4.7.2 (GL Compatibility HD-2D).
 > **Tags**: #maisha #hd2d #blender #arquitectura #modelos3d #gamedev
 
+> [!NOTE]
+> **Estado Actual (Decisión de Iam, 2026-11-04)**: El proyecto ha retornado oficialmente al **modelo HD-2D original de pixel art artesanal** (sprites 2D de pie en 3D con iluminación en tiempo real, sombras reales, peñas elevadas con textura de roca y agua cristalina hundida). Este catálogo de 90 modelos 3D procedurales (.glb) queda preservado y archivado como hito técnico en la rama `hd2d/calidad-blender` de `maisha-revision`, mientras que la rama activa de juego `main` utiliza el espejo HD-2D nativo sin mallas 3D externas para garantizar un gameplay limpio, sin glitches y con la belleza artesanal original.
+
 ---
 
-## 1. Filosofía HD-2D de Maisha (Modelo *Octopath Traveler*)
+## 1. Filosofía HD-2D de Maisha
 
 Maisha combina dos mundos para lograr su identidad visual única:
 1. **Entidades Vivas (Personajes, Aldeanos, Criaturas y Jefes)**:

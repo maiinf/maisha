@@ -379,6 +379,11 @@ se pasan.
 | Narrativa Ambiental del Abandono | Evidencias del avance progresivo de la Purga de Giza en la granja: el huerto tiene la mayoría de surcos secos y agrietados (solo 2 o 3 brotes vivos), una **carretilla de madera volcada** con abono seco y una **pala oxidada clavada y olvidada** a medio surco. Espantapájaros rústico como maniquí de entrenamiento táctico. |
 | Cráter del Despertar y Tatuajes Mnemotécnicos | El cráter de impacto tiene **glifos ancestrales en espiral grabados en la roca madre**. Al despertar Maisha, **la simbología del cráter y los tatuajes de sus brazos se iluminan en sincronía**: es la tierra misma hablándole a Maisha (*Vida*). Este recurso diegético de comunicación telúrica se repite en cada altar sagrado. |
 
+### Retorno al modelo HD-2D original de pixel art artesanal (2026-11-04, Decisión de Iam)
+| Qué | Decisión |
+| --- | --- |
+| Retorno al HD-2D original sin mallas 3D procedurales | A petición explícita de Iam para recuperar la estética visual del principio («hacerlo como el modelo ese hd-2d del principio que era muy bonito»), se descartan definitivamente los modelos 3D procedurales (.glb de Blender) para casas, edificios y props del mundo. Se consolida el modelo HD-2D original: sprites 2D artesanales de pixel art colocados de pie en el espacio 3D con iluminación en tiempo real, sombras arrojadas, peñas elevadas con textura de roca y agua cristalina hundida con orillas suaves (`scripts/mundo/hd2d/espejo_hd2d.gd`), eliminando por completo cualquier artefacto visual, Z-fighting o problemas de ordenación de caras. El juego recupera la riqueza artística, calidez y belleza del pixel art artesanal sin ningún tipo de glitch. |
+
 
 
 
