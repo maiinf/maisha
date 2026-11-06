@@ -26,7 +26,7 @@ La guía para instalarlo todo está en [`documentacion/guia_instalacion.md`](doc
 | `scripts/` | Código (`.gd`), organizado como `escenas/` |
 | `datos/` | Diálogos, mapas, ropa… en archivos de datos (se editan sin tocar código) |
 | `documentacion/` | Guías y notas del proyecto |
-| `pruebas/` | Pruebas automáticas |
+| `pruebas/` | Pruebas automáticas (las del 3D, guardadas aparte en `pruebas/archivo_3d/`) |
 
 ## Cómo nombrar los archivos
 
