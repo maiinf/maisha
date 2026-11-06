@@ -1748,12 +1748,116 @@ def jefe_bibliotecario():
     return final(p, sala=3.0, mezcla=0.32, brillo=5400)
 
 
+def canal_tinta():
+    """«Lo que lleva la corriente»: El Canal de Tinta. Una barcarola invernal en mi menor (6/8): el murmullo profundo
+    del cauce de tinta, el tintineo cristalino de las placas de hielo al flotar, golpes suaves de esclusa y el tema de
+    Sigilia mecido por la corriente en flauta y piano."""
+    tempo = Tempo(108)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("E2", "m"), ("C2", "M7"), ("A1", "m7"), ("B1", "sus"),
+        ("E2", "m"), ("G2", "M"), ("C2", "M7"), ("B1", "M"),
+        ("A1", "m"), ("E2", "m"), ("C2", "M7"), ("D2", "M"),
+        ("G2", "M"), ("C2", "M7"), ("B1", "sus"), ("E2", "m")
+    ]
+    colchones(p, tempo, progresion, compas=6, brillo=680, volumen=0.17, octava_bajo=1, fuerza_bajo=0.28)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 6, 6, cada=1.0, volumen=0.13, pan=-0.25, patron=(0, 1, 2, 3, 2, 1))
+        p.poner(campanita(raiz[:-1] + "5", 1.5, 0.08), tempo.s(i * 6), pan=0.25)
+        p.poner(campanita(acorde(raiz[:-1] + "5", tipo)[1], 1.1, 0.05), tempo.s(i * 6 + 3), pan=-0.2)
+
+    # La corriente densa de tinta y el entrechocar de placas de hielo
+    d = tempo.s(pulsos)
+    n = int(d * SR)
+    corriente = paso_banda(ruido_rosa(d), 140, 850) * (0.55 + 0.45 * np.sin(np.linspace(0, 8 * np.pi, n)))
+    p.poner(corriente * 0.055, 0.0)
+    rng = np.random.default_rng(305)
+    for k in range(28):
+        b = rng.random() * (pulsos - 1)
+        nota_hielo = ["E6", "G6", "B6", "F#6", "D7"][rng.integers(5)]
+        p.poner(campanita(nota_hielo, 0.55, 0.05), tempo.s(b), pan=rng.uniform(-0.45, 0.45))
+
+    # El tema de Sigilia transportado a mi menor (+5 semitonos), mecido en compás de 6
+    tema_canal = transportar(TEMA_SIGILIA, 5)
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.38, vibrato=4.2)
+    melodia(p, tempo, tema_canal, desde=6, instrumento=flauta_, volumen=0.28, sostener=0.92, pan=-0.12)
+    tocar(p, tempo, transportar(tema_canal, -12), desde=48, fuerza=0.24, pan=0.12)
+    melodia(p, tempo, tema_canal[::2], desde=48, instrumento=kalimba, volumen=0.15, pan=-0.25)
+    p.poner(coro(["E3", "B3", "G4"], tempo.s(18)), tempo.s(24), 0.045)
+    p.poner(coro(["C3", "G3", "E4"], tempo.s(18)), tempo.s(72), 0.045)
+    return final(p, sala=3.3, mezcla=0.36, brillo=5000)
+
+
+def jefe_pweza():
+    """«El tintero del abismo»: la pelea contra Pweza, el Calamar del Tintero Real, en la Gran Dársena.
+    Compás tenso y pesado en mi menor (118 BPM): bajo y taikos como golpes del gran tintero de latón contra el muelle,
+    plumillas de oro que rasgan el aire (balafón y campanitas agudas), cristales de hielo al congelar sus tentáculos
+    y el tema de Sigilia luchando contra la marea de tinta."""
+    tempo = Tempo(118)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    acords = [
+        ["E1", "B1", "G2", "B2"],
+        ["C1", "G1", "E2", "G2"],
+        ["A1", "E2", "C3", "E3"],
+        ["B1", "F#2", "D#3", "F#3"],
+        ["E1", "B1", "G2", "E3"],
+        ["G1", "D2", "B2", "D3"],
+        ["C1", "G1", "E2", "C3"],
+        ["B1", "F#2", "D#3", "A3"]
+    ] * 2
+
+    for i in range(16):
+        a = acords[i]
+        t0 = tempo.s(i * 6)
+        p.poner(bajo(a[0], tempo.s(3)), t0, 0.48)
+        p.poner(bajo(a[0], tempo.s(3)), t0 + tempo.s(3), 0.42)
+        p.poner(acorde_piano(a[1:], 0.42), t0 + tempo.s(1.5), 0.34, pan=-0.2)
+        p.poner(acorde_piano(a[1:], 0.42), t0 + tempo.s(4.5), 0.32, pan=0.2)
+        if i % 2 == 0:
+            p.poner(coro(a[1:3], tempo.s(12) + 0.8, "o", 0.55), t0, 0.19, pan=0.1)
+
+    for b in range(0, pulsos, 3):
+        p.poner(tambor("E1", 0.40, 0.58, golpe=0.38), tempo.s(b), pan=-0.12)
+        p.poner(tambor("B1", 0.24, 0.32, golpe=0.22), tempo.s(b + 1.5), pan=0.12)
+        p.poner(tambor("G1", 0.22, 0.30, golpe=0.20), tempo.s(b + 2), pan=0.0)
+        if b % 12 == 0:
+            p.poner(taiko(1.3, 0.7), tempo.s(b), pan=0.0)
+
+    # Estocadas de las plumillas de oro y esquirlas del Sigilo de Hielo
+    rng = np.random.default_rng(319)
+    for b in range(0, pulsos, 2):
+        nota_pluma = ["E4", "G4", "B4", "D#4", "C5"][(b // 2) % 5]
+        p.poner(balafon(nota_pluma, 0.28, 0.15), tempo.s(b + 0.5), pan=-0.3)
+        if rng.random() > 0.45:
+            nota_hielo = ["E6", "B6", "G6", "F#6"][rng.integers(4)]
+            p.poner(campanita(nota_hielo, 0.3, 0.055), tempo.s(b + rng.uniform(0.2, 1.2)), pan=rng.uniform(-0.4, 0.4))
+
+    frase_pweza = [
+        ("E5", 0, 1.5), ("G5", 1.5, 0.5), ("B5", 2, 2), ("A5", 4, 1), ("G5", 5, 1),
+        ("F#5", 6, 2), ("D#5", 8, 1), ("E5", 9, 3),
+        ("G5", 12, 1.5), ("A5", 13.5, 0.5), ("B5", 14, 2), ("C6", 16, 1), ("B5", 17, 1),
+        ("A5", 18, 2), ("G5", 20, 1), ("F#5", 21, 3),
+        ("E5", 24, 2), ("B4", 26, 1), ("C5", 27, 2), ("D#5", 29, 1),
+        ("E5", 30, 2), ("F#5", 32, 1), ("E5", 33, 3)
+    ]
+    melodia(p, tempo, frase_pweza, desde=12, instrumento=kalimba, volumen=0.36, pan=-0.15)
+    melodia(p, tempo, frase_pweza, desde=60, instrumento=lambda n_, d_: flauta(n_, d_, 0.44, vibrato=4.8), volumen=0.38, pan=0.15)
+    melodia(p, tempo, transportar(frase_pweza, -12), desde=60, instrumento=kalimba, volumen=0.20, pan=-0.25)
+    return final(p, sala=3.1, mezcla=0.33, brillo=5300)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
+PIEZAS["canal_tinta"] = canal_tinta
+PIEZAS["jefe_pweza"] = jefe_pweza
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
+TITULOS["canal_tinta"] = "Lo que lleva la corriente"
+TITULOS["jefe_pweza"] = "El tintero del abismo"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

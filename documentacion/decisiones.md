@@ -392,6 +392,15 @@ se pasan.
 | Música y ambientación | «El vals de las páginas perdidas» (`audio/musica/jefe_bibliotecario.ogg`, 51,4 s): vals rápido en Si menor a 156 BPM con coro espectral, cajita de música mágica, chelos en staccato y aleteos rítmicos de páginas de pergamino. |
 | Sprites y relieve | Creados spritesheets de 80×80 (7 fotogramas: levitación, conjuro con puntero, ráfaga de tinta, aturdido, dolor, desinflado) y libros voladores de 24×24 en `arte/mundos/sigilia/estanterias/` con sus mapas de normales generados con `relieve.py`. |
 
+### 2026-11-06 · El Canal de Tinta y su jefe Pweza (Decidido con Iam)
+| Qué | Decisión |
+| --- | --- |
+| Trazado y mecánica (`documentacion/boceto_canal_tinta.png`) | **Navegación en placas de hielo + esclusas**: el **Sigilo de Hielo** congela un círculo de tinta líquida creando una placa de tinta helada flotante a la que Maisha se sube mientras la corriente la lleva hacia el este, combinada con ruedas doradas que abren las compuertas de las esclusas. |
+| Viajero y enemigo nuevo | **Mfereji, el armiño esclusista** (en blanco junto a la primera compuerta; su ficha del Índice está en el Remanso Norte tras un tapón de Tinta Quieta, y al recuperarla enseña el Sigilo de Hielo). Enemigo nuevo: **Ruba, la Sanguijuela de Tinta** (nada oculta bajo la tinta y queda atrapada en un témpano con media cabeza fuera si congelas la tinta sobre ella). |
+| Jefe: **Pweza** (`documentacion/boceto_pweza.png`) | **Opción A · El Calamar del Tintero Real** (elegido por Iam): metido dentro de un gran tintero de latón y cristal agrietado que flota en la Gran Dársena; saca tentáculos con plumillas de oro para azotar el muelle. Si congelas un tentáculo con el Sigilo de Hielo y lo golpeas con el cetro, el tintero vuelca al muelle y Pweza queda expuesto. Al vencerlo entrega la 3.ª ficha del canal. |
+| Música (compuesta por Gemini) | `audio/musica/canal_tinta.ogg` («Lo que lleva la corriente», barcarola invernal en Mi menor) y `audio/musica/jefe_pweza.ogg` («El tintero del abismo»). Construcción de escena, arte 2D y lógica asignadas a Claude en `documentacion/coordinacion.md`. |
+
+
 
 
 
