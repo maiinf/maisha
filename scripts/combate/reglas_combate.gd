@@ -253,3 +253,11 @@ const NUNGU_RUEDA := 175.0              # Nungu hecho bola, rodando
 const NUNGU_RUEDA_CADA := 2.6           # controlado: entre bola y bola
 const NUNGU_MAREADO := 3.2              # tras rebotar en el escudo: ahí se le corta el hilo
 const NUNGU_AYUDA_CADA := 5.0           # libre: cada cuánto embiste a Kuvu
+
+# --- El Bibliotecario Hueco (Las Estanterías Colgantes, Sigilia) ----------------
+const BIBLIOTECARIO_VIDA := 12
+const BIBLIOTECARIO_LIBROS := 3
+const BIBLIOTECARIO_ATURDIDO := 3.6     # segundos que cae al suelo sin escudo (vulnerable)
+const BIBLIOTECARIO_DISPARO_CADA := 2.8 # segundos entre ataques de libros / tinta
+const BIBLIOTECARIO_VELOCIDAD := 48.0   # velocidad de levitación
+const LIBRO_ESCUDO_VIDA := 2            # golpes para quemar/romper un libro

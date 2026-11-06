@@ -14,6 +14,10 @@ const PAGINA := preload("res://scripts/enemigos/pagina_suelta.gd")
 const CHARCO := preload("res://scripts/mundo/sigilia/charco_tinta.gd")
 const RECOGIBLE := preload("res://scripts/mundo/objetos/recogible.gd")
 const ATRIL := preload("res://arte/mundos/sigilia/estanterias/atril.png")
+const BIBLIOTECARIO := preload("res://scripts/enemigos/bibliotecario.gd")
+
+var _bibliotecario: CharacterBody2D = null
+var _despertando_jefe := false
 
 
 func _ready() -> void:
@@ -77,6 +81,13 @@ func _poner_cosas() -> void:
 	atril.position = Vector2(30, 6) * 16.0
 	$Entidades.add_child(atril)
 
+	if not Estado.tiene("bibliotecario_vencido"):
+		var b: CharacterBody2D = BIBLIOTECARIO.new()
+		b.position = Vector2(30, 6) * 16.0 + Vector2(0, -18)
+		$Entidades.add_child(b)
+		_bibliotecario = b
+		b.destruido.connect(_al_vencer_bibliotecario)
+
 
 ## Los huecos son paredes (salvo los carriles de las escaleras, que ponen la suya cuando no están tendidas)
 func _crear_huecos(filas: PackedStringArray, carriles: Dictionary) -> void:
@@ -106,3 +117,27 @@ func _pensar_al_llegar() -> void:
 		return
 	await CHARLA_SCRIPT.hablar(self, "estanterias_llegada")
 	Estado.marcar("estanterias_llegada")
+
+
+func _process(_delta: float) -> void:
+	if is_instance_valid(_bibliotecario) and not _despertando_jefe and not Estado.tiene("bibliotecario_vencido"):
+		var maisha := get_tree().get_first_node_in_group("maisha") as Node2D
+		if maisha and maisha.global_position.y < 12.0 * 16.0:
+			_despertando_jefe = true
+			_iniciar_combate_bibliotecario()
+
+
+func _iniciar_combate_bibliotecario() -> void:
+	if not is_instance_valid(_bibliotecario):
+		return
+	if not Estado.tiene("bibliotecario_visto"):
+		Estado.marcar("bibliotecario_visto")
+		await CHARLA_SCRIPT.hablar(self, "bibliotecario_encuentro")
+	if is_instance_valid(_bibliotecario):
+		_bibliotecario.despertar()
+
+
+func _al_vencer_bibliotecario() -> void:
+	await get_tree().create_timer(3.0).timeout
+	if is_inside_tree():
+		Sonido.musica("maandiko")

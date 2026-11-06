@@ -384,6 +384,14 @@ se pasan.
 | --- | --- |
 | Retorno al HD-2D original sin mallas 3D procedurales | A petición explícita de Iam para recuperar la estética visual del principio («hacerlo como el modelo ese hd-2d del principio que era muy bonito»), se descartan definitivamente los modelos 3D procedurales (.glb de Blender) para casas, edificios y props del mundo. Se consolida el modelo HD-2D original: sprites 2D artesanales de pixel art colocados de pie en el espacio 3D con iluminación en tiempo real, sombras arrojadas, peñas elevadas con textura de roca y agua cristalina hundida con orillas suaves (`scripts/mundo/hd2d/espejo_hd2d.gd`), eliminando por completo cualquier artefacto visual, Z-fighting o problemas de ordenación de caras. El juego recupera la riqueza artística, calidez y belleza del pixel art artesanal sin ningún tipo de glitch. |
 
+### 2026-11-06 · El Bibliotecario Hueco (Jefe de Las Estanterías Colgantes)
+| Qué | Decisión |
+| --- | --- |
+| Diseño del jefe | **Opción A: El abrigo vacío** (elegido por Iam entre las opciones de `documentacion/boceto_bibliotecario.png`): la toga púrpura con cuello de armiño del bibliotecario original flota vacía sin cuerpo dentro, con cuencas brillantes de tinta mágica violeta. |
+| Mecánicas de combate | 12 de vida. Empieza dormido sobre el atril; al cruzar Maisha, despierta y levita protegido por un **escudo de 3 libros voladores** que orbitan a su alrededor. El escudo bloquea y absorbe los golpes frontales del Cetro. Destruir los 3 libros (2 impactos de Cetro o 1 explosión de semilla/fuego cada uno) lo **aturde y hace caer durante 3,6 s**, ventana en la que es vulnerable a daño directo. Fase 2 (< 8 de vida): ráfagas triples de tinta y libros más rápidos. Fase 3 (< 4 de vida): embestidas espectrales y proyectiles explosivos. Al vencerlo, la toga cae desinflada al suelo y libera la **Ficha de Mwalimu, Guardián de la Memoria**. |
+| Música y ambientación | «El vals de las páginas perdidas» (`audio/musica/jefe_bibliotecario.ogg`, 51,4 s): vals rápido en Si menor a 156 BPM con coro espectral, cajita de música mágica, chelos en staccato y aleteos rítmicos de páginas de pergamino. |
+| Sprites y relieve | Creados spritesheets de 80×80 (7 fotogramas: levitación, conjuro con puntero, ráfaga de tinta, aturdido, dolor, desinflado) y libros voladores de 24×24 en `arte/mundos/sigilia/estanterias/` con sus mapas de normales generados con `relieve.py`. |
+
 
 
 

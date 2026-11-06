@@ -428,5 +428,29 @@
 				]
 			}
 		]
+	},
+	"bibliotecario_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Ese abrigo... flota solo ante el atril enorme. En la capucha no hay nadie, solo dos ojos de tinta brillante.",
+					"¡Los libros se han levantado en el aire y le dan vueltas como un escudo!"
+				]
+			}
+		]
+	},
+	"ficha_mwalimu": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"«Mwalimu, Gran Bibliotecario del Archivo de Sigilia, Guardián de la Memoria».",
+					"La toga vacía descansa por fin en paz sobre el atril. Ya no tiene miedo de olvidar."
+				]
+			}
+		]
 	}
 }

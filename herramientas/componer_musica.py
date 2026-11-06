@@ -1683,10 +1683,77 @@ def maandiko():
     return final(p, sala=2.6, mezcla=0.3, brillo=5600)
 
 
+def jefe_bibliotecario():
+    """«El vals de las páginas perdidas»: la pelea contra el Bibliotecario Hueco en Las Estanterías Colgantes.
+    Un vals rápido en si menor (el tono de Sigilia y del olvido): piano oscuro en tres tiempos, tambores secos y
+    taikos pesados que marcan el pulso, campanitas y pizzicatos de páginas que baten rápido como alas en órbita,
+    susurros de pergamino en el aire y el tema de Sigilia cantado por un coro espectral, flauta y kalimba."""
+    tempo = Tempo(112)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    acords = [
+        ["B1", "F#2", "D3", "F#3"],
+        ["G1", "D2", "B2", "D3"],
+        ["E1", "B1", "G2", "B2"],
+        ["F#1", "C#2", "A#2", "C#3"],
+        ["B1", "F#2", "D3", "B3"],
+        ["D2", "A2", "F#3", "A3"],
+        ["G1", "D2", "B2", "D3"],
+        ["F#1", "C#2", "A#2", "E3"]
+    ] * 2
+
+    for i in range(16):
+        a = acords[i]
+        t0 = tempo.s(i * 6)
+        p.poner(bajo(a[0], tempo.s(3)), t0, 0.45)
+        p.poner(bajo(a[0], tempo.s(3)), t0 + tempo.s(3), 0.40)
+        p.poner(acorde_piano(a[1:], 0.45), t0 + tempo.s(1), 0.35, pan=-0.2)
+        p.poner(acorde_piano(a[1:], 0.40), t0 + tempo.s(2), 0.30, pan=-0.2)
+        p.poner(acorde_piano(a[1:], 0.45), t0 + tempo.s(4), 0.35, pan=-0.2)
+        p.poner(acorde_piano(a[1:], 0.40), t0 + tempo.s(5), 0.30, pan=-0.2)
+        if i % 2 == 0:
+            p.poner(coro(a[1:3], tempo.s(12) + 0.8, "u", 0.5), t0, 0.18, pan=0.15)
+
+    for b in range(0, pulsos, 3):
+        p.poner(tambor("B1", 0.35, 0.55, golpe=0.35), tempo.s(b), pan=-0.1)
+        p.poner(tambor("F#2", 0.20, 0.30, golpe=0.20), tempo.s(b + 1), pan=0.1)
+        p.poner(tambor("D2", 0.22, 0.32, golpe=0.20), tempo.s(b + 2), pan=-0.05)
+        if b % 12 == 0:
+            p.poner(taiko(1.2, 0.65), tempo.s(b), pan=0.0)
+
+    rng = np.random.default_rng(214)
+    for b in range(0, pulsos):
+        if rng.random() > 0.3:
+            nota = ["B5", "D6", "F#6", "A#5", "C#6"][rng.integers(5)]
+            p.poner(campanita(nota, 0.22, 0.04), tempo.s(b + rng.uniform(0, 0.5)), pan=rng.uniform(-0.4, 0.4))
+
+    d = tempo.s(pulsos)
+    n = int(d * SR)
+    u = np.linspace(0, 1, n)
+    viento_libros = ruido_rosa(d) * (0.4 + 0.3 * np.sin(u * 2 * np.pi * 8)) ** 2
+    p.poner(paso_banda(viento_libros, 800, 2400) * 0.06, 0.0)
+
+    frase_biblio = [
+        ("F#5", 0, 2), ("B5", 2, 1), ("D6", 3, 2), ("C#6", 5, 1),
+        ("B5", 6, 2), ("A#5", 8, 1), ("B5", 9, 3),
+        ("F#5", 12, 1.5), ("G5", 13.5, 0.5), ("A5", 14, 1), ("B5", 15, 2), ("A5", 17, 1),
+        ("G5", 18, 2), ("F#5", 20, 1), ("E5", 21, 3),
+        ("F#5", 24, 2), ("C#5", 26, 1), ("D5", 27, 2), ("E5", 29, 1),
+        ("F#5", 30, 2), ("A#5", 32, 1), ("B5", 33, 3)
+    ]
+    melodia(p, tempo, frase_biblio, desde=12, instrumento=kalimba, volumen=0.35, pan=-0.15)
+    melodia(p, tempo, frase_biblio, desde=60, instrumento=lambda n_, d_: flauta(n_, d_, 0.42, vibrato=4.5), volumen=0.38, pan=0.15)
+    melodia(p, tempo, transportar(frase_biblio, -7), desde=60, instrumento=kalimba, volumen=0.18, pan=-0.25)
+
+    return final(p, sala=3.0, mezcla=0.32, brillo=5400)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
+PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
+TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

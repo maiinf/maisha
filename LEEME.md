@@ -958,7 +958,7 @@ Escena `escenas/mundo/maandiko.tscn` (`scripts/mundo/maandiko.gd`), detrás de l
 
 Falta: los caminos (Estanterías, Canal, Observatorio) con las fichas del Índice y la Sección Prohibida.
 
-## Las Estanterías Colgantes (parte 1: la biblioteca, las escaleras rodantes y Daftari)
+## Las Estanterías Colgantes (la biblioteca, las escaleras rodantes y el Bibliotecario Hueco)
 
 Escena `escenas/mundo/estanterias_colgantes.tscn` (`scripts/mundo/estanterias_colgantes.gd`), por la salida del oeste de Maandiko (tras su charco de Tinta Quieta). Mapa de 60×96 (`crear_estanterias`): una biblioteca de cuatro pisos, de sur a norte. Suelo propio (`pintar_suelo.pintar_biblioteca`): parqué, alfombras moradas con cenefa dorada, **estanterías** con tres baldas de libros (con su lomo y su letrero dorado) y los **huecos** a los pisos de abajo. Capturas en `documentacion/estanterias_capturas.png`.
 
@@ -969,10 +969,8 @@ Escena `escenas/mundo/estanterias_colgantes.tscn` (`scripts/mundo/estanterias_co
 | El Tintero rabioso | `ǜ`, `scripts/enemigos/tintero.gd` (`tintero.png`, 6 fotogramas; `mancha.png`): el «cazador» de Sigilia. Si ve a Maisha en línea recta, se agacha y **embiste**, dejando manchas de tinta que pringan (frenan); al chocar, se queda bizco: ahí entra el cetro. 3 golpes; semilla o fuego, 2. En el Bestiario |
 | Cerraduras | `ẋ`: charcos de Tinta Quieta (como en la ciudad) que tapan una alcoba y un paso |
 | La ficha de Daftari | `ʣ`, en la alcoba del oeste del piso 3. En Maandiko, **Daftari** (`sigilia/escriba.gd`: un escriba con nombre propio) está en blanco en la plaza; al darle su ficha recupera el color y habla (encuadernador de libros raros). Dibujo `escriba` (con color) en `dibujar_aldeanos.py` |
-| La sala de lectura | Arriba, con su atril y un libro enorme (`atril.png`): ahí espera el Bibliotecario Hueco (parte 2) |
-| Prueba | `pruebas/prueba_estanterias.gd` |
-
-Falta: el jefe (el Bibliotecario Hueco) y una música propia (por ahora suena la de Maandiko).
+| La sala de lectura y el jefe | Arriba (piso 4, y < 12 casillas), con su atril y el gran libro abierto: espera el **Bibliotecario Hueco** (jefe de las Estanterías). Opción A elegida por Iam: abrigo púrpura y armiño flotante sin cuerpo físico, ojos de tinta espectral y 3 libros voladores orbitando como escudo. Música propia: `jefe_bibliotecario.ogg` («El vals de las páginas perdidas»). Al vencerlo cae desinflado y libera la **Ficha de Mwalimu**, el Guardián de la Memoria |
+| Pruebas | `pruebas/prueba_estanterias.gd` y `pruebas/prueba_bibliotecario.gd` |
 
 ## Las construcciones, al nivel de la casa del castor
 
