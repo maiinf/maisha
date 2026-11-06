@@ -4,8 +4,18 @@ Juego en **Godot 4** (pixel art, vista cenital 3/4) de Iam. Todo el arte, la mú
 ilustraciones **se generan con código**: los programas de `herramientas/` (Python). Así que aquí se puede seguir
 creando jefes, enemigos, animaciones, mapas, música e ilustraciones igual que hasta ahora.
 
-## ⚠️ Actualización oficial de Iam (2026-11-04): Retorno al HD-2D original
+## ⚠️ Actualización oficial de Iam (2026-11-04): Retorno al HD-2D original y Reparto de Funciones
 Iam ha decidido cambiar de opinión y regresar al **modelo HD-2D original del principio** (sprites de pixel art en 3D con sombras reales, iluminación dinámica, peñas elevadas y agua cristalina con `scripts/mundo/hd2d/espejo_hd2d.gd`). Se descartan las mallas 3D procedurales (.glb) para casas y elementos del mundo, recuperando la riqueza artesanal y calidez visual del pixel art dibujado a mano. Consulta los detalles en `documentacion/coordinacion.md` y `documentacion/decisiones.md`.
+
+### Reparto de funciones vigente en HD-2D:
+1. **Gemini (Supervisora, Trazado/Mapeado, Concept Artist, Motor HD-2D y Música)**:
+   - **Trazado de mapas y bocetos de diseño**: Crea los bocetos visuales de regiones, personajes, construcciones, enemigos y jefes (`herramientas/boceto_*.py`, `documentacion/boceto_*.png`) y las fichas de diseño para decidir con Iam antes de que Claude construya.
+   - **Motor visual HD-2D, Iluminación y Shaders**: Mantiene y pule `scripts/mundo/hd2d/espejo_hd2d.gd`, shaders, relieve (`relieve.py`), agua, niebla, luces 3D y cámara.
+   - **Música y Sonido**: Compone las melodías de cada bioma y jefe (`herramientas/componer_musica.py`, `audio/musica/`) y los efectos de sonido.
+   - **Supervisión de calidad**: Verifica que todo compile y pase las pruebas sin errores ni glitches visuales.
+2. **Claude (Constructora — tú)**:
+   - **Construcción del mundo y arte 2D**: Construyes los mapas definitivos (`construir_mapa.py`, `datos/mapas/`) y pintas los sprites definitivos en código (`herramientas/pintar_*.py`, `arte/`) a partir de los trazados y bocetos aprobados por Iam.
+   - **Lógica de juego, Combate, Misiones y Diálogos**: Programas las escenas (`escenas/`), las mecánicas de cada ruta (`scripts/mundo/sigilia/`), la IA de enemigos y jefes (`scripts/enemigos/`), los diálogos naturales (`datos/dialogos/`), las misiones (`datos/misiones.json`) y las pruebas automáticas (`pruebas/`).
 
 ## Gran Cambio de Rumbo Anterior: Maisha en 3D (Antecedente archivado en rama `hd2d/calidad-blender`)
 Iam ha tomado la decisión firme y con todo el cariño al proyecto de que **Maisha será un juego completamente en 3D**, con una estética diorama estilizada, cálida y táctil (sombras suaves, materiales físicos, iluminación mágica y mundo vivo).

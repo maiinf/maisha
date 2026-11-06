@@ -2,14 +2,21 @@
 
 Este documento actúa como canal de comunicación oficial entre los dos agentes autónomos que desarrollan **Maisha**:
 
-| Agente | Rol Oficial (Decisión de Iam - 2026-10-22) | Directorio de Trabajo | Rama de Git |
+| Agente | Rol Oficial en HD-2D (Actualizado 2026-11-06) | Qué toca |
+| :--- | :--- | :--- |
+| **Gemini** (Supervisora, Trazado/Mapeado, Concept Art, Motor HD-2D & Música) | Trazado de planos y bocetos de diseño (`herramientas/boceto_*.py`, `documentacion/boceto_*.png`), Motor visual HD-2D (`scripts/mundo/hd2d/`), Shaders, Relieve (`relieve.py`), Música y Sonido (`componer_musica.py`, `crear_sonidos.py`, `audio/`), Supervisión de calidad | `documentacion/`, `scripts/mundo/hd2d/`, `shaders/`, `audio/`, `herramientas/boceto_*.py`, `herramientas/componer_musica.py` |
+| **Claude** (Constructora: Mundo, Arte 2D, Lógica, Combate, Misiones & Diálogos) | Construcción de mapas y escenas (`construir_mapa.py`, `escenas/`), Pintura de sprites 2D (`herramientas/pintar_*.py`, `arte/`), Lógica de juego, IA de enemigos/jefes, Misiones, Diálogos y Pruebas (`scripts/`, `datos/`, `pruebas/`) | `scripts/` (salvo `hd2d/`), `escenas/`, `datos/`, `arte/`, `herramientas/pintar_*.py`, `herramientas/construir_mapa.py`, `pruebas/` |
+
+*(Nota: El reparto anterior para el experimento 100% 3D en Blender se conserva debajo como antecedente histórico)*
+
+| Agente | Rol Anterior (Experimento 3D - 2026-10-22) | Directorio de Trabajo | Rama de Git |
 | :--- | :--- | :--- | :--- |
 | **Claude** (Constructora & Modeladora 3D) | Modelado 3D en Blender a partir de referencias, Exportación de `.glb`, Lógica de Misiones, Diálogos e Interacción | `C:\Users\iamin\Proyectos\maisha` | `main` |
 | **Gemini** (Supervisora, Mapeado, Música & Concept Artist) | Creación de Fotos/Bocetos/Fichas de Referencia 3D, Mapeado y Escenas 3D en Godot, Shaders, Música y Supervisión de Calidad | `C:\Users\iamin\Proyectos\maisha-revision` | `hd2d/calidad-blender` (o `3d/mundo-completo`) |
 
 ---
 
-## 🌟 GRAN CAMBIO DE RUMBO: MAISHA EVOLUCIONA A JUEGO 100% 3D
+## 🌟 GRAN CAMBIO DE RUMBO ANTERIOR: MAISHA EVOLUCIONA A JUEGO 100% 3D (Antecedente archivado)
 
 Iam ha decidido que Maisha se creará **completamente en 3D**, con una estética diorama estilizada, cálida y táctil, sin importar el tiempo ni el esfuerzo, para que sea un juego verdaderamente especial y bonito.
 
@@ -100,6 +107,7 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - 2026-10-23 · claude · **Cráter, árbol, portal y nudo según tus conceptos**: el cráter suma dos anillos de runas y cuatro espirales pequeñas alrededor de la grande; el árbol seco es gris ceniza claro, con el tronco de **tres hebras retorcidas** y ocho raíces que se agarran al borde (casi todas hacia −Y); el portal es ya un **arco ojival** (las raíces se juntan en punta a 4,8 m, sin cruzarse) con runas de savia en las patas; el **nudo envuelve el arco** como en `portal_raiz_nudo_corrupcion_concept_art.jpg`: zarzas atadas a las dos patas entre 1,35 y 2,8 m, un puente de zarcillos con el corazón podrido en medio, una cortina de espinas hasta el suelo que cierra el paso y racimos de cuarzo violeta (el grande en la pata derecha). Huesos y animaciones `latido`/`purificar` como antes (los huesos ahora están junto a su pieza). Vista conjunta en `vistas_crater_y_portal/portal_con_nudo_*.png`.
 - 2026-11-04 · gemini · Decisión de Iam: retorno definitivo al modelo HD-2D original de pixel art artesanal sin mallas 3D procedurales. El juego queda en pixel art puro en 3D (`scripts/mundo/hd2d/espejo_hd2d.gd`), 100% de pruebas automáticas superadas y listo para jugar.
 - 2026-11-06 · gemini · Las Estanterías Colgantes (parte 2) completadas: jefe El Bibliotecario Hueco (Opción A · El abrigo vacío) con escudo de libros voladores, spritesheets con normales, música propia 'El vals de las páginas perdidas' (jefe_bibliotecario.ogg) y Ficha de Mwalimu. 100% de pruebas automáticas superadas (prueba_bibliotecario y prueba_estanterias).
+- 2026-11-06 · gemini · Trazado y bocetos de El Canal de Tinta (`documentacion/boceto_canal_tinta.png`) y de su jefe Pweza (`documentacion/boceto_pweza.png`) listos para decidir con Iam; clarificado el reparto de funciones vigente en HD-2D (Gemini: trazado/bocetos, motor HD-2D, música y supervisión; Claude: construcción de mapas, arte 2D, lógica de juego, combate, misiones y diálogos).
 
 ---
 
@@ -116,8 +124,7 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
 - [x] para gemini: **concept art y turnaround de Maisha humanizada** (sin astas, con los tatuajes y corazón): resuelto en `personajes/maisha_turnaround_sheet.jpg`.
 - [x] para gemini: **concept art y turnaround de Mzee Shamba bípedo sabio**: resuelto en `personajes/mzee_shamba_turnaround_sheet.jpg`.
 - [x] para gemini: **concept art de todos los props, cráter y portal de El Kitovu**: resueltos y entregados.
-- [ ] para gemini: rehacer el mockup `interfaz/ui_gameplay_aaa_concept_art.jpg` con Maisha místico y subtítulos en español.
-- [ ] para gemini: en `kitovu_3d.tscn`, poner `NudoCorrupcion` con **la misma transformación que `PortalRaiz`** (ahora el nudo se modela alrededor de las patas del arco, como tu concepto; donde está, a 15 m del portal, quedaría flotando). Su `CollisionShape3D` (cilindro de 1,4 m) ya tapa bien el vano. El cráter baja 0,45 m bajo z = 0: el suelo de alrededor tiene que dejarle el hueco.
+- [ ] para claude (SIGILIA · EL CANAL DE TINTA, listo tras elegir Iam las opciones del boceto): Construir la escena, arte 2D y mecánicas de **El Canal de Tinta** (`escenas/mundo/canal_tinta.tscn`, `scripts/mundo/canal_tinta.gd`, `construir_mapa.py`, `pintar_canal.py`, el **Sigilo de Hielo**, **Mfereji** el armiño esclusista, la sanguijuela de tinta **Ruba**, el jefe **Pweza** en `scripts/enemigos/pweza.gd`, diálogos en `datos/dialogos/sigilia.json` y `pruebas/prueba_canal_tinta.gd`) a partir de los bocetos `documentacion/boceto_canal_tinta.png` y `documentacion/boceto_pweza.png`. Gemini compondrá las pistas de música (`canal_tinta.ogg` y `jefe_pweza.ogg`) y supervisará la integración HD-2D.
 
 ---
 
