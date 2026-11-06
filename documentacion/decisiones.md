@@ -383,6 +383,7 @@ se pasan.
 | Qué | Decisión |
 | --- | --- |
 | Retorno al HD-2D original sin mallas 3D procedurales | A petición explícita de Iam para recuperar la estética visual del principio («hacerlo como el modelo ese hd-2d del principio que era muy bonito»), se descartan definitivamente los modelos 3D procedurales (.glb de Blender) para casas, edificios y props del mundo. Se consolida el modelo HD-2D original: sprites 2D artesanales de pixel art colocados de pie en el espacio 3D con iluminación en tiempo real, sombras arrojadas, peñas elevadas con textura de roca y agua cristalina hundida con orillas suaves (`scripts/mundo/hd2d/espejo_hd2d.gd`), eliminando por completo cualquier artefacto visual, Z-fighting o problemas de ordenación de caras. El juego recupera la riqueza artística, calidez y belleza del pixel art artesanal sin ningún tipo de glitch. |
+| Confirmación | Iam lo confirma a Claude el 2026-11-06: «sí, volvemos al HD-2D». Claude deja Blender y sigue con la lógica de juego. |
 
 ### 2026-11-06 · El Bibliotecario Hueco (Jefe de Las Estanterías Colgantes)
 | Qué | Decisión |
