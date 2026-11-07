@@ -1924,6 +1924,58 @@ def hielo_romper():
     return reverb(p.entera(), 0.85, 0.25)
 
 
+def carga_sismica():
+    """Maisha embiste con la Carga Sísmica: golpe grave de tierra, deslizamiento de roca y destello de ámbar."""
+    p = Pista(0.65)
+    d = 0.48
+    n = _n(d)
+    empuje = seno(_desliz(170, 48, d), d) * caida(n, 0.12) * 0.85
+    roca = _crujido_piedra(d, 220, grave=True) * adsr(n, 0.01, 0.08, 0.55, 0.2) * 0.65
+    soplo = barrido_bajo(ruido_rosa(d), 1400, 260) * caida(n, 0.14) * 0.45
+    p.poner(empuje + roca + soplo, 0.0)
+    for k, nota in enumerate(("D5", "A5", "D6")):
+        p.poner(campanita(nota, 0.42, 0.22 - k * 0.04), 0.03 + k * 0.045)
+    return reverb(p.entera(), 0.75, 0.22)
+
+
+def roca_romper():
+    """Un muro agrietado o coraza de basalto salta en pedazos con destello de ámbar."""
+    p = Pista(0.85)
+    d = 0.65
+    n = _n(d)
+    golpe = taiko(0.45, 0.85)
+    escombros = _crujido_piedra(d, 310, grave=True) * caida(n, 0.22) * 0.9
+    p.poner(golpe, 0.0)
+    p.poner(escombros, 0.02)
+    for k, nota in enumerate(("A5", "D6", "F#6")):
+        p.poner(campanita(nota, 0.5, 0.18), 0.08 + k * 0.06)
+    return reverb(p.entera(), 0.95, 0.25)
+
+
+def diapason_ambar():
+    """Un pilar-diapasón o horno de Mji-Jiwe resuena al recibir un impacto sísmico."""
+    p = Pista(1.5)
+    for k, (nota, t0, vol) in enumerate((("D5", 0.0, 0.42), ("A5", 0.04, 0.34), ("D6", 0.09, 0.28), ("F#6", 0.15, 0.22))):
+        p.poner(campanita(nota, 1.25 - k * 0.1, vol), t0)
+    zumbido = seno(293.66, 1.2) * adsr(_n(1.2), 0.02, 0.2, 0.45, 0.6) * 0.22
+    p.poner(zumbido, 0.0)
+    return reverb(p.entera(), 1.6, 0.32)
+
+
+def vagoneta_rodar():
+    """Una vagoneta de hierro cargada de ámbar rueda por los raíles tras un golpe sísmico."""
+    p = Pista(0.95)
+    d = 0.85
+    n = _n(d)
+    rampa_v = np.sin(np.linspace(0, np.pi, n))
+    rodar = paso_banda(ruido_rosa(d), 220, 1400) * rampa_v * 0.55
+    p.poner(rodar, 0.0)
+    for k in range(6):
+        tk = 0.04 + k * 0.12
+        p.poner(campanita("A4" if k % 2 == 0 else "D5", 0.12, 0.18), tk)
+    return reverb(p.entera(), 0.6, 0.18)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -1979,6 +2031,8 @@ EFECTOS = {
     "mamba_dolor": (mamba_dolor, 0.8), "mamba_coletazo": (mamba_coletazo, 0.7), "mamba_vencido": (mamba_vencido, 0.85),
     "cangrejo_chasca": (cangrejo_chasca, 0.55), "cangrejo_vuelca": (cangrejo_vuelca, 0.65),
     "hielo_runa": (hielo_runa, 0.65), "hielo_pisar": (hielo_pisar, 0.55), "hielo_romper": (hielo_romper, 0.65),
+    "carga_sismica": (carga_sismica, 0.75), "roca_romper": (roca_romper, 0.8),
+    "diapason_ambar": (diapason_ambar, 0.65), "vagoneta_rodar": (vagoneta_rodar, 0.65),
 }
 
 AMBIENTES = {

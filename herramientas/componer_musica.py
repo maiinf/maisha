@@ -2050,6 +2050,96 @@ def jefe_grimorio():
     return final(p, sala=3.6, mezcla=0.36, brillo=5500)
 
 
+# =============================================================================
+# ASTERHAUL (MUNDO 3): «El eco de la piedra» y «La ciudad dentro del cráter»
+# Kalimba de láminas de hierro, marimba de piedra (balafón), flauta cálida y yunque en Re dórico
+# =============================================================================
+
+TEMA_ASTERHAUL = [
+    ("D5", 0, 1.5), ("F5", 1.5, 0.5), ("A5", 2, 2), ("G5", 4, 1), ("F5", 5, 1), ("E5", 6, 2),
+    ("D5", 8, 1), ("C5", 9, 1), ("D5", 10, 1.5), ("E5", 11.5, 0.5), ("F5", 12, 2), ("A4", 14, 2),
+    ("D5", 16, 1.5), ("F5", 17.5, 0.5), ("A5", 18, 1.5), ("B5", 19.5, 0.5), ("C6", 20, 2), ("A5", 22, 2),
+    ("G5", 24, 1), ("F5", 25, 1), ("E5", 26, 1.5), ("C5", 27.5, 0.5), ("D5", 28, 4),
+]
+
+
+def desfiladero_meteorito():
+    """«El eco de la piedra»: subida por el Desfiladero del Meteorito en Re dórico (96 BPM).
+    Kalimba de hierro, marimba de piedra, golpes lejanos de pico/yunque y flauta de caña que resuena en el cañón."""
+    tempo = Tempo(96)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m7"), ("G2", "M"), ("C2", "M7"), ("D2", "m7"),
+        ("B1", "m"), ("G2", "M"), ("A2", "m7"), ("D2", "m7"),
+    ] * 3
+    colchones(p, tempo, progresion, compas=4, brillo=920, volumen=0.25, octava_bajo=2, fuerza_bajo=0.34)
+    # obstinato de kalimba de hierro y balafón de piedra
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.20, pan=-0.28, patron=(0, 2, 1, 3, 2, 0, 3, 1))
+        notas = acorde(raiz[:-1] + "4", tipo)
+        p.poner(balafon(notas[0], 0.35, 0.18), tempo.s(i * 4 + 1), pan=0.25)
+        p.poner(balafon(notas[2], 0.35, 0.16), tempo.s(i * 4 + 2.5), pan=0.25)
+    # el pulso sísmico del cráter y el cincel de Mwamba a lo lejos
+    rng = np.random.default_rng(701)
+    for b in range(0, pulsos, 4):
+        p.poner(tambor("D2", 0.32, 0.34, golpe=0.55), tempo.s(b), pan=-0.1)
+        p.poner(tambor("A2", 0.18, 0.22, golpe=0.7), tempo.s(b + 2.5), pan=0.15)
+        if b % 8 == 4:
+            p.poner(campanita("A6", 0.45, 0.11), tempo.s(b + 3), pan=0.4)
+            p.poner(campanita("D6", 0.55, 0.08), tempo.s(b + 3.5), pan=0.4)
+    # destellos de las geodas de ámbar
+    for _ in range(18):
+        b = rng.uniform(0, pulsos - 2)
+        nota = ["D6", "F6", "A6", "B6", "E6"][rng.integers(5)]
+        p.poner(campanita(nota, 0.9, 0.09), tempo.s(b), pan=rng.uniform(-0.45, 0.45))
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.42, vibrato=4.6)
+    melodia(p, tempo, TEMA_ASTERHAUL, desde=0, instrumento=kalimba, volumen=0.34, pan=-0.12)
+    melodia(p, tempo, TEMA_ASTERHAUL, desde=32, instrumento=flauta_, volumen=0.38, sostener=0.92, pan=0.16)
+    melodia(p, tempo, transportar(TEMA_ASTERHAUL, -12), desde=64, instrumento=kalimba, volumen=0.24, pan=-0.22)
+    tocar(p, tempo, TEMA_ASTERHAUL, desde=64, fuerza=0.28, pan=0.12)
+    return final(p, sala=3.1, mezcla=0.32, brillo=5200)
+
+
+def mji_jiwe():
+    """«La ciudad dentro del cráter»: las tres terrazas de Mji-Jiwe y la Gran Forja de Mhunzi (104 BPM).
+    Un tema acogedor, artesano y luminoso en Re dórico / Fa mayor con marimba, kalimba doble, diapasones de ámbar y flauta."""
+    tempo = Tempo(104)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D3", "m7"), ("G2", "M"), ("F2", "M7"), ("C3", "M"),
+        ("D3", "m7"), ("B2", "m"), ("G2", "M"), ("A2", "M"),
+    ] * 3
+    colchones(p, tempo, progresion, compas=4, brillo=1050, volumen=0.24, octava_bajo=2, fuerza_bajo=0.32)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.21, pan=-0.25, patron=(0, 1, 2, 3, 2, 1, 3, 0))
+        notas = acorde(raiz[:-1] + "4", tipo)
+        for k, paso_ in enumerate((0, 1.5, 2.5, 3)):
+            p.poner(balafon(notas[k % len(notas)], 0.32, 0.18 if k == 0 else 0.13), tempo.s(i * 4 + paso_), pan=0.22)
+    # percusión suave de taller y el Gran Diapasón vibrando cada 8 pulsos
+    for b in range(0, pulsos, 4):
+        p.poner(tambor("D2", 0.26, 0.24, golpe=0.45), tempo.s(b), pan=0.0)
+        p.poner(maraca(0.07, 0.10), tempo.s(b + 1), pan=-0.3)
+        p.poner(tambor("A2", 0.20, 0.18, golpe=0.5), tempo.s(b + 2), pan=0.1)
+        p.poner(maraca(0.07, 0.12), tempo.s(b + 3), pan=0.3)
+        if b % 8 == 0:
+            p.poner(campanita("D6", 1.8, 0.14), tempo.s(b), pan=0.0)
+            p.poner(campanita("A6", 1.6, 0.10), tempo.s(b + 0.15), pan=0.15)
+    tema_ciudad = [
+        ("F5", 0, 1.5), ("G5", 1.5, 0.5), ("A5", 2, 2), ("B5", 4, 1), ("A5", 5, 1), ("G5", 6, 2),
+        ("F5", 8, 1), ("E5", 9, 1), ("D5", 10, 2), ("A4", 12, 2), ("D5", 14, 2),
+        ("F5", 16, 1.5), ("G5", 17.5, 0.5), ("A5", 18, 1.5), ("C6", 19.5, 0.5), ("D6", 20, 2), ("A5", 22, 2),
+        ("B5", 24, 1), ("A5", 25, 1), ("G5", 26, 1), ("E5", 27, 1), ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.44, vibrato=4.8)
+    melodia(p, tempo, tema_ciudad, desde=0, instrumento=flauta_, volumen=0.37, sostener=0.9, pan=0.14)
+    melodia(p, tempo, tema_ciudad, desde=32, instrumento=kalimba, volumen=0.33, pan=-0.14)
+    tocar(p, tempo, TEMA_ASTERHAUL, desde=64, fuerza=0.30, pan=0.10)
+    melodia(p, tempo, transportar(tema_ciudad, -12), desde=64, instrumento=flauta_, volumen=0.20, sostener=0.9, pan=-0.20)
+    return final(p, sala=2.9, mezcla=0.30, brillo=5600)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2059,6 +2149,8 @@ PIEZAS["observatorio_aurora"] = observatorio_aurora
 PIEZAS["jefe_kengele"] = jefe_kengele
 PIEZAS["seccion_prohibida"] = seccion_prohibida
 PIEZAS["jefe_grimorio"] = jefe_grimorio
+PIEZAS["desfiladero_meteorito"] = desfiladero_meteorito
+PIEZAS["mji_jiwe"] = mji_jiwe
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -2068,6 +2160,8 @@ TITULOS["observatorio_aurora"] = "Donde miran las estrellas"
 TITULOS["jefe_kengele"] = "La campana que no suena"
 TITULOS["seccion_prohibida"] = "Lo que se guardó bajo llave"
 TITULOS["jefe_grimorio"] = "El último capítulo"
+TITULOS["desfiladero_meteorito"] = "El eco de la piedra"
+TITULOS["mji_jiwe"] = "La ciudad dentro del cráter"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]
