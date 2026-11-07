@@ -413,3 +413,12 @@ se pasan.
 | Qué | Decisión |
 | --- | --- |
 | Cambiar de sigilo | **R** pasa al siguiente sigilo aprendido (Fuego → Hielo → … el Rayo, cuando llegue) y **U** traza el elegido. Una runa pequeña en la pantalla dice cuál está puesto |
+
+### 2026-11-07 · La Sección Prohibida y su jefe final El Grimorio de Tinta (Decidido con Iam: «vale sigue»)
+| Qué | Decisión |
+| --- | --- |
+| Acceso y trazado (`documentacion/boceto_seccion_prohibida.png`) | **Las 12 Fichas del Índice + Claustro de los Tres Sigilos**: al devolver los 12 nombres de Maandiko (3 en la ciudad, 3 en las Estanterías, 3 en el Canal y 3 en el Observatorio), los 12 atriles del Gran Archivo se encienden y abren la escalera subterránea bajo el atril central. **Kalamu y Mauti** bajan con Maisha por la **Escalera de los 12 Nombres**; para abrir el Triple Sello de la Rotonda hay que superar dos cámaras laterales que combinan **Fuego + Hielo** (Oeste) y **Hielo + Rayo** (Este). Enemigo nuevo: **Sombra de Renglón** (tira de tinta viva que sale de los libros encadenados y solo es vulnerable tras iluminarla/congelarla con un Sigilo). |
+| Jefe final: **El Grimorio de Tinta** (`documentacion/boceto_grimorio.png`) | **Opción A · El Códice Abierto con Manos de Tinta** (elegida por Iam): tomo colosal de cuero púrpura y oro abierto de par en par, con dos grandes manos de tinta terminadas en garras de plumilla dorada y la **Pluma del Primer Nombre** clavada en el lomo; pasa las hojas invocando **capítulos de Hielo, Fuego y Rayo**, y Maisha debe activar el **pedestal del Sigilo opuesto** para rasgar el capítulo y aturdirlo. |
+| Cierre del Reino de Sigilia (`arte/historia/24_sigilia_libre.png`) | **Mauti y Kalamu entran en la Rotonda, el Grimorio vuelve a ser el Índice Vivo y entrega la Pluma del Primer Nombre**: al vencer la tinta nacida del miedo a olvidar, el Grimorio deja de esconder los nombres, la tinta helada de todo Maandiko vuelve a correr líquida y dorada por los canales, y se muestra la ilustración de historia `24_sigilia_libre.png`. |
+| Música y sonido (compuestos por Gemini) | `audio/musica/seccion_prohibida.ogg` («Lo que se guardó bajo llave») y `audio/musica/jefe_grimorio.ogg` («El último capítulo»), además de los sonidos del hielo (`hielo_runa`, `hielo_pisar`, `hielo_romper`) en `audio/sonidos/`. Construcción asignada a Claude en `documentacion/coordinacion.md`. |
+

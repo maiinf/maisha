@@ -1975,15 +1975,17 @@ PIEZAS = {"1_kitovu_antes": kitovu_antes, "2_familia_shamba": familia_shamba, "3
 
 
 def main():
-    # las del Bosque Cobrizo, la Ciénaga Quieta y el Campo Segado están en su propio archivo
+    # las del Bosque Cobrizo, la Ciénaga Quieta, el Campo Segado, el Sendero y Sigilia están en su propio archivo
     import cinematicas_bosque
     import cinematicas_cienaga
     import cinematicas_campo
     import cinematicas_sendero
+    import cinematicas_sigilia
     PIEZAS.update(cinematicas_sendero.PIEZAS)
     PIEZAS.update(cinematicas_bosque.PIEZAS)
     PIEZAS.update(cinematicas_cienaga.PIEZAS)
     PIEZAS.update(cinematicas_campo.PIEZAS)
+    PIEZAS.update(cinematicas_sigilia.PIEZAS)
     nombres = sys.argv[1:] or list(PIEZAS)
     for n in nombres:
         lz = PIEZAS[n]()

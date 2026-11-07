@@ -1944,6 +1944,112 @@ def jefe_kengele():
     return final(p, sala=3.4, mezcla=0.35, brillo=5600)
 
 
+def seccion_prohibida():
+    """«Lo que se guardó bajo llave»: La Sección Prohibida bajo el Gran Archivo.
+    Solemne, subterránea y misteriosa en si menor (3/4, 70 BPM): gotas de tinta espesa en la bóveda,
+    los tres motivos elementales de los Sigilos (Fuego, Hielo y Rayo) entrelazados en el Claustro
+    y el tema de Sigilia susurrado en la oscuridad antes de la Rotonda del Primer Nombre."""
+    tempo = Tempo(70)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("B1", "m"), ("G1", "M7"), ("E1", "m7"), ("F#1", "sus"),
+        ("B1", "m"), ("D2", "M"), ("G1", "M7"), ("F#1", "M"),
+        ("E1", "m7"), ("B1", "m"), ("G1", "M7"), ("C#2", "m7"),
+        ("G1", "M7"), ("E1", "m7"), ("F#1", "M"), ("B1", "m")
+    ] * 2
+    colchones(p, tempo, progresion, compas=3, brillo=480, volumen=0.18, octava_bajo=1, fuerza_bajo=0.28)
+
+    # Gotas de tinta bajo la cripta y ecos de los tres Sigilos (fuego cálido, cristal helado, chispa astral)
+    rng = np.random.default_rng(509)
+    for b in range(0, pulsos, 3):
+        if b % 6 == 0:
+            p.poner(tambor("B1", 0.36, 0.32, golpe=0.18), tempo.s(b), pan=0.0)
+        if rng.random() > 0.35:
+            nota_eco = ["B5", "F#6", "D6", "A5", "G5", "C#6"][rng.integers(6)]
+            p.poner(campanita(nota_eco, 1.5, 0.06), tempo.s(b + rng.uniform(0.3, 2.2)), pan=rng.uniform(-0.4, 0.4))
+
+    # Tema de Sigilia en su tono original (si menor), grave y solemne, con respuesta de la caja de música
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.36, vibrato=3.8)
+    caja = lambda n_, d_: campanita(n_, max(d_ * 1.6, 1.2), 0.32)
+    melodia(p, tempo, transportar(TEMA_SIGILIA, -12), desde=6, instrumento=flauta_, volumen=0.27, sostener=0.95, pan=-0.12)
+    melodia(p, tempo, TEMA_SIGILIA, desde=30, instrumento=caja, volumen=0.23, pan=0.15)
+    tocar(p, tempo, transportar(TEMA_SIGILIA, -12), desde=54, fuerza=0.22, pan=0.0)
+    p.poner(coro(["B2", "F#3", "D4"], tempo.s(24)), tempo.s(12), 0.055)
+    p.poner(coro(["G2", "D3", "B3"], tempo.s(24)), tempo.s(60), 0.055)
+    return final(p, sala=4.2, mezcla=0.44, brillo=4500)
+
+
+def jefe_grimorio():
+    """«El último capítulo»: el combate final de Sigilia contra El Grimorio de Tinta en la Rotonda del Primer Nombre.
+    Vals épico y vertiginoso en si menor que se abre hacia si mayor al final del ciclo (132 BPM):
+    los tres capítulos elementales (Hielo, Fuego y Rayo), taikos y coro solemne, el rasgueo de las garras-plumilla
+    y la flauta de Maisha devolviendo a los nombres su voz."""
+    tempo = Tempo(132)
+    pulsos = 144
+    p = Pista(tempo.s(pulsos))
+    acords = [
+        ["B1", "F#2", "D3", "F#3"],
+        ["G1", "D2", "B2", "D3"],
+        ["E1", "B1", "G2", "B2"],
+        ["F#1", "C#2", "A#2", "C#3"],
+        ["B1", "F#2", "D3", "B3"],
+        ["D1", "A1", "F#2", "A2"],
+        ["G1", "D2", "B2", "G3"],
+        ["F#1", "C#2", "A#2", "F#3"],
+        ["E1", "B1", "G2", "E3"],
+        ["B1", "F#2", "D3", "F#3"],
+        ["G1", "D2", "B2", "D3"],
+        ["F#1", "C#2", "A#2", "C#3"]
+    ] * 2
+
+    for i in range(24):
+        a = acords[i]
+        t0 = tempo.s(i * 6)
+        p.poner(bajo(a[0], tempo.s(3)), t0, 0.50)
+        p.poner(bajo(a[0], tempo.s(3)), t0 + tempo.s(3), 0.44)
+        p.poner(acorde_piano(a[1:], 0.45), t0 + tempo.s(1), 0.35, pan=-0.22)
+        p.poner(acorde_piano(a[1:], 0.45), t0 + tempo.s(2), 0.33, pan=0.22)
+        p.poner(acorde_piano(a[1:], 0.45), t0 + tempo.s(4), 0.34, pan=-0.18)
+        p.poner(acorde_piano(a[1:], 0.45), t0 + tempo.s(5), 0.32, pan=0.18)
+        if i % 2 == 0:
+            p.poner(coro(a[1:3], tempo.s(12) + 0.8, "a", 0.58), t0, 0.21, pan=0.0)
+
+    for b in range(0, pulsos, 3):
+        p.poner(tambor("B1", 0.40, 0.58, golpe=0.40), tempo.s(b), pan=-0.1)
+        p.poner(tambor("F#2", 0.22, 0.32, golpe=0.24), tempo.s(b + 1), pan=0.1)
+        p.poner(tambor("D2", 0.24, 0.34, golpe=0.24), tempo.s(b + 2), pan=0.0)
+        if b % 12 == 0:
+            p.poner(taiko(1.4, 0.75), tempo.s(b), pan=0.0)
+
+    # Capítulos de hielo, fuego y rayo en cascada de campanitas y balafón
+    rng = np.random.default_rng(612)
+    for b in range(0, pulsos, 2):
+        nota_cap = ["B4", "D5", "F#5", "G5", "A#4", "C#5"][(b // 2) % 6]
+        p.poner(balafon(nota_cap, 0.26, 0.16), tempo.s(b + 0.5), pan=-0.28 if (b // 2) % 2 else 0.28)
+        if rng.random() > 0.35:
+            nota_luz = ["B6", "F#6", "D6", "C#7", "G6"][rng.integers(5)]
+            p.poner(campanita(nota_luz, 0.32, 0.06), tempo.s(b + rng.uniform(0.1, 0.8)), pan=rng.uniform(-0.45, 0.45))
+
+    frase_grimorio = [
+        ("B5", 0, 2), ("F#5", 2, 1), ("G5", 3, 2), ("F#5", 5, 1),
+        ("E5", 6, 2), ("D5", 8, 1), ("C#5", 9, 2), ("A#4", 11, 1),
+        ("B4", 12, 2), ("D5", 14, 1), ("F#5", 15, 2), ("B5", 17, 1),
+        ("A5", 18, 2), ("G5", 20, 1), ("F#5", 21, 3),
+        ("G5", 24, 1.5), ("A5", 25.5, 0.5), ("B5", 26, 2), ("C#6", 28, 1), ("D6", 29, 1),
+        ("C#6", 30, 2), ("B5", 32, 1), ("A#5", 33, 3),
+        ("B5", 36, 2), ("F#5", 38, 1), ("G5", 39, 2), ("E5", 41, 1),
+        ("F#5", 42, 2), ("A#5", 44, 1), ("B5", 45, 3)
+    ]
+    caja = lambda n_, d_: campanita(n_, max(d_ * 1.3, 0.8), 0.38)
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.46, vibrato=5.0)
+    melodia(p, tempo, frase_grimorio, desde=12, instrumento=caja, volumen=0.36, pan=-0.15)
+    melodia(p, tempo, frase_grimorio, desde=72, instrumento=flauta_, volumen=0.40, pan=0.15)
+    melodia(p, tempo, transportar(frase_grimorio, -12), desde=72, instrumento=kalimba, volumen=0.22, pan=-0.25)
+    melodia(p, tempo, TEMA_SIGILIA, desde=108, instrumento=flauta_, volumen=0.38, pan=0.0)
+    return final(p, sala=3.6, mezcla=0.36, brillo=5500)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -1951,6 +2057,8 @@ PIEZAS["canal_tinta"] = canal_tinta
 PIEZAS["jefe_pweza"] = jefe_pweza
 PIEZAS["observatorio_aurora"] = observatorio_aurora
 PIEZAS["jefe_kengele"] = jefe_kengele
+PIEZAS["seccion_prohibida"] = seccion_prohibida
+PIEZAS["jefe_grimorio"] = jefe_grimorio
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -1958,6 +2066,8 @@ TITULOS["canal_tinta"] = "Lo que lleva la corriente"
 TITULOS["jefe_pweza"] = "El tintero del abismo"
 TITULOS["observatorio_aurora"] = "Donde miran las estrellas"
 TITULOS["jefe_kengele"] = "La campana que no suena"
+TITULOS["seccion_prohibida"] = "Lo que se guardó bajo llave"
+TITULOS["jefe_grimorio"] = "El último capítulo"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

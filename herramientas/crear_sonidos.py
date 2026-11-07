@@ -1886,6 +1886,44 @@ def rango_nuevo():
     p.poner(campanita(1567.98, 0.6) * 0.25, 0.32)
     return reverb(p.entera(), 1.4, 0.3)
 
+def hielo_runa():
+    """El Sigilo de Hielo cristaliza la tinta: un crujido gélido que se endurece y tres esquirlas de cristal agudas."""
+    p = Pista(1.1)
+    d = 0.55
+    soplo = paso_banda(ruido(d), 1800, 7500) * np.sin(np.linspace(0, np.pi, _n(d))) ** 1.4
+    p.poner(soplo * 0.45, 0.0)
+    for k in range(5):
+        dk = 0.045
+        crujido = paso_banda(ruido(dk), 1400 + k * 350, 6500) * caida(_n(dk), 0.015)
+        p.poner(crujido * (0.55 - k * 0.06), 0.04 + k * 0.065)
+    for k, nota in enumerate(("E6", "B6", "G6")):
+        p.poner(campanita(nota, 0.55, 0.28 - k * 0.05), 0.08 + k * 0.09)
+    return reverb(p.entera(), 0.9, 0.28)
+
+
+def hielo_pisar():
+    """Maisha salta sobre una placa de tinta helada: golpe hueco sobre el hielo, crujido corto y leve chapoteo debajo."""
+    p = Pista(0.55)
+    golpe = seno(_desliz(240, 95, 0.11), 0.11) * caida(_n(0.11), 0.04)
+    p.poner(golpe * 0.65, 0.0)
+    p.poner(paso_banda(ruido(0.06), 2200, 7200) * caida(_n(0.06), 0.018) * 0.55, 0.01)
+    p.poner(campanita("B6", 0.25, 0.16), 0.02)
+    p.poner(_chapoteo(0.18, 350, 1800, 0.28), 0.05)
+    return reverb(p.entera(), 0.5, 0.18)
+
+
+def hielo_romper():
+    """La placa de tinta helada se agrieta y se deshace en la corriente: crujidos de hielo que estalla y chapuzón."""
+    p = Pista(1.0)
+    for k in range(7):
+        dk = 0.05
+        p.poner(paso_banda(ruido(dk), 1600 + k * 320, 8000) * caida(_n(dk), 0.018) * (0.65 - k * 0.06), k * 0.045)
+    for k, nota in enumerate(("G6", "E6", "B5")):
+        p.poner(campanita(nota, 0.4, 0.22 - k * 0.04), 0.05 + k * 0.08)
+    p.poner(_chapoteo(0.35, 280, 2400, 0.55), 0.18)
+    return reverb(p.entera(), 0.85, 0.25)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -1940,6 +1978,7 @@ EFECTOS = {
     "mamba_ruge": (mamba_ruge, 0.85), "mamba_salta": (mamba_salta, 0.7), "mamba_muerde": (mamba_muerde, 0.85),
     "mamba_dolor": (mamba_dolor, 0.8), "mamba_coletazo": (mamba_coletazo, 0.7), "mamba_vencido": (mamba_vencido, 0.85),
     "cangrejo_chasca": (cangrejo_chasca, 0.55), "cangrejo_vuelca": (cangrejo_vuelca, 0.65),
+    "hielo_runa": (hielo_runa, 0.65), "hielo_pisar": (hielo_pisar, 0.55), "hielo_romper": (hielo_romper, 0.65),
 }
 
 AMBIENTES = {
