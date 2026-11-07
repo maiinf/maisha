@@ -19,6 +19,8 @@ const ESCENA_SEMILLA := preload("res://scripts/combate/semilla.gd")
 const ESCENA_GOLPE := preload("res://scripts/combate/golpe_efecto.gd")
 const ESCENA_LATIDO := preload("res://scripts/combate/latido_efecto.gd")
 const SIGILO_FUEGO := preload("res://scripts/combate/sigilo_fuego.gd")
+const SIGILO_HIELO := preload("res://scripts/combate/sigilo_hielo.gd")
+const SIGILOS := {"fuego": "Sigilo de Fuego", "hielo": "Sigilo de Hielo"}   # (en el orden en que se cambian con R)
 const SIGILO_COSTE := 20.0      # Aliento que gasta trazar un sigilo
 const SIGILO_ESPERA := 0.7      # segundos entre sigilo y sigilo
 const RELIEVE := preload("res://scripts/mundo/relieve.gd")
@@ -136,6 +138,8 @@ func _physics_process(delta: float) -> void:
 			latido()
 		if Input.is_action_just_pressed("sigilo"):
 			sigilo()
+		if Input.is_action_just_pressed("cambiar_sigilo"):
+			cambiar_sigilo()
 
 	if Input.is_action_just_pressed("usar"):
 		tomar_sopa()
@@ -248,15 +252,39 @@ func latido() -> bool:
 	return true
 
 
-## El sigilo (arte Runa, Sigilia): traza delante una runa de fuego que enciende, derrite y quema.
-## Hace falta haberlo aprendido (marca «sigilo_fuego», se lo enseña Taa en el Paso de la Escarcha).
+## El sigilo elegido (se cambia con R): «fuego» o «hielo». Solo los aprendidos (marca «sigilo_<nombre>»).
+func sigilo_elegido() -> String:
+	var elegido := String(Estado.extra.get("sigilo", "fuego"))
+	return elegido if Estado.tiene("sigilo_" + elegido) else "fuego"
+
+
+## Con R, el siguiente sigilo aprendido (si hay más de uno); lo dice arriba
+func cambiar_sigilo() -> bool:
+	var sabidos: Array[String] = []
+	for s in SIGILOS:
+		if Estado.tiene("sigilo_" + s):
+			sabidos.append(s)
+	if sabidos.size() < 2:
+		return false
+	var siguiente := sabidos[(sabidos.find(sigilo_elegido()) + 1) % sabidos.size()]
+	Estado.extra["sigilo"] = siguiente
+	Sonido.efecto("pluma", -8.0, global_position, 0.1)
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud:
+		hud.mostrar_mensaje(SIGILOS[siguiente])
+	return true
+
+
+## El sigilo (arte Runa, Sigilia): traza delante la runa elegida. La de fuego enciende, derrite y quema (se la
+## enseña Taa en el Paso de la Escarcha); la de hielo congela y endurece la tinta (Mfereji, en el Canal de Tinta).
 func sigilo() -> bool:
 	var coste := SIGILO_COSTE * (0.6 if Estado.tiene("pluma_ligera") else 1.0)     # (la pluma de Wino: gasta menos)
-	if not Estado.tiene("sigilo_fuego") or _espera_sigilo > 0.0 or agotada or aliento < coste:
+	var elegido := sigilo_elegido()
+	if not Estado.tiene("sigilo_" + elegido) or _espera_sigilo > 0.0 or agotada or aliento < coste:
 		return false
 	aliento -= coste
 	_espera_sigilo = SIGILO_ESPERA
-	var efecto: Node2D = SIGILO_FUEGO.new()
+	var efecto: Node2D = (SIGILO_HIELO if elegido == "hielo" else SIGILO_FUEGO).new()
 	efecto.position = global_position + direccion_mirada() * 18.0 + Vector2(0, -6)
 	get_parent().add_child(efecto)
 	if aliento < 1.0:

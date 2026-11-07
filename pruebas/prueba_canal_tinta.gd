@@ -80,6 +80,56 @@ func _ready() -> void:
 		charcos += 1
 	_comprobar(charcos == 1, "un tapón de Tinta Quieta cierra el Remanso Norte (%d)" % charcos)
 
+	print("El Sigilo de Hielo y las placas:")
+	_comprobar(not m.cambiar_sigilo() and m.sigilo_elegido() == "fuego", "con un solo sigilo, R no cambia nada")
+	Estado.marcar("sigilo_hielo")
+	_comprobar(m.cambiar_sigilo() and m.sigilo_elegido() == "hielo", "con el de hielo aprendido, R pasa al Sigilo de Hielo")
+	m.global_position = Vector2(30 * 16 + 8, 20 * 16 + 8)
+	await _andar(m, "mover_abajo", 0.3)
+	m.aliento = m.aliento_maximo()
+	await _esperar(0.8)
+	_comprobar(m.sigilo(), "Maisha traza la runa de hielo hacia la tinta")
+	await _esperar(0.5)
+	var placas := get_tree().get_nodes_in_group("placas_hielo")
+	_comprobar(placas.size() == 1, "la tinta se endurece en una placa de hielo (%d)" % placas.size())
+	if placas.size() == 1:
+		var placa: Node2D = placas[0]
+		var x0 := placa.position.x
+		await _esperar(1.0)
+		_comprobar(placa.position.x > x0 + 8.0, "la corriente lleva la placa hacia el este")
+		# se sube andando hacia ella
+		m.global_position = Vector2(placa.position.x, 20 * 16 + 8)
+		await _andar(m, "mover_abajo", 0.4)
+		_comprobar(placa.encima(), "Maisha salta encima de la placa")
+		var xm := m.global_position.x
+		await _esperar(1.5)
+		_comprobar(m.global_position.x > xm + 16.0 and placa.contiene(m.global_position), "la placa la lleva (y no se cae)")
+		await _andar(m, "mover_abajo", 1.0)
+		_comprobar(placa.encima() and m.global_position.y < 31 * 16, "andar hacia la tinta no la saca de la placa")
+		# de vuelta al muelle norte
+		await _andar(m, "mover_arriba", 1.5)
+		_comprobar(not placa.encima() and m.global_position.y < 21 * 16, "y anda hacia el muelle para bajar")
+		# la compuerta cerrada la para
+		placa.position.x = 46 * 16 - 30
+		await _esperar(1.5)
+		_comprobar(placa.quieta and placa.position.x < 46 * 16 - 20, "la compuerta cerrada frena la placa")
+		# si se deshace con Maisha encima, se hunde
+		m.global_position = Vector2(placa.position.x, 20 * 16 + 8)
+		await _andar(m, "mover_abajo", 0.4)
+		var hojas: int = m.vida
+		placa.vida = 0.2
+		await _esperar(1.5)
+		_comprobar(m.vida == hojas - 1 and m.global_position.y < 21 * 16, "si se deshace con ella encima, se hunde, pierde una hoja y vuelve a la orilla")
+		_comprobar(not is_instance_valid(placa), "y la placa se deshace")
+	m.global_position = Vector2(30 * 16 + 8, 17 * 16)
+	await _esperar(0.8)
+	m.aliento = m.aliento_maximo()
+	m.sigilo()
+	await _esperar(0.5)
+	_comprobar(get_tree().get_nodes_in_group("placas_hielo").is_empty(), "en el muelle, el hielo no hace placas")
+	m.cambiar_sigilo()
+	_comprobar(m.sigilo_elegido() == "fuego", "R vuelve al Sigilo de Fuego")
+
 	print("De vuelta:")
 	await _ir("maandiko", "canal", "Maandiko")
 	_comprobar(_escena() == "Maandiko", "se vuelve a Maandiko por la salida del este")

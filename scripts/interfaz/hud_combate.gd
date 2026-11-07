@@ -146,6 +146,21 @@ func _dibujar() -> void:
 			PIEL.caja(_lienzo, Rect2(sx, 4, 36, 24), "cuero", 0.95 * alfa)
 			_lienzo.draw_texture_rect_region(OBJETOS, Rect2(sx + 2, 8, 16, 16), Rect2(160, 0, 16, 16), mod)
 			_lienzo.draw_string(_fuente, Vector2(sx + 19, 21), str(sopas), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(TEXTO, alfa))
+		# el sigilo elegido (con más de uno aprendido): una runa pequeña debajo del panel
+		if Estado.tiene("sigilo_hielo") and _maisha.has_method("sigilo_elegido"):
+			var caja := Rect2(6, panel.end.y + 4, 20, 20)
+			PIEL.caja(_lienzo, caja, "cuero", 0.95 * alfa)
+			var hielo: bool = _maisha.sigilo_elegido() == "hielo"
+			var col := Color(0.75, 0.92, 1.0, alfa) if hielo else Color(1.0, 0.62, 0.2, alfa)
+			var c := caja.get_center()
+			if hielo:
+				_lienzo.draw_polyline(PackedVector2Array([c + Vector2(0, -6), c + Vector2(4, 0), c + Vector2(0, 6), c + Vector2(-4, 0), c + Vector2(0, -6)]), col, 1.0)
+				_lienzo.draw_line(c + Vector2(-6, -3), c + Vector2(6, 3), col, 1.0)
+				_lienzo.draw_line(c + Vector2(-6, 3), c + Vector2(6, -3), col, 1.0)
+			else:
+				_lienzo.draw_line(c + Vector2(0, 6), c + Vector2(0, -5), col, 1.0)
+				_lienzo.draw_polyline(PackedVector2Array([c + Vector2(-5, -1), c + Vector2(0, 2), c + Vector2(5, -1)]), col, 1.0)
+				_lienzo.draw_line(c + Vector2(-3, 5), c + Vector2(3, 5), col, 1.0)
 		# marca del coste de una semilla
 		var marca := floorf(barra.size.x * Artes.semilla_coste() / _maisha.aliento_maximo())
 		_lienzo.draw_rect(Rect2(barra.position + Vector2(marca, 0), Vector2(1, barra.size.y)), Color(0, 0, 0, 0.5 * alfa))

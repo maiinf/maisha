@@ -1848,16 +1848,116 @@ def jefe_pweza():
     return final(p, sala=3.1, mezcla=0.33, brillo=5300)
 
 
+def observatorio_aurora():
+    """«Donde miran las estrellas»: El Observatorio de la Aurora. Nocturna y cristalina en fa# menor / la mayor (3/4,
+    78 BPM): el tic-tac delicado de los relojes astronómicos, destellos de aurora boreal en campanitas muy agudas,
+    acordes suspendidos de cielo estrellado y el tema de Sigilia mirando hacia arriba en la flauta y la caja de música."""
+    tempo = Tempo(78)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("F#1", "m7"), ("D2", "M7"), ("A1", "M"), ("E2", "sus"),
+        ("F#1", "m7"), ("D2", "M7"), ("B1", "m7"), ("C#2", "sus"),
+        ("D2", "M7"), ("A1", "M"), ("E2", "M"), ("F#1", "m7"),
+        ("B1", "m7"), ("D2", "M7"), ("C#2", "sus"), ("F#1", "m")
+    ] * 2
+    colchones(p, tempo, progresion, compas=3, brillo=640, volumen=0.17, octava_bajo=1, fuerza_bajo=0.25)
+
+    # El tic-tac del mecanismo astral y los destellos de las constelaciones
+    rng = np.random.default_rng(402)
+    for b in range(pulsos):
+        d_c = 0.018
+        clic = paso_banda(ruido_rosa(d_c), 3600, 9200) * np.linspace(1, 0, int(d_c * SR)) ** 3
+        p.poner(clic * (0.09 if b % 3 == 0 else 0.045), tempo.s(b), pan=0.28 if b % 2 else -0.28)
+        if rng.random() > 0.55:
+            nota_est = ["F#6", "A6", "C#7", "E6", "G#6"][rng.integers(5)]
+            p.poner(campanita(nota_est, 1.3, 0.055), tempo.s(b + rng.uniform(0, 0.7)), pan=rng.uniform(-0.45, 0.45))
+
+    # Tema de Sigilia transportado a fa# menor (+7 semitonos, quinta justa arriba)
+    tema_obs = transportar(TEMA_SIGILIA, 7)
+    caja = lambda n_, d_: campanita(n_, max(d_ * 1.5, 1.1), 0.35)
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.38, vibrato=4.0)
+    melodia(p, tempo, tema_obs, desde=6, instrumento=caja, volumen=0.26, pan=-0.15)
+    melodia(p, tempo, transportar(tema_obs, -12), desde=30, instrumento=flauta_, volumen=0.28, sostener=0.92, pan=0.15)
+    tocar(p, tempo, transportar(tema_obs, -12), desde=54, fuerza=0.23, pan=-0.08)
+    p.poner(coro(["F#3", "C#4", "A4"], tempo.s(18)), tempo.s(18), 0.05)
+    p.poner(coro(["D3", "A3", "F#4"], tempo.s(18)), tempo.s(66), 0.05)
+    return final(p, sala=3.8, mezcla=0.40, brillo=5600)
+
+
+def jefe_kengele():
+    """«La campana que no suena»: la pelea contra Kengele, la Gran Campana Muda, en la Gran Cúpula.
+    Solemne y eléctrica en fa# menor (122 BPM): grandes golpes de campana grave (al principio apagados por la tinta,
+    luego brillantes cuando resuenan los diapasones con el Sigilo de Rayo), chispas de bobina astral, tambores en tres
+    y el tema de Sigilia doblando como un carillón de bronce."""
+    tempo = Tempo(122)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    acords = [
+        ["F#1", "C#2", "A2", "C#3"],
+        ["D1", "A1", "F#2", "A2"],
+        ["B1", "F#2", "D3", "F#3"],
+        ["C#1", "G#1", "F2", "G#2"],
+        ["F#1", "C#2", "A2", "F#3"],
+        ["A1", "E2", "C#3", "E3"],
+        ["D1", "A1", "F#2", "D3"],
+        ["C#1", "G#1", "F2", "B2"]
+    ] * 2
+
+    for i in range(16):
+        a = acords[i]
+        t0 = tempo.s(i * 6)
+        p.poner(bajo(a[0], tempo.s(3)), t0, 0.48)
+        p.poner(bajo(a[0], tempo.s(3)), t0 + tempo.s(3), 0.42)
+        # Tañido de la gran campana de bronce en el primer tiempo de cada compás
+        p.poner(campanita(a[1][:-1] + "4", 2.4, 0.22), t0, pan=0.0)
+        p.poner(acorde_piano(a[1:], 0.44), t0 + tempo.s(2), 0.33, pan=-0.2)
+        p.poner(acorde_piano(a[1:], 0.44), t0 + tempo.s(4), 0.33, pan=0.2)
+        if i % 2 == 0:
+            p.poner(coro(a[1:3], tempo.s(12) + 0.8, "a", 0.55), t0, 0.19, pan=0.12)
+
+    for b in range(0, pulsos, 3):
+        p.poner(tambor("F#1", 0.38, 0.56, golpe=0.38), tempo.s(b), pan=-0.1)
+        p.poner(tambor("C#2", 0.22, 0.30, golpe=0.22), tempo.s(b + 1), pan=0.1)
+        p.poner(tambor("A1", 0.24, 0.32, golpe=0.22), tempo.s(b + 2), pan=0.0)
+        if b % 12 == 0:
+            p.poner(taiko(1.3, 0.72), tempo.s(b), pan=0.0)
+
+    # Chispas eléctricas de los diapasones del Sigilo de Rayo
+    rng = np.random.default_rng(419)
+    for b in range(0, pulsos):
+        if rng.random() > 0.35:
+            nota_rayo = ["F#6", "C#7", "A6", "F6", "G#6"][rng.integers(5)]
+            p.poner(campanita(nota_rayo, 0.26, 0.05), tempo.s(b + rng.uniform(0, 0.5)), pan=rng.uniform(-0.45, 0.45))
+
+    frase_kengele = [
+        ("F#5", 0, 2), ("C#6", 2, 1), ("A5", 3, 2), ("G#5", 5, 1),
+        ("F#5", 6, 2), ("F5", 8, 1), ("F#5", 9, 3),
+        ("A5", 12, 1.5), ("B5", 13.5, 0.5), ("C#6", 14, 2), ("D6", 16, 1), ("C#6", 17, 1),
+        ("B5", 18, 2), ("A5", 20, 1), ("G#5", 21, 3),
+        ("F#5", 24, 2), ("C#5", 26, 1), ("D5", 27, 2), ("F5", 29, 1),
+        ("F#5", 30, 2), ("G#5", 32, 1), ("F#5", 33, 3)
+    ]
+    melodia(p, tempo, frase_kengele, desde=12, instrumento=kalimba, volumen=0.36, pan=-0.15)
+    melodia(p, tempo, frase_kengele, desde=60, instrumento=lambda n_, d_: flauta(n_, d_, 0.44, vibrato=4.8), volumen=0.38, pan=0.15)
+    melodia(p, tempo, transportar(frase_kengele, -12), desde=60, instrumento=kalimba, volumen=0.20, pan=-0.25)
+    return final(p, sala=3.4, mezcla=0.35, brillo=5600)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
 PIEZAS["canal_tinta"] = canal_tinta
 PIEZAS["jefe_pweza"] = jefe_pweza
+PIEZAS["observatorio_aurora"] = observatorio_aurora
+PIEZAS["jefe_kengele"] = jefe_kengele
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
 TITULOS["canal_tinta"] = "Lo que lleva la corriente"
 TITULOS["jefe_pweza"] = "El tintero del abismo"
+TITULOS["observatorio_aurora"] = "Donde miran las estrellas"
+TITULOS["jefe_kengele"] = "La campana que no suena"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

@@ -401,6 +401,15 @@ se pasan.
 | Jefe: **Pweza** (`documentacion/boceto_pweza.png`) | **Opción A · El Calamar del Tintero Real** (elegido por Iam): metido dentro de un gran tintero de latón y cristal agrietado que flota en la Gran Dársena; saca tentáculos con plumillas de oro para azotar el muelle. Si congelas un tentáculo con el Sigilo de Hielo y lo golpeas con el cetro, el tintero vuelca al muelle y Pweza queda expuesto. Al vencerlo entrega la 3.ª ficha del canal. |
 | Música (compuesta por Gemini) | `audio/musica/canal_tinta.ogg` («Lo que lleva la corriente», barcarola invernal en Mi menor) y `audio/musica/jefe_pweza.ogg` («El tintero del abismo»). Construcción de escena, arte 2D y lógica asignadas a Claude en `documentacion/coordinacion.md`. |
 
+### 2026-11-07 · El Observatorio de la Aurora y su jefe Kengele (Decidido con Iam: «sigue»)
+| Qué | Decisión |
+| --- | --- |
+| Trazado y mecánica (`documentacion/boceto_observatorio_aurora.png`) | **Bobinas astrales + Puentes de Constelación**: el **Sigilo de Rayo** activa las bobinas y diapasones astrales de cobre para encender puentes de luz estelar entre las tres terrazas escalonadas (algunos piden encender dos bobinas antes de que se apaguen). En las galerías laterales se combinan Fuego, Hielo y Rayo. |
+| Viajera y enemigo nuevo | **Nyota, la astrónoma armiño** (en blanco junto a la primera cúpula; su ficha está al este de la terraza sur y al recuperarla enseña el Sigilo de Rayo). Enemigo nuevo: **Saa, el Autómata de Relojería** (centinela de cuerda que patrulla las terrazas y solo se detiene sobrecargándolo con el Sigilo de Rayo). |
+| Jefe: **Kengele** (`documentacion/boceto_kengele.png`) | **Opción A · La Gran Campana Muda** (elegida por Iam): campana colosal de bronce grabada con constelaciones y badajo de tinta helada; sus tañidos mudos lanzan ondas de silencio, y hay que cargar con el Sigilo de Rayo los diapasones de la Gran Cúpula cuando embiste para que resuene de verdad y caiga aturdida. Al vencerla entrega la 3.ª ficha del observatorio. |
+| Música (compuesta por Gemini) | `audio/musica/observatorio_aurora.ogg` («Donde miran las estrellas», 73,8 s) y `audio/musica/jefe_kengele.ogg` («La campana que no suena», 47,2 s). Construcción asignada a Claude en `documentacion/coordinacion.md`. |
+
+
 
 
 
