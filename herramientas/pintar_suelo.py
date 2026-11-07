@@ -327,11 +327,13 @@ PISADA_N = ["#4a5468", "#5e6a80", "#76829a", "#8e9ab0", "#a8b2c4", "#c0c9d8"]
 NIEVE_LILA = ["#4e4870", "#655e8a", "#7e76a2", "#9890ba", "#b0a9cd", "#c8c2de", "#dddaec", "#f0eef8"]
 PISADA_LILA = ["#4c4664", "#605a7a", "#787292", "#908aa8", "#a8a2bc", "#c0bbd0"]
 # los mapas de Sigilia guardan su suelo en arte/mundos/sigilia/suelos
-SIGILIA = {"paso_escarcha", "maandiko", "estanterias_colgantes"}
+SIGILIA = {"paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta"}
+# la tinta del Canal: casi negra en lo hondo, morada en la orilla
+AGUA_TINTA = ["#0b0812", "#120d1c", "#1a1328", "#231a36", "#2e2246", "#3a2c58", "#4a3a6c", "#5c4c82", "#9a8cc4"]
 BIBLIOTECAS = {"estanterias_colgantes"}
 
 
-def _nevar(lz, tipos, fina, media, pared, conservar=(), lila=False):
+def _nevar(lz, tipos, fina, media, pared, conservar=(), lila=False, sin_agua=False):
     """El SENDERO OLVIDADO: todo nevado. Donde había hierba, nieve con ondas del viento y sombras azuladas; el camino,
     nieve pisada (más gris, con huellas); encima de las peñas, nieve; en sus paredes, escarcha."""
     import cv2 as _cv
@@ -341,6 +343,9 @@ def _nevar(lz, tipos, fina, media, pared, conservar=(), lila=False):
     ri = mascara(lz, tipos, ("risco",), 4.0, 0.5, semilla=50)
     pared = pared if pared is not None else np.zeros_like(ri)
     suelo = np.clip(1 - ri, 0, 1)
+    if sin_agua:
+        # (la tinta del Canal no se hiela: la nieve se queda en los muelles)
+        suelo = suelo * np.clip(1 - mascara(lz, tipos, ("agua",), 3, 0.2, semilla=910), 0, 1)
     if conservar:
         # (lo que se conserva, p. ej. las losas de las Ruinas, solo lleva un poco de nieve en las juntas)
         guardar = mascara(lz, tipos, conservar, 5, 0.2, semilla=909)
@@ -613,7 +618,7 @@ def pintar(nombre, salida=None):
     paso = nombre == "paso_piedra"
     campo = nombre.startswith("campo") or paso
     hierba_r = HIERBA_BOSQUE if bosque else (HIERBA_CIENAGA if cienaga else (HIERBA_CAMPO if campo else HIERBA_R))
-    agua_r = AGUA_CIENAGA if cienaga else AGUA_R
+    agua_r = AGUA_CIENAGA if cienaga else (AGUA_TINTA if nombre == "canal_tinta" else AGUA_R)
     # ---- hierba: base con manchas grandes, matas medianas y briznas finas
     grande = lz.ruido(60, 3, semilla=1)
     media = lz.ruido(9, 3, semilla=2)
@@ -805,11 +810,11 @@ def pintar(nombre, salida=None):
         lz.pintar(postes * (lz.ruido(0.5, 1, semilla=21) > 0.6), "#a8735a", 0.6)
 
     _puente_piedra(lz, tipos, alto, ancho, fina, media)
-    olvidado = nombre in ("sendero_olvidado", "paso_escarcha", "maandiko")
-    ruinas = nombre in ("ruinas_primer_arbol", "maandiko")
+    olvidado = nombre in ("sendero_olvidado", "paso_escarcha", "maandiko", "canal_tinta")
+    ruinas = nombre in ("ruinas_primer_arbol", "maandiko", "canal_tinta")
     pared = _riscos(lz, tipos, fina, media, cara=2.0 if (canada or paso or olvidado or ruinas) else 1.0)
     if olvidado or ruinas:
-        _nevar(lz, tipos, fina, media, pared, conservar=("losas",) if ruinas else (), lila=nombre in SIGILIA)
+        _nevar(lz, tipos, fina, media, pared, conservar=("losas",) if ruinas else (), lila=nombre in SIGILIA, sin_agua=nombre == "canal_tinta")
     if canada or paso:
         _mesetas(lz, tipos, fina, media, pared)
 
@@ -822,7 +827,7 @@ def pintar(nombre, salida=None):
 
     # sombra muy suave de las nubes (da volumen al terreno)
     nubes = np.clip((lz.ruido(90, 3, semilla=20) - 0.6) * 3, 0, 1)
-    lz.pintar(nubes, "#1d2e18" if nombre not in ("sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko") else "#1a2236", 0.12)
+    lz.pintar(nubes, "#1d2e18" if nombre not in ("sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "canal_tinta") else "#1a2236", 0.12)
 
     destino = salida or os.path.join(RAIZ, "arte", "mundos", "sigilia" if nombre in SIGILIA else "raiz", "suelos", nombre + "_suelo.png")
     os.makedirs(os.path.dirname(destino), exist_ok=True)

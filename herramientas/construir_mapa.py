@@ -2226,6 +2226,80 @@ def crear_estanterias():
     return ["".join(f) for f in m], {}
 
 
+def crear_canal():
+    """EL CANAL DE TINTA (Sigilia, 100x60, de oeste a este). Se entra por el oeste (de Maandiko, «<»). Por el medio corre
+    el CAUCE MAYOR («~», tinta líquida que no se pisa) hacia el este, entre dos MUELLES de sillería nevados («%»).
+    Al norte, el REMANSO NORTE (la casa de Mfereji «ḿ», con su ficha «ʣ» tras un tapón de Tinta Quieta «ẋ»), la ESTELA
+    del Sigilo de Hielo («ȷ») y la CASA DE LA ESCLUSA («ẽ»). Tres COMPUERTAS («ŧ», cruzan el cauce) con su RUEDA DORADA
+    en el muelle norte («ŵ»). Al sur, la ESCLUSA HUNDIDA (un dique de tinta con la 2.ª ficha «ʤ» al fondo). Al este,
+    la GRAN DÁRSENA (redonda, con Pweza «ƿ» en medio y la 3.ª ficha al vencerlo). Por la tinta, Ruba («ř»)."""
+    ANCHO, ALTO = 100, 60
+    azar = random.Random(1203)
+    m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def poner(x, y, c):
+        if 0 <= x < ANCHO and 0 <= y < ALTO:
+            m[y][x] = c
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                poner(x, y, c)
+
+    rect(0, 0, ANCHO - 1, ALTO - 1, "0")
+    # el muelle norte (de punta a punta) y el muelle sur (dos trozos, partidos por la Esclusa Hundida)
+    rect(2, 15, 76, 20, "%")
+    rect(10, 31, 40, 35, "%")
+    rect(56, 31, 74, 35, "%")
+    # el Cauce Mayor
+    rect(2, 21, 74, 30, "~")
+    # el Remanso Norte: una placita con la casa de Mfereji, abierta al muelle por un paso tapado de Tinta Quieta
+    rect(12, 4, 28, 12, "%")
+    rect(19, 13, 21, 14, "%")
+    poner(20, 14, "ẋ")
+    poner(20, 9, "ḿ")
+    poner(15, 7, "ʣ")
+    # la estela del Sigilo de Hielo y la casa de la esclusa, en el muelle norte
+    poner(36, 16, "ȷ")
+    poner(10, 16, "ẽ")
+    # las compuertas (cruzan el cauce) y su rueda en el muelle norte
+    for x in (24, 46, 66):
+        for y in range(21, 31):
+            poner(x, y, "ŧ")
+        poner(x, 19, "ŵ")
+    # la Esclusa Hundida: un dique de tinta que baja del cauce, con un andén al fondo
+    rect(41, 31, 55, 50, "~")
+    rect(40, 51, 56, 54, "%")
+    poner(48, 53, "ʤ")
+    # la Gran Dársena: un estanque redondo de tinta con un anillo de muelle alrededor
+    CX, CY = 86, 26
+    for y in range(ALTO):
+        for x in range(60, ANCHO - 2):
+            d = ((x - CX) / 1.0) ** 2 + ((y - CY) / 0.9) ** 2
+            if d <= 10.5 ** 2:
+                poner(x, y, "~")
+            elif d <= 14 ** 2 and m[y][x] == "0":
+                poner(x, y, "%")
+    rect(74, 21, 76, 30, "~")                                # el cauce desemboca en la dársena
+    poner(CX, CY, "ƿ")
+    # Ruba, nadando bajo la tinta
+    for (x, y) in ((14, 26), (34, 23), (56, 27), (48, 44)):
+        poner(x, y, "ř")
+    # la entrada (oeste)
+    for y in range(16, 19):
+        poner(0, y, "<")
+        poner(1, y, "%")
+    # nieve en los rincones: pinos y rocas junto a los muros
+    for _ in range(700):
+        x, y = azar.randrange(2, ANCHO - 2), azar.randrange(2, ALTO - 2)
+        if m[y][x] != "%" or any(m[y + dy][x + dx] not in "%0" for dy in (-1, 0, 1) for dx in (-1, 0, 1)):
+            continue
+        if any(m[y + d][x] == "0" or m[y][x + d] == "0" for d in (-1, 1)) and azar.random() < 0.12:
+            poner(x, y, "ň")
+    poner(4, 19, "L")
+    return ["".join(f) for f in m], {}
+
+
 def crear_cueva():
     """La cueva de las setas (56x64, de norte a sur), bajo la casa de Nungu: se baja por la escalera del armario.
     A oscuras: alumbran las SETAS que brillan («ů»). Salas: la de la escalera (arriba), un pasillo con NUBES DE ESPORAS
@@ -2968,7 +3042,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta"}
 
 
 def construir_suelo(nombre):
@@ -3118,7 +3192,8 @@ if __name__ == "__main__":
                         "canada_eco": crear_canada, "lago_espejo": crear_lago,
                         "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta,
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
-                        "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias}.get(nombre, crear_prados)()
+                        "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
+                        "canal_tinta": crear_canal}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

@@ -361,6 +361,19 @@
 			}
 		]
 	},
+	"canal_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Esto no es agua. Es tinta, y se mueve sola hacia el este, despacio, como si tuviera prisa por llegar a algún sitio.",
+					"Todo lo que cae dentro se lo lleva... y no vuelve a salir.",
+					"Esas compuertas doradas cortan el canal. Alguien las cuidaba, antes de quedarse en blanco."
+				]
+			}
+		]
+	},
 	"estanterias_llegada": {
 		"nombre": "",
 		"estilo": "pensamiento",

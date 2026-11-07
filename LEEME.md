@@ -972,6 +972,18 @@ Escena `escenas/mundo/estanterias_colgantes.tscn` (`scripts/mundo/estanterias_co
 | La sala de lectura y el jefe | Arriba (piso 4, y < 12 casillas), con su atril y el gran libro abierto: espera el **Bibliotecario Hueco** (jefe de las Estanterías). Opción A elegida por Iam: abrigo púrpura y armiño flotante sin cuerpo físico, ojos de tinta espectral y 3 libros voladores orbitando como escudo. Música propia: `jefe_bibliotecario.ogg` («El vals de las páginas perdidas»). Al vencerlo cae desinflado y libera la **Ficha de Mwalimu**, el Guardián de la Memoria |
 | Pruebas | `pruebas/prueba_estanterias.gd` y `pruebas/prueba_bibliotecario.gd` |
 
+## El Canal de Tinta (parte 1: el canal y sus muelles)
+
+Escena `escenas/mundo/canal_tinta.tscn` (`scripts/mundo/canal_tinta.gd`), por la salida del este de Maandiko (tras su charco de Tinta Quieta). Mapa de 100×60 (`crear_canal`), según `documentacion/boceto_canal_tinta.png`. Suelo pintado con la nieve lila de Sigilia en los muelles y la **tinta** (`AGUA_TINTA`, casi negra y morada) en el agua, sin nieve encima (`_nevar(..., sin_agua=True)`). Música `canal_tinta` («Lo que lleva la corriente», de Gemini).
+
+| Qué | Cómo |
+| --- | --- |
+| El Cauce Mayor | `~`: tinta que no se pisa, de oeste a este, entre el muelle norte (de punta a punta) y el sur (partido por la Esclusa Hundida) |
+| El Remanso Norte | Una placita al norte con la casa de Mfereji (`ḿ`) y su ficha (`ʣ`), tras un charco de Tinta Quieta (`ẋ`) |
+| La Esclusa Hundida y la Gran Dársena | Un dique de tinta al sur con un andén al fondo (2.ª ficha, `ʤ`) y un estanque redondo al este (Pweza, `ƿ`) |
+| Marcadas para las partes 2 a 4 | Estela del Sigilo de Hielo `ȷ`, casa de la esclusa `ẽ`, compuertas `ŧ` con su rueda `ŵ`, Ruba `ř` (aún no hacen nada) |
+| Prueba | `pruebas/prueba_canal_tinta.gd` |
+
 ## Las construcciones, al nivel de la casa del castor
 
 Todas las casas y construcciones antiguas se han repintado con el pintor de las cinemáticas (volumen, luz, materiales y objetos de su dueño), casi al doble de tamaño. Capturas: `documentacion/aldea_edificios.png` y `documentacion/casas_caminos.png`.

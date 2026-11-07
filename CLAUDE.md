@@ -86,7 +86,7 @@ El grafo de caminos para la flecha de misiones está en `datos/misiones.json` �
 & "C:\Users\iamin\Godot\extraido\Godot_v4.7.2-stable_win64_console.exe" --headless --import --path .
 & "C:\Users\iamin\Godot\extraido\Godot_v4.7.2-stable_win64_console.exe" --headless --path . res://pruebas/ejecutar.tscn -- prueba_senda_surcos
 ```
-Hay 36 pruebas (`pruebas/prueba_*.gd`; las del 3D, archivadas en `pruebas/archivo_3d/`); todas deben acabar en «RESULTADO: todo correcto».
+Hay 37 pruebas (`pruebas/prueba_*.gd`; las del 3D, archivadas en `pruebas/archivo_3d/`); todas deben acabar en «RESULTADO: todo correcto».
 
 ## Dónde estamos
 Fase 6. Raíz es un mundo libre con caminos con nombre (Sendero del Puente, Las Pasarelas, Camino Cobrizo,

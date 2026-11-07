@@ -117,9 +117,13 @@
 		],
 		"maandiko": [
 			"paso_escarcha",
-			"estanterias_colgantes"
+			"estanterias_colgantes",
+			"canal_tinta"
 		],
 		"estanterias_colgantes": [
+			"maandiko"
+		],
+		"canal_tinta": [
 			"maandiko"
 		]
 	},
