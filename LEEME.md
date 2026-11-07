@@ -980,8 +980,11 @@ Escena `escenas/mundo/canal_tinta.tscn` (`scripts/mundo/canal_tinta.gd`), por la
 | --- | --- |
 | El Cauce Mayor | `~`: tinta que no se pisa, de oeste a este, entre el muelle norte (de punta a punta) y el sur (partido por la Esclusa Hundida) |
 | El Remanso Norte | Una placita al norte con la casa de Mfereji (`ḿ`) y su ficha (`ʣ`), tras un charco de Tinta Quieta (`ẋ`) |
-| La Esclusa Hundida y la Gran Dársena | Un dique de tinta al sur con un andén al fondo (2.ª ficha, `ʤ`) y un estanque redondo al este (Pweza, `ƿ`) |
-| Marcadas para las partes 2 a 4 | Estela del Sigilo de Hielo `ȷ`, casa de la esclusa `ẽ`, compuertas `ŧ` con su rueda `ŵ`, Ruba `ř` (aún no hacen nada) |
+| La Esclusa Hundida y la Gran Dársena | Un dique de tinta al sur con un andén al fondo (2.ª ficha, `ʤ`) y un estanque redondo al este (Pweza, que lo pone la escena) |
+| Marcadas para las partes 2 a 4 | Estela del Sigilo de Hielo `ȷ`, casa de la esclusa `ẽ`, compuertas `ŧ` con su rueda `ŵ` (aún no hacen nada) |
+| El Sigilo de Hielo | `scripts/combate/sigilo_hielo.gd` (marca `sigilo_hielo`): una runa de escarcha (rombo con puntas de copo) que congela lo que está en el grupo `congelables` y, sobre tinta líquida, la endurece en una **placa** |
+| Cambiar de sigilo | **R** (acción `cambiar_sigilo`) pasa al siguiente sigilo aprendido y lo dice arriba; **U** traza el elegido (`Estado.extra["sigilo"]`, se guarda). Con más de uno aprendido, una runa pequeña bajo el panel de las hojas dice cuál está puesto |
+| Las placas de tinta helada | `scripts/mundo/sigilia/placa_hielo.gd` (48×36 px, dibujada en código): la corriente la lleva al este a 18 px/s; se para contra un muelle, una compuerta cerrada (`ŧ`, abierta con la marca `compuerta/<x>`) u otra placa. Se sube andando hacia ella; encima, Maisha se mueve por la placa y la placa la lleva; baja andando a tierra o salta a otra placa pegada. Dura 24 s (los 4 últimos se agrieta y parpadea); si se deshace con Maisha encima, se hunde, pierde una hoja y vuelve a la orilla |
 | Prueba | `pruebas/prueba_canal_tinta.gd` |
 
 ## Las construcciones, al nivel de la casa del castor

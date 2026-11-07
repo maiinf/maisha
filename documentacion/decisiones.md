@@ -409,9 +409,7 @@ se pasan.
 | Jefe: **Kengele** (`documentacion/boceto_kengele.png`) | **Opción A · La Gran Campana Muda** (elegida por Iam): campana colosal de bronce grabada con constelaciones y badajo de tinta helada; sus tañidos mudos lanzan ondas de silencio, y hay que cargar con el Sigilo de Rayo los diapasones de la Gran Cúpula cuando embiste para que resuene de verdad y caiga aturdida. Al vencerla entrega la 3.ª ficha del observatorio. |
 | Música (compuesta por Gemini) | `audio/musica/observatorio_aurora.ogg` («Donde miran las estrellas», 73,8 s) y `audio/musica/jefe_kengele.ogg` («La campana que no suena», 47,2 s). Construcción asignada a Claude en `documentacion/coordinacion.md`. |
 
-
-
-
-
-
-
+### 2026-11-07 · Cómo se elige el sigilo (Decidido con Iam)
+| Qué | Decisión |
+| --- | --- |
+| Cambiar de sigilo | **R** pasa al siguiente sigilo aprendido (Fuego → Hielo → … el Rayo, cuando llegue) y **U** traza el elegido. Una runa pequeña en la pantalla dice cuál está puesto |

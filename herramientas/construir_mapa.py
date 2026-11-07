@@ -2232,7 +2232,8 @@ def crear_canal():
     Al norte, el REMANSO NORTE (la casa de Mfereji «ḿ», con su ficha «ʣ» tras un tapón de Tinta Quieta «ẋ»), la ESTELA
     del Sigilo de Hielo («ȷ») y la CASA DE LA ESCLUSA («ẽ»). Tres COMPUERTAS («ŧ», cruzan el cauce) con su RUEDA DORADA
     en el muelle norte («ŵ»). Al sur, la ESCLUSA HUNDIDA (un dique de tinta con la 2.ª ficha «ʤ» al fondo). Al este,
-    la GRAN DÁRSENA (redonda, con Pweza «ƿ» en medio y la 3.ª ficha al vencerlo). Por la tinta, Ruba («ř»)."""
+    la GRAN DÁRSENA (redonda, con Pweza en medio y la 3.ª ficha al vencerlo). Pweza y Ruba los pone la escena (la tinta
+    tiene que quedar entera «~»)."""
     ANCHO, ALTO = 100, 60
     azar = random.Random(1203)
     m = [["." for _ in range(ANCHO)] for _ in range(ALTO)]
@@ -2281,10 +2282,6 @@ def crear_canal():
             elif d <= 14 ** 2 and m[y][x] == "0":
                 poner(x, y, "%")
     rect(74, 21, 76, 30, "~")                                # el cauce desemboca en la dársena
-    poner(CX, CY, "ƿ")
-    # Ruba, nadando bajo la tinta
-    for (x, y) in ((14, 26), (34, 23), (56, 27), (48, 44)):
-        poner(x, y, "ř")
     # la entrada (oeste)
     for y in range(16, 19):
         poner(0, y, "<")

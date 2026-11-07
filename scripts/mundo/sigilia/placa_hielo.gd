@@ -7,7 +7,7 @@ extends Node2D
 ##     pierde una hoja y vuelve a la orilla de la que subió.
 ## Una compuerta está abierta si está la marca «compuerta/<x>» (x = su columna).
 
-const TAM := Vector2(40, 30)          # el trozo que se pisa (desde el centro)
+const TAM := Vector2(48, 36)          # el trozo que se pisa (desde el centro)
 const CORRIENTE := 18.0               # px/s hacia el este
 const VIDA := 24.0
 const AVISO := 4.0
@@ -35,6 +35,21 @@ static func helar_en(padre: Node, centro: Vector2) -> Node2D:
 	var c := Vector2i(floori(centro.x / 16.0), floori(centro.y / 16.0))
 	if c.y < 0 or c.y >= filas.size() or c.x < 0 or c.x >= filas[c.y].length() or filas[c.y][c.x] != "~":
 		return null
+	# (junto al muelle, se separa un poco: la placa entera tiene que quedar sobre la tinta)
+	var tinta := func(p: Vector2) -> bool:
+		var t := Vector2i(floori(p.x / 16.0), floori(p.y / 16.0))
+		return t.y >= 0 and t.y < filas.size() and t.x >= 0 and t.x < filas[t.y].length() and filas[t.y][t.x] == "~"
+	for i in 16:
+		if not tinta.call(centro + Vector2(0, -TAM.y * 0.5 + 2.0)):
+			centro.y += 2.0
+		elif not tinta.call(centro + Vector2(0, TAM.y * 0.5 - 2.0)):
+			centro.y -= 2.0
+		elif not tinta.call(centro + Vector2(-TAM.x * 0.5 + 2.0, 0)):
+			centro.x += 2.0
+		elif not tinta.call(centro + Vector2(TAM.x * 0.5 - 2.0, 0)):
+			centro.x -= 2.0
+		else:
+			break
 	for p in padre.get_tree().get_nodes_in_group("placas_hielo"):
 		if absf((p as Node2D).global_position.x - centro.x) < TAM.x and absf((p as Node2D).global_position.y - centro.y) < TAM.y:
 			return null
@@ -207,8 +222,17 @@ func _draw() -> void:
 	var hondo := PackedVector2Array()
 	for p in _forma:
 		hondo.append(p + Vector2(0, 3))
+	# (un anillo de tinta removida alrededor, para que se vea bien sobre lo oscuro)
+	var onda := PackedVector2Array()
+	for p in _forma:
+		onda.append(p * (1.12 + 0.03 * sin(_t * 3.0)) + Vector2(0, 2))
+	onda.append(onda[0])
+	draw_polyline(onda, Color(0.62, 0.52, 0.9, 0.45), 1.0)
 	draw_colored_polygon(hondo, HIELO[0])
 	draw_colored_polygon(_forma, HIELO[1])
+	var filo := _forma.duplicate()
+	filo.append(_forma[0])
+	draw_polyline(filo, Color("0e1626"), 1.0)
 	var cara := PackedVector2Array()
 	for p in _forma:
 		cara.append((p * 0.86 + Vector2(-1, -1)).round())
@@ -218,10 +242,15 @@ func _draw() -> void:
 		luz.append((p * 0.5 + Vector2(-5, -4)).round())
 	draw_colored_polygon(luz, HIELO[3])
 	# vetas de tinta atrapada dentro y destellos
-	draw_line(Vector2(-12, 3), Vector2(-2, 6), Color(HIELO[0], 0.5), 1.0)
-	draw_line(Vector2(4, -6), Vector2(13, -2), Color(HIELO[0], 0.4), 1.0)
-	draw_rect(Rect2(-9, -8, 2, 1), HIELO[4])
-	draw_rect(Rect2(6, -3, 1, 1), HIELO[4])
+	draw_line(Vector2(-15, 4), Vector2(-3, 8), Color(HIELO[0], 0.55), 1.0)
+	draw_line(Vector2(5, -8), Vector2(16, -3), Color(HIELO[0], 0.45), 1.0)
+	draw_line(Vector2(-6, 10), Vector2(8, 11), Color(HIELO[1], 0.8), 1.0)
+	# facetas: dos aristas que parten la cara en planos
+	draw_line(Vector2(-18, -2), Vector2(-4, -1), Color(HIELO[3], 0.7), 1.0)
+	draw_line(Vector2(-4, -1), Vector2(6, 9), Color(HIELO[1], 0.7), 1.0)
+	draw_rect(Rect2(-11, -10, 3, 1), HIELO[4])
+	draw_rect(Rect2(-10, -11, 1, 3), HIELO[4])
+	draw_rect(Rect2(8, -4, 1, 1), HIELO[4])
 	# la línea clara del canto
 	for i in _forma.size():
 		var a := _forma[i]
