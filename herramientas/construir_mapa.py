@@ -2228,10 +2228,13 @@ def crear_estanterias():
 
 def crear_canal():
     """EL CANAL DE TINTA (Sigilia, 100x60, de oeste a este). Se entra por el oeste (de Maandiko, «<»). Por el medio corre
-    el CAUCE MAYOR («~», tinta líquida que no se pisa) hacia el este, entre dos MUELLES de sillería nevados («%»).
-    Al norte, el REMANSO NORTE (la casa de Mfereji «ḿ», con su ficha «ʣ» tras un tapón de Tinta Quieta «ẋ»), la ESTELA
-    del Sigilo de Hielo («ȷ») y la CASA DE LA ESCLUSA («ẽ»). Tres COMPUERTAS («ŧ», cruzan el cauce) con su RUEDA DORADA
-    en el muelle norte («ŵ»). Al sur, la ESCLUSA HUNDIDA (un dique de tinta con la 2.ª ficha «ʤ» al fondo). Al este,
+    el CAUCE MAYOR («~», tinta líquida que no se pisa) hacia el este, entre dos MUELLES de sillería nevados («%»); cerca de
+    la entrada lo cruza la PASARELA de la esclusa («=»). El muelle norte se acaba antes de la Gran Dársena: más allá
+    solo se llega en placa de hielo. Al norte, el REMANSO NORTE (la casa de Mfereji «ḣ», con su ficha «ʣ» tras un
+    tapón de Tinta Quieta «ẋ») y la ESTELA del Sigilo de Hielo («ȩ»). Mfereji, en blanco, junto a la primera compuerta.
+    Dos COMPUERTAS («ŧ», cruzan el cauce) con su RUEDA DORADA en el muelle norte («ŵ»). Al sur, la ESCLUSA HUNDIDA (un
+    dique de tinta que corre hacia el sur, con la 2.ª ficha «ʤ» en el andén del fondo y una escalerilla «%» de vuelta
+    al muelle sur, con su TRAMPILLA «ẗ» que solo se abre desde abajo). Al este,
     la GRAN DÁRSENA (redonda, con Pweza en medio y la 3.ª ficha al vencerlo). Pweza y Ruba los pone la escena (la tinta
     tiene que quedar entera «~»)."""
     ANCHO, ALTO = 100, 60
@@ -2249,7 +2252,7 @@ def crear_canal():
 
     rect(0, 0, ANCHO - 1, ALTO - 1, "0")
     # el muelle norte (de punta a punta) y el muelle sur (dos trozos, partidos por la Esclusa Hundida)
-    rect(2, 15, 76, 20, "%")
+    rect(2, 15, 68, 20, "%")
     rect(10, 31, 40, 35, "%")
     rect(56, 31, 74, 35, "%")
     # el Cauce Mayor
@@ -2258,20 +2261,22 @@ def crear_canal():
     rect(12, 4, 28, 12, "%")
     rect(19, 13, 21, 14, "%")
     poner(20, 14, "ẋ")
-    poner(20, 9, "ḿ")
+    poner(20, 9, "ḣ")
     poner(15, 7, "ʣ")
-    # la estela del Sigilo de Hielo y la casa de la esclusa, en el muelle norte
-    poner(36, 16, "ȷ")
-    poner(10, 16, "ẽ")
+    # la estela del Sigilo de Hielo, en el muelle norte
+    poner(36, 16, "ȩ")
     # las compuertas (cruzan el cauce) y su rueda en el muelle norte
-    for x in (24, 46, 66):
+    for x in (46, 66):
         for y in range(21, 31):
             poner(x, y, "ŧ")
         poner(x, 19, "ŵ")
+    rect(23, 21, 24, 30, "=")                                # la pasarela de la esclusa
     # la Esclusa Hundida: un dique de tinta que baja del cauce, con un andén al fondo
     rect(41, 31, 55, 50, "~")
     rect(40, 51, 56, 54, "%")
     poner(48, 53, "ʤ")
+    rect(39, 36, 40, 50, "%")                                # la escalerilla del andén al muelle sur...
+    poner(39, 36, "ẗ")                                       # ...con su trampilla
     # la Gran Dársena: un estanque redondo de tinta con un anillo de muelle alrededor
     CX, CY = 86, 26
     for y in range(ALTO):

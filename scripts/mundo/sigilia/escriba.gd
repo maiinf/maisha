@@ -5,21 +5,23 @@ extends "res://scripts/mundo/sigilia/vecino.gd"
 ## Su conversación es la de su nombre («daftari», ...), con sus partes en blanco y con nombre.
 
 @export var nombre := ""
+## su dibujo con color (el de en blanco es «<dibujo>_blanco»): el de escriba, o uno propio (Mfereji)
+@export var dibujo := "escriba"
 
 
 func _ready() -> void:
 	charla = nombre
-	id = "escriba" if Estado.tiene(nombre + "_nombre") else "escriba_blanco"
+	id = dibujo if Estado.tiene(nombre + "_nombre") else dibujo + "_blanco"
 	super()
 	add_to_group("escribas")
 
 
 func _al_poner_marca(marca: String) -> void:
 	super(marca)
-	if marca != nombre + "_nombre" or id == "escriba":
+	if marca != nombre + "_nombre" or id == dibujo:
 		return
-	id = "escriba"
-	_sprite.texture = load("res://arte/personajes/aldeanos/escriba_anim.png")
+	id = dibujo
+	_sprite.texture = load("res://arte/personajes/aldeanos/%s_anim.png" % dibujo)
 	Sonido.efecto("arte_sube", -4.0, global_position)
 	modulate = Color(2.2, 2.0, 1.6)
 	create_tween().tween_property(self, "modulate", Color.WHITE, 0.9)

@@ -1,6 +1,6 @@
 extends Node2D
 ## UNA PLACA DE TINTA HELADA (Canal de Tinta): la deja el Sigilo de Hielo al caer sobre tinta líquida («~»).
-##   - Flota y la CORRIENTE la lleva hacia el este; se para contra un muelle, una compuerta cerrada («ŧ») u otra placa.
+##   - Flota y la CORRIENTE la lleva (hacia el este, o hacia donde diga la escena con corriente_en(posición)); se para contra un muelle, una compuerta cerrada («ŧ») u otra placa.
 ##   - Maisha SUBE andando hacia ella desde la orilla (salta encima); arriba se mueve por la placa, que la lleva.
 ##     Baja andando hacia tierra firme o salta a otra placa que esté pegada.
 ##   - Dura VIDA s; los últimos AVISO s se agrieta y parpadea. Si se deshace con Maisha encima, se hunde en la tinta:
@@ -112,18 +112,25 @@ func _physics_process(delta: float) -> void:
 
 ## La corriente: hacia el este, mientras delante haya tinta libre
 func _derivar(delta: float) -> void:
+	# hacia dónde corre la tinta aquí: lo dice la escena (corriente_en), si no, al este
+	var escena := get_tree().current_scene
+	var dir: Vector2 = escena.corriente_en(position) if escena.has_method("corriente_en") else Vector2.RIGHT
 	var paso := CORRIENTE * delta
-	var frente := position.x + TAM.x * 0.5 + 2.0 + paso
+	var medio := TAM * 0.5
+	var lado := Vector2(-dir.y, dir.x).abs()                 # (a lo ancho del frente)
+	var frente := position + dir * (absf(dir.x) * medio.x + absf(dir.y) * medio.y + 2.0 + paso)
+	var ancho := absf(lado.x) * medio.x + absf(lado.y) * medio.y - 2.0
 	quieta = false
-	for dy in [-TAM.y * 0.5 + 2.0, 0.0, TAM.y * 0.5 - 2.0]:
-		if not _es_tinta_en(Vector2(frente, position.y + dy)):
+	for k in [-1.0, 0.0, 1.0]:
+		if not _es_tinta_en(frente + lado * ancho * k):
 			quieta = true
 	for p in get_tree().get_nodes_in_group("placas_hielo"):
-		if p != self and p.position.x > position.x and p.position.x - position.x < TAM.x + 1.0 + paso \
-				and absf(p.position.y - position.y) < TAM.y:
+		var d: Vector2 = p.position - position
+		if p != self and d.dot(dir) > 0.0 and absf(d.x) < TAM.x + 1.0 + paso and absf(d.y) < TAM.y + 1.0 + paso \
+				and absf(d.dot(lado)) < (TAM * lado).length():
 			quieta = true
 	if not quieta:
-		position.x += paso
+		position += dir * paso
 
 
 func _es_tinta_en(p: Vector2) -> bool:
@@ -170,7 +177,7 @@ func _subir() -> void:
 	var d := _maisha.global_position - global_position
 	var dentro := global_position + Vector2(clampf(d.x, -TAM.x * 0.5 + 4.0, TAM.x * 0.5 - 4.0), clampf(d.y, -TAM.y * 0.5 + 4.0, TAM.y * 0.5 - 4.0))
 	_maisha.global_position = dentro
-	Sonido.efecto("cristal", -10.0, dentro, 0.2)
+	Sonido.efecto("hielo_pisar", -4.0, dentro, 0.2)
 
 
 func _bajar() -> void:
@@ -182,6 +189,7 @@ func _bajar() -> void:
 ## Se deshace: si Maisha va encima, se hunde en la tinta y vuelve a la orilla
 func _deshacer() -> void:
 	_hundiendo = true
+	Sonido.efecto("hielo_romper", -2.0, global_position)
 	if encima():
 		_bajar()
 		_maisha.set("puede_actuar", false)

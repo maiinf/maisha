@@ -700,6 +700,62 @@ def taa_blanco():
     return taa(True)
 
 
+def mfereji(blanco=False):
+    """MFEREJI: el armiño esclusista del Canal de Tinta, el que abría y cerraba las compuertas. Fornido para ser
+    armiño, con un chubasquero de hule ocre abrochado con botones de hierro, botas altas de goma, una gorra de
+    visera azul marino, el silbato de latón colgado del cuello y, al hombro, la LLAVE DE COMPUERTA: una manivela
+    de hierro en T casi tan alta como él. Bajo la gorra asoma la bufanda morada de los escribas (todos lo son).
+    EN BLANCO (blanco=True): pálido y sin color, los ojos vacíos y el silbato mudo."""
+    l = Lienzo()
+    for y in range(5, 30):                                    # la llave de compuerta: la barra...
+        l.px(19, y, "metal", 2 if y % 5 else 1)
+    for x in range(16, 23):                                   # ...el mango en T...
+        l.px(x, 5, "metal", 3 if x in (16, 22) else 2)
+        l.px(x, 6, "metal", 1)
+    l.rect(18, 28, 20, 30, "metal", 1); l.px(19, 29, "hollin", 2)   # ...y la boca cuadrada que encaja en la rueda
+    _armino_base(l)
+    l.ovalo(11.5, 23.5, 5.0, 6.6, "delantal")                 # el chubasquero de hule, ancho
+    l.ovalo(10.5, 21.0, 2.0, 2.6, "delantal")                 # (con brillo de hule arriba a la izquierda)
+    for y in range(18, 29):                                   # la tira de botones
+        l.px(11 if y % 2 else 12, y, "delantal", 1)
+    for y in (19, 22, 25):
+        l.px(12, y, "metal", 3)
+    l.rect(7, 26, 16, 26, "delantal", 1)                      # el bajo del chubasquero
+    l.ovalo(7.0, 22, 1.5, 3.2, "delantal")                    # la manga de la izquierda
+    l.ovalo(17.5, 18.5, 1.7, 2.0, "armino")                   # la mano en la llave
+    l.rect(16, 18, 17, 20, "delantal", 2)                     # (la manga, remangada)
+    for x in (9, 14):                                         # las botas altas de goma
+        l.rect(x - 1, 27, x + 1, 30, "hollin", 2)
+        l.px(x - 1, 27, "hollin", 3)
+    ojos(l, 9, 9, 14, alto=2)
+    l.px(9, 8, "armino", 1); l.px(14, 8, "armino", 1)         # el ceño de quien mira el agua
+    l.ovalo(11.5, 6.5, 5.0, 2.0, "azul")                      # la gorra de visera azul marino
+    l.rect(7, 7, 16, 7, "azul", 1)                            # la visera
+    l.px(11, 5, "laton", 3); l.px(12, 5, "laton", 2)          # la insignia de la esclusa
+    l.rect(8, 16, 15, 16, "morado", 3)                        # la bufanda de escriba, asomando
+    for y in range(16, 20):                                   # el cordón del silbato y el silbato
+        l.px(14 - (y - 16) // 2, y, "laton", 1)
+    l.px(13, 20, "laton", 3); l.px(12, 20, "laton", 2)
+    if blanco:
+        for y in range(ALTO):
+            for x in range(ANCHO):
+                c = l.m[y][x]
+                if c is None:
+                    continue
+                mat, t = c
+                if mat == "ojo":
+                    l.m[y][x] = ("en_blanco", 0)
+                elif mat == "brillo":
+                    l.m[y][x] = ("en_blanco", 1)
+                else:
+                    l.m[y][x] = ("en_blanco", max(1, min(3, t + (1 if mat in ("tinta", "morado", "laton", "hollin", "azul") else 0))))
+    return l
+
+
+def mfereji_blanco():
+    return mfereji(True)
+
+
 def _armino_base(l, cola_x=3):
     """El cuerpo de un armiño de Sigilia (sin ropa): esbelto, de cuello largo, cola con la punta negra."""
     for (x, y) in ((cola_x, 29), (cola_x - 1, 28), (cola_x - 1, 27), (cola_x, 26), (cola_x + 1, 25), (cola_x + 2, 25)):
@@ -854,7 +910,7 @@ def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
 
 
 ## Desde qué columna (y fila) se levanta lo de la mano derecha en el gesto por defecto (para no mover picos ni orejas)
-ALZA = {"bibi": (19, 0), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
+ALZA = {"bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
         "kasia": (17, 0), "sungura": (19, 0)}
 
 
@@ -921,7 +977,7 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+ALDEANOS = {"kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

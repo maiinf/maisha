@@ -38,7 +38,7 @@ func _process(delta: float) -> void:
 
 
 func _helar() -> void:
-	Sonido.efecto("cristal", -2.0, global_position)   # shortcut: falta un sonido de hielo propio (pedido a Gemini)
+	Sonido.efecto("hielo_runa", 0.0, global_position)
 	var centro := global_position + Vector2(0, 6)      # (la runa va a la altura del pecho; el hielo, en el suelo)
 	for nodo in get_tree().get_nodes_in_group("congelables"):
 		if (nodo as Node2D).global_position.distance_to(centro) <= RADIO + 10.0:

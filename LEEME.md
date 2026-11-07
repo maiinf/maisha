@@ -972,16 +972,18 @@ Escena `escenas/mundo/estanterias_colgantes.tscn` (`scripts/mundo/estanterias_co
 | La sala de lectura y el jefe | Arriba (piso 4, y < 12 casillas), con su atril y el gran libro abierto: espera el **Bibliotecario Hueco** (jefe de las Estanterías). Opción A elegida por Iam: abrigo púrpura y armiño flotante sin cuerpo físico, ojos de tinta espectral y 3 libros voladores orbitando como escudo. Música propia: `jefe_bibliotecario.ogg` («El vals de las páginas perdidas»). Al vencerlo cae desinflado y libera la **Ficha de Mwalimu**, el Guardián de la Memoria |
 | Pruebas | `pruebas/prueba_estanterias.gd` y `pruebas/prueba_bibliotecario.gd` |
 
-## El Canal de Tinta (parte 1: el canal y sus muelles)
+## El Canal de Tinta (partes 1 y 2: el canal, Mfereji, el Sigilo de Hielo y las compuertas)
 
 Escena `escenas/mundo/canal_tinta.tscn` (`scripts/mundo/canal_tinta.gd`), por la salida del este de Maandiko (tras su charco de Tinta Quieta). Mapa de 100×60 (`crear_canal`), según `documentacion/boceto_canal_tinta.png`. Suelo pintado con la nieve lila de Sigilia en los muelles y la **tinta** (`AGUA_TINTA`, casi negra y morada) en el agua, sin nieve encima (`_nevar(..., sin_agua=True)`). Música `canal_tinta` («Lo que lleva la corriente», de Gemini).
 
 | Qué | Cómo |
 | --- | --- |
-| El Cauce Mayor | `~`: tinta que no se pisa, de oeste a este, entre el muelle norte (de punta a punta) y el sur (partido por la Esclusa Hundida) |
-| El Remanso Norte | Una placita al norte con la casa de Mfereji (`ḿ`) y su ficha (`ʣ`), tras un charco de Tinta Quieta (`ẋ`) |
-| La Esclusa Hundida y la Gran Dársena | Un dique de tinta al sur con un andén al fondo (2.ª ficha, `ʤ`) y un estanque redondo al este (Pweza, que lo pone la escena) |
-| Marcadas para las partes 2 a 4 | Estela del Sigilo de Hielo `ȷ`, casa de la esclusa `ẽ`, compuertas `ŧ` con su rueda `ŵ` (aún no hacen nada) |
+| El Cauce Mayor | `~`: tinta que no se pisa, de oeste a este, entre el muelle norte y el sur (partido por la Esclusa Hundida). Cerca de la entrada lo cruza la **pasarela** de la esclusa (`=`). El muelle norte se acaba antes de la Gran Dársena: más allá, solo en placa |
+| Mfereji | El armiño esclusista (`sigilia/escriba.gd` con `dibujo = "mfereji"`; dibujos `mfereji` y `mfereji_blanco` en `dibujar_aldeanos.py`: chubasquero de hule, botas de agua, gorra de visera, silbato y la llave de compuerta al hombro). Está en blanco junto a la primera compuerta. Su ficha (`ʣ`, `ficha_mfereji`) está en su casa del **Remanso Norte** (`ḣ`), tras un charco de Tinta Quieta (`ẋ`). Con su nombre, enseña el **Sigilo de Hielo** y da la **llave de compuerta** (`llave_compuerta`) |
+| Las compuertas | `ŧ` (columnas 46 y 66) con su **rueda dorada** en el muelle norte (`ŵ`, `sigilia/compuerta.gd`, dibujada en código: tablones con flejes de latón entre dos guías de hierro). Con la llave, Acción en la rueda: gira y la hoja sube (marca `compuerta/<x>`) o baja. Cerrada, para las placas |
+| La Esclusa Hundida | Allí la tinta corre hacia el **sur** (`corriente_en` de la escena; las placas lo preguntan) hasta el andén del fondo (2.ª ficha, `ʤ`). De vuelta, una escalerilla al muelle sur con su **trampilla** (`ẗ`, `sigilia/trampilla.gd`), que solo se abre desde abajo |
+| La estela | `ȩ` (el dibujo de las del Paso de la Escarcha): se lee (`sigilia/lectura.gd`, conversación `canal_estela`) |
+| La Gran Dársena | Un estanque redondo al este (Pweza, en la parte 4) |
 | El Sigilo de Hielo | `scripts/combate/sigilo_hielo.gd` (marca `sigilo_hielo`): una runa de escarcha (rombo con puntas de copo) que congela lo que está en el grupo `congelables` y, sobre tinta líquida, la endurece en una **placa** |
 | Cambiar de sigilo | **R** (acción `cambiar_sigilo`) pasa al siguiente sigilo aprendido y lo dice arriba; **U** traza el elegido (`Estado.extra["sigilo"]`, se guarda). Con más de uno aprendido, una runa pequeña bajo el panel de las hojas dice cuál está puesto |
 | Las placas de tinta helada | `scripts/mundo/sigilia/placa_hielo.gd` (48×36 px, dibujada en código): la corriente la lleva al este a 18 px/s; se para contra un muelle, una compuerta cerrada (`ŧ`, abierta con la marca `compuerta/<x>`) u otra placa. Se sube andando hacia ella; encima, Maisha se mueve por la placa y la placa la lleva; baja andando a tierra o salta a otra placa pegada. Dura 24 s (los 4 últimos se agrieta y parpadea); si se deshace con Maisha encima, se hunde, pierde una hoja y vuelve a la orilla |

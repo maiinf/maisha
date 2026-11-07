@@ -344,8 +344,8 @@ def _nevar(lz, tipos, fina, media, pared, conservar=(), lila=False, sin_agua=Fal
     pared = pared if pared is not None else np.zeros_like(ri)
     suelo = np.clip(1 - ri, 0, 1)
     if sin_agua:
-        # (la tinta del Canal no se hiela: la nieve se queda en los muelles)
-        suelo = suelo * np.clip(1 - mascara(lz, tipos, ("agua",), 3, 0.2, semilla=910), 0, 1)
+        # (la tinta del Canal no se hiela, y en la pasarela se ven las tablas: la nieve se queda en los muelles)
+        suelo = suelo * np.clip(1 - mascara(lz, tipos, ("agua", "puente"), 3, 0.2, semilla=910), 0, 1)
     if conservar:
         # (lo que se conserva, p. ej. las losas de las Ruinas, solo lleva un poco de nieve en las juntas)
         guardar = mascara(lz, tipos, conservar, 5, 0.2, semilla=909)

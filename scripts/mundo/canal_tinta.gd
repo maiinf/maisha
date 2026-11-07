@@ -1,12 +1,26 @@
 extends "res://scripts/mundo/escena_mundo.gd"
 ## EL CANAL DE TINTA (Sigilia, el segundo camino desde Maandiko, por el este).
-##   - EL CAUCE MAYOR («~»): tinta líquida que corre hacia el este; no se pisa.
-##   - LOS MUELLES («%»), con nieve; el norte va de punta a punta hasta la Gran Dársena.
-##   - EL REMANSO NORTE: la casa de Mfereji, tras un tapón de Tinta Quieta («ẋ», sigilia/charco_tinta.gd).
-## Parte 1: el canal y sus muelles. Luego: el Sigilo de Hielo, las placas, las compuertas, Ruba y Pweza.
+##   - EL CAUCE MAYOR («~»): tinta líquida que corre hacia el este; no se pisa. Lo cruza la PASARELA de la esclusa («=»).
+##   - LOS MUELLES («%»), con nieve; el norte se acaba antes de la Gran Dársena (más allá, en placa de hielo).
+##   - MFEREJI, el esclusista (sigilia/escriba.gd con su dibujo), en blanco junto a la primera compuerta. Su FICHA
+##     («ʣ») está en su casa del REMANSO NORTE, tras un tapón de Tinta Quieta («ẋ»). Con su nombre, enseña el
+##     SIGILO DE HIELO y da la LLAVE DE COMPUERTA.
+##   - LAS COMPUERTAS («ŧ») con su RUEDA DORADA («ŵ», sigilia/compuerta.gd) y las PLACAS DE HIELO (sigilia/placa_hielo.gd).
+##   - LA ESCLUSA HUNDIDA: allí la tinta corre hacia el SUR (corriente_en), hasta el andén del fondo; de vuelta, la
+##     escalerilla con su TRAMPILLA («ẗ», sigilia/trampilla.gd), que solo se abre desde abajo.
+##   - LA ESTELA («ȩ»): se lee.
+## Luego (partes 3 y 4): Ruba en la Esclusa Hundida con la 2.ª ficha («ʤ») y Pweza en la Gran Dársena.
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const CHARCO := preload("res://scripts/mundo/sigilia/charco_tinta.gd")
+const ESCRIBA := preload("res://scripts/mundo/sigilia/escriba.gd")
+const COMPUERTA := preload("res://scripts/mundo/sigilia/compuerta.gd")
+const TRAMPILLA := preload("res://scripts/mundo/sigilia/trampilla.gd")
+const RECOGIBLE := preload("res://scripts/mundo/objetos/recogible.gd")
+const LECTURA := preload("res://scripts/mundo/sigilia/lectura.gd")
+const MFEREJI := Vector2i(42, 17)
+## la Esclusa Hundida (en casillas): ahí la tinta baja hacia el sur
+const HUNDIDA := Rect2i(41, 31, 15, 20)
 
 
 func _ready() -> void:
@@ -17,15 +31,59 @@ func _ready() -> void:
 		_pensar_al_llegar.call_deferred()
 
 
+## Hacia dónde corre la tinta en un punto (lo preguntan las placas de hielo)
+func corriente_en(p: Vector2) -> Vector2:
+	var c := Vector2i(floori(p.x / 16.0), floori(p.y / 16.0))
+	return Vector2.DOWN if HUNDIDA.has_point(c) else Vector2.RIGHT
+
+
 func _poner_cosas() -> void:
 	var filas: PackedStringArray = $Region._filas
 	for y in filas.size():
 		for x in filas[y].length():
-			if filas[y][x] == "ẋ":
+			var c := filas[y][x]
+			var pos := Vector2(x, y) * 16.0 + Vector2(8, 14)
+			if c == "ẋ":
 				var ch: StaticBody2D = CHARCO.new()
 				ch.marca = "charco/canal/%d,%d" % [x, y]
-				ch.position = Vector2(x, y) * 16.0 + Vector2(8, 14)
+				ch.position = pos
 				$Entidades.add_child(ch)
+			elif c == "ʣ":
+				var ficha: Node2D = RECOGIBLE.new()
+				ficha.objeto = "ficha_mfereji"
+				ficha.marca = "ficha/mfereji"
+				ficha.dibujo = "res://arte/mundos/sigilia/paso/ficha.png"
+				ficha.color_halo = Color(0.85, 0.7, 1.0)
+				ficha.position = pos
+				$Entidades.add_child(ficha)
+			elif c == "ŵ":
+				var compuerta: StaticBody2D = COMPUERTA.new()
+				compuerta.columna = x
+				compuerta.position = Vector2(x, y) * 16.0 + Vector2(8, 12)
+				$Entidades.add_child(compuerta)
+			elif c == "ẗ":
+				var trampilla: StaticBody2D = TRAMPILLA.new()
+				trampilla.marca = "canal/trampilla"
+				trampilla.position = Vector2(x, y) * 16.0
+				$Entidades.add_child(trampilla)
+			elif c == "ȩ":
+				var estela: Node2D = LECTURA.new()
+				estela.charla = "canal_estela"
+				estela.position = pos + Vector2(0, 6)
+				$Entidades.add_child(estela)
+	var mfereji: StaticBody2D = ESCRIBA.new()
+	mfereji.nombre = "mfereji"
+	mfereji.dibujo = "mfereji"
+	mfereji.position = Vector2(MFEREJI) * 16.0 + Vector2(8, 14)
+	$Entidades.add_child(mfereji)
+
+
+func _al_poner_marca(marca: String) -> void:
+	super(marca)
+	if marca == "sigilo_hielo":
+		var hud := get_tree().get_first_node_in_group("hud")
+		if hud:
+			hud.mostrar_mensaje("Sigilo de Hielo (R para cambiar)")
 
 
 func _pensar_al_llegar() -> void:

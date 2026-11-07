@@ -58,6 +58,10 @@ const OBJETOS := {
 		"texto": "Una tarjeta del Índice del Archivo de Maandiko, con su pestaña morada. Pone, con letra muy pulcra: «Taa, farolero del Paso de la Escarcha»."},
 	"ficha_daftari": {"uno": "Ficha del Índice", "encargo": 0, "hecho": "", "icono": 27,
 		"texto": "Una ficha del Índice con la letra muy apretada: «Daftari, copista del Barrio, encuadernador de libros raros»."},
+	"ficha_mfereji": {"uno": "Ficha del Índice", "encargo": 0, "hecho": "", "icono": 27,
+		"texto": "Una ficha del Índice, arrugada y con una gota de tinta seca: «Mfereji, esclusista del Canal de Tinta. Abre y cierra las compuertas»."},
+	"llave_compuerta": {"uno": "Llave de compuerta", "encargo": 0, "hecho": "", "icono": 25,
+		"texto": "La llave de repuesto de Mfereji: una manivela de hierro en T. Encaja en las ruedas doradas de las compuertas del Canal."},
 	"sopa": {"uno": "Sopa de Juncia", "encargo": 0, "hecho": "", "icono": 10, "usable": true,
 		"texto": "Calentita. Devuelve 3 hojas de vida. Tómala con F (o desde aquí, con Acción), incluso en plena pelea."},
 }

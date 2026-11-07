@@ -361,6 +361,111 @@
 			}
 		]
 	},
+	"mfereji": {
+		"nombre": "Mfereji",
+		"conversaciones": [
+			{
+				"no": [
+					"mfereji_nombre"
+				],
+				"tiene": {
+					"ficha_mfereji": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"«Mfereji, esclusista del Canal de Tinta. Abre y cierra las compuertas». Eres tú, ¿a que sí?",
+					"Toma. Esto es tuyo. Te llamas Mfereji."
+				],
+				"entrega": {
+					"ficha_mfereji": 1
+				},
+				"marca": [
+					"mfereji_nombre"
+				]
+			},
+			{
+				"no": [
+					"mfereji_nombre"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un armiño en blanco, con chubasquero y botas de agua. Mira la tinta sin verla.",
+					"Lleva al hombro una llave de hierro enorme, como si se le hubiera olvidado soltarla.",
+					"En la gorra pone «Esclusa». Los esclusistas viven junto al agua... Su casa no andará lejos."
+				]
+			},
+			{
+				"si": [
+					"mfereji_nombre"
+				],
+				"no": [
+					"mfereji_hablado"
+				],
+				"lineas": [
+					"...Mfereji. Eso. Mfereji, el de las compuertas.",
+					"Uf. ¿Cuánto llevo aquí plantado, con la llave al hombro, mirando la tinta como un pasmarote?",
+					"Esto antes era agua, ¿sabes? Agua de nieve, limpia, que bajaba tranquila hasta la Dársena.",
+					"Desde que se puso negra corre con prisa. Como si huyera de algo.",
+					"Tú traes fuego en los dedos, se te nota. Aquí hace falta lo contrario. Mira: así.",
+					"El copo, sobre la tinta. Se pone dura como una losa y aguanta un rato. Te lleva la corriente, eso sí: no te pelees con ella, úsala.",
+					"Y llévate la llave de repuesto. Las ruedas doradas suben y bajan las compuertas. Yo ya no estoy para ir saltando de témpano en témpano."
+				],
+				"recibe": {
+					"llave_compuerta": 1
+				},
+				"marca": [
+					"mfereji_hablado",
+					"sigilo_hielo"
+				]
+			},
+			{
+				"si": [
+					"mfereji_hablado"
+				],
+				"lineas": [
+					"La tinta empuja hacia el este. En la Esclusa Hundida, hacia abajo, al andén del fondo.",
+					"Compuerta cerrada, el hielo se para. Abierta, sigue. Así de sencillo, y así de traicionero."
+				]
+			}
+		]
+	},
+	"canal_rueda_sin_llave": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una rueda dorada, gorda como un escudo. No se mueve ni un pelo.",
+					"En el centro tiene un agujero cuadrado. Para una llave, seguro. Y grande."
+				]
+			}
+		]
+	},
+	"canal_trampilla_arriba": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una trampilla de hierro sobre una escalerilla que baja.",
+					"El pestillo está por debajo. Desde aquí no hay manera: se abre desde abajo."
+				]
+			}
+		]
+	},
+	"canal_estela": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una estela con letras de escriba, gastadas de tantas manos:",
+					"«Lo que corre no se para con las manos. Se para con el frío».",
+					"Debajo, una runa como un copo de nieve."
+				]
+			}
+		]
+	},
 	"canal_llegada": {
 		"nombre": "",
 		"estilo": "pensamiento",
