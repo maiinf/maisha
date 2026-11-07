@@ -1976,6 +1976,39 @@ def vagoneta_rodar():
     return reverb(p.entera(), 0.6, 0.18)
 
 
+def aguja_cambiar():
+    """Chasquido metálico de una palanca de cambio de agujas al girar los raíles."""
+    p = Pista(0.45)
+    d = 0.22
+    golpe = paso_banda(ruido(d), 600, 4200) * caida(_n(d), 0.04) * 0.7
+    p.poner(golpe, 0.0)
+    p.poner(campanita("A4", 0.25, 0.35), 0.02)
+    p.poner(campanita("E5", 0.3, 0.38), 0.11)
+    return reverb(p.entera(), 0.5, 0.18)
+
+
+def geoda_encender():
+    """Una geoda resonante se enciende en la oscuridad de la mina con un acorde cálido de ámbar."""
+    p = Pista(1.4)
+    for k, nota in enumerate(("D5", "F#5", "A5", "D6")):
+        p.poner(campanita(nota, 1.1 - k * 0.1, 0.32 - k * 0.04), k * 0.055)
+    brillo = seno(587.33, 1.0) * adsr(_n(1.0), 0.03, 0.2, 0.4, 0.5) * 0.18
+    p.poner(brillo, 0.0)
+    return reverb(p.entera(), 1.5, 0.32)
+
+
+def kifaru_embiste():
+    """El Kifaru de Basalto bufa y arranca su embestida pesada por la cámara."""
+    p = Pista(0.95)
+    d = 0.75
+    n = _n(d)
+    bramido = sierra(_desliz(115, 58, d), d, 16) * adsr(n, 0.04, 0.15, 0.65, 0.25) * 0.55
+    roca = _crujido_piedra(d, 240, grave=True) * caida(n, 0.28) * 0.65
+    p.poner(paso_bajo(bramido, 780) + roca, 0.0)
+    p.poner(taiko(0.5, 0.75), 0.08)
+    return reverb(p.entera(), 0.9, 0.24)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -2033,6 +2066,8 @@ EFECTOS = {
     "hielo_runa": (hielo_runa, 0.65), "hielo_pisar": (hielo_pisar, 0.55), "hielo_romper": (hielo_romper, 0.65),
     "carga_sismica": (carga_sismica, 0.75), "roca_romper": (roca_romper, 0.8),
     "diapason_ambar": (diapason_ambar, 0.65), "vagoneta_rodar": (vagoneta_rodar, 0.65),
+    "aguja_cambiar": (aguja_cambiar, 0.6), "geoda_encender": (geoda_encender, 0.65),
+    "kifaru_embiste": (kifaru_embiste, 0.8),
 }
 
 AMBIENTES = {

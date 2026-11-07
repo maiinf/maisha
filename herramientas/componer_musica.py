@@ -2140,6 +2140,89 @@ def mji_jiwe():
     return final(p, sala=2.9, mezcla=0.30, brillo=5600)
 
 
+def galerias_ambar():
+    """«Las vetas que cantan»: Las Galerías de Ámbar (camino del oeste de Asterhaul, 92 BPM).
+    Eco profundo de caverna en Re dórico / Si bemol lidio: geodas resonantes que brillan en la oscuridad,
+    kalimba de hierro, marimba grave de basalto y el traqueteo lejano de las vagonetas por los raíles."""
+    tempo = Tempo(92)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m7"), ("A#1", "M7"), ("G2", "m7"), ("A2", "m7"),
+        ("D2", "m7"), ("F2", "M7"), ("C2", "M"), ("D2", "m7"),
+    ] * 3
+    colchones(p, tempo, progresion, compas=4, brillo=840, volumen=0.26, octava_bajo=2, fuerza_bajo=0.36)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.19, pan=-0.30, patron=(0, 2, 3, 1, 2, 3, 1, 0))
+        notas = acorde(raiz[:-1] + "4", tipo)
+        p.poner(balafon(notas[0], 0.42, 0.17), tempo.s(i * 4), pan=0.26)
+        p.poner(balafon(notas[1], 0.38, 0.14), tempo.s(i * 4 + 2), pan=0.22)
+    # traqueteo rítmico de vagonetas y destellos de geodas de ámbar en la bóveda oscura
+    rng = np.random.default_rng(715)
+    for b in range(0, pulsos, 4):
+        p.poner(tambor("D2", 0.28, 0.26, golpe=0.5), tempo.s(b), pan=-0.15)
+        p.poner(tambor("A2", 0.16, 0.18, golpe=0.65), tempo.s(b + 1.5), pan=0.15)
+        p.poner(tambor("A2", 0.14, 0.15, golpe=0.65), tempo.s(b + 2.0), pan=0.15)
+        if b % 8 == 0:
+            ac_geoda = ("D6", "A6", "F6") if (b // 8) % 2 == 0 else ("C6", "G6", "E6")
+            for k, n_g in enumerate(ac_geoda):
+                p.poner(campanita(n_g, 1.5, 0.12 - k * 0.02), tempo.s(b + 3 + k * 0.12), pan=rng.uniform(-0.4, 0.4))
+    tema_mina = [
+        ("A4", 0, 1.5), ("D5", 1.5, 0.5), ("F5", 2, 2), ("E5", 4, 1), ("D5", 5, 1), ("C5", 6, 2),
+        ("A#4", 8, 1.5), ("C5", 9.5, 0.5), ("D5", 10, 2), ("A4", 12, 4),
+        ("D5", 16, 1.5), ("F5", 17.5, 0.5), ("A5", 18, 2), ("G5", 20, 1), ("F5", 21, 1), ("E5", 22, 2),
+        ("F5", 24, 1), ("E5", 25, 1), ("D5", 26, 1.5), ("C5", 27.5, 0.5), ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.42, vibrato=4.5)
+    melodia(p, tempo, tema_mina, desde=0, instrumento=kalimba, volumen=0.35, pan=-0.12)
+    melodia(p, tempo, tema_mina, desde=32, instrumento=flauta_, volumen=0.38, sostener=0.92, pan=0.16)
+    melodia(p, tempo, TEMA_ASTERHAUL, desde=64, instrumento=flauta_, volumen=0.36, sostener=0.9, pan=0.10)
+    melodia(p, tempo, transportar(tema_mina, -12), desde=64, instrumento=kalimba, volumen=0.24, pan=-0.24)
+    return final(p, sala=3.8, mezcla=0.38, brillo=4800)
+
+
+def jefe_kifaru():
+    """«El cuerno de basalto»: combate contra El Kifaru de Basalto y Geoda en la Cámara del Ancla Oeste (138 BPM).
+    Galope pesado de tambores de roca y taikos en Re menor / dórico, embestidas de bajo sísmico, choques de vagoneta
+    y arpegios cristalinos de ámbar cuando se abre su coraza dorsal."""
+    tempo = Tempo(138)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m"), ("C2", "M"), ("A#1", "M"), ("A1", "M"),
+        ("D2", "m"), ("F2", "M"), ("G2", "m"), ("A1", "M"),
+    ] * 3
+    colchones(p, tempo, progresion, compas=4, brillo=1150, volumen=0.28, octava_bajo=1, fuerza_bajo=0.46)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.22, pan=-0.26, patron=(0, 1, 2, 0, 1, 2, 3, 2))
+        notas = acorde(raiz[:-1] + "3", tipo)
+        for paso_ in (0, 1.5, 3):
+            p.poner(balafon(notas[0], 0.25, 0.24), tempo.s(i * 4 + paso_), pan=0.24)
+    # galope del rinoceronte de basalto
+    for b in range(0, pulsos, 2):
+        p.poner(tambor("D1", 0.36, 0.56, golpe=0.55), tempo.s(b), pan=-0.1)
+        p.poner(tambor("A1", 0.22, 0.34, golpe=0.65), tempo.s(b + 0.5), pan=0.1)
+        p.poner(tambor("D2", 0.24, 0.38, golpe=0.60), tempo.s(b + 1.0), pan=0.0)
+        p.poner(maraca(0.06, 0.14), tempo.s(b + 1.5), pan=0.25)
+        if b % 8 == 0:
+            p.poner(taiko(1.1, 0.72), tempo.s(b), pan=0.0)
+    tema_kifaru = [
+        ("D5", 0, 1), ("D5", 1, 0.5), ("F5", 1.5, 0.5), ("A5", 2, 1.5), ("G5", 3.5, 0.5),
+        ("F5", 4, 1), ("E5", 5, 1), ("D5", 6, 2),
+        ("C5", 8, 1), ("D5", 9, 0.5), ("E5", 9.5, 0.5), ("F5", 10, 1.5), ("E5", 11.5, 0.5),
+        ("D5", 12, 1), ("C#5", 13, 1), ("A4", 14, 2),
+        ("D5", 16, 1), ("F5", 17, 1), ("A5", 18, 1), ("D6", 19, 1),
+        ("C6", 20, 1), ("A#5", 21, 1), ("A5", 22, 2),
+        ("G5", 24, 1), ("F5", 25, 1), ("E5", 26, 1), ("C#5", 27, 1), ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.46, vibrato=5.2)
+    melodia(p, tempo, tema_kifaru, desde=0, instrumento=kalimba, volumen=0.38, pan=-0.15)
+    melodia(p, tempo, tema_kifaru, desde=32, instrumento=flauta_, volumen=0.42, sostener=0.88, pan=0.15)
+    tocar(p, tempo, tema_kifaru, desde=64, fuerza=0.34, pan=0.0)
+    melodia(p, tempo, transportar(tema_kifaru, -12), desde=64, instrumento=kalimba, volumen=0.26, pan=-0.22)
+    return final(p, sala=2.8, mezcla=0.30, brillo=5600)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2151,6 +2234,8 @@ PIEZAS["seccion_prohibida"] = seccion_prohibida
 PIEZAS["jefe_grimorio"] = jefe_grimorio
 PIEZAS["desfiladero_meteorito"] = desfiladero_meteorito
 PIEZAS["mji_jiwe"] = mji_jiwe
+PIEZAS["galerias_ambar"] = galerias_ambar
+PIEZAS["jefe_kifaru"] = jefe_kifaru
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -2162,6 +2247,8 @@ TITULOS["seccion_prohibida"] = "Lo que se guardó bajo llave"
 TITULOS["jefe_grimorio"] = "El último capítulo"
 TITULOS["desfiladero_meteorito"] = "El eco de la piedra"
 TITULOS["mji_jiwe"] = "La ciudad dentro del cráter"
+TITULOS["galerias_ambar"] = "Las vetas que cantan"
+TITULOS["jefe_kifaru"] = "El cuerno de basalto"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]
