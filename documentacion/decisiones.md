@@ -422,3 +422,11 @@ se pasan.
 | Cierre del Reino de Sigilia (`arte/historia/24_sigilia_libre.png`) | **Mauti y Kalamu entran en la Rotonda, el Grimorio vuelve a ser el Índice Vivo y entrega la Pluma del Primer Nombre**: al vencer la tinta nacida del miedo a olvidar, el Grimorio deja de esconder los nombres, la tinta helada de todo Maandiko vuelve a correr líquida y dorada por los canales, y se muestra la ilustración de historia `24_sigilia_libre.png`. |
 | Música y sonido (compuestos por Gemini) | `audio/musica/seccion_prohibida.ogg` («Lo que se guardó bajo llave») y `audio/musica/jefe_grimorio.ogg` («El último capítulo»), además de los sonidos del hielo (`hielo_runa`, `hielo_pisar`, `hielo_romper`) en `audio/sonidos/`. Construcción asignada a Claude en `documentacion/coordinacion.md`. |
 
+### 2026-11-07 · El Arte de la Runa y el Cetro del Nexo (Decidido con Iam)
+| Qué | Decisión |
+| --- | --- |
+| Quién despierta la rama Runa | **Kalamu despierta el Arte de la Runa** en el diario al llegar al Gran Archivo de Maandiko. |
+| Los 6 niveles del Arte de la Runa (`documentacion/boceto_arte_runa.png`) | **Nivel 1 · Muñequeras rúnicas** (el Sigilo cuesta 16 de Aliento en vez de 20) · **Nivel 2 · Pluma de escriba** (el trazo dura más en el suelo) · **Nivel 3 ✦ Estola del Índice** (cambio grande, 2 Cristales: +1 hoja de Vida y +25 % de radio en los Sigilos) · **Nivel 4 · Sello de lacre** (activar un Sigilo devuelve 6 de Aliento) · **Nivel 5 · Manto escrito** (los Sigilos se trazan y recargan más rápido) · **Nivel 6 ✦ Halo de los 3 Sigilos** (cambio grande, 4 Cristales: +1 hoja de Vida y al trazar un Sigilo deja una chispa elemental que daña a enemigos cercanos). |
+| El Cetro Nuevo al acabar Sigilia | **Opción A · El Cetro del Nexo** (elegida por Iam): vara esbelta de piedra rúnica y cristal flotante que nace al vencer al Grimorio de Tinta cuando la **Semilla del Primer Árbol** brota junto a la **Pluma del Primer Nombre**. Se sube de 0 a 6 en el Mundo 3 (Asterhaul), evolucionando desde piedra rúnica azul dormida (`0`) hasta horquilla astral (`3*`) y cristal solar con el brote y la pluma dorada (`6*`). |
+
+
