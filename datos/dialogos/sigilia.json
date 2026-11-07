@@ -551,6 +551,89 @@
 			}
 		]
 	},
+	"pweza_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"En medio de la Dársena flota un tintero enorme, de cristal y latón, con la tapa rota.",
+					"Dentro hay algo. Dos ojos grandes me miran a través del cristal... y la tinta empieza a moverse sola."
+				]
+			}
+		]
+	},
+	"canal_verja_fuera": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una verja de hierro. El pestillo está del otro lado, por dentro de la Dársena.",
+					"Desde aquí no se abre. Habrá que llegar por la tinta."
+				]
+			}
+		]
+	},
+	"chapa": {
+		"nombre": "Chapa",
+		"conversaciones": [
+			{
+				"no": [
+					"chapa_nombre"
+				],
+				"tiene": {
+					"ficha_chapa": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"«Chapa, impresora del Archivo. Tipos de plomo y prensa de mano». La ficha estaba dentro del tintero de Pweza.",
+					"Toma. Esto es tuyo. Te llamas Chapa."
+				],
+				"entrega": {
+					"ficha_chapa": 1
+				},
+				"marca": [
+					"chapa_nombre"
+				]
+			},
+			{
+				"no": [
+					"chapa_nombre"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un escriba en blanco con un delantal tieso de tinta seca y los dedos negros hasta los nudillos.",
+					"Huele a plomo y a tinta de imprenta. Tiene la mirada perdida hacia el este, hacia el Canal."
+				]
+			},
+			{
+				"si": [
+					"chapa_nombre"
+				],
+				"no": [
+					"chapa_hablado"
+				],
+				"lineas": [
+					"Chapa... Chapa. Sí. La prensa del sótano del Archivo es mía. O lo era, hasta que se secó todo.",
+					"Toda la tinta buena bajaba por el Canal hasta el tintero grande de la Dársena. De ahí sacábamos la de imprimir.",
+					"¿Que dentro había un calamar? ¿Con plumillas de oro? Ay, madre. Eso explica las manchas de las tiradas del último invierno.",
+					"Gracias por traerme el nombre. Prometo imprimirlo bien grande en algún sitio, para que no se me vuelva a perder."
+				],
+				"marca": [
+					"chapa_hablado"
+				]
+			},
+			{
+				"si": [
+					"chapa_hablado"
+				],
+				"lineas": [
+					"Lo escrito a mano se olvida. Lo impreso, por lo menos, se olvida cien veces a la vez."
+				]
+			}
+		]
+	},
 	"daftari": {
 		"nombre": "Daftari",
 		"conversaciones": [

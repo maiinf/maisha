@@ -3,7 +3,8 @@ extends Node
 ## Maisha piensa al llegar, la tinta del cauce no se pisa, el muelle norte lleva hasta la Gran Dársena, el tapón de
 ## Tinta Quieta del Remanso Norte está puesto, Mfereji y su ficha, el Sigilo de Hielo y sus placas, las compuertas,
 ## la Esclusa Hundida (la tinta baja al sur), la trampilla que se abre desde abajo, la estela, Ruba (oculta, muerde,
-## atrapada en el hielo y vencida), la ficha de Karatasi en el andén, y en Maandiko Karatasi recupera su nombre.
+## atrapada en el hielo y vencida), Pweza (tentáculos, hielo, el tintero volcado, la furia y su ficha), la verja de la
+## Dársena, la ficha de Karatasi en el andén, y en Maandiko Karatasi y Chapa recuperan su nombre.
 ## Se ejecuta sin abrir el editor:  godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_canal_tinta
 
 const PLACA := preload("res://scripts/mundo/sigilia/placa_hielo.gd")
@@ -198,7 +199,7 @@ func _ready() -> void:
 	var y0 := baja.position.y
 	await _esperar(1.5)
 	_comprobar(baja.position.y > y0 + 16.0 and absf(baja.position.x - 48 * 16) < 2.0, "la placa baja hacia el andén del fondo")
-	var trampilla: Node = get_tree().get_nodes_in_group("interactuables").filter(func(n): return n.get_script() == TRAMPILLA)[0]
+	var trampilla: Node = get_tree().get_nodes_in_group("interactuables").filter(func(n): return n.get_script() == TRAMPILLA and n.desde == Vector2.DOWN)[0]
 	m.global_position = Vector2(40 * 16, 35 * 16 + 4)
 	trampilla.interactuar()
 	await _leer_dialogo()
@@ -272,6 +273,87 @@ func _ready() -> void:
 	_comprobar(otra_ruba.fase == otra_ruba.Fase.OCULTA, "si no se le da a tiempo, rompe el hielo y se hunde")
 	otra_ruba.set_process(false)
 
+	print("Pweza, el Calamar del Tintero:")
+	var pweza: Node2D = get_tree().get_nodes_in_group("jefes")[0]
+	_comprobar(pweza.fase == pweza.Fase.DORMIDO, "en medio de la Gran Dársena flota un tintero enorme")
+	m.global_position = Vector2(86 * 16 + 8, 37 * 16 + 8)
+	await _esperar(0.5)
+	await _leer_dialogo()
+	await _esperar(0.3)
+	_comprobar(pweza.fase == pweza.Fase.FLOTA and Sonido.musica_actual == "jefe_pweza", "al pisar el muelle de la Dársena, despierta (y suena «El tintero del abismo»)")
+	var t: Node2D = null
+	for i in 40:
+		await _esperar(0.1)
+		if not get_tree().get_nodes_in_group("tentaculos").is_empty():
+			t = get_tree().get_nodes_in_group("tentaculos")[0]
+			break
+	_comprobar(t != null, "saca un tentáculo con plumilla junto a la orilla, hacia Maisha")
+	_comprobar(not pweza.recibir_golpe(1, Vector2.UP), "flotando en el centro, no hay forma de darle")
+	# Maisha, en el muelle, justo delante del tentáculo
+	m.global_position = t.global_position + t.fuera * 20.0
+	m.mirar(-t.fuera)
+	var hojas3: int = m.vida
+	for i in 30:
+		await _esperar(0.1)
+		if t.fase == t.Fase.ARRIBA:
+			break
+	_comprobar(m.vida < hojas3, "el tentáculo azota el muelle (y a Maisha, que estaba delante)")
+	m.aliento = m.aliento_maximo()
+	await _esperar(0.8)
+	m.global_position = t.global_position + t.fuera * 14.0
+	m.mirar(-t.fuera)
+	m.sigilo()
+	await _esperar(0.4)
+	_comprobar(t.fase == t.Fase.HELADO, "alzado, el Sigilo de Hielo lo deja helado")
+	var fuera: Vector2 = t.fuera          # (al golpearlo, el tentáculo se va)
+	m.golpear()
+	await _esperar(1.2)
+	_comprobar(pweza.fase == pweza.Fase.VOLCADO, "un golpe al tentáculo helado: el tintero vuelca contra el muelle")
+	for i in 3:
+		m.global_position = pweza.global_position + fuera * 14.0
+		m.mirar(-fuera)
+		m.golpear()
+		await _esperar(0.45)
+	_comprobar(pweza.vida == pweza.VIDA_MAX - 3, "volcado, el cetro le alcanza (%d de vida)" % pweza.vida)
+	await _esperar(1.6)
+	_comprobar(pweza.fase == pweza.Fase.FLOTA, "tras tres golpes se endereza y vuelve al centro")
+	pweza.vida = 4
+	_comprobar(pweza.furia(), "con la mitad de la vida, se enfurece (dos tentáculos y gotas de tinta)")
+	pweza.vida = 1
+	for tt in get_tree().get_nodes_in_group("tentaculos"):
+		tt.irse()
+	await _esperar(0.4)
+	var t2: Node2D = pweza.sacar_tentaculo()
+	t2._cambiar(t2.Fase.ARRIBA)
+	t2.congelar()
+	fuera = t2.fuera
+	t2.recibir_golpe(1, Vector2.UP)
+	await _esperar(1.2)
+	m.global_position = pweza.global_position + fuera * 14.0
+	m.mirar(-fuera)
+	m.golpear()
+	await _esperar(0.6)
+	_comprobar(Estado.tiene("pweza_vencido") and pweza.fase == pweza.Fase.VENCIDO, "vencido, se queda volcado y quieto")
+	_comprobar(int(Estado.extra.get("bestiario", {}).get("pweza", 0)) == 1, "y cuenta en el Bestiario")
+	var ficha3: Node2D = null
+	for r in get_tree().get_nodes_in_group("recogibles"):
+		if r.objeto == "ficha_chapa":
+			ficha3 = r
+	_comprobar(ficha3 != null, "del tintero sale despedida la 3.ª ficha del canal")
+	m.global_position = ficha3.global_position
+	await _esperar(0.4)
+	_comprobar(Estado.cuantos("ficha_chapa") == 1, "es la de Chapa")
+	var verja: Node = get_tree().get_nodes_in_group("interactuables").filter(func(n): return n.get_script() == TRAMPILLA and n.desde == Vector2.RIGHT)[0]
+	m.global_position = Vector2(68 * 16, 18 * 16)
+	verja.interactuar()
+	await _leer_dialogo()
+	_comprobar(not Estado.tiene("canal/verja"), "desde el muelle norte, la verja de la Dársena no se abre")
+	m.global_position = Vector2(72 * 16, 18 * 16)
+	verja.interactuar()
+	await _esperar(0.3)
+	await _andar(m, "mover_izquierda", 1.2)
+	_comprobar(Estado.tiene("canal/verja") and m.global_position.x < 69 * 16, "desde dentro se abre: el atajo de vuelta al muelle norte")
+
 	print("La ficha de la Esclusa Hundida:")
 	var ficha2: Node2D = null
 	for r in get_tree().get_nodes_in_group("recogibles"):
@@ -297,6 +379,16 @@ func _ready() -> void:
 	await _esperar(1.0)
 	await _leer_dialogo()
 	_comprobar(Estado.tiene("karatasi_nombre") and karatasi.id == "escriba" and Estado.tiene("karatasi_hablado"), "al darle su ficha, recupera el nombre y habla")
+	var chapa: Node = null
+	for a in get_tree().get_nodes_in_group("escribas"):
+		if a.nombre == "chapa":
+			chapa = a
+	m.global_position = (chapa as Node2D).global_position + Vector2(-18, 6)
+	chapa.interactuar()
+	await _leer_dialogo()
+	await _esperar(1.0)
+	await _leer_dialogo()
+	_comprobar(Estado.tiene("chapa_nombre") and chapa.id == "escriba" and Estado.tiene("chapa_hablado"), "y Chapa, la impresora, también")
 
 	print()
 	print("RESULTADO: todo correcto" if _fallos == 0 else "RESULTADO: %d fallos" % _fallos)

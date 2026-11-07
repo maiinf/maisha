@@ -2235,6 +2235,7 @@ def crear_canal():
     Dos COMPUERTAS («ŧ», cruzan el cauce) con su RUEDA DORADA en el muelle norte («ŵ»). Al sur, la ESCLUSA HUNDIDA (un
     dique de tinta que corre hacia el sur, con la 2.ª ficha «ʤ» en el andén del fondo y una escalerilla «%» de vuelta
     al muelle sur, con su TRAMPILLA «ẗ» que solo se abre desde abajo). Al este,
+    tras una VERJA «ṽ» que solo se abre desde dentro (el atajo de vuelta al muelle norte),
     la GRAN DÁRSENA (redonda, con Pweza en medio y la 3.ª ficha al vencerlo). Pweza y Ruba los pone la escena (la tinta
     tiene que quedar entera «~»)."""
     ANCHO, ALTO = 100, 60
@@ -2287,6 +2288,8 @@ def crear_canal():
             elif d <= 14 ** 2 and m[y][x] == "0":
                 poner(x, y, "%")
     rect(74, 21, 76, 30, "~")                                # el cauce desemboca en la dársena
+    rect(69, 17, 76, 18, "%")                                # el paso de la Dársena al muelle norte...
+    poner(69, 17, "ṽ")                                       # ...con su verja (se abre desde la Dársena)
     # la entrada (oeste)
     for y in range(16, 19):
         poner(0, y, "<")

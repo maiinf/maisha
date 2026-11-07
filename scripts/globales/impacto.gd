@@ -19,6 +19,8 @@ var temblores := true
 var _pausas := 0
 var _lenta := 1.0                  # la cámara lenta (1.0 = normal)
 var _base := 1.0                   # la velocidad sin efectos (las pruebas la suben para ir más deprisa)
+## hacia dónde se corre la cámara (lo pone una escena, p. ej. para que se vea un jefe); el temblor va encima
+var encuadre := Vector2.ZERO
 var _temblor := 0.0
 var _temblor_dura := 0.0
 var _temblor_tiempo := 0.0
@@ -150,6 +152,8 @@ func _process(delta: float) -> void:
 		_lenta_desde = 0.0
 	var camara := get_viewport().get_camera_2d()
 	if _temblor <= 0.0:
+		if camara:
+			camara.offset = encuadre
 		return
 	# el temblor corre en tiempo real (no se para con la pausa del golpe)
 	var real := delta / maxf(Engine.time_scale, 0.001)
@@ -158,8 +162,8 @@ func _process(delta: float) -> void:
 	if resto <= 0.0:
 		_temblor = 0.0
 		if camara:
-			camara.offset = Vector2.ZERO
+			camara.offset = encuadre
 		return
 	if camara:
 		var f := _temblor * resto
-		camara.offset = Vector2(randf_range(-f, f), randf_range(-f, f)).round()
+		camara.offset = encuadre + Vector2(randf_range(-f, f), randf_range(-f, f)).round()

@@ -16,7 +16,7 @@ const VECINO := preload("res://scripts/mundo/sigilia/vecino.gd")
 const CHARCO := preload("res://scripts/mundo/sigilia/charco_tinta.gd")
 const ESCRIBA := preload("res://scripts/mundo/sigilia/escriba.gd")
 ## los escribas con nombre (los que se pueden curar con su ficha del Índice)
-const ESCRIBAS := ["daftari", "karatasi"]
+const ESCRIBAS := ["daftari", "karatasi", "chapa"]
 const FAROL := preload("res://scripts/mundo/sigilia/farol_runico.gd")
 ## vecino: [id del dibujo, conversación, casilla, marca que hace falta]
 const VECINOS := [
@@ -26,7 +26,7 @@ const VECINOS := [
 	["taa", "taa_ciudad", Vector2i(41, 47), "taa_nombre"],
 	["daftari", "", Vector2i(30, 30), ""],
 	["karatasi", "", Vector2i(44, 24), ""],
-	["escriba_blanco", "", Vector2i(10, 22), ""],
+	["chapa", "", Vector2i(10, 22), ""],
 	["escriba_blanco", "", Vector2i(14, 36), ""],
 	["escriba_blanco", "", Vector2i(58, 35), ""],
 	["escriba_blanco", "", Vector2i(34, 44), ""],

@@ -11,7 +11,8 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ##   - LA ESTELA («ȩ»): se lee.
 ##   - RUBA, la sanguijuela de tinta (enemigos/ruba.gd), en el cauce y en la Esclusa Hundida; la 2.ª FICHA («ʤ», la de
 ##     Karatasi, una escriba de Maandiko) en el andén del fondo.
-## Luego (parte 4): Pweza en la Gran Dársena.
+##   - PWEZA, el jefe (enemigos/pweza.gd), en la GRAN DÁRSENA: despierta al pisar su anillo de muelle. Suelta la 3.ª
+##     ficha (la de Chapa). La VERJA («ṽ») del paso al muelle norte solo se abre desde la Dársena (el atajo de vuelta).
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const CHARCO := preload("res://scripts/mundo/sigilia/charco_tinta.gd")
@@ -21,11 +22,18 @@ const TRAMPILLA := preload("res://scripts/mundo/sigilia/trampilla.gd")
 const RECOGIBLE := preload("res://scripts/mundo/objetos/recogible.gd")
 const LECTURA := preload("res://scripts/mundo/sigilia/lectura.gd")
 const RUBA := preload("res://scripts/enemigos/ruba.gd")
+const PWEZA := preload("res://scripts/enemigos/pweza.gd")
+## la Gran Dársena: su centro (en casillas) y los semiejes de la orilla de tinta (px)
+const DARSENA := Vector2(86, 26)
+const ORILLA := Vector2(168, 151)
 ## donde nada Ruba (en casillas de tinta): dos en el cauce y dos en la Esclusa Hundida
 const RUBAS := [Vector2i(34, 24), Vector2i(58, 27), Vector2i(46, 38), Vector2i(50, 45)]
 const MFEREJI := Vector2i(42, 17)
 ## la Esclusa Hundida (en casillas): ahí la tinta baja hacia el sur
 const HUNDIDA := Rect2i(41, 31, 15, 20)
+
+var _pweza: Node2D = null
+var _despertando := false
 
 
 func _ready() -> void:
@@ -79,6 +87,13 @@ func _poner_cosas() -> void:
 				trampilla.marca = "canal/trampilla"
 				trampilla.position = Vector2(x, y) * 16.0
 				$Entidades.add_child(trampilla)
+			elif c == "ṽ":
+				var verja: StaticBody2D = TRAMPILLA.new()
+				verja.marca = "canal/verja"
+				verja.desde = Vector2.RIGHT
+				verja.charla_cerrada = "canal_verja_fuera"
+				verja.position = Vector2(x, y) * 16.0
+				$Entidades.add_child(verja)
 			elif c == "ȩ":
 				var estela: Node2D = LECTURA.new()
 				estela.charla = "canal_estela"
@@ -89,6 +104,12 @@ func _poner_cosas() -> void:
 	mfereji.dibujo = "mfereji"
 	mfereji.position = Vector2(MFEREJI) * 16.0 + Vector2(8, 14)
 	$Entidades.add_child(mfereji)
+	if not Estado.tiene("pweza_vencido"):
+		_pweza = PWEZA.new()
+		_pweza.orilla = ORILLA
+		_pweza.position = DARSENA * 16.0 + Vector2(8, 8)
+		$Entidades.add_child(_pweza)
+		_pweza.destruido.connect(_al_vencer_pweza)
 	for r in RUBAS:
 		var ruba: Node2D = RUBA.new()
 		ruba.position = Vector2(r) * 16.0 + Vector2(8, 8)
@@ -101,6 +122,38 @@ func _al_poner_marca(marca: String) -> void:
 		var hud := get_tree().get_first_node_in_group("hud")
 		if hud:
 			hud.mostrar_mensaje("Sigilo de Hielo (R para cambiar)")
+
+
+## Al pisar el anillo de la Gran Dársena, despierta Pweza. Mientras pelean, la cámara se va hacia la mitad entre
+## Maisha y el tintero, para que se vean los dos (si no, el tintero queda fuera de la pantalla).
+func _process(delta: float) -> void:
+	var maisha := get_tree().get_first_node_in_group("maisha") as Node2D
+	if maisha == null:
+		return
+	var hacia := Vector2.ZERO
+	if _despertando and is_instance_valid(_pweza) and not Estado.tiene("pweza_vencido"):
+		hacia = ((_pweza.global_position + Vector2(0, -30) - maisha.global_position) * 0.5).clamp(Vector2(-200, -110), Vector2(200, 110))
+	Impacto.encuadre = Impacto.encuadre.lerp(hacia, clampf(delta * 3.0, 0.0, 1.0)).round()
+	if _despertando or not is_instance_valid(_pweza) or Estado.tiene("pweza_vencido"):
+		return
+	var d := (maisha.global_position - (DARSENA * 16.0 + Vector2(8, 8))) / (ORILLA + Vector2(56, 50))
+	if d.length() < 1.0:
+		_despertando = true
+		if not Estado.tiene("pweza_visto"):
+			Estado.marcar("pweza_visto")
+			await CHARLA_SCRIPT.hablar(self, "pweza_encuentro")
+		if is_instance_valid(_pweza):
+			_pweza.despertar()
+
+
+func _exit_tree() -> void:
+	Impacto.encuadre = Vector2.ZERO      # (que la cámara de la pelea no se quede corrida en otra escena)
+
+
+func _al_vencer_pweza() -> void:
+	await get_tree().create_timer(3.0).timeout
+	if is_inside_tree():
+		Sonido.musica("canal_tinta")
 
 
 func _pensar_al_llegar() -> void:
