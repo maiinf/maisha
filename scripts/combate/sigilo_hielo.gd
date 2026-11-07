@@ -2,7 +2,8 @@ extends Node2D
 ## EL SIGILO DE HIELO (arte Runa, Sigilia; lo enseña Mfereji en el Canal de Tinta): una runa de escarcha delante.
 ##   - 0 → 0,25 s: la runa se dibuja trazo a trazo (líneas azul claro).
 ##   - a los 0,25 s HIELA: un círculo de RADIO px que congela lo que se deja («congelables» → congelar, p. ej. Ruba)
-##     y, si cae sobre tinta líquida («~»), la endurece en una PLACA DE TINTA HELADA (sigilia/placa_hielo.gd) que flota.
+##     (congelar devuelve true si lo atrapa) y, si no, sobre tinta líquida («~») la endurece en una PLACA DE TINTA
+##     HELADA (sigilia/placa_hielo.gd) que flota.
 ##   - después suben copos.
 
 const PLACA := preload("res://scripts/mundo/sigilia/placa_hielo.gd")
@@ -40,10 +41,13 @@ func _process(delta: float) -> void:
 func _helar() -> void:
 	Sonido.efecto("hielo_runa", 0.0, global_position)
 	var centro := global_position + Vector2(0, 6)      # (la runa va a la altura del pecho; el hielo, en el suelo)
+	var atrapo := false
 	for nodo in get_tree().get_nodes_in_group("congelables"):
 		if (nodo as Node2D).global_position.distance_to(centro) <= RADIO + 10.0:
-			nodo.call("congelar")
-	PLACA.helar_en(get_parent(), centro)
+			atrapo = bool(nodo.call("congelar")) or atrapo
+	# (si ha atrapado algo en el hielo, ese témpano ya es el suyo: no hace además una placa)
+	if not atrapo:
+		PLACA.helar_en(get_parent(), centro)
 	for i in 16:
 		var a := randf() * TAU
 		_copos.append({"p": Vector2(cos(a), sin(a) * 0.6) * randf_range(4, RADIO), "v": Vector2(randf_range(-8, 8), randf_range(-26, -10)), "t": 0.0})

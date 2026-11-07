@@ -60,6 +60,8 @@ const OBJETOS := {
 		"texto": "Una ficha del Índice con la letra muy apretada: «Daftari, copista del Barrio, encuadernador de libros raros»."},
 	"ficha_mfereji": {"uno": "Ficha del Índice", "encargo": 0, "hecho": "", "icono": 27,
 		"texto": "Una ficha del Índice, arrugada y con una gota de tinta seca: «Mfereji, esclusista del Canal de Tinta. Abre y cierra las compuertas»."},
+	"ficha_karatasi": {"uno": "Ficha del Índice", "encargo": 0, "hecho": "", "icono": 27,
+		"texto": "Una ficha del Índice escrita con letra de planos, muy derecha: «Karatasi, copista de planos. Dibujó el Canal entero, esclusa a esclusa»."},
 	"llave_compuerta": {"uno": "Llave de compuerta", "encargo": 0, "hecho": "", "icono": 25,
 		"texto": "La llave de repuesto de Mfereji: una manivela de hierro en T. Encaja en las ruedas doradas de las compuertas del Canal."},
 	"sopa": {"uno": "Sopa de Juncia", "encargo": 0, "hecho": "", "icono": 10, "usable": true,

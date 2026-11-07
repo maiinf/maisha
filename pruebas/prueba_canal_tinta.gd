@@ -2,7 +2,8 @@ extends Node
 ## Prueba automática de El Canal de Tinta (Sigilia), parte 1: se llega desde Maandiko por el este, suena su música,
 ## Maisha piensa al llegar, la tinta del cauce no se pisa, el muelle norte lleva hasta la Gran Dársena, el tapón de
 ## Tinta Quieta del Remanso Norte está puesto, Mfereji y su ficha, el Sigilo de Hielo y sus placas, las compuertas,
-## la Esclusa Hundida (la tinta baja al sur), la trampilla que se abre desde abajo, la estela, y se vuelve a Maandiko.
+## la Esclusa Hundida (la tinta baja al sur), la trampilla que se abre desde abajo, la estela, Ruba (oculta, muerde,
+## atrapada en el hielo y vencida), la ficha de Karatasi en el andén, y en Maandiko Karatasi recupera su nombre.
 ## Se ejecuta sin abrir el editor:  godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_canal_tinta
 
 const PLACA := preload("res://scripts/mundo/sigilia/placa_hielo.gd")
@@ -70,6 +71,10 @@ func _ready() -> void:
 	await _leer_dialogo()
 	_comprobar(Estado.tiene("canal_llegada"), "Maisha mira la tinta que corre al llegar")
 	var m := get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	var rubas := get_tree().get_nodes_in_group("rubas")
+	_comprobar(rubas.size() == 4, "cuatro Rubas nadan en la tinta (%d)" % rubas.size())
+	for r in rubas:
+		r.set_process(false)              # (quietas hasta su parte de la prueba)
 	_comprobar(m.global_position.x < 4 * 16 and m.global_position.y > 15 * 16 and m.global_position.y < 20 * 16,
 			"aparece en el muelle norte, junto a la entrada")
 
@@ -223,9 +228,75 @@ func _ready() -> void:
 	m.cambiar_sigilo()
 	_comprobar(m.sigilo_elegido() == "fuego", "R vuelve al Sigilo de Fuego")
 
+	print("Ruba:")
+	for p in get_tree().get_nodes_in_group("placas_hielo"):
+		p.queue_free()
+	m.cambiar_sigilo()
+	var ruba: Node2D = rubas[0]
+	ruba.set_process(true)
+	m.global_position = Vector2(34 * 16 + 8, 20 * 16 + 8)
+	m.mirar(Vector2.DOWN)
+	_comprobar(ruba.fase == ruba.Fase.OCULTA and not ruba.is_in_group("golpeables"), "oculta bajo la tinta: solo se ven las ondas")
+	var hojas2: int = m.vida
+	for i in 40:
+		await _esperar(0.1)
+		if ruba.fase == ruba.Fase.LANZA:
+			break
+	_comprobar(ruba.fase == ruba.Fase.LANZA or ruba.fase == ruba.Fase.OCULTA, "nada hacia Maisha, asoma y se lanza")
+	await _esperar(0.5)
+	_comprobar(m.vida == hojas2 - 1, "muerde: Maisha pierde una hoja")
+	_comprobar(ruba.fase == ruba.Fase.OCULTA and not ruba.recibir_golpe(1, Vector2.DOWN), "se vuelve a hundir, y en la tinta no hay forma de darle")
+	# el hielo encima la atrapa
+	var placas_antes := get_tree().get_nodes_in_group("placas_hielo").size()
+	ruba.global_position = m.global_position + Vector2(0, 16)
+	await _esperar(1.0)
+	m.aliento = m.aliento_maximo()
+	m.mirar(Vector2.DOWN)
+	_comprobar(m.sigilo_elegido() == "hielo" and m.sigilo(), "Maisha le traza la runa de hielo encima")
+	await _esperar(0.4)
+	_comprobar(ruba.fase == ruba.Fase.ATRAPADA, "Ruba se queda atrapada en un témpano, con media cabeza fuera")
+	_comprobar(get_tree().get_nodes_in_group("placas_hielo").size() == placas_antes, "(y el sigilo no hace además una placa)")
+	var vencidas := int(Estado.extra.get("bestiario", {}).get("ruba", 0))
+	for i in 3:
+		m.mirar(Vector2.DOWN)
+		m.golpear()
+		await _esperar(0.5)
+	await _esperar(0.5)
+	_comprobar(not is_instance_valid(ruba) or ruba.is_queued_for_deletion() or ruba.vida <= 0, "tres golpes de cetro y Ruba se deshace")
+	_comprobar(int(Estado.extra.get("bestiario", {}).get("ruba", 0)) == vencidas + 1, "y cuenta en el Bestiario")
+	# si no se le da a tiempo, rompe el hielo
+	var otra_ruba: Node2D = rubas[1]
+	otra_ruba.set_process(true)
+	otra_ruba.congelar()
+	await _esperar(4.4)
+	_comprobar(otra_ruba.fase == otra_ruba.Fase.OCULTA, "si no se le da a tiempo, rompe el hielo y se hunde")
+	otra_ruba.set_process(false)
+
+	print("La ficha de la Esclusa Hundida:")
+	var ficha2: Node2D = null
+	for r in get_tree().get_nodes_in_group("recogibles"):
+		if r.objeto == "ficha_karatasi":
+			ficha2 = r
+	_comprobar(ficha2 != null and ficha2.global_position.y > 51 * 16, "en el andén del fondo, otra ficha del Índice")
+	m.global_position = ficha2.global_position
+	await _esperar(0.4)
+	_comprobar(Estado.cuantos("ficha_karatasi") == 1, "es la de Karatasi")
+
 	print("De vuelta:")
 	await _ir("maandiko", "canal", "Maandiko")
 	_comprobar(_escena() == "Maandiko", "se vuelve a Maandiko por la salida del este")
+	var karatasi: Node = null
+	for a in get_tree().get_nodes_in_group("escribas"):
+		if a.nombre == "karatasi":
+			karatasi = a
+	_comprobar(karatasi != null and karatasi.id == "escriba_blanco", "en Maandiko, Karatasi está en blanco")
+	m = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	m.global_position = (karatasi as Node2D).global_position + Vector2(-18, 6)
+	karatasi.interactuar()
+	await _leer_dialogo()
+	await _esperar(1.0)
+	await _leer_dialogo()
+	_comprobar(Estado.tiene("karatasi_nombre") and karatasi.id == "escriba" and Estado.tiene("karatasi_hablado"), "al darle su ficha, recupera el nombre y habla")
 
 	print()
 	print("RESULTADO: todo correcto" if _fallos == 0 else "RESULTADO: %d fallos" % _fallos)

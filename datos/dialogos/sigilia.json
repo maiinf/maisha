@@ -492,6 +492,65 @@
 			}
 		]
 	},
+	"karatasi": {
+		"nombre": "Karatasi",
+		"conversaciones": [
+			{
+				"no": [
+					"karatasi_nombre"
+				],
+				"tiene": {
+					"ficha_karatasi": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"«Karatasi, copista de planos. Dibujó el Canal entero, esclusa a esclusa». Esta letra tan derecha es la tuya, ¿verdad?",
+					"Toma. Te llamas Karatasi."
+				],
+				"entrega": {
+					"ficha_karatasi": 1
+				},
+				"marca": [
+					"karatasi_nombre"
+				]
+			},
+			{
+				"no": [
+					"karatasi_nombre"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un escriba en blanco con una escuadra de latón en una mano y un rollo de papel en la otra.",
+					"Tiene los dedos manchados de tinta azul, de esa de dibujar líneas finas. Mira hacia el este, hacia el Canal."
+				]
+			},
+			{
+				"si": [
+					"karatasi_nombre"
+				],
+				"no": [
+					"karatasi_hablado"
+				],
+				"lineas": [
+					"¡Karatasi! Claro. Karatasi, la de los planos. O el de los planos, como prefieras: aquí nunca nos ha importado mucho.",
+					"Me pasé tres inviernos midiendo el Canal con una cuerda y un farol. Cada compuerta, cada escalón, cada argolla.",
+					"¿Y dices que mi ficha estaba en el fondo de la Esclusa Hundida? Ahí es donde se me cayó el rollo, la última vez que bajé.",
+					"Gracias. Si vuelves por allí, no te fíes de las ondas. Lo que parece tinta quieta casi nunca lo está."
+				],
+				"marca": [
+					"karatasi_hablado"
+				]
+			},
+			{
+				"si": [
+					"karatasi_hablado"
+				],
+				"lineas": [
+					"Un plano bien hecho no te dice por dónde ir. Te dice por dónde no caerte."
+				]
+			}
+		]
+	},
 	"daftari": {
 		"nombre": "Daftari",
 		"conversaciones": [
