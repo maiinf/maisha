@@ -130,7 +130,7 @@ def acorde(raiz, tipo="M"):
     from sintetizador import NOTAS
     nombre, octava = raiz[:-1], int(raiz[-1])
     base = NOTAS[nombre] + octava * 12
-    inter = {"M": (0, 4, 7), "m": (0, 3, 7), "sus": (0, 5, 7), "m7": (0, 3, 7, 10), "M7": (0, 4, 7, 11), "add9": (0, 4, 7, 14)}[tipo]
+    inter = {"M": (0, 4, 7), "m": (0, 3, 7), "sus": (0, 5, 7), "m7": (0, 3, 7, 10), "M7": (0, 4, 7, 11), "add9": (0, 4, 7, 14), "dim": (0, 3, 6)}[tipo]
     nombres = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
     return [f"{nombres[(base + i) % 12]}{(base + i) // 12}" for i in inter]
 
@@ -2223,6 +2223,97 @@ def jefe_kifaru():
     return final(p, sala=2.8, mezcla=0.30, brillo=5600)
 
 
+def fundicion_escoria():
+    """«El hierro que no duerme»: La Fundición de Escoria (camino del este de Asterhaul, 94 BPM).
+    Calor sofocante en Re frigio / eólico sobre ríos de escoria incandescente: fuelles colosales,
+    golpes de martillo sobre yunques, cadenas de puentes-grúa y kalimba pesada de láminas de hierro."""
+    tempo = Tempo(94)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m"), ("D#2", "M"), ("C2", "m"), ("D2", "m"),
+        ("A#1", "M"), ("C2", "M"), ("G2", "m"), ("A1", "m"),
+    ] * 3
+    colchones(p, tempo, progresion, compas=4, brillo=920, volumen=0.28, octava_bajo=1, fuerza_bajo=0.42)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.20, pan=-0.28, patron=(0, 2, 1, 3, 2, 1, 0, 2))
+        notas = acorde(raiz[:-1] + "4", tipo)
+        p.poner(balafon(notas[0], 0.38, 0.20), tempo.s(i * 4), pan=0.25)
+        p.poner(balafon(notas[2], 0.34, 0.16), tempo.s(i * 4 + 2), pan=-0.25)
+    # yunque, fuelle y cadenas de la fundición
+    rng = np.random.default_rng(912)
+    for b in range(0, pulsos, 4):
+        # golpe de yunque en tiempo 1
+        p.poner(taiko(0.8, 0.65), tempo.s(b), pan=-0.1)
+        p.poner(campanita("A5", 0.5, 0.22), tempo.s(b + 0.02), pan=0.2)
+        # fuelle en tiempo 2
+        p.poner(tambor("D2", 0.32, 0.28, golpe=0.4), tempo.s(b + 1.5), pan=0.1)
+        # golpe secundario en tiempo 3
+        p.poner(tambor("A1", 0.28, 0.35, golpe=0.55), tempo.s(b + 2.0), pan=-0.15)
+        p.poner(campanita("D5", 0.45, 0.18), tempo.s(b + 2.02), pan=-0.2)
+        # cadenas de puente-grúa
+        for k in range(3):
+            tk = b + 3.0 + k * 0.3
+            p.poner(maraca(0.08, 0.16), tempo.s(tk), pan=rng.uniform(-0.35, 0.35))
+    tema_fundicion = [
+        ("D5", 0, 1.5), ("D#5", 1.5, 0.5), ("D5", 2, 1), ("C5", 3, 1), ("A#4", 4, 2), ("A4", 6, 2),
+        ("G4", 8, 1.5), ("A4", 9.5, 0.5), ("A#4", 10, 1), ("C5", 11, 1), ("D5", 12, 4),
+        ("F5", 16, 1.5), ("G5", 17.5, 0.5), ("F5", 18, 1), ("D#5", 19, 1), ("D5", 20, 2), ("C5", 22, 2),
+        ("A#4", 24, 1), ("A4", 25, 1), ("G4", 26, 1.5), ("A4", 27.5, 0.5), ("D4", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.40, vibrato=4.8)
+    melodia(p, tempo, tema_fundicion, desde=0, instrumento=kalimba, volumen=0.36, pan=-0.14)
+    melodia(p, tempo, tema_fundicion, desde=32, instrumento=flauta_, volumen=0.40, sostener=0.9, pan=0.18)
+    melodia(p, tempo, TEMA_ASTERHAUL, desde=64, instrumento=flauta_, volumen=0.38, sostener=0.92, pan=0.08)
+    melodia(p, tempo, transportar(tema_fundicion, -12), desde=64, instrumento=kalimba, volumen=0.25, pan=-0.22)
+    return final(p, sala=3.4, mezcla=0.34, brillo=5200)
+
+
+def jefe_nyundo():
+    """«Las cuatro tenazas del crisol»: combate contra Nyundo, el Herrero de 4 Tenazas en el Ancla Este (142 BPM).
+    Ritmo implacable y tenso de forja en Re menor con alteraciones cromáticas, martilleo cuádruple articulado
+    de tenazas al rojo vivo, taiko pesado y contragolpes magnéticos."""
+    tempo = Tempo(142)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m"), ("D#2", "M"), ("D2", "m"), ("A1", "M"),
+        ("D2", "m"), ("F2", "M"), ("G#2", "dim"), ("A1", "M"),
+    ] * 3
+    colchones(p, tempo, progresion, compas=4, brillo=1200, volumen=0.30, octava_bajo=1, fuerza_bajo=0.48)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.24, pan=-0.28, patron=(0, 2, 1, 3, 0, 2, 3, 1))
+        notas = acorde(raiz[:-1] + "3", tipo)
+        for paso_ in (0, 1.5, 3):
+            p.poner(balafon(notas[0], 0.22, 0.26), tempo.s(i * 4 + paso_), pan=0.22)
+    # las cuatro tenazas martillan en ráfaga rítmica
+    for b in range(0, pulsos, 2):
+        p.poner(tambor("D1", 0.32, 0.58, golpe=0.6), tempo.s(b), pan=0.0)
+        # tenaza 1 y 2
+        p.poner(campanita("A5", 0.18, 0.22), tempo.s(b + 0.5), pan=-0.35)
+        p.poner(tambor("A1", 0.20, 0.36, golpe=0.65), tempo.s(b + 0.75), pan=-0.15)
+        # tenaza 3 y 4
+        p.poner(campanita("D6", 0.18, 0.24), tempo.s(b + 1.25), pan=0.35)
+        p.poner(tambor("D2", 0.22, 0.40, golpe=0.65), tempo.s(b + 1.5), pan=0.15)
+        if b % 8 == 0:
+            p.poner(taiko(1.2, 0.75), tempo.s(b), pan=0.0)
+    tema_nyundo = [
+        ("D5", 0, 1), ("D#5", 1, 0.5), ("D5", 1.5, 0.5), ("C5", 2, 1.5), ("A#4", 3.5, 0.5),
+        ("A4", 4, 1), ("G#4", 5, 1), ("A4", 6, 2),
+        ("F5", 8, 1), ("G5", 9, 0.5), ("F5", 9.5, 0.5), ("D#5", 10, 1.5), ("D5", 11.5, 0.5),
+        ("C#5", 12, 1), ("D5", 13, 1), ("E5", 14, 2),
+        ("D5", 16, 1), ("F5", 17, 1), ("G#5", 18, 1), ("A5", 19, 1),
+        ("A#5", 20, 1), ("A5", 21, 1), ("F5", 22, 2),
+        ("D#5", 24, 1), ("D5", 25, 1), ("C#5", 26, 1), ("D#5", 27, 1), ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.44, vibrato=5.4)
+    melodia(p, tempo, tema_nyundo, desde=0, instrumento=kalimba, volumen=0.40, pan=-0.16)
+    melodia(p, tempo, tema_nyundo, desde=32, instrumento=flauta_, volumen=0.44, sostener=0.88, pan=0.16)
+    tocar(p, tempo, tema_nyundo, desde=64, fuerza=0.36, pan=0.0)
+    melodia(p, tempo, transportar(tema_nyundo, -12), desde=64, instrumento=kalimba, volumen=0.28, pan=-0.24)
+    return final(p, sala=2.6, mezcla=0.32, brillo=5800)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2236,6 +2327,8 @@ PIEZAS["desfiladero_meteorito"] = desfiladero_meteorito
 PIEZAS["mji_jiwe"] = mji_jiwe
 PIEZAS["galerias_ambar"] = galerias_ambar
 PIEZAS["jefe_kifaru"] = jefe_kifaru
+PIEZAS["fundicion_escoria"] = fundicion_escoria
+PIEZAS["jefe_nyundo"] = jefe_nyundo
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -2249,6 +2342,8 @@ TITULOS["desfiladero_meteorito"] = "El eco de la piedra"
 TITULOS["mji_jiwe"] = "La ciudad dentro del cráter"
 TITULOS["galerias_ambar"] = "Las vetas que cantan"
 TITULOS["jefe_kifaru"] = "El cuerno de basalto"
+TITULOS["fundicion_escoria"] = "El hierro que no duerme"
+TITULOS["jefe_nyundo"] = "Las cuatro tenazas del crisol"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

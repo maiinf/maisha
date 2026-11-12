@@ -2145,6 +2145,69 @@ def kengele_vencida():
     return reverb(p.entera(), 1.8, 0.3)
 
 
+def pulso_magnetico():
+    """El 2.º poder del Arte de la Tierra: onda expansiva magnética que polariza el hierro meteórico."""
+    p = Pista(1.1)
+    d = 0.75
+    n = _n(d)
+    zumbido = (seno(_desliz(80, 240, d), d) * 0.6 + seno(_desliz(160, 480, d), d) * 0.4) * adsr(n, 0.05, 0.18, 0.65, 0.25)
+    onda = barrido_bajo(ruido_rosa(d), 2000, 300) * caida(n, 0.22) * 0.55
+    p.poner(zumbido + onda, 0.0)
+    for k, nota in enumerate(("D5", "G#5", "A5", "D6")):
+        p.poner(campanita(nota, 0.7 - k * 0.1, 0.28 - k * 0.04), 0.05 + k * 0.06)
+    return reverb(p.entera(), 1.2, 0.28)
+
+
+def bloque_atraer():
+    """Un bloque o puente-grúa de hierro meteórico es atraído por el pulso magnético y desliza con fuerza."""
+    p = Pista(0.9)
+    d = 0.65
+    n = _n(d)
+    arrastre = paso_banda(ruido(d), 350, 2200) * adsr(n, 0.04, 0.15, 0.7, 0.2) * 0.7
+    impacto_tope = taiko(0.4, 0.75)
+    p.poner(arrastre, 0.0)
+    p.poner(impacto_tope, 0.35)
+    p.poner(campanita("D5", 0.4, 0.3), 0.37)
+    return reverb(p.entera(), 0.7, 0.2)
+
+
+def kovu_sumerge():
+    """La Kovu de Escoria se sumerge en el río de escoria incandescente con chapoteo de magma espeso."""
+    p = Pista(0.85)
+    d = 0.6
+    n = _n(d)
+    chof = paso_bajo(ruido_rosa(d), 650) * caida(n, 0.18) * 0.75
+    burbujas = sierra(_desliz(280, 95, d), d, 8) * adsr(n, 0.03, 0.1, 0.4, 0.25) * 0.45
+    p.poner(chof + burbujas, 0.0)
+    return reverb(p.entera(), 0.75, 0.22)
+
+
+def kovu_enfria():
+    """El Kovu de Escoria cae sobre piedra fría: su coraza de hierro fundido se apaga con siseo de vapor y se agrieta."""
+    p = Pista(1.2)
+    d = 0.85
+    n = _n(d)
+    siseo = paso_alto(ruido(d), 2800) * caida(n, 0.28) * 0.75
+    grieta = _crujido_piedra(0.45, 260) * caida(_n(0.45), 0.12) * 0.8
+    p.poner(siseo, 0.0)
+    p.poner(grieta, 0.12)
+    p.poner(campanita("A5", 0.35, 0.25), 0.15)
+    return reverb(p.entera(), 1.0, 0.25)
+
+
+def nyundo_tenaza():
+    """Chasquido metálico de las tenazas incandescentes de Nyundo al cerrarse y golpear."""
+    p = Pista(0.6)
+    d = 0.35
+    n = _n(d)
+    mordisco = paso_banda(ruido(d), 1200, 6500) * caida(n, 0.05) * 0.85
+    yunque = taiko(0.3, 0.7)
+    p.poner(mordisco, 0.0)
+    p.poner(yunque, 0.02)
+    p.poner(campanita("D6", 0.4, 0.35), 0.02)
+    return reverb(p.entera(), 0.6, 0.22)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -2209,6 +2272,9 @@ EFECTOS = {
     "saa_mazazo": (saa_mazazo, 0.75), "saa_sobrecarga": (saa_sobrecarga, 0.8),
     "kengele_tanido": (kengele_tanido, 0.75), "kengele_embiste": (kengele_embiste, 0.8),
     "kengele_resuena": (kengele_resuena, 0.85), "kengele_vencida": (kengele_vencida, 0.75),
+    "pulso_magnetico": (pulso_magnetico, 0.75), "bloque_atraer": (bloque_atraer, 0.7),
+    "kovu_sumerge": (kovu_sumerge, 0.65), "kovu_enfria": (kovu_enfria, 0.7),
+    "nyundo_tenaza": (nyundo_tenaza, 0.75),
 }
 
 AMBIENTES = {
