@@ -22,6 +22,8 @@ const PX := 1.0 / 16.0
 const ALTO_PENA := 1.25            # metros que se levanta una peña (lo que mide su pared pintada: unos 20 px)
 ## Mapas en los que la pared pintada es el doble de alta (gargantas y montaña: pintar_suelo, «cara=2»)
 const PARED_DOBLE := ["canada_eco", "paso_piedra", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha"]
+## Mapas en los que «0» no es peña sino cielo o vacío (no se levantan bloques de roca)
+const SIN_PENAS := ["observatorio_aurora"]
 const SUELO_BAJO := -4             # dibujos con z_index por debajo: se tumban en el suelo
 const CAMARA_INCLINACION := -48.0  # grados (mirando hacia abajo)
 const CAMARA_DISTANCIA := 30.0     # metros hasta Maisha (se ve más o menos lo mismo que en 2D)
@@ -214,30 +216,32 @@ func _crear_suelo() -> void:
 	for m in _suelos_lejanos:
 		m.set_shader_parameter("agua", _mascara_agua)
 	# las peñas: bloques que se levantan, con el suelo pintado encima y los lados de roca oscura
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var lados := SurfaceTool.new()
-	lados.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for y in filas.size():
-		var x := 0
-		var fila := filas[y]
-		while x < fila.length():
-			if fila[x] != "0":
-				x += 1
-				continue
-			var x0 := x
-			while x < fila.length() and fila[x] == "0":
-				x += 1
-			_bloque(st, lados, x0, x, y, ancho, alto, filas)
-	var techo := MeshInstance3D.new()
-	techo.mesh = st.commit()
-	techo.material_override = mat
-	add_child(techo)
-	# las paredes: la del sur, con la pared de roca que ya está pintada en el suelo; las demás, de roca oscura
-	var paredes := MeshInstance3D.new()
-	paredes.mesh = lados.commit()
-	paredes.material_override = mat
-	add_child(paredes)
+	# (salvo en mapas como observatorio_aurora donde «0» es el cielo estrellado)
+	if not String(region.get("mapa")) in SIN_PENAS:
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		var lados := SurfaceTool.new()
+		lados.begin(Mesh.PRIMITIVE_TRIANGLES)
+		for y in filas.size():
+			var x := 0
+			var fila := filas[y]
+			while x < fila.length():
+				if fila[x] != "0":
+					x += 1
+					continue
+				var x0 := x
+				while x < fila.length() and fila[x] == "0":
+					x += 1
+				_bloque(st, lados, x0, x, y, ancho, alto, filas)
+		var techo := MeshInstance3D.new()
+		techo.mesh = st.commit()
+		techo.material_override = mat
+		add_child(techo)
+		# las paredes: la del sur, con la pared de roca que ya está pintada en el suelo; las demás, de roca oscura
+		var paredes := MeshInstance3D.new()
+		paredes.mesh = lados.commit()
+		paredes.material_override = mat
+		add_child(paredes)
 
 
 ## Un tramo de peña de x0 a x1 (casillas) en la fila y: techo con el suelo pintado y paredes donde no hay peña al lado

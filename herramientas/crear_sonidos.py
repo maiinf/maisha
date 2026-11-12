@@ -2009,6 +2009,142 @@ def kifaru_embiste():
     return reverb(p.entera(), 0.9, 0.24)
 
 
+def rayo_runa():
+    """El Sigilo de Rayo descarga en el suelo: chasquido eléctrico seco, arco voltaico y chispas."""
+    p = Pista(0.65)
+    d = 0.22
+    n = _n(d)
+    arco = paso_banda(ruido(d), 2200, 7800) * caida(n, 0.04) * 0.85
+    chispa_tono = sierra(_desliz(3400, 480, d), d, 8) * caida(n, 0.06) * 0.5
+    p.poner(arco + chispa_tono, 0.0)
+    rng = np.random.default_rng(77)
+    for k in range(4):
+        tk = 0.03 + k * 0.04
+        dk = 0.04
+        ch = paso_alto(ruido(dk), 4000) * caida(_n(dk), 0.01) * 0.35
+        p.poner(ch, tk, pan=float(rng.uniform(-0.5, 0.5)))
+    return reverb(p.entera(), 0.6, 0.18)
+
+
+def bobina_encender():
+    """Una bobina astral se activa con rayo: zumbido ascendente armónico de corriente y destello cósmico."""
+    p = Pista(1.1)
+    d = 0.65
+    n = _n(d)
+    zumbido = (seno(_desliz(110, 220, d), d) * 0.5 + seno(_desliz(220, 440, d), d) * 0.35) * adsr(n, 0.08, 0.15, 0.6, 0.2)
+    p.poner(zumbido, 0.0)
+    for k, nota in enumerate(("D5", "A5", "D6", "F#6")):
+        p.poner(campanita(nota, 0.8 - k * 0.1, 0.3 - k * 0.04), 0.08 + k * 0.07)
+    return reverb(p.entera(), 1.2, 0.28)
+
+
+def bobina_apagar():
+    """Una bobina astral pierde la carga: zumbido descendente y disipación de energía."""
+    p = Pista(0.7)
+    d = 0.45
+    n = _n(d)
+    bajada = seno(_desliz(330, 75, d), d) * caida(n, 0.15) * 0.6
+    soplo = paso_bajo(ruido_rosa(d), 1200) * caida(n, 0.18) * 0.4
+    p.poner(bajada + soplo, 0.0)
+    return reverb(p.entera(), 0.5, 0.15)
+
+
+def saa_tictac():
+    """El autómata Saa patrulla: tictac metálico de escape de reloj y engranajes finos."""
+    p = Pista(0.5)
+    d = 0.08
+    tic = paso_banda(ruido(d), 1600, 4500) * caida(_n(d), 0.015) * 0.65
+    tac = paso_banda(ruido(d), 1200, 3800) * caida(_n(d), 0.015) * 0.55
+    p.poner(tic, 0.0)
+    p.poner(tac, 0.22)
+    p.poner(campanita(1760.0, 0.08, 0.2), 0.005)
+    p.poner(campanita(1320.0, 0.08, 0.18), 0.225)
+    return reverb(p.entera(), 0.35, 0.12)
+
+
+def saa_mazazo():
+    """Saa asesta un mazazo con su brazo de latón."""
+    p = Pista(0.65)
+    d = 0.4
+    n = _n(d)
+    golpe = taiko(0.35, 0.8)
+    laton = paso_banda(ruido(d), 700, 3200) * caida(n, 0.08) * 0.7
+    p.poner(golpe, 0.0)
+    p.poner(laton, 0.01)
+    p.poner(campanita("B4", 0.35, 0.3), 0.02)
+    return reverb(p.entera(), 0.6, 0.2)
+
+
+def saa_sobrecarga():
+    """Saa es sobrecargado con el Sigilo de Rayo: muelles que saltan y engranajes desbocados."""
+    p = Pista(1.2)
+    d = 0.5
+    descarga = paso_banda(ruido(d), 2500, 8000) * caida(_n(d), 0.1) * 0.75
+    p.poner(descarga, 0.0)
+    for k in range(5):
+        tk = 0.06 + k * 0.07
+        f_muelle = 800 + k * 260
+        muelle = seno(f_muelle, 0.12) * caida(_n(0.12), 0.03) * 0.35
+        p.poner(muelle, tk)
+    p.poner(taiko(0.4, 0.7), 0.4)
+    return reverb(p.entera(), 0.85, 0.25)
+
+
+def kengele_tanido():
+    """Un tañido mudo de Kengele: golpe grave de aire comprimido sin nota musical."""
+    p = Pista(0.9)
+    d = 0.6
+    n = _n(d)
+    aire = seno(_desliz(62, 38, d), d) * caida(n, 0.22) * 0.95
+    soplo = paso_bajo(ruido_rosa(d), 320) * caida(n, 0.18) * 0.6
+    p.poner(aire + soplo, 0.0)
+    return reverb(p.entera(), 0.8, 0.2)
+
+
+def kengele_embiste():
+    """Kengele oscila pesadamente por la cúpula y embiste con su badajo de hielo."""
+    p = Pista(1.1)
+    d = 0.85
+    n = _n(d)
+    vuelo = barrido_bajo(ruido_rosa(d), 500, 180) * caida(n, 0.3) * 0.65
+    crujido = paso_banda(ruido(d), 1400, 6000) * caida(n, 0.08) * 0.45
+    p.poner(vuelo + crujido, 0.0)
+    p.poner(taiko(0.5, 0.8), 0.1)
+    return reverb(p.entera(), 1.0, 0.25)
+
+
+def kengele_resuena():
+    """¡Kengele resuena al chocar con los diapasones! Campanada colosal de bronce, plena y majestuosa."""
+    p = Pista(3.2)
+    dur = 2.8
+    n = _n(dur)
+    fundamentales = [164.81, 246.94, 329.63, 392.0, 493.88, 659.25]
+    for i, f in enumerate(fundamentales):
+        vol = 0.45 / (1.0 + i * 0.35)
+        tau = 0.65 + i * 0.15
+        camp = seno(f, dur) * caida(n, tau) * vol
+        inarm = seno(f * 2.76, dur * 0.4) * caida(_n(dur * 0.4), 0.12) * (vol * 0.5)
+        p.poner(camp, 0.0)
+        p.poner(inarm, 0.005)
+    impacto = paso_banda(ruido(0.3), 800, 4500) * caida(_n(0.3), 0.04) * 0.7
+    p.poner(impacto, 0.0)
+    return reverb(p.entera(), 2.4, 0.38)
+
+
+def kengele_vencida():
+    """Kengele es derrotada: el badajo de hielo se rompe y el bronce pierde el tono."""
+    p = Pista(2.0)
+    d = 0.9
+    n = _n(d)
+    hielo = paso_alto(ruido(d), 2000) * caida(n, 0.12) * 0.8
+    p.poner(hielo, 0.0)
+    for k, nota in enumerate(("E5", "B5", "E6")):
+        p.poner(campanita(nota, 0.5, 0.25), 0.02 + k * 0.05)
+    bronce_apagado = seno(_desliz(220, 110, 1.2), 1.2) * caida(_n(1.2), 0.3) * 0.4
+    p.poner(bronce_apagado, 0.15)
+    return reverb(p.entera(), 1.8, 0.3)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -2068,6 +2204,11 @@ EFECTOS = {
     "diapason_ambar": (diapason_ambar, 0.65), "vagoneta_rodar": (vagoneta_rodar, 0.65),
     "aguja_cambiar": (aguja_cambiar, 0.6), "geoda_encender": (geoda_encender, 0.65),
     "kifaru_embiste": (kifaru_embiste, 0.8),
+    "rayo_runa": (rayo_runa, 0.7), "bobina_encender": (bobina_encender, 0.65),
+    "bobina_apagar": (bobina_apagar, 0.55), "saa_tictac": (saa_tictac, 0.5),
+    "saa_mazazo": (saa_mazazo, 0.75), "saa_sobrecarga": (saa_sobrecarga, 0.8),
+    "kengele_tanido": (kengele_tanido, 0.75), "kengele_embiste": (kengele_embiste, 0.8),
+    "kengele_resuena": (kengele_resuena, 0.85), "kengele_vencida": (kengele_vencida, 0.75),
 }
 
 AMBIENTES = {
