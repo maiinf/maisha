@@ -118,12 +118,16 @@
 		"maandiko": [
 			"paso_escarcha",
 			"estanterias_colgantes",
-			"canal_tinta"
+			"canal_tinta",
+			"observatorio_aurora"
 		],
 		"estanterias_colgantes": [
 			"maandiko"
 		],
 		"canal_tinta": [
+			"maandiko"
+		],
+		"observatorio_aurora": [
 			"maandiko"
 		]
 	},

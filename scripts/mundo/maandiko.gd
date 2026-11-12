@@ -16,7 +16,7 @@ const VECINO := preload("res://scripts/mundo/sigilia/vecino.gd")
 const CHARCO := preload("res://scripts/mundo/sigilia/charco_tinta.gd")
 const ESCRIBA := preload("res://scripts/mundo/sigilia/escriba.gd")
 ## los escribas con nombre (los que se pueden curar con su ficha del Índice)
-const ESCRIBAS := ["daftari", "karatasi", "chapa"]
+const ESCRIBAS := ["daftari", "karatasi", "chapa", "darubini", "mlinzi"]
 const FAROL := preload("res://scripts/mundo/sigilia/farol_runico.gd")
 ## vecino: [id del dibujo, conversación, casilla, marca que hace falta]
 const VECINOS := [
@@ -27,8 +27,8 @@ const VECINOS := [
 	["daftari", "", Vector2i(30, 30), ""],
 	["karatasi", "", Vector2i(44, 24), ""],
 	["chapa", "", Vector2i(10, 22), ""],
-	["escriba_blanco", "", Vector2i(14, 36), ""],
-	["escriba_blanco", "", Vector2i(58, 35), ""],
+	["darubini", "", Vector2i(14, 36), ""],
+	["mlinzi", "", Vector2i(58, 35), ""],
 	["escriba_blanco", "", Vector2i(34, 44), ""],
 ]
 ## los charcos de Tinta Quieta que tapan las salidas: casilla (el centro de la calle, junto a la muralla)

@@ -55,7 +55,7 @@ func _arder() -> void:
 			nodo.call("derretir")
 	for nodo in get_tree().get_nodes_in_group("daniables"):
 		var o := nodo as Node2D
-		if o and o.global_position.distance_to(centro) <= radio + 4.0:
+		if o and not o.is_in_group("maisha") and o.global_position.distance_to(centro) <= radio + 4.0:      # (a Maisha, su propio fuego no la quema)
 			o.call("recibir_danio", 1, centro, "fuego")
 	for i in 18:
 		var a := randf() * TAU

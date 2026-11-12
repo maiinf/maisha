@@ -327,10 +327,11 @@ PISADA_N = ["#4a5468", "#5e6a80", "#76829a", "#8e9ab0", "#a8b2c4", "#c0c9d8"]
 NIEVE_LILA = ["#4e4870", "#655e8a", "#7e76a2", "#9890ba", "#b0a9cd", "#c8c2de", "#dddaec", "#f0eef8"]
 PISADA_LILA = ["#4c4664", "#605a7a", "#787292", "#908aa8", "#a8a2bc", "#c0bbd0"]
 # los mapas de Sigilia guardan su suelo en arte/mundos/sigilia/suelos
-SIGILIA = {"paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta"}
+SIGILIA = {"paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora"}
 # la tinta del Canal: casi negra en lo hondo, morada en la orilla
 AGUA_TINTA = ["#0b0812", "#120d1c", "#1a1328", "#231a36", "#2e2246", "#3a2c58", "#4a3a6c", "#5c4c82", "#9a8cc4"]
 BIBLIOTECAS = {"estanterias_colgantes"}
+OBSERVATORIOS = {"observatorio_aurora"}
 
 
 def _nevar(lz, tipos, fina, media, pared, conservar=(), lila=False, sin_agua=False):
@@ -597,9 +598,128 @@ def pintar_biblioteca(nombre, salida=None):
     print("Suelo pintado:", destino, (lz.w, lz.h))
 
 
+def pintar_observatorio(nombre, salida=None):
+    """El suelo de EL OBSERVATORIO DE LA AURORA (Sigilia): terrazas de piedra astronómica colgadas en la noche.
+    El vacío («0» y los puentes «=», que los enciende el juego) es el CIELO: azul muy hondo, estrellas y, arriba, las
+    cintas verdes y moradas de la aurora. Las TERRAZAS: losas grandes lila-gris con juntas, un cerco de cobre junto al
+    borde, círculos y líneas de constelación grabados en oro y un poco de nieve en los rincones; por el sur se les ve
+    la CARA (sillares en sombra, con carámbanos). La TINTA («~»): negra, con brillos morados."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=23)
+    tipos = [["cielo" if c in "0=" else ("tinta" if c == "~" else "suelo") for c in f] for f in filas]
+    firme = [["cielo" if c in "0=" else "suelo" for c in f] for f in filas]        # (la terraza, con su estanque dentro)
+    suelo = mascara(lz, firme, ("suelo",), 1.2, 0.0, semilla=231)
+    tinta = mascara(lz, tipos, ("tinta",), 2.0, 0.12, semilla=232)
+    fina = lz.ruido(0.8, 2, semilla=233)
+    media = lz.ruido(9, 3, semilla=234)
+    grande = lz.ruido(60, 3, semilla=235)
+    # EL CIELO: de azul casi negro (abajo) a morado hondo (arriba), con nubes de polvo de estrellas
+    v = np.clip(1 - lz.y / lz.h, 0, 1)
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#05040c", "#080714", "#0c0a1e", "#120e2a", "#1a1238"], np.clip(v * 0.8 + (grande - 0.5) * 0.5, 0, 1)))
+    polvo = np.clip((ruido_torcido_local(lz, 40, 236) - 0.52) * 3.0, 0, 1)
+    lz.pintar(lz.desenfocar(polvo, 10), "#3a2c66", 0.4)
+    # las estrellas: muchas pequeñas, algunas gordas con su cruz
+    chica = (lz.ruido(0.45, 1, semilla=237) > 0.972) * (lz.ruido(3, 2, semilla=238) > 0.4)
+    lz.pintar(chica * 1.0, "#b8b4e0", 0.8)
+    rng = np.random.default_rng(239)
+    S = lz.s
+    for col in ("#ffffff", "#ffe9b0", "#bfe3f3", "#e0c8ff"):                      # (con cv2: muchas formas pequeñas de una vez)
+        gordas = np.zeros((lz.H, lz.W), np.float32)
+        for _ in range(int(ancho * alto * 0.0125)):
+            x, y = int(rng.uniform(2, lz.w - 2) * S), int(rng.uniform(2, lz.h - 2) * S)
+            cv2.rectangle(gordas, (x, y), (x + S - 1, y + S - 1), 1.0, -1)
+            if rng.random() < 0.3:
+                cv2.rectangle(gordas, (x - 2 * S, y), (x + 3 * S - 1, y + S - 1), 0.6, -1)
+                cv2.rectangle(gordas, (x, y - 2 * S), (x + S - 1, y + 3 * S - 1), 0.6, -1)
+                cv2.rectangle(gordas, (x, y), (x + S - 1, y + S - 1), 1.0, -1)
+        lz.pintar(gordas, col)
+    # la AURORA: cintas que ondean, verdes y moradas (fuertes arriba, un velo más abajo)
+    for k, (col, y0, amp, fuerza) in enumerate((("#3fd6a8", 40, 16, 0.95), ("#9a6cf0", 62, 20, 0.8), ("#5ff0c8", 84, 12, 0.7),
+                                                ("#7a5ae0", 330, 30, 0.3), ("#3fd6a8", 600, 36, 0.24), ("#9a6cf0", 960, 30, 0.2), ("#3fd6a8", 1230, 24, 0.18))):
+        onda = y0 + np.sin(lz.x * 0.011 + k * 1.7) * amp + np.sin(lz.x * 0.031 + k) * amp * 0.35
+        d = lz.y - onda
+        cinta = np.clip(1 - np.abs(d) / 4.0, 0, 1) + np.clip(1 - d / 46.0, 0, 1) ** 2 * (d > 0) * 0.7      # el filo y la cortina que cuelga
+        hebras = 0.72 + 0.28 * np.sin(lz.x * 0.35 + np.sin(lz.y * 0.05) * 3)
+        lz.sumar_luz(np.clip(cinta * hebras, 0, 1), col, fuerza)
+    # LA CARA de las terrazas (22 px por el sur): sillares en sombra, con su hilada de cobre y carámbanos
+    cara = np.clip(desplazar(lz, suelo, 0, 22) - suelo, 0, 1)
+    hil = np.floor(lz.y / 6)
+    sillar = ((lz.y % 6) < 0.8) | (((lz.x + (hil % 2) * 7) % 14) < 0.8)
+    vc = 0.42 + (media - 0.5) * 0.3 + (fina - 0.5) * 0.2
+    lz.pintar(cara, rampa(["#0e0c1c", "#1a1730", "#2a2548", "#3c3562", "#4e4678"], np.clip(vc, 0, 1)))
+    lz.pintar(cara * sillar, "#08071a", 0.6)
+    lz.pintar(np.clip(desplazar(lz, suelo, 0, 3) - suelo, 0, 1), "#b87a3c", 0.9)       # la hilada de cobre, bajo el borde
+    lz.pintar(np.clip(desplazar(lz, suelo, 0, 1.2) - suelo, 0, 1), "#f0c070", 0.8)
+    caram = cara * (lz.ruido(1.4, 1, semilla=240) > 0.6) * (((lz.y - 3) % 22) < 9 + 6 * np.sin(lz.x * 0.7))
+    lz.pintar(np.clip(desplazar(lz, suelo, 0, 12) - suelo, 0, 1) * caram, "#bfe3f3", 0.7)
+    lz.pintar(np.clip(desplazar(lz, suelo, 0, 26) - desplazar(lz, suelo, 0, 22), 0, 1) * (1 - suelo), "#030208", 0.55)   # la sombra de debajo
+    # LAS LOSAS: grandes, a matajunta, cada una con su tono
+    fl = np.floor(lz.y / 16)
+    cl = np.floor((lz.x + (fl % 2) * 12) / 24)
+    tono = (np.sin(fl * 12.9898 + cl * 78.233) * 43758.5453) % 1
+    vl = 0.5 + (tono - 0.5) * 0.24 + (media - 0.5) * 0.22 + (fina - 0.5) * 0.16
+    lz.pintar(suelo, rampa(["#3a3558", "#4c4670", "#605a88", "#77709e", "#8e88b2", "#a6a0c4"], np.clip(vl, 0, 1)))
+    junta = ((lz.y % 16) < 0.9) | (((lz.x + (fl % 2) * 12) % 24) < 0.9)
+    lz.pintar(suelo * junta, "#262240", 0.75)
+    lz.pintar(suelo * desplazar(lz, junta * 1.0, 0, 1), "#b8b2d4", 0.25)                # la luz en el canto de cada losa
+    lz.pintar(suelo * (lz.ruido(1.1, 2, semilla=241) > 0.78), "#2e2a4a", 0.35)          # picaduras
+    # el CERCO DE COBRE, a 5 px del borde, y el canto de arriba con luz
+    dist = lz.distancia(suelo)
+    lz.pintar(suelo * (np.abs(dist - 5.0) < 0.9), "#b87a3c", 0.9)
+    lz.pintar(suelo * (np.abs(dist - 4.4) < 0.35), "#f0c070", 0.8)
+    lz.pintar(suelo * (dist < 1.4), "#c8c2de", 0.7)
+    # los GRABADOS de oro: en el centro de cada terraza grande, círculos de astrolabio con sus marcas y rayos
+    def astrolabio(cx, cy, r):
+        dx, dy = lz.x - cx, lz.y - cy
+        d = np.sqrt(dx * dx + dy * dy)
+        a = np.arctan2(dy, dx)
+        g = (np.abs(d - r) < 0.7) | (np.abs(d - r * 0.62) < 0.5) | (np.abs(d - r * 0.3) < 0.5)
+        g = g | ((d > r * 0.62) & (d < r) & (np.abs(((a / (np.pi / 12)) % 1) - 0.5) > 0.46))        # las 24 marcas de las horas
+        g = g | ((d < r * 0.62) & (d > r * 0.3) & (np.abs(((a / (np.pi / 4)) % 1) - 0.5) > 0.47))   # los 8 rayos
+        lz.pintar(suelo * g, "#8a5a24", 0.9)
+        lz.pintar(suelo * desplazar(lz, g * 1.0, -0.6, -0.6) * g, "#f0c868", 0.75)
+    for (cx, cy, r) in ((36, 46.5, 62), (36, 67, 46), (36.5, 19.5, 120), (11.5, 46.5, 18), (61.5, 46.5, 44)):
+        astrolabio(cx * 16, cy * 16, r)
+    # constelaciones grabadas: estrellitas de oro unidas por líneas finas
+    lineas = np.zeros((lz.H, lz.W), np.float32)
+    puntos = np.zeros((lz.H, lz.W), np.float32)
+    for _ in range(26):
+        pts = [(rng.uniform(40, lz.w - 40), rng.uniform(40, lz.h - 40))]
+        for _k in range(int(rng.integers(2, 5))):
+            pts.append((pts[-1][0] + rng.uniform(-22, 22), pts[-1][1] + rng.uniform(-16, 16)))
+        ent = [(int(x * S), int(y * S)) for (x, y) in pts]
+        for i in range(len(ent) - 1):
+            cv2.line(lineas, ent[i], ent[i + 1], 1.0, 1)
+        for (x, y) in ent:
+            cv2.rectangle(puntos, (x - S, y - S), (x + S - 1, y + S - 1), 1.0, -1)
+    lz.pintar(lineas * suelo * (dist > 8), "#c89a40", 0.55)
+    lz.pintar(puntos * suelo * (dist > 8), "#f0d27a", 0.9)
+    # nieve en los rincones y junto a los bordes del norte
+    nieve = suelo * np.clip((lz.ruido(14, 3, semilla=242) - 0.56) * 5, 0, 1) * np.clip(1.15 - dist / 18.0, 0, 1)
+    lz.pintar(nieve, rampa(NIEVE_LILA[3:], np.clip(0.5 + (fina - 0.5) * 0.6, 0, 1)), 0.9)
+    # LA TINTA del estanque: negra, con ondas moradas, el borde de piedra en sombra y un filo de luz
+    vt = 0.3 + (lz.ruido(12, 3, semilla=243) - 0.5) * 0.6 + np.sin(lz.y * 0.5 + lz.ruido(6, 2, semilla=244) * 8) * 0.06
+    lz.pintar(tinta, rampa(AGUA_TINTA, np.clip(vt, 0, 1)))
+    lz.pintar(np.clip(tinta - desplazar(lz, tinta, 0, 4), 0, 1), "#05040c", 0.75)       # la sombra del borde del norte
+    lz.pintar(np.clip(tinta - desplazar(lz, tinta, 0, -1.5), 0, 1), "#9a8cc4", 0.6)     # el filo de luz del sur
+    lz.pintar(tinta * (lz.ruido(0.5, 1, semilla=245) > 0.95), "#c8b8f0", 0.6)           # estrellas reflejadas
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "sigilia", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.012)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
+def ruido_torcido_local(lz, escala, semilla):
+    from pintor import ruido_torcido
+    return ruido_torcido(lz, escala, 4, semilla)
+
+
 def pintar(nombre, salida=None):
     if nombre in ("gruta_raices", "cueva_setas"):
         return pintar_gruta(nombre, salida, setas=nombre == "cueva_setas")
+    if nombre in OBSERVATORIOS:
+        return pintar_observatorio(nombre, salida)
     if nombre in BIBLIOTECAS:
         return pintar_biblioteca(nombre, salida)
     filas = leer(nombre)

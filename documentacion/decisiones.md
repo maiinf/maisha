@@ -459,3 +459,15 @@ se pasan.
 | Trazado y mecánica (`documentacion/boceto_fundicion_escoria.png`) | **Pulso Magnético + Puentes-grúa y Bloques-imán sobre la escoria fundida**: un pulso con el Cetro del Nexo atrae o repele bloques de hierro meteórico, puentes-grúa colgados de cadenas y compuertas de crisol para cruzar los ríos de escoria incandescente. |
 | Viajero y enemigo nuevo | **Moto, el maestro gruista** (espera en gris junto a la primera grúa; su Esquirla está en el Crisol Norte y al recuperarla enseña el **Pulso Magnético**). Enemigo nuevo: **Kovu de Escoria (Salamandra de Hierro Fundido)** (nada por la escoria con cresta de hierro meteórico y, si lo atraes a piedra fría con el Pulso Magnético, su coraza se enfría y se agrieta). |
 | Jefe: **Nyundo, el Gran Martillo** (`documentacion/boceto_nyundo.png`) | **Opción B · El Herrero de 4 Tenazas** (elegido por Iam): autómata de forja colosal con cuatro brazos articulados en forma de tenaza al rojo vivo que agarra bloques de hierro del río de escoria en la Cámara del Ancla Este; hay que repeler sus propias tenazas con el **Pulso Magnético** cuando ataca para abrir su peto de bronce y golpear su núcleo. Al vencerlo suelta la segunda Cadena del Cráter y la 3.ª Esquirla de la fundición. |
+
+### 2026-11-12 · El Observatorio de la Aurora, construido (Iam: «hazlo todo de una»)
+Lo que se decidió con Iam el 2026-11-07 (bobinas y puentes, Nyota, Saa, Kengele opción A) está hecho. Estos detalles los ha puesto Claude al construirlo; si alguno no gusta, se cambia:
+
+| Qué | Cómo ha quedado |
+| --- | --- |
+| Las otras dos fichas | **Darubini**, tallista de lentes (en la Galería del Solsticio), y **Mlinzi**, el campanero (la suelta Kengele: la llevaba colgada del badajo). En Maandiko ocupan dos sitios de escribas en blanco |
+| La ficha de Nyota | En un rincón al sur de su terraza, tras un tapón de Tinta Quieta y con un Saa de ronda que todavía no se puede parar (hay que esquivarlo) |
+| Los puentes | El primero pide una bobina; los dos del Claustro, dos bobinas en 7 s; el de la Gran Cúpula, las dos **bobinas mayores**: la del oeste en la isleta de un estanque (Hielo + Rayo) y la del este tras Tinta Quieta (Fuego + Rayo) |
+| Las ondas de silencio de Kengele | Además de quitar 1 hoja, dejan a Maisha **3 s sin poder trazar sigilos** |
+| R | Ahora pasa por los tres sigilos aprendidos: Fuego → Hielo → Rayo |
+| Arreglo | El Sigilo de Fuego quemaba a Maisha al trazarlo; ya no |

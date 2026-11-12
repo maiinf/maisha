@@ -956,7 +956,7 @@ Escena `escenas/mundo/maandiko.tscn` (`scripts/mundo/maandiko.gd`), detrás de l
 | La tienda de Wino | Abre al deshelar la primera calle (`calle_deshelada`). Es la misma tienda que la de Tawi (`tienda_tawi.gd`, con `tendero = "wino"`; los artículos llevan `"tienda": "wino"`), con su puesto por dentro y Wino grande con 4 gestos (`herramientas/pintar_tienda_wino.py`: `tienda_wino_fondo.png` y `tienda_wino.png`; captura en `documentacion/tienda_wino.png`). Vende la **Pluma de garza nival** (el sigilo gasta 12 de Aliento en vez de 20), la **Tinta viva** (la runa arde a 30 px en vez de 20) y las **Raquetas de nieve** (en la nieve honda se anda al 80 % en vez del 55 %) |
 | Los faroles de Taa | Los faroles de las calles son faroles rúnicos apagados (`ƒ`, 10). Con todos encendidos (`faroles_maandiko`), Taa lo agradece y se ganan **3 Cristales del Nexo** |
 
-Falta: los caminos (Estanterías, Canal, Observatorio) con las fichas del Índice y la Sección Prohibida.
+Falta: la Sección Prohibida (el cierre de Sigilia) y el Arte de la Runa. Los tres caminos (Estanterías, Canal y Observatorio) están hechos.
 
 ## Las Estanterías Colgantes (la biblioteca, las escaleras rodantes y el Bibliotecario Hueco)
 
@@ -992,6 +992,27 @@ Escena `escenas/mundo/canal_tinta.tscn` (`scripts/mundo/canal_tinta.gd`), por la
 | Cambiar de sigilo | **R** (acción `cambiar_sigilo`) pasa al siguiente sigilo aprendido y lo dice arriba; **U** traza el elegido (`Estado.extra["sigilo"]`, se guarda). Con más de uno aprendido, una runa pequeña bajo el panel de las hojas dice cuál está puesto |
 | Las placas de tinta helada | `scripts/mundo/sigilia/placa_hielo.gd` (48×36 px, dibujada en código): la corriente la lleva al este a 18 px/s; se para contra un muelle, una compuerta cerrada (`ŧ`, abierta con la marca `compuerta/<x>`) u otra placa. Se sube andando hacia ella; encima, Maisha se mueve por la placa y la placa la lleva; baja andando a tierra o salta a otra placa pegada. Dura 24 s (los 4 últimos se agrieta y parpadea); si se deshace con Maisha encima, se hunde, pierde una hoja y vuelve a la orilla |
 | Prueba | `pruebas/prueba_canal_tinta.gd` |
+
+## El Observatorio de la Aurora (las terrazas, Nyota, el Sigilo de Rayo, las bobinas, Saa y Kengele)
+
+Escena `escenas/mundo/observatorio_aurora.tscn` (`scripts/mundo/observatorio_aurora.gd`), por la salida del noroeste de Maandiko (tras su charco de Tinta Quieta). Mapa de 72×80 (`crear_observatorio`), según `documentacion/boceto_observatorio_aurora.png`; capturas en `documentacion/observatorio_captura_1.png` (y `_2`, `_3`).
+
+| Qué | Cómo |
+| --- | --- |
+| Las terrazas | `%`: losas de piedra lila colgadas en la noche. Lo demás (`0`) es **cielo** y no se pisa. De sur a norte: la **Cúpula de Nyota**, el **Claustro de los Telescopios** (con la **Galería del Solsticio** al oeste y la de **las Campanas** al este) y la **Gran Cúpula**. El suelo lo pinta `pintar_observatorio` de `herramientas/pintar_suelo.py`: cielo con estrellas y aurora, losas con cerco de cobre y astrolabios grabados en oro, y la cara de sillares por el sur |
+| Nyota | La astrónoma armiño (`sigilia/escriba.gd` con `dibujo = "nyota"`; dibujos `nyota` y `nyota_blanco` en `dibujar_aldeanos.py`: gorro de punta con estrellas, capa azul, catalejo), en blanco junto a su cúpula. Su **ficha** está en el rincón del sur, tras un tapón de Tinta Quieta (fuego) y con un Saa de ronda al que aún no se puede parar. Con su nombre enseña el **Sigilo de Rayo** |
+| El Sigilo de Rayo | `scripts/combate/sigilo_rayo.gd` (marca `sigilo_rayo`): una runa en zigzag que **carga** lo que está en el grupo `cargables` (bobinas, diapasones, Saa) y da 1 de daño (`rayo`) a los enemigos. Es el tercero de **R**; el HUD lo dibuja en amarillo |
+| Las bobinas astrales | `scripts/mundo/sigilia/bobina.gd` (`bobina.png`): el rayo las enciende **7 s** (los 2 últimos parpadean) y se apagan solas. Las **mayores** (con `marca`) se quedan encendidas. Con otro `dibujo` (`diapason.png`) son los diapasones de Kengele |
+| Los Puentes de Constelación | `scripts/mundo/sigilia/puente_constelacion.gd` (dibujado en código, sobre las casillas `=`): un muro invisible hasta que **todas sus bobinas** están encendidas a la vez; entonces se tiende para siempre (marca `observatorio/puente_<nombre>`). El del sur pide **una**; los del Claustro (oeste y este), **dos antes de que se apaguen**; el del norte, las **dos bobinas mayores** |
+| La Galería del Solsticio | La bobina mayor del oeste está en la isleta de un **estanque de tinta**: se cruza con una placa del **Sigilo de Hielo** (aquí `corriente_en` devuelve cero: la placa no deriva). Al fondo, la **ficha de Darubini** |
+| La Galería de las Campanas | La bobina mayor del este está en un rincón al norte, tapado por **Tinta Quieta** (fuego) |
+| Saa, el autómata de relojería | `scripts/enemigos/saa.gd` (`saa.png`, 5 fotogramas): cuatro, de **ronda** por las terrazas (`SAAS` de la escena). Si ve a Maisha a menos de 76 px la **persigue** despacio (sin salir de la terraza ni alejarse más de 130 px de su puesto) y le da un **mazazo** (1 hoja). El cetro y las semillas **rebotan** en el latón. El **Sigilo de Rayo** lo deja **sobrecargado** 4,5 s: ahí entran el cetro (1) y las semillas (2); 3 de vida. En el Bestiario |
+| Kengele, la jefa | `scripts/enemigos/kengele.gd` (`kengele.png`, 5 fotogramas de 96×96). Opción A elegida por Iam: la Gran Campana Muda, con el badajo de tinta helada. Despierta al entrar en la Gran Cúpula (conversación `kengele_encuentro`; música `jefe_kengele`; barra de jefe). Flota hacia Maisha y el cetro rebota. **Tañido mudo**: se inclina (0,7 s) y suelta una **onda de silencio** en abanico (120°): 1 hoja y 3 s **sin poder trazar sigilos**. Cada tercer ataque **embiste** en línea recta (aviso de 0,95 s; 1 hoja). Si embistiendo pasa a menos de 46 px de un **diapasón cargado** (6 s tras el rayo), **resuena de verdad** y cae **aturdida** (5 s o 3 golpes): cetro 1, semillas 2. 10 de vida. Con la mitad (**furia**): dos ondas seguidas y embiste antes y más deprisa. Vencida (`kengele_vencida`, en el Bestiario) suelta la **ficha de Mlinzi** |
+| Las fichas en Maandiko | **Darubini** (tallista de lentes, en (14,36)) y **Mlinzi** (campanero, en (58,35)) ocupan el sitio de dos escribas en blanco; con su ficha recuperan el nombre y hablan |
+| Los dibujos | `herramientas/pintar_observatorio.py` → `arte/mundos/sigilia/observatorio/`: `bobina`, `diapason`, `saa`, `kengele`, `cupula_nyota` (la casa-cúpula con su telescopio), `telescopio` y `campanas` |
+| Arreglo de paso | El Sigilo de Fuego **quemaba a Maisha** al trazarlo (ella también está en `daniables`): ya no; ni el fuego ni el rayo propios le hacen nada |
+| Sonidos | De momento, prestados (`chispa`, `geoda_encender`, `diapason_ambar`, `clinc`, `kifaru_embiste`...): pedidos a Gemini los propios |
+| Prueba | `pruebas/prueba_observatorio_aurora.gd` |
 
 ## Las construcciones, al nivel de la casa del castor
 

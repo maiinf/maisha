@@ -756,6 +756,57 @@ def mfereji_blanco():
     return mfereji(True)
 
 
+def nyota(blanco=False):
+    """NYOTA: la astrónoma armiño del Observatorio de la Aurora. Menuda, con un gorro de astrónoma alto y puntiagudo,
+    azul noche con estrellas de latón y la punta doblada; una capa azul hasta los pies abrochada con un broche de
+    estrella, las gafas redondas de latón subidas a la frente y, bajo el brazo, un catalejo de latón plegado.
+    Bajo la capa asoma la bufanda morada de los escribas (todos lo son).
+    EN BLANCO (blanco=True): pálida y sin color, los ojos vacíos, las estrellas del gorro apagadas."""
+    l = Lienzo()
+    _armino_base(l)
+    l.ovalo(11.5, 23.5, 5.2, 6.8, "azul")                     # la capa azul, hasta los pies
+    for y in range(18, 30):                                   # la abertura de la capa, por delante
+        l.px(11, y, "azul", 0); l.px(12, y, "armino", 2 if y < 27 else 1)
+    l.rect(7, 29, 16, 29, "azul", 1)                          # el bajo de la capa
+    l.px(8, 27, "laton", 2); l.px(15, 25, "laton", 2); l.px(9, 22, "laton", 3)     # estrellitas bordadas
+    l.rect(8, 16, 15, 17, "morado", 2)                        # la bufanda de escriba...
+    l.rect(8, 16, 15, 16, "morado", 3)
+    l.px(11, 18, "laton", 3); l.px(12, 18, "laton", 2); l.px(11, 19, "laton", 1)   # ...y el broche de estrella
+    for x in range(15, 22):                                   # el catalejo plegado, bajo el brazo
+        l.px(x, 22, "laton", 2 if x % 3 else 1)
+        l.px(x, 21, "laton", 3)
+    l.px(21, 21, "azul", 3); l.px(21, 22, "azul", 2)          # la lente
+    l.ovalo(16.5, 20.5, 1.5, 1.8, "armino")                   # la mano que lo sujeta
+    ojos(l, 10, 9, 14, alto=2)
+    for x in (8, 9, 10, 13, 14, 15):                          # las gafas, subidas a la frente
+        l.px(x, 8, "laton", 2)
+    l.px(9, 8, "lente", 3); l.px(14, 8, "lente", 3); l.px(11, 8, "laton", 1); l.px(12, 8, "laton", 1)
+    for y in range(0, 8):                                     # el gorro puntiagudo: ancho abajo, la punta doblada
+        medio = max(0.6, (y - 0.5) * 0.72)
+        for x in range(int(round(11.5 - medio)), int(round(11.5 + medio)) + 1):
+            l.px(x + (2 if y < 2 else (1 if y < 4 else 0)), y, "azul", 3 if x < 11 else (2 if x < 13 else 1))
+    l.rect(6, 7, 17, 7, "azul", 1)                            # el ala del gorro
+    l.px(10, 5, "laton", 3); l.px(13, 3, "laton", 2); l.px(12, 6, "laton", 2); l.px(14, 1, "laton", 3)
+    if blanco:
+        for y in range(ALTO):
+            for x in range(ANCHO):
+                c = l.m[y][x]
+                if c is None:
+                    continue
+                mat, t = c
+                if mat == "ojo":
+                    l.m[y][x] = ("en_blanco", 0)
+                elif mat == "brillo":
+                    l.m[y][x] = ("en_blanco", 1)
+                else:
+                    l.m[y][x] = ("en_blanco", max(1, min(3, t + (1 if mat in ("tinta", "morado", "laton", "azul", "lente") else 0))))
+    return l
+
+
+def nyota_blanco():
+    return nyota(True)
+
+
 def _armino_base(l, cola_x=3):
     """El cuerpo de un armiño de Sigilia (sin ropa): esbelto, de cuello largo, cola con la punta negra."""
     for (x, y) in ((cola_x, 29), (cola_x - 1, 28), (cola_x - 1, 27), (cola_x, 26), (cola_x + 1, 25), (cola_x + 2, 25)):
@@ -910,7 +961,7 @@ def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
 
 
 ## Desde qué columna (y fila) se levanta lo de la mano derecha en el gesto por defecto (para no mover picos ni orejas)
-ALZA = {"bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
+ALZA = {"bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "nyota": (15, 18), "nyota_blanco": (15, 18), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
         "kasia": (17, 0), "sungura": (19, 0)}
 
 
@@ -977,7 +1028,7 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+ALDEANOS = {"kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "nyota": nyota, "nyota_blanco": nyota_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

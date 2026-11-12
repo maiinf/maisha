@@ -712,5 +712,290 @@
 				]
 			}
 		]
+	},
+	"observatorio_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Aquí arriba no hay suelo entre una terraza y otra. Solo cielo. Mejor no mirar mucho hacia abajo.",
+					"Esas luces verdes y moradas... Parece que alguien hubiera volcado tinta de colores en la noche.",
+					"Y qué silencio. Un observatorio con tantas campanas, y no suena ni una."
+				]
+			}
+		]
+	},
+	"observatorio_estela": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una estela con letras de escriba y un dibujo de estrellas unidas con rayas:",
+					"«Lo que duerme en el cobre no despierta con calor ni con frío. Despierta con un susto».",
+					"Debajo, una runa en zigzag, como un rayo entre dos rayas."
+				]
+			}
+		]
+	},
+	"observatorio_bobina": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"no": [
+					"sigilo_rayo"
+				],
+				"lineas": [
+					"Un carrete de hilo de cobre, vuelta sobre vuelta, con una bola de latón encima.",
+					"Si acerco la mano se me eriza el pelo. Está dormido, pero no del todo.",
+					"Ni el fuego ni el hielo le hacen nada. Le hace falta otra cosa."
+				]
+			},
+			{
+				"si": [
+					"sigilo_rayo"
+				],
+				"lineas": [
+					"Una bobina astral. Con el rayo se enciende... y al rato se apaga sola.",
+					"Si un puente pide dos, tengo que darme prisa de una a otra."
+				]
+			}
+		]
+	},
+	"observatorio_diapason": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"no": [
+					"kengele_vista"
+				],
+				"lineas": [
+					"Una horquilla de cobre más alta que yo. Si le doy un toque con el dedo, casi no suena.",
+					"Hay cuatro, alrededor de toda la cúpula. Como si esperaran a que alguien cantara en medio."
+				]
+			},
+			{
+				"si": [
+					"kengele_vista"
+				],
+				"lineas": [
+					"Cargado con el rayo, zumba unos segundos. La campana no lo soporta cerca.",
+					"Si pasa embistiendo junto a uno que esté zumbando..."
+				]
+			}
+		]
+	},
+	"kengele_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"En medio de la cúpula cuelga del aire una campana enorme, de bronce, con las estrellas grabadas.",
+					"Tiene el badajo negro y duro. De tinta helada. Por eso aquí no suena nada.",
+					"Se ha movido. Y no he oído nada... pero lo he notado en el pecho, como un golpe sin ruido."
+				]
+			}
+		]
+	},
+	"nyota": {
+		"nombre": "Nyota",
+		"conversaciones": [
+			{
+				"no": [
+					"nyota_nombre"
+				],
+				"tiene": {
+					"ficha_nyota": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"«Nyota, astrónoma del Observatorio de la Aurora. Cuenta las estrellas y les pone nombre». Con estos numeritos al margen... tienes que ser tú.",
+					"Toma. Es tuya. Te llamas Nyota."
+				],
+				"entrega": {
+					"ficha_nyota": 1
+				},
+				"marca": [
+					"nyota_nombre"
+				]
+			},
+			{
+				"no": [
+					"nyota_nombre"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Una armiño en blanco, pequeñita, con un gorro de punta que le queda grande.",
+					"Tiene un catalejo bajo el brazo y mira hacia arriba. Pero no al cielo: a un punto donde no hay nada.",
+					"En la puerta de la cúpula hay una estrella de latón. Vive aquí. Su ficha no puede haber ido muy lejos."
+				]
+			},
+			{
+				"si": [
+					"nyota_nombre"
+				],
+				"no": [
+					"nyota_hablado"
+				],
+				"lineas": [
+					"Nyota... ¡Nyota! Ay, madre. ¿Qué hora es? No, espera, no me lo digas. ¿Qué AÑO es?",
+					"Estaba contando. Iba por la cuatro mil doscientas y pico, y de pronto no sabía ni qué estaba contando. Ni quién contaba.",
+					"¿Has oído la campana al subir? ¿No? Claro que no. Kengele lleva muda desde que se le heló el badajo.",
+					"Daba las horas a toda Maandiko. Ahora da... otra cosa. Te lo noto en la cara, ya la has sentido. Ese golpe sin ruido que te deja las runas tontas.",
+					"Mira, tú traes fuego y traes frío. Te falta el susto. Así: un zigzag, de arriba abajo, sin pensarlo mucho. Si lo piensas, no sale.",
+					"¡Eso es! Con eso despiertas las bobinas, y las bobinas encienden los puentes. Algunos piden dos a la vez, y se apagan enseguida: corre.",
+					"Y a los Saa, los de la cuerda, les sienta fatal. Se quedan un rato viendo estrellas. Aprovecha, que luego se les pasa."
+				],
+				"marca": [
+					"nyota_hablado",
+					"sigilo_rayo"
+				]
+			},
+			{
+				"si": [
+					"nyota_hablado"
+				],
+				"no": [
+					"kengele_vencida"
+				],
+				"lineas": [
+					"Las dos bobinas mayores están en las galerías, una a cada lado del Claustro. Sin ellas no hay puente a la Gran Cúpula.",
+					"La del Solsticio está en mitad del estanque. La de las Campanas, tapada de tinta. Fuego, frío y susto: te va a hacer falta todo.",
+					"Y arriba, con Kengele... no le pegues a lo loco, que es bronce. Los diapasones. Para eso están."
+				]
+			},
+			{
+				"si": [
+					"nyota_hablado",
+					"kengele_vencida"
+				],
+				"lineas": [
+					"¿La has oído? Ha dado una. Una sola, y un poco ronca, pero ha sonado.",
+					"Mañana le quito el hielo que le queda al badajo. Hoy me conformo con saber qué hora es."
+				]
+			}
+		]
+	},
+	"darubini": {
+		"nombre": "Darubini",
+		"conversaciones": [
+			{
+				"no": [
+					"darubini_nombre"
+				],
+				"tiene": {
+					"ficha_darubini": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"«Darubini, tallista de lentes. Pule el cristal de los telescopios». Y tú no paras de frotar el aire con ese trapo...",
+					"Toma. Te llamas Darubini."
+				],
+				"entrega": {
+					"ficha_darubini": 1
+				},
+				"marca": [
+					"darubini_nombre"
+				]
+			},
+			{
+				"no": [
+					"darubini_nombre"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un escriba en blanco que frota algo con un trapo, muy despacio, en círculos. No tiene nada en la mano.",
+					"Lleva una lupa colgada del cuello. Se ha puesto de cara al noroeste, hacia las luces del Observatorio."
+				]
+			},
+			{
+				"si": [
+					"darubini_nombre"
+				],
+				"no": [
+					"darubini_hablado"
+				],
+				"lineas": [
+					"Darubini. Sí. Darubini, que no se me olvide otra vez. ¿Me lo apuntas en la mano?",
+					"Yo hago las lentes de allá arriba. Meses, cada una. Las pules y las pules hasta que dejas de ver el cristal y solo ves lo que hay detrás.",
+					"¿En la Galería del Solsticio, dices? Allí subí la última, la grande. Me acuerdo del frío y de un autómata que no me dejaba pasar.",
+					"Qué raro es que te devuelvan el nombre. Es como limpiar unas gafas que no sabías que estaban sucias."
+				],
+				"marca": [
+					"darubini_hablado"
+				]
+			},
+			{
+				"si": [
+					"darubini_hablado"
+				],
+				"lineas": [
+					"Si subes al Observatorio y ves un telescopio con la lente empañada, échale el aliento y frota en círculos. De nada."
+				]
+			}
+		]
+	},
+	"mlinzi": {
+		"nombre": "Mlinzi",
+		"conversaciones": [
+			{
+				"no": [
+					"mlinzi_nombre"
+				],
+				"tiene": {
+					"ficha_mlinzi": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"«Mlinzi, campanero del Observatorio. Da las horas a toda Maandiko». Estaba colgada del badajo de Kengele. Como si la campana te la guardara.",
+					"Toma. Te llamas Mlinzi."
+				],
+				"entrega": {
+					"ficha_mlinzi": 1
+				},
+				"marca": [
+					"mlinzi_nombre"
+				]
+			},
+			{
+				"no": [
+					"mlinzi_nombre"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un escriba en blanco, alto, con las dos manos levantadas como si tirara de una cuerda que no está.",
+					"Tira, espera, vuelve a tirar. Cuenta algo moviendo los labios. No se oye nada."
+				]
+			},
+			{
+				"si": [
+					"mlinzi_nombre"
+				],
+				"no": [
+					"mlinzi_hablado"
+				],
+				"lineas": [
+					"...Mlinzi. Mlinzi, el de la campana. Y son... ¿qué hora son? Llevo sin darlas no sé cuánto. Qué vergüenza.",
+					"Kengele no es mala, ¿eh? Es una campana. Quiere sonar. Imagínate que abres la boca para cantar y no te sale nada, un día y otro.",
+					"Cuando se le heló el badajo me subí a calentárselo con las manos. Es lo último que recuerdo. Eso, y que no oía ni mis pasos.",
+					"¿Ha sonado? ¿De verdad? Entonces subo esta misma noche. Una campana que ha estado muda necesita que alguien le diga que lo ha hecho bien."
+				],
+				"marca": [
+					"mlinzi_hablado"
+				]
+			},
+			{
+				"si": [
+					"mlinzi_hablado"
+				],
+				"lineas": [
+					"Escucha. ¿Lo oyes? Yo tampoco, todavía. Pero ya no es el mismo silencio de antes."
+				]
+			}
+		]
 	}
 }

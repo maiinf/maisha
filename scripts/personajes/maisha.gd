@@ -20,7 +20,8 @@ const ESCENA_GOLPE := preload("res://scripts/combate/golpe_efecto.gd")
 const ESCENA_LATIDO := preload("res://scripts/combate/latido_efecto.gd")
 const SIGILO_FUEGO := preload("res://scripts/combate/sigilo_fuego.gd")
 const SIGILO_HIELO := preload("res://scripts/combate/sigilo_hielo.gd")
-const SIGILOS := {"fuego": "Sigilo de Fuego", "hielo": "Sigilo de Hielo"}   # (en el orden en que se cambian con R)
+const SIGILO_RAYO := preload("res://scripts/combate/sigilo_rayo.gd")
+const SIGILOS := {"fuego": "Sigilo de Fuego", "hielo": "Sigilo de Hielo", "rayo": "Sigilo de Rayo"}   # (en el orden en que se cambian con R)
 const SIGILO_COSTE := 20.0      # Aliento que gasta trazar un sigilo
 const SIGILO_ESPERA := 0.7      # segundos entre sigilo y sigilo
 const RELIEVE := preload("res://scripts/mundo/relieve.gd")
@@ -252,7 +253,7 @@ func latido() -> bool:
 	return true
 
 
-## El sigilo elegido (se cambia con R): «fuego» o «hielo». Solo los aprendidos (marca «sigilo_<nombre>»).
+## El sigilo elegido (se cambia con R): «fuego», «hielo» o «rayo». Solo los aprendidos (marca «sigilo_<nombre>»).
 func sigilo_elegido() -> String:
 	var elegido := String(Estado.extra.get("sigilo", "fuego"))
 	return elegido if Estado.tiene("sigilo_" + elegido) else "fuego"
@@ -276,7 +277,8 @@ func cambiar_sigilo() -> bool:
 
 
 ## El sigilo (arte Runa, Sigilia): traza delante la runa elegida. La de fuego enciende, derrite y quema (se la
-## enseña Taa en el Paso de la Escarcha); la de hielo congela y endurece la tinta (Mfereji, en el Canal de Tinta).
+## enseña Taa en el Paso de la Escarcha); la de hielo congela y endurece la tinta (Mfereji, en el Canal de Tinta);
+## la de rayo carga bobinas, diapasones y autómatas (Nyota, en el Observatorio de la Aurora).
 func sigilo() -> bool:
 	var coste := SIGILO_COSTE * (0.6 if Estado.tiene("pluma_ligera") else 1.0)     # (la pluma de Wino: gasta menos)
 	var elegido := sigilo_elegido()
@@ -284,7 +286,7 @@ func sigilo() -> bool:
 		return false
 	aliento -= coste
 	_espera_sigilo = SIGILO_ESPERA
-	var efecto: Node2D = (SIGILO_HIELO if elegido == "hielo" else SIGILO_FUEGO).new()
+	var efecto: Node2D = ({"hielo": SIGILO_HIELO, "rayo": SIGILO_RAYO}.get(elegido, SIGILO_FUEGO) as GDScript).new()
 	efecto.position = global_position + direccion_mirada() * 18.0 + Vector2(0, -6)
 	get_parent().add_child(efecto)
 	if aliento < 1.0:

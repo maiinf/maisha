@@ -2305,6 +2305,50 @@ def crear_canal():
     return ["".join(f) for f in m], {}
 
 
+def crear_observatorio():
+    """EL OBSERVATORIO DE LA AURORA (Sigilia, 72x80, de sur a norte): terrazas de piedra colgadas en la noche («%»),
+    sin nada debajo («0»: el cielo, no se pisa). Se entra por el sur (de Maandiko, «_»).
+      1. LA CÚPULA DE NYOTA (abajo): su casa-cúpula, Nyota en blanco, la ESTELA del Sigilo de Rayo («ȩ») y, al
+         sur, un rincón tapado por Tinta Quieta con su ficha.
+      2. EL CLAUSTRO DE LOS TELESCOPIOS (en medio), con las GALERÍAS a los lados: la del SOLSTICIO (oeste, con un
+         estanque de tinta «~» y una isleta) y la de las CAMPANAS (este, con un rincón al norte tapado por Tinta Quieta).
+      3. LA GRAN CÚPULA (arriba, redonda): Kengele.
+    Entre las terrazas, los PUENTES DE CONSTELACIÓN («=»): no están hasta que se encienden sus bobinas.
+    Las bobinas, los puentes, Nyota, Saa, las fichas y Kengele los pone la escena."""
+    ANCHO, ALTO = 72, 80
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y][x] = c
+
+    rect(20, 60, 52, 73, "%")                                # 1. la Cúpula de Nyota
+    rect(34, 74, 37, 78, "%")                                # la escalera del sur
+    rect(34, 79, 37, 79, "_")
+    rect(42, 76, 50, 78, "%")                                # el rincón de la ficha (al sur)...
+    rect(45, 74, 47, 75, "%")                                # ...y su paso (lo tapa la Tinta Quieta)
+    m[62][41] = "ȩ"
+    rect(35, 55, 37, 59, "=")                                # puente 1: de la Cúpula de Nyota al Claustro
+    rect(26, 38, 46, 54, "%")                                # 2. el Claustro de los Telescopios
+    rect(20, 45, 25, 47, "=")                                # puente del oeste
+    rect(47, 45, 52, 47, "=")                                # puente del este
+    rect(2, 38, 19, 54, "%")                                 # la Galería del Solsticio...
+    rect(7, 42, 15, 50, "~")                                 # ...con su estanque de tinta...
+    rect(10, 45, 12, 47, "%")                                # ...y la isleta de la bobina mayor
+    rect(53, 38, 69, 54, "%")                                # la Galería de las Campanas...
+    rect(61, 31, 65, 35, "%")                                # ...con el rincón de su bobina mayor...
+    rect(62, 36, 64, 37, "%")                                # ...y su paso (lo tapa la Tinta Quieta)
+    rect(35, 32, 37, 37, "=")                                # el puente del norte, a la Gran Cúpula
+    CX, CY = 36, 19                                          # 3. la Gran Cúpula
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            if ((x + 0.5 - CX - 0.5) / 15.5) ** 2 + ((y + 0.5 - CY - 0.5) / 11.5) ** 2 <= 1.0:
+                m[y][x] = "%"
+    rect(35, 30, 37, 31, "%")
+    return ["".join(f) for f in m], {}
+
+
 def crear_cueva():
     """La cueva de las setas (56x64, de norte a sur), bajo la casa de Nungu: se baja por la escalera del armario.
     A oscuras: alumbran las SETAS que brillan («ů»). Salas: la de la escalera (arriba), un pasillo con NUBES DE ESPORAS
@@ -3047,7 +3091,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora"}
 
 
 def construir_suelo(nombre):
@@ -3198,7 +3242,7 @@ if __name__ == "__main__":
                         "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta,
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
-                        "canal_tinta": crear_canal}.get(nombre, crear_prados)()
+                        "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

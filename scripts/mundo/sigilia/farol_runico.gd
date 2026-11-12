@@ -112,7 +112,7 @@ func _dibujar_llama() -> void:
 		_llama.draw_rect(Rect2((c["p"] as Vector2 - _llama.position).floor(), Vector2.ONE), Color(1.0, 0.75, 0.35, vida))
 
 
-func _textura_luz() -> GradientTexture2D:
+static func _textura_luz() -> GradientTexture2D:
 	var g := Gradient.new()
 	g.offsets = PackedFloat32Array([0.0, 0.35, 0.7, 1.0])
 	g.colors = PackedColorArray([Color(1, 1, 1, 1), Color(1, 1, 1, 0.55), Color(1, 1, 1, 0.15), Color(1, 1, 1, 0)])
