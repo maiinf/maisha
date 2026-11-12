@@ -461,6 +461,13 @@ se pasan.
 | Jefe: **Nyundo, el Gran Martillo** (`documentacion/boceto_nyundo.png`) | **Opción B · El Herrero de 4 Tenazas** (elegido por Iam): autómata de forja colosal con cuatro brazos articulados en forma de tenaza al rojo vivo que agarra bloques de hierro del río de escoria en la Cámara del Ancla Este; hay que repeler sus propias tenazas con el **Pulso Magnético** cuando ataca para abrir su peto de bronce y golpear su núcleo. Al vencerlo suelta la segunda Cadena del Cráter y la 3.ª Esquirla de la fundición. |
 | Música y sonido (compuestos por Gemini) | `audio/musica/fundicion_escoria.ogg` («El hierro que no duerme», 61,3 s) y `audio/musica/jefe_nyundo.ogg` («Las cuatro tenazas del crisol», 40,6 s). Sonidos nuevos en `audio/sonidos/`: `pulso_magnetico.ogg`, `bloque_atraer.ogg`, `kovu_sumerge.ogg`, `kovu_enfria.ogg` y `nyundo_tenaza.ogg`. Construcción asignada a Claude en `documentacion/coordinacion.md`. |
 
+### 2026-11-12 · La Aguja Caída y su jefe Kipanga Astral (Decidido con Iam)
+| Qué | Decisión |
+| --- | --- |
+| Trazado y mecánica (`documentacion/boceto_aguja_caida.png`) | **Resonancia de Ámbar + Monolitos-diapasón y Puentes de Cristal**: hacer vibrar los monolitos con el Cetro del Nexo emite ondas sónicas continuas que activan puentes de cristal flotante y alinean peñascos en el abismo de viento astral hacia la cumbre. |
+| Viajera y enemigo nuevo | **Pigo, la afinadora de campanas** (espera en gris en la base de la aguja; su Esquirla está en la Cresta de los Diapasones y al recuperarla enseña la **Resonancia de Ámbar**). Enemigo nuevo: **Popo de Obsidiana (Murciélago Resonante)** (aturde con chillidos ultrasónicos si no desvías su eco haciendo resonar el diapasón cercano). |
+| Jefe: **Kipanga Astral** (`documentacion/boceto_kipanga.png`) | **Opción A · El Halcón de Obsidiana y Cristal** (elegido por Iam): rapaz titánica con armadura de lajas de obsidiana, corazón de cristal resonante y garras de hierro meteórico en el Nido de la Cima; planea lanzando plumas-cuchilla que emiten zumbidos y, al hacer vibrar los monolitos con la Resonancia de Ámbar, la onda de choque rompe su vuelo y cae aturdido. Al vencerlo suelta la tercera y última Cadena del Cráter y la 3.ª Esquirla de la cumbre, desbloqueando el Núcleo de la Estrella. |
+
 ### 2026-11-12 · El Observatorio de la Aurora, construido (Iam: «hazlo todo de una»)
 Lo que se decidió con Iam el 2026-11-07 (bobinas y puentes, Nyota, Saa, Kengele opción A) está hecho. Estos detalles los ha puesto Claude al construirlo; si alguno no gusta, se cambia:
 
