@@ -16,7 +16,14 @@ const VECINO := preload("res://scripts/mundo/sigilia/vecino.gd")
 const CHARCO := preload("res://scripts/mundo/sigilia/charco_tinta.gd")
 const ESCRIBA := preload("res://scripts/mundo/sigilia/escriba.gd")
 ## los escribas con nombre (los que se pueden curar con su ficha del Índice)
-const ESCRIBAS := ["daftari", "karatasi", "chapa", "darubini", "mlinzi"]
+const ESCRIBAS := ["daftari", "karatasi", "chapa", "darubini", "mlinzi", "kurasa", "muhuri", "wimbo"]
+const INDICE := preload("res://scripts/mundo/sigilia/indice.gd")
+const PUERTA := preload("res://scripts/mundo/puerta.gd")
+const RECOGIBLE := preload("res://scripts/mundo/objetos/recogible.gd")
+## las tres fichas del Índice que el viento dejó dentro de la ciudad, en sus rincones: [objeto, casilla]
+const FICHAS := [["ficha_kurasa", Vector2i(4, 6)], ["ficha_muhuri", Vector2i(66, 50)], ["ficha_wimbo", Vector2i(5, 50)]]
+## la puerta del Gran Archivo (baja a la Sección Prohibida con los doce nombres)
+const ARCHIVO := Vector2i(36, 15)
 const FAROL := preload("res://scripts/mundo/sigilia/farol_runico.gd")
 ## vecino: [id del dibujo, conversación, casilla, marca que hace falta]
 const VECINOS := [
@@ -29,7 +36,9 @@ const VECINOS := [
 	["chapa", "", Vector2i(10, 22), ""],
 	["darubini", "", Vector2i(14, 36), ""],
 	["mlinzi", "", Vector2i(58, 35), ""],
-	["escriba_blanco", "", Vector2i(34, 44), ""],
+	["kurasa", "", Vector2i(34, 44), ""],
+	["muhuri", "", Vector2i(48, 40), ""],
+	["wimbo", "", Vector2i(24, 38), ""],
 ]
 ## los charcos de Tinta Quieta que tapan las salidas: casilla (el centro de la calle, junto a la muralla)
 const CHARCOS := [Vector2i(4, 25), Vector2i(67, 25), Vector2i(15, 3)]
@@ -42,6 +51,8 @@ func _ready() -> void:
 	_poner_vecinos()
 	_poner_charcos()
 	_poner_faroles()
+	_poner_fichas()
+	_poner_archivo()
 	if not Estado.tiene("maandiko_llegada"):
 		_pensar_al_llegar.call_deferred()
 
@@ -91,6 +102,44 @@ func _al_encender_farol() -> void:
 	if not Estado.tiene("faroles_maandiko"):
 		Estado.marcar("faroles_maandiko")
 		_hud.mostrar_mensaje("Todos los faroles de Maandiko están encendidos")
+
+
+func _poner_fichas() -> void:
+	for f in FICHAS:
+		var ficha: Node2D = RECOGIBLE.new()
+		ficha.objeto = f[0]
+		ficha.marca = "ficha/" + String(f[0]).trim_prefix("ficha_")
+		ficha.dibujo = "res://arte/mundos/sigilia/paso/ficha.png"
+		ficha.color_halo = Color(0.85, 0.7, 1.0)
+		ficha.position = Vector2(f[1]) * 16.0 + Vector2(8, 14)
+		$Entidades.add_child(ficha)
+
+
+## La puerta del Gran Archivo: cerrada hasta que el Índice tiene sus doce nombres («indice_completo»)
+func _poner_archivo() -> void:
+	if INDICE.completo():
+		Estado.marcar("indice_completo")
+	var puerta: Area2D = PUERTA.new()
+	puerta.id = "archivo"
+	puerta.destino = "seccion_prohibida"
+	puerta.destino_puerta = "archivo"
+	puerta.salida = Vector2.DOWN
+	puerta.tam = Vector2(32, 12)
+	puerta.cerrada_hasta = "indice_completo"
+	puerta.position = Vector2(ARCHIVO) * 16.0 + Vector2(0, 8)
+	add_child(puerta)
+	puerta.cerrada.connect(func() -> void:
+		_hud.mostrar_mensaje("Nombres del Índice: %d de %d" % [INDICE.cuantos(), INDICE.NOMBRES.size()])
+		CHARLA_SCRIPT.hablar(self, "archivo_cerrado"))
+
+
+## Cada nombre que vuelve: si ya están los doce, el Gran Archivo se abre
+func _al_poner_marca(marca: String) -> void:
+	super(marca)
+	if marca in INDICE.NOMBRES and INDICE.completo() and not Estado.tiene("indice_completo"):
+		Estado.marcar("indice_completo")
+		_hud.mostrar_mensaje("Los doce nombres han vuelto: el Gran Archivo se abre")
+		Sonido.efecto("arte_sube", 0.0, Vector2(ARCHIVO) * 16.0)
 
 
 func _pensar_al_llegar() -> void:

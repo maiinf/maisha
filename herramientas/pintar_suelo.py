@@ -327,7 +327,7 @@ PISADA_N = ["#4a5468", "#5e6a80", "#76829a", "#8e9ab0", "#a8b2c4", "#c0c9d8"]
 NIEVE_LILA = ["#4e4870", "#655e8a", "#7e76a2", "#9890ba", "#b0a9cd", "#c8c2de", "#dddaec", "#f0eef8"]
 PISADA_LILA = ["#4c4664", "#605a7a", "#787292", "#908aa8", "#a8a2bc", "#c0bbd0"]
 # los mapas de Sigilia guardan su suelo en arte/mundos/sigilia/suelos
-SIGILIA = {"paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora"}
+SIGILIA = {"paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida"}
 # la tinta del Canal: casi negra en lo hondo, morada en la orilla
 AGUA_TINTA = ["#0b0812", "#120d1c", "#1a1328", "#231a36", "#2e2246", "#3a2c58", "#4a3a6c", "#5c4c82", "#9a8cc4"]
 BIBLIOTECAS = {"estanterias_colgantes"}
@@ -710,6 +710,96 @@ def pintar_observatorio(nombre, salida=None):
     print("Suelo pintado:", destino, (lz.w, lz.h))
 
 
+def pintar_seccion(nombre, salida=None):
+    """El suelo de LA SECCIÓN PROHIBIDA (Sigilia): salas de MÁRMOL MORADO bajo el Gran Archivo: damero de losas
+    claras y oscuras con vetas, un filete de oro junto a las paredes y un gran sello de oro en el centro de cada sala.
+    Las paredes («0») son ESTANTERÍAS DE LIBROS ENCADENADOS vistas en 3/4: arriba el canto de madera negra; al sur, la
+    cara con libros oscuros cruzados por cadenas. La SIMA («=») es un pozo negro con baldas al fondo; la TINTA («~»),
+    negra con brillos morados."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=29)
+    tipos = [["pared" if c == "0" else ("sima" if c == "=" else ("tinta" if c == "~" else "suelo")) for c in f] for f in filas]
+    pared = mascara(lz, tipos, ("pared",), 1.2, 0.0, semilla=291)
+    sima = mascara(lz, tipos, ("sima",), 1.5, 0.08, semilla=292)
+    tinta = mascara(lz, tipos, ("tinta",), 2.0, 0.1, semilla=293)
+    fina = lz.ruido(0.8, 2, semilla=294)
+    media = lz.ruido(9, 3, semilla=295)
+    S = lz.s
+    # EL MÁRMOL: damero de losas de 16 px, vetas claras que cruzan varias losas
+    cx_, cy_ = np.floor(lz.x / 16), np.floor(lz.y / 16)
+    clara = ((cx_ + cy_) % 2) == 0
+    veta = np.abs(ruido_torcido_local(lz, 26, 296) - 0.5) < 0.018
+    veta2 = np.abs(ruido_torcido_local(lz, 11, 297) - 0.5) < 0.012
+    v = np.where(clara, 0.52, 0.36) + (media - 0.5) * 0.22 + (fina - 0.5) * 0.12
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#1c1230", "#2a1c46", "#3c2a60", "#523c7c", "#6c5698", "#8a76b4", "#a896cc"], np.clip(v, 0, 1)))
+    lz.pintar(veta * 1.0, "#c8b8e8", 0.5)
+    lz.pintar(veta2 * 1.0, "#140c24", 0.35)
+    junta = ((lz.x % 16) < 0.6) | ((lz.y % 16) < 0.6)
+    lz.pintar(junta * 1.0, "#120a20", 0.7)
+    lz.pintar(desplazar(lz, junta * 1.0, 0.6, 0.6) * (1 - junta), "#b8a8dc", 0.18)       # el brillo del canto pulido
+    # el filete de oro junto a las paredes y los sellos de oro de las salas
+    suelo = np.clip(1 - pared - sima - tinta, 0, 1)
+    dist = lz.distancia(1 - pared)
+    lz.pintar(suelo * (np.abs(dist - 6.0) < 0.8), "#8a5a24", 0.9)
+    lz.pintar(suelo * (np.abs(dist - 5.5) < 0.3), "#f0c868", 0.85)
+
+    def sello(cx, cy, r, puntas):
+        dx, dy = lz.x - cx, lz.y - cy
+        d = np.sqrt(dx * dx + dy * dy)
+        a = np.arctan2(dy, dx)
+        estrella = d < r * (0.55 + 0.3 * np.abs(np.cos(a * puntas / 2.0)) ** 6)
+        g = (np.abs(d - r) < 0.8) | (np.abs(d - r * 0.92) < 0.4) | ((np.abs(d - r * 0.55) < 0.5))
+        borde = estrella & ~(d < r * (0.55 + 0.3 * np.abs(np.cos(a * puntas / 2.0)) ** 6) - 1.2)
+        g = g | borde
+        lz.pintar(suelo * g, "#8a5a24", 0.9)
+        lz.pintar(suelo * desplazar(lz, g * 1.0, -0.6, -0.6) * g, "#f0c868", 0.8)
+    for (cx, cy, r, n) in ((32, 44, 56, 6), (32, 63.5, 40, 12), (31.5 + 0.5, 18.5, 110, 12), (8.5, 44, 40, 4), (56.5, 44.5, 20, 4)):
+        sello(cx * 16, cy * 16, r, n)
+    # LA TINTA
+    vt = 0.3 + (lz.ruido(12, 3, semilla=298) - 0.5) * 0.6 + np.sin(lz.y * 0.5 + lz.ruido(6, 2, semilla=299) * 8) * 0.06
+    lz.pintar(tinta, rampa(AGUA_TINTA, np.clip(vt, 0, 1)))
+    lz.pintar(np.clip(tinta - desplazar(lz, tinta, 0, 5), 0, 1), "#05040c", 0.8)
+    lz.pintar(np.clip(tinta - desplazar(lz, tinta, 0, -1.5), 0, 1), "#9a8cc4", 0.6)
+    # LA SIMA: un pozo negro, con baldas de libros muy al fondo y el canto del mármol roto arriba
+    lz.pintar(sima, rampa(["#030208", "#07050f", "#0c0918", "#120e22"], np.clip(0.4 + (media - 0.5) * 0.6, 0, 1)))
+    lz.pintar(sima * ((lz.y % 7) < 1.0) * (np.sin(lz.x * 0.3 + lz.y) > 0.1), "#1c1430", 0.7)
+    lz.pintar(np.clip(sima - desplazar(lz, sima, 0, -4), 0, 1), "#6c5698", 0.9)
+    # LAS ESTANTERÍAS ENCADENADAS: el canto de arriba y, al sur, la cara con libros oscuros y cadenas
+    lz.pintar(pared, rampa(["#08060e", "#100c1a", "#1a1428", "#261e38"], np.clip(0.45 + (media - 0.5) * 0.3, 0, 1)))
+    lz.pintar(pared * (((lz.x + lz.y * 0.5) % 11) < 0.6), "#05040a", 0.5)
+    cara = np.clip(pared - desplazar(lz, pared, 0, -24), 0, 1)
+    fila = np.floor(lz.y / 8)
+    balda = ((lz.y % 8) < 1.6) * cara
+    u = lz.x + fila * 5.3
+    n_libro = np.floor(u / 3.5)
+    azar_l = (np.sin(n_libro * 12.9898 + fila * 78.233) * 43758.5453) % 1
+    libros_col = rampa(["#2a1030", "#3c1a44", "#1c2040", "#20303a", "#4a2a50", "#3a2a1c", "#2a1a3a", "#50305a"], azar_l)
+    alto_libro = 1.6 + np.floor(((azar_l * 7.13) % 1) * 3)
+    libro = cara * (1 - balda) * ((lz.y % 8) > alto_libro)
+    lz.pintar(cara * (1 - balda), "#05030a")
+    lz.pintar(libro, libros_col)
+    lz.pintar(libro * ((u % 3.5) < 0.5), "#05030a", 0.8)
+    lz.pintar(libro * (np.abs((lz.y % 8) - 5.2) < 0.3) * (azar_l > 0.55), "#c89a40", 0.5)
+    lz.pintar(balda, "#1e1626")
+    lz.pintar(cara * ((lz.y % 8) < 0.5), "#4a3a5c", 0.8)
+    # las cadenas: eslabones en aspa por delante de los libros, con un candado de oro en cada cruce
+    aspa = (np.abs(((lz.x + lz.y) % 40) - 20) < 1.0) | (np.abs(((lz.x - lz.y) % 40) - 20) < 1.0)
+    eslabon = (((lz.x + lz.y * 0.0) % 3) < 1.6)
+    lz.pintar(cara * aspa, "#2e2c38")
+    lz.pintar(cara * aspa * eslabon, "#8a8898", 0.9)
+    cruce = (np.abs(((lz.x + lz.y) % 40) - 20) < 2.2) & (np.abs(((lz.x - lz.y) % 40) - 20) < 2.2)
+    lz.pintar(cara * cruce, "#c89a40")
+    lz.pintar(cara * desplazar(lz, cruce * 1.0, -0.6, -0.6) * cruce, "#f8e098", 0.8)
+    encima = np.clip(pared - cara, 0, 1)
+    lz.pintar(np.clip(encima - desplazar(lz, encima, 0, 1.5), 0, 1), "#4a3a5c", 0.8)
+    lz.pintar(np.clip(desplazar(lz, pared, 0, -3) - pared, 0, 1), "#05030a", 0.6)       # la sombra al pie
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "sigilia", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.012)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
 def ruido_torcido_local(lz, escala, semilla):
     from pintor import ruido_torcido
     return ruido_torcido(lz, escala, 4, semilla)
@@ -720,6 +810,8 @@ def pintar(nombre, salida=None):
         return pintar_gruta(nombre, salida, setas=nombre == "cueva_setas")
     if nombre in OBSERVATORIOS:
         return pintar_observatorio(nombre, salida)
+    if nombre == "seccion_prohibida":
+        return pintar_seccion(nombre, salida)
     if nombre in BIBLIOTECAS:
         return pintar_biblioteca(nombre, salida)
     filas = leer(nombre)

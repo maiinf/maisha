@@ -956,7 +956,7 @@ Escena `escenas/mundo/maandiko.tscn` (`scripts/mundo/maandiko.gd`), detrás de l
 | La tienda de Wino | Abre al deshelar la primera calle (`calle_deshelada`). Es la misma tienda que la de Tawi (`tienda_tawi.gd`, con `tendero = "wino"`; los artículos llevan `"tienda": "wino"`), con su puesto por dentro y Wino grande con 4 gestos (`herramientas/pintar_tienda_wino.py`: `tienda_wino_fondo.png` y `tienda_wino.png`; captura en `documentacion/tienda_wino.png`). Vende la **Pluma de garza nival** (el sigilo gasta 12 de Aliento en vez de 20), la **Tinta viva** (la runa arde a 30 px en vez de 20) y las **Raquetas de nieve** (en la nieve honda se anda al 80 % en vez del 55 %) |
 | Los faroles de Taa | Los faroles de las calles son faroles rúnicos apagados (`ƒ`, 10). Con todos encendidos (`faroles_maandiko`), Taa lo agradece y se ganan **3 Cristales del Nexo** |
 
-Falta: la Sección Prohibida (el cierre de Sigilia) y el Arte de la Runa. Los tres caminos (Estanterías, Canal y Observatorio) están hechos.
+Falta: el Arte de la Runa y el Cetro del Nexo. Los tres caminos y la Sección Prohibida (el final de Sigilia) están hechos.
 
 ## Las Estanterías Colgantes (la biblioteca, las escaleras rodantes y el Bibliotecario Hueco)
 
@@ -1013,6 +1013,27 @@ Escena `escenas/mundo/observatorio_aurora.tscn` (`scripts/mundo/observatorio_aur
 | Arreglo de paso | El Sigilo de Fuego **quemaba a Maisha** al trazarlo (ella también está en `daniables`): ya no; ni el fuego ni el rayo propios le hacen nada |
 | Sonidos | De momento, prestados (`chispa`, `geoda_encender`, `diapason_ambar`, `clinc`, `kifaru_embiste`...): pedidos a Gemini los propios |
 | Prueba | `pruebas/prueba_observatorio_aurora.gd` |
+
+## La Sección Prohibida (el final de Sigilia: los 12 nombres, el Triple Sello, la Sombra de Renglón y el Grimorio)
+
+Escena `escenas/mundo/seccion_prohibida.tscn` (`scripts/mundo/seccion_prohibida.gd`), bajo el Gran Archivo de Maandiko. Mapa de 64×72 (`crear_seccion`), según `documentacion/boceto_seccion_prohibida.png`; capturas en `documentacion/seccion_captura_1.png` y `_2`.
+
+| Qué | Cómo |
+| --- | --- |
+| Los 12 nombres | `scripts/mundo/sigilia/indice.gd` (`NOMBRES`): Taa, Daftari, Mwalimu (al recoger su ficha), Mfereji, Karatasi, Chapa, Nyota, Darubini, Mlinzi y los tres de la ciudad: **Kurasa** (pasadora de páginas), **Muhuri** (selladora) y **Wimbo** (cantor), cuyas fichas están en tres rincones de Maandiko (`FICHAS` de `maandiko.gd`). Con los doce se pone `indice_completo` |
+| La puerta del Archivo | En Maandiko, una puerta (`scripts/mundo/puerta.gd`, id `archivo`) en la avenida, delante del Gran Archivo: cerrada hasta `indice_completo` (dice cuántos nombres van y la conversación `archivo_cerrado`) |
+| La Escalera de los 12 Nombres | Los doce **atriles** encendidos (`atril.png`). **Mauti** y **Kalamu** esperan aquí (`mauti_seccion`, `kalamu_seccion`): Kalamu cuenta qué pedestal deshace cada capítulo |
+| Los pedestales | `scripts/mundo/sigilia/pedestal.gd` (`pedestal.png`): cada uno responde solo a **su** sigilo (fuego, hielo o rayo). Con `marca` se quedan encendidos; sin ella, 2,5 s. `dormido`: no responde |
+| El Claustro del Triple Sello | Tres pedestales, dormidos hasta que estén los dos **sellos** de las cámaras; luego, con los tres encendidos se abre el **Triple Sello** (`sello.png`, marca `seccion/triple_sello`) |
+| La cámara del oeste (Fuego + Hielo) | Tras un **foso** de tinta que corre hacia el sur (`corriente_en`; se cruza en placa de hielo). Su sello, un pedestal de fuego, en un rincón tapado por Tinta Quieta |
+| La cámara del este (Hielo + Rayo) | Tras una **sima** (un Puente de Constelación con dos bobinas). Su sello, un pedestal de rayo, en la isleta de un estanque de tinta |
+| La Sombra de Renglón | `scripts/enemigos/sombra_renglon.gd` (`sombra.png`, 5 fotogramas): cuatro por las salas. Repta haciendo eses hacia Maisha y se le lanza (1 hoja). El cetro la **atraviesa**; **cualquier sigilo la fija** 4 s (sólida y pálida): cetro 1, semillas 2; 2 de vida. En el Bestiario |
+| El Grimorio de Tinta, el jefe final | `scripts/enemigos/grimorio_tinta.gd` (`grimorio.png`, 5 de 128×104; `mano.png`). Opción A elegida por Iam. Despierta al entrar en la Rotonda (`grimorio_encuentro`; música `jefe_grimorio`). Pasa las hojas y abre **capítulos** de 11 s (fuego → hielo → rayo), con su runa sobre las páginas: **fuego**, un círculo grande que estalla bajo Maisha; **hielo**, una franja que cruza la Rotonda; **rayo**, tres rayos pequeños y rápidos. Cada 5 s, una **mano de tinta** sale del suelo y da un manotazo. El capítulo se **rasga** en el pedestal que **late**: fuego con hielo, hielo con rayo, rayo con fuego. Rasgado, cae **aturdido** (5 s o 3 golpes): cetro 1, semillas 2 (se le alcanza también por las páginas, con `parte_jefe.gd`). 12 de vida. Con la mitad (**furia**): ataca más deprisa y saca Sombras de Renglón. Si Maisha cae, se levanta a la entrada de la Rotonda |
+| El cierre | Vencido (`grimorio_vencido`): entran Kalamu y Mauti, tres conversaciones (`sigilia_final_kalamu`, `_indice`, `_mauti`), la **Pluma del Primer Nombre** (objeto `pluma_primer_nombre`, marca `sigilia_libre`) y la pantalla de final (`fin_mundo.gd`, que ahora admite su propia cuenta y música) con `24_sigilia_libre.png`: «Sigilia recuerda» |
+| Arreglo de paso | En las escenas que no se ocupaban de la caída de Maisha (todas las de Sigilia), **se quedaba caída para siempre**. Ahora `escena_mundo.gd` la levanta donde entró si la escena no dice otra cosa |
+| Falta | Que en Maandiko se vea la tinta correr dorada tras el final (ahora solo se cuenta); el Cetro del Nexo y el Arte de la Runa (lo siguiente); sonidos propios (pedidos a Gemini) |
+| Los dibujos | `herramientas/pintar_seccion_prohibida.py` → `arte/mundos/sigilia/seccion/`; el suelo, `pintar_seccion` de `pintar_suelo.py` (mármol morado en damero y estanterías de libros encadenados) |
+| Prueba | `pruebas/prueba_seccion_prohibida.gd` |
 
 ## Las construcciones, al nivel de la casa del castor
 

@@ -997,5 +997,377 @@
 				]
 			}
 		]
+	},
+	"kurasa": {
+		"nombre": "Kurasa",
+		"conversaciones": [
+			{
+				"no": [
+					"kurasa_nombre"
+				],
+				"tiene": {
+					"ficha_kurasa": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"«Kurasa, pasadora de páginas. Lee en voz alta en la Plaza del Índice». Y tú mueves los labios como si leyeras...",
+					"Toma. Te llamas Kurasa."
+				],
+				"entrega": {
+					"ficha_kurasa": 1
+				},
+				"marca": [
+					"kurasa_nombre"
+				]
+			},
+			{
+				"no": [
+					"kurasa_nombre"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Una escriba en blanco con un libro abierto. Pasa una página, y otra, y otra. Están todas en blanco.",
+					"Mueve los labios. Lee algo que solo ve ella."
+				]
+			},
+			{
+				"si": [
+					"kurasa_nombre"
+				],
+				"no": [
+					"kurasa_hablado"
+				],
+				"lineas": [
+					"Kurasa. ¡Kurasa! Mira, hasta suena bien dicho en alto. Kurasa.",
+					"Yo leía en la plaza, por las tardes. Venía quien quería. Los pequeños se sentaban en el borde de la fuente, aunque les tenía dicho que no.",
+					"¿Sabes lo peor? No es que se me olvidara mi nombre. Es que seguía pasando páginas sin darme cuenta de que no ponía nada.",
+					"Esta tarde leo. Aunque no venga nadie. Sobre todo si no viene nadie."
+				],
+				"marca": [
+					"kurasa_hablado"
+				]
+			},
+			{
+				"si": [
+					"kurasa_hablado"
+				],
+				"lineas": [
+					"Si pasas por la plaza al caer la tarde, siéntate un rato. En el borde de la fuente no."
+				]
+			}
+		]
+	},
+	"muhuri": {
+		"nombre": "Muhuri",
+		"conversaciones": [
+			{
+				"no": [
+					"muhuri_nombre"
+				],
+				"tiene": {
+					"ficha_muhuri": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"«Muhuri, selladora del Archivo. Lo que ella cierra, no lo abre el viento». Hueles a lacre. Tienes que ser tú.",
+					"Toma. Te llamas Muhuri."
+				],
+				"entrega": {
+					"ficha_muhuri": 1
+				},
+				"marca": [
+					"muhuri_nombre"
+				]
+			},
+			{
+				"no": [
+					"muhuri_nombre"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Una escriba en blanco con una barra de lacre en una mano y un sello de latón en la otra.",
+					"Aprieta el sello contra el aire, con fuerza, una y otra vez. Tiene los dedos manchados de rojo seco."
+				]
+			},
+			{
+				"si": [
+					"muhuri_nombre"
+				],
+				"no": [
+					"muhuri_hablado"
+				],
+				"lineas": [
+					"Muhuri. Eso. Muhuri, la del lacre. Qué descanso, oye.",
+					"Yo cerraba las cartas, las cajas, los armarios. Y la Sección de abajo. Esa también la cerré yo, con tres sellos, cuando Kalamu me lo pidió.",
+					"Pensamos que si lo guardábamos todo bajo llave, no se perdería nada. Y mira. Lo que encierras por miedo se te pudre dentro.",
+					"Si algún día bajas, los sellos se abren con lo mismo que los cerró: fuego, frío y un buen susto. No les tengas respeto. Yo ya no se lo tengo."
+				],
+				"marca": [
+					"muhuri_hablado"
+				]
+			},
+			{
+				"si": [
+					"muhuri_hablado"
+				],
+				"lineas": [
+					"Un sello no guarda nada. Solo dice quién tuvo miedo de que se abriera."
+				]
+			}
+		]
+	},
+	"wimbo": {
+		"nombre": "Wimbo",
+		"conversaciones": [
+			{
+				"no": [
+					"wimbo_nombre"
+				],
+				"tiene": {
+					"ficha_wimbo": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"«Wimbo, cantor del Archivo. Se sabe de memoria lo que aún no está escrito». Estás tarareando. Bajito, pero estás tarareando.",
+					"Toma. Te llamas Wimbo."
+				],
+				"entrega": {
+					"ficha_wimbo": 1
+				},
+				"marca": [
+					"wimbo_nombre"
+				]
+			},
+			{
+				"no": [
+					"wimbo_nombre"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un escriba en blanco que tararea algo sin letra. Siempre los mismos cuatro compases, y se para en el mismo sitio.",
+					"Como si la canción siguiera, pero no supiera por dónde."
+				]
+			},
+			{
+				"si": [
+					"wimbo_nombre"
+				],
+				"no": [
+					"wimbo_hablado"
+				],
+				"lineas": [
+					"...Wimbo. ¡Claro! Wimbo. Y la canción seguía así: la, la-rá, la...",
+					"Uf. Llevaba no sé cuánto atascado en el cuarto compás. ¿Tú sabes lo que es tener una canción en la punta de la lengua durante meses?",
+					"Yo me sé las cosas antes de que las apunten. Las nanas, los pregones del mercado, lo que cantan los canteros de allá abajo. Luego Kalamu las escribe, por si acaso.",
+					"Qué manía con el por si acaso. Una canción no se pierde mientras haya alguien que la tararee mal."
+				],
+				"marca": [
+					"wimbo_hablado"
+				]
+			},
+			{
+				"si": [
+					"wimbo_hablado"
+				],
+				"lineas": [
+					"La, la-rá, la... Te la enseñaría, pero entonces se te pega. Luego no digas que no avisé."
+				]
+			}
+		]
+	},
+	"archivo_cerrado": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La puerta del Gran Archivo. Dentro se ven doce atriles en fila, y casi todos a oscuras.",
+					"Cada nombre que vuelve enciende uno. Hasta que no estén los doce, la escalera de abajo no se abre."
+				]
+			}
+		]
+	},
+	"seccion_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Mármol morado, frío, y libros con cadenas hasta donde alcanza la vista.",
+					"Aquí abajo no hay polvo. Nadie ha entrado... pero algo se ha estado moviendo.",
+					"Los doce atriles están encendidos. Los doce nombres. Por lo menos eso ya no se lo puede llevar nadie."
+				]
+			}
+		]
+	},
+	"kalamu_seccion": {
+		"nombre": "Kalamu",
+		"conversaciones": [
+			{
+				"si": [
+					"sigilia_libre"
+				],
+				"lineas": [
+					"Voy a quitar las cadenas de los estantes. Una a una, con mis manos. Me va a llevar lo que me queda de vida, y me parece bien.",
+					"Kalamu. Me llamo Kalamu. ...Ya no hace falta, ¿verdad? Pero me gusta cómo suena."
+				]
+			},
+			{
+				"no": [
+					"kalamu_bajada"
+				],
+				"lineas": [
+					"Treinta años sin bajar esta escalera. Me temblaban las rodillas, y no es por la edad.",
+					"Esto lo mandé cerrar yo, Maisha. Que quede dicho. Tuve miedo de que el Índice se nos olvidara... y lo encerré para que no pudiera.",
+					"El Índice no es un libro cualquiera. Está vivo. Y lleva aquí abajo solo, a oscuras, creyendo que si suelta un solo nombre lo perderá para siempre.",
+					"Escucha, que esto sí me lo sé: lo que escriba con fuego, bórralo con hielo. Lo que escriba con hielo, pártelo con el rayo. Y el rayo... al rayo solo lo despista el fuego, que brilla más.",
+					"Los pedestales, criatura. No le pegues al libro. Rásgale el capítulo."
+				],
+				"marca": [
+					"kalamu_bajada"
+				]
+			},
+			{
+				"lineas": [
+					"Fuego con hielo. Hielo con rayo. Rayo con fuego. El pedestal que late es el bueno.",
+					"Aquí te esperamos. Si subo yo, me pongo a pedirle perdón y no acabamos nunca."
+				]
+			}
+		]
+	},
+	"mauti_seccion": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"si": [
+					"sigilia_libre"
+				],
+				"lineas": [
+					"¿Has visto la tinta de los canales? Corre. Y es dorada. Esta gente no se lo cree todavía.",
+					"Al este hay una ciudad dentro de un cráter. Dicen que allí han dejado de sonar los martillos. Voy tirando: no tardes."
+				]
+			},
+			{
+				"no": [
+					"mauti_bajada"
+				],
+				"lineas": [
+					"He bajado contando los escalones. Doce tramos. Uno por nombre, supongo.",
+					"Yo también dejé de moverme para no perder nada, ¿te acuerdas? En las Ruinas. Sé cómo piensa eso que hay arriba.",
+					"No está enfadado. Está agarrado. Es distinto, y es peor.",
+					"No lo rompas, Maisha. Suéltale los dedos."
+				],
+				"marca": [
+					"mauti_bajada"
+				]
+			},
+			{
+				"lineas": [
+					"Las sombras esas salen de los libros con cadenas. Son frases que alguien tachó. No saben estarse quietas.",
+					"Ve. Yo le hago compañía a Kalamu, que anda repitiendo su nombre más deprisa que nunca."
+				]
+			}
+		]
+	},
+	"seccion_pedestal_dormido": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un pedestal de mármol con un cuenco de oro y una runa grabada. Está frío, como apagado por dentro.",
+					"Arriba, sobre la puerta, hay tres discos con las tres runas. Y a los lados del claustro, dos cámaras. Algo habrá que encender antes."
+				]
+			}
+		]
+	},
+	"seccion_pedestal_fuego": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un pedestal con su cuenco de oro. La runa es la del fuego.",
+					"Le toca el fuego. Con otro sigilo ni se entera."
+				]
+			}
+		]
+	},
+	"seccion_pedestal_hielo": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un pedestal con su cuenco de oro. La runa es la del copo.",
+					"Le toca el hielo. Con otro sigilo ni se entera."
+				]
+			}
+		]
+	},
+	"seccion_pedestal_rayo": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un pedestal con su cuenco de oro. La runa es la del zigzag.",
+					"Le toca el rayo. Con otro sigilo ni se entera."
+				]
+			}
+		]
+	},
+	"grimorio_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"En medio de la rotonda flota un libro. Enorme. Abierto, con las tapas como dos alas.",
+					"Tiene una pluma dorada clavada en el lomo. Y dos ojos, uno en cada página, que me están leyendo a mí.",
+					"Las hojas empiezan a pasar solas. Deprisa. Como quien busca una página para esconderla."
+				]
+			}
+		]
+	},
+	"sigilia_final_kalamu": {
+		"nombre": "Kalamu",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Ya está. Ya está, viejo amigo. Suelta.",
+					"Mírame. Soy Kalamu. La que te cerró la puerta. Y he venido a abrírtela, que ya era hora.",
+					"No se nos va a olvidar nada por dejarlo al aire. Se nos olvidaba aquí abajo, a oscuras, sin nadie que lo leyera."
+				]
+			}
+		]
+	},
+	"sigilia_final_indice": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El libro se queda muy quieto. Las manos de tinta se deshacen en el suelo, despacio, como quien abre un puño.",
+					"Las páginas ya no están negras. Tienen nombres. Cientos. Los leo sin querer y me suenan todos, aunque no conozca a ninguno.",
+					"La pluma dorada se suelta del lomo y cae. No hace ruido. Me cae en las manos como si supiera adónde iba.",
+					"Es la Pluma del Primer Nombre. Con ella se escribió el primero de todos. No pone cuál.",
+					"En el bolsillo, la Semilla del Primer Árbol se ha puesto tibia. Como si se hubieran reconocido."
+				]
+			}
+		]
+	},
+	"sigilia_final_mauti": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¿Lo oyes? Arriba. Es agua. No... es tinta, corriendo por los canales. Se ha deshelado toda de golpe.",
+					"Yo creía que recordar era guardar. Y resulta que es esto: dejar la puerta abierta y fiarte de que alguien entre a leer.",
+					"Maisha. Esa pluma y esa semilla... Me parece que quieren ser una sola cosa. No aquí. Más adelante.",
+					"Vamos arriba. Quiero ver Maandiko con color."
+				]
+			}
+		]
 	}
 }

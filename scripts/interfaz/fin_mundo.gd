@@ -24,6 +24,9 @@ var titulo := "Raíz es libre"
 var subtitulo := "Fin del primer mundo"
 var pie := "Continuará en Sigilia..."
 var mapas: Array = MAPAS
+## (otro mundo puede traer su propia cuenta —[texto, hecho, total, texto fijo]— y su música)
+var lineas_propias: Array = []
+var musica := "raiz_libre"
 var abierto := false
 var _lienzo: Control
 var _fuente: FontFile
@@ -60,9 +63,9 @@ func abrir() -> void:
 	visible = true
 	_t = 0.0
 	_alfa = 0.0
-	_lineas = _calcular()
+	_lineas = lineas_propias if not lineas_propias.is_empty() else _calcular()
 	get_tree().paused = true
-	Sonido.musica("raiz_libre", 1.5)
+	Sonido.musica(musica, 1.5)
 	if _maisha.sprite_frames.has_animation("celebrar_abajo"):
 		_maisha.play("celebrar_abajo")
 

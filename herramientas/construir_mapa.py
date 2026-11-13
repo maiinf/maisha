@@ -2349,6 +2349,46 @@ def crear_observatorio():
     return ["".join(f) for f in m], {}
 
 
+def crear_seccion():
+    """LA SECCIÓN PROHIBIDA (Sigilia, 64x72, de sur a norte): las salas de mármol morado bajo el Gran Archivo. Lo que
+    no es sala («0») son estanterías de libros encadenados. Se entra por el sur (del Gran Archivo de Maandiko, «_»).
+      1. LA ESCALERA DE LOS 12 NOMBRES (abajo), con los doce atriles; aquí esperan Mauti y Kalamu.
+      2. EL CLAUSTRO DEL TRIPLE SELLO (en medio). Al oeste, tras un FOSO DE TINTA («~», corre hacia el sur), la
+         CÁMARA DEL SELLO DE FUEGO Y HIELO (su sello, en un rincón al norte tapado por Tinta Quieta). Al este, tras
+         una SIMA («=», un Puente de Constelación), la CÁMARA DEL SELLO DE HIELO Y RAYO (su sello, en la isleta de
+         un estanque de tinta).
+      3. El pasillo del TRIPLE SELLO y LA ROTONDA DEL PRIMER NOMBRE (arriba, redonda): el Grimorio de Tinta.
+    Los atriles, los pedestales, los sellos, las Sombras de Renglón, Mauti, Kalamu y el Grimorio los pone la escena."""
+    ANCHO, ALTO = 64, 72
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y][x] = c
+
+    rect(20, 58, 43, 68, "%")                                # 1. la Escalera de los 12 Nombres
+    rect(30, 69, 33, 70, "%")
+    rect(30, 71, 33, 71, "_")
+    rect(30, 52, 33, 57, "%")                                # el pasillo al Claustro
+    rect(20, 36, 43, 51, "%")                                # 2. el Claustro del Triple Sello
+    rect(18, 41, 19, 46, "%")                                # el embarcadero del foso
+    rect(15, 38, 17, 49, "~")                                # el foso de tinta (corre hacia el sur)
+    rect(2, 36, 14, 51, "%")                                 # la Cámara del Sello de Fuego y Hielo...
+    rect(4, 29, 10, 33, "%")                                 # ...con el rincón de su sello...
+    rect(6, 34, 8, 35, "%")                                  # ...y su paso (lo tapa la Tinta Quieta)
+    rect(44, 43, 49, 45, "=")                                # la sima del este (Puente de Constelación)
+    rect(50, 36, 61, 51, "%")                                # la Cámara del Sello de Hielo y Rayo...
+    rect(52, 40, 60, 48, "~")                                # ...con su estanque...
+    rect(55, 43, 57, 45, "%")                                # ...y la isleta de su sello
+    rect(30, 30, 33, 35, "%")                                # el pasillo del Triple Sello
+    for y in range(ALTO):                                    # 3. la Rotonda del Primer Nombre
+        for x in range(ANCHO):
+            if ((x - 31.5) / 15.5) ** 2 + ((y - 18) / 11.5) ** 2 <= 1.0:
+                m[y][x] = "%"
+    return ["".join(f) for f in m], {}
+
+
 def crear_cueva():
     """La cueva de las setas (56x64, de norte a sur), bajo la casa de Nungu: se baja por la escalera del armario.
     A oscuras: alumbran las SETAS que brillan («ů»). Salas: la de la escalera (arriba), un pasillo con NUBES DE ESPORAS
@@ -3091,7 +3131,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida"}
 
 
 def construir_suelo(nombre):
@@ -3242,7 +3282,7 @@ if __name__ == "__main__":
                         "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta,
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
-                        "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio}.get(nombre, crear_prados)()
+                        "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

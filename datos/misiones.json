@@ -119,7 +119,8 @@
 			"paso_escarcha",
 			"estanterias_colgantes",
 			"canal_tinta",
-			"observatorio_aurora"
+			"observatorio_aurora",
+			"seccion_prohibida"
 		],
 		"estanterias_colgantes": [
 			"maandiko"
@@ -128,6 +129,9 @@
 			"maandiko"
 		],
 		"observatorio_aurora": [
+			"maandiko"
+		],
+		"seccion_prohibida": [
 			"maandiko"
 		]
 	},
