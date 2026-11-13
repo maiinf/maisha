@@ -38,7 +38,7 @@ func _process(delta: float) -> void:
 
 
 func _descargar() -> void:
-	Sonido.efecto("chispa", 2.0, global_position, 0.15)
+	Sonido.efecto("rayo_runa", 2.0, global_position, 0.15)
 	var centro := global_position + Vector2(0, 6)
 	for nodo in get_tree().get_nodes_in_group("cargables"):
 		if (nodo as Node2D).global_position.distance_to(centro) <= RADIO + 12.0:

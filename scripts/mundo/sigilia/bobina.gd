@@ -84,7 +84,7 @@ func cargar() -> void:
 		_fija = true
 	if encendida:
 		return
-	Sonido.efecto("geoda_encender", -2.0, global_position)
+	Sonido.efecto("bobina_encender", -2.0, global_position)
 	Sonido.efecto("campanilla", -8.0, global_position, 0.1)
 	_poner(true)
 
@@ -111,7 +111,7 @@ func _process(delta: float) -> void:
 	if not _fija:
 		_queda -= delta
 		if _queda <= 0.0:
-			Sonido.efecto("clinc", -8.0, global_position)
+			Sonido.efecto("bobina_apagar", -8.0, global_position)
 			_poner(false)
 			return
 		# los últimos 2 s, parpadea: se está apagando

@@ -103,7 +103,7 @@ func _process(delta: float) -> void:
 		Fase.RONDA:
 			if la_ve:
 				_cambiar(Fase.PERSIGUE)
-				Sonido.efecto("clinc", -6.0, global_position, 0.2)
+				Sonido.efecto("saa_tictac", -6.0, global_position, 0.2)
 			elif ronda.is_empty():
 				_andar(_puesto, ANDA, delta)
 			else:
@@ -121,7 +121,7 @@ func _process(delta: float) -> void:
 		Fase.MAZAZO:
 			if _t >= MAZAZO and not _pego:
 				_pego = true
-				Sonido.efecto("cetro_golpe", -2.0, global_position, 0.2)
+				Sonido.efecto("saa_mazazo", -2.0, global_position, 0.2)
 				if maisha and d.length() < PEGA + 8.0:
 					maisha.call("recibir_danio", 1, global_position, "contacto")
 			if _t >= MAZAZO + 0.25:
@@ -177,7 +177,7 @@ func cargar() -> void:
 	if _muriendo:
 		return
 	_cambiar(Fase.SOBRECARGADO)
-	Sonido.efecto("geoda_encender", 0.0, global_position, 0.2)
+	Sonido.efecto("saa_sobrecarga", 0.0, global_position, 0.2)
 	Impacto.chispa(global_position + Vector2(0, -14), Vector2.UP, Color("fff0a0"))
 
 

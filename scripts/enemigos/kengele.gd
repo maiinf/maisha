@@ -148,7 +148,7 @@ func _process(delta: float) -> void:
 			if _t >= aviso:
 				_cambiar(Fase.EMBISTE)
 				_toco = false
-				Sonido.efecto("kifaru_embiste", -1.0, global_position)
+				Sonido.efecto("kengele_embiste", -1.0, global_position)
 		Fase.EMBISTE:
 			var paso := _rumbo * (EMBISTE_VEL_FURIA if furia() else EMBISTE_VEL) * delta
 			if not _dentro(global_position + paso):
@@ -191,7 +191,7 @@ func _fotograma() -> int:
 
 ## El tañido mudo: una onda de silencio en abanico hacia `angulo`
 func tanido(angulo: float, ancho: float) -> void:
-	Sonido.efecto("onda_rebota", -2.0, global_position, 0.1)
+	Sonido.efecto("kengele_tanido", -2.0, global_position, 0.1)
 	Impacto.temblar(1.5, 0.15)
 	_ondas.append({"origen": global_position + Vector2(0, -8), "angulo": angulo, "ancho": ancho, "r": 18.0, "dio": false})
 
@@ -223,7 +223,7 @@ func resonar(diapason: Node) -> void:
 	_golpes = 0
 	_cambiar(Fase.ATURDIDA)
 	add_to_group("daniables")
-	Sonido.efecto("diapason_ambar", 3.0, global_position)
+	Sonido.efecto("kengele_resuena", 3.0, global_position)
 	Sonido.efecto("kambare_cae", -2.0, global_position)
 	Impacto.temblar(5.0, 0.4)
 	preload("res://scripts/mundo/relieve.gd").destello(get_parent(), position, Color("fff0a0"), 1.2, 1.2, 0.5)
@@ -273,8 +273,8 @@ func morir() -> void:
 	_ondas.clear()
 	Estado.marcar("kengele_vencida")
 	Bestiario.vencido("kengele", self)
-	Sonido.efecto("diapason_ambar", 4.0, global_position)       # (por fin suena)
-	Sonido.efecto("cosechadora_vencida", -4.0, global_position)
+	Sonido.efecto("kengele_resuena", 4.0, global_position)       # (por fin suena)
+	Sonido.efecto("kengele_vencida", -4.0, global_position)
 	Sonido.musica("victoria")
 	if _barra:
 		_barra.queue_free()
