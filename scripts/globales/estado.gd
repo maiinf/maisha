@@ -84,7 +84,7 @@ var marcas := {}
 ## Lo que lleva Maisha: nombre del objeto -> cuántos
 var objetos := {}
 ## Otros datos que se guardan con la partida (la misión que se sigue, la Esencia, las Artes...)
-var extra := {}
+var extra := {"hd2d": true}
 ## Por qué puerta hay que aparecer al cargar la escena siguiente ("" = el inicio del mapa)
 var llegada := ""
 var cambiando := false
@@ -195,7 +195,7 @@ func olvidar_todo() -> void:
 	posicion = Vector2.ZERO
 	posicion_carga = null
 	tiempo_jugado = 0.0
-	extra.clear()
+	extra = {"hd2d": true}
 	partida_cambiada.emit()
 
 
@@ -290,6 +290,7 @@ func cargar() -> bool:
 	var guardado_extra = datos.get("extra", {})
 	if guardado_extra is Dictionary:
 		extra = guardado_extra.duplicate(true)
+	extra["hd2d"] = true
 	partida_cambiada.emit()
 	return true
 

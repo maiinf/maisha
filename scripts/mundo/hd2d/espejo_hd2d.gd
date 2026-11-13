@@ -21,7 +21,7 @@ extends Node3D
 const PX := 1.0 / 16.0
 const ALTO_PENA := 1.25            # metros que se levanta una peña (lo que mide su pared pintada: unos 20 px)
 ## Mapas en los que la pared pintada es el doble de alta (gargantas y montaña: pintar_suelo, «cara=2»)
-const PARED_DOBLE := ["canada_eco", "paso_piedra", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha"]
+const PARED_DOBLE := ["canada_eco", "paso_piedra", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "canal_tinta"]
 ## Mapas en los que «0» no es peña sino cielo o vacío (no se levantan bloques de roca)
 const SIN_PENAS := ["observatorio_aurora"]
 const SUELO_BAJO := -4             # dibujos con z_index por debajo: se tumban en el suelo
@@ -41,10 +41,12 @@ const CANALES_MUNDO := CANAL_SUELO | CANAL_GEMELO | CANAL_PANTALLA | CANAL_NADA 
 ## lo que dibujan ellos (o sus hijos sin script) se ve en una VENTANITA de pie sobre ellos (_ventanas)
 const DE_PIE := ["brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_perdido.gd", "esencia.gd",
 	"recogible.gd", "arco_ruinas.gd", "portal.gd", "aldeano.gd", "taa.gd", "vecino.gd", "escriba.gd",
-	"bobina.gd", "saa.gd"]
-const VENTANA := Vector2i(128, 160)       # píxeles de cada ventanita
-const VENTANA_PIE := Vector2(64, 148)     # dónde cae el pie del objeto dentro de la ventanita
-const VENTANAS := 10                      # como mucho, las de los 10 objetos de pie más cerca de la cámara
+	"bobina.gd", "saa.gd", "rasgos_maisha.gd", "kimya.gd", "roca_mineral.gd", "escarcha.gd",
+	"piedra_recuerdo.gd", "primer_arbol.gd", "buibui.gd", "guardian.gd", "kambare.gd", "mamba.gd",
+	"cangrejo.gd", "rescoldo.gd", "espinas_paso.gd", "gallina_perdida.gd", "barca_bata.gd"]
+const VENTANA := Vector2i(160, 160)       # píxeles de cada ventanita
+const VENTANA_PIE := Vector2(80, 144)     # dónde cae el pie del objeto dentro de la ventanita
+const VENTANAS := 14                      # como mucho, las de los 14 objetos de pie más cerca de la cámara
 const LADO_CAPA := 1024            # píxeles de la capa de suelo (64 m alrededor de Maisha)
 ## El suelo cercano: la capa de suelo, con luz (para las sombras)
 ## Con «hundido» = 0 es el suelo, con un agujero donde hay agua; con 1, el agua (más abajo, algo más oscura y azul,
@@ -58,19 +60,24 @@ uniform vec2 origen = vec2(0.0);
 uniform vec2 casillas = vec2(1.0);
 uniform float lado = 1024.0;
 uniform float hundido = 0.0;
+uniform float hay_agua = 1.0;
 void fragment() {
-	vec2 px = origen + UV * lado;
-	// (la máscara, suavizada y con un temblor, para que la orilla sea curva como la pintada y no en escalones)
-	float temblor = sin(px.x * 0.37 + px.y * 0.21) * 0.06 + sin(px.y * 0.53 - px.x * 0.17) * 0.05;
-	float es_agua = texture(agua, px / 16.0 / casillas).r + temblor;
-	if (hundido < 0.5 && es_agua > 0.5) { discard; }
-	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
 	vec3 c = texture(capa, UV).rgb;
-	if (hundido > 0.5) {
-		float brillo = sin(px.x * 0.07 + TIME * 1.3) * sin(px.y * 0.11 - TIME * 0.9);
-		c = mix(c, vec3(0.08, 0.16, 0.24), 0.22) + vec3(0.05, 0.07, 0.08) * smoothstep(0.75, 1.0, brillo);
-		// junto a la orilla, la sombra del borde (se nota que el agua está más abajo)
-		c *= mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua));
+	if (hay_agua > 0.5) {
+		vec2 px = origen + UV * lado;
+		// (la máscara, suavizada y con un temblor, para que la orilla sea curva como la pintada y no en escalones)
+		float temblor = sin(px.x * 0.37 + px.y * 0.21) * 0.06 + sin(px.y * 0.53 - px.x * 0.17) * 0.05;
+		float es_agua = texture(agua, px / 16.0 / casillas).r + temblor;
+		if (hundido < 0.5 && es_agua > 0.5) { discard; }
+		if (hundido > 0.5 && es_agua <= 0.5) { discard; }
+		if (hundido > 0.5) {
+			float brillo = sin(px.x * 0.07 + TIME * 1.3) * sin(px.y * 0.11 - TIME * 0.9);
+			c = mix(c, vec3(0.08, 0.16, 0.24), 0.22) + vec3(0.05, 0.07, 0.08) * smoothstep(0.75, 1.0, brillo);
+			// junto a la orilla, la sombra del borde (se nota que el agua está más abajo)
+			c *= mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua));
+		}
+	} else if (hundido > 0.5) {
+		discard;
 	}
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
@@ -83,12 +90,13 @@ render_mode diffuse_lambert, specular_disabled;
 uniform sampler2D suelo : filter_nearest, source_color;
 uniform sampler2D agua : filter_linear;
 uniform float hundido = 0.0;
+uniform vec4 tinte : source_color = vec4(1.0);
 void fragment() {
 	float es_agua = texture(agua, UV).r;
 	if (hundido < 0.5 && es_agua > 0.5) { discard; }
 	if (hundido > 0.5 && es_agua <= 0.5) { discard; }
-	vec3 c = texture(suelo, UV).rgb;
-	if (hundido > 0.5) { c = mix(c, vec3(0.08, 0.16, 0.24), 0.22) * mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua)); }
+	vec3 c = texture(suelo, UV).rgb * tinte.rgb;
+	if (hundido > 0.5) { c = mix(c, vec3(0.08, 0.16, 0.24) * tinte.rgb, 0.22) * mix(0.55, 1.0, smoothstep(0.5, 0.72, es_agua)); }
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
 }
@@ -110,7 +118,13 @@ var _mats_capa: Array[ShaderMaterial] = []
 var _plano_agua: MeshInstance3D
 var _mascara_agua: ImageTexture
 var _suelos_lejanos: Array[ShaderMaterial] = []
-var _tinte := Color.WHITE
+var _mat_penas: StandardMaterial3D
+var _entorno: Environment
+var _fondo_base := Color.BLACK
+var _mod_escena := Color.WHITE
+var _moduladores: Array[CanvasModulate] = []
+var _luces_2d: Array[PointLight2D] = []
+var _luz_muros: OmniLight3D
 var _canales := {}                 # id de cada dibujo -> [dibujo, su canal de antes] (para devolverlo al apagar)
 var _capa_suelo: SubViewport
 var _plano_capa: MeshInstance3D
@@ -149,7 +163,9 @@ func _todos(nodo: Node) -> Array:
 func _crear_ambiente() -> void:
 	var entorno := Environment.new()
 	entorno.background_mode = Environment.BG_COLOR
-	entorno.background_color = RenderingServer.get_default_clear_color()
+	_fondo_base = Color.BLACK if region == null else RenderingServer.get_default_clear_color()
+	entorno.background_color = _fondo_base
+	_entorno = entorno
 	entorno.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	entorno.ambient_light_color = Color(1, 1, 1)
 	entorno.ambient_light_energy = 0.4     # (medido: con esto y el sol, el suelo al sol sale igual de claro que en 2D)
@@ -166,6 +182,15 @@ func _crear_ambiente() -> void:
 	sol.rotation_degrees = Vector3(-50, -35, 0)          # (desde arriba a la izquierda y algo por detrás: sombras hacia delante y a la derecha, como las pintadas)
 	sol.directional_shadow_max_distance = 60.0
 	add_child(sol)
+	# (en cuevas o de noche, un resplandor suave alrededor de Maisha solo sobre los muros para que la roca cercana se distinga)
+	_luz_muros = OmniLight3D.new()
+	_luz_muros.light_cull_mask = 2
+	_luz_muros.omni_range = 7.5
+	_luz_muros.omni_attenuation = 1.6
+	_luz_muros.light_color = Color(1.0, 0.9, 0.72)
+	_luz_muros.light_energy = 0.65
+	_luz_muros.visible = false
+	add_child(_luz_muros)
 
 
 # --- El suelo y las peñas -------------------------------------------------------------------------------------
@@ -188,6 +213,7 @@ func _crear_suelo() -> void:
 	mat.albedo_texture = tex
 	mat.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
 	mat.roughness = 1.0
+	_mat_penas = mat
 	# el suelo: una sola malla del tamaño del mapa con el suelo pintado (con el agujero del agua) y, debajo, el agua
 	var plano := PlaneMesh.new()
 	plano.size = Vector2(ancho, alto)
@@ -237,11 +263,13 @@ func _crear_suelo() -> void:
 		var techo := MeshInstance3D.new()
 		techo.mesh = st.commit()
 		techo.material_override = mat
+		techo.layers = 2
 		add_child(techo)
 		# las paredes: la del sur, con la pared de roca que ya está pintada en el suelo; las demás, de roca oscura
 		var paredes := MeshInstance3D.new()
 		paredes.mesh = lados.commit()
 		paredes.material_override = mat
+		paredes.layers = 2
 		add_child(paredes)
 
 
@@ -252,8 +280,16 @@ func _bloque(st: SurfaceTool, lados: SurfaceTool, x0: int, x1: int, y: int, anch
 	# el techo (a «h» de alto) toma el dibujo de «h» casillas más al norte, y la pared del sur, la franja pintada.
 	var h := _alto_pena
 	var uv := func(px: float, pz: float) -> Vector2: return Vector2(px / ancho, clampf(pz, 0.0, alto) / alto)
+	var z_top := float(y) - h
+	var z_bot := float(y + 1) - h
+	if z_bot <= 0.0:
+		# Cerca del borde norte: refleja hacia dentro para conservar la escala 1:1 sin estirar la fila 0
+		z_top = clampf(-z_top, 0.0, alto)
+		z_bot = clampf(-z_bot, 0.0, alto)
+	elif z_top < 0.0:
+		z_top = 0.0
 	_cuad(st, Vector3(x0, h, y), Vector3(x1, h, y), Vector3(x1, h, y + 1), Vector3(x0, h, y + 1),
-		uv.call(x0, y - h), uv.call(x1, y - h), uv.call(x1, y + 1 - h), uv.call(x0, y + 1 - h))
+		uv.call(x0, z_top), uv.call(x1, z_top), uv.call(x1, z_bot), uv.call(x0, z_bot))
 	for x in range(x0, x1):
 		if y + 1 >= filas.size() or filas[y + 1][x] != "0":
 			_cuad(lados, Vector3(x, h, y + 1), Vector3(x + 1, h, y + 1), Vector3(x + 1, 0, y + 1), Vector3(x, 0, y + 1),
@@ -296,14 +332,18 @@ func _crear_capas() -> void:
 	sombreador.code = SOMBREADOR_CAPA
 	var plano := PlaneMesh.new()
 	plano.size = Vector2(LADO_CAPA * PX, LADO_CAPA * PX)
-	for hundido in [0.0, 1.0]:
+	var hay_agua := _mascara_agua != null
+	var agua_tex: Texture2D = _mascara_agua if hay_agua else ImageTexture.create_from_image(Image.create(1, 1, false, Image.FORMAT_L8))
+	var capas_hundido: Array = [0.0, 1.0] if hay_agua else [0.0]
+	for hundido: float in capas_hundido:
 		var mat := ShaderMaterial.new()
 		mat.shader = sombreador
 		mat.set_shader_parameter("capa", _capa_suelo.get_texture())
-		mat.set_shader_parameter("agua", _mascara_agua)
-		mat.set_shader_parameter("casillas", Vector2(_mascara_agua.get_width(), _mascara_agua.get_height()) if _mascara_agua else Vector2.ONE)
+		mat.set_shader_parameter("agua", agua_tex)
+		mat.set_shader_parameter("casillas", Vector2(_mascara_agua.get_width(), _mascara_agua.get_height()) if hay_agua else Vector2.ONE)
 		mat.set_shader_parameter("lado", float(LADO_CAPA))
 		mat.set_shader_parameter("hundido", hundido)
+		mat.set_shader_parameter("hay_agua", 1.0 if hay_agua else 0.0)
 		_mats_capa.append(mat)
 		var p := MeshInstance3D.new()
 		p.mesh = plano
@@ -365,7 +405,8 @@ func _mover_capas() -> void:
 	var centro := Vector2(roundf(_foco.x / PX), roundf(_foco.z / PX))
 	_capa_suelo.canvas_transform = Transform2D(0.0, -(centro - Vector2(LADO_CAPA, LADO_CAPA) / 2.0))
 	_plano_capa.position = Vector3(centro.x * PX, 0.005, centro.y * PX)
-	_plano_agua.position = Vector3(centro.x * PX, -HONDO_AGUA, centro.y * PX)
+	if _plano_agua:
+		_plano_agua.position = Vector3(centro.x * PX, -HONDO_AGUA, centro.y * PX)
 	for mat in _mats_capa:
 		mat.set_shader_parameter("origen", centro - Vector2(LADO_CAPA, LADO_CAPA) / 2.0)
 	_capa_pantalla.canvas_transform = escena.get_viewport().canvas_transform
@@ -386,12 +427,14 @@ func _mover_capas() -> void:
 		var g: Sprite3D = _ventanas[i][1]
 		if i >= cerca.size():
 			g.visible = false
+			v.render_target_update_mode = SubViewport.UPDATE_DISABLED
 			continue
+		v.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 		var c: Node2D = cerca[i][1]
 		var pie := c.global_position.round()
 		v.canvas_transform = Transform2D(0.0, -(pie - VENTANA_PIE))
 		g.position = _al_suelo(pie) + Vector3(0, 0, 0.06)        # (un pelín hacia la cámara: por delante de su dibujo)
-		g.modulate = _tinte
+		g.modulate = Color.WHITE
 		g.visible = true
 
 
@@ -408,26 +451,38 @@ func _exit_tree() -> void:
 
 # --- La cámara ------------------------------------------------------------------------------------------------
 
+func _objetivo_camara() -> Vector2:
+	if region == null and is_instance_valid(escena):
+		var cam := escena.get_viewport().get_camera_2d()
+		if cam and (not is_instance_valid(_maisha) or not _maisha.is_ancestor_of(cam)):
+			return cam.get_screen_center_position() + Impacto.encuadre
+	if is_instance_valid(_maisha):
+		return _maisha.global_position + Impacto.encuadre
+	return Vector2.ZERO
+
+
 func _crear_camara() -> void:
 	camara = Camera3D.new()
 	camara.fov = CAMARA_FOV
 	camara.rotation_degrees = Vector3(CAMARA_INCLINACION, 0, 0)
 	add_child(camara)
 	camara.current = true
-	if _maisha:
-		_foco = _al_suelo(_maisha.global_position + Impacto.encuadre)
+	_foco = _al_suelo(_objetivo_camara())
 	_colocar_camara(1.0)
 
 
 func _colocar_camara(suave: float) -> void:
-	if _maisha and is_instance_valid(_maisha):
-		_foco = _foco.lerp(_al_suelo(_maisha.global_position + Impacto.encuadre), suave)
-	# sin salirse del mapa (como la cámara 2D): deja un margen de media pantalla a cada lado
+	var objetivo := _objetivo_camara()
+	if objetivo != Vector2.ZERO or is_instance_valid(_maisha):
+		_foco = _foco.lerp(_al_suelo(objetivo), suave)
+	# sin salirse del mapa (como la cámara 2D): cubre la proyección completa (-33° norte ~ 14.5m, -63° sur ~ 9m)
 	if region:
 		var tam: Vector2 = region.get("tam") * PX
-		var mx := minf(16.0, tam.x / 2.0)
-		_foco.x = clampf(_foco.x, mx, tam.x - mx)
-		_foco.z = clampf(_foco.z, minf(7.0, tam.y / 2.0), tam.y - minf(11.0, tam.y / 2.0))
+		var mx := 15.0
+		_foco.x = tam.x / 2.0 if mx * 2.0 >= tam.x else clampf(_foco.x, mx, tam.x - mx)
+		var z_min := 14.5
+		var z_max := tam.y - 9.0
+		_foco.z = tam.y / 2.0 if z_min >= z_max else clampf(_foco.z, z_min, z_max)
 	var atras := camara.global_transform.basis.z * CAMARA_DISTANCIA
 	camara.global_position = _foco + atras
 
@@ -439,6 +494,14 @@ func _al_suelo(p: Vector2) -> Vector3:
 # --- Los gemelos de los dibujos -------------------------------------------------------------------------------
 
 func _registrar(n: Node) -> void:
+	if n is CanvasModulate:
+		var cm := n as CanvasModulate
+		if escena.is_ancestor_of(cm) and not _moduladores.has(cm):
+			_moduladores.append(cm)
+	elif n is PointLight2D:
+		var luz := n as PointLight2D
+		if escena.is_ancestor_of(luz) and not _luces_2d.has(luz):
+			_luces_2d.append(luz)
 	if not (n is CanvasItem) or not escena.is_ancestor_of(n) or _en_interfaz(n):
 		return
 	var ci := n as CanvasItem
@@ -504,7 +567,11 @@ func _dibuja(n: Node) -> bool:
 
 ## El objeto de pie al que pertenece este dibujo (él mismo o su padre, si es de los DE_PIE), o null
 func _dueno_de_pie(n: Node) -> Node:
-	for c in [n, n.get_parent()]:
+	var candidatos: Array[Node] = [n]
+	# Un hijo «top_level» (rastros o capas en el suelo) vive en el mundo, no sobre el cuerpo del padre
+	if not (n is Node2D and (n as Node2D).top_level):
+		candidatos.append(n.get_parent())
+	for c in candidatos:
 		if c and c != escena and c.get_script():
 			var s: Script = c.get_script()
 			while s:
@@ -530,6 +597,10 @@ func _de_pantalla(n: Node) -> bool:
 
 
 func _quitar(n: Node) -> void:
+	if n is CanvasModulate:
+		_moduladores.erase(n)
+	elif n is PointLight2D:
+		_luces_2d.erase(n)
 	var id := n.get_instance_id()
 	_canales.erase(id)
 	if _gemelos.has(id):
@@ -590,11 +661,53 @@ func _process(_delta: float) -> void:
 		_copiar(n, g, par[2], par[3])
 	_colocar_camara(0.12)
 	_mover_capas()
-	# el sol sigue la hora del día (de día, cálido; de noche, frío y flojo), y los dibujos se tiñen igual
-	var dia: float = Reloj.luz_dia() if Reloj.has_method("luz_dia") else 1.0
-	sol.light_energy = lerpf(0.07, 0.27, dia)
-	sol.light_color = Color(0.6, 0.66, 0.95).lerp(Color(1.0, 0.95, 0.86), dia)
-	_tinte = Color(0.42, 0.46, 0.68).lerp(Color.WHITE, dia)
+	# La capa 2D del suelo y las ventanitas ya reciben LuzDelDia / Penumbra; aquí igualamos el suelo lejano, las peñas y los gemelos
+	var mod := Color.WHITE
+	for i in range(_moduladores.size() - 1, -1, -1):
+		var cm: CanvasModulate = _moduladores[i]
+		if not is_instance_valid(cm):
+			_moduladores.remove_at(i)
+			continue
+		if cm.is_visible_in_tree():
+			mod *= cm.color
+	_mod_escena = mod
+	if _entorno:
+		_entorno.background_color = _fondo_base * mod
+	for m in _suelos_lejanos:
+		m.set_shader_parameter("tinte", mod)
+	if _mat_penas:
+		_mat_penas.albedo_color = mod
+	if _luz_muros:
+		var oscuro := clampf((0.8 - mod.get_luminance()) * 1.4, 0.0, 1.0)
+		_luz_muros.visible = oscuro > 0.05 and is_instance_valid(_maisha)
+		if _luz_muros.visible:
+			_luz_muros.light_energy = 0.75 * oscuro
+			_luz_muros.global_position = _al_suelo(_maisha.global_position) + Vector3(0.0, 1.4, 0.2)
+
+
+func _tinte_sprite(n: Node2D) -> Color:
+	if n.material is CanvasItemMaterial and (n.material as CanvasItemMaterial).light_mode == CanvasItemMaterial.LIGHT_MODE_UNSHADED:
+		return Color.WHITE
+	if _mod_escena.r >= 0.99 and _mod_escena.g >= 0.99 and _mod_escena.b >= 0.99:
+		return Color.WHITE
+	var luz := _mod_escena
+	for i in range(_luces_2d.size() - 1, -1, -1):
+		var l: PointLight2D = _luces_2d[i]
+		if not is_instance_valid(l):
+			_luces_2d.remove_at(i)
+			continue
+		if not l.enabled or not l.is_visible_in_tree() or l.texture == null:
+			continue
+		var radio := l.texture.get_width() * 0.5 * l.texture_scale
+		if radio <= 1.0:
+			continue
+		var d := n.global_position.distance_to(l.global_position)
+		if d >= radio:
+			continue
+		var f := clampf(1.0 - d / radio, 0.0, 1.0)
+		f = f * f * (3.0 - 2.0 * f) * l.energy
+		luz += l.color * f
+	return Color(minf(luz.r, 1.0), minf(luz.g, 1.0), minf(luz.b, 1.0), 1.0)
 
 
 func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
@@ -624,7 +737,7 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 	g.flip_h = n.flip_h
 	g.flip_v = n.flip_v
 	g.centered = n.centered
-	g.modulate = n.modulate * n.self_modulate * _tinte
+	g.modulate = n.modulate * n.self_modulate * _tinte_sprite(n)
 	var escala := n.global_scale
 	g.scale = Vector3(escala.x, escala.y, 1.0)
 	var rot := n.global_rotation

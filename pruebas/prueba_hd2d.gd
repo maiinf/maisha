@@ -39,17 +39,21 @@ func _ready() -> void:
 		Estado.marcar(m)
 	Estado.jugando = true
 
-	print("Encender el HD-2D:")
+	print("Arranca en HD-2D y se alterna con H:")
 	await _ir("prados_del_eco", "")
 	var escena := get_tree().current_scene
-	_comprobar(_espejo() == null and escena.visible, "al empezar, el juego se ve en 2D")
+	var espejo := _espejo()
+	_comprobar(espejo != null and escena.visible, "al empezar, el juego arranca directamente en HD-2D")
 	var tecla := InputEventKey.new()
 	tecla.physical_keycode = KEY_H
 	tecla.pressed = true
 	escena._unhandled_key_input(tecla)
+	await _esperar(0.3)
+	_comprobar(_espejo() == null and not Estado.extra.get("hd2d", false), "con H se apaga al 2D clásico")
+	escena._unhandled_key_input(tecla)
 	await _esperar(0.5)
-	var espejo := _espejo()
-	_comprobar(espejo != null, "con H se enciende el HD-2D")
+	espejo = _espejo()
+	_comprobar(espejo != null, "con H vuelve a encenderse el HD-2D")
 	_comprobar(escena.visible and espejo != null and espejo.get("_capa_suelo") != null, "el dibujo 2D del mundo pasa a las capas 3D (la escena sigue viva)")
 	var gemelos: Dictionary = espejo.get("_gemelos") if espejo else {}
 	_comprobar(gemelos.size() > 40, "cada dibujo del mundo tiene su gemelo 3D (%d)" % gemelos.size())

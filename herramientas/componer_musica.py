@@ -2406,6 +2406,87 @@ def jefe_kipanga():
     return final(p, sala=3.0, mezcla=0.32, brillo=6000)
 
 
+def nucleo_estrella():
+    """«Lo que cayó del cielo»: El Núcleo de la Estrella (mazmorra final de Asterhaul, 88 BPM).
+    Solemne e íntima en Re dórico / lidio: latido grave de semilla dormida, coro estelar lejano,
+    kalimba de hierro resonante y flauta dialogando con el tema de Asterhaul antes del santuario."""
+    tempo = Tempo(88)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m7"), ("A#1", "M7"), ("C2", "M"), ("D2", "m7"),
+        ("G2", "m7"), ("F2", "M7"), ("A#1", "M7"), ("A1", "sus"),
+    ] * 3
+    colchones(p, tempo, progresion, compas=4, brillo=980, volumen=0.26, octava_bajo=1, fuerza_bajo=0.38)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.19, pan=-0.28, patron=(0, 2, 1, 3, 2, 1, 3, 0))
+        notas = acorde(raiz[:-1] + "4", tipo)
+        p.poner(balafon(notas[0], 0.45, 0.16), tempo.s(i * 4), pan=0.25)
+    # pulso de latido sordo del meteorito en calma
+    for b in range(0, pulsos, 4):
+        p.poner(tambor("D1", 0.38, 0.42, golpe=0.38), tempo.s(b), pan=0.0)
+        p.poner(tambor("D1", 0.28, 0.24, golpe=0.35), tempo.s(b + 0.75), pan=0.0)
+        if b % 8 == 0:
+            p.poner(campanita("D6", 1.9, 0.12), tempo.s(b + 2), pan=0.32)
+            p.poner(campanita("A6", 1.7, 0.09), tempo.s(b + 2.5), pan=-0.30)
+    p.poner(coro(["D3", "A3", "E4"], tempo.s(16)), tempo.s(16), 0.07)
+    p.poner(coro(["A#2", "F3", "C4"], tempo.s(16)), tempo.s(48), 0.07)
+    p.poner(coro(["D3", "A3", "F4"], tempo.s(16)), tempo.s(80), 0.08)
+    tema_nucleo = [
+        ("D5", 0, 2), ("A4", 2, 1), ("E5", 3, 1), ("F5", 4, 2), ("E5", 6, 2),
+        ("D5", 8, 1.5), ("C5", 9.5, 0.5), ("A#4", 10, 2), ("A4", 12, 4),
+        ("F5", 16, 1.5), ("G5", 17.5, 0.5), ("A5", 18, 2), ("G5", 20, 1.5), ("F5", 21.5, 0.5), ("E5", 22, 2),
+        ("D5", 24, 1), ("E5", 25, 1), ("F5", 26, 1.5), ("A4", 27.5, 0.5), ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.44, vibrato=4.5)
+    tocar(p, tempo, tema_nucleo, desde=0, fuerza=0.28, pan=-0.1)
+    melodia(p, tempo, tema_nucleo, desde=32, instrumento=flauta_, volumen=0.40, sostener=0.94, pan=0.14)
+    melodia(p, tempo, TEMA_ASTERHAUL, desde=64, instrumento=flauta_, volumen=0.38, sostener=0.94, pan=0.10)
+    melodia(p, tempo, transportar(tema_nucleo, -12), desde=64, instrumento=kalimba, volumen=0.24, pan=-0.22)
+    return final(p, sala=3.9, mezcla=0.38, brillo=5400)
+
+
+def jefe_corazon():
+    """«El pulso de la estrella»: combate final de Asterhaul contra El Corazón del Meteorito (146 BPM).
+    Fuerza épica y emotiva en Re menor / dórico: tambores sísmicos, yunques de hierro magnético,
+    destellos de ámbar cristalino, coro solemne y el tema de Maisha abriéndose paso hacia la luz."""
+    tempo = Tempo(146)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m"), ("A#1", "M"), ("C2", "M"), ("A1", "m"),
+        ("D2", "m"), ("F2", "M"), ("G2", "m"), ("A1", "M"),
+    ] * 3
+    colchones(p, tempo, progresion, compas=4, brillo=1300, volumen=0.30, octava_bajo=1, fuerza_bajo=0.48)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.24, pan=-0.28, patron=(0, 2, 1, 3, 2, 0, 1, 3))
+        notas = acorde(raiz[:-1] + "4", tipo)
+        for paso_ in (0, 1.5, 3):
+            p.poner(balafon(notas[0], 0.22, 0.26), tempo.s(i * 4 + paso_), pan=0.22)
+    for b in range(0, pulsos, 2):
+        p.poner(tambor("D1", 0.34, 0.58, golpe=0.58), tempo.s(b), pan=0.0)
+        p.poner(tambor("A1", 0.20, 0.36, golpe=0.68), tempo.s(b + 0.5), pan=-0.18)
+        p.poner(tambor("D2", 0.20, 0.38, golpe=0.66), tempo.s(b + 1.25), pan=0.18)
+        p.poner(maraca(0.06, 0.16), tempo.s(b + 1.5), pan=0.26)
+        if b % 8 == 0:
+            p.poner(taiko(1.2, 0.78), tempo.s(b), pan=0.0)
+            p.poner(campanita("D6", 0.45, 0.22), tempo.s(b), pan=0.35)
+    p.poner(coro(["D3", "A3", "F4"], tempo.s(16)), tempo.s(32), 0.09)
+    p.poner(coro(["G3", "D4", "A#4"], tempo.s(16)), tempo.s(64), 0.09)
+    tema_corazon = [
+        ("D5", 0, 1), ("A5", 1, 1), ("G5", 2, 1.5), ("F5", 3.5, 0.5), ("E5", 4, 1), ("D5", 5, 1), ("C5", 6, 2),
+        ("A#4", 8, 1), ("C5", 9, 1), ("D5", 10, 1.5), ("E5", 11.5, 0.5), ("F5", 12, 1), ("G5", 13, 1), ("A5", 14, 2),
+        ("D6", 16, 1.5), ("C6", 17.5, 0.5), ("A5", 18, 1), ("F5", 19, 1), ("G5", 20, 1.5), ("F5", 21.5, 0.5), ("E5", 22, 2),
+        ("D5", 24, 1.5), ("A4", 25.5, 0.5), ("E5", 26, 1), ("F#5", 27, 1), ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.46, vibrato=5.4)
+    melodia(p, tempo, tema_corazon, desde=0, instrumento=kalimba, volumen=0.40, pan=-0.16)
+    melodia(p, tempo, tema_corazon, desde=32, instrumento=flauta_, volumen=0.45, sostener=0.9, pan=0.16)
+    tocar(p, tempo, tema_corazon, desde=64, fuerza=0.38, pan=0.0)
+    melodia(p, tempo, transportar(tema_corazon, -12), desde=64, instrumento=kalimba, volumen=0.28, pan=-0.22)
+    return final(p, sala=3.2, mezcla=0.34, brillo=6000)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2423,6 +2504,8 @@ PIEZAS["fundicion_escoria"] = fundicion_escoria
 PIEZAS["jefe_nyundo"] = jefe_nyundo
 PIEZAS["aguja_caida"] = aguja_caida
 PIEZAS["jefe_kipanga"] = jefe_kipanga
+PIEZAS["nucleo_estrella"] = nucleo_estrella
+PIEZAS["jefe_corazon"] = jefe_corazon
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -2440,6 +2523,8 @@ TITULOS["fundicion_escoria"] = "El hierro que no duerme"
 TITULOS["jefe_nyundo"] = "Las cuatro tenazas del crisol"
 TITULOS["aguja_caida"] = "Donde canta el cristal"
 TITULOS["jefe_kipanga"] = "Alas de obsidiana"
+TITULOS["nucleo_estrella"] = "Lo que cayó del cielo"
+TITULOS["jefe_corazon"] = "El pulso de la estrella"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

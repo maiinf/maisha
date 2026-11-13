@@ -2270,6 +2270,64 @@ def kipanga_pluma():
     return reverb(p.entera(), 0.75, 0.24)
 
 
+def corazon_latido():
+    """Latido profundo del Corazón del Meteorito resonando en las paredes del cráter."""
+    p = Pista(1.1)
+    for i, f0 in enumerate((64.0, 52.0)):
+        t0 = i * 0.24
+        d = 0.45
+        n = _n(d)
+        golpe = seno(_desliz(f0, 32.0, d), d) * caida(n, 0.14) * (0.85 if i == 0 else 0.55)
+        p.poner(golpe, t0)
+    p.poner(campanita("D5", 0.9, 0.18), 0.02)
+    return reverb(p.entera(), 1.6, 0.35)
+
+
+def corazon_aro():
+    """Giro pesado de los aros de hierro meteórico encajando alrededor de la semilla estelar."""
+    p = Pista(0.85)
+    d = 0.65
+    n = _n(d)
+    roce = paso_banda(ruido_rosa(d), 450, 2600) * adsr(n, 0.05, 0.18, 0.65, 0.2) * 0.68
+    cierre = taiko(0.32, 0.75)
+    p.poner(roce, 0.0)
+    p.poner(cierre, 0.36)
+    p.poner(campanita("A5", 0.45, 0.28), 0.38)
+    return reverb(p.entera(), 0.9, 0.26)
+
+
+def corazon_abierto():
+    """Un aro exterior cede y la luz dorada estalla al exponer la semilla estelar."""
+    p = Pista(1.3)
+    grieta = _crujido_piedra(0.45, 220) * caida(_n(0.45), 0.15) * 0.75
+    p.poner(grieta, 0.0)
+    for k, nota in enumerate(("D5", "F#5", "A5", "D6")):
+        p.poner(campanita(nota, 0.9 - k * 0.1, 0.30 - k * 0.03), 0.05 + k * 0.06)
+    return reverb(p.entera(), 1.8, 0.36)
+
+
+def corazon_rayo():
+    """Barrido luminoso de plasma estelar emitido por los aros del Corazón del Meteorito."""
+    p = Pista(1.0)
+    d = 0.85
+    n = _n(d)
+    haz = (sierra(_desliz(760, 260, d), d, 7) * 0.55 + seno(_desliz(380, 760, d), d) * 0.45) * adsr(n, 0.04, 0.2, 0.6, 0.25) * 0.45
+    soplo = barrido_bajo(ruido_rosa(d), 3600, 800) * caida(n, 0.25) * 0.5
+    p.poner(haz + soplo, 0.0)
+    return reverb(p.entera(), 1.1, 0.28)
+
+
+def cetro_nexo():
+    """El Cetro del Nexo queda completo con los 3 poderes de Asterhaul brillando en la estrella."""
+    p = Pista(1.8)
+    notas = ("D5", "E5", "F#5", "A5", "D6", "F#6")
+    for k, nota in enumerate(notas):
+        p.poner(campanita(nota, 1.2 - k * 0.1, 0.28 - k * 0.02), k * 0.09)
+    fondo = seno(_desliz(293.66, 587.33, 1.4), 1.4) * adsr(_n(1.4), 0.15, 0.4, 0.5, 0.45) * 0.28
+    p.poner(fondo, 0.05)
+    return reverb(p.entera(), 2.2, 0.38)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -2340,6 +2398,9 @@ EFECTOS = {
     "resonancia_ambar": (resonancia_ambar, 0.7), "puente_cristal": (puente_cristal, 0.65),
     "popo_chillido": (popo_chillido, 0.65), "kipanga_picado": (kipanga_picado, 0.75),
     "kipanga_pluma": (kipanga_pluma, 0.75),
+    "corazon_latido": (corazon_latido, 0.8), "corazon_aro": (corazon_aro, 0.7),
+    "corazon_abierto": (corazon_abierto, 0.75), "corazon_rayo": (corazon_rayo, 0.75),
+    "cetro_nexo": (cetro_nexo, 0.75),
 }
 
 AMBIENTES = {

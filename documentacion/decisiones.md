@@ -435,7 +435,7 @@ se pasan.
 | Habitantes y miedo de Giza | **Los Canteros de Ámbar y el Miedo al Derrumbe**: **Mji-Jiwe** es una ciudad-anfiteatro de canteros, herreros y afinadores de diapasón tallada en un antiguo cráter al este de Kitovu que vivía del calor de la estrella caída. Giza les hizo temer que el pulso de la estrella resquebrajara la tierra y sellaron el Núcleo con tres grandes cadenas, dejando las forjas frías y a sus artesanos mudos de polvo gris. Su guía es **Mhunzi**, una vieja maestra fundidora con gafas de soldar de ámbar. |
 | Los 3 poderes del Arte de la Tierra y sus rutas | **1. Carga Sísmica** (embestida pesada que rompe muros agrietados, mueve vagonetas sobre raíles y abre los secretos de Carga en Raíz) en el **Desfiladero del Meteorito** y **Las Galerías de Ámbar** (jefe: **Kifaru de Basalto**) · **2. Pulso Magnético** (atrae o repele bloques de hierro meteórico y grúas sobre la escoria fundida) en **La Fundición de Escoria** (jefe: **Nyundo, el Gran Martillo**) · **3. Resonancia de Ámbar** (hace vibrar monolitos-diapasón para encender puentes de cristal y peñascos flotantes) en **La Aguja Caída** (jefe: **Kipanga Astral**). |
 | Misterio y coleccionables | **12 Esquirlas de Estrella** repartidas por Asterhaul que devuelven el pulso y el calor a los 12 artesanos en gris de Mji-Jiwe y encienden los 12 Yunques de Memoria alrededor del Gran Diapasón. |
-| Mauti y el Núcleo de la Estrella | En el Desfiladero del Meteorito, **Mauti** intenta apartar un derrumbe sin ayuda y queda atrapada hasta que Maisha la rescata con la Carga Sísmica; juntas descubren que la estrella caída hace siglos en **El Núcleo de la Estrella** (jefe final: **El Corazón del Meteorito**) era una hermana mayor de Maisha cuyo corazón aún late esperando el Cetro del Nexo. |
+| Mauti y el Núcleo de la Estrella | En el Desfiladero del Meteorito, **Mauti** intenta apartar un derrumbe sin ayuda y queda bajo las rocas hasta que Maisha abre paso con la Carga Sísmica; ambas figuras descubren que la estrella caída hace siglos en **El Núcleo de la Estrella** (jefe final: **El Corazón del Meteorito**) guardaba a la semilla mayor cuyo corazón aún late esperando el Cetro del Nexo. |
 | Bocetos | Ambiente: `documentacion/boceto_asterhaul.png` (`herramientas/boceto_asterhaul.py`). Mapa de regiones (8×6 pantallas): `documentacion/boceto_mapa_asterhaul.png` (`herramientas/boceto_mapa_asterhaul.py`). |
 
 ### 2026-11-07 · El Desfiladero del Meteorito y Mji-Jiwe, la Ciudad del Cráter (Decidido con Iam)
@@ -479,3 +479,23 @@ Lo que se decidió con Iam el 2026-11-07 (bobinas y puentes, Nyota, Saa, Kengele
 | Las ondas de silencio de Kengele | Además de quitar 1 hoja, dejan a Maisha **3 s sin poder trazar sigilos** |
 | R | Ahora pasa por los tres sigilos aprendidos: Fuego → Hielo → Rayo |
 | Arreglo | El Sigilo de Fuego quemaba a Maisha al trazarlo; ya no |
+
+### 2026-11-13 · La Sección Prohibida y el final de Sigilia, construidos (Iam: «sí, sigue»)
+Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigilos, la Sombra de Renglón, el Grimorio opción A, el cierre con Mauti y Kalamu) está hecho. Estos detalles los ha puesto Claude al construirlo; si alguno no gusta, se cambia:
+
+| Qué | Cómo ha quedado |
+| --- | --- |
+| Los tres nombres que faltaban | Solo había 9 fichas. Las otras tres están en rincones de Maandiko: **Kurasa** (pasadora de páginas, lee en la plaza), **Muhuri** (selladora: fue quien cerró la Sección) y **Wimbo** (cantor del Archivo) |
+| Qué pedestal rasga cada capítulo | El fuego se borra con **hielo**, el hielo se parte con **rayo**, el rayo se pierde en el **fuego**. El pedestal que toca late, y Kalamu lo cuenta antes |
+| La Sombra de Renglón | La fija **cualquier** sigilo, no solo el fuego o el hielo |
+| El Triple Sello | Primero los dos sellos de las cámaras (despiertan los pedestales del Claustro), luego los tres pedestales, cada uno con su sigilo |
+| El título del final | «Sigilia recuerda · Fin del segundo mundo · Continuará en Asterhaul...» |
+| Arreglo | En Sigilia, si Maisha caía se quedaba caída para siempre. Ahora se levanta donde entró en la escena (o a la entrada de la Rotonda, contra el Grimorio) |
+
+### 2026-11-13 · El Núcleo de la Estrella y El Corazón del Meteorito (Decidido con Iam: «vale»)
+| Qué | Decisión |
+| :--- | :--- |
+| Acceso y estructura (`documentacion/boceto_nucleo_estrella.png`) | **Descenso en espiral por las 3 Cámaras de Prueba + Santuario**: al romper las 3 Cadenas del Cráter (**Kifaru**, **Nyundo** y **Kipanga Astral**) y despertar los **12 Yunques de Memoria** en Mji-Jiwe, se abre el pozo central. Tres salas consecutivas obligan a combinar **Carga Sísmica**, **Pulso Magnético** y **Resonancia de Ámbar** antes de cruzar la Puerta Triple hacia la arena final. |
+| Jefe final: **El Corazón del Meteorito** (`documentacion/boceto_corazon_meteorito.png`) | **Opción A · La Semilla Estelar Encadenada**: núcleo poliédrico de ámbar vivo flotando dentro de tres aros giratorios de hierro meteórico encadenados al altar estelar. |
+| Mecánica de combate y clímax con **Mauti** | **3 Fases por poder + Mauti sostiene la luz estelar**: cada aro exterior cede ante un poder de la Tierra (*Sísmica -> Magnético -> Ámbar*) antes de golpear el núcleo con el Cetro. Al caer herido el corazón, **Mauti** acompaña a Maisha al descubrir que la estrella caída siglos atrás guardaba a la semilla mayor caída antes que Maisha; juntas energías calman el núcleo y completan el **Cetro del Nexo**, abriendo el último mundo. |
+| Modo HD-2D por defecto (`H`) | Iam confirma su prioridad: que todo funcione limpio al pulsar `H` sin fallos visuales en ninguna escena y que el juego pueda lanzarse directamente con el modo **HD-2D** activo. |

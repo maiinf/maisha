@@ -56,13 +56,13 @@ func _ready() -> void:
 	z_index = 1
 	# lo de detrás va en un nodo aparte, por debajo de Maisha y con mezcla de luz
 	_aura = Node2D.new()
-	_aura.z_index = -1
+	_aura.z_index = -2
 	_aura.show_behind_parent = true
 	var suma := CanvasItemMaterial.new()
 	suma.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	_aura.material = suma
 	_aura.draw.connect(_dibujar_detras)
-	get_parent().add_child.call_deferred(_aura)
+	add_child(_aura)
 	Artes.arte_subida.connect(func(_id: String, _n: int) -> void: _actualizar())
 	Estado.partida_cambiada.connect(_actualizar)
 	_actualizar()
