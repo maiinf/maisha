@@ -233,20 +233,63 @@ func _alcanza(marca: Dictionary, p: Vector2) -> bool:
 
 ## Una mano de tinta sale del suelo, se alza y da un manotazo
 func sacar_mano(donde: Vector2) -> void:
-	_manos.append({"p": donde, "t": 0.0})
+	var s := Sprite2D.new()
+	s.texture = MANO
+	s.centered = false
+	s.region_enabled = true
+	s.region_rect = Rect2(0, 0, 48, 1)
+	s.position = donde
+	s.offset = Vector2(-24, 0)
+	s.visible = false
+	get_parent().add_child(s)
+	_manos.append({"p": donde, "t": 0.0, "sprite": s})
 	Sonido.efecto("babosa_chof", -4.0, donde, 0.2)
 
 
+func _limpiar_manos() -> void:
+	for mano in _manos:
+		var s: Variant = mano.get("sprite")
+		if is_instance_valid(s):
+			(s as Node).queue_free()
+	_manos.clear()
+
+
+func _exit_tree() -> void:
+	_limpiar_manos()
+
+
 func _mover_manos(delta: float, m: Node2D) -> void:
+	var vivas: Array[Dictionary] = []
 	for mano in _manos:
 		var antes: float = mano["t"]
 		mano["t"] += delta
-		if antes < 0.7 and mano["t"] >= 0.7:
+		var t: float = mano["t"]
+		var s: Sprite2D = mano.get("sprite") as Sprite2D
+		if t >= 1.9:
+			if is_instance_valid(s):
+				s.queue_free()
+			continue
+		if is_instance_valid(s):
+			if t < 0.7:
+				var sube := clampf(t / 0.5, 0.0, 1.0)
+				var alto := 56.0 * sube
+				s.visible = alto >= 1.0
+				if s.visible:
+					s.region_rect = Rect2(0, 0, 48, alto)
+					s.offset = Vector2(-24, -52.0 * sube)
+					s.modulate.a = 1.0
+			else:
+				s.visible = true
+				s.region_rect = Rect2(48, 0, 48, 56)
+				s.offset = Vector2(-24, -44)
+				s.modulate.a = 1.0 - clampf((t - 1.5) / 0.4, 0.0, 1.0)
+		if antes < 0.7 and t >= 0.7:
 			Sonido.efecto("raiz_azota", -3.0, mano["p"], 0.2)
 			Impacto.temblar(1.5, 0.12)
 			if m and m.global_position.distance_to(mano["p"]) < 20.0:
 				m.call("recibir_danio", 1, mano["p"], "contacto")
-	_manos = _manos.filter(func(mano: Dictionary) -> bool: return mano["t"] < 1.9)
+		vivas.append(mano)
+	_manos = vivas
 
 
 ## Un pedestal de la Rotonda se ha activado: si es el que deshace el capítulo, lo rasga
@@ -259,7 +302,7 @@ func rasgar() -> void:
 	if fase != Fase.CAPITULO:
 		return
 	_marcas.clear()
-	_manos.clear()
+	_limpiar_manos()
 	_marcar_pedestal("")
 	_golpes = 0
 	_cambiar(Fase.ATURDIDO)
@@ -302,7 +345,7 @@ func morir() -> void:
 	for g in ["golpeables", "daniables", "enemigos"]:
 		remove_from_group(g)
 	_marcas.clear()
-	_manos.clear()
+	_limpiar_manos()
 	_marcar_pedestal("")
 	for s in get_tree().get_nodes_in_group("sombras_renglon"):
 		s.morir()
@@ -354,17 +397,11 @@ func _dibujar_suelo() -> void:
 	for mano in _manos:
 		var t: float = mano["t"]
 		var p: Vector2 = mano["p"]
-		if t < 0.7:
-			# sale del suelo: su charco crece y la mano sube
-			_suelo.draw_set_transform(p, 0.0, Vector2(1.0, 0.5))
-			_suelo.draw_circle(Vector2.ZERO, 20.0 * clampf(t / 0.4, 0.0, 1.0), Color(0.05, 0.03, 0.1, 0.7))
-			_suelo.draw_arc(Vector2.ZERO, 20.0, 0, TAU, 24, Color(0.72, 0.6, 1.0, 0.7), 1.0)
-			_suelo.draw_set_transform(Vector2.ZERO)
-			var sube := clampf(t / 0.5, 0.0, 1.0)
-			_suelo.draw_texture_rect_region(MANO, Rect2(p + Vector2(-24, -52 * sube), Vector2(48, 56 * sube)), Rect2(0, 0, 48, 56 * sube))
-		else:
-			var a := 1.0 - clampf((t - 1.5) / 0.4, 0.0, 1.0)
-			_suelo.draw_texture_rect_region(MANO, Rect2(p + Vector2(-24, -44), Vector2(48, 56)), Rect2(48, 0, 48, 56), Color(1, 1, 1, a))
+		var r := clampf(t / 0.4, 0.0, 1.0) if t < 0.7 else (1.0 - clampf((t - 1.5) / 0.4, 0.0, 1.0))
+		_suelo.draw_set_transform(p, 0.0, Vector2(1.0, 0.5))
+		_suelo.draw_circle(Vector2.ZERO, 20.0 * r, Color(0.05, 0.03, 0.1, 0.7 * r))
+		_suelo.draw_arc(Vector2.ZERO, 20.0, 0, TAU, 24, Color(0.72, 0.6, 1.0, 0.7 * r), 1.0)
+		_suelo.draw_set_transform(Vector2.ZERO)
 
 
 ## La runa del capítulo, brillando sobre las páginas; pasando hojas, páginas que vuelan

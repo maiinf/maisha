@@ -169,6 +169,93 @@ const CATALOGO := {
 		"tipo": "domo", "x0": 10, "x1": 34, "cap_x0": 16, "cap_x1": 28,
 		"y_alero": 46, "y_pico": 6, "fondo": 1.6, "cono": true,
 	},
+	"fuente.png": {
+		"tipo": "bloques",
+		"partes": [
+			["cil", 7, 57, 35, 48, 0.25, -1.95, true, [10, 26, 40, 46], [16, 48, 36, 42]],
+			["cil", 29, 35, 16, 38, -0.67, -1.03, false, [29, 34, 18, 34]],
+			["capa", 20, 48, 4, 38, -0.85, 1.0],
+		],
+	},
+	"seccion/sello.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 0, 6, 4, 47, 0.02, -0.68, true, [0, 5, 8, 44]],
+			["caja", 58, 64, 4, 47, 0.02, -0.68, true, [58, 63, 8, 44]],
+		],
+	},
+	"pedestal.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 5, 19, 8, 15, 0.01, -0.62, true, [6, 18, 9, 13]],
+			["caja", 8, 16, 15, 30, -0.06, -0.46, false, [8, 15, 16, 29]],
+			["caja", 4, 20, 30, 35, 0.02, -0.72, true, [5, 19, 31, 34]],
+		],
+	},
+	"seccion/atril.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 3, 13, 6, 13, 0.01, -0.45, true, [4, 12, 6, 12]],
+			["caja", 6, 10, 13, 27, -0.10, -0.34, false, [4, 12, 6, 12]],
+			["caja", 3, 13, 27, 30, 0.02, -0.52, true, [4, 12, 6, 12]],
+		],
+	},
+	"estanterias/atril.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 7, 33, 13, 25, 0.01, -0.82, true, [10, 30, 15, 23]],
+			["caja", 18, 23, 25, 38, -0.15, -0.55, false, [18, 22, 27, 37]],
+			["caja", 13, 27, 38, 44, 0.02, -0.82, true, [14, 26, 39, 43]],
+		],
+	},
+	"altar.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 9, 25, 20, 30, -0.02, -0.92, true, [10, 23, 21, 29]],
+			["caja", 6, 28, 30, 35, 0.02, -1.08, true, [7, 27, 31, 34]],
+		],
+	},
+	"menhir.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 5, 13, 12, 34, 0.01, -0.65, true, [5, 12, 16, 32]],
+			["capa", 3, 15, 2, 14, -0.22, 0.88],
+			["capa", 3, 15, 2, 14, -0.44, 0.76],
+		],
+	},
+	"arco_ruinas.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 16, 29, 24, 83, 0.02, -1.10, true, [17, 28, 36, 76]],
+			["caja", 83, 97, 34, 83, 0.02, -1.10, true, [84, 96, 40, 76]],
+			["capa", 16, 94, 0, 32, -0.28, 0.88],
+			["capa", 16, 94, 0, 32, -0.56, 0.78],
+			["capa", 16, 94, 0, 32, -0.84, 0.68],
+		],
+	},
+	"estatua.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 6, 25, 35, 39, 0.02, -0.78, true, [8, 22, 35, 39]],
+			["caja", 36, 55, 35, 39, 0.02, -0.78, true, [38, 52, 35, 39]],
+			["caja", 66, 85, 35, 39, 0.02, -0.78, true, [68, 82, 35, 39]],
+			["capa", 4, 89, 1, 36, -0.22, 0.88],
+			["capa", 4, 89, 1, 36, -0.44, 0.78],
+			["capa", 4, 89, 1, 36, -0.66, 0.70],
+		],
+	},
+	"muro.png": {
+		"tipo": "bloques",
+		"partes": [
+			["caja", 0, 24, 1, 12, 0.02, -0.68, true, [2, 22, 3, 10], [2, 22, 3, 8]],
+		],
+	},
+	"columna.png": {
+		"tipo": "bloques",
+		"partes": [
+			["cil", 1, 11, 3, 30, 0.02, -0.60, true, [2, 9, 8, 26], [2, 9, 8, 16]],
+		],
+	},
 }
 
 var _shader: Shader
@@ -184,8 +271,9 @@ func _nombre_catalogo(tex: Texture2D) -> String:
 	if tex == null:
 		return ""
 	var ruta := tex.resource_path
-	if ruta.ends_with("campo/molino.png"):
-		return "campo/molino.png"
+	for clave: String in ["campo/molino.png", "seccion/atril.png", "estanterias/atril.png", "seccion/sello.png"]:
+		if ruta.ends_with(clave):
+			return clave
 	var archivo := ruta.get_file()
 	return archivo if CATALOGO.has(archivo) else ""
 
@@ -449,8 +537,74 @@ func _construir_malla(tex: Texture2D, archivo: String, marco: int, hf: int, fw: 
 			_construir_puesto(st, img, cfg, xoff, yoff, fw, fh)
 		"arbol":
 			_construir_arbol(st, img, cfg, xoff, yoff, fw, fh)
+		"bloques":
+			_construir_bloques(st, img, cfg, xoff, yoff, fw, fh)
 
 	return st.commit()
+
+
+static func _construir_bloques(st: SurfaceTool, img: Image, cfg: Dictionary, xoff: int, yoff: int, fw: int, fh: int) -> void:
+	var tiene_frente := cfg.has("frente_z")
+	if tiene_frente:
+		var fz := float(cfg["frente_z"])
+		_quad(st,
+			_p(0, fh, fz, fw, fh), _p(fw, fh, fz, fw, fh),
+			_p(fw, 0, fz, fw, fh), _p(0, 0, fz, fw, fh),
+			_uv(0, fh, fw, fh), _uv(fw, fh, fw, fh), _uv(fw, 0, fw, fh), _uv(0, 0, fw, fh), Color.WHITE)
+	var col_i := yoff / fh
+	var partes: Array = cfg.get("partes", [])
+	for parte_v: Variant in partes:
+		var p := parte_v as Array
+		var kind := String(p[0])
+		if kind == "capa":
+			var x0 := float(p[1]); var x1 := float(p[2]); var y0 := float(p[3]); var y1 := float(p[4])
+			var z := float(p[5]); var s := float(p[6])
+			_quad(st,
+				_p(x0, y1, z, fw, fh), _p(x1, y1, z, fw, fh), _p(x1, y0, z, fw, fh), _p(x0, y0, z, fw, fh),
+				_uv(x0, y1, fw, fh), _uv(x1, y1, fw, fh), _uv(x1, y0, fw, fh), _uv(x0, y0, fw, fh), Color(s, s, s))
+			continue
+		var x0 := float(p[1]); var x1 := float(p[2]); var y0 := float(p[3]); var y1 := float(p[4])
+		var zf := float(p[5]); var zb := float(p[6]); var con_top := bool(p[7])
+		var mr: Array = p[8] if p.size() > 8 else [int(x0) + 1, int(x1) - 1, int(y0) + 2, int(y1) - 2]
+		var m_pared := _muestra(img, xoff, col_i, fw, fh, int(mr[0]), int(mr[1]), int(mr[2]), int(mr[3]))
+		var m_top := Rect2()
+		if con_top:
+			if p.size() > 9:
+				var tr_rect: Array = p[9]
+				m_top = _muestra(img, xoff, col_i, fw, fh, int(tr_rect[0]), int(tr_rect[1]), int(tr_rect[2]), int(tr_rect[3]))
+			else:
+				m_top = m_pared
+		if kind == "caja":
+			_caja_texturada(st, x0, x1, y0, y1, zf, zb, fw, fh, m_pared, m_top, not tiene_frente)
+		elif kind == "cil":
+			var cx_m := ((x0 + x1) * 0.5 - float(fw) * 0.5) * PX
+			var rx := maxf((x1 - x0) * 0.5 * PX, 0.12)
+			var rz := maxf((zf - zb) * 0.5, 0.12)
+			var zc := (zf + zb) * 0.5
+			var y_bot_m := (float(fh) - y1) * PX
+			var y_top_m := (float(fh) - y0) * PX
+			var segs := 12
+			var centro := Vector3(cx_m, y_top_m, zc)
+			for i in segs:
+				var a0 := -PI + TAU * float(i) / float(segs)
+				var a1 := -PI + TAU * float(i + 1) / float(segs)
+				var b0 := Vector3(cx_m + sin(a0) * rx, y_bot_m, zc + cos(a0) * rz)
+				var b1 := Vector3(cx_m + sin(a1) * rx, y_bot_m, zc + cos(a1) * rz)
+				var t1 := Vector3(b1.x, y_top_m, b1.z)
+				var t0 := Vector3(b0.x, y_top_m, b0.z)
+				var am := (a0 + a1) * 0.5
+				var sombra := 0.76 + 0.24 * clampf(cos(am), 0.0, 1.0)
+				if cos(am) >= 0.0:
+					var px_s0 := lerpf(x0, x1, (sin(a0) + 1.0) * 0.5)
+					var px_s1 := lerpf(x0, x1, (sin(a1) + 1.0) * 0.5)
+					_quad(st, b0, b1, t1, t0,
+						_uv(px_s0, y1, fw, fh), _uv(px_s1, y1, fw, fh),
+						_uv(px_s1, y0, fw, fh), _uv(px_s0, y0, fw, fh),
+						Color(sombra, sombra, sombra))
+				else:
+					_quad_tiling(st, b0, b1, t1, t0, m_pared, fw, fh, Color(sombra * 0.9, sombra * 0.92, sombra * 0.96))
+				if con_top:
+					_tri_tiling(st, t0, t1, centro, m_top, fw, fh, Color(0.92, 0.92, 0.94))
 
 
 static func _construir_sello(st: SurfaceTool, cfg: Dictionary, fw: int, fh: int) -> void:

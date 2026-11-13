@@ -22,6 +22,8 @@ const PX := 1.0 / 16.0
 const ALTO_PENA := 1.25            # metros que se levanta una peña (lo que mide su pared pintada: unos 20 px)
 ## Mapas en los que la pared pintada es el doble de alta (gargantas y montaña: pintar_suelo, «cara=2»)
 const PARED_DOBLE := ["canada_eco", "paso_piedra", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "canal_tinta"]
+## Mapas con altura de pared propia en casillas (p. ej. Sección Prohibida: estanterías de 24 px = 1,5 casillas)
+const ALTO_MAPA := {"seccion_prohibida": 1.5}
 ## Mapas en los que «0» no es peña sino cielo o vacío (no se levantan bloques de roca)
 const SIN_PENAS := ["observatorio_aurora"]
 const SUELO_BAJO := -4             # dibujos con z_index por debajo: se tumban en el suelo
@@ -41,7 +43,7 @@ const CANALES_MUNDO := CANAL_SUELO | CANAL_GEMELO | CANAL_PANTALLA | CANAL_NADA 
 ## lo que dibujan ellos (o sus hijos sin script) se ve en una VENTANITA de pie sobre ellos (_ventanas)
 const DE_PIE := ["brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_perdido.gd", "esencia.gd",
 	"recogible.gd", "arco_ruinas.gd", "portal.gd", "aldeano.gd", "taa.gd", "vecino.gd", "escriba.gd",
-	"bobina.gd", "saa.gd", "rasgos_maisha.gd", "kimya.gd", "roca_mineral.gd", "escarcha.gd",
+	"bobina.gd", "saa.gd", "grimorio_tinta.gd", "rasgos_maisha.gd", "kimya.gd", "roca_mineral.gd", "escarcha.gd",
 	"piedra_recuerdo.gd", "primer_arbol.gd", "buibui.gd", "guardian.gd", "kambare.gd", "mamba.gd",
 	"cangrejo.gd", "rescoldo.gd", "espinas_paso.gd", "gallina_perdida.gd", "barca_bata.gd"]
 const VENTANA := Vector2i(160, 160)       # píxeles de cada ventanita
@@ -207,7 +209,8 @@ func _crear_suelo() -> void:
 	if region == null:
 		return
 	var tex := _textura_suelo()
-	_alto_pena = ALTO_PENA * (2.0 if String(region.get("mapa")) in PARED_DOBLE else 1.0)
+	var mapa_n := String(region.get("mapa"))
+	_alto_pena = float(ALTO_MAPA.get(mapa_n, ALTO_PENA * (2.0 if mapa_n in PARED_DOBLE else 1.0)))
 	var filas: PackedStringArray = region.get("_filas")
 	var ancho: float = filas[0].length()
 	var alto: float = filas.size()

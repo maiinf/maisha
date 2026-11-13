@@ -31,6 +31,7 @@ var _texto_paso := ""
 var _texto_anterior := ""
 var _cambio := 1.0                   # 0 → 1 al cambiar el texto del paso (se desliza)
 var _esencias: Array[Dictionary] = []   # «+2 Esencia» que salen arriba a la izquierda: {n, motivo, t}
+var _y_panel := 8.0
 
 
 func _ready() -> void:
@@ -111,6 +112,8 @@ func oculto_por_menu() -> bool:
 func _oculto() -> bool:
 	if not Estado.jugando or Estado.cambiando or _hablando() or oculto_por_menu():
 		return true
+	if not get_tree().get_nodes_in_group("barra_jefe").is_empty():
+		return true
 	for zona in get_tree().get_nodes_in_group("zonas"):
 		if zona.estado in [1, 2, 3]:          # en plena pelea
 			return true
@@ -121,6 +124,9 @@ func _process(delta: float) -> void:
 	_tiempo += delta
 	_destello = maxf(0.0, _destello - delta * 1.2)
 	_cambio = minf(1.0, _cambio + delta * 3.0)
+	var hud := get_tree().get_first_node_in_group("hud")
+	var banner := hud != null and float(hud.get("_texto_tiempo")) > 0.0
+	_y_panel = move_toward(_y_panel, 66.0 if banner else 8.0, delta * 240.0)
 	var oculto := _oculto()
 	var m := Misiones.seguida()
 	var hay := not m.is_empty() and Misiones.ver_objetivo
@@ -229,7 +235,7 @@ func _dibujar_panel() -> void:
 		ancho = maxf(ancho, _ancho(l) + 16)
 	ancho = minf(ancho, ANCHO_MAX)
 	var alto := 26.0 + lineas.size() * 15.0
-	var caja := Rect2(640 - 8 - ancho, 8, ancho, alto)
+	var caja := Rect2(640 - 8 - ancho, roundf(_y_panel), ancho, alto)
 	PIEL.caja(_lienzo, caja.grow(3), "cuero", 0.92 * a)
 	PIEL.esquinas_oro(_lienzo, caja.grow(3), color_tipo, 0.7 * a, 5.0)
 	if _destello > 0.0:
@@ -266,11 +272,13 @@ func _dibujar_flecha() -> void:
 	var en_pantalla := _a_pantalla(donde)
 	if maisha and (maisha.global_position.distance_to(donde) < 22.0):
 		return
-	var margen := Rect2(Vector2(14, 14), Vector2(640, 360) - Vector2(28, 28))
+	var hud := get_tree().get_first_node_in_group("hud")
+	var abajo := 320.0 if (hud != null and bool(hud.get("_ayuda")) and String(hud.get("texto_ayuda")) != "") else 346.0
+	var margen := Rect2(Vector2(14, 14), Vector2(612.0, abajo - 14.0))
 	var a := _alfa
 	if margen.has_point(en_pantalla):
 		# encima del sitio: una flechita que bota
-		var p := en_pantalla + Vector2(0, -altura + sin(_tiempo * 4.0) * 2.0)
+		var p := (en_pantalla + Vector2(0, -altura + sin(_tiempo * 4.0) * 2.0)).clamp(margen.position, margen.end)
 		_punta(p, Vector2.DOWN, a)
 		return
 	# fuera de la pantalla: en el borde, apuntando hacia allí
