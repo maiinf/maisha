@@ -2208,6 +2208,68 @@ def nyundo_tenaza():
     return reverb(p.entera(), 0.6, 0.22)
 
 
+def resonancia_ambar():
+    """El 3.º poder del Arte de la Tierra: acorde cálido de ámbar cristalino que vibra y despierta los puentes."""
+    p = Pista(1.1)
+    d = 0.9
+    n = _n(d)
+    halo = seno(_desliz(293.66, 440.0, d), d) * adsr(n, 0.06, 0.25, 0.55, 0.3) * 0.45
+    brisa = barrido_bajo(ruido_rosa(d), 3200, 900) * caida(n, 0.25) * 0.3
+    p.poner(halo + brisa, 0.0)
+    for k, nota in enumerate(("D5", "F#5", "A5", "D6")):
+        p.poner(campanita(nota, 0.85 - k * 0.1, 0.30 - k * 0.03), 0.02 + k * 0.055)
+    return reverb(p.entera(), 1.6, 0.34)
+
+
+def puente_cristal():
+    """Un puente de cristal astral se materializa placa a placa en el aire sobre el abismo estelar."""
+    p = Pista(0.95)
+    notas = ("A5", "D6", "F#6", "A6", "D7")
+    for k, nota in enumerate(notas):
+        p.poner(campanita(nota, 0.55, 0.25 - k * 0.02), k * 0.08)
+    d = 0.55
+    brillo = paso_alto(ruido_rosa(d), 3200) * caida(_n(d), 0.14) * 0.35
+    p.poner(brillo, 0.04)
+    return reverb(p.entera(), 1.4, 0.3)
+
+
+def popo_chillido():
+    """Chillido sonar agudo de Popo Astral, el murciélago ciego de alas de ámbar."""
+    p = Pista(0.5)
+    for k in range(2):
+        d = 0.14
+        n = _n(d)
+        chirp = (seno(_desliz(2200, 3600, d), d) * 0.65 + seno(_desliz(3600, 1400, d), d) * 0.35) * adsr(n, 0.01, 0.04, 0.5, 0.05)
+        p.poner(chirp * 0.7, k * 0.17)
+    aleteo = paso_banda(ruido(0.2), 1400, 4200) * caida(_n(0.2), 0.06) * 0.28
+    p.poner(aleteo, 0.0)
+    return reverb(p.entera(), 0.7, 0.25)
+
+
+def kipanga_picado():
+    """Silbido cortante de Kipanga Astral cayendo en picado desde lo alto entre nubes estelares."""
+    p = Pista(0.75)
+    d = 0.65
+    n = _n(d)
+    silbo = seno(_desliz(1750, 460, d), d) * adsr(n, 0.04, 0.15, 0.7, 0.2) * 0.42
+    viento = barrido_bajo(ruido_rosa(d), 4200, 700) * adsr(n, 0.05, 0.2, 0.6, 0.2) * 0.72
+    p.poner(silbo + viento, 0.0)
+    return reverb(p.entera(), 0.9, 0.26)
+
+
+def kipanga_pluma():
+    """Ráfaga de plumas de cristal negro clavándose en las terrazas de obsidiana."""
+    p = Pista(0.6)
+    for k, nota in enumerate(("E6", "B5", "A6")):
+        t0 = k * 0.08
+        d = 0.16
+        golpe = paso_banda(ruido(d), 2400, 7500) * caida(_n(d), 0.035) * 0.65
+        p.poner(golpe, t0)
+        p.poner(campanita(nota, 0.35, 0.28), t0 + 0.01)
+    p.poner(taiko(0.25, 0.45), 0.02)
+    return reverb(p.entera(), 0.75, 0.24)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -2275,6 +2337,9 @@ EFECTOS = {
     "pulso_magnetico": (pulso_magnetico, 0.75), "bloque_atraer": (bloque_atraer, 0.7),
     "kovu_sumerge": (kovu_sumerge, 0.65), "kovu_enfria": (kovu_enfria, 0.7),
     "nyundo_tenaza": (nyundo_tenaza, 0.75),
+    "resonancia_ambar": (resonancia_ambar, 0.7), "puente_cristal": (puente_cristal, 0.65),
+    "popo_chillido": (popo_chillido, 0.65), "kipanga_picado": (kipanga_picado, 0.75),
+    "kipanga_pluma": (kipanga_pluma, 0.75),
 }
 
 AMBIENTES = {

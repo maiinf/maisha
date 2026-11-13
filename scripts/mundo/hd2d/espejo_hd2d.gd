@@ -40,7 +40,8 @@ const CANALES_MUNDO := CANAL_SUELO | CANAL_GEMELO | CANAL_PANTALLA | CANAL_NADA 
 ## Los que dibujan con código algo que va DE PIE (llamas, halos, el «!» de los aldeanos, la niebla de un arco):
 ## lo que dibujan ellos (o sus hijos sin script) se ve en una VENTANITA de pie sobre ellos (_ventanas)
 const DE_PIE := ["brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_perdido.gd", "esencia.gd",
-	"recogible.gd", "arco_ruinas.gd", "portal.gd", "aldeano.gd", "taa.gd"]
+	"recogible.gd", "arco_ruinas.gd", "portal.gd", "aldeano.gd", "taa.gd", "vecino.gd", "escriba.gd",
+	"bobina.gd", "saa.gd"]
 const VENTANA := Vector2i(128, 160)       # píxeles de cada ventanita
 const VENTANA_PIE := Vector2(64, 148)     # dónde cae el pie del objeto dentro de la ventanita
 const VENTANAS := 10                      # como mucho, las de los 10 objetos de pie más cerca de la cámara
@@ -414,13 +415,13 @@ func _crear_camara() -> void:
 	add_child(camara)
 	camara.current = true
 	if _maisha:
-		_foco = _al_suelo(_maisha.global_position)
+		_foco = _al_suelo(_maisha.global_position + Impacto.encuadre)
 	_colocar_camara(1.0)
 
 
 func _colocar_camara(suave: float) -> void:
 	if _maisha and is_instance_valid(_maisha):
-		_foco = _foco.lerp(_al_suelo(_maisha.global_position), suave)
+		_foco = _foco.lerp(_al_suelo(_maisha.global_position + Impacto.encuadre), suave)
 	# sin salirse del mapa (como la cámara 2D): deja un margen de media pantalla a cada lado
 	if region:
 		var tam: Vector2 = region.get("tam") * PX
@@ -505,10 +506,13 @@ func _dibuja(n: Node) -> bool:
 func _dueno_de_pie(n: Node) -> Node:
 	for c in [n, n.get_parent()]:
 		if c and c != escena and c.get_script():
-			var ruta := String(c.get_script().resource_path)
-			for nombre in DE_PIE:
-				if ruta.ends_with("/" + nombre):
-					return c
+			var s: Script = c.get_script()
+			while s:
+				var ruta := String(s.resource_path)
+				for nombre in DE_PIE:
+					if ruta.ends_with("/" + nombre):
+						return c
+				s = s.get_base_script()
 	return null
 
 
@@ -623,15 +627,23 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 	g.modulate = n.modulate * n.self_modulate * _tinte
 	var escala := n.global_scale
 	g.scale = Vector3(escala.x, escala.y, 1.0)
+	var rot := n.global_rotation
+	if absf(rot) > 0.001:
+		g.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+		g.rotation = Vector3(0.0, 0.0, -rot)
+	else:
+		g.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
+		g.rotation = Vector3.ZERO
 	# de pie: apoyado en el suelo de su cuerpo; lo que en 2D está más arriba que el cuerpo, en 3D está más alto
 	var sube: Vector2 = n.global_position - ancla.global_position
-	var o2: Vector2 = n.offset + Vector2(sube.x, sube.y)
-	# (en 2D la «y» crece hacia abajo y en 3D hacia arriba: sin centrar, el dibujo va de o2.y a o2.y + alto en 2D,
-	# así que en 3D su borde de abajo está en -(o2.y + alto); centrado, se queda donde está, solo cambia el signo)
+	# (en 2D la «y» crece hacia abajo y en 3D hacia arriba: sin centrar, el dibujo va de offset.y a offset.y + alto en 2D,
+	# así que en 3D su borde de abajo está en -(offset.y + alto); centrado, se queda donde está, solo cambia el signo)
 	var alto := 0.0
 	if not g.centered and tex:
 		alto = (g.region_rect.size.y if g.region_enabled else tex.get_height() / float(maxi(g.vframes, 1)))
-	g.offset = Vector2(o2.x, -(o2.y + alto))
+	g.offset = Vector2(n.offset.x, -(n.offset.y + alto))
+	# si gira hacia abajo (p. ej. un tentáculo hacia el sur), lo alzamos lo justo para que no se hunda bajo el suelo
+	var alza := (1.0 - cos(rot)) * maxf(0.0, -(n.offset.y + (alto * 0.5 if not g.centered else 0.0)))
 	# (las capas de un mismo cuerpo, un pelín hacia la cámara según su orden de dibujo, para que no parpadeen)
 	var orden := z * 0.004 + n.get_index() * 0.0015
-	g.position = _al_suelo(ancla.global_position) + Vector3(0, 0, orden)
+	g.position = _al_suelo(ancla.global_position) + Vector3(sube.x * PX, (-sube.y + alza) * PX, orden)

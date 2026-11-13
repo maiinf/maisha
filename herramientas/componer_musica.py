@@ -2314,6 +2314,98 @@ def jefe_nyundo():
     return final(p, sala=2.6, mezcla=0.32, brillo=5800)
 
 
+def aguja_caida():
+    """«Donde canta el cristal»: La Aguja Caída (camino norte de Asterhaul, 86 BPM).
+    Vértigo luminoso a cielo abierto en Re dórico: viento de altura entre terrazas de obsidiana,
+    destellos vítreos de puentes de ámbar, coro lejano entre las estrellas y flauta cristalina."""
+    tempo = Tempo(86)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m7"), ("G2", "M"), ("A#1", "M7"), ("C2", "M"),
+        ("D2", "m7"), ("F2", "M7"), ("C2", "M"), ("A1", "sus"),
+    ] * 3
+    colchones(p, tempo, progresion, compas=4, brillo=1050, volumen=0.22, octava_bajo=2, fuerza_bajo=0.30)
+    rng = np.random.default_rng(1041)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.17, pan=-0.28, patron=(0, 2, 3, 1, 3, 2, 1, 0))
+        if i % 2 == 0:
+            notas = acorde(raiz[:-1] + "5", tipo)
+            p.poner(campanita(notas[0], 1.8, 0.14), tempo.s(i * 4), pan=0.32)
+            p.poner(campanita(notas[2 % len(notas)], 1.6, 0.10), tempo.s(i * 4 + 2), pan=-0.30)
+    # viento fino entre agujas de obsidiana y polvo estelar
+    for k in range(10):
+        d = 4.2 + rng.random() * 2.5
+        n = int(d * SR)
+        viento = ruido_rosa(d) * np.sin(np.linspace(0, np.pi, n)) ** 2
+        p.poner(paso_banda(viento, 420 + rng.random() * 260, 2200) * 0.16, k * tempo.s(pulsos) / 10, pan=rng.uniform(-0.45, 0.45))
+    for k in range(28):
+        b = rng.random() * pulsos
+        nota = ["D6", "F#6", "A6", "E7", "C6"][rng.integers(5)]
+        p.poner(campanita(nota, 1.4, 0.08), tempo.s(b), pan=rng.uniform(-0.5, 0.5))
+    p.poner(coro(["D3", "A3", "E4"], tempo.s(16)), tempo.s(32), 0.06)
+    p.poner(coro(["F3", "C4", "A4"], tempo.s(16)), tempo.s(64), 0.06)
+    tema_aguja = [
+        ("A4", 0, 1.5), ("D5", 1.5, 0.5), ("F5", 2, 2), ("G5", 4, 1), ("A5", 5, 1), ("E5", 6, 2),
+        ("D5", 8, 1.5), ("E5", 9.5, 0.5), ("F#5", 10, 2), ("D5", 12, 4),
+        ("A5", 16, 1.5), ("C6", 17.5, 0.5), ("B5", 18, 1), ("A5", 19, 1), ("G5", 20, 1.5), ("F5", 21.5, 0.5), ("E5", 22, 2),
+        ("F5", 24, 1), ("E5", 25, 1), ("D5", 26, 1.5), ("A4", 27.5, 0.5), ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.42, vibrato=4.6)
+    melodia(p, tempo, tema_aguja, desde=0, instrumento=kalimba, volumen=0.34, pan=-0.12)
+    melodia(p, tempo, tema_aguja, desde=32, instrumento=flauta_, volumen=0.38, sostener=0.92, pan=0.16)
+    melodia(p, tempo, TEMA_ASTERHAUL, desde=64, instrumento=flauta_, volumen=0.36, sostener=0.92, pan=0.12)
+    tocar(p, tempo, transportar(tema_aguja, -12), desde=64, fuerza=0.26, pan=-0.18)
+    return final(p, sala=4.0, mezcla=0.38, brillo=5800)
+
+
+def jefe_kipanga():
+    """«Alas de obsidiana»: combate contra El Kipanga Astral en la Cima de los Vientos (148 BPM).
+    Vuelo vertiginoso en Re menor / dórico sobre el precipicio estelar: ráfagas de viento, alas rápidas de tambor,
+    destellos agudos de plumas de cristal y el tema heroico enfrentando al halcón cósmico."""
+    tempo = Tempo(148)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m"), ("C2", "M"), ("A#1", "M"), ("A1", "m"),
+        ("D2", "m"), ("F2", "M"), ("G2", "m"), ("A1", "M"),
+    ] * 3
+    colchones(p, tempo, progresion, compas=4, brillo=1250, volumen=0.28, octava_bajo=1, fuerza_bajo=0.45)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.22, pan=-0.26, patron=(0, 2, 1, 3, 2, 3, 1, 2))
+        notas = acorde(raiz[:-1] + "4", tipo)
+        for paso_ in (0, 1.5, 3):
+            p.poner(balafon(notas[0], 0.20, 0.24), tempo.s(i * 4 + paso_), pan=0.22)
+    # aleteo veloz y picados en el viento
+    rng = np.random.default_rng(1042)
+    for b in range(0, pulsos, 2):
+        p.poner(tambor("D1", 0.28, 0.52, golpe=0.58), tempo.s(b), pan=0.0)
+        p.poner(tambor("A2", 0.16, 0.34, golpe=0.70), tempo.s(b + 0.5), pan=-0.2)
+        p.poner(maraca(0.06, 0.18), tempo.s(b + 1.0), pan=0.28)
+        p.poner(tambor("D2", 0.18, 0.36, golpe=0.68), tempo.s(b + 1.5), pan=0.15)
+        if b % 8 == 0:
+            p.poner(taiko(1.0, 0.72), tempo.s(b), pan=0.0)
+            p.poner(campanita("D6", 0.35, 0.20), tempo.s(b), pan=-0.3)
+        if b % 8 == 4:
+            rafaga = paso_banda(ruido_rosa(0.45), 700, 3200) * np.sin(np.linspace(0, np.pi, int(0.45 * SR))) ** 2
+            p.poner(rafaga * 0.20, tempo.s(b), pan=rng.uniform(-0.4, 0.4))
+    tema_kipanga = [
+        ("D5", 0, 0.75), ("F5", 0.75, 0.75), ("A5", 1.5, 0.5), ("D6", 2, 1.5), ("C6", 3.5, 0.5),
+        ("A5", 4, 1), ("G5", 5, 1), ("F5", 6, 2),
+        ("E5", 8, 1), ("F5", 9, 0.5), ("G5", 9.5, 0.5), ("A5", 10, 1.5), ("G5", 11.5, 0.5),
+        ("F5", 12, 1), ("E5", 13, 1), ("D5", 14, 2),
+        ("D5", 16, 1), ("A5", 17, 1), ("B5", 18, 1), ("D6", 19, 1),
+        ("C6", 20, 1), ("A5", 21, 1), ("G5", 22, 2),
+        ("F5", 24, 1), ("G5", 25, 1), ("A5", 26, 1), ("E5", 27, 1), ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.45, vibrato=5.4)
+    melodia(p, tempo, tema_kipanga, desde=0, instrumento=kalimba, volumen=0.38, pan=-0.16)
+    melodia(p, tempo, tema_kipanga, desde=32, instrumento=flauta_, volumen=0.43, sostener=0.88, pan=0.16)
+    tocar(p, tempo, tema_kipanga, desde=64, fuerza=0.35, pan=0.0)
+    melodia(p, tempo, transportar(tema_kipanga, -12), desde=64, instrumento=kalimba, volumen=0.28, pan=-0.22)
+    return final(p, sala=3.0, mezcla=0.32, brillo=6000)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2329,6 +2421,8 @@ PIEZAS["galerias_ambar"] = galerias_ambar
 PIEZAS["jefe_kifaru"] = jefe_kifaru
 PIEZAS["fundicion_escoria"] = fundicion_escoria
 PIEZAS["jefe_nyundo"] = jefe_nyundo
+PIEZAS["aguja_caida"] = aguja_caida
+PIEZAS["jefe_kipanga"] = jefe_kipanga
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -2344,6 +2438,8 @@ TITULOS["galerias_ambar"] = "Las vetas que cantan"
 TITULOS["jefe_kifaru"] = "El cuerno de basalto"
 TITULOS["fundicion_escoria"] = "El hierro que no duerme"
 TITULOS["jefe_nyundo"] = "Las cuatro tenazas del crisol"
+TITULOS["aguja_caida"] = "Donde canta el cristal"
+TITULOS["jefe_kipanga"] = "Alas de obsidiana"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]
