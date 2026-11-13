@@ -105,12 +105,14 @@ const HONDO_AGUA := 0.35             # metros que baja el agua
 const LETRAS_AGUA := "~\\"
 ## Dibujos de pantalla (por su script): van a la capa de pantalla, con sus hijos
 const DE_PANTALLA := ["ambiente.gd", "nevada.gd", "ventisca.gd", "luz_sol.gd"]
+const EDIFICIOS := preload("res://scripts/mundo/hd2d/edificios_hd2d.gd")
 
 var escena: Node2D
 var region: Node2D
 var camara: Camera3D
 var sol: DirectionalLight3D
-var _gemelos := {}                 # id del dibujo 2D -> Sprite3D
+var _gemelos := {}                 # id del dibujo 2D -> [nodo, gemelo 3D, ancla, z, edificio]
+var _edificios: EDIFICIOS = EDIFICIOS.new()
 var _maisha: Node2D
 var _foco := Vector3.ZERO
 var _alto_pena := ALTO_PENA
@@ -447,6 +449,7 @@ func _exit_tree() -> void:
 	for par in _canales.values():
 		if is_instance_valid(par[0]):
 			(par[0] as CanvasItem).visibility_layer = par[1]
+	_edificios.limpiar()
 
 
 # --- La cámara ------------------------------------------------------------------------------------------------
@@ -529,6 +532,14 @@ func _registrar(n: Node) -> void:
 	ci.visibility_layer = CANAL_GEMELO
 	if _gemelos.has(n.get_instance_id()):
 		return
+	var edif := _edificios.nombre_catalogo(n as Node2D)
+	var g: GeometryInstance3D = _edificios.crear_gemelo() if edif != "" else _crear_sprite_gemelo()
+	add_child(g)
+	# (lo que no cambia: el cuerpo en el que se apoya y su orden de dibujo; se calcula una vez)
+	_gemelos[n.get_instance_id()] = [n, g, null, _z(n), edif]
+
+
+func _crear_sprite_gemelo() -> Sprite3D:
 	var g := Sprite3D.new()
 	g.pixel_size = PX
 	g.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
@@ -537,9 +548,7 @@ func _registrar(n: Node) -> void:
 	g.double_sided = true
 	g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 	g.billboard = BaseMaterial3D.BILLBOARD_FIXED_Y
-	add_child(g)
-	# (lo que no cambia: el cuerpo en el que se apoya y su orden de dibujo; se calcula una vez)
-	_gemelos[n.get_instance_id()] = [n, g, null, _z(n)]
+	return g
 
 
 ## ¿Cuelga de una CanvasLayer (la interfaz: el HUD, los diálogos, la mochila...)? Eso no se toca.
@@ -646,7 +655,7 @@ func _process(_delta: float) -> void:
 	for id in _gemelos.keys():
 		var par: Array = _gemelos[id]
 		var n: Node2D = par[0]
-		var g: Sprite3D = par[1]
+		var g: GeometryInstance3D = par[1]
 		if not is_instance_valid(n):
 			g.queue_free()
 			_gemelos.erase(id)
@@ -658,7 +667,11 @@ func _process(_delta: float) -> void:
 			continue
 		if par[2] == null or not is_instance_valid(par[2]):
 			par[2] = _ancla(n)
-		_copiar(n, g, par[2], par[3])
+		var edif := String(par[4])
+		if edif != "":
+			_edificios.copiar(n, g as MeshInstance3D, par[2], par[3], _visible(n), _al_suelo(par[2].global_position), _tinte_sprite(n))
+		else:
+			_copiar(n, g as Sprite3D, par[2], par[3])
 	_colocar_camara(0.12)
 	_mover_capas()
 	# La capa 2D del suelo y las ventanitas ya reciben LuzDelDia / Penumbra; aquí igualamos el suelo lejano, las peñas y los gemelos

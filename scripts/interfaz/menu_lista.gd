@@ -96,27 +96,38 @@ func _gui_input(evento: InputEvent) -> void:
 func _draw() -> void:
 	for i in opciones.size():
 		var y := _y_de(i)
-		var texto := String(opciones[i]["texto"])
+		var op: Dictionary = opciones[i]
+		var texto := String(op["texto"])
 		var elegida_ahora := i == seleccion and activa
 		var x := 14.0 if elegida_ahora else 10.0
 		var color := TEXTO if elegida_ahora else APAGADO
-		if opciones[i].get("apagada", false):
+		if op.get("apagada", false):
 			color = Color(APAGADO, 0.45)
+		var ancho_t := _fuente.get_string_size(texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
 		if en_papel:
 			color = PIEL.TINTA if elegida_ahora else PIEL.TINTA_SUAVE
-			if opciones[i].get("apagada", false):
+			if op.get("apagada", false):
 				color = PIEL.TINTA_APAGADA
 			if elegida_ahora:
-				PIEL.subrayar(self, Rect2(x - 4, y + 1, _fuente.get_string_size(texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 10, 19), _tiempo)
+				var ancho_sel := maxf(ancho_t + 14.0, size.x - 22.0) if size.x > 80.0 else ancho_t + 12.0
+				PIEL.subrayar(self, Rect2(x - 4.0, y + 1.0, minf(ancho_sel, size.x - 10.0), 19.0), _tiempo)
 		else:
 			draw_string(_fuente, Vector2(x + 1, y + 16), texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, SOMBRA)
 		draw_string(_fuente, Vector2(x, y + 15), texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, color)
 		if elegida_ahora:
 			var vaiven := roundf(sin(_tiempo * 5.0))
-			draw_texture(CURSOR, Vector2(vaiven, y + 6))
-		var nota := String(opciones[i].get("nota", ""))
+			if en_papel:
+				PIEL.marcapaginas(self, Vector2(8.0 + vaiven, y + 11.0), 0.95)
+			else:
+				draw_texture(CURSOR, Vector2(vaiven, y + 6))
+		if op.has("valor"):
+			var r_val := Rect2(size.x - 94.0, y + 4.0, 76.0, 12.0)
+			PIEL.deslizador(self, r_val, float(op["valor"]), elegida_ahora, PIEL.ROJO if en_papel else PIEL.ORO)
+		elif op.has("interruptor"):
+			PIEL.interruptor(self, Vector2(size.x - 62.0, y + 4.0), bool(op["interruptor"]), _fuente, elegida_ahora)
+		var nota := String(op.get("nota", ""))
 		if nota != "":
 			if not en_papel:
 				draw_string(_fuente, Vector2(x + 1, y + 29), nota, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, SOMBRA)
 			draw_string(_fuente, Vector2(x, y + 28), nota, HORIZONTAL_ALIGNMENT_LEFT, -1, 16,
-				Color(PIEL.ROJO if en_papel else NOTA, 0.9 if elegida_ahora else 0.6))
+				Color(PIEL.ROJO if en_papel else NOTA, 0.9 if elegida_ahora else 0.65))

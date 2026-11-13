@@ -9,6 +9,7 @@ extends CanvasLayer
 signal pulsada
 
 const FUENTE := preload("res://fuentes/pixelify_sans.woff")
+const PIEL := preload("res://scripts/interfaz/piel.gd")
 const AMBAR := Color("e6a852")
 const PERGAMINO := Color("efe6cf")
 const TINTA := Color("3b2416")
@@ -133,24 +134,30 @@ func _dibujar() -> void:
 	var fuente: Font = FUENTE
 	if _fuerza > 0.02:
 		var a := _fuerza
-		# la tecla: una losa de pergamino con borde dorado, que late
+		# la tecla: pergamino cosido con esquineras doradas, que late
 		var late := 1.0 + 0.08 * sin(_tiempo * 6.0)
-		var centro := Vector2(320, 262)
-		var tam := Vector2(34, 34) * late
+		var centro := Vector2(320, 260)
+		var tam := (Vector2(38, 38) * late).round()
 		var caja := Rect2(centro - tam / 2.0, tam)
-		_lienzo.draw_rect(Rect2(caja.position + Vector2(2, 3), caja.size), Color(0, 0, 0, 0.5 * a))
-		_lienzo.draw_rect(caja, Color(PERGAMINO, a))
-		_lienzo.draw_rect(caja, Color(AMBAR, a), false, 2.0)
-		_lienzo.draw_rect(Rect2(caja.position + Vector2(3, caja.size.y - 6), Vector2(caja.size.x - 6, 3)), Color(0.75, 0.62, 0.42, a))
+		PIEL.caja(_lienzo, caja, "pergamino", a)
+		PIEL.esquinas_oro(_lienzo, caja, PIEL.ORO, a, 5.0)
 		var ancho_l := fuente.get_string_size(_tecla, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x
 		_lienzo.draw_string(fuente, centro + Vector2(-ancho_l / 2.0, 8), _tecla, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(TINTA, a))
 		# el halo que se abre alrededor de la tecla
 		var f := fmod(_tiempo * 0.9, 1.0)
-		_lienzo.draw_arc(centro, 22.0 + f * 16.0, 0, TAU, 32, Color(AMBAR, (1.0 - f) * 0.6 * a), 1.5)
-		# el texto, debajo
-		_texto_sombra(_texto, Vector2(320, 304), 16, Color(PERGAMINO, a))
+		_lienzo.draw_arc(centro, 24.0 + f * 18.0, 0, TAU, 32, Color(AMBAR, (1.0 - f) * 0.65 * a), 1.5)
+		# el texto, debajo dentro de una cartela de noche
+		var tw := fuente.get_string_size(_texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+		var tcaja := Rect2(roundf(320.0 - tw / 2.0 - 12.0), 289, tw + 24.0, 24.0)
+		PIEL.caja(_lienzo, tcaja, "noche", a)
+		PIEL.esquinas_oro(_lienzo, tcaja, PIEL.ORO, 0.85 * a, 4.0)
+		_texto_sombra(_texto, Vector2(320, 305), 16, Color(PERGAMINO, a))
 	if _lenta:
 		var parpadeo := 0.7 + 0.3 * sin(_tiempo * 10.0)
+		var aw := fuente.get_string_size(_aviso_lento, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
+		var acaja := Rect2(roundf(320.0 - aw / 2.0 - 14.0), 50, aw + 28.0, 28.0)
+		PIEL.caja(_lienzo, acaja, "noche", 0.96)
+		PIEL.esquinas_oro(_lienzo, acaja, AMBAR, parpadeo, 5.0)
 		_texto_sombra(_aviso_lento, Vector2(320, 70), 18, Color(AMBAR, parpadeo))
 
 

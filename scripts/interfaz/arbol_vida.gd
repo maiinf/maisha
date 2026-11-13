@@ -8,6 +8,7 @@ extends CanvasLayer
 signal cerrado
 
 const FUENTE := preload("res://fuentes/pixelify_sans.woff")
+const PIEL := preload("res://scripts/interfaz/piel.gd")
 const PANEL := Color(0.06, 0.07, 0.08, 0.88)
 const FILO := Color("d6b46e")
 const TEXTO := Color("fff3c4")
@@ -43,6 +44,7 @@ var _maisha_tex: Texture2D
 
 func _ready() -> void:
 	add_to_group("arbol_vida")
+	add_to_group("modales")
 	layer = 30
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_fuente = FUENTE
@@ -57,6 +59,10 @@ func _ready() -> void:
 	for i in 46:
 		_motas.append({"p": Vector2(azar.randf_range(0, 640), azar.randf_range(0, 360)), "v": azar.randf_range(4, 14),
 			"f": azar.randf_range(0, TAU), "r": azar.randf_range(0.6, 1.6)})
+
+
+func esta_abierta() -> bool:
+	return abierto
 
 
 func abrir() -> void:
@@ -389,32 +395,37 @@ func _dibujar_maisha(a: float) -> void:
 
 func _dibujar_cabecera(a: float) -> void:
 	var titulo := "Árbol de la Vida"
-	_texto(titulo, Vector2(round(320 - _ancho(titulo) / 2.0), 22), Color(TEXTO, a))
-	# la Esencia que hay
+	var wt := _ancho(titulo)
+	PIEL.divisor(_lienzo, 320.0 - wt * 0.5 - 42.0, 320.0 - wt * 0.5 - 8.0, 17.0, FILO, 0.7 * a)
+	PIEL.divisor(_lienzo, 320.0 + wt * 0.5 + 8.0, 320.0 + wt * 0.5 + 42.0, 17.0, FILO, 0.7 * a)
+	_texto(titulo, Vector2(round(320 - wt / 2.0), 22), Color(TEXTO, a))
+	# la Esencia que hay en una insignia dorada
 	var esencia := "%d" % Artes.esencia()
-	var caja := Rect2(640 - 16 - 72, 8, 72, 22)
-	_lienzo.draw_rect(caja, Color(PANEL, a))
-	_lienzo.draw_rect(caja, Color(FILO, 0.6 * a), false, 1.0)
-	var c := caja.position + Vector2(13, 11)
-	_brillo(c, 3.5, Color(0.8, 1.0, 0.6, a), 3)
+	var w_num := _ancho(esencia)
+	var caja := Rect2(640 - 14 - maxf(68.0, w_num + 34.0), 8, maxf(68.0, w_num + 34.0), 24)
+	PIEL.caja(_lienzo, caja, "noche", a)
+	PIEL.esquinas_oro(_lienzo, caja, Color(0.75, 1.0, 0.55), 0.9 * a, 4.0)
+	var c := caja.position + Vector2(14, 12)
+	_brillo(c, 4.5, Color(0.8, 1.0, 0.6, a), 3)
 	_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -6), c + Vector2(4, 0), c + Vector2(0, 6), c + Vector2(-4, 0)]), Color(0.75, 1.0, 0.55, a))
-	_lienzo.draw_circle(c + Vector2(-1, -1), 1.2, Color(1, 1, 1, 0.8 * a))
-	_texto(esencia, caja.position + Vector2(26, 16), Color(TEXTO, a))
+	_lienzo.draw_circle(c + Vector2(-1, -1), 1.2, Color(1, 1, 1, 0.85 * a))
+	_texto(esencia, caja.position + Vector2(26, 17), Color(TEXTO, a))
 	var etiqueta := "Esencia"
-	_texto(etiqueta, Vector2(caja.position.x - 6 - _ancho(etiqueta), caja.position.y + 16), Color(APAGADO, 0.85 * a))
+	_texto(etiqueta, Vector2(caja.position.x - 6 - _ancho(etiqueta), caja.position.y + 17), Color(APAGADO, 0.9 * a))
 
 
 func _dibujar_detalle(a: float) -> void:
 	var arte := _arte()
 	var id := String(arte["id"])
 	var color := Color(String(arte["color"]))
-	var caja := Rect2(14, 200, 204, 138)
-	_lienzo.draw_rect(caja, Color(PANEL, a))
-	_lienzo.draw_rect(caja, Color(color, 0.7 * a), false, 1.0)
-	var x := caja.position.x + 8
-	_texto(String(arte["nombre"]), Vector2(x, caja.position.y + 16), Color(color, a))
+	var caja := Rect2(12, 180, 224, 164)
+	PIEL.caja(_lienzo, caja, "noche", a)
+	PIEL.esquinas_oro(_lienzo, caja, color, 0.92 * a, 6.0)
+	var x := caja.position.x + 10
+	_texto(String(arte["nombre"]), Vector2(x, caja.position.y + 18), Color(color, a))
+	PIEL.divisor(_lienzo, x, caja.end.x - 10, caja.position.y + 24, color, 0.55 * a)
 	if arte.has("bloqueada"):
-		var y := _parrafo(String(arte["texto"]), Vector2(x, caja.position.y + 34), caja.size.x - 16, Color(APAGADO, a))
+		var y := _parrafo(String(arte["texto"]), Vector2(x, caja.position.y + 39), caja.size.x - 20, Color(APAGADO, a))
 		_texto(String(arte["bloqueada"]), Vector2(x, y + 6), Color(0.75, 0.72, 0.8, a))
 	else:
 		var n := _nivel_mirado()
@@ -422,13 +433,14 @@ func _dibujar_detalle(a: float) -> void:
 		var datos: Dictionary = niveles[n]
 		var nivel_actual := Artes.nivel(id)
 		var estado := "despierto" if n < nivel_actual else ("siguiente" if n == nivel_actual else "dormido")
-		_texto("Nivel %d · %s" % [n + 1, datos["nombre"]], Vector2(x, caja.position.y + 34), Color(TEXTO, a))
-		var y := _parrafo(String(datos["texto"]), Vector2(x, caja.position.y + 51), caja.size.x - 16, Color(APAGADO, a))
+		_texto("Nivel %d · %s" % [n + 1, datos["nombre"]], Vector2(x, caja.position.y + 39), Color(TEXTO, a))
+		var y := _parrafo(String(datos["texto"]), Vector2(x, caja.position.y + 56), caja.size.x - 20, Color(APAGADO, a))
 		# lo que cambia por fuera (se ve en grande en la pestaña Habilidades del diario)
 		var cambios: Array = Artes.CAMBIO_VISIBLE.get(id, [])
-		if n < cambios.size() and y < caja.end.y - 42:
+		if n < cambios.size() and y < caja.end.y - 54:
 			var cambio := String(cambios[n])
-			_parrafo("Se verá: " + cambio.left(1).to_lower() + cambio.substr(1), Vector2(x, y + 2), caja.size.x - 16, Color(color, 0.85 * a))
+			_parrafo("Se verá: " + cambio.left(1).to_lower() + cambio.substr(1), Vector2(x, y + 4), caja.size.x - 20, Color(color, 0.88 * a))
+		PIEL.divisor(_lienzo, x, caja.end.x - 10, caja.end.y - 24, FILO, 0.35 * a)
 		var pie := ""
 		var color_pie := AMBAR
 		if estado == "despierto":
@@ -441,21 +453,20 @@ func _dibujar_detalle(a: float) -> void:
 					pie += " y %d Cristales" % Artes.cristales_siguiente(id)
 			elif Artes.esencia() < Artes.coste_siguiente(id):
 				pie = "Cuesta %d Esencia (hay %d)" % [Artes.coste_siguiente(id), Artes.esencia()]
-				color_pie = Color(APAGADO, 0.8)
+				color_pie = Color(APAGADO, 0.85)
 			else:
 				pie = "Pide %d Cristales (tienes %d)" % [Artes.cristales_siguiente(id), Tienda.cristales()]
-				color_pie = Color(APAGADO, 0.8)
+				color_pie = Color(APAGADO, 0.85)
 		else:
 			pie = "Antes, el nivel %d" % (nivel_actual + 1)
-			color_pie = Color(APAGADO, 0.6)
+			color_pie = Color(APAGADO, 0.65)
 		_texto(pie, Vector2(x, caja.end.y - 8), Color(color_pie, a))
-	# ayuda abajo
-	var ayuda := "← → Arte · ↑ ↓ niveles · Tab: salir"
-	_texto(ayuda, Vector2(640 - 14 - _ancho(ayuda), 354), Color(APAGADO, 0.75 * a))
+	# ayuda abajo centrada a la derecha sin tapar a Maisha ni el panel
+	PIEL.barra_teclas(_lienzo, 490.0, 344.0, [["←→", "Arte"], ["↑↓", "Nivel"], ["Tab", "Salir"]], _fuente, 16, a, true)
 	if _aviso_t > 0.0:
 		var b := clampf(_aviso_t / 0.4, 0.0, 1.0) * a
-		var w := _ancho(_aviso) + 20
-		var r := Rect2(round(320 - w / 2.0), 36, w, 22)
-		_lienzo.draw_rect(r, Color(PANEL, 0.9 * b))
-		_lienzo.draw_rect(r, Color(FILO, b), false, 1.0)
-		_texto(_aviso, r.position + Vector2(10, 16), Color(TEXTO, b))
+		var w := _ancho(_aviso) + 24
+		var r := Rect2(round(320 - w / 2.0), 34, w, 24)
+		PIEL.caja(_lienzo, r, "noche", 0.95 * b)
+		PIEL.esquinas_oro(_lienzo, r, FILO, b, 4.0)
+		_texto(_aviso, r.position + Vector2(12, 17), Color(TEXTO, b))

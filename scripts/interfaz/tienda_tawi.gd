@@ -59,6 +59,7 @@ var _chispas: Array[Dictionary] = []
 
 func _ready() -> void:
 	add_to_group("tienda")
+	add_to_group("modales")
 	layer = 30
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_fuente = FUENTE
@@ -68,6 +69,10 @@ func _ready() -> void:
 	_lienzo.draw.connect(_dibujar)
 	add_child(_lienzo)
 	visible = false
+
+
+func esta_abierta() -> bool:
+	return abierto
 
 
 func abrir() -> void:
@@ -199,6 +204,7 @@ func _lineas(texto: String, ancho: float) -> Array[String]:
 
 func _caja(r: Rect2, a: float, tipo := "pergamino") -> void:
 	PIEL.caja(_lienzo, r, tipo, a)
+	PIEL.esquinas_oro(_lienzo, r, PIEL.ORO if tipo in ["cuero", "noche"] else PIEL.TINTA_SUAVE, 0.55 * a, 5.0)
 
 
 func _y_fila(i: int) -> float:
@@ -245,10 +251,12 @@ func _dibujar() -> void:
 	_caja(lista_r, a)
 	_texto(String(TENDEROS[tendero]["rotulo"]), lista_r.position + Vector2(12, 22), Color(AMBAR, a))
 	var cr := "%d" % Tienda.cristales()
-	var xc := lista_r.end.x - 16 - _ancho(cr)
-	_lienzo.draw_texture(CRISTAL, Vector2(xc - 14, lista_r.position.y + 10), Color(1, 1, 1, a))
-	_texto(cr, Vector2(xc, lista_r.position.y + 22), Color(AZUL, a))
-	PIEL.raya(_lienzo, Vector2(lista_r.position.x + 12, lista_r.position.y + 32), Vector2(lista_r.end.x - 12, lista_r.position.y + 32), PIEL.TINTA_SUAVE, 0.6 * a)
+	var w_cr := _ancho(cr) + 22.0
+	var b_cr := Rect2(lista_r.end.x - 10.0 - w_cr, lista_r.position.y + 7.0, w_cr, 18.0)
+	PIEL.caja(_lienzo, b_cr, "cuero", a, false)
+	_lienzo.draw_texture(CRISTAL, b_cr.position + Vector2(5, 4), Color(1, 1, 1, a))
+	_texto(cr, b_cr.position + Vector2(17, 14), Color(Color("9ee6ff"), a), 16, false)
+	PIEL.divisor(_lienzo, lista_r.position.x + 12, lista_r.end.x - 12, lista_r.position.y + 32, PIEL.TINTA_SUAVE, 0.6 * a)
 	var lista := _lista()
 	for i in lista.size():
 		var art: Dictionary = lista[i]
@@ -256,7 +264,7 @@ func _dibujar() -> void:
 		var fila := Rect2(lista_r.position.x + 8, fy - 4, lista_r.size.x - 16, 24)
 		var elegida := i == seleccion
 		if elegida:
-			PIEL.subrayar(_lienzo, Rect2(fila.position + Vector2(10, 1), fila.size - Vector2(10, 2)), _tiempo, a)
+			PIEL.subrayar(_lienzo, Rect2(fila.position + Vector2(10, 1), fila.size - Vector2(14, 2)), _tiempo, a)
 			PIEL.marcapaginas(_lienzo, fila.position + Vector2(6, 12), a)
 		var icono := int(art.get("icono", 0))
 		_lienzo.draw_texture_rect_region(ICONOS, Rect2(fila.position + Vector2(12, 4), Vector2(16, 16)), Rect2(icono * 16, 0, 16, 16), Color(1, 1, 1, a))
@@ -281,13 +289,12 @@ func _dibujar() -> void:
 	if seleccion < lista.size():
 		var art: Dictionary = lista[seleccion]
 		var dy := lista_r.end.y - 92
-		PIEL.raya(_lienzo, Vector2(lista_r.position.x + 12, dy - 8), Vector2(lista_r.end.x - 12, dy - 8), PIEL.TINTA_SUAVE, 0.6 * a)
+		PIEL.divisor(_lienzo, lista_r.position.x + 12, lista_r.end.x - 12, dy - 8, PIEL.TINTA_SUAVE, 0.6 * a)
 		for linea in _lineas(String(art.get("texto", "")), lista_r.size.x - 24):
 			_texto(linea, Vector2(lista_r.position.x + 12, dy + 8), Color(APAGADO, a))
 			dy += 17
-	var pie := Rect2(lista_r.position.x + 10, lista_r.end.y + 6, _ancho("↑ ↓ elegir · Acción comprar · Tab salir") + 20, 22)
-	_caja(pie, a, "cuero")
-	_texto("↑ ↓ elegir · Acción comprar · Tab salir", pie.position + Vector2(10, 16), Color(PIEL.CREMA, 0.9 * a), 16, false)
+	PIEL.barra_teclas(_lienzo, lista_r.get_center().x, lista_r.end.y + 19.0,
+		[["↑↓", "Elegir"], ["E", "Comprar"], ["Tab", "Salir"]], _fuente, 16, a, true)
 	# chispas al comprar
 	for c in _chispas:
 		var v: float = 1.0 - c["t"] / 0.9

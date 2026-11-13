@@ -266,37 +266,43 @@ func _dibujar() -> void:
 		p = (p - Vector2(ancho / 2.0, su["vida"] * 3.0)).round()
 		_lienzo.draw_string(_fuente, p + Vector2(1, 1), texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0, 0, 0, 0.7 * a))
 		_lienzo.draw_string(_fuente, p, texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(PENSAMIENTO, a))
-	# bocadillo sobre lo que se puede usar: un papelito con tres puntos de tinta
+	# bocadillo sobre lo que se puede usar: papelito cosido con tres puntos de tinta
 	if _cerca and not hablando:
 		var arriba: float = _cerca.get("altura_bocadillo") if _cerca.get("altura_bocadillo") != null else 36.0
 		var p: Vector2 = get_viewport().get_canvas_transform() * (_cerca.global_position + Vector2(0, -arriba))
 		p = p.round() + Vector2(0, round(sin(_tiempo * 4.0)))
-		var caja := Rect2(p - Vector2(9, 7), Vector2(18, 12))
-		_lienzo.draw_rect(Rect2(caja.position + Vector2(1, 2), caja.size), Color(0, 0, 0, 0.35))
+		var caja := Rect2(p - Vector2(10, 8), Vector2(20, 13))
+		_lienzo.draw_rect(Rect2(caja.position + Vector2(1, 2), caja.size), Color(0, 0, 0, 0.4))
 		_lienzo.draw_rect(caja, Color("efe0bc"))
+		_lienzo.draw_line(caja.position + Vector2(1, 1), Vector2(caja.end.x - 1, caja.position.y + 1), Color.WHITE * Color(1, 1, 1, 0.45), 1.0)
 		_lienzo.draw_rect(caja, Color("6b4a2e"), false, 1.0)
 		_lienzo.draw_colored_polygon(PackedVector2Array([p + Vector2(-2, 5), p + Vector2(2, 5), p + Vector2(0, 8)]), Color("6b4a2e"))
 		for i in 3:
-			_lienzo.draw_rect(Rect2(p + Vector2(-5 + i * 4, -1), Vector2(2, 2)), PIEL.TINTA)
+			_lienzo.draw_rect(Rect2(p + Vector2(-5 + i * 4, -2), Vector2(2, 2)), PIEL.TINTA)
 	if not hablando:
 		return
 	if _estilo == "narrador":
 		# la voz del narrador: un panel de noche con filigrana dorada (abajo si hay una ilustración en pantalla)
 		var cn := _caja_n
 		PIEL.caja(_lienzo, cn, "noche")
+		PIEL.esquinas_oro(_lienzo, cn, PIEL.ORO, 0.9, 6.0)
 		if _linea_completa():
-			var qn := cn.end - Vector2(16, 10 - round(sin(_tiempo * 6.0)))
-			_lienzo.draw_colored_polygon(PackedVector2Array([qn + Vector2(-4, -3), qn + Vector2(4, -3), qn + Vector2(0, 2)]), NARRADOR)
+			var dy := roundf(sin(_tiempo * 6.0))
+			var wt := PIEL.tecla(_lienzo, cn.end - Vector2(72, 7), "Espacio", _fuente, 16, 0.95, true)
+			var qn := Vector2(cn.end.x - 66 + wt, cn.end.y + dy)
+			_lienzo.draw_colored_polygon(PackedVector2Array([qn + Vector2(-3, -3), qn + Vector2(3, -3), qn + Vector2(0, 2)]), NARRADOR)
 		return
 	# caja de texto: pergamino con borde de cuero (los pensamientos, en un papel suelto)
 	if _estilo == "pensamiento":
 		PIEL.caja(_lienzo, CAJA, "papel", 0.97)
 	else:
 		PIEL.caja(_lienzo, CAJA, "pergamino")
-	# retrato de quien habla, encima de la caja a la derecha, en un marco de cuero
+		PIEL.esquinas_oro(_lienzo, CAJA, PIEL.ORO, 0.75, 6.0)
+	# retrato de quien habla, encima de la caja a la derecha, en marco rebajado con remaches
 	if _retrato and _estilo == "normal" and _ilustracion_alfa < 0.05:
 		var marco := Rect2(CAJA.end.x - 80, CAJA.position.y - 80, 76, 76)
 		PIEL.caja(_lienzo, marco, "cuero")
+		PIEL.marco_retrato(_lienzo, Rect2(marco.position + Vector2(4, 4), Vector2(68, 68)), PIEL.ORO)
 		_lienzo.draw_rect(Rect2(marco.position + Vector2(5, 5), Vector2(66, 66)), Color("e6d3a8"))
 		_lienzo.draw_texture(_retrato, marco.position + Vector2(6, 6))
 	# pestaña con el nombre (los pensamientos llevan una nubecita)
@@ -305,15 +311,21 @@ func _dibujar() -> void:
 		for c: Vector3 in [Vector3(0, 2, 2.0), Vector3(7, -2, 3.0), Vector3(16, -6, 4.0)]:
 			_lienzo.draw_circle(base + Vector2(c.x, c.y), c.z + 1.0, Color("6b4a2e"))
 			_lienzo.draw_circle(base + Vector2(c.x, c.y), c.z, Color("efe0bc"))
-		var ancho_n := _fuente.get_string_size(_nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-		PIEL.caja(_lienzo, Rect2(base + Vector2(22, -14), Vector2(ancho_n + 12, 18)), "cuero", 1.0, false)
-		_lienzo.draw_string(_fuente, base + Vector2(28, 0), _nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color("b8ef8e"))
+		if _nombre != "":
+			var ancho_n := _fuente.get_string_size(_nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+			PIEL.caja(_lienzo, Rect2(base + Vector2(22, -14), Vector2(ancho_n + 14, 18)), "cuero", 1.0, false)
+			_lienzo.draw_string(_fuente, base + Vector2(29, 0), _nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color("b8ef8e"))
 	elif _nombre != "":
 		var ancho := _fuente.get_string_size(_nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-		var pestana := Rect2(CAJA.position + Vector2(12, -18), Vector2(ancho + 18, 20))
+		var pestana := Rect2(CAJA.position + Vector2(12, -19), Vector2(ancho + 28, 21))
 		PIEL.caja(_lienzo, pestana, "cuero")
-		_lienzo.draw_string(_fuente, pestana.position + Vector2(10, 15), _nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PIEL.CREMA)
-	# flechita que indica que se puede seguir
+		PIEL.esquinas_oro(_lienzo, pestana, PIEL.ORO, 0.7, 4.0)
+		var dc := Vector2(pestana.position.x + 10, pestana.position.y + 10)
+		_lienzo.draw_colored_polygon(PackedVector2Array([dc + Vector2(0, -3), dc + Vector2(3, 0), dc + Vector2(0, 3), dc + Vector2(-3, 0)]), PIEL.ORO)
+		_lienzo.draw_string(_fuente, pestana.position + Vector2(17, 15), _nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PIEL.CREMA)
+	# indicador tactil sobre el borde inferior derecho cuando la linea esta completa
 	if _linea_completa():
-		var q := CAJA.end - Vector2(18, 12 - round(sin(_tiempo * 6.0)))
-		_lienzo.draw_colored_polygon(PackedVector2Array([q + Vector2(-4, -3), q + Vector2(4, -3), q + Vector2(0, 2)]), PIEL.ROJO)
+		var dy := roundf(sin(_tiempo * 6.0))
+		var wt := PIEL.tecla(_lienzo, CAJA.end - Vector2(74, 7), "Espacio", _fuente, 16, 0.96, true)
+		var q := Vector2(CAJA.end.x - 67 + wt, CAJA.end.y + dy)
+		_lienzo.draw_colored_polygon(PackedVector2Array([q + Vector2(-3, -3), q + Vector2(3, -3), q + Vector2(0, 2)]), PIEL.ROJO)

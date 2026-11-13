@@ -77,6 +77,16 @@ func _ready() -> void:
 	_comprobar(gemelo_m != null and absf(gemelo_m.position.x - m.global_position.x / 16.0) < 0.05, "y su gemelo la sigue por el suelo 3D")
 	_comprobar(gemelo_m != null and gemelo_m.texture != null and gemelo_m.billboard == BaseMaterial3D.BILLBOARD_FIXED_Y, "de pie, mirando a la cámara, con su dibujo")
 
+	print("Edificios con volumen 3D:")
+	await _ir("cuna_de_musgo", "")
+	espejo = _espejo()
+	var edificios_3d := 0
+	if espejo:
+		for par in espejo.get("_gemelos").values():
+			if par[1] is MeshInstance3D:
+				edificios_3d += 1
+	_comprobar(edificios_3d > 0, "los edificios de Cuna de Musgo se construyen como mallas 3D con volumen (%d)" % edificios_3d)
+
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")
 	espejo = _espejo()

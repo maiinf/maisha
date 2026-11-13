@@ -71,43 +71,43 @@ func _process(delta: float) -> void:
 
 
 func _dibujar() -> void:
-	var y := -40.0 + 48.0 * _bajada
-	var caja := Rect2((640.0 - ANCHO) / 2.0, y, ANCHO, 30.0 if ira < 0.0 else 35.0)
-	PIEL.caja(_lienzo, caja.grow(2), "cuero")
+	var y := -44.0 + 52.0 * _bajada
+	var caja := Rect2((640.0 - ANCHO) / 2.0, y, ANCHO, 32.0 if ira < 0.0 else 39.0)
+	PIEL.caja(_lienzo, caja.grow(2), "noche")
+	PIEL.esquinas_oro(_lienzo, caja.grow(2), GIZA, 0.9, 6.0)
 	var ancho_nombre := FUENTE.get_string_size(nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-	_lienzo.draw_string(FUENTE, Vector2(320.0 - ancho_nombre / 2.0, y + 13).round(), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TEXTO)
-	# un trozo de raíz por cada punto de vida
+	if ira >= 0.0:
+		var etapa := mini(3, int(ira / 25.0))
+		var t_etapa: String = ETAPAS[etapa]
+		var w_etapa := FUENTE.get_string_size(t_etapa, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 10.0
+		var nx := roundf(caja.position.x + 12.0)
+		_lienzo.draw_string(FUENTE, Vector2(nx, y + 14).round(), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TEXTO)
+		PIEL.insignia(_lienzo, Vector2(caja.end.x - 10.0 - w_etapa, y + 2.0), t_etapa, FUENTE, Color(0.14, 0.08, 0.16), COLOR_IRA[etapa], COLOR_IRA[etapa], 0.96, 16, 5.0)
+	else:
+		_lienzo.draw_string(FUENTE, Vector2(320.0 - ancho_nombre / 2.0, y + 14).round(), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TEXTO)
+	# un trozo de raíz biselado por cada punto de vida
 	var hueco := 3.0
-	var tam := (ANCHO - 24.0 - hueco * (maximo - 1)) / maximo
+	var tam := (ANCHO - 26.0 - hueco * (maximo - 1)) / maximo
 	for i in maximo:
-		var r := Rect2(caja.position.x + 12.0 + i * (tam + hueco), y + 18, tam, 6).abs()
+		var r := Rect2(caja.position.x + 13.0 + i * (tam + hueco), y + 19, tam, 7).abs()
 		r.position = r.position.round()
-		_lienzo.draw_rect(r, Color("1a0d24"))
+		_lienzo.draw_rect(r, Color(0.08, 0.05, 0.12, 0.95))
+		_lienzo.draw_rect(r, Color(PIEL.ORO, 0.35), false, 1.0)
 		if i < _vida:
-			_lienzo.draw_rect(r.grow(-1), GIZA_OSCURO)
-			_lienzo.draw_rect(Rect2(r.position + Vector2(1, 1), Vector2(r.size.x - 2, 2)), GIZA)
+			_lienzo.draw_rect(r.grow(-1), GIZA)
+			_lienzo.draw_rect(Rect2(r.position + Vector2(1, 1), Vector2(maxf(1.0, r.size.x - 2.0), 1.0)), GIZA.lightened(0.35))
+			_lienzo.draw_rect(Rect2(r.position.x + 1.0, r.end.y - 2.0, maxf(1.0, r.size.x - 2.0), 1.0), GIZA_OSCURO)
 		elif i == _perdido and _destello > 0.0 and int(_destello * 12.0) % 2 == 0:
 			_lienzo.draw_rect(r.grow(-1), TEXTO)
 	if ira >= 0.0:
 		var etapa := mini(3, int(ira / 25.0))
-		var barra := Rect2(caja.position.x + 12.0, y + 27, ANCHO - 24.0, 3)
-		_lienzo.draw_rect(barra, Color("1a0d24"))
+		var barra := Rect2(caja.position.x + 13.0, y + 29, ANCHO - 26.0, 5)
 		var col: Color = COLOR_IRA[etapa]
 		if etapa == 3 and int(Time.get_ticks_msec() / 120) % 2 == 0:
 			col = TEXTO
-		_lienzo.draw_rect(Rect2(barra.position, Vector2(floorf(barra.size.x * clampf(ira / 100.0, 0.0, 1.0)), 3)), col)
-		for k in range(1, 4):
-			_lienzo.draw_rect(Rect2(barra.position + Vector2(roundf(barra.size.x * k / 4.0), 0), Vector2(1, 3)), PANEL)
-		# la etapa, a la derecha de la caja (con su panel)
-		var texto: String = ETAPAS[etapa]
-		var ancho_t := FUENTE.get_string_size(texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-		var pt := Vector2(caja.end.x + 10.0, y + 22).round()
-		PIEL.caja(_lienzo, Rect2(pt + Vector2(-7, -16), Vector2(ancho_t + 14, 23)), "cuero", 1.0, false)
-		_lienzo.draw_rect(Rect2(pt + Vector2(-5, -14), Vector2(ancho_t + 10, 19)).grow(-1), col, false, 1.0)
-		_lienzo.draw_string(FUENTE, pt + Vector2(1, 1), texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0, 0, 0, 0.7))
-		_lienzo.draw_string(FUENTE, pt, texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, COLOR_IRA[etapa])
+		PIEL.medidor(_lienzo, barra, clampf(ira / 100.0, 0.0, 1.0), col, -1.0, Color.WHITE, 1.0, 4)
 	if not partes.is_empty():
-		_dibujar_partes(caja.end.y + 3.0)
+		_dibujar_partes(caja.end.y + 4.0)
 
 
 ## Una fila con las partes: su nombre y una marca por golpe que aguantan (tachadas si están rotas)
@@ -125,6 +125,7 @@ func _dibujar_partes(y: float) -> void:
 	total -= 12.0
 	var caja := Rect2(roundf(320.0 - total / 2.0 - 8.0), y, total + 16.0, 19.0)
 	PIEL.caja(_lienzo, caja.grow(2), "cuero")
+	PIEL.esquinas_oro(_lienzo, caja.grow(2), PIEL.ORO, 0.55, 4.0)
 	var x := caja.position.x + 8.0
 	for t in trozos:
 		var p: Dictionary = partes[t[0]]

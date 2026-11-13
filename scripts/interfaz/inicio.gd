@@ -19,7 +19,7 @@ const VERSION := "v0.6 · prototipo"
 const APAGADO := Color("c9b07e")
 const LOMO := 320.0
 const LLAMA := Vector2(284, 124)          # la punta de la mecha (la misma que en pintar_inicio_mesa.py)
-const TARJETA_X := 30.0
+const TARJETA_X := 24.0
 const TARJETA_Y := 116.0
 const MENU_FUERA := 0.35                  # lo que tarda en irse la tarjeta del menú
 const ABRIR_DURA := 1.3                   # lo que tarda el diario en abrirse
@@ -84,8 +84,8 @@ func _ready() -> void:
 	capa.add_child(_brillo)
 	_lista = LISTA.new()
 	_lista.en_papel = true
-	_lista.position = Vector2(TARJETA_X + 22, TARJETA_Y + 20)
-	_lista.size = Vector2(196, 120)
+	_lista.position = Vector2(TARJETA_X + 14, TARJETA_Y + 18)
+	_lista.size = Vector2(228, 120)
 	_lista.elegida.connect(_al_elegir)
 	capa.add_child(_lista)
 	_pregunta = LISTA.new()
@@ -111,13 +111,16 @@ func _montar_menu() -> void:
 	var guardada := Estado.leer_partida()
 	if not guardada.is_empty():
 		var lugar := String(guardada.get("lugar", ""))
+		var max_lugar := 16
+		if lugar.length() > max_lugar:
+			lugar = lugar.left(max_lugar - 1) + "…"
 		var nota := "%s · %s" % [lugar, Estado.texto_tiempo(float(guardada.get("tiempo", 0.0)))]
 		opciones.append({"texto": "Continuar", "nota": nota})
 		_acciones.append("continuar")
 	opciones.append({"texto": "Nueva partida"})
 	_acciones.append("nueva")
 	var completa := DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
-	opciones.append({"texto": "Pantalla completa: %s" % ("sí" if completa else "no")})
+	opciones.append({"texto": "Pantalla completa", "interruptor": completa})
 	_acciones.append("pantalla")
 	opciones.append({"texto": "Salir"})
 	_acciones.append("salir")
@@ -263,10 +266,9 @@ func _dibujar() -> void:
 		_dibujar_tarjeta(menu)
 	if _intro >= 0 or (_intro == -2 and _tras_abrir == "intro"):
 		_dibujar_intro()
-	# pie: controles y versión
+	# pie: controles en barra tactil sobre la mesa
 	if menu > 0.0:
-		var ayuda := "↑↓ elegir · Espacio aceptar"
-		_texto(ayuda, Vector2(10, 352), Color(APAGADO, 0.75 * menu))
+		PIEL.barra_teclas(_lienzo, 134.0, 344.0, [["↑↓", "Elegir"], ["Espacio", "Aceptar"]], _fuente, 16, menu, true)
 	# la pregunta antes de borrar una partida
 	if _pregunta.visible:
 		var caja := Rect2(222, 150, 228, 112)
@@ -307,17 +309,19 @@ func _dibujar_tarjeta(alfa: float) -> void:
 	var logo_pos := Vector2(34, 26 + round(sin(_tiempo * 1.2) * 1.0) + sube)
 	_lienzo.draw_texture_rect(LOGO, Rect2(logo_pos + Vector2(3, 4), LOGO.get_size() * 3), false, Color(0, 0, 0, 0.55 * alfa))
 	_lienzo.draw_texture_rect(LOGO, Rect2(logo_pos, LOGO.get_size() * 3), false, Color(1, 1, 1, alfa))
-	var alto: float = _lista.alto_total() + 52
-	var tarjeta := Rect2(TARJETA_X, TARJETA_Y + sube, 222, alto)
+	var alto: float = _lista.alto_total() + 56
+	var tarjeta := Rect2(TARJETA_X, TARJETA_Y + sube, 256, alto)
 	PIEL.caja(_lienzo, tarjeta, "papel", alfa)
+	PIEL.esquinas_oro(_lienzo, tarjeta, PIEL.TINTA_SUAVE, 0.45 * alfa, 5.0)
 	# dos trozos de cinta que la sujetan a la mesa
 	for p: Vector2 in [tarjeta.position + Vector2(-6, -4), tarjeta.position + Vector2(tarjeta.size.x - 26, -6)]:
 		var cinta := PackedVector2Array([p, p + Vector2(30, 6), p + Vector2(27, 16), p + Vector2(-3, 10)])
 		_lienzo.draw_colored_polygon(cinta, Color(0.93, 0.88, 0.72, 0.55 * alfa))
 		_lienzo.draw_polyline(PackedVector2Array([p, p + Vector2(30, 6)]), Color(1, 1, 1, 0.25 * alfa), 1.0)
-	# la versión, a lápiz en la esquina
+	# divisor y la versión, a lápiz en la esquina
+	PIEL.divisor(_lienzo, tarjeta.position.x + 18, tarjeta.end.x - 18, tarjeta.end.y - 26, PIEL.TINTA_APAGADA, 0.55 * alfa)
 	var ancho := _fuente.get_string_size(VERSION, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-	_lienzo.draw_string(_fuente, tarjeta.end - Vector2(16 + ancho, 12), VERSION, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(PIEL.TINTA_APAGADA, 0.8 * alfa))
+	_lienzo.draw_string(_fuente, tarjeta.end - Vector2(16 + ancho, 10), VERSION, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(PIEL.TINTA_APAGADA, 0.85 * alfa))
 
 
 ## La llama de la vela: una gota que se mece, con el corazón azulado y la punta blanca

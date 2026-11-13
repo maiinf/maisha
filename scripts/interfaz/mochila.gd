@@ -205,6 +205,7 @@ var _sel_y := -1.0                # el subrayado de lo elegido se desliza hasta 
 
 func _ready() -> void:
 	add_to_group("mochila")
+	add_to_group("modales")
 	layer = 29
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_fuente = FUENTE
@@ -355,6 +356,10 @@ func _se_puede_abrir() -> bool:
 		return false
 	var dialogo := get_tree().get_first_node_in_group("dialogo")
 	return not (dialogo and dialogo.hablando)
+
+
+func esta_abierta() -> bool:
+	return abierta
 
 
 func abrir(cual := -1) -> void:
@@ -618,8 +623,11 @@ func _dibujar_bolsa(tinta: float) -> void:
 	for k in PESTANAS.size():
 		var r := Rect2(BOLSA.get_center().x - PESTANAS.size() * 15.5 + k * 31, y, 28, 26)
 		var elegido := k == pestana
-		_lienzo.draw_rect(r, Color(0.28, 0.2, 0.08, 0.95 * tinta) if elegido else Color(0.08, 0.08, 0.16, 0.9 * tinta))
+		_lienzo.draw_rect(Rect2(r.position + Vector2(1, 2), r.size), Color(0, 0, 0, 0.3 * tinta))
+		_lienzo.draw_rect(r, Color(0.28, 0.2, 0.08, 0.96 * tinta) if elegido else Color(0.08, 0.08, 0.16, 0.92 * tinta))
 		_lienzo.draw_rect(r, Color(TN_TITULO if elegido else TN_APAGADA, (1.0 if elegido else 0.5) * tinta), false, 1.5 if elegido else 1.0)
+		if elegido:
+			PIEL.esquinas_oro(_lienzo, r, TN_TITULO, tinta, 4.0)
 		_icono_pestana(k, r.position + Vector2(6, 5), 1.0, Color(1, 1, 1, tinta * (1.0 if elegido else 0.6)))
 	# las flechitas de los lados
 	for lado in [-1.0, 1.0]:
@@ -631,24 +639,26 @@ func _dibujar_bolsa(tinta: float) -> void:
 func _dibujar_bolsillos_mini(tinta: float) -> void:
 	var ancho := PESTANAS.size() * 26.0
 	var x0 := 320.0 - ancho / 2.0
-	_lienzo.draw_rect(Rect2(x0 - 6, 4, ancho + 12, 24), Color(0.03, 0.03, 0.07, 0.85 * tinta))
-	_lienzo.draw_rect(Rect2(x0 - 6, 4, ancho + 12, 24), Color(TN_TITULO, 0.5 * tinta), false, 1.0)
+	var bar := Rect2(x0 - 8, 4, ancho + 16, 25)
+	PIEL.caja(_lienzo, bar, "noche", 0.96 * tinta, false)
+	PIEL.esquinas_oro(_lienzo, bar, TN_TITULO, 0.85 * tinta, 4.0)
 	for k in PESTANAS.size():
 		var elegido := k == pestana
 		var r := Rect2(x0 + k * 26, 6, 22, 20)
 		if elegido:
-			_lienzo.draw_rect(r, Color(0.28, 0.2, 0.08, 0.95 * tinta))
+			_lienzo.draw_rect(r, Color(0.32, 0.22, 0.09, 0.96 * tinta))
+			_lienzo.draw_rect(r, Color(TN_TITULO, 0.9 * tinta), false, 1.0)
 		_icono_pestana(k, r.position + Vector2(3, 2), 1.0, Color(1, 1, 1, tinta * (1.0 if elegido else 0.55)))
-	_texto(PESTANAS[pestana], Vector2(x0 + ancho + 14, 22), Color(TN_TITULO, tinta))
+	PIEL.insignia(_lienzo, Vector2(bar.end.x + 8, 8), PESTANAS[pestana], _fuente, PIEL.CUERO_OSCURO, TN_TITULO, TN_TITULO, 0.94 * tinta)
 
 
 ## Lo que hay escrito en las dos páginas
 func _dibujar_paginas(tinta: float) -> void:
-	var ayuda := "←→ pestañas · ↑↓ elegir · Tab cerrar"
+	var items_ayuda := [["←→", "Pestañas"], ["↑↓", "Elegir"], ["Tab", "Cerrar"]]
 	if pestana == P_MISIONES:
-		ayuda = "↑↓ elegir · Acción seguir · Tab cerrar"
+		items_ayuda = [["↑↓", "Elegir"], ["E", "Seguir"], ["Tab", "Cerrar"]]
 	elif pestana == P_OBJETOS and (Estado.cuantos("sopa") > 0 or not Tienda.prendas_compradas().is_empty()):
-		ayuda = "↑↓ elegir · Acción usar o ponerse"
+		items_ayuda = [["↑↓", "Elegir"], ["E", "Usar"], ["Tab", "Cerrar"]]
 	if pestana == P_MAPA:
 		_dibujar_mapa()
 		_dibujar_bolsillos_mini(tinta)
@@ -658,10 +668,10 @@ func _dibujar_paginas(tinta: float) -> void:
 		_dibujar_bolsillos_mini(tinta)
 		return
 	_dibujar_bolsa(tinta)
-	# la ayuda, abajo a la derecha de la descripción
-	_texto(ayuda, Vector2(DESC.end.x - 34 - _fuente.get_string_size(ayuda, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x, DESC.end.y - 13), Color(TN_SUAVE, tinta), -1, 15)
+	# barra de controles dentro del borde inferior derecho de la descripcion (sin pisar el marco)
+	PIEL.barra_teclas(_lienzo, DESC.end.x - 166.0, DESC.end.y - 18.0, items_ayuda, _fuente, 16, tinta, true)
 	var filas := _lista()
-	var area := Rect2(LISTA.position + Vector2(26, 10), Vector2(LISTA.size.x - 40, FILAS_VISIBLES * ALTO_FILA))
+	var area := Rect2(LISTA.position + Vector2(26, 10), Vector2(LISTA.size.x - 42, FILAS_VISIBLES * ALTO_FILA))
 	# (la lista entra deslizándose al cambiar de bolsillo)
 	area.position.x += (1.0 - _ease(_pagina)) * 24.0 * _sentido
 	if filas.is_empty():
@@ -678,10 +688,10 @@ func _dibujar_paginas(tinta: float) -> void:
 	var seguida := Misiones.seguida_id() if pestana == P_MISIONES else ""
 	if pestana == P_MISIONES and seguida == "" and not Misiones.seguida().is_empty():
 		seguida = Misiones.seguida()["id"]
-	# el subrayado de lo elegido, que se desliza hasta su fila
+	# el subrayado de lo elegido, ajustado para no invadir el borde derecho ni el icono de seguida
 	var y_obj := area.position.y + (seleccion - _desplazamiento) * ALTO_FILA
 	_sel_y = y_obj if _sel_y < 0.0 else lerpf(_sel_y, y_obj, minf(1.0, get_process_delta_time() * 18.0))
-	PIEL.subrayar(_lienzo, Rect2(area.position.x + 10, _sel_y + 2, area.size.x - 10, ALTO_FILA - 3), _tiempo, tinta)
+	PIEL.subrayar(_lienzo, Rect2(area.position.x + 10, _sel_y + 2, area.size.x - 30, ALTO_FILA - 3), _tiempo, tinta)
 	PIEL.marcapaginas(_lienzo, Vector2(area.position.x + 6, _sel_y + ALTO_FILA / 2.0), tinta)
 	var hechas_desde := -1
 	for i in range(_desplazamiento, mini(filas.size(), _desplazamiento + FILAS_VISIBLES)):
@@ -722,20 +732,19 @@ func _dibujar_paginas(tinta: float) -> void:
 		var nombre := String(f["nombre"])
 		_texto(nombre, Vector2(tx, y + 19), color, -1, 18)
 		if f.get("hecha", false):
-			PIEL.raya(_lienzo, Vector2(tx, y + 12), Vector2(tx + _ancho(nombre), y + 12), TN_APAGADA, 0.8 * tinta)
+			var w_nom := _fuente.get_string_size(nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
+			PIEL.raya(_lienzo, Vector2(tx, y + 12), Vector2(tx + w_nom, y + 12), TN_APAGADA, 0.8 * tinta)
 		if f.has("cantidad"):
-			_texto("x%d" % f["cantidad"], Vector2(area.end.x - 34, y + 19), Color(TN_ELEGIDA if elegida else TN_SUAVE, tinta), -1, 18)
+			_texto("x%d" % f["cantidad"], Vector2(area.end.x - 36, y + 19), Color(TN_ELEGIDA if elegida else TN_SUAVE, tinta), -1, 18)
 		if f.get("clave", false):
-			_texto("clave", Vector2(area.end.x - 46, y + 19), Color(TN_ELEGIDA if elegida else TN_ROJO, 0.9 * tinta), -1, 16)
+			_texto("clave", Vector2(area.end.x - 48, y + 19), Color(TN_ELEGIDA if elegida else TN_ROJO, 0.9 * tinta), -1, 16)
 		if f.get("tecla", "") != "":
-			# la tecla, en una etiqueta de cuero
 			var tecla := String(f["tecla"])
-			var r := Rect2(area.end.x - 14 - _ancho(tecla), y + 3, _ancho(tecla) + 10, 18)
-			PIEL.caja(_lienzo, r, "cuero", tinta, false)
-			_texto(tecla, r.position + Vector2(5, 14), Color(PIEL.CREMA, tinta))
+			var wt := _ancho(tecla) + 9.0
+			PIEL.tecla(_lienzo, Vector2(area.end.x - 16 - wt, y + 5), tecla, _fuente, 16, tinta, elegida)
 		if f.get("id", "") == seguida and seguida != "" and not f.get("hecha", false):
 			# la que se sigue en pantalla: una flechita roja que late
-			var c := Vector2(area.end.x - 8 + sin(_tiempo * 4.0), y + 12)
+			var c := Vector2(area.end.x - 10 + sin(_tiempo * 4.0), y + 12)
 			_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(-5, -4), c + Vector2(3, 0), c + Vector2(-5, 4)]), Color(TN_ROJO, tinta))
 	# flechas de que hay más arriba o abajo
 	if _desplazamiento > 0:
@@ -822,10 +831,7 @@ func _detalle_mision(m: Dictionary, caja: Rect2, es_seguida: bool) -> void:
 		_rombo(Vector2(x + 4, y - 5), 4.0, ct)
 	_texto(cabecera, Vector2(x + 16, y), ct)
 	if es_seguida and Misiones.estado(m) == "activa":
-		var r := Rect2(x + ancho - _ancho("en pantalla") - 10, y - 13, _ancho("en pantalla") + 10, 17)
-		_lienzo.draw_rect(r, Color(TN_ROJO, 0.12))
-		_lienzo.draw_rect(r, Color(TN_ROJO, 0.7), false, 1.0)
-		_texto("en pantalla", r.position + Vector2(5, 13), Color(TN_ROJO, 0.9))
+		PIEL.insignia(_lienzo, Vector2(x + ancho - _ancho("En pantalla") - 12, y - 13), "En pantalla", _fuente, Color("3c1814"), TN_ROJO, PIEL.CREMA, 0.95)
 	y += 22
 	_texto(String(m["titulo"]), Vector2(x, y), TN_TITULO, -1, 18)
 	y = _parrafo(String(m.get("texto", "")), Vector2(x, y + 20), ancho, TN_SUAVE, 16.0)
@@ -864,10 +870,9 @@ func _detalle_bestia(tipo: String, caja: Rect2) -> void:
 	var ficha: Dictionary = Bestiario.FICHAS[tipo]
 	var conocido := Bestiario.conocido(tipo)
 	var rango := Bestiario.rango(tipo)
-	# el dibujo, en un marco (en sombra si aún no lo conoces)
+	# el dibujo, en marco rebajado con remaches (en sombra si aún no lo conoces)
 	var marco := Rect2(caja.position + Vector2(4, 4), Vector2(84, 84))
-	_lienzo.draw_rect(marco, Color(0.05, 0.05, 0.1, 0.9))
-	_lienzo.draw_rect(marco, Color(Bestiario.COLOR_RANGO[rango], 0.8), false, 2.0)
+	PIEL.marco_retrato(_lienzo, marco, Bestiario.COLOR_RANGO[rango])
 	var d: Array = ficha["dibujo"]
 	if not _retratos.has(d[0]):
 		_retratos[d[0]] = load(String(d[0]))
@@ -916,7 +921,7 @@ func _cargar_retrato(id: String) -> Texture2D:
 
 
 func _dibujar_mapa() -> void:
-	var area := Rect2(16, 30, 608, 320)
+	var area := Rect2(16, 30, 608, 306)
 	if not Estado.tiene("mapa_partido"):
 		_texto("Aún no tienes ningún mapa.", Vector2(250, 180), TN_APAGADA, -1, 18)
 		return
@@ -945,9 +950,11 @@ func _dibujar_mapa() -> void:
 	var punto := Vector2(78, 132) if PUNTO_RAIZ.has(Estado.escena_actual) and not Estado.escena_actual in ["kitovu", "casa_shamba"] else Vector2(152, 100)
 	_punto(pos + punto * MAPA_MUNDO_ESCALA)
 	var pie := "Falta el trozo del norte. Mzee Shamba cree que está en Sigilia."
+	var wp := _ancho(pie) + 18.0
 	if _raiz_conocida():
-		pie = "↑ ↓ ver el mapa de Raíz · " + "Falta el trozo de Sigilia."
-	_texto(pie, Vector2(area.position.x + 16, area.end.y - 12), TN_SUAVE)
+		PIEL.barra_teclas(_lienzo, 320.0, area.end.y - 10.0, [["↑↓", "Mapa de Raíz"], ["·", "Falta el trozo de Sigilia"]], _fuente, 16, 1.0, true)
+	else:
+		PIEL.insignia(_lienzo, Vector2(roundf(320.0 - wp * 0.5), area.end.y - 18.0), pie, _fuente, PIEL.CUERO_OSCURO, PIEL.ORO, PIEL.CREMA, 0.94, 16, 9.0)
 
 
 func _punto(aqui: Vector2) -> void:
@@ -1033,7 +1040,7 @@ func _dibujar_mapa_raiz(area: Rect2) -> void:
 	for cam in CAMINOS_RAIZ:
 		if cam[1] == Estado.escena_actual:
 			pie = "Estás en: %s · %s" % [cam[0], pie]
-	_texto(pie + " · ↑ ↓ mundo", Vector2(area.position.x + 8, area.end.y - 2), TN_TINTA)
+	PIEL.barra_teclas(_lienzo, 320.0, area.end.y - 8.0, [["↑↓", "Mundo"], ["·", pie]], _fuente, 16, 1.0, true)
 
 
 ## Un camino trazado con tinta: rayitas, como lo dibujaría Maisha al andar
@@ -1272,16 +1279,15 @@ func _dibujar_nodo(id: String, i: int, p: Vector2, tinta: float, elegido: bool) 
 
 func _dibujar_panel_nodo(tinta: float) -> void:
 	var caja := Rect2(PANEL_MAISHA.end.x + 6, 248, 618 - PANEL_MAISHA.end.x - 6, 82)
-	_lienzo.draw_rect(caja, Color(0.04, 0.04, 0.09, 0.88 * tinta))
-	_lienzo.draw_rect(caja, Color(TN_TITULO, 0.8 * tinta), false, 1.0)
-	_lienzo.draw_rect(caja.grow(-3), Color(TN_TITULO, 0.3 * tinta), false, 1.0)
 	var id: String = RAMAS_ARBOL[_rama]
 	var col: Color = COLOR_RAMA[id]
+	PIEL.caja(_lienzo, caja, "noche", 0.96 * tinta)
+	PIEL.esquinas_oro(_lienzo, caja, col, 0.9 * tinta, 5.0)
 	var x := caja.position.x + 12
 	var y := caja.position.y + 18
 	# lo que tienes, abajo a la derecha del panel
 	var bolsa := "◆ Esencia %d   ✧ Cristales %d" % [Artes.esencia(), Tienda.cristales()]
-	_texto(bolsa, Vector2(caja.end.x - 10 - _ancho(bolsa), caja.end.y - 6), Color(TN_TITULO, tinta))
+	_texto(bolsa, Vector2(caja.end.x - 16 - _ancho(bolsa), caja.end.y - 9), Color(TN_TITULO, tinta))
 	if _nodo == 0:
 		var h: Array = HABILIDADES[BASICA_RAMA[id]]
 		_texto("%s  (%s)" % [h[0], h[1]], Vector2(x, y), Color(col, tinta))
@@ -1318,9 +1324,8 @@ func _dibujar_panel_nodo(tinta: float) -> void:
 	else:
 		aviso = "Mantén Acción"
 		color_aviso = col
-		var barra := Rect2(xd, yd + 26, 160, 4)
-		_lienzo.draw_rect(barra, Color(0.1, 0.1, 0.2, tinta))
-		_lienzo.draw_rect(Rect2(barra.position, Vector2(barra.size.x * (_mantenido / MANTENER), barra.size.y)), Color(col, tinta))
+		var barra := Rect2(xd, yd + 25, 160, 6)
+		PIEL.medidor(_lienzo, barra, _mantenido / MANTENER, col, -1.0, Color.WHITE, tinta)
 	_texto(aviso, Vector2(xd, yd + 20), Color(color_aviso, tinta))
 
 
@@ -1400,9 +1405,8 @@ func _dibujar_maisha(tinta: float) -> void:
 	var id: String = RAMAS_ARBOL[_rama]
 	var col: Color = COLOR_RAMA[id]
 	var previa := _hay_vista_previa()
-	_lienzo.draw_rect(caja, Color(0.04, 0.04, 0.09, 0.88 * tinta))
-	_lienzo.draw_rect(caja, Color(TN_TITULO, 0.8 * tinta), false, 1.0)
-	_lienzo.draw_rect(caja.grow(-3), Color(TN_TITULO, 0.3 * tinta), false, 1.0)
+	PIEL.caja(_lienzo, caja, "noche", 0.96 * tinta)
+	PIEL.esquinas_oro(_lienzo, caja, col if previa else TN_TITULO, 0.9 * tinta, 5.0)
 	var cx := caja.get_center().x
 	var titulo := "MAISHA"
 	_texto(titulo, Vector2(round(cx - _ancho(titulo) / 2.0), caja.position.y + 20), Color(TN_TITULO, tinta))
@@ -1428,8 +1432,7 @@ func _dibujar_maisha(tinta: float) -> void:
 	if previa:
 		var cambio: String = Artes.CAMBIO_VISIBLE[id][_nodo - 1]
 		_parrafo(cambio, Vector2(caja.position.x + 10, y), caja.size.x - 20, Color(col if not _ver_antes else TN_TINTA, tinta))
-		var pista := "F  ver " + ("después" if _ver_antes else "ahora")
-		_texto(pista, Vector2(round(cx - _ancho(pista, 13) / 2.0), caja.end.y - 8), Color(TN_SUAVE, tinta), -1, 13)
+		PIEL.barra_teclas(_lienzo, cx, caja.end.y - 12.0, [["F", "Ver " + ("después" if _ver_antes else "ahora")]], _fuente, 16, tinta, true)
 	elif _nodo > 0:
 		_parrafo(String(Artes.CAMBIO_VISIBLE[id][_nodo - 1]), Vector2(caja.position.x + 10, y), caja.size.x - 20, Color(TN_VERDE, tinta))
 

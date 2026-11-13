@@ -88,8 +88,16 @@ func _hablando() -> bool:
 	return dialogo != null and dialogo.hablando
 
 
-## La mochila, la pausa o el Árbol de la Vida tapan la pantalla: los avisos esperan
+## La mochila, la pausa, la tienda o el Árbol de la Vida tapan la pantalla: los avisos esperan
 func oculto_por_menu() -> bool:
+	for n: Node in get_tree().get_nodes_in_group("modales"):
+		if n.has_method("esta_abierta") and bool(n.call("esta_abierta")):
+			return true
+		if "visible" in n and bool(n.get("visible")):
+			return true
+	var tienda := get_tree().get_first_node_in_group("tienda")
+	if tienda and (tienda.get("abierto") or tienda.visible):
+		return true
 	var mochila := get_tree().get_first_node_in_group("mochila")
 	if mochila and (mochila.abierta or mochila.visible):
 		return true
@@ -173,11 +181,11 @@ func _lineas(texto: String, ancho: float) -> PackedStringArray:
 
 
 func _dibujar() -> void:
+	if oculto_por_menu():
+		return
 	if _alfa > 0.01:
 		_dibujar_panel()
 		_dibujar_flecha()
-	if oculto_por_menu():
-		return
 	if not _avisos.is_empty() and _aviso_t > 0.0:
 		_dibujar_aviso(_avisos[0])
 	if not _esencias.is_empty() and not _hablando():
@@ -193,8 +201,9 @@ func _dibujar_esencia(e: Dictionary) -> void:
 	var motivo := String(e["motivo"])
 	var ancho := _ancho(texto) + 24 + (_ancho(" · " + motivo) if motivo != "" else 0.0)
 	var caja := Rect2(8 - (1.0 - a) * 10.0, 38, ancho + 8, 20)
-	PIEL.caja(_lienzo, caja.grow(2), "cuero", 0.92 * a)
 	var tinte := Color(0.6, 0.85, 1.0) if cristal else Color(0.75, 1.0, 0.55)
+	PIEL.caja(_lienzo, caja.grow(2), "cuero", 0.94 * a)
+	PIEL.esquinas_oro(_lienzo, caja.grow(2), tinte, 0.7 * a, 4.0)
 	var c := caja.position + Vector2(11, 10)
 	for i in 3:
 		_lienzo.draw_circle(c, 3.0 + i * 2.5, Color(tinte, 0.12 * a / (i + 1)))
@@ -219,19 +228,21 @@ func _dibujar_panel() -> void:
 	for l in lineas:
 		ancho = maxf(ancho, _ancho(l) + 16)
 	ancho = minf(ancho, ANCHO_MAX)
-	var alto := 22.0 + lineas.size() * 15.0
+	var alto := 26.0 + lineas.size() * 15.0
 	var caja := Rect2(640 - 8 - ancho, 8, ancho, alto)
-	PIEL.caja(_lienzo, caja.grow(3), "cuero", 0.88 * a)
+	PIEL.caja(_lienzo, caja.grow(3), "cuero", 0.92 * a)
+	PIEL.esquinas_oro(_lienzo, caja.grow(3), color_tipo, 0.7 * a, 5.0)
 	if _destello > 0.0:
 		_lienzo.draw_rect(caja.grow(1), Color(VERDE, _destello * a), false, 1.0)
 	# rombo del tipo de misión
 	var r := caja.position + Vector2(10, 11)
 	_lienzo.draw_colored_polygon(PackedVector2Array([r + Vector2(0, -4), r + Vector2(4, 0), r + Vector2(0, 4), r + Vector2(-4, 0)]), Color(color_tipo, a))
-	_texto(titulo, caja.position + Vector2(18, 16), Color(color_tipo, a))
+	_texto(titulo, caja.position + Vector2(18, 15), Color(color_tipo, a))
+	PIEL.divisor(_lienzo, caja.position.x + 8, caja.end.x - 8, caja.position.y + 19, PIEL.ORO, 0.45 * a)
 	# el paso (se desliza un poco al cambiar)
 	var desliz := (1.0 - _cambio) * 6.0
 	for i in lineas.size():
-		_texto(lineas[i], caja.position + Vector2(8 + desliz, 31 + i * 15), Color(TEXTO, a * _cambio))
+		_texto(lineas[i], caja.position + Vector2(8 + desliz, 33 + i * 15), Color(TEXTO, a * _cambio))
 
 
 func _dibujar_flecha() -> void:
@@ -302,13 +313,13 @@ func _dibujar_aviso(aviso: Dictionary) -> void:
 	var titulo := String(aviso["titulo"])
 	var texto := String(aviso["texto"])
 	var color: Color = aviso["color"]
-	var ancho := maxf(_ancho(titulo), _ancho(texto)) + 40
-	var caja := Rect2(round((640 - ancho) / 2.0), 84 - (1.0 - a) * 8.0, ancho, 40)
-	PIEL.caja(_lienzo, caja.grow(2), "cuero", a)
-	_lienzo.draw_rect(Rect2(caja.position + Vector2(5, 5), caja.size - Vector2(10, 10)), Color(color, 0.35 * a), false, 1.0)
+	var ancho := maxf(_ancho(titulo), _ancho(texto)) + 48
+	var caja := Rect2(round((640 - ancho) / 2.0), 82 - (1.0 - a) * 8.0, ancho, 44)
+	PIEL.caja(_lienzo, caja.grow(2), "noche", a)
+	PIEL.esquinas_oro(_lienzo, caja.grow(2), color, 0.88 * a, 6.0)
 	# hojitas a los lados
 	for s in [-1, 1]:
-		var c := caja.get_center() + Vector2(s * (ancho / 2.0 - 12), 0)
+		var c := caja.get_center() + Vector2(s * (ancho / 2.0 - 13), 0)
 		_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -5), c + Vector2(4, 0), c + Vector2(0, 5), c + Vector2(-4, 0)]), Color(color, a))
-	_texto(titulo, Vector2(round(caja.get_center().x - _ancho(titulo) / 2.0), caja.position.y + 16), Color(color, a))
-	_texto(texto, Vector2(round(caja.get_center().x - _ancho(texto) / 2.0), caja.position.y + 33), Color(TEXTO, a))
+	_texto(titulo, Vector2(round(caja.get_center().x - _ancho(titulo) / 2.0), caja.position.y + 17), Color(color, a))
+	_texto(texto, Vector2(round(caja.get_center().x - _ancho(texto) / 2.0), caja.position.y + 35), Color(TEXTO, a))
