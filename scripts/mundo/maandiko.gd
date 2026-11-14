@@ -45,6 +45,7 @@ const CHARCOS := [Vector2i(4, 25), Vector2i(67, 25), Vector2i(15, 3)]
 
 
 func _ready() -> void:
+	_poner_archivo()             # (antes de super(): al volver de la Sección Prohibida, la puerta tiene que estar ya)
 	super()
 	Estado.marcar("maandiko")
 	add_child(NEVADA.new())
@@ -52,7 +53,6 @@ func _ready() -> void:
 	_poner_charcos()
 	_poner_faroles()
 	_poner_fichas()
-	_poner_archivo()
 	if not Estado.tiene("maandiko_llegada"):
 		_pensar_al_llegar.call_deferred()
 

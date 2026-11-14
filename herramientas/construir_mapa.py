@@ -2349,6 +2349,50 @@ def crear_observatorio():
     return ["".join(f) for f in m], {}
 
 
+def crear_desfiladero():
+    """EL DESFILADERO DEL METEORITO (Asterhaul, 80x58): un cañón de roca ocre y ámbar al este del Kitovu. Lo que no
+    es suelo («0») es la pared del cañón. Se entra por el oeste (del Kitovu, «_»).
+      1. LA ENTRADA (suroeste): una vía con su vagoneta que acaba en un montón de rocas, un Kaa-Jiwe y, al norte,
+         un rincón SECRETO tras un muro agrietado (la 2.ª Esquirla).
+      2. EL TALLER DE MWAMBA (centro): su taller, Mwamba en gris, la ESTELA de la Carga («ȩ») y la vía larga, con un
+         ramal al norte que acaba en el DERRUMBE (noroeste) donde está Mauti.
+      3. LA CANTERA HUNDIDA (sureste): los Kaa-Jiwe y la Esquirla de Mwamba; al norte, un rincón tras otro muro.
+      4. LA PUERTA DEL CRÁTER (noreste), tras un muro agrietado: los 3 pilares-diapasón y la puerta a Mji-Jiwe.
+    Las vías («=») solo son dibujo en el suelo. Vagonetas, muros, derrumbes, pilares, Mwamba, Mauti, los Kaa-Jiwe
+    y las Esquirlas los pone la escena."""
+    ANCHO, ALTO = 80, 58
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y][x] = c
+
+    rect(3, 36, 30, 52, "%")                                 # 1. la Entrada
+    rect(1, 43, 2, 45, "%")
+    rect(0, 43, 0, 45, "_")
+    rect(6, 41, 23, 41, "=")                                 # su vía (acaba en el montón de rocas)
+    rect(24, 40, 28, 42, "%")
+    rect(17, 28, 23, 32, "%")                                # el rincón secreto...
+    rect(19, 33, 21, 35, "%")                                # ...y su paso (lo tapa un muro agrietado)
+    rect(27, 31, 31, 35, "%")                                # la subida al Taller
+    rect(26, 14, 56, 30, "%")                                # 2. el Taller de Mwamba
+    rect(31, 24, 62, 24, "=")                                # la vía larga...
+    rect(30, 14, 30, 24, "=")                                # ...y el ramal del norte, hasta el derrumbe
+    rect(26, 5, 34, 10, "%")                                 # el rincón de Mauti...
+    rect(29, 11, 31, 13, "%")                                # ...y su paso (lo tapa el derrumbe)
+    rect(57, 22, 68, 26, "%")                                # el pasillo del este
+    rect(65, 13, 67, 21, "%")                                # la subida a la Puerta (la tapa un muro agrietado)
+    rect(52, 3, 77, 12, "%")                                 # 4. la Puerta del Cráter
+    rect(50, 31, 53, 35, "%")                                # la rampa de la Cantera
+    rect(46, 36, 77, 54, "%")                                # 3. la Cantera Hundida
+    for (x, y) in ((54, 41), (63, 45), (69, 40), (58, 49)):   # peñas sin tallar (para cubrirse de los Kaa-Jiwe)
+        rect(x, y, x + 1, y + 1, "0")
+    rect(69, 29, 75, 33, "%")                                # su rincón...
+    rect(71, 34, 73, 35, "%")                                # ...y su paso (lo tapa un muro agrietado)
+    return ["".join(f) for f in m], {}
+
+
 def crear_seccion():
     """LA SECCIÓN PROHIBIDA (Sigilia, 64x72, de sur a norte): las salas de mármol morado bajo el Gran Archivo. Lo que
     no es sala («0») son estanterías de libros encadenados. Se entra por el sur (del Gran Archivo de Maandiko, «_»).
@@ -3131,7 +3175,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito"}
 
 
 def construir_suelo(nombre):
@@ -3282,7 +3326,8 @@ if __name__ == "__main__":
                         "orilla_juncos": crear_orilla, "embarcadero_junco": crear_embarcadero, "la_travesia": crear_travesia, "gruta_raices": crear_gruta,
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
-                        "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion}.get(nombre, crear_prados)()
+                        "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion,
+                        "desfiladero_meteorito": crear_desfiladero}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

@@ -800,6 +800,104 @@ def pintar_seccion(nombre, salida=None):
     print("Suelo pintado:", destino, (lz.w, lz.h))
 
 
+def pintar_desfiladero(nombre, salida=None):
+    """El suelo de EL DESFILADERO DEL METEORITO (Asterhaul): un cañón de ROCA OCRE con estratos, polvo claro por
+    donde se pisa, vetas y esquirlas de ÁMBAR que brillan, y grietas. Las paredes («0») son el cañón visto en 3/4:
+    arriba la meseta morada (es de noche) y, al sur, la cara de roca en franjas con vetas de ámbar. Las VÍAS («=»)
+    son dos raíles de hierro sobre traviesas de madera."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=41)
+    tipos = [["pared" if c == "0" else "suelo" for c in f] for f in filas]
+    pared = mascara(lz, tipos, ("pared",), 2.2, 0.16, semilla=411)
+    fina = lz.ruido(0.8, 2, semilla=412)
+    media = lz.ruido(10, 3, semilla=413)
+    grande = lz.ruido(46, 3, semilla=414)
+    S = lz.s
+    # LA ROCA DEL SUELO: ocre, con estratos anchos que ondulan y polvo claro lejos de las paredes
+    dist = lz.distancia(1 - pared)
+    estrato = np.sin((lz.y + ruido_torcido_local(lz, 30, 415) * 60) * 0.16) * 0.5 + 0.5
+    v = 0.42 + (grande - 0.5) * 0.35 + (media - 0.5) * 0.25 + (fina - 0.5) * 0.14 + (estrato - 0.5) * 0.1
+    v += np.clip(dist / 40.0, 0, 1) * 0.12
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#2a1810", "#3e2416", "#573420", "#74482c", "#8e5e3a", "#a8764a", "#c0905e", "#d4a874"], np.clip(v, 0, 1)))
+    # LA CANTERA HUNDIDA (sureste): bancales tallados que bajan hacia el centro, con las marcas del cincel
+    cantera = ((lz.x > 46 * 16) & (lz.x < 78 * 16) & (lz.y > 36 * 16) & (lz.y < 55 * 16)) * 1.0
+    borde = np.minimum(np.minimum(lz.x - 46 * 16, 78 * 16 - lz.x), np.minimum(lz.y - 36 * 16, 55 * 16 - lz.y))
+    for k, d0 in enumerate((30.0, 62.0, 98.0)):
+        dentro = cantera * (borde > d0)
+        lz.pintar(dentro, "#1c0e08", 0.12)                                             # cada bancal, un poco más hondo
+        lz.pintar(cantera * (np.abs(borde - d0 - 1.5) < 1.6), "#1c0e08", 0.55)          # la sombra del escalón
+        lz.pintar(cantera * (np.abs(borde - d0 + 1.0) < 0.6), "#e8c090", 0.6)           # el canto, con luz
+    lz.pintar(cantera * (((lz.x + lz.y * 0.35) % 9) < 0.5) * (media > 0.52), "#2a1810", 0.3)   # las marcas del cincel
+    # guijarros y grietas
+    guijarro = (lz.ruido(1.6, 1, semilla=416) > 0.78) * (media > 0.45)
+    lz.pintar(guijarro * 1.0, "#5a3a26", 0.55)
+    lz.pintar(desplazar(lz, guijarro * 1.0, -0.6, -0.6) * guijarro, "#e0b888", 0.35)
+    grieta = np.abs(ruido_torcido_local(lz, 22, 417) - 0.5) < 0.012
+    lz.pintar(grieta * (grande < 0.55), "#24140c", 0.6)
+    # EL ÁMBAR: vetas finas que brillan y esquirlas sueltas
+    veta = (np.abs(ruido_torcido_local(lz, 34, 418) - 0.5) < 0.01) * (lz.ruido(40, 2, semilla=419) > 0.5)
+    lz.pintar(veta * 1.0, "#c8741c", 0.9)
+    lz.pintar(desplazar(lz, veta * 1.0, -0.5, -0.5) * veta, "#ffd070", 0.8)
+    rng = np.random.default_rng(420)
+    esq = np.zeros((lz.H, lz.W), np.float32)
+    luz_e = np.zeros((lz.H, lz.W), np.float32)
+    for _ in range(260):
+        x, y = int(rng.integers(8, lz.w - 8)), int(rng.integers(8, lz.h - 8))
+        if filas[y // CASILLA][x // CASILLA] == "0":
+            continue
+        a, b = int(rng.integers(2, 4)), int(rng.integers(3, 6))
+        pts = np.array([[x * S, (y - b) * S], [(x + a) * S, y * S], [x * S, (y + 1) * S], [(x - a) * S, y * S]], np.int32)
+        cv2.fillConvexPoly(esq, pts, 1.0)
+        cv2.fillConvexPoly(luz_e, np.array([[x * S, (y - b) * S], [x * S, (y + 1) * S], [(x - a) * S, y * S]], np.int32), 1.0)
+    lz.pintar(desplazar(lz, esq, 1.2, 1.5) * (1 - esq), "#1c0e08", 0.5)
+    lz.pintar(esq, "#d8841c")
+    lz.pintar(luz_e, "#ffd878", 0.9)
+    lz.sumar_luz(lz.desenfocar(esq, 5), "#ffb040", 0.35)
+    # LAS VÍAS: traviesas de madera y dos raíles (cada casilla de vía se une con sus vecinas)
+    trav = np.zeros((lz.H, lz.W), np.float32)
+    rail = np.zeros((lz.H, lz.W), np.float32)
+    es_via = lambda x, y: 0 <= y < alto and 0 <= x < ancho and filas[y][x] == "="
+    for y in range(alto):
+        for x in range(ancho):
+            if not es_via(x, y):
+                continue
+            cx, cy = x * CASILLA + 8, y * CASILLA + 8
+            for (dx, dy) in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                if not es_via(x + dx, y + dy):
+                    continue
+                ex, ey = cx + dx * 8, cy + dy * 8
+                px_, py_ = -dy, dx                                   # la perpendicular
+                for k in (-3, 3):
+                    cv2.line(rail, (int((cx + px_ * k) * S), int((cy + py_ * k) * S)), (int((ex + px_ * k) * S), int((ey + py_ * k) * S)), 1.0, S)
+                for t in (2, 6):
+                    mx, my = cx + dx * t, cy + dy * t
+                    cv2.line(trav, (int((mx - px_ * 5) * S), int((my - py_ * 5) * S)), (int((mx + px_ * 5) * S), int((my + py_ * 5) * S)), 1.0, 2 * S)
+    lz.pintar(desplazar(lz, trav, 0.8, 1.0) * (1 - trav), "#1c0e08", 0.5)
+    lz.pintar(trav, rampa(["#3a2414", "#523420", "#6a462c"], np.clip(fina, 0, 1)))
+    lz.pintar(desplazar(lz, rail, 0.6, 1.0) * (1 - rail), "#140a06", 0.6)
+    lz.pintar(rail, "#565a6a")
+    lz.pintar(desplazar(lz, rail, -0.5, -0.5) * rail, "#b8bccc", 0.8)
+    # LAS PAREDES DEL CAÑÓN: la meseta de arriba (morada, de noche) y, al sur, la cara de roca en franjas
+    lz.pintar(pared, rampa(["#140c18", "#1e1222", "#2a1a2c", "#382236", "#462a3c"], np.clip(0.4 + (grande - 0.5) * 0.5 + (media - 0.5) * 0.3 + (fina - 0.5) * 0.12, 0, 1)))
+    lz.pintar(pared * (np.abs(ruido_torcido_local(lz, 18, 421) - 0.5) < 0.014), "#0c0610", 0.6)
+    cara = np.clip(pared - desplazar(lz, pared, 0, -26), 0, 1)
+    franja = np.sin((lz.y + ruido_torcido_local(lz, 40, 422) * 30) * 0.9) * 0.5 + 0.5
+    vc = 0.35 + (franja - 0.5) * 0.4 + (media - 0.5) * 0.25 + (fina - 0.5) * 0.12
+    lz.pintar(cara, rampa(["#1e100c", "#341c12", "#4c2a1a", "#663a22", "#80502e", "#9a683e"], np.clip(vc, 0, 1)))
+    lz.pintar(cara * (np.abs(((lz.x + lz.ruido(8, 2, semilla=423) * 30) % 23) - 11) < 0.5), "#1a0c08", 0.5)       # grietas verticales
+    veta_c = cara * (np.abs(franja - 0.5) < 0.06) * (lz.ruido(26, 2, semilla=424) > 0.55)
+    lz.pintar(veta_c, "#d8841c", 0.9)
+    lz.sumar_luz(lz.desenfocar(veta_c, 3), "#ffb040", 0.3)
+    encima = np.clip(pared - cara, 0, 1)
+    lz.pintar(np.clip(encima - desplazar(lz, encima, 0, 1.6), 0, 1), "#6a4458", 0.8)          # el canto de la meseta
+    lz.pintar(np.clip(desplazar(lz, pared, 0, -5) - pared, 0, 1), "#1c0e08", 0.55)            # la sombra al pie
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "asterhaul", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.014)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
 def ruido_torcido_local(lz, escala, semilla):
     from pintor import ruido_torcido
     return ruido_torcido(lz, escala, 4, semilla)
@@ -812,6 +910,8 @@ def pintar(nombre, salida=None):
         return pintar_observatorio(nombre, salida)
     if nombre == "seccion_prohibida":
         return pintar_seccion(nombre, salida)
+    if nombre == "desfiladero_meteorito":
+        return pintar_desfiladero(nombre, salida)
     if nombre in BIBLIOTECAS:
         return pintar_biblioteca(nombre, salida)
     filas = leer(nombre)

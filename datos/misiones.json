@@ -12,7 +12,8 @@
 	"caminos": {
 		"kitovu": [
 			"prados_del_eco",
-			"casa_shamba"
+			"casa_shamba",
+			"desfiladero_meteorito"
 		],
 		"casa_shamba": [
 			"kitovu"
@@ -133,6 +134,9 @@
 		],
 		"seccion_prohibida": [
 			"maandiko"
+		],
+		"desfiladero_meteorito": [
+			"kitovu"
 		]
 	},
 	"misiones": [
@@ -1391,6 +1395,80 @@
 					"ir": {
 						"escena": "maandiko",
 						"buscar": "aldeano:kalamu"
+					}
+				}
+			]
+		},
+		{
+			"id": "desfiladero_meteorito",
+			"tipo": "historia",
+			"titulo": "El Desfiladero del Meteorito",
+			"texto": "Al nacer el Cetro del Nexo, un temblor ha abierto el sendero del este del Kitovu. Detrás hay un cañón de roca rojiza y ámbar... y algo que late muy hondo.",
+			"aparece": [
+				"cetro_nexo"
+			],
+			"hecha": [
+				"puerta_crater_abierta"
+			],
+			"pasos": [
+				{
+					"texto": "Sal del Kitovu por el sendero del este",
+					"hecho": [
+						"desfiladero_meteorito"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "puerta:desfiladero_meteorito"
+					}
+				},
+				{
+					"texto": "Mira qué le pasa al viejo cantero",
+					"hecho": [
+						"mwamba_visto"
+					],
+					"ir": {
+						"escena": "desfiladero_meteorito",
+						"buscar": "aldeano:mwamba_gris"
+					}
+				},
+				{
+					"texto": "Busca lo que se le cayó, en la cantera del sureste",
+					"hecho": [
+						"esquirla/mwamba"
+					],
+					"ir": {
+						"escena": "desfiladero_meteorito",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Devuélvele la esquirla al cantero",
+					"hecho": [
+						"carga_sismica"
+					],
+					"ir": {
+						"escena": "desfiladero_meteorito",
+						"buscar": "aldeano:mwamba_gris"
+					}
+				},
+				{
+					"texto": "Lanza una vagoneta contra el derrumbe del norte (Carga, I)",
+					"hecho": [
+						"desfiladero/derrumbe_mauti"
+					],
+					"ir": {
+						"escena": "desfiladero_meteorito",
+						"buscar": "grupo:vagonetas"
+					}
+				},
+				{
+					"texto": "Despierta los tres pilares de la Puerta del Cráter, al noreste",
+					"hecho": [
+						"puerta_crater_abierta"
+					],
+					"ir": {
+						"escena": "desfiladero_meteorito",
+						"buscar": "grupo:pilares_diapason"
 					}
 				}
 			]

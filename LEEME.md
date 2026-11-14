@@ -1054,6 +1054,28 @@ La cuarta rama del árbol del diario (`documentacion/runa_diario.png`, `document
 | Prueba | `prueba_artes` (apartado «El Arte de la Runa y el Cetro del Nexo») |
 | Falta | Que el Sello de lacre solo devuelva Aliento si el Sigilo toca algo (ahora devuelve siempre); un sonido propio para la chispa del halo |
 
+## Asterhaul (mundo 3): El Desfiladero del Meteorito
+
+El primer camino de Asterhaul: un cañón de roca ocre y ámbar al este del Kitovu (`documentacion/desfiladero_captura_1.png`…`_3.png` y `_hd2d.png`).
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | Por el **sendero del este del Kitovu** (`_poner_sendero_este()` en `kitovu.gd`, casilla 60,38): lo tapa un desprendimiento hasta que nace el Cetro del Nexo (`cetro_nexo`) |
+| Mapa | `desfiladero_meteorito` (80×58, `crear_desfiladero()`): la Entrada (suroeste), el Taller de Mwamba (centro), la Cantera Hundida (sureste) y la Puerta del Cráter (noreste). Suelo en `arte/mundos/asterhaul/suelos/` (`pintar_desfiladero()` en `pintar_suelo.py`); las vías son la letra `=` |
+| **Carga Sísmica** (tecla **I**, acción `carga`) | `maisha.gd → carga()` + `scripts/combate/carga_sismica.gd`: embiste unos 48 px hacia donde mira, 20 de Aliento, 0,9 s de espera; mientras embiste no recibe daño. Lo que está en el grupo `sismicos` recibe `recibir_carga(direccion)`; a los demás enemigos les quita 1. La enseña Mwamba (marca `carga_sismica`) |
+| Mwamba | El viejo cantero, un **damán de roca** (`mwamba` y `mwamba_gris` en `dibujar_aldeanos.py`). Es un `escriba.gd` con `sufijo_apagado = "_gris"` y `sufijo_marca = "_pulso"`: en gris hasta que se le devuelve su Esquirla (`esquirla_mwamba`, en la cantera) |
+| Muro agrietado y derrumbe | `scripts/mundo/asterhaul/muro_agrietado.gd`: el muro cae con la Carga; el derrumbe (`con_carga = false`) solo con una vagoneta |
+| Vagoneta | `asterhaul/vagoneta.gd`: la Carga la lanza a lo largo de la vía; sigue las curvas y, si al final hay un derrumbe, lo aparta. Contra el sentido de la vía no se mueve |
+| Pilar-diapasón y Puerta del Cráter | `asterhaul/pilar_diapason.gd`: tres pilares; con los tres sonando se abre la puerta (`puerta_crater_abierta`). Detrás irá Mji-Jiwe |
+| Kaa-Jiwe | `scripts/enemigos/kaa_jiwe.gd`: cangrejo de geoda. Avisa y embiste en línea recta (si falla, se estampa y se queda atontado). El cetro rebota; la Carga lo vuelca 4,5 s y entonces sí entra (3 de vida). Está en el Bestiario |
+| Mauti | Tras el derrumbe del norte; se le oye antes de apartarlo |
+| Esquirlas de Estrella | 2 de las 12: la de Mwamba y otra tras el muro secreto del oeste (`esquirla_estrella`, para alguien de Mji-Jiwe) |
+| Secretos | El montón de rocas del final de la vía del oeste y la inscripción de los primeros canteros (cada uno da 1 de Esencia) |
+| Arte | `herramientas/pintar_desfiladero.py` → `arte/mundos/asterhaul/desfiladero/` |
+| Diálogos y misión | `datos/dialogos/asterhaul.json` (nuevo), misión `desfiladero_meteorito` |
+| Prueba | `prueba_desfiladero_meteorito` (47 comprobaciones) |
+| Falta | Mji-Jiwe (la puerta abierta solo se mira); el botón de mando de la Carga; sonidos propios del Kaa-Jiwe; que la especie de los canteros (damán de roca) la confirme Iam |
+
 ## Las construcciones, al nivel de la casa del castor
 
 Todas las casas y construcciones antiguas se han repintado con el pintor de las cinemáticas (volumen, luz, materiales y objetos de su dueño), casi al doble de tamaño. Capturas: `documentacion/aldea_edificios.png` y `documentacion/casas_caminos.png`.

@@ -48,6 +48,7 @@ var _avisos_kuku := 0
 
 
 func _ready() -> void:
+	_poner_sendero_este()        # (antes de super(): si se llega por ella, la puerta tiene que estar ya)
 	super()
 	$Corrupcion.registrar_oasis(GRANJA, GRANJA_RADIOS, 40.0)
 	for z in get_tree().get_nodes_in_group("zonas"):
@@ -288,6 +289,34 @@ func _al_poner_marca(marca: String) -> void:
 	super(marca)
 	if marca == "cetro_recibido":
 		_activar_zonas()
+
+
+## EL SENDERO DEL ESTE (a Asterhaul: el Desfiladero del Meteorito): lo tapa un desprendimiento hasta que nace el
+## Cetro del Nexo (al final de Sigilia: el temblor lo aparta).
+const SENDERO_ESTE := Vector2i(60, 38)
+
+
+func _poner_sendero_este() -> void:
+	var abierto := Estado.tiene("cetro_nexo")
+	var rocas := StaticBody2D.new()
+	rocas.position = Vector2(SENDERO_ESTE) * 16.0 + Vector2(8, 14)
+	var sprite := Sprite2D.new()
+	sprite.texture = load("res://arte/mundos/asterhaul/desfiladero/derrumbe.png")
+	sprite.hframes = 2
+	sprite.frame = 1 if abierto else 0
+	sprite.offset = Vector2(0, -16)
+	rocas.add_child(sprite)
+	$Entidades.add_child(rocas)
+	var puerta: Area2D = preload("res://scripts/mundo/puerta.gd").new()
+	puerta.id = "desfiladero"
+	puerta.destino = "desfiladero_meteorito"
+	puerta.destino_puerta = "oeste"
+	puerta.salida = Vector2.LEFT
+	puerta.tam = Vector2(24, 24)
+	puerta.cerrada_hasta = "cetro_nexo"
+	puerta.position = rocas.position + Vector2(0, -6)
+	add_child(puerta)
+	puerta.cerrada.connect(func() -> void: preload("res://scripts/mundo/charla.gd").hablar(self, "kitovu_derrumbe"))
 
 
 func _al_golpear_espantapajaros(veces: int) -> void:

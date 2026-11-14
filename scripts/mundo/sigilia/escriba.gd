@@ -7,18 +7,21 @@ extends "res://scripts/mundo/sigilia/vecino.gd"
 @export var nombre := ""
 ## su dibujo con color (el de en blanco es «<dibujo>_blanco»): el de escriba, o uno propio (Mfereji)
 @export var dibujo := "escriba"
+## (los artesanos en gris de Asterhaul son lo mismo: dibujo «<dibujo>_gris» y marca «<nombre>_pulso»)
+@export var sufijo_apagado := "_blanco"
+@export var sufijo_marca := "_nombre"
 
 
 func _ready() -> void:
 	charla = nombre
-	id = dibujo if Estado.tiene(nombre + "_nombre") else dibujo + "_blanco"
+	id = dibujo if Estado.tiene(nombre + sufijo_marca) else dibujo + sufijo_apagado
 	super()
 	add_to_group("escribas")
 
 
 func _al_poner_marca(marca: String) -> void:
 	super(marca)
-	if marca != nombre + "_nombre" or id == dibujo:
+	if marca != nombre + sufijo_marca or id == dibujo:
 		return
 	id = dibujo
 	_sprite.texture = load("res://arte/personajes/aldeanos/%s_anim.png" % dibujo)

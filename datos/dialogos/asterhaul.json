@@ -1,0 +1,206 @@
+{
+	"_ayuda": [
+		"Los diálogos de ASTERHAUL (mundo 3). El mismo formato que raiz.json y sigilia.json."
+	],
+	"desfiladero_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El suelo cruje. No es tierra: es piedra molida, y entre el polvo brillan trocitos de ámbar.",
+					"Hay vías. Y una vagoneta cargada hasta arriba, parada en mitad de la nada, como si alguien la hubiera soltado a medio camino.",
+					"Para ser una cantera, hay demasiado silencio. Ni un martillo. Ni una voz."
+				]
+			}
+		]
+	},
+	"mwamba": {
+		"nombre": "Mwamba",
+		"conversaciones": [
+			{
+				"no": [
+					"mwamba_pulso"
+				],
+				"tiene": {
+					"esquirla_mwamba": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"La esquirla me late en la mano, despacio. Y el viejo, aunque no se mueve, tiene la zarpa abierta. Justo de este tamaño.",
+					"Toma. Creo que esto se te cayó."
+				],
+				"entrega": {
+					"esquirla_mwamba": 1
+				},
+				"marca": [
+					"mwamba_pulso"
+				]
+			},
+			{
+				"no": [
+					"mwamba_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un damán viejo, cubierto de polvo gris de las cejas a los pies. Lleva una maza al hombro, pero no pega con ella.",
+					"No habla. Respira, eso sí. Muy despacio, como respiraría una piedra.",
+					"Tiene una zarpa abierta, como si se le hubiera caído algo. Las vías bajan hacia el sureste, a una cantera."
+				],
+				"marca": [
+					"mwamba_visto"
+				]
+			},
+			{
+				"si": [
+					"mwamba_pulso"
+				],
+				"no": [
+					"mwamba_hablado"
+				],
+				"lineas": [
+					"...Ejem. Ejem. Cuánto polvo. Perdona, criatura, llevo aquí de pie desde... ¿qué día es? Da igual. Mucho.",
+					"Mwamba. Cantero. Cincuenta años sacándole ámbar a esta pared, y un mal día me paro y pienso: ¿y si un golpe de más lo tira todo abajo?",
+					"Y ya no di ni uno. Ni yo, ni nadie. Miedo al derrumbe, en un pueblo de canteros. Tendría gracia, si la tuviera.",
+					"A ver ese cetro. Mmm. Piedra buena. Y tú tienes hombros. Pequeños, pero hombros.",
+					"Escucha: la roca no se rompe a golpecitos. Se rompe con todo el cuerpo, de una vez y sin dudar. Baja la cabeza, aprieta los dientes... y ve.",
+					"¡Eso! ¿Lo has notado en los pies? Eso es una Carga. Lo que está agrietado se viene abajo, y lo que tiene ruedas, sale rodando.",
+					"Y a los Kaa-Jiwe, los cangrejos de geoda, los pones panza arriba. Por fuera son piedra. Por dentro, no tanto."
+				],
+				"marca": [
+					"mwamba_hablado",
+					"carga_sismica"
+				]
+			},
+			{
+				"si": [
+					"puerta_crater_abierta"
+				],
+				"lineas": [
+					"¿Los oyes? Los tres. Hacía años que no sonaban.",
+					"Anda, ve. Yo recojo esto y bajo detrás. Despacio, que mis rodillas no son de ámbar."
+				]
+			},
+			{
+				"si": [
+					"mwamba_hablado"
+				],
+				"no": [
+					"desfiladero/derrumbe_mauti"
+				],
+				"lineas": [
+					"Ahí arriba, al final del ramal, ha habido un desprendimiento hace un rato. Y juraría que he oído a alguien detrás.",
+					"Eso no lo mueves tú ni con diez hombros. Pero una vagoneta cargada, bien lanzada... Las vías llegan hasta allí. Tú verás desde dónde la empujas."
+				]
+			},
+			{
+				"si": [
+					"mwamba_hablado"
+				],
+				"lineas": [
+					"La Puerta del Cráter está al noreste, detrás de una pared que lleva años pidiendo un empujón.",
+					"Tiene tres pilares. Antes sonaban solos, con el pulso de la estrella. Ahora hay que despertarlos a las bravas. Uno, dos y tres.",
+					"Detrás está Mji-Jiwe. Mi ciudad. Diles que... No, déjalo. Ya se lo digo yo, cuando se me quite el polvo de la garganta."
+				]
+			}
+		]
+	},
+	"estela_carga": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una laja naranja, más alta que yo, con un dibujo grabado: algo que embiste, y tres rayas que se abren por delante.",
+					"Debajo, a cincel: «La montaña no escucha a quien llama a la puerta. Escucha a quien entra».",
+					"Los canteros tienen su manera de decir las cosas."
+				]
+			}
+		]
+	},
+	"derrumbe_mauti": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"lineas": [
+					"¿Maisha? ¿Eres tú? ¡Aquí! ¡Detrás de las piedras!",
+					"Estoy bien. De verdad. Es que quise apartar una roca sin ayuda de nadie, para variar... y la montaña opinaba otra cosa.",
+					"No tires desde ahí, que pesan una barbaridad. Busca algo más grande que tú. Yo de aquí no me muevo. Je. Qué remedio."
+				]
+			}
+		]
+	},
+	"mauti_desfiladero": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"no": [
+					"mauti_desfiladero_libre"
+				],
+				"lineas": [
+					"Uf. Aire. Gracias. Y gracias también por no decir «te lo dije».",
+					"Llegué antes que tú, ¿sabes? Seguí el temblor. Cuando tu cetro cambió, algo aquí abajo contestó. Lo noté en las hojas.",
+					"Vi las piedras y pensé: esto lo aparto yo. Sin pedirle nada a nadie. Ya has visto cómo me fue.",
+					"Pero ahí dentro, a oscuras, lo oí. Un latido. Muy hondo, muy lento. No es de la montaña. Es de algo que cayó dentro.",
+					"Voy contigo hasta la puerta. Detrás, esta vez. Que conste."
+				],
+				"marca": [
+					"mauti_desfiladero_libre"
+				]
+			},
+			{
+				"lineas": [
+					"Ese latido viene del cráter. De muy abajo.",
+					"Tú abre camino, que se te da mejor. Yo escucho."
+				]
+			}
+		]
+	},
+	"desfiladero_inscripcion": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Alguien grabó esto en la pared hace muchísimo, con letra torpe:",
+					"«Aquí cayó. La tierra tembló tres días. Cuando dejó de temblar, bajamos, y estaba tibia. La llamamos estrella porque no supimos qué otra cosa llamarla».",
+					"Debajo hay doce marcas de cincel, una por familia. La última está a medias."
+				]
+			}
+		]
+	},
+	"puerta_crater": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"puerta_crater_abierta"
+				],
+				"lineas": [
+					"Detrás de la puerta, una escalera ancha baja y baja. Huele a forja fría y a piedra mojada.",
+					"Al fondo se ven tejados. Muchos. Y ni una sola chimenea echando humo.",
+					"(Mji-Jiwe, la Ciudad del Cráter, llegará en la próxima parte.)"
+				]
+			},
+			{
+				"lineas": [
+					"Dos hojas de basalto con un sol de ámbar partido por la mitad. No hay cerradura ni aldaba.",
+					"A los lados hay tres pilares con una horquilla de hierro arriba. Están quietos. Y tienen pinta de no deber estarlo."
+				]
+			}
+		]
+	},
+	"kitovu_derrumbe": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un desprendimiento tapa el sendero del este. Detrás asoma una roca rojiza, muy distinta de la de aquí.",
+					"No hay quien mueva esto. Todavía."
+				]
+			}
+		]
+	}
+}

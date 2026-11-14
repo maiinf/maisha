@@ -64,6 +64,9 @@ MATERIALES = {
     "armino":   ["4E4870", "A8A0C4", "E2DEEE", "FFFFFF"],   # pelo blanco de armiño (sombra lila)
     "tinta":    ["0A0814", "16122A", "241E3C", "342C50"],   # la punta negra de la cola
     "morado":   ["2E1A44", "5A3480", "7A52A6", "A07AC4"],   # bufanda morada de escriba
+    # ASTERHAUL
+    "daman":    ["3A2A22", "6E5444", "9A7A62", "C2A486"],   # pelo pardo de damán de roca
+    "polvo":    ["5E5A58", "86827E", "A6A29C", "C4C0B8"],   # el polvo gris que deja mudos a los canteros
     "en_blanco": ["8A869A", "B4B0C2", "CDCAD8", "E0DEE8"],  # lo que la Tinta Quieta deja sin color
 }
 ANCHO, ALTO = 24, 32
@@ -807,6 +810,66 @@ def nyota_blanco():
     return nyota(True)
 
 
+def _daman_base(l):
+    """El cuerpo de un damán de roca de Asterhaul (sin ropa): rechoncho, sin cola, cabeza ancha y orejas redondas."""
+    l.ovalo(11.5, 23.5, 5.6, 6.6, "daman")
+    l.ovalo(11.5, 25.0, 3.0, 4.2, "hocico", plano=True)
+    l.ovalo(6.0, 22.5, 1.6, 2.8, "daman")
+    l.ovalo(11.5, 11.5, 5.8, 4.8, "daman")
+    l.ovalo(11.5, 14.2, 3.0, 1.8, "hocico", plano=True)
+    l.px(11, 13, "nariz"); l.px(12, 13, "nariz")
+    for (x, y) in ((6, 7), (7, 6), (7, 7), (16, 6), (16, 7), (17, 7)):
+        l.px(x, y, "daman", 2)
+    l.px(7, 7, "rosa", 1); l.px(16, 7, "rosa", 1)
+    for x in (9, 14):
+        l.rect(x - 1, 29, x + 1, 30, "daman", 1)
+
+
+def mwamba(gris=False):
+    """MWAMBA: el viejo cantero del Desfiladero del Meteorito, un damán de roca. Rechoncho, con las cejas blancas
+    muy pobladas, un mandil de cuero con el cincel en el bolsillo, un pañuelo rojo al cuello y, apoyada en el
+    hombro, una maza de cantero de cabeza de piedra casi tan alta como él.
+    EN GRIS (gris=True): cubierto de polvo gris, sin color, los ojos apagados."""
+    l = Lienzo()
+    for y in range(9, 30):                                    # la maza: el mango...
+        l.px(19, y, "concha", 2 if y % 4 else 1)
+    l.rect(16, 4, 22, 9, "metal", 2)                          # ...y la cabeza de piedra
+    l.rect(16, 4, 22, 4, "metal", 3); l.rect(16, 9, 22, 9, "metal", 1)
+    l.px(16, 5, "metal", 3); l.px(22, 8, "metal", 0)
+    _daman_base(l)
+    l.ovalo(11.5, 24.5, 4.4, 5.2, "delantal")                 # el mandil de cuero
+    l.rect(8, 19, 15, 19, "delantal", 1)
+    l.px(9, 17, "delantal", 1); l.px(14, 17, "delantal", 1); l.px(9, 18, "delantal", 2); l.px(14, 18, "delantal", 2)   # los tirantes
+    l.rect(9, 24, 11, 26, "delantal", 1)                      # el bolsillo...
+    l.px(10, 22, "metal", 3); l.px(10, 23, "metal", 2)        # ...con el cincel asomando
+    l.rect(8, 16, 15, 16, "rojo", 3)                          # el pañuelo rojo
+    l.px(12, 17, "rojo", 2); l.px(13, 18, "rojo", 2)
+    l.ovalo(17.5, 19.0, 1.7, 2.0, "daman")                    # la mano en la maza
+    ojos(l, 10, 9, 14, alto=2)
+    for x in (8, 9, 10, 13, 14, 15):                          # las cejas blancas, pobladas
+        l.px(x, 9, "cana", 3)
+    l.px(8, 8, "cana", 2); l.px(15, 8, "cana", 2)
+    l.px(9, 15, "cana", 2); l.px(14, 15, "cana", 2)           # los bigotes
+    if gris:
+        for y in range(ALTO):
+            for x in range(ANCHO):
+                c = l.m[y][x]
+                if c is None:
+                    continue
+                mat, t = c
+                if mat in ("ojo", "nariz"):
+                    l.m[y][x] = ("polvo", 0)
+                elif mat == "brillo":
+                    l.m[y][x] = ("polvo", 1)
+                else:
+                    l.m[y][x] = ("polvo", max(1, min(3, t + (1 if mat in ("concha", "delantal", "rojo") else 0))))
+    return l
+
+
+def mwamba_gris():
+    return mwamba(True)
+
+
 def _armino_base(l, cola_x=3):
     """El cuerpo de un armiño de Sigilia (sin ropa): esbelto, de cuello largo, cola con la punta negra."""
     for (x, y) in ((cola_x, 29), (cola_x - 1, 28), (cola_x - 1, 27), (cola_x, 26), (cola_x + 1, 25), (cola_x + 2, 25)):
@@ -961,7 +1024,7 @@ def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
 
 
 ## Desde qué columna (y fila) se levanta lo de la mano derecha en el gesto por defecto (para no mover picos ni orejas)
-ALZA = {"bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "nyota": (15, 18), "nyota_blanco": (15, 18), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
+ALZA = {"mwamba": (16, 0), "mwamba_gris": (16, 0), "bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "nyota": (15, 18), "nyota_blanco": (15, 18), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
         "kasia": (17, 0), "sungura": (19, 0)}
 
 
@@ -1028,7 +1091,7 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "nyota": nyota, "nyota_blanco": nyota_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+ALDEANOS = {"mwamba": mwamba, "mwamba_gris": mwamba_gris, "kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "nyota": nyota, "nyota_blanco": nyota_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -508,3 +508,13 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Nivel VI «chispa elemental» | 1 de daño a los enemigos que quedan hasta 26 px fuera del círculo del Sigilo. |
 | Prendas de la Runa | En zonas propias: no quitan las de la Raíz ni las del Aliento. |
 | El Cetro del Nexo | Es el mismo cetro, transformado: la Semilla brota y lo abraza con la Pluma (así el Arte del Cetro sigue valiendo). Nace dormido (`nexo_0`) y subirá con el Arte de la Tierra. |
+
+### 2026-11-14 · El Desfiladero del Meteorito, construido (Claude)
+| Tema | Cómo ha quedado |
+| :--- | :--- |
+| Entrada a Asterhaul | Por el este del Kitovu: un desprendimiento tapa el sendero hasta que nace el Cetro del Nexo. |
+| Tecla de la Carga Sísmica | **I** (junto a J, K, L y U). Falta darle botón en el mando. |
+| La cantera antes de la Carga | La Esquirla de Mwamba está en la Cantera Hundida y se llega andando: hay que esquivar a los Kaa-Jiwe (aún no se les puede hacer nada) cubriéndose tras las peñas. El muro agrietado que el boceto ponía en su entrada está dentro, guardando la inscripción de los primeros canteros. |
+| La vagoneta del oeste | Aparta un montón de rocas al final de su vía (un secreto). |
+| ⚠️ Pendiente de Iam: la especie de los canteros | He dibujado a Mwamba como **damán de roca** (rechoncho, de roquedal). Es provisional: si Iam prefiere otra, se repinta en `dibujar_aldeanos.py`. |
+| Mji-Jiwe | Aún no existe: la Puerta del Cráter se abre y deja ver la escalera, pero no se cruza. |

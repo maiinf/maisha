@@ -23,6 +23,10 @@ const SIGILO_HIELO := preload("res://scripts/combate/sigilo_hielo.gd")
 const SIGILO_RAYO := preload("res://scripts/combate/sigilo_rayo.gd")
 const SIGILOS := {"fuego": "Sigilo de Fuego", "hielo": "Sigilo de Hielo", "rayo": "Sigilo de Rayo"}   # (en el orden en que se cambian con R)
 const SIGILO_COSTE := 20.0      # Aliento que gasta trazar un sigilo
+const ESCENA_CARGA := preload("res://scripts/combate/carga_sismica.gd")
+const CARGA_COSTE := 20.0       # Aliento que gasta la Carga Sísmica
+const CARGA_ESPERA := 0.9       # segundos entre carga y carga
+const CARGA_IMPULSO := 240.0    # el empujón de la embestida (unos 48 px)
 const SIGILO_ESPERA := 0.7      # segundos entre sigilo y sigilo
 const RELIEVE := preload("res://scripts/mundo/relieve.gd")
 const RASGOS := preload("res://scripts/personajes/rasgos_maisha.gd")
@@ -47,6 +51,7 @@ var _invulnerable := 0.0
 var _espera_golpe := 0.0
 var _espera_latido := 0.0
 var _espera_sigilo := 0.0
+var _espera_carga := 0.0
 var _golpeando := false
 var _tiempo_agotada := 0.0
 var _desde_ultima_semilla := 99.0
@@ -81,6 +86,7 @@ func _physics_process(delta: float) -> void:
 	_espera_golpe = maxf(0.0, _espera_golpe - delta)
 	_espera_latido = maxf(0.0, _espera_latido - delta)
 	_espera_sigilo = maxf(0.0, _espera_sigilo - delta)
+	_espera_carga = maxf(0.0, _espera_carga - delta)
 	_invulnerable = maxf(0.0, _invulnerable - delta)
 	pegajoso = maxf(0.0, pegajoso - delta)
 	hundida = maxf(0.0, hundida - delta)
@@ -141,6 +147,8 @@ func _physics_process(delta: float) -> void:
 			sigilo()
 		if Input.is_action_just_pressed("cambiar_sigilo"):
 			cambiar_sigilo()
+		if Input.is_action_just_pressed("carga"):
+			carga()
 
 	if Input.is_action_just_pressed("usar"):
 		tomar_sopa()
@@ -293,6 +301,30 @@ func sigilo() -> bool:
 		_agotarse()
 	aliento = minf(aliento_maximo(), aliento + Artes.valor("sigilo_devuelve"))     # (Runa 4: el sello de lacre)
 	return true
+
+
+## La Carga Sísmica (arte Tierra, Asterhaul; la enseña Mwamba en el Desfiladero del Meteorito): Maisha embiste
+## hacia donde mira con una onda de ámbar por delante (combate/carga_sismica.gd). Rompe muros agrietados, empuja
+## vagonetas, hace sonar los pilares-diapasón y vuelca a los Kaa-Jiwe. Mientras embiste no le hacen daño.
+func carga() -> bool:
+	if not Estado.tiene("carga_sismica") or _espera_carga > 0.0 or agotada or escudo or aliento < CARGA_COSTE:
+		return false
+	aliento -= CARGA_COSTE
+	_espera_carga = CARGA_ESPERA
+	_empuje = direccion_mirada() * CARGA_IMPULSO
+	_invulnerable = maxf(_invulnerable, 0.4)
+	var efecto: Node2D = ESCENA_CARGA.new()
+	efecto.maisha = self
+	efecto.direccion = direccion_mirada()
+	get_parent().add_child(efecto)
+	if aliento < 1.0:
+		_agotarse()
+	return true
+
+
+## (la onda de la carga la para en seco al chocar con algo)
+func frenar_carga() -> void:
+	_empuje = Vector2.ZERO
 
 
 # --- Daño, caída y vuelta ----------------------------------------------------------
