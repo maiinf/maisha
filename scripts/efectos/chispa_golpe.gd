@@ -5,6 +5,7 @@ const DURA := 0.24
 var direccion := Vector2.RIGHT
 var color := Color("fff3c4")
 var escala := 1.0
+var tipo := "normal"
 var _t := 0.0
 var _chispas: Array[Dictionary] = []
 
@@ -71,3 +72,32 @@ func _draw() -> void:
 		var len_s: float = c["largo"] * (1.0 - 0.65 * k)
 		var p: Vector2 = c["pos"]
 		draw_line(p.round(), (p - d_v * len_s).round(), Color(color, a), 1.0)
+	_dibujar_elemento(k, a, dir)
+
+
+## Detalles visuales según elemento o tipo de impacto
+func _dibujar_elemento(k: float, a: float, dir: Vector2) -> void:
+	match tipo:
+		"fuego":
+			for i in 4:
+				var p := (Vector2((i - 1.5) * 3.5, -14.0 * k - float(i % 2) * 3.0) * escala).round()
+				draw_circle(p, maxf(1.0, (2.2 - 1.2 * k) * escala), Color("ff9a40", 0.85 * a))
+		"hielo":
+			for ang in range(0, 360, 60):
+				var v := Vector2.from_angle(deg_to_rad(float(ang))) * (8.0 + 7.0 * k) * escala
+				draw_line((v * 0.35).round(), v.round(), Color("b8f0ff", 0.9 * a), 1.0)
+		"rayo":
+			for j in 3:
+				var ang0 := dir.angle() + (j - 1) * 0.85
+				var p1 := Vector2.from_angle(ang0) * (5.0 * escala)
+				var p2 := Vector2.from_angle(ang0 + 0.35) * (9.0 * escala)
+				var p3 := Vector2.from_angle(ang0 - 0.15) * ((13.0 + 5.0 * k) * escala)
+				draw_polyline(PackedVector2Array([Vector2.ZERO, p1.round(), p2.round(), p3.round()]), Color("fff49c", 0.95 * a), 1.0)
+		"carga":
+			draw_arc(dir * (3.0 * escala), (11.0 + 8.0 * k) * escala, dir.angle() - 1.15, dir.angle() + 1.15, 12, Color("ffd878", 0.85 * a), 2.0)
+			for i in 4:
+				var dx := (i - 1.5) * 4.2 * escala
+				var dy := (-8.0 * sin(k * PI) + k * 6.0) * escala
+				draw_rect(Rect2(Vector2(dx, dy).round(), Vector2(2, 2)), Color("c9985a", a))
+		"rebote":
+			draw_arc(Vector2.ZERO, (5.0 + 11.0 * k) * escala, 0.0, TAU, 16, Color("e2e8f0", 0.8 * a), 1.0)

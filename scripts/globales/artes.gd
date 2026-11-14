@@ -245,7 +245,7 @@ func chispa_runa(sigilo: Node2D, radio: float, desde: float, tipo: String, color
 		var lejos := o.global_position.distance_to(sigilo.global_position)
 		if lejos > desde and lejos <= radio + 26.0:
 			o.call("recibir_danio", 1, sigilo.global_position, tipo)
-			Impacto.chispa(o.global_position + Vector2(0, -8), Vector2.UP, color)
+			Impacto.chispa(o.global_position + Vector2(0, -8), Vector2.UP, color, 1.1, tipo)
 			sonar = true
 	if sonar:
 		Sonido.efecto("halo_chispa", -2.0, sigilo.global_position)

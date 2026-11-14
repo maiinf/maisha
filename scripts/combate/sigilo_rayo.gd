@@ -49,11 +49,13 @@ func _descargar() -> void:
 	for nodo in get_tree().get_nodes_in_group("cargables"):
 		if (nodo as Node2D).global_position.distance_to(centro) <= radio + 12.0:
 			nodo.call("cargar")
+			Impacto.chispa((nodo as Node2D).global_position + Vector2(0, -10), Vector2.UP, Color("fff0a0"), 1.05, "rayo")
 			_arcos.append(_arco(Vector2(0, 6), (nodo as Node2D).global_position + Vector2(0, -14) - global_position))
 	for nodo in get_tree().get_nodes_in_group("daniables"):
 		var o := nodo as Node2D
 		if o and not o.is_in_group("cargables") and not o.is_in_group("maisha") and o.global_position.distance_to(centro) <= radio + 4.0:
 			o.call("recibir_danio", 1, centro, "rayo")
+			Impacto.chispa(o.global_position + Vector2(0, -8), (o.global_position - centro), Color("fff0a0"), 1.0, "rayo")
 	for i in 5:
 		var a := randf() * TAU
 		_arcos.append(_arco(Vector2(0, 6), Vector2(cos(a), sin(a) * 0.6) * radio + Vector2(0, 6)))

@@ -159,6 +159,9 @@ var _ventanas: Array = []          # [SubViewport, Sprite3D] (se reparten entre 
 var _de_pie := {}                  # id del objeto de pie (su cuerpo) -> el cuerpo
 var _velo_pantalla: CanvasLayer
 var _mascara_antes := 0xFFFFFFFF
+var _motas_mm: MultiMesh
+var _motas_datos: Array = []
+var _motas_t := 0.0
 
 
 func _ready() -> void:
@@ -168,6 +171,7 @@ func _ready() -> void:
 	_crear_suelo()
 	_crear_camara()
 	_crear_capas()
+	_crear_motas()
 	for n in _todos(escena):
 		_registrar(n)
 	# la raíz de la escena, en los canales de las dos capas (si no, se llevaría por delante a todos sus hijos)
@@ -715,6 +719,7 @@ func _process(_delta: float) -> void:
 			_copiar(n, g as Sprite3D, par[2], par[3])
 	_colocar_camara(0.12)
 	_mover_capas()
+	_actualizar_motas(_delta)
 	# La capa 2D del suelo y las ventanitas ya reciben LuzDelDia / Penumbra; aquí igualamos el suelo lejano, las peñas y los gemelos
 	var mod := Color.WHITE
 	for i in range(_moduladores.size() - 1, -1, -1):
@@ -834,3 +839,79 @@ static func _orden_en_ancla(n: Node, ancla: Node) -> float:
 		total += float(paso) * peso
 		peso *= 0.12
 	return total
+
+
+## Partículas atmosféricas suaves por bioma en HD-2D (esporas, nieve fina, motas doradas o polvo mineral)
+func _crear_motas() -> void:
+	if region == null:
+		return
+	var mapa := String(region.get("mapa"))
+	var mundo := String(region.get("mundo")) if region.get("mundo") else "raiz"
+	var col_a := Color("f0e088")
+	var col_b := Color("b4e070")
+	var vel_y := 0.25
+	if mapa in ["paso_escarcha", "sendero_olvidado", "ruinas_primer_arbol"]:
+		col_a = Color("eef4ff")
+		col_b = Color("b6cde8")
+		vel_y = -0.35
+	elif mapa == "observatorio_aurora":
+		col_a = Color("9ce8ff")
+		col_b = Color("ffe690")
+		vel_y = 0.22
+	elif mundo == "sigilia":
+		col_a = Color("edd694")
+		col_b = Color("b6a6dc")
+		vel_y = 0.18
+	elif mundo == "asterhaul":
+		col_a = Color("ffcb72")
+		col_b = Color("d88450")
+		vel_y = 0.30
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	mat.vertex_color_use_as_albedo = true
+	mat.no_depth_test = false
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.085, 0.085)
+	quad.material = mat
+	_motas_mm = MultiMesh.new()
+	_motas_mm.transform_format = MultiMesh.TRANSFORM_3D
+	_motas_mm.use_colors = true
+	_motas_mm.mesh = quad
+	_motas_mm.instance_count = 34
+	var inst := MultiMeshInstance3D.new()
+	inst.multimesh = _motas_mm
+	inst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	inst.extra_cull_margin = 40.0
+	add_child(inst)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 20261114
+	for i in 34:
+		var c := col_a.lerp(col_b, rng.randf())
+		_motas_datos.append({
+			"off": Vector3(rng.randf_range(-13.0, 13.0), rng.randf_range(0.35, 3.6), rng.randf_range(-10.0, 10.0)),
+			"vy": vel_y * rng.randf_range(0.6, 1.3),
+			"vx": rng.randf_range(-0.35, 0.35),
+			"fase": rng.randf() * TAU,
+			"col": c,
+		})
+	_actualizar_motas(0.0)
+
+
+func _actualizar_motas(delta: float) -> void:
+	if _motas_mm == null or _motas_datos.is_empty():
+		return
+	_motas_t += delta
+	for i in _motas_datos.size():
+		var d: Dictionary = _motas_datos[i]
+		var off: Vector3 = d["off"]
+		var fase: float = float(d["fase"])
+		var y := fposmod(off.y + _motas_t * float(d["vy"]), 3.4) + 0.3
+		var x := wrapf(off.x + _motas_t * float(d["vx"]) + sin(_motas_t * 0.9 + fase) * 0.45, -13.0, 13.0)
+		var z := wrapf(off.z + cos(_motas_t * 0.7 + fase) * 0.35, -10.0, 10.0)
+		var pulso := 0.25 + 0.45 * (0.5 + 0.5 * sin(_motas_t * 1.8 + fase))
+		var alt_a := clampf(minf(y - 0.3, 3.7 - y) * 1.4, 0.0, 1.0)
+		var col: Color = d["col"]
+		_motas_mm.set_instance_transform(i, Transform3D(Basis(), _foco + Vector3(x, y, z)))
+		_motas_mm.set_instance_color(i, Color(col.r, col.g, col.b, pulso * alt_a))

@@ -50,7 +50,9 @@ func _helar(eco := false) -> void:
 	var atrapo := false
 	for nodo in get_tree().get_nodes_in_group("congelables"):
 		if (nodo as Node2D).global_position.distance_to(centro) <= radio + 10.0:
-			atrapo = bool(nodo.call("congelar")) or atrapo
+			if bool(nodo.call("congelar")):
+				atrapo = true
+				Impacto.chispa((nodo as Node2D).global_position + Vector2(0, -8), Vector2.UP, Color("9fd8f0"), 1.0, "hielo")
 	# (si ha atrapado algo en el hielo, ese témpano ya es el suyo: no hace además una placa)
 	if not atrapo and not eco:      # (el segundo pulso de la Runa 2 vuelve a helar a quien pille, pero no hace otra placa)
 		PLACA.helar_en(get_parent(), centro)

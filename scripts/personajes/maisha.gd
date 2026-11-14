@@ -62,6 +62,7 @@ var escudo := false            # con el Escudo de corteza: J mantenida (para lo 
 var _j_mantenida := 0.0
 var _escudo_dibujo: Sprite2D
 var _emocion := 0.0           # mientras dure, se ve una expresión (sorpresa, daño, celebrar...) y no se pisa
+var _paso_polvo := 0.0
 
 @onready var _sprite: AnimatedSprite2D = $Sprite
 @onready var _ropa: Node = $Ropa
@@ -129,6 +130,13 @@ func _physics_process(delta: float) -> void:
 	_empuje = _empuje.move_toward(Vector2.ZERO, 600.0 * delta)
 	viento = viento.move_toward(Vector2.ZERO, 900.0 * delta)
 	move_and_slide()
+	if corriendo and velocity.length_squared() > 900.0:
+		_paso_polvo -= delta
+		if _paso_polvo <= 0.0:
+			_paso_polvo = 0.17
+			Impacto.polvo_pisada(global_position + Vector2(0, -1), _color_polvo_paso())
+	else:
+		_paso_polvo = minf(_paso_polvo, 0.05)
 
 	if combate_activo:
 		# tocar J golpea; mantenerla (con el Escudo de corteza) levanta el escudo
@@ -204,7 +212,7 @@ func _comprobar_golpe() -> void:
 			aciertos += 1
 			Impacto.chispa(objetivo.global_position + Vector2(0, -6) - mira * 4.0, mira)
 		else:
-			Impacto.chispa(objetivo.global_position + Vector2(0, -10) - mira * 6.0, -mira, Color("a3a4a6"))   # rebota (clinc)
+			Impacto.chispa(objetivo.global_position + Vector2(0, -10) - mira * 6.0, -mira, Color("a3a4a6"), 1.0, "rebote")   # rebota (clinc)
 	if aciertos > 0:
 		Impacto.pausa(0.045)
 		Impacto.temblar(1.5, 0.12)
@@ -611,3 +619,14 @@ func _actualizar_animacion(direccion: Vector2) -> void:
 func _reproducir(animacion: String) -> void:
 	if _sprite.animation != animacion:
 		_sprite.play(animacion)
+
+
+func _color_polvo_paso() -> Color:
+	var sc := Estado.escena_actual
+	if sc in ["paso_escarcha", "sendero_olvidado", "ruinas_primer_arbol"]:
+		return Color(0.86, 0.90, 0.98, 0.55)
+	if sc in ["maandiko", "canal_tinta", "estanterias_colgantes", "observatorio_aurora", "seccion_prohibida"]:
+		return Color(0.76, 0.72, 0.86, 0.45)
+	if sc in ["desfiladero_meteorito", "mji_jiwe", "galerias_ambar", "fundicion_escoria"]:
+		return Color(0.88, 0.68, 0.44, 0.55)
+	return Color(0.84, 0.78, 0.62, 0.48)

@@ -62,6 +62,7 @@ func _arder() -> void:
 		var o := nodo as Node2D
 		if o and not o.is_in_group("maisha") and o.global_position.distance_to(centro) <= radio + 4.0:      # (a Maisha, su propio fuego no la quema)
 			o.call("recibir_danio", 1, centro, "fuego")
+			Impacto.chispa(o.global_position + Vector2(0, -8), (o.global_position - centro), Color("ff9a40"), 1.0, "fuego")
 	Artes.chispa_runa(self, radio, radio + 4.0, "fuego", Color("ff9a40"))
 	for i in 18:
 		var a := randf() * TAU

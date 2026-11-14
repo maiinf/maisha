@@ -12,6 +12,7 @@ const GIZA_OSCURO := Color("3a1650")
 const ANCHO := 236.0
 
 var nombre := ""
+var subtitulo := ""
 var maximo := 4
 ## La Ira del jefe (0..100, -1 = no tiene): una barrita debajo con su etapa (Calma, Enfado, Furia, Frenesí)
 var ira := -1.0
@@ -27,6 +28,9 @@ var _bajada := 0.0           # 0 = fuera de la pantalla, 1 = en su sitio
 var _destello := 0.0
 var _sacudida := 0.0         # vibración horizontal al encajar golpe o perder una parte
 var _perdido := -1           # el trozo que se acaba de perder (parpadea)
+var _banner_t := 2.4         # banner breve de presentación del jefe al aparecer
+var _etapa_ant := -1
+var _destello_fase := 0.0
 var _lienzo: Control
 
 
@@ -35,6 +39,12 @@ func _ready() -> void:
 	add_to_group("barra_jefe")
 	_vida = maximo
 	_cola_vida = float(maximo)
+	if subtitulo == "":
+		for k in Bestiario.FICHAS:
+			var f: Dictionary = Bestiario.FICHAS[k]
+			if Bestiario.es_jefe(k) and (String(f["nombre"]).begins_with(nombre) or nombre in String(f["nombre"])):
+				subtitulo = String(f.get("donde", ""))
+				break
 	_lienzo = Control.new()
 	_lienzo.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_lienzo.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -78,6 +88,13 @@ func cerrar() -> void:
 func _process(delta: float) -> void:
 	_destello = maxf(0.0, _destello - delta)
 	_sacudida = maxf(0.0, _sacudida - delta * 4.5)
+	_banner_t = maxf(0.0, _banner_t - delta)
+	_destello_fase = maxf(0.0, _destello_fase - delta)
+	if ira >= 0.0:
+		var etapa := mini(3, int(ira / 25.0))
+		if _etapa_ant >= 0 and etapa > _etapa_ant:
+			_destello_fase = 0.9
+		_etapa_ant = etapa
 	if _pausa_cola > 0.0:
 		_pausa_cola = maxf(0.0, _pausa_cola - delta)
 	else:
@@ -90,18 +107,21 @@ func _process(delta: float) -> void:
 func _dibujar() -> void:
 	var sx := roundf(sin(Time.get_ticks_msec() * 0.08) * 2.5 * _sacudida) if _sacudida > 0.01 else 0.0
 	var y := -44.0 + 52.0 * _bajada
-	var caja := Rect2((640.0 - ANCHO) / 2.0 + sx, y, ANCHO, 32.0 if ira < 0.0 else 40.0)
 	var etapa := mini(3, int(ira / 25.0)) if ira >= 0.0 else -1
+	var ancho_nombre := FUENTE.get_string_size(nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
+	var t_etapa: String = ETAPAS[etapa] if ira >= 0.0 else ""
+	var w_etapa := FUENTE.get_string_size(t_etapa, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 10.0 if ira >= 0.0 else 0.0
+	var ancho_caja := maxf(ANCHO, ancho_nombre + w_etapa + 34.0) if ira >= 0.0 else maxf(ANCHO, ancho_nombre + 36.0)
+	var caja := Rect2(roundf((640.0 - ancho_caja) / 2.0 + sx), y, ancho_caja, 32.0 if ira < 0.0 else 40.0)
 	var col_borde: Color = GIZA if etapa < 2 else (COLOR_IRA[etapa] as Color)
 	var pulso := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.008)
 	PIEL.caja(_lienzo, caja.grow(2), "noche")
-	if etapa >= 2:
-		_lienzo.draw_rect(caja.grow(3), Color(col_borde, 0.16 + 0.18 * pulso), false, 2.0)
+	if etapa >= 2 or _destello_fase > 0.01:
+		var af := maxf(0.16 + 0.18 * pulso if etapa >= 2 else 0.0, _destello_fase * 0.65)
+		var cb := col_borde if _destello_fase <= 0.01 else Color("ffd878").lerp(col_borde, 0.5)
+		_lienzo.draw_rect(caja.grow(3 + _destello_fase * 3.0), Color(cb, af), false, 2.0)
 	PIEL.esquinas_oro(_lienzo, caja.grow(2), col_borde, 0.92, 7.0)
-	var ancho_nombre := FUENTE.get_string_size(nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
 	if ira >= 0.0:
-		var t_etapa: String = ETAPAS[etapa]
-		var w_etapa := FUENTE.get_string_size(t_etapa, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 10.0
 		var nx := roundf(caja.position.x + 12.0)
 		_lienzo.draw_string(FUENTE, Vector2(nx + 1, y + 15).round(), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0, 0, 0, 0.75))
 		_lienzo.draw_string(FUENTE, Vector2(nx, y + 14).round(), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TEXTO)
@@ -115,7 +135,7 @@ func _dibujar() -> void:
 		_lienzo.draw_string(FUENTE, Vector2(tx, y + 14).round(), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, TEXTO)
 	# Cristales biselados de Giza por cada golpe que aguanta, con estela dorada de daño
 	var hueco := 3.0
-	var tam := (ANCHO - 26.0 - hueco * (maximo - 1)) / maximo
+	var tam := (ancho_caja - 26.0 - hueco * (maximo - 1)) / maximo
 	for i in maximo:
 		var r := Rect2(caja.position.x + 13.0 + i * (tam + hueco), y + 19, tam, 7).abs()
 		r.position = r.position.round()
@@ -139,13 +159,42 @@ func _dibujar() -> void:
 			if i == _perdido and _destello > 0.0 and int(_destello * 14.0) % 2 == 0:
 				_lienzo.draw_rect(inner, Color(1.0, 0.97, 0.85, 0.95))
 	if ira >= 0.0:
-		var barra := Rect2(caja.position.x + 13.0, y + 30, ANCHO - 26.0, 5)
+		var barra := Rect2(caja.position.x + 13.0, y + 30, ancho_caja - 26.0, 5)
 		var col: Color = COLOR_IRA[etapa]
 		if etapa == 3 and int(Time.get_ticks_msec() / 120) % 2 == 0:
 			col = TEXTO
 		PIEL.medidor(_lienzo, barra, clampf(ira / 100.0, 0.0, 1.0), col, -1.0, Color.WHITE, 1.0, 4)
 	if not partes.is_empty():
 		_dibujar_partes(caja.end.y + 4.0, sx)
+	if _banner_t > 0.0:
+		_dibujar_banner(caja.end.y + (28.0 if not partes.is_empty() else 10.0))
+
+
+## Cartel cinemático breve de presentación al iniciar un combate contra jefe
+func _dibujar_banner(y_base: float) -> void:
+	var entrada := clampf((2.4 - _banner_t) / 0.35, 0.0, 1.0)
+	var salida := clampf(_banner_t / 0.45, 0.0, 1.0)
+	var a := minf(entrada, salida)
+	if a <= 0.02:
+		return
+	var w_nom := FUENTE.get_string_size(nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x
+	var w_sub := FUENTE.get_string_size(subtitulo, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x if subtitulo != "" else 0.0
+	var ancho := clampf(maxf(w_nom, w_sub) + 52.0, 220.0, 540.0)
+	var alto := 42.0 if subtitulo != "" else 28.0
+	var despl := (1.0 - entrada) * 8.0
+	var marco := Rect2(roundf(320.0 - ancho * 0.5), roundf(y_base + despl), ancho, alto)
+	PIEL.caja(_lienzo, marco, "noche", 0.94 * a)
+	PIEL.esquinas_oro(_lienzo, marco, GIZA.lerp(PIEL.ORO, 0.55), 0.92 * a, 7.0)
+	var tx := roundf(320.0 - w_nom * 0.5)
+	var ty := roundf(marco.position.y + 20.0)
+	_dibujar_rombo(Vector2(tx - 10.0, ty - 5.0), Color(GIZA, a))
+	_dibujar_rombo(Vector2(tx + w_nom + 10.0, ty - 5.0), Color(GIZA, a))
+	_lienzo.draw_string(FUENTE, Vector2(tx + 1, ty + 1), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(0, 0, 0, 0.8 * a))
+	_lienzo.draw_string(FUENTE, Vector2(tx, ty), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(TEXTO, a))
+	if subtitulo != "":
+		PIEL.raya(_lienzo, Vector2(marco.position.x + 18.0, ty + 4.0), Vector2(marco.end.x - 18.0, ty + 4.0), PIEL.ORO, 0.55 * a)
+		var sx := roundf(320.0 - w_sub * 0.5)
+		_lienzo.draw_string(FUENTE, Vector2(sx, marco.position.y + 36.0).round(), subtitulo, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(PIEL.ORO_BRILLO, 0.92 * a))
 
 
 ## Pequeño cristal ornamental flanqueando el nombre del jefe

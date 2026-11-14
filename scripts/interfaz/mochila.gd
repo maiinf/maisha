@@ -15,11 +15,15 @@ extends CanvasLayer
 const FUENTE := preload("res://fuentes/pixelify_sans.woff")
 const ICONOS := preload("res://arte/interfaz/objetos.png")
 const MAPA := preload("res://arte/interfaz/mapa_mundo.png")
+const MAPA_ENTERO := preload("res://arte/interfaz/mapa_mundo_entero.png")
 const MAPA_RAIZ := preload("res://arte/interfaz/mapa_raiz.png")
+const MAPA_SIGILIA := preload("res://arte/interfaz/mapa_sigilia.png")
+const MAPA_ASTERHAUL := preload("res://arte/interfaz/mapa_asterhaul.png")
 const MAPA_ESCALA := 1.32                 # el mapa de Raíz se ve ampliado (los nombres no: se escriben aparte)
 const MAPA_MUNDO_ESCALA := 1.6            # y el del mundo, igual
-## Los nombres del mapa del mundo: [nombre, dónde (en píxeles del dibujo)]. Sigilia no: es el trozo que falta.
+## Los nombres del mapa del mundo: [nombre, dónde (en píxeles del dibujo)].
 const LUGARES_MUNDO := [["Raíz", Vector2(78, 120)], ["Asterhaul", Vector2(232, 110)], ["Valle del Ocaso", Vector2(170, 160)], ["Kitovu", Vector2(152, 122)]]
+const LUGAR_SIGILIA_MUNDO := Vector2(150, 48)
 ## El diario de cuero (herramientas/pintar_interfaz.py)
 const PIEL := preload("res://scripts/interfaz/piel.gd")
 const SELLO := preload("res://arte/interfaz/diario/sello.png")
@@ -70,6 +74,50 @@ const PUNTO_RAIZ := {"ruinas_primer_arbol": Vector2(384, 30), "sendero_olvidado"
 	"sendero_del_puente": Vector2(160, 166), "las_pasarelas": Vector2(268, 166),
 	"camino_cobrizo": Vector2(104, 132), "senda_surcos": Vector2(205, 90),
 	"canada_eco": Vector2(68, 91), "cueva_eco": Vector2(68, 91), "lago_espejo": Vector2(40, 110), "orilla_juncos": Vector2(370, 150), "embarcadero_junco": Vector2(388, 124), "la_travesia": Vector2(356, 90), "gruta_raices": Vector2(318, 64)}
+const LUGARES_SIGILIA := [
+	["Paso de la Escarcha", Vector2(210, 178), "visto/paso_escarcha"],
+	["Maandiko", Vector2(210, 114), "visto/maandiko"],
+	["Estanterías Colgantes", Vector2(84, 108), "visto/estanterias_colgantes"],
+	["Canal de Tinta", Vector2(336, 108), "visto/canal_tinta"],
+	["Observatorio Aurora", Vector2(194, 40), "visto/observatorio_aurora"],
+	["Sección Prohibida", Vector2(314, 62), "visto/seccion_prohibida"],
+]
+const CAMINOS_SIGILIA := [
+	["Ruta del Paso", "paso_escarcha", [Vector2(210, 198), Vector2(204, 188), Vector2(210, 178), Vector2(214, 150), Vector2(210, 130)]],
+	["Pasarela Oeste", "estanterias_colgantes", [Vector2(184, 112), Vector2(150, 110), Vector2(114, 108)]],
+	["Esclusas Este", "canal_tinta", [Vector2(236, 112), Vector2(272, 110), Vector2(308, 108)]],
+	["Subida Aurora", "observatorio_aurora", [Vector2(210, 92), Vector2(200, 72), Vector2(196, 54)]],
+	["Ala Sellada", "seccion_prohibida", [Vector2(226, 98), Vector2(264, 80), Vector2(300, 68)]],
+]
+const PUNTO_SIGILIA := {
+	"paso_escarcha": Vector2(210, 178), "maandiko": Vector2(210, 114),
+	"estanterias_colgantes": Vector2(84, 108), "canal_tinta": Vector2(336, 108),
+	"observatorio_aurora": Vector2(194, 40), "seccion_prohibida": Vector2(314, 62),
+}
+const LUGARES_ASTERHAUL := [
+	["Desfiladero Meteorito", Vector2(106, 168), "visto/desfiladero_meteorito"],
+	["Mji-Jiwe", Vector2(220, 108), "visto/mji_jiwe"],
+	["Galerías de Ámbar", Vector2(96, 86), "visto/galerias_ambar"],
+	["Fundición de Escoria", Vector2(334, 112), "visto/fundicion_escoria"],
+	["La Aguja Caída", Vector2(220, 38), "visto/aguja_caida"],
+]
+const CAMINOS_ASTERHAUL := [
+	["Senda del Cráter", "desfiladero_meteorito", [Vector2(58, 196), Vector2(80, 182), Vector2(106, 168), Vector2(148, 146), Vector2(182, 126)]],
+]
+const PUNTO_ASTERHAUL := {
+	"desfiladero_meteorito": Vector2(106, 168), "mji_jiwe": Vector2(220, 108),
+	"galerias_ambar": Vector2(96, 86), "fundicion_escoria": Vector2(334, 112),
+	"aguja_caida": Vector2(220, 38), "nucleo_estrella": Vector2(220, 108),
+}
+const DEBILIDAD_BESTIA := {
+	"pagina": ["fuego"], "tintero": ["fuego"], "ruba": ["hielo"], "pweza": ["hielo"],
+	"saa": ["rayo"], "kengele": ["rayo"], "kaa_jiwe": ["sismica"],
+	"sombra_renglon": ["fuego", "hielo", "rayo"], "grimorio": ["fuego", "hielo", "rayo"],
+	"jabali": ["escudo"], "cangrejo": ["atras"], "espino": ["semilla"],
+	"bundi": ["escudo"], "buibui": ["semilla"], "murcielago": ["latido"],
+	"mzizi": ["semilla"], "pembe": ["semilla"], "konokono": ["semilla"], "kuvu": ["escudo"],
+}
+const FILTRO_TEXTO := ["Todas", "Activas", "Hechas"]
 const NIEBLA := Color("e2cea0")
 const NIEBLA_SOMBRA := Color("c9b07e")
 const TINTA := Color("5c3e26")
@@ -203,7 +251,9 @@ var rueda := false
 var _pulsada := 0.0               # cuánto tiempo lleva pulsado Tab desde que se abrió
 var _eleccion_rueda := -1
 var _rueda_alfa := 0.0
-var _mapa_mundo := false          # en la pestaña Mapa: false = el de Raíz (si se tiene), true = el del mundo
+var _mapa_mundo := false          # en la pestaña Mapa: false = regional, true = el del mundo
+var _vista_mapa := "raiz"         # "raiz", "sigilia", "asterhaul", "mundo"
+var _filtro_mision := 0           # 0 Todas · 1 Activas · 2 Hechas
 ## Animaciones del diario
 var _abre := 0.0                  # 0 = cerrado, 1 = abierto del todo
 var _cerrando := false
@@ -300,11 +350,24 @@ func _process(delta: float) -> void:
 		_ir_a_pestana((pestana + 1) % PESTANAS.size())
 	elif Input.is_action_just_pressed("mover_izquierda") or Input.is_action_just_pressed("ui_left"):
 		_ir_a_pestana((pestana - 1 + PESTANAS.size()) % PESTANAS.size())
-	if pestana == P_MAPA and _raiz_conocida():
-		if Input.is_action_just_pressed("mover_abajo") or Input.is_action_just_pressed("ui_down") \
-				or Input.is_action_just_pressed("mover_arriba") or Input.is_action_just_pressed("ui_up"):
-			_mapa_mundo = not _mapa_mundo
-			Sonido.efecto("menu_mover")
+	if pestana == P_MAPA:
+		var vistas := _regiones_disponibles()
+		if vistas.size() > 1:
+			var paso := 0
+			if Input.is_action_just_pressed("mover_abajo") or Input.is_action_just_pressed("ui_down"):
+				paso = 1
+			elif Input.is_action_just_pressed("mover_arriba") or Input.is_action_just_pressed("ui_up"):
+				paso = -1
+			if paso != 0:
+				var idx := maxi(0, vistas.find(_vista_mapa))
+				_vista_mapa = String(vistas[(idx + paso + vistas.size()) % vistas.size()])
+				_mapa_mundo = _vista_mapa == "mundo"
+				Sonido.efecto("menu_mover")
+	if pestana == P_MISIONES and (Input.is_action_just_pressed("cambiar_sigilo") or Input.is_action_just_pressed("usar")):
+		_filtro_mision = (_filtro_mision + 1) % FILTRO_TEXTO.size()
+		seleccion = 0
+		_desplazamiento = 0
+		Sonido.efecto("menu_mover")
 	var n := _lista().size()
 	if n > 0:
 		if Input.is_action_just_pressed("mover_abajo") or Input.is_action_just_pressed("ui_down"):
@@ -328,6 +391,8 @@ func _ir_a_pestana(cual: int) -> void:
 	pestana = cual
 	seleccion = 0
 	_desplazamiento = 0
+	if pestana == P_MAPA:
+		_elegir_mapa_inicial()
 
 
 ## En Objetos: Acción usa el objeto elegido si se puede usar (la sopa) o se pone / quita una prenda
@@ -380,6 +445,9 @@ func abrir(cual := -1) -> void:
 		pestana = cual
 	seleccion = 0
 	_desplazamiento = 0
+	_filtro_mision = 0
+	if pestana == P_MAPA:
+		_elegir_mapa_inicial()
 	# en el diario, empieza por la misión que se está siguiendo
 	if pestana == P_MISIONES:
 		var seguida := Misiones.seguida()
@@ -459,10 +527,12 @@ func _lista() -> Array:
 	var filas := []
 	match pestana:
 		P_MISIONES:
-			for m in Misiones.activas():
-				filas.append({"id": m["id"], "nombre": m["titulo"], "tipo": m.get("tipo", ""), "hecha": false, "mision": m})
-			for m in Misiones.hechas():
-				filas.append({"id": m["id"], "nombre": m["titulo"], "tipo": m.get("tipo", ""), "hecha": true, "mision": m, "apagada": true})
+			if _filtro_mision != 2:
+				for m in Misiones.activas():
+					filas.append({"id": m["id"], "nombre": m["titulo"], "tipo": m.get("tipo", ""), "hecha": false, "mision": m})
+			if _filtro_mision != 1:
+				for m in Misiones.hechas():
+					filas.append({"id": m["id"], "nombre": m["titulo"], "tipo": m.get("tipo", ""), "hecha": true, "mision": m, "apagada": true})
 		P_OBJETOS:
 			for m in CLAVE:
 				if Estado.tiene(m):
@@ -544,20 +614,27 @@ func _ancho(texto: String, tam := 16) -> float:
 	return _fuente.get_string_size(texto, HORIZONTAL_ALIGNMENT_LEFT, -1, tam).x
 
 
-## Texto en varias líneas dentro de un ancho. Devuelve la y de debajo de la última línea.
-func _parrafo(texto: String, pos: Vector2, ancho: float, color: Color, interlineado := 17.0) -> float:
+## Parte `texto` en líneas ajustadas a `ancho` con tamaño `tam`
+func _envolver(texto: String, ancho: float, tam := 16) -> PackedStringArray:
+	var salida := PackedStringArray()
 	var linea := ""
-	var y := pos.y
 	for palabra in texto.split(" "):
 		var prueba := palabra if linea == "" else linea + " " + palabra
-		if _ancho(prueba) > ancho and linea != "":
-			_texto(linea, Vector2(pos.x, y), color)
-			y += interlineado
+		if _ancho(prueba, tam) > ancho and linea != "":
+			salida.append(linea)
 			linea = palabra
 		else:
 			linea = prueba
 	if linea != "":
-		_texto(linea, Vector2(pos.x, y), color)
+		salida.append(linea)
+	return salida
+
+
+## Texto en varias líneas dentro de un ancho. Devuelve la y de debajo de la última línea.
+func _parrafo(texto: String, pos: Vector2, ancho: float, color: Color, interlineado := 17.0, tam := 16) -> float:
+	var y := pos.y
+	for linea in _envolver(texto, ancho, tam):
+		_texto(linea, Vector2(pos.x, y), color, -1.0, tam)
 		y += interlineado
 	return y
 
@@ -665,7 +742,9 @@ func _dibujar_bolsillos_mini(tinta: float) -> void:
 func _dibujar_paginas(tinta: float) -> void:
 	var items_ayuda := [["←→", "Pestañas"], ["↑↓", "Elegir"], ["Tab", "Cerrar"]]
 	if pestana == P_MISIONES:
-		items_ayuda = [["↑↓", "Elegir"], ["E", "Seguir"], ["Tab", "Cerrar"]]
+		items_ayuda = [["E", "Seguir"], ["R", "Filtro"], ["Tab", "Cerrar"]]
+	elif pestana == P_BESTIARIO:
+		items_ayuda = [["↑↓", "Elegir"], ["Tab", "Cerrar"]]
 	elif pestana == P_OBJETOS and (Estado.cuantos("sopa") > 0 or not Tienda.prendas_compradas().is_empty()):
 		items_ayuda = [["↑↓", "Elegir"], ["E", "Usar"], ["Tab", "Cerrar"]]
 	if pestana == P_MAPA:
@@ -678,13 +757,31 @@ func _dibujar_paginas(tinta: float) -> void:
 		return
 	_dibujar_bolsa(tinta)
 	# barra de controles dentro del borde inferior derecho de la descripcion (sin pisar el marco)
-	PIEL.barra_teclas(_lienzo, DESC.end.x - 166.0, DESC.end.y - 18.0, items_ayuda, _fuente, 16, tinta, true)
+	var ayuda_cx := DESC.end.x - (106.0 if pestana == P_BESTIARIO else (130.0 if pestana == P_MISIONES else 166.0))
+	PIEL.barra_teclas(_lienzo, ayuda_cx, DESC.end.y - 14.0, items_ayuda, _fuente, 16, tinta, true)
 	var filas := _lista()
-	var area := Rect2(LISTA.position + Vector2(26, 10), Vector2(LISTA.size.x - 42, FILAS_VISIBLES * ALTO_FILA))
+	var es_misiones := pestana == P_MISIONES
+	var max_filas := 6 if es_misiones else FILAS_VISIBLES
+	var area := Rect2(LISTA.position + Vector2(26, 28 if es_misiones else 10), Vector2(LISTA.size.x - 42, max_filas * ALTO_FILA))
 	# (la lista entra deslizándose al cambiar de bolsillo)
 	area.position.x += (1.0 - _ease(_pagina)) * 24.0 * _sentido
+	if es_misiones:
+		var fx := area.position.x + 8.0
+		var fy := LISTA.position.y + 8.0
+		fx += PIEL.tecla(_lienzo, Vector2(fx, fy + 1.0), "R", _fuente, 16, tinta) + 6.0
+		for idx_f in FILTRO_TEXTO.size():
+			var act := idx_f == _filtro_mision
+			var r_p := PIEL.insignia(_lienzo, Vector2(fx, fy), FILTRO_TEXTO[idx_f], _fuente,
+				Color("4c331e") if act else Color(0.08, 0.08, 0.14),
+				ORO_CLARO if act else TN_APAGADA, ORO_CLARO if act else TN_APAGADA, tinta, 15, 6.0)
+			fx = r_p.end.x + 5.0
 	if filas.is_empty():
-		var vacio: String = {P_MISIONES: "No hay nada apuntado en el diario.", P_OBJETOS: "La mochila está vacía.",
+		var vacio_mision := "No hay nada apuntado en el diario."
+		if es_misiones and _filtro_mision == 1:
+			vacio_mision = "No hay misiones activas ahora."
+		elif es_misiones and _filtro_mision == 2:
+			vacio_mision = "Aún no has completado ninguna misión."
+		var vacio: String = {P_MISIONES: vacio_mision, P_OBJETOS: "La mochila está vacía.",
 			P_LAZOS: "Aún no conoces a nadie."}.get(pestana, "")
 		_texto(vacio, area.position + Vector2(6, 26), Color(TN_APAGADA, tinta), -1, 18)
 		return
@@ -692,18 +789,18 @@ func _dibujar_paginas(tinta: float) -> void:
 	# si hay más filas de las que caben, la lista se desplaza para que se vea la elegida
 	if seleccion < _desplazamiento:
 		_desplazamiento = seleccion
-	elif seleccion >= _desplazamiento + FILAS_VISIBLES:
-		_desplazamiento = seleccion - FILAS_VISIBLES + 1
+	elif seleccion >= _desplazamiento + max_filas:
+		_desplazamiento = seleccion - max_filas + 1
 	var seguida := Misiones.seguida_id() if pestana == P_MISIONES else ""
 	if pestana == P_MISIONES and seguida == "" and not Misiones.seguida().is_empty():
 		seguida = Misiones.seguida()["id"]
 	# el subrayado de lo elegido, ajustado para no invadir el borde derecho ni el icono de seguida
 	var y_obj := area.position.y + (seleccion - _desplazamiento) * ALTO_FILA
 	_sel_y = y_obj if _sel_y < 0.0 else lerpf(_sel_y, y_obj, minf(1.0, get_process_delta_time() * 18.0))
-	PIEL.subrayar(_lienzo, Rect2(area.position.x + 10, _sel_y + 2, area.size.x - 30, ALTO_FILA - 3), _tiempo, tinta)
+	PIEL.subrayar(_lienzo, Rect2(area.position.x + 10, _sel_y + 2, area.size.x - 22, ALTO_FILA - 3), _tiempo, tinta)
 	PIEL.marcapaginas(_lienzo, Vector2(area.position.x + 6, _sel_y + ALTO_FILA / 2.0), tinta)
 	var hechas_desde := -1
-	for i in range(_desplazamiento, mini(filas.size(), _desplazamiento + FILAS_VISIBLES)):
+	for i in range(_desplazamiento, mini(filas.size(), _desplazamiento + max_filas)):
 		var f: Dictionary = filas[i]
 		var y := area.position.y + (i - _desplazamiento) * ALTO_FILA
 		var elegida := i == seleccion
@@ -739,12 +836,15 @@ func _dibujar_paginas(tinta: float) -> void:
 			_lienzo.draw_texture_rect_region(t, Rect2(tx - 2, y, 18, 24), Rect2(ancho_t / 2 - 9, 2 + (t.get_height() - 32), 18, 24))
 			tx += 22
 		var nombre := String(f["nombre"])
+		var max_w := area.end.x - tx - (48.0 if f.has("cantidad") else 18.0)
+		while _fuente.get_string_size(nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x > max_w and nombre.length() > 5:
+			nombre = nombre.left(nombre.length() - 4) + "..."
 		_texto(nombre, Vector2(tx, y + 19), color, -1, 18)
 		if f.get("hecha", false):
 			var w_nom := _fuente.get_string_size(nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
 			PIEL.raya(_lienzo, Vector2(tx, y + 12), Vector2(tx + w_nom, y + 12), TN_APAGADA, 0.8 * tinta)
 		if f.has("cantidad"):
-			_texto("x%d" % f["cantidad"], Vector2(area.end.x - 36, y + 19), Color(TN_ELEGIDA if elegida else TN_SUAVE, tinta), -1, 18)
+			_texto("x%d" % f["cantidad"], Vector2(area.end.x - 42, y + 19), Color(TN_ELEGIDA if elegida else TN_SUAVE, tinta), -1, 18)
 		if f.get("clave", false):
 			_texto("clave", Vector2(area.end.x - 48, y + 19), Color(TN_ELEGIDA if elegida else TN_ROJO, 0.9 * tinta), -1, 16)
 		if f.get("tecla", "") != "":
@@ -759,12 +859,12 @@ func _dibujar_paginas(tinta: float) -> void:
 	if _desplazamiento > 0:
 		var c := Vector2(area.get_center().x, area.position.y - 4)
 		_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(-4, 2), c + Vector2(0, -2), c + Vector2(4, 2)]), Color(TN_SUAVE, tinta))
-	if _desplazamiento + FILAS_VISIBLES < filas.size():
-		var c := Vector2(area.get_center().x, area.position.y + FILAS_VISIBLES * ALTO_FILA + 3)
+	if _desplazamiento + max_filas < filas.size():
+		var c := Vector2(area.get_center().x, area.position.y + max_filas * ALTO_FILA + 3)
 		_lienzo.draw_colored_polygon(PackedVector2Array([c + Vector2(-4, -2), c + Vector2(0, 2), c + Vector2(4, -2)]), Color(TN_SUAVE, tinta))
 	# el detalle de lo elegido, en la página de la derecha
 	var f: Dictionary = filas[seleccion]
-	var detalle := Rect2(DESC.position + Vector2(20, 12), DESC.size - Vector2(40, 30))
+	var detalle := Rect2(DESC.position + Vector2(20, 9), DESC.size - Vector2(40, 24))
 	if f.has("mision"):
 		_detalle_mision(f["mision"], detalle, f.get("id", "") == seguida)
 		return
@@ -822,12 +922,12 @@ func _desplazamiento_libro() -> float:
 func _detalle_mision(m: Dictionary, caja: Rect2, es_seguida: bool) -> void:
 	# a la izquierda, de qué va; a la derecha, los pasos y lo que da
 	var x := caja.position.x + 4
-	var ancho := caja.size.x * 0.56
+	var ancho := caja.size.x * 0.50
 	var x2 := caja.position.x + ancho + 20
 	var ancho2 := caja.end.x - x2
 	var tipo := String(m.get("tipo", ""))
 	var ct: Color = COLOR_TIPO.get(tipo, TN_TINTA)
-	var y := caja.position.y + 16
+	var y := caja.position.y + 15
 	var cabecera := String(Misiones.TIPOS.get(tipo, ""))
 	var quien := String(m.get("quien", ""))
 	if quien != "":
@@ -841,24 +941,50 @@ func _detalle_mision(m: Dictionary, caja: Rect2, es_seguida: bool) -> void:
 	_texto(cabecera, Vector2(x + 16, y), ct)
 	if es_seguida and Misiones.estado(m) == "activa":
 		PIEL.insignia(_lienzo, Vector2(x + ancho - _ancho("En pantalla") - 12, y - 13), "En pantalla", _fuente, Color("3c1814"), TN_ROJO, PIEL.CREMA, 0.95)
-	y += 22
+	y += 21
 	_texto(String(m["titulo"]), Vector2(x, y), TN_TITULO, -1, 18)
-	y = _parrafo(String(m.get("texto", "")), Vector2(x, y + 20), ancho, TN_SUAVE, 16.0)
+	y = _parrafo(String(m.get("texto", "")), Vector2(x, y + 18), ancho, TN_SUAVE, 14.5, 15)
 	# la línea que separa las dos columnas
 	_lienzo.draw_line(Vector2(x2 - 10, caja.position.y + 4), Vector2(x2 - 10, caja.end.y - 2), Color(TN_TITULO, 0.25), 1.0)
-	var y2 := caja.position.y + 16
-	for paso in Misiones.pasos_visibles(m):
+	var pasos := Misiones.pasos_visibles(m)
+	var hechos := 0
+	for paso in pasos:
+		if paso["hecho"]:
+			hechos += 1
+	var y2 := caja.position.y + 14
+	if not pasos.is_empty():
+		var lbl_prog := "Pasos %d/%d" % [hechos, pasos.size()]
+		var hecho_todo := hechos == pasos.size()
+		_texto(lbl_prog, Vector2(x2, caja.position.y + 13), TN_VERDE if hecho_todo else TN_SUAVE, -1, 15)
+		var xm := x2 + maxf(68.0, _ancho(lbl_prog) + 8.0)
+		var wm := maxf(32.0, ancho2 - (xm - x2) - 2.0)
+		PIEL.medidor(_lienzo, Rect2(xm, caja.position.y + 5.0, wm, 6.0), float(hechos) / float(pasos.size()),
+			TN_VERDE if hecho_todo else ORO_CLARO, -1.0, Color.WHITE, 0.95, pasos.size())
+		y2 = caja.position.y + 28
+	var premio := String(m.get("premio", ""))
+	var lineas_prem: PackedStringArray = _envolver("Recompensa: " + premio, ancho2 - 14.0, 14) if premio != "" else PackedStringArray()
+	var h_prem := float(lineas_prem.size()) * 13.0 + 4.0 if not lineas_prem.is_empty() else 0.0
+	var yr_box := 324.0 - h_prem
+	var y_tope := (yr_box - 6.0) if not lineas_prem.is_empty() else 322.0
+	for paso in pasos:
 		var hecho: bool = paso["hecho"]
 		if hecho:
 			_palomita(Vector2(x2 + 4, y2 - 4), TN_VERDE)
 		else:
 			_lienzo.draw_rect(Rect2(x2, y2 - 10, 9, 9), Color(TN_TINTA, 0.8), false, 1.0)
-		y2 = _parrafo(String(paso["texto"]), Vector2(x2 + 14, y2 + 1), ancho2 - 14, TN_APAGADA if hecho else TN_TINTA, 16.0) + 2
-		if y2 > caja.end.y - 40:
+		y2 = _parrafo(String(paso["texto"]), Vector2(x2 + 14, y2 + 1), ancho2 - 14, TN_APAGADA if hecho else TN_TINTA, 14.0, 15) + 2
+		if y2 > y_tope:
 			break
-	var premio := String(m.get("premio", ""))
-	if premio != "":
-		_parrafo("Recompensa: " + premio, Vector2(x2, maxf(y2 + 4, caja.end.y - 26)), ancho2, TN_VERDE if Misiones.estado(m) == "hecha" else TN_ROJO, 15.0)
+	if not lineas_prem.is_empty():
+		var hecha := Misiones.estado(m) == "hecha"
+		var cp := TN_VERDE if hecha else TN_ROJO
+		var y_box := clampf(maxf(y2 + 2.0, caja.end.y - h_prem - 14.0), caja.position.y + 34.0, yr_box)
+		var r_prem := Rect2(x2 - 2.0, y_box, ancho2 + 4.0, h_prem)
+		_lienzo.draw_rect(r_prem, Color(0.08, 0.14, 0.08, 0.62) if hecha else Color(0.16, 0.09, 0.06, 0.62))
+		_lienzo.draw_rect(r_prem, Color(cp, 0.45), false, 1.0)
+		_rombo(Vector2(x2 + 4.0, y_box + 8.0), 3.0, cp)
+		for k in lineas_prem.size():
+			_texto(lineas_prem[k], Vector2(x2 + 11.0, y_box + 12.0 + float(k) * 13.0), cp, -1.0, 14)
 
 
 ## Una medalla de rango: un círculo con el color del rango (gris si aún no tiene) y un brillo
@@ -880,7 +1006,7 @@ func _detalle_bestia(tipo: String, caja: Rect2) -> void:
 	var conocido := Bestiario.conocido(tipo)
 	var rango := Bestiario.rango(tipo)
 	# el dibujo, en marco rebajado con remaches (en sombra si aún no lo conoces)
-	var marco := Rect2(caja.position + Vector2(4, 4), Vector2(84, 84))
+	var marco := Rect2(caja.position + Vector2(4, 3), Vector2(82, 82))
 	PIEL.marco_retrato(_lienzo, marco, Bestiario.COLOR_RANGO[rango])
 	var d: Array = ficha["dibujo"]
 	if not _retratos.has(d[0]):
@@ -888,38 +1014,76 @@ func _detalle_bestia(tipo: String, caja: Rect2) -> void:
 	var t: Texture2D = _retratos[d[0]]
 	var fw := t.get_width() / int(d[1])
 	var fh := t.get_height() / int(d[2])
-	var esc := minf(76.0 / fw, 76.0 / fh)
+	var esc := minf(74.0 / fw, 74.0 / fh)
 	esc = floorf(esc) if esc >= 1.0 else esc
 	var tam := Vector2(fw, fh) * esc
-	_lienzo.draw_texture_rect_region(t, Rect2(marco.get_center() - tam / 2.0, tam), Rect2(int(d[3]) * fw, 0, fw, fh),
+	var f_base := int(d[3])
+	var nframes := 1 if tipo == "miedo" else clampi(int(d[1]) - f_base, 1, 3)
+	var col_f := f_base if not conocido else f_base + (int(floor(_tiempo * 3.8)) % nframes)
+	_lienzo.draw_texture_rect_region(t, Rect2(marco.get_center() - tam / 2.0, tam), Rect2(col_f * fw, 0, fw, fh),
 		Color.WHITE if conocido else Color(0, 0, 0, 0.85))
-	var x := marco.end.x + 16
+	var x := marco.end.x + 14
 	var ancho := caja.end.x - x - 4
 	if not conocido:
 		_texto("???", Vector2(x, caja.position.y + 22), TN_TITULO, -1, 20)
 		_parrafo("Aún no lo has vencido. Dicen que anda por: " + String(ficha["donde"]) + ".", Vector2(x, caja.position.y + 48), ancho, TN_APAGADA, 19.0)
 		return
-	_texto(String(ficha["nombre"]), Vector2(x, caja.position.y + 18), TN_TITULO, -1, 20)
-	if not Bestiario.es_jefe(tipo):
-		# cuántos lleva y cuántos faltan para el siguiente rango, arriba a la derecha
+	_texto(String(ficha["nombre"]), Vector2(x, caja.position.y + 16), TN_TITULO, -1, 20)
+	var es_jefe := Bestiario.es_jefe(tipo)
+	if not es_jefe:
+		# cuántos lleva y cuántos faltan para el siguiente rango, arriba a la derecha con medidor
 		var n := Bestiario.cuantos(tipo)
 		var u := Bestiario.umbrales(tipo)
 		var cuenta := "%d vencidos" % n
 		if rango < 3:
 			cuenta += " · %s con %d" % [String(Bestiario.NOMBRE_RANGO[rango + 1]), int(u[rango])]
-		_texto(cuenta, Vector2(caja.end.x - 4 - _fuente.get_string_size(cuenta, HORIZONTAL_ALIGNMENT_LEFT, -1, 15).x, caja.position.y + 18), TN_TINTA, -1, 15)
+		_texto(cuenta, Vector2(caja.end.x - 4 - _ancho(cuenta, 15), caja.position.y + 14), TN_TINTA, -1, 15)
+		var meta := int(u[mini(rango, 2)])
+		var prev := 0 if rango == 0 else int(u[rango - 1])
+		var prop := 1.0 if rango >= 3 else clampf(float(n - prev) / float(maxi(1, meta - prev)), 0.0, 1.0)
+		var col_m: Color = Bestiario.COLOR_RANGO[3 if rango >= 3 else rango + 1]
+		PIEL.medidor(_lienzo, Rect2(caja.end.x - 106.0, caja.position.y + 18.0, 102.0, 5.0), prop, col_m)
+	elif rango >= 3:
+		PIEL.insignia(_lienzo, Vector2(caja.end.x - _ancho("Sin daño") - 16.0, caja.position.y + 3.0), "Sin daño", _fuente, Color("3c280a"), ORO_CLARO, ORO_CLARO, 0.96)
+	elif rango >= 2:
+		PIEL.insignia(_lienzo, Vector2(caja.end.x - _ancho("Máx. 3 golpes") - 16.0, caja.position.y + 3.0), "Máx. 3 golpes", _fuente, Color("1a2230"), Bestiario.COLOR_RANGO[2], Bestiario.COLOR_RANGO[2], 0.92)
 	var linea := String(ficha["donde"])
 	if rango > 0:
 		linea += " · rango de " + String(Bestiario.NOMBRE_RANGO[rango])
-	_texto(linea, Vector2(x, caja.position.y + 35), Bestiario.COLOR_RANGO[rango] if rango > 0 else TN_SUAVE, -1, 15)
-	var y := _parrafo(String(ficha["texto"]), Vector2(x, caja.position.y + 52), ancho, TN_TINTA, 15.0)
+	_texto(linea, Vector2(x, caja.position.y + 30), Bestiario.COLOR_RANGO[rango] if rango > 0 else TN_SUAVE, -1, 14)
+	var tam_cuerpo := 13 if String(ficha["texto"]).length() + String(ficha.get("secreto", "")).length() > 230 else 14
+	var paso_l := 12.0 if tam_cuerpo == 13 else 13.0
+	var y := _parrafo(String(ficha["texto"]), Vector2(x, caja.position.y + 44), ancho, TN_TINTA, paso_l, tam_cuerpo)
 	if rango >= 2:
-		_parrafo("Secreto: " + String(ficha["secreto"]), Vector2(x, y + 2), ancho, TN_VERDE, 15.0)
+		_parrafo("Secreto: " + String(ficha["secreto"]), Vector2(x, y + 1), ancho, TN_VERDE, paso_l, tam_cuerpo)
 	else:
 		var pista := "Secreto: se descubre con el rango de plata."
-		if Bestiario.es_jefe(tipo):
+		if es_jefe:
 			pista = "Plata: vencerlo dejándote dar 3 veces o menos. Oro: sin que te den."
-		_parrafo(pista, Vector2(x, y + 2), ancho, TN_APAGADA, 15.0)
+		_parrafo(pista, Vector2(x, y + 1), ancho, TN_APAGADA, paso_l, tam_cuerpo)
+	var debs: Array = DEBILIDAD_BESTIA.get(tipo, [])
+	if not debs.is_empty():
+		var clave0 := String(debs[0])
+		var col0: Color = PIEL.TACTICO_INFO.get(clave0, ["", TN_SUAVE])[1]
+		var nombres := PackedStringArray()
+		for db in debs:
+			var nm := String(PIEL.TACTICO_INFO.get(String(db), [""])[0])
+			if nm != "":
+				nombres.append(nm)
+		var etq := " · ".join(nombres)
+		var pref := "Debilidad: "
+		var wp_lbl := _ancho(pref, 14) + _ancho(etq, 14)
+		var ww := roundf(wp_lbl + float(debs.size()) * 13.0 + 16.0)
+		var wy := DESC.end.y - 22.0
+		var r_deb := Rect2(x, wy, minf(ww, 395.0 - x), 16.0)
+		_lienzo.draw_rect(r_deb, Color(0.06, 0.05, 0.09, 0.92))
+		_lienzo.draw_rect(r_deb, Color(col0, 0.6), false, 1.0)
+		var ix := r_deb.position.x + 6.0
+		_texto(pref, Vector2(ix, wy + 12.0), TN_SUAVE, -1.0, 14)
+		ix += _ancho(pref, 14) + 5.0
+		for j in debs.size():
+			PIEL.icono_tactico(_lienzo, Vector2(ix + float(j) * 13.0, wy + 8.0), String(debs[j]), 0.88, 1.0)
+		_texto(etq, Vector2(ix + float(debs.size()) * 13.0, wy + 12.0), Color(col0.lightened(0.22), 0.98), -1.0, 14)
 
 
 
@@ -929,19 +1093,117 @@ func _cargar_retrato(id: String) -> Texture2D:
 	return _retratos[id]
 
 
+const VISTA_NOMBRE := {"raiz": "Raíz", "sigilia": "Sigilia", "asterhaul": "Asterhaul", "mundo": "Mundo"}
+
+
+func _algun_lugar_visto(lugares: Array) -> bool:
+	for r in lugares:
+		if Estado.tiene(String(r[2])):
+			return true
+	return false
+
+
+## El mapa de Raíz existe desde que Maisha pisa Raíz (lo va dibujando ella)
+func _raiz_conocida() -> bool:
+	return Estado.tiene("visto/prados_del_eco")
+
+
+func _sigilia_conocida() -> bool:
+	return Estado.tiene("mapa_norte") or PUNTO_SIGILIA.has(Estado.escena_actual) or _algun_lugar_visto(LUGARES_SIGILIA)
+
+
+func _asterhaul_conocida() -> bool:
+	return PUNTO_ASTERHAUL.has(Estado.escena_actual) or _algun_lugar_visto(LUGARES_ASTERHAUL)
+
+
+func _regiones_disponibles() -> Array:
+	var vistas: Array = []
+	if _raiz_conocida():
+		vistas.append("raiz")
+	if _sigilia_conocida():
+		vistas.append("sigilia")
+	if _asterhaul_conocida():
+		vistas.append("asterhaul")
+	if Estado.tiene("mapa_partido"):
+		vistas.append("mundo")
+	return vistas
+
+
+func _elegir_mapa_inicial() -> void:
+	var vistas := _regiones_disponibles()
+	if PUNTO_ASTERHAUL.has(Estado.escena_actual) and vistas.has("asterhaul"):
+		_vista_mapa = "asterhaul"
+	elif PUNTO_SIGILIA.has(Estado.escena_actual) and vistas.has("sigilia"):
+		_vista_mapa = "sigilia"
+	elif vistas.has("raiz") and (not Estado.escena_actual in ["kitovu", "casa_shamba"] or not Estado.tiene("mapa_norte")):
+		_vista_mapa = "raiz"
+	elif not vistas.is_empty():
+		_vista_mapa = String(vistas[-1])
+	else:
+		_vista_mapa = "mundo"
+	_mapa_mundo = _vista_mapa == "mundo"
+
+
+func _config_mapa(vista: String) -> Dictionary:
+	match vista:
+		"sigilia":
+			return {"titulo": "Sigilia", "textura": MAPA_SIGILIA, "lugares": LUGARES_SIGILIA, "caminos": CAMINOS_SIGILIA, "puntos": PUNTO_SIGILIA, "siempre_visible": Estado.tiene("mapa_norte")}
+		"asterhaul":
+			return {"titulo": "Asterhaul", "textura": MAPA_ASTERHAUL, "lugares": LUGARES_ASTERHAUL, "caminos": CAMINOS_ASTERHAUL, "puntos": PUNTO_ASTERHAUL, "siempre_visible": false}
+		_:
+			return {"titulo": "Raíz", "textura": MAPA_RAIZ, "lugares": LUGARES_RAIZ, "caminos": CAMINOS_RAIZ, "puntos": PUNTO_RAIZ, "siempre_visible": Estado.tiene("mapa_raiz")}
+
+
+func _dibujar_selector_mapa(vistas: Array, y_centro: float) -> void:
+	if vistas.size() <= 1:
+		return
+	var total := 24.0
+	for v in vistas:
+		var lbl := String(VISTA_NOMBRE.get(String(v), String(v)))
+		total += roundf(_ancho(lbl, 15) + 12.0) + 5.0
+	total -= 5.0
+	var sx := roundf(320.0 - total * 0.5)
+	var sy := roundf(y_centro - 8.0)
+	sx += PIEL.tecla(_lienzo, Vector2(sx, sy + 1.0), "↑↓", _fuente, 16, 1.0) + 6.0
+	for i in vistas.size():
+		var clave := String(vistas[i])
+		var activo := clave == _vista_mapa
+		var r_p := PIEL.insignia(_lienzo, Vector2(sx, sy), String(VISTA_NOMBRE.get(clave, clave)), _fuente,
+			Color("4c331e") if activo else PIEL.CUERO_OSCURO,
+			ORO_CLARO if activo else TN_APAGADA, ORO_CLARO if activo else TN_APAGADA, 0.96, 15, 6.0)
+		sx = r_p.end.x + 5.0
+
+
+func _dibujar_cabecera_mapa(izq: String, der: String) -> void:
+	if izq != "":
+		PIEL.insignia(_lienzo, Vector2(12.0, 8.0), izq, _fuente, PIEL.CUERO_OSCURO, PIEL.ORO, PIEL.CREMA, 0.94, 15, 7.0)
+	if der != "":
+		var wd := _ancho(der, 15) + 14.0
+		PIEL.insignia(_lienzo, Vector2(roundf(628.0 - wd), 8.0), der, _fuente, PIEL.CUERO_OSCURO, PIEL.ORO, ORO_CLARO, 0.94, 15, 7.0)
+
+
 func _dibujar_mapa() -> void:
 	var area := Rect2(16, 30, 608, 306)
-	if not Estado.tiene("mapa_partido"):
+	var vistas := _regiones_disponibles()
+	if vistas.is_empty():
 		_texto("Aún no tienes ningún mapa.", Vector2(250, 180), TN_APAGADA, -1, 18)
 		return
-	if _raiz_conocida() and not _mapa_mundo:
-		_dibujar_mapa_raiz(area)
+	if not vistas.has(_vista_mapa):
+		_vista_mapa = String(vistas[0])
+	_mapa_mundo = _vista_mapa == "mundo"
+	if _vista_mapa != "mundo":
+		_dibujar_mapa_region(area, _config_mapa(_vista_mapa), vistas)
 		return
-	# el mapa del mundo, ampliado (MAPA_MUNDO_ESCALA); los nombres, aparte, en etiquetas de pergamino
-	var tam := Vector2(MAPA.get_size()) * MAPA_MUNDO_ESCALA
+	# el mapa del mundo (completo si tiene el trozo del norte o ya conoce Sigilia)
+	var completo := Estado.tiene("mapa_norte") or _sigilia_conocida()
+	var tex_mundo: Texture2D = MAPA_ENTERO if completo else MAPA
+	var tam := Vector2(tex_mundo.get_size()) * MAPA_MUNDO_ESCALA
 	var pos := (area.position + (area.size - tam) / 2.0 - Vector2(0, 6)).round()
-	_lienzo.draw_texture_rect(MAPA, Rect2(pos, tam), false)
-	for lugar in LUGARES_MUNDO:
+	_lienzo.draw_texture_rect(tex_mundo, Rect2(pos, tam), false)
+	var lugares := LUGARES_MUNDO.duplicate()
+	if completo:
+		lugares.append(["Sigilia", LUGAR_SIGILIA_MUNDO])
+	for lugar in lugares:
 		var c: Vector2 = pos + Vector2(lugar[1]) * MAPA_MUNDO_ESCALA
 		var nombre: String = lugar[0]
 		var ancho := _ancho(nombre)
@@ -955,15 +1217,22 @@ func _dibujar_mapa() -> void:
 		var r: Vector2 = pos + Vector2(LUGARES_MUNDO[0][1]) * MAPA_MUNDO_ESCALA + Vector2(_ancho("Raíz") / 2.0 + 10, 0)
 		_lienzo.draw_circle(r, 4.0, Color("f0cc60"))
 		_lienzo.draw_circle(r + Vector2(-1, -1), 1.5, Color("fff6d0"))
-	# Maisha está en el Kitovu (o en Raíz): un punto que late
-	var punto := Vector2(78, 132) if PUNTO_RAIZ.has(Estado.escena_actual) and not Estado.escena_actual in ["kitovu", "casa_shamba"] else Vector2(152, 100)
+	# dónde está Maisha en el mundo: un punto que late
+	var punto := Vector2(152, 100)
+	if PUNTO_SIGILIA.has(Estado.escena_actual):
+		punto = LUGAR_SIGILIA_MUNDO
+	elif PUNTO_ASTERHAUL.has(Estado.escena_actual):
+		punto = Vector2(232, 110)
+	elif PUNTO_RAIZ.has(Estado.escena_actual) and not Estado.escena_actual in ["kitovu", "casa_shamba"]:
+		punto = Vector2(78, 132)
 	_punto(pos + punto * MAPA_MUNDO_ESCALA)
-	var pie := "Falta el trozo del norte. Mzee Shamba cree que está en Sigilia."
-	var wp := _ancho(pie) + 18.0
-	if _raiz_conocida():
-		PIEL.barra_teclas(_lienzo, 320.0, area.end.y - 10.0, [["↑↓", "Mapa de Raíz"], ["·", "Falta el trozo de Sigilia"]], _fuente, 16, 1.0, true)
-	else:
-		PIEL.insignia(_lienzo, Vector2(roundf(320.0 - wp * 0.5), area.end.y - 18.0), pie, _fuente, PIEL.CUERO_OSCURO, PIEL.ORO, PIEL.CREMA, 0.94, 16, 9.0)
+	_dibujar_cabecera_mapa("Mapa completo" if completo else "Mapa del mundo", "El norte al fin" if completo else "Falta Sigilia")
+	if vistas.size() > 1:
+		_dibujar_selector_mapa(vistas, 336.0)
+	elif not completo:
+		var pie := "Falta el trozo del norte. Mzee Shamba cree que está en Sigilia."
+		var wp := _ancho(pie) + 18.0
+		PIEL.insignia(_lienzo, Vector2(roundf(320.0 - wp * 0.5), 328.0), pie, _fuente, PIEL.CUERO_OSCURO, PIEL.ORO, PIEL.CREMA, 0.94, 16, 9.0)
 
 
 func _punto(aqui: Vector2) -> void:
@@ -972,47 +1241,43 @@ func _punto(aqui: Vector2) -> void:
 	_lienzo.draw_circle(aqui, pulso, VERDE)
 
 
-## El mapa de Raíz existe desde que Maisha pisa Raíz (lo va dibujando ella)
-func _raiz_conocida() -> bool:
-	return Estado.tiene("visto/prados_del_eco")
-
-
-## El mapa de Raíz: los caminos que ya ha pisado (con tinta), niebla sobre lo que no conoce, los nombres de los
-## lugares (con el mapa de Tawi se ven todos) y dónde está Maisha
-func _dibujar_mapa_raiz(area: Rect2) -> void:
-	# el dibujo, los caminos y la niebla, ampliados (MAPA_ESCALA); los nombres y el alfiler, aparte y nítidos
-	var tam := Vector2(MAPA_RAIZ.get_size()) * MAPA_ESCALA
+## Mapa regional genérico (Raíz, Sigilia, Asterhaul): caminos, niebla, etiquetas, secretos y posición de Maisha
+func _dibujar_mapa_region(area: Rect2, cfg: Dictionary, vistas: Array) -> void:
+	var tex: Texture2D = cfg["textura"]
+	var lugares: Array = cfg["lugares"]
+	var caminos: Array = cfg["caminos"]
+	var puntos_escena: Dictionary = cfg["puntos"]
+	var siempre_visible: bool = cfg["siempre_visible"]
+	var escala := minf(MAPA_ESCALA, minf((area.size.x - 16.0) / float(tex.get_width()), (area.size.y - 24.0) / float(tex.get_height())))
+	var tam := Vector2(tex.get_size()) * escala
 	var pos := (area.position + (area.size - tam) / 2.0 - Vector2(0, 8)).round()
-	var m := func(v: Vector2) -> Vector2: return pos + v * MAPA_ESCALA
-	_lienzo.draw_set_transform(pos + Vector2(0, _desplaz_y()), 0.0, Vector2(MAPA_ESCALA, MAPA_ESCALA))
-	_lienzo.draw_texture(MAPA_RAIZ, Vector2.ZERO)
-	var con_tawi := Estado.tiene("mapa_raiz")
+	var m := func(v: Vector2) -> Vector2: return pos + v * escala
+	_lienzo.draw_set_transform(pos + Vector2(0, _desplaz_y()), 0.0, Vector2(escala, escala))
+	_lienzo.draw_texture(tex, Vector2.ZERO)
 	var caminos_vistos := 0
-	for k in CAMINOS_RAIZ.size():
-		var cam: Array = CAMINOS_RAIZ[k]
-		var puntos: Array = cam[2]
+	for k in caminos.size():
+		var cam: Array = caminos[k]
+		var pts: Array = cam[2]
 		if Estado.tiene("visto/" + String(cam[1])):
 			caminos_vistos += 1
-			_trazo_tinta(Vector2.ZERO, puntos)
+			_trazo_tinta(Vector2.ZERO, pts)
 		else:
-			# niebla sobre el tramo de en medio (los extremos tocan los lugares, que tienen la suya)
-			var medio: Array = puntos.slice(1, puntos.size() - 1) if puntos.size() > 2 else [(Vector2(puntos[0]) + Vector2(puntos[-1])) / 2.0]
+			var medio: Array = pts.slice(1, pts.size() - 1) if pts.size() > 2 else [(Vector2(pts[0]) + Vector2(pts[-1])) / 2.0]
 			for j in medio.size():
 				_nube(Vector2(medio[j]), Vector2(13, 9), k * 7 + j)
-	for k in LUGARES_RAIZ.size():
-		var r: Array = LUGARES_RAIZ[k]
-		if not Estado.tiene(String(r[2])) and not con_tawi:
+	for k in lugares.size():
+		var r: Array = lugares[k]
+		if not Estado.tiene(String(r[2])) and not siempre_visible:
 			_nube(Vector2(r[1]), Vector2(40, 22), k * 13 + 100)
 	_lienzo.draw_set_transform(Vector2(0, _desplaz_y()))
-	for k in LUGARES_RAIZ.size():
-		var r: Array = LUGARES_RAIZ[k]
-		if not Estado.tiene(String(r[2])) and not con_tawi:
+	for k in lugares.size():
+		var r: Array = lugares[k]
+		if not Estado.tiene(String(r[2])) and not siempre_visible:
 			_texto("?", (m.call(Vector2(r[1])) + Vector2(-3, 6)).round(), Color(NIEBLA_SOMBRA, 1.0), -1, 18)
-	for r in LUGARES_RAIZ:
+	for r in lugares:
 		var conocida := Estado.tiene(String(r[2]))
-		if not conocida and not con_tawi:
+		if not conocida and not siempre_visible:
 			continue
-		# el nombre en una etiqueta de pergamino (dos líneas: «Bosque / Cobrizo»), que se lee sobre cualquier color
 		var nombre: String = r[0]
 		var partes: PackedStringArray = nombre.split(" ", false, 1)
 		var ancho := 0.0
@@ -1021,6 +1286,7 @@ func _dibujar_mapa_raiz(area: Rect2) -> void:
 		var c: Vector2 = m.call(Vector2(r[1])) + Vector2(0, 16)
 		var caja := Rect2(round(c.x - ancho / 2.0 - 4), round(c.y - 2), round(ancho + 8), partes.size() * 13 + 5)
 		caja.position.x = clampf(caja.position.x, pos.x + 2, pos.x + tam.x - caja.size.x - 2)
+		caja.position.y = clampf(caja.position.y, pos.y + 4, pos.y + tam.y - caja.size.y - 4)
 		_lienzo.draw_rect(Rect2(caja.position + Vector2(1, 2), caja.size), Color(0.1, 0.06, 0.03, 0.45))
 		_lienzo.draw_rect(caja, Color("f4e4c0") if conocida else Color("e2cea0"))
 		_lienzo.draw_rect(caja, Color(TINTA, 0.8 if conocida else 0.45), false, 1.0)
@@ -1043,13 +1309,19 @@ func _dibujar_mapa_raiz(area: Rect2) -> void:
 				_lienzo.draw_rect(Rect2(q + Vector2(-3, -12), Vector2(_ancho(txt) + 16, 15)), Color("f4e4c0"))
 				_lienzo.draw_colored_polygon(PackedVector2Array([q + Vector2(3, -9), q + Vector2(6, -6), q + Vector2(3, -3), q + Vector2(0, -6)]), col)
 				_lienzo.draw_string(_fuente, q.round() + Vector2(10, 0), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, col)
-	if PUNTO_RAIZ.has(Estado.escena_actual):
-		_aqui(m.call(PUNTO_RAIZ[Estado.escena_actual]))
-	var pie := "Caminos descubiertos: %d/%d" % [caminos_vistos, CAMINOS_RAIZ.size()]
-	for cam in CAMINOS_RAIZ:
-		if cam[1] == Estado.escena_actual:
-			pie = "Estás en: %s · %s" % [cam[0], pie]
-	PIEL.barra_teclas(_lienzo, 320.0, area.end.y - 8.0, [["↑↓", "Mundo"], ["·", pie]], _fuente, 16, 1.0, true)
+	if puntos_escena.has(Estado.escena_actual):
+		_aqui(m.call(puntos_escena[Estado.escena_actual]))
+	var lugar_act := String(cfg["titulo"])
+	for r in lugares:
+		if String(r[2]) == "visto/" + Estado.escena_actual:
+			lugar_act = String(r[0])
+			break
+	for cam in caminos:
+		if String(cam[1]) == Estado.escena_actual:
+			lugar_act = String(cam[0])
+			break
+	_dibujar_cabecera_mapa(lugar_act, "Caminos %d/%d" % [caminos_vistos, caminos.size()])
+	_dibujar_selector_mapa(vistas, 336.0)
 
 
 ## Un camino trazado con tinta: rayitas, como lo dibujaría Maisha al andar

@@ -316,5 +316,63 @@ static func interruptor(lienzo: CanvasItem, pos: Vector2, encendido: bool, fuent
 			Color(VERDE if encendido else TINTA_SUAVE, alfa))
 
 
+const TACTICO_INFO := {
+	"fuego": ["Fuego", Color("ff9a40")],
+	"hielo": ["Hielo", Color("7ad7f0")],
+	"rayo": ["Rayo", Color("f6e05e")],
+	"sismica": ["Carga Sísmica", Color("f8b040")],
+	"semilla": ["Semilla", Color("8fe06a")],
+	"escudo": ["Escudo", Color("d6b46e")],
+	"latido": ["Latido", Color("e6a852")],
+	"atras": ["Por la espalda", Color("c8a0f0")],
+}
+
+
+## Icono vectorial nítido de elemento o táctica (reutilizable entre HUD de combate y Bestiario)
+static func icono_tactico(lienzo: CanvasItem, centro: Vector2, clave: String, escala := 1.0, alfa := 1.0) -> void:
+	if not TACTICO_INFO.has(clave) or alfa <= 0.01:
+		return
+	var col: Color = TACTICO_INFO[clave][1]
+	var c := centro.round()
+	var r := 5.0 * escala
+	lienzo.draw_circle(c, r + 1.0, Color(0.06, 0.04, 0.09, 0.94 * alfa))
+	lienzo.draw_arc(c, r + 1.0, 0.0, TAU, 16, Color(col, 0.85 * alfa), 1.0)
+	var ct := Color(col, alfa)
+	match clave:
+		"fuego":
+			lienzo.draw_colored_polygon(PackedVector2Array([
+				c + Vector2(0, -3.8) * escala, c + Vector2(2.8, 0.5) * escala,
+				c + Vector2(1.4, 3.2) * escala, c + Vector2(-1.4, 3.2) * escala, c + Vector2(-2.8, 0.5) * escala,
+			]), ct)
+		"hielo":
+			lienzo.draw_line((c + Vector2(0, -3.5) * escala).round(), (c + Vector2(0, 3.5) * escala).round(), ct, 1.0)
+			lienzo.draw_line((c + Vector2(-3.2, -1.8) * escala).round(), (c + Vector2(3.2, 1.8) * escala).round(), ct, 1.0)
+			lienzo.draw_line((c + Vector2(-3.2, 1.8) * escala).round(), (c + Vector2(3.2, -1.8) * escala).round(), ct, 1.0)
+		"rayo":
+			lienzo.draw_polyline(PackedVector2Array([
+				(c + Vector2(1.8, -3.8) * escala).round(), (c + Vector2(-1.8, -0.3) * escala).round(),
+				(c + Vector2(1.6, 0.3) * escala).round(), (c + Vector2(-1.8, 3.8) * escala).round(),
+			]), ct, 1.4)
+		"sismica":
+			lienzo.draw_arc(c, 3.2 * escala, -PI * 0.85, -PI * 0.15, 8, ct, 1.5)
+			lienzo.draw_line((c + Vector2(-2.8, 1.8) * escala).round(), (c + Vector2(2.8, 1.8) * escala).round(), ct, 1.5)
+		"semilla":
+			lienzo.draw_circle(c, 2.3 * escala, ct)
+			lienzo.draw_line(c.round(), (c + Vector2(0, -4.0) * escala).round(), Color("fff3c4", alfa), 1.0)
+		"escudo":
+			lienzo.draw_colored_polygon(PackedVector2Array([
+				c + Vector2(-3.0, -3.0) * escala, c + Vector2(3.0, -3.0) * escala,
+				c + Vector2(2.6, 0.8) * escala, c + Vector2(0, 3.6) * escala, c + Vector2(-2.6, 0.8) * escala,
+			]), ct)
+		"latido":
+			lienzo.draw_arc(c, 1.8 * escala, 0.0, TAU, 10, ct, 1.2)
+			lienzo.draw_arc(c, 3.4 * escala, 0.0, TAU, 12, Color(col, 0.7 * alfa), 1.0)
+		"atras":
+			lienzo.draw_polyline(PackedVector2Array([
+				(c + Vector2(-3.0, -1.5) * escala).round(), (c + Vector2(0, -3.2) * escala).round(), (c + Vector2(3.0, 0) * escala).round(),
+			]), ct, 1.4)
+			lienzo.draw_circle((c + Vector2(2.5, 1.5) * escala).round(), 1.3 * escala, ct)
+
+
 static func _redondo(r: Rect2) -> Rect2:
 	return Rect2(r.position.round(), r.size.round())

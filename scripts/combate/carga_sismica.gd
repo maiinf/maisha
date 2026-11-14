@@ -51,7 +51,7 @@ func _embestir() -> void:
 		if o.call("recibir_carga", direccion):
 			maisha.call("frenar_carga")
 			Impacto.temblar(2.5, 0.18)
-			Impacto.chispa(frente + direccion * 6.0, direccion, AMBAR[1])
+			Impacto.chispa(frente + direccion * 6.0, direccion, AMBAR[1], 1.15, "carga")
 	for nodo in get_tree().get_nodes_in_group("daniables"):
 		var o := nodo as Node2D
 		if o == null or o.is_in_group("maisha") or o.is_in_group("sismicos") or _tocados.has(o.get_instance_id()):
@@ -59,7 +59,7 @@ func _embestir() -> void:
 		if (o.global_position + Vector2(0, -6)).distance_to(frente) <= ALCANCE + 4.0:
 			_tocados[o.get_instance_id()] = true
 			o.call("recibir_danio", 1, maisha.global_position, "carga")
-			Impacto.chispa(o.global_position + Vector2(0, -8), direccion, AMBAR[1])
+			Impacto.chispa(o.global_position + Vector2(0, -8), direccion, AMBAR[1], 1.1, "carga")
 
 
 func _draw() -> void:

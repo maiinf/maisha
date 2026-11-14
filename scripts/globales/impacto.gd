@@ -12,6 +12,7 @@ extends Node
 
 const CHISPA := preload("res://scripts/efectos/chispa_golpe.gd")
 const ONDA := preload("res://scripts/efectos/onda_explosion.gd")
+const POLVO_PISADA := preload("res://scripts/efectos/polvo_pisada.gd")
 
 var activo := true
 var temblores := true
@@ -107,7 +108,7 @@ func temblar(fuerza: float, segundos: float) -> void:
 		_temblor_tiempo = 0.0
 
 
-func chispa(pos: Vector2, direccion: Vector2, color := Color("fff3c4"), escala := 1.0) -> void:
+func chispa(pos: Vector2, direccion: Vector2, color := Color("fff3c4"), escala := 1.0, tipo := "normal") -> void:
 	if not activo:
 		return
 	var nodo: Node2D = CHISPA.new()
@@ -115,6 +116,16 @@ func chispa(pos: Vector2, direccion: Vector2, color := Color("fff3c4"), escala :
 	nodo.direccion = direccion
 	nodo.color = color
 	nodo.escala = escala
+	nodo.tipo = tipo
+	_al_mundo(nodo)
+
+
+func polvo_pisada(pos: Vector2, color := Color(0.86, 0.80, 0.66, 0.5)) -> void:
+	if not activo:
+		return
+	var nodo: Node2D = POLVO_PISADA.new()
+	nodo.global_position = pos
+	nodo.color = color
 	_al_mundo(nodo)
 
 

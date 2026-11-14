@@ -14,6 +14,25 @@ const ALIENTO := Color("9aa95f")         # Hierba 4
 const ALIENTO_LLENO := Color("fff3c4")
 const AGOTADA := Color("de6771")
 const TEXTO := Color("fff3c4")
+## Metadatos tácticos por script de enemigo: telegrafía de ataque e icono de debilidad
+const INFO_ENEMIGO := {
+	"kaa_jiwe.gd": {"prop": "fase", "aviso": [1], "debil": "sismica"},
+	"saa.gd": {"prop": "fase", "aviso": [2], "debil": "rayo"},
+	"jabali.gd": {"prop": "fase", "aviso": [1], "debil": "escudo"},
+	"tintero.gd": {"prop": "fase", "aviso": [1], "debil": "fuego"},
+	"cangrejo.gd": {"prop": "fase", "aviso": [2], "debil": "atras"},
+	"ruba.gd": {"prop": "fase", "aviso": [1], "debil": "hielo"},
+	"sombra_renglon.gd": {"prop": "fase", "aviso": [1], "debil": "fuego"},
+	"murcielago.gd": {"prop": "fase", "aviso": [2], "debil": "latido"},
+	"cuervo.gd": {"prop": "fase", "aviso": [1], "debil": ""},
+	"rana.gd": {"prop": "fase", "aviso": [1], "debil": ""},
+	"topo.gd": {"prop": "fase", "aviso": [1], "debil": ""},
+	"anguila.gd": {"prop": "fase", "aviso": [0], "debil": ""},
+	"bundi.gd": {"prop": "estado", "aviso": [1], "debil": "escudo"},
+	"buibui.gd": {"prop": "fase", "aviso": [], "debil": "semilla"},
+	"espino.gd": {"prop": "fase", "aviso": [], "debil": "semilla"},
+	"pagina_suelta.gd": {"prop": "fase", "aviso": [], "debil": "fuego"},
+}
 
 var _maisha: Node
 var _visible := 0.0
@@ -269,7 +288,7 @@ func _dibujar() -> void:
 		PIEL.barra_teclas(_lienzo, 320.0, 344.0, pares, _fuente, 16, 0.96, true)
 
 
-## Mini barras biseladas e indicadores de estado sobre enemigos dañados o alterados
+## Mini barras biseladas, telegrafía e indicadores tácticos sobre enemigos
 func _dibujar_barras_enemigos() -> void:
 	for en in get_tree().get_nodes_in_group("enemigos"):
 		if not is_instance_valid(en) or not (en is Node2D):
@@ -287,7 +306,10 @@ func _dibujar_barras_enemigos() -> void:
 		var helado := float(en.get("_congelado")) > 0.0 if en.get("_congelado") != null else false
 		var electro := float(en.get("_electrificado")) > 0.0 if en.get("_electrificado") != null else false
 		var volcado := float(en.get("_volcado")) > 0.0 if en.get("_volcado") != null else false
-		if vida >= vmax and not (helado or electro or volcado):
+		var info := _info_enemigo(n2d)
+		var avisando := _esta_telegrafiando(n2d, info)
+		var herido_o_alterado := vida < vmax or helado or electro or volcado
+		if not herido_o_alterado and not avisando:
 			continue
 		var p_v: Variant = _proyectar_sobre_cabeza(n2d)
 		if p_v == null:
@@ -295,36 +317,76 @@ func _dibujar_barras_enemigos() -> void:
 		var p: Vector2 = (p_v as Vector2).round()
 		if p.x < -20.0 or p.x > 660.0 or p.y < 14.0 or p.y > 350.0:
 			continue
-		var w := clampf(float(vmax) * 7.0 + 2.0, 18.0, 44.0)
-		var caja := Rect2(roundf(p.x - w * 0.5), roundf(p.y - 6.0), w, 6.0)
-		var destello := float(st["destello"]) > 0.0
-		_lienzo.draw_rect(Rect2(caja.position + Vector2(1, 1), caja.size), Color(0, 0, 0, 0.55))
-		_lienzo.draw_rect(caja, Color(0.08, 0.05, 0.11, 0.94))
-		_lienzo.draw_rect(caja, Color("fff3c4") if destello else Color(PIEL.ORO, 0.7), false, 1.0)
-		var inner := caja.grow(-1)
-		var cola := clampf(float(st["cola"]) / float(vmax), 0.0, 1.0)
-		var frac := clampf(float(vida) / float(vmax), 0.0, 1.0)
-		if cola > frac:
-			var cw := maxf(1.0, roundf(inner.size.x * cola))
-			_lienzo.draw_rect(Rect2(inner.position, Vector2(cw, inner.size.y)), Color("f4df9a", 0.9))
-		var rw := maxf(1.0, roundf(inner.size.x * frac))
-		var col_fill := Color("d64f5e")
-		if helado:
-			col_fill = Color("7ad7f0")
-		elif electro:
-			col_fill = Color("f6e05e")
-		elif volcado:
-			col_fill = Color("ef8a26")
-		_lienzo.draw_rect(Rect2(inner.position, Vector2(rw, inner.size.y)), col_fill)
-		_lienzo.draw_rect(Rect2(inner.position, Vector2(rw, 1.0)), col_fill.lightened(0.35))
-		if vmax > 1 and vmax <= 6:
-			for k in range(1, vmax):
-				var tx := roundf(inner.position.x + inner.size.x * float(k) / float(vmax))
-				_lienzo.draw_line(Vector2(tx, inner.position.y), Vector2(tx, inner.end.y), Color(0.08, 0.05, 0.11, 0.72), 1.0)
-		# Micro insignia de estado alterado encima de la barra
-		if helado or electro or volcado:
-			var tag := "ATURDIDO" if volcado else ("RAYO" if electro else "HIELO")
-			var col_tag := Color("ef8a26") if volcado else (Color("f6e05e") if electro else Color("7ad7f0"))
-			var cx := roundf(p.x - _fuente.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x * 0.5)
-			_lienzo.draw_string(_fuente, Vector2(cx + 1, caja.position.y - 2).round(), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0, 0, 0, 0.8))
-			_lienzo.draw_string(_fuente, Vector2(cx, caja.position.y - 3).round(), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, col_tag)
+		var top_y := p.y - 2.0
+		if herido_o_alterado:
+			var w := clampf(float(vmax) * 7.0 + 2.0, 18.0, 44.0)
+			var caja := Rect2(roundf(p.x - w * 0.5), roundf(p.y - 6.0), w, 6.0)
+			top_y = caja.position.y
+			var destello := float(st["destello"]) > 0.0
+			_lienzo.draw_rect(Rect2(caja.position + Vector2(1, 1), caja.size), Color(0, 0, 0, 0.55))
+			_lienzo.draw_rect(caja, Color(0.08, 0.05, 0.11, 0.94))
+			_lienzo.draw_rect(caja, Color("fff3c4") if destello else Color(PIEL.ORO, 0.7), false, 1.0)
+			var inner := caja.grow(-1)
+			var cola := clampf(float(st["cola"]) / float(vmax), 0.0, 1.0)
+			var frac := clampf(float(vida) / float(vmax), 0.0, 1.0)
+			if cola > frac:
+				var cw := maxf(1.0, roundf(inner.size.x * cola))
+				_lienzo.draw_rect(Rect2(inner.position, Vector2(cw, inner.size.y)), Color("f4df9a", 0.9))
+			var rw := maxf(1.0, roundf(inner.size.x * frac))
+			var col_fill := Color("d64f5e")
+			if helado:
+				col_fill = Color("7ad7f0")
+			elif electro:
+				col_fill = Color("f6e05e")
+			elif volcado:
+				col_fill = Color("ef8a26")
+			_lienzo.draw_rect(Rect2(inner.position, Vector2(rw, inner.size.y)), col_fill)
+			_lienzo.draw_rect(Rect2(inner.position, Vector2(rw, 1.0)), col_fill.lightened(0.35))
+			if vmax > 1 and vmax <= 6:
+				for k in range(1, vmax):
+					var tx := roundf(inner.position.x + inner.size.x * float(k) / float(vmax))
+					_lienzo.draw_line(Vector2(tx, inner.position.y), Vector2(tx, inner.end.y), Color(0.08, 0.05, 0.11, 0.72), 1.0)
+			var debil := String(info.get("debil", ""))
+			if debil != "":
+				PIEL.icono_tactico(_lienzo, Vector2(caja.position.x - 8.0, caja.get_center().y), debil, 0.85, 0.96)
+			if helado or electro or volcado:
+				var tag := "ATURDIDO" if volcado else ("RAYO" if electro else "HIELO")
+				var col_tag := Color("ef8a26") if volcado else (Color("f6e05e") if electro else Color("7ad7f0"))
+				var cx := roundf(p.x - _fuente.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x * 0.5)
+				_lienzo.draw_string(_fuente, Vector2(cx + 1, caja.position.y - 2).round(), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0, 0, 0, 0.8))
+				_lienzo.draw_string(_fuente, Vector2(cx, caja.position.y - 3).round(), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, col_tag)
+				top_y -= 13.0
+		if avisando:
+			_dibujar_aviso_ataque(Vector2(p.x, top_y - 8.0))
+
+
+func _info_enemigo(n2d: Node2D) -> Dictionary:
+	var scr: Script = n2d.get_script() as Script
+	if scr == null:
+		return {}
+	return INFO_ENEMIGO.get(scr.resource_path.get_file(), {})
+
+
+func _esta_telegrafiando(n2d: Node2D, info: Dictionary) -> bool:
+	if info.is_empty():
+		return false
+	var avisos: Array = info.get("aviso", [])
+	if avisos.is_empty():
+		return false
+	var val: Variant = n2d.get(String(info.get("prop", "fase")))
+	return val != null and int(val) in avisos
+
+
+func _dibujar_aviso_ataque(centro: Vector2) -> void:
+	var c := centro.round()
+	var pulso := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.025)
+	var col_fondo := Color("de6771").lerp(Color("ff3b4a"), pulso)
+	var r := 6.0 + pulso
+	_lienzo.draw_colored_polygon(PackedVector2Array([
+		c + Vector2(0, -r), c + Vector2(r, 0), c + Vector2(0, r), c + Vector2(-r, 0)
+	]), Color(0.08, 0.04, 0.08, 0.94))
+	_lienzo.draw_polyline(PackedVector2Array([
+		c + Vector2(0, -r), c + Vector2(r, 0), c + Vector2(0, r), c + Vector2(-r, 0), c + Vector2(0, -r)
+	]), col_fondo, 1.2)
+	_lienzo.draw_rect(Rect2(c + Vector2(-1, -3), Vector2(2, 4)), Color("fff3c4"))
+	_lienzo.draw_rect(Rect2(c + Vector2(-1, 2), Vector2(2, 2)), Color("fff3c4"))

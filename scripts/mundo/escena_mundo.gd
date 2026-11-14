@@ -95,7 +95,7 @@ func _ready() -> void:
 	Estado.marcar("visto/" + Estado.escena_actual)
 	_poner_sonido()
 	Estado.lugar = titulo
-	if Estado.extra.get("hd2d", false):
+	if Estado.extra.get("hd2d", false) or not OS.is_debug_build():
 		poner_hd2d.call_deferred(true)
 	Estado.guardar.call_deferred()
 	if Estado.llegada == "" or continuando:
@@ -137,6 +137,8 @@ func poner_hd2d(si: bool) -> void:
 
 
 func _unhandled_key_input(evento: InputEvent) -> void:
+	if not OS.is_debug_build():
+		return
 	var tecla := evento as InputEventKey
 	if tecla and tecla.pressed and not tecla.echo and tecla.physical_keycode == KEY_H:
 		poner_hd2d(_espejo == null)
