@@ -10,6 +10,7 @@ const RADIO := 20.0
 const RADIO_TINTA_VIVA := 30.0     # con la tinta viva de Wino, arde más lejos
 const TRAZA := 0.25
 const DURA := 0.95
+const ECO := 0.45
 const LLAMA := [Color("fff4c0"), Color("ffc860"), Color("ff8a2a"), Color("c84a14")]
 ## la runa (trazos en coordenadas de -1 a 1): un tronco, dos brazos que suben y un punto arriba
 const TRAZOS := [[Vector2(0, 1), Vector2(0, -0.8)], [Vector2(-0.7, -0.1), Vector2(0, 0.35), Vector2(0.7, -0.1)],
@@ -18,12 +19,13 @@ const TRAZOS := [[Vector2(0, 1), Vector2(0, -0.8)], [Vector2(-0.7, -0.1), Vector
 var radio := RADIO
 var _t := 0.0
 var _ardio := false
+var _eco := Artes.valor("sigilo_dura") > 0.0     # (Runa 2: la runa prende otra vez)
 var _chispas: Array[Dictionary] = []
 
 
 func _ready() -> void:
 	z_index = 2
-	radio = RADIO_TINTA_VIVA if Estado.tiene("tinta_viva") else RADIO
+	radio = (RADIO_TINTA_VIVA if Estado.tiene("tinta_viva") else RADIO) * (1.0 + Artes.valor("sigilo_radio"))
 	Sonido.efecto("pluma", -4.0, global_position, 0.1)
 
 
@@ -31,6 +33,9 @@ func _process(delta: float) -> void:
 	_t += delta
 	if _t >= TRAZA and not _ardio:
 		_ardio = true
+		_arder()
+	if _eco and _t >= TRAZA + ECO:
+		_eco = false
 		_arder()
 	for c in _chispas:
 		c["t"] += delta
@@ -57,6 +62,7 @@ func _arder() -> void:
 		var o := nodo as Node2D
 		if o and not o.is_in_group("maisha") and o.global_position.distance_to(centro) <= radio + 4.0:      # (a Maisha, su propio fuego no la quema)
 			o.call("recibir_danio", 1, centro, "fuego")
+	Artes.chispa_runa(self, radio, radio + 4.0, "fuego", Color("ff9a40"))
 	for i in 18:
 		var a := randf() * TAU
 		_chispas.append({"p": Vector2(cos(a), sin(a)) * randf_range(4, radio), "v": Vector2(randf_range(-14, 14), randf_range(-50, -20)), "t": 0.0})

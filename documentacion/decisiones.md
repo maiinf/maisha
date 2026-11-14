@@ -499,3 +499,12 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Jefe final: **El Corazón del Meteorito** (`documentacion/boceto_corazon_meteorito.png`) | **Opción A · La Semilla Estelar Encadenada**: núcleo poliédrico de ámbar vivo flotando dentro de tres aros giratorios de hierro meteórico encadenados al altar estelar. |
 | Mecánica de combate y clímax con **Mauti** | **3 Fases por poder + Mauti sostiene la luz estelar**: cada aro exterior cede ante un poder de la Tierra (*Sísmica -> Magnético -> Ámbar*) antes de golpear el núcleo con el Cetro. Al caer herido el corazón, **Mauti** acompaña a Maisha al descubrir que la estrella caída siglos atrás guardaba a la semilla mayor caída antes que Maisha; juntas energías calman el núcleo y completan el **Cetro del Nexo**, abriendo el último mundo. |
 | Modo HD-2D por defecto (`H`) | Iam confirma su prioridad: que todo funcione limpio al pulsar `H` sin fallos visuales en ninguna escena y que el juego pueda lanzarse directamente con el modo **HD-2D** activo. |
+
+### 2026-11-14 · El Arte de la Runa y el Cetro del Nexo, construidos (Claude)
+| Tema | Cómo ha quedado |
+| :--- | :--- |
+| Nivel II «el trazo dura más» | La runa prende una segunda vez 0,45 s después (cuenta dos veces en charcos y enemigos). El hielo no hace una segunda placa. |
+| Nivel IV «devuelve 6» | Devuelve 6 de Aliento siempre que se traza (más simple que mirar si tocó algo). |
+| Nivel VI «chispa elemental» | 1 de daño a los enemigos que quedan hasta 26 px fuera del círculo del Sigilo. |
+| Prendas de la Runa | En zonas propias: no quitan las de la Raíz ni las del Aliento. |
+| El Cetro del Nexo | Es el mismo cetro, transformado: la Semilla brota y lo abraza con la Pluma (así el Arte del Cetro sigue valiendo). Nace dormido (`nexo_0`) y subirá con el Arte de la Tierra. |

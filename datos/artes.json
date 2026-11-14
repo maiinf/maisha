@@ -5,7 +5,9 @@
 		"Se gasta meditando en un Claro de Calma: lo que cuesta cada nivel está en COSTES (scripts/globales/artes.gd): 2, 3, 5, 7, 10 y 14.",
 		"Cada nivel puede cambiar números del combate (efectos) y algunos añaden un rasgo visual a Maisha (rasgo).",
 		"Efectos: vida_maxima (+hojas), aliento_maximo (+), ritmo_aliento (multiplica), semilla_coste (-), semilla_alcance (+casillas),",
-		"  semilla_raices (+píxeles), semilla_mecha (-segundos), latido_coste (-), latido_radio (+píxeles), golpe_recarga (+Aliento por golpe)."
+		"  semilla_raices (+píxeles), semilla_mecha (-segundos), latido_coste (-), latido_radio (+píxeles), golpe_recarga (+Aliento por golpe).",
+		"  Arte de la Runa: sigilo_coste (-), sigilo_dura (segundo pulso), sigilo_radio (multiplica), sigilo_devuelve (+Aliento), sigilo_espera (-s), sigilo_chispa.",
+		"Una rama con «bloqueada» duerme hasta que se pone la marca «despierta_con»."
 	],
 	"esencia_por_marca": [
 		{
@@ -223,9 +225,60 @@
 			"id": "runa",
 			"nombre": "Arte de la Runa",
 			"color": "c9a7e8",
-			"bloqueada": "Despierta en Sigilia",
-			"texto": "Sigilos y elementos. Aún duerme: alguien en Sigilia sabrá despertarla.",
-			"niveles": []
+			"bloqueada": "Aún duerme: Kalamu, en Maandiko, sabrá despertarla",
+			"texto": "Los Sigilos y sus elementos. Hace que las runas de Maisha cuesten menos, lleguen más lejos y dejen más huella.",
+			"niveles": [
+				{
+					"nombre": "Muñequeras rúnicas",
+					"texto": "Trazar un Sigilo gasta menos Aliento (16 en vez de 20).",
+					"efectos": {
+						"sigilo_coste": 4
+					}
+				},
+				{
+					"nombre": "Pluma de escriba",
+					"texto": "El trazo dura más: la runa vuelve a prender un momento después (cuenta dos veces).",
+					"efectos": {
+						"sigilo_dura": 1
+					}
+				},
+				{
+					"nombre": "Estola del Índice",
+					"texto": "Una hoja más de Vida, y los Sigilos llegan un 25 % más lejos.",
+					"efectos": {
+						"vida_maxima": 1,
+						"sigilo_radio": 0.25
+					},
+					"grande": true,
+					"cristales": 2
+				},
+				{
+					"nombre": "Sello de lacre",
+					"texto": "Cada Sigilo, al prender, devuelve 6 de Aliento.",
+					"efectos": {
+						"sigilo_devuelve": 6
+					}
+				},
+				{
+					"nombre": "Manto escrito",
+					"texto": "Los Sigilos se recargan antes: se puede trazar uno cada 0,4 s en vez de cada 0,7 s.",
+					"efectos": {
+						"sigilo_espera": 0.3
+					}
+				},
+				{
+					"nombre": "Halo de los tres Sigilos",
+					"texto": "Otra hoja más de Vida, y cada Sigilo suelta una chispa de su elemento que daña a los enemigos de alrededor.",
+					"efectos": {
+						"vida_maxima": 1,
+						"sigilo_chispa": 1
+					},
+					"rasgo": "halo",
+					"grande": true,
+					"cristales": 4
+				}
+			],
+			"despierta_con": "arte_runa"
 		},
 		{
 			"id": "tierra",

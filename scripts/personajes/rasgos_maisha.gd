@@ -8,6 +8,7 @@ extends Node2D
 ##   remolino     (Aliento 4)  un remolino de aire bajo los pies
 ##   alitas       (Aliento 5)  alitas de brisa que aletean
 ##   alas         (Aliento 6)  alas grandes de brisa
+##   halo         (Runa 6)     tres chispas (fuego, hielo y rayo) que dan vueltas despacio sobre la cabeza
 ##   brisa        (Aliento 6)  el cuerpo se vuelve un poco transparente y deja una estela al moverse
 ## Todo es sutil a propósito y sin brillitos sueltos: con todo despierto, Maisha no debe verse cargada.
 ## El brote se coloca solo encima de la cabeza en cualquier animación: busca el píxel más alto del dibujo.
@@ -39,6 +40,7 @@ const ALA := [
 	["........ooO", "......ooOVO", "....ooOVVOo", "..oOVVOOoq.", ".oOVOOoq...", "oOVOoq.....", "OOoq.......", "oq........."],
 	["...........", ".........oO", "......ooOVO", "...ooOVVVOo", ".oOVVOOooq.", "oOVOOoqq...", "OVOoq......", "Ooq........"],
 ]
+const HALO := [Color("ff9a40"), Color("9fd8f0"), Color("ffe66a")]
 const VIENTO := Color(0.85, 0.96, 1.0)
 
 var _sprite: AnimatedSprite2D
@@ -161,6 +163,8 @@ func _draw() -> void:
 			_dibujar_alas(ALA, self)
 	if "brote" in _rasgos:
 		_dibujar_brote()
+	if "halo" in _rasgos:
+		_dibujar_halo()
 	if "flores" in _rasgos:
 		_dibujar_flores()
 
@@ -177,6 +181,17 @@ func _dibujar_brote() -> void:
 	_pixel(tallo + Vector2(0, -1), PALETA["G"])
 	_pixel(tallo + Vector2(0, -2), PALETA["G"])
 	_cuadricula(tallo + Vector2(-1, -5), CAPULLO, PALETA)
+
+
+## El halo de los tres Sigilos: una chispa de cada elemento, girando en un aro tumbado sobre la cabeza
+func _dibujar_halo() -> void:
+	var centro := _cima() + Vector2(0, 4)
+	for i in 3:
+		var a := _tiempo * 1.6 + i * TAU / 3.0
+		var p := (centro + Vector2(cos(a) * 10.0, sin(a) * 3.0)).round()
+		draw_rect(Rect2(p - Vector2(1, 1), Vector2(3, 3)), Color(HALO[i], 0.35))
+		draw_rect(Rect2(p, Vector2(2, 2)), HALO[i])
+		_pixel(p, Color.WHITE)
 
 
 ## Florecillas por el cuerpo (siguen el lado hacia el que mira)

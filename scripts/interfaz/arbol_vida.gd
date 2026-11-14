@@ -178,7 +178,7 @@ func _nivel_mirado() -> int:
 
 func _por_que_no() -> String:
 	var arte := _arte()
-	if arte.has("bloqueada"):
+	if Artes.dormida(arte):
 		return String(arte["bloqueada"])
 	var id := String(arte["id"])
 	if Artes.nivel(id) >= Artes.nivel_maximo(id):
@@ -309,7 +309,7 @@ func _dibujar_arbol(a: float) -> void:
 	for i in ORDEN.size():
 		var id: String = ORDEN[i]
 		var arte := Artes.buscar(id)
-		var bloqueada := arte.has("bloqueada")
+		var bloqueada := Artes.dormida(arte)
 		var color := Color(String(arte["color"]))
 		var elegida := i == _elegida
 		var nivel := Artes.nivel(id)
@@ -424,7 +424,7 @@ func _dibujar_detalle(a: float) -> void:
 	var x := caja.position.x + 10
 	_texto(String(arte["nombre"]), Vector2(x, caja.position.y + 18), Color(color, a))
 	PIEL.divisor(_lienzo, x, caja.end.x - 10, caja.position.y + 24, color, 0.55 * a)
-	if arte.has("bloqueada"):
+	if Artes.dormida(arte):
 		var y := _parrafo(String(arte["texto"]), Vector2(x, caja.position.y + 39), caja.size.x - 20, Color(APAGADO, a))
 		_texto(String(arte["bloqueada"]), Vector2(x, y + 6), Color(0.75, 0.72, 0.8, a))
 	else:

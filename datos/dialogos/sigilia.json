@@ -156,13 +156,36 @@
 					"La Tinta Quieta. Lo que toca, se queda sin nombre. Mis copistas están ahí fuera, de pie, sin acordarse de quiénes son.",
 					"Sus nombres estaban en las fichas del Índice. Cuando la tinta se heló, el viento se las llevó por los caminos: las Estanterías, el Canal, el Observatorio...",
 					"¿Que buscas un trozo de mapa? ¿El del norte? Ah... Shamba, el castor. Me escribía cartas, hace años.",
-					"Toma. Lo guardé por si alguien venía a buscarlo. Con él, tu mapa ya está entero."
+					"Toma. Lo guardé por si alguien venía a buscarlo. Con él, tu mapa ya está entero.",
+					"Espera, no te vayas. Enséñame esa mano. ...Ya decía yo. Tú trazas runas, ¿a que sí? Eso te lo ha enseñado Taa, que no sabe estarse callado.",
+					"Trazar, trazas. Pero lo haces como quien firma con prisa. Ven aquí, que eso en el Archivo sabíamos hacerlo bien.",
+					"Así. La muñeca suelta, y la runa la piensas entera antes de empezar. ...Eso es. ¿Notas el cosquilleo?",
+					"No te he dado nada, que conste. Lo llevabas dentro, dormido. Mira tu diario: al árbol le ha salido una rama nueva."
 				],
 				"marca": [
 					"kalamu_conocida",
-					"mapa_norte"
+					"mapa_norte",
+					"arte_runa"
 				],
-				"aviso": "Has conseguido el TROZO DEL NORTE del mapa: el mapa del mundo ya está entero"
+				"aviso": "Tienes el TROZO DEL NORTE del mapa · Ha despertado el ARTE DE LA RUNA (mira el diario)"
+			},
+			{
+				"si": [
+					"kalamu_conocida"
+				],
+				"no": [
+					"arte_runa"
+				],
+				"lineas": [
+					"Antes de que se me olvide —y mira que yo no olvido—: enséñame esa mano. Tú trazas runas, ¿a que sí?",
+					"Trazar, trazas. Pero lo haces como quien firma con prisa. Ven aquí, que eso en el Archivo sabíamos hacerlo bien.",
+					"Así. La muñeca suelta, y la runa la piensas entera antes de empezar. ...Eso es. ¿Notas el cosquilleo?",
+					"No te he dado nada, que conste. Lo llevabas dentro, dormido. Mira tu diario: al árbol le ha salido una rama nueva."
+				],
+				"marca": [
+					"arte_runa"
+				],
+				"aviso": "Ha despertado el ARTE DE LA RUNA (mira el diario)"
 			},
 			{
 				"lineas": [
@@ -1352,7 +1375,9 @@
 					"Las páginas ya no están negras. Tienen nombres. Cientos. Los leo sin querer y me suenan todos, aunque no conozca a ninguno.",
 					"La pluma dorada se suelta del lomo y cae. No hace ruido. Me cae en las manos como si supiera adónde iba.",
 					"Es la Pluma del Primer Nombre. Con ella se escribió el primero de todos. No pone cuál.",
-					"En el bolsillo, la Semilla del Primer Árbol se ha puesto tibia. Como si se hubieran reconocido."
+					"En el bolsillo, la Semilla del Primer Árbol se ha puesto tibia. Como si se hubieran reconocido.",
+					"La semilla se abre. Un brote fino trepa por mi cetro y lo abraza, con la pluma dentro. La madera se aclara hasta volverse piedra.",
+					"Arriba, donde estaba la gema, se queda flotando un cristal azul. No brilla. Parece que duerme."
 				]
 			}
 		]
@@ -1364,7 +1389,7 @@
 				"lineas": [
 					"¿Lo oyes? Arriba. Es agua. No... es tinta, corriendo por los canales. Se ha deshelado toda de golpe.",
 					"Yo creía que recordar era guardar. Y resulta que es esto: dejar la puerta abierta y fiarte de que alguien entre a leer.",
-					"Maisha. Esa pluma y esa semilla... Me parece que quieren ser una sola cosa. No aquí. Más adelante.",
+					"Maisha. Tu cetro... no es el de antes, ¿verdad? Está como dormido. Me parece que le falta algo. No aquí. Más adelante.",
 					"Vamos arriba. Quiero ver Maandiko con color."
 				]
 			}

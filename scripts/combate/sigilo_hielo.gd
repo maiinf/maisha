@@ -10,11 +10,14 @@ const PLACA := preload("res://scripts/mundo/sigilia/placa_hielo.gd")
 const RADIO := 20.0
 const TRAZA := 0.25
 const DURA := 0.95
+const ECO := 0.45
 const HIELO := [Color("f4fbff"), Color("bfe6f5"), Color("7fc2e6"), Color("3c78a8")]
 ## la runa: un rombo partido y tres puntas que salen, como un copo
 const TRAZOS := [[Vector2(0, -1), Vector2(0.65, 0), Vector2(0, 1), Vector2(-0.65, 0), Vector2(0, -1)],
 	[Vector2(0, -1), Vector2(0, 1)], [Vector2(-0.95, -0.55), Vector2(0.95, 0.55)], [Vector2(-0.95, 0.55), Vector2(0.95, -0.55)]]
 
+var radio := RADIO * (1.0 + Artes.valor("sigilo_radio"))
+var _eco := Artes.valor("sigilo_dura") > 0.0     # (Runa 2: la runa prende otra vez)
 var _t := 0.0
 var _helo := false
 var _copos: Array[Dictionary] = []
@@ -30,6 +33,9 @@ func _process(delta: float) -> void:
 	if _t >= TRAZA and not _helo:
 		_helo = true
 		_helar()
+	if _eco and _t >= TRAZA + ECO:
+		_eco = false
+		_helar(true)
 	for c in _copos:
 		c["t"] += delta
 		c["p"] += c["v"] * delta
@@ -38,19 +44,20 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
-func _helar() -> void:
+func _helar(eco := false) -> void:
 	Sonido.efecto("hielo_runa", 0.0, global_position)
 	var centro := global_position + Vector2(0, 6)      # (la runa va a la altura del pecho; el hielo, en el suelo)
 	var atrapo := false
 	for nodo in get_tree().get_nodes_in_group("congelables"):
-		if (nodo as Node2D).global_position.distance_to(centro) <= RADIO + 10.0:
+		if (nodo as Node2D).global_position.distance_to(centro) <= radio + 10.0:
 			atrapo = bool(nodo.call("congelar")) or atrapo
 	# (si ha atrapado algo en el hielo, ese témpano ya es el suyo: no hace además una placa)
-	if not atrapo:
+	if not atrapo and not eco:      # (el segundo pulso de la Runa 2 vuelve a helar a quien pille, pero no hace otra placa)
 		PLACA.helar_en(get_parent(), centro)
 	for i in 16:
 		var a := randf() * TAU
-		_copos.append({"p": Vector2(cos(a), sin(a) * 0.6) * randf_range(4, RADIO), "v": Vector2(randf_range(-8, 8), randf_range(-26, -10)), "t": 0.0})
+		_copos.append({"p": Vector2(cos(a), sin(a) * 0.6) * randf_range(4, radio), "v": Vector2(randf_range(-8, 8), randf_range(-26, -10)), "t": 0.0})
+	Artes.chispa_runa(self, radio, -1.0, "hielo", Color("9fd8f0"))
 	preload("res://scripts/mundo/relieve.gd").destello(get_parent(), position, Color("9fd8f0"), 0.7, 0.8, 0.35)
 
 
@@ -78,7 +85,7 @@ func _draw() -> void:
 		var f := 1.0 - clampf((_t - TRAZA) / 0.5, 0.0, 1.0)
 		for k in 16:
 			var ang := k * TAU / 16.0
-			var base := Vector2(cos(ang), sin(ang) * 0.6) * RADIO * (0.5 + 0.5 * (1.0 - f)) + Vector2(0, 6)
+			var base := Vector2(cos(ang), sin(ang) * 0.6) * radio * (0.5 + 0.5 * (1.0 - f)) + Vector2(0, 6)
 			var col: Color = HIELO[k % 4]
 			draw_rect(Rect2(base.floor() + Vector2(-1, 0), Vector2(3, 1)), Color(col, f))
 			draw_rect(Rect2(base.floor() + Vector2(0, -1), Vector2(1, 3)), Color(col, f))

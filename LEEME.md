@@ -956,7 +956,7 @@ Escena `escenas/mundo/maandiko.tscn` (`scripts/mundo/maandiko.gd`), detrás de l
 | La tienda de Wino | Abre al deshelar la primera calle (`calle_deshelada`). Es la misma tienda que la de Tawi (`tienda_tawi.gd`, con `tendero = "wino"`; los artículos llevan `"tienda": "wino"`), con su puesto por dentro y Wino grande con 4 gestos (`herramientas/pintar_tienda_wino.py`: `tienda_wino_fondo.png` y `tienda_wino.png`; captura en `documentacion/tienda_wino.png`). Vende la **Pluma de garza nival** (el sigilo gasta 12 de Aliento en vez de 20), la **Tinta viva** (la runa arde a 30 px en vez de 20) y las **Raquetas de nieve** (en la nieve honda se anda al 80 % en vez del 55 %) |
 | Los faroles de Taa | Los faroles de las calles son faroles rúnicos apagados (`ƒ`, 10). Con todos encendidos (`faroles_maandiko`), Taa lo agradece y se ganan **3 Cristales del Nexo** |
 
-Falta: el Arte de la Runa y el Cetro del Nexo. Los tres caminos y la Sección Prohibida (el final de Sigilia) están hechos.
+Los tres caminos, la Sección Prohibida (el final de Sigilia), el Arte de la Runa y el Cetro del Nexo están hechos.
 
 ## Las Estanterías Colgantes (la biblioteca, las escaleras rodantes y el Bibliotecario Hueco)
 
@@ -1031,9 +1031,28 @@ Escena `escenas/mundo/seccion_prohibida.tscn` (`scripts/mundo/seccion_prohibida.
 | El Grimorio de Tinta, el jefe final | `scripts/enemigos/grimorio_tinta.gd` (`grimorio.png`, 5 de 128×104; `mano.png`). Opción A elegida por Iam. Despierta al entrar en la Rotonda (`grimorio_encuentro`; música `jefe_grimorio`). Pasa las hojas y abre **capítulos** de 11 s (fuego → hielo → rayo), con su runa sobre las páginas: **fuego**, un círculo grande que estalla bajo Maisha; **hielo**, una franja que cruza la Rotonda; **rayo**, tres rayos pequeños y rápidos. Cada 5 s, una **mano de tinta** sale del suelo y da un manotazo. El capítulo se **rasga** en el pedestal que **late**: fuego con hielo, hielo con rayo, rayo con fuego. Rasgado, cae **aturdido** (5 s o 3 golpes): cetro 1, semillas 2 (se le alcanza también por las páginas, con `parte_jefe.gd`). 12 de vida. Con la mitad (**furia**): ataca más deprisa y saca Sombras de Renglón. Si Maisha cae, se levanta a la entrada de la Rotonda |
 | El cierre | Vencido (`grimorio_vencido`): entran Kalamu y Mauti, tres conversaciones (`sigilia_final_kalamu`, `_indice`, `_mauti`), la **Pluma del Primer Nombre** (objeto `pluma_primer_nombre`, marca `sigilia_libre`) y la pantalla de final (`fin_mundo.gd`, que ahora admite su propia cuenta y música) con `24_sigilia_libre.png`: «Sigilia recuerda» |
 | Arreglo de paso | En las escenas que no se ocupaban de la caída de Maisha (todas las de Sigilia), **se quedaba caída para siempre**. Ahora `escena_mundo.gd` la levanta donde entró si la escena no dice otra cosa |
-| Falta | Que en Maandiko se vea la tinta correr dorada tras el final (ahora solo se cuenta); el Cetro del Nexo y el Arte de la Runa (lo siguiente); sonidos propios (pedidos a Gemini) |
+| Falta | Que en Maandiko se vea la tinta correr dorada tras el final (ahora solo se cuenta); sonidos propios (pedidos a Gemini) |
 | Los dibujos | `herramientas/pintar_seccion_prohibida.py` → `arte/mundos/sigilia/seccion/`; el suelo, `pintar_seccion` de `pintar_suelo.py` (mármol morado en damero y estanterías de libros encadenados) |
 | Prueba | `pruebas/prueba_seccion_prohibida.gd` |
+
+## El Arte de la Runa y el Cetro del Nexo
+
+La cuarta rama del árbol del diario (`documentacion/runa_diario.png`, `documentacion/runa_prendas.png`).
+
+| Qué | Cómo |
+| --- | --- |
+| Despertar | **Kalamu**, en Maandiko, al darle el mapa (marca `arte_runa`; si la partida ya la conocía, se lo dice la próxima vez que hablen). Hasta entonces la rama duerme: `Artes.dormida(arte)` mira `bloqueada` + `despierta_con` en `datos/artes.json` |
+| En el diario | La rama sale abajo a la izquierda, morada (`arbol_rama_runa.png`, `NODOS_ARBOL["runa"]` en `mochila.gd` = `RUNA` en `pintar_interfaz.py`). Su raíz es la habilidad **Sigilo (U)** |
+| I · Muñequeras rúnicas | El Sigilo cuesta 16 de Aliento en vez de 20 (`sigilo_coste`) |
+| II · Pluma de escriba | El trazo dura más: la runa prende otra vez 0,45 s después (`sigilo_dura`; el hielo vuelve a helar pero no hace otra placa) |
+| III ✦ Estola del Índice | +1 hoja de Vida y +25 % de radio (`sigilo_radio`) · 2 Cristales |
+| IV · Sello de lacre | Cada Sigilo devuelve 6 de Aliento (`sigilo_devuelve`) |
+| V · Manto escrito | Un Sigilo cada 0,4 s en vez de 0,7 s (`sigilo_espera`) |
+| VI ✦ Halo de los tres Sigilos | +1 hoja de Vida y una chispa del elemento que daña a los enemigos de alrededor (hasta 26 px fuera del círculo: `Artes.chispa_runa`) · 4 Cristales |
+| Lo que se ve | Prendas en zonas propias (`runa_brazos`, `runa_cabeza`, `runa_torso`, `runa_sello`, `runa_espalda`: conviven con las de la Raíz y el Aliento) en `dibujar_prendas.py`; el halo, en `rasgos_maisha.gd` |
+| Cetro del Nexo | Nace en el cierre de Sigilia (marca `cetro_nexo`): la Semilla brota y abraza el cetro con la Pluma. Dibujos `nexo_0`…`nexo_6` (`cetro_nexo(n)` en `dibujar_prendas.py`); el nivel será el del Arte de la Tierra (Asterhaul). Los efectos del Arte del Cetro siguen igual |
+| Prueba | `prueba_artes` (apartado «El Arte de la Runa y el Cetro del Nexo») |
+| Falta | Que el Sello de lacre solo devuelva Aliento si el Sigilo toca algo (ahora devuelve siempre); un sonido propio para la chispa del halo |
 
 ## Las construcciones, al nivel de la casa del castor
 

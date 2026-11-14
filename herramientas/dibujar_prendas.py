@@ -45,6 +45,16 @@ COLORES = {
     "B": "5AB0C8",  # brisa
     "v": "9FD8E8",  # brisa clara
     "V": "E0F6FA",  # brisa con luz
+    # Runa (lo que da el Arte de la Runa: tela morada de escriba, hilo de oro, pluma blanca, lacre)
+    "u": "2A1848",  # morado oscuro (contorno)
+    "U": "6B3FA0",  # morado
+    "j": "9A6FD0",  # morado con luz
+    "a": "C89A30",  # oro
+    "A": "F2D27A",  # oro con luz
+    "z": "F4F0FF",  # pluma
+    "Z": "B8B0D0",  # pluma en sombra
+    "e": "7A1A1E",  # lacre oscuro
+    "E": "D0453A",  # lacre
     # flor
     "f": "FFD7E0",  # pétalo
     "F": "F9D36A",  # centro
@@ -314,6 +324,147 @@ def cetro_nivel(n):
 
 
 # ---------------------------------------------------------------------------
+# EL CETRO DEL NEXO (nexo_0 ... nexo_6, 16×21, el mismo agarre que los del Arte del Cetro). Nace al final de Sigilia
+# y crece en Asterhaul: 0 piedra rúnica dormida · 1 una runa · 2 dos runas · 3 ✦ HORQUILLA ASTRAL (el cristal flota)
+# · 4 oro · 5 cristal solar · 6 ✦ NEXO (dorado, con el brote de la Semilla y la pluma del Primer Nombre)
+# ---------------------------------------------------------------------------
+def cetro_nexo(n):
+    img = Image.new("RGBA", (16, 21), (0, 0, 0, 0))
+    def px(x, y, c):
+        if 0 <= x < 16 and 0 <= y < 21:
+            img.putpixel((x, y), tuple(int(c[i:i + 2], 16) for i in (0, 2, 4)) + (255,))
+    s = ["1E2233", "3A4058", "5A6280", "8A93B0"]
+    oro = ["4A3008", "9A7420", "E8C060", "FFF0B0"]
+    for y in range(8, 21):                                           # la vara: piedra fina, lisa
+        px(6, y, s[0]); px(7, y, s[3] if y % 4 == 1 else s[2]); px(8, y, s[1]); px(9, y, s[0])
+        if n >= 6 and y % 3 == 0:                                    # el Nexo: franjas de oro
+            px(7, y, oro[3]); px(8, y, oro[2])
+    px(7, 20, s[0]); px(8, 20, s[0])
+    runa = "F2D27A" if n >= 4 else "7FE0FF"
+    if n >= 1:
+        px(7, 15, runa); px(8, 14, runa)
+    if n >= 2:
+        px(7, 18, runa); px(8, 17, runa)
+    if n >= 4:                                                       # un aro de oro bajo la cabeza
+        for x in range(6, 10):
+            px(x, 10, oro[2]); px(x, 11, oro[1])
+        px(7, 10, oro[3])
+    sube = 1 if n >= 3 else 0                                        # desde la horquilla, el cristal flota
+    if n >= 3:
+        m = oro if n >= 6 else s
+        for (x, y) in ((5, 8), (4, 7), (4, 6), (4, 5), (10, 8), (11, 7), (11, 6), (11, 5)):
+            px(x, y, m[2])
+        for (x, y) in ((3, 4), (12, 4)):
+            px(x, y, oro[2] if n >= 4 else m[3])
+        for (x, y) in ((5, 9), (10, 9), (3, 5), (12, 5)):
+            px(x, y, m[0])
+        px(7, 7, "D0F0FF" if n < 5 else "FFF0B0"); px(8, 7, "7FE0FF" if n < 5 else "F9D77A")     # la luz que lo sostiene
+    else:
+        for x in range(6, 10):
+            px(x, 7, s[1])
+    g = ["8A6A10", "F9D77A", "FFFFFF"] if n >= 5 else ["1A3A6A", "4AA8F0", "D0F0FF"]
+    for (x, y) in ((7, 3), (8, 3), (6, 4), (9, 4), (6, 5), (9, 5), (7, 6), (8, 6)):
+        px(x, y - sube, g[0])
+    for (x, y) in ((7, 4), (8, 4), (7, 5), (8, 5)):
+        px(x, y - sube, g[1])
+    px(7, 4 - sube, g[2])
+    if n >= 5:                                                       # los rayos del cristal solar
+        for (x, y) in ((7, 0), (8, 0), (5, 1), (10, 1)):
+            px(x, y, "F9D77A")
+    if n >= 6:                                                       # el brote de la Semilla y la pluma dorada
+        for (x, y, c) in ((2, 3, "3E9A35"), (1, 2, "6FCF4F"), (2, 2, "6FCF4F"), (1, 1, "B8E08A"),
+                          (13, 3, "C89A30"), (14, 2, "F2D27A"), (13, 2, "F4F0FF"), (14, 1, "F4F0FF"), (15, 0, "F2D27A")):
+            px(x, y, c)
+    return img
+
+
+# ---------------------------------------------------------------------------
+# PRENDAS DE LA RUNA (las da el Arte de la Runa; van en zonas suyas: conviven con las raíces, la bufanda y la capa)
+# ---------------------------------------------------------------------------
+MUNEQUERA = [      # Runa 1: una cinta morada con una runa de oro en cada muñeca
+    "UjU",
+    "UAU",
+]
+PLUMA = [          # Runa 2: una pluma de escriba prendida tras la cabeza
+    "zz...",
+    "zZz..",
+    ".zZz.",
+    "..zZu",
+    "...uu",
+]
+PLUMA_ESPEJO = [f[::-1] for f in PLUMA]
+ESTOLA_ABAJO = [   # Runa 3: la Estola del Índice; dos tiras que caen por el pecho (el corazón queda a la vista)
+    "uUUUUUUUUu",
+    "uUjUuuUjUu",
+    ".UjU..UjU.",
+    ".UjU..UjU.",
+    ".UAU..UAU.",
+    ".uuu..uuu.",
+]
+ESTOLA_ARRIBA = [  # de espaldas: la banda sobre los hombros, que acaba en pico
+    "uUUUUUUUUu",
+    "uUjUUUUjUu",
+    ".uuUAAUuu.",
+    "...uUUu...",
+    "....uu....",
+]
+ESTOLA_LADO = [
+    ".uUUUUUu",
+    "uUjUUjUu",
+    ".uu.UjU.",
+    "....UjU.",
+    "....UAU.",
+    "....uuu.",
+]
+SELLO = [          # Runa 4: un sello de lacre cierra la estola
+    ".eE.",
+    "eEAe",
+    ".ee.",
+]
+SELLO_LADO = [
+    "eE",
+    "Ee",
+]
+MANTO_ABAJO = [    # Runa 5: el manto escrito; de frente solo asoma por los lados y entre las piernas
+    "uUu........uUu",
+    "uUUu......uUUu",
+    "uUAu......uAUu",
+    "uUUu......uUUu",
+    "uUAu......uAUu",
+    "uUUu......uUUu",
+    "uUUu......uUUu",
+    "ujUUUUUUUUUUju",
+    "ujUAAUAAAUAUju",
+    "ujjUUUUUUUUjju",
+    "uuuuuuuuuuuuuu",
+]
+MANTO_ARRIBA = [   # de espaldas se lee: renglones de oro
+    ".uuuuuuuuuu.",
+    ".ujUUUUUUju.",
+    ".uUAAUAAAUu.",
+    ".uUUUUUUUUu.",
+    ".uUAAAUAAUu.",
+    ".uUUUUUUUUu.",
+    "uUUAAUAAAUUu",
+    "uUUUUUUUUUUu",
+    "uUjAAAUAAjUu",
+    "uuuuuuuuuuuu",
+]
+MANTO_LADO = [
+    "..uuuu",
+    ".ujUUU",
+    ".ujAUU",
+    ".ujUUU",
+    "ujUAUU",
+    "ujUUUU",
+    "ujUAUU",
+    "ujUUUU",
+    "ujjUUU",
+    "uuuuuu",
+]
+
+
+# ---------------------------------------------------------------------------
 # PRENDAS GRANDES DE LA RAÍZ (las da el Arte de la Raíz)
 # ---------------------------------------------------------------------------
 # RAÍCES EN LAS PIERNAS (zona: piernas · Raíz 1; con hojas, Raíz 2). Una raíz enroscada en cada pierna.
@@ -447,6 +598,53 @@ PRENDAS = {
         "piezas": {d: [(f"cetro_{n}", None, "mano", AGARRE_CETRO_N[d], True)] for d in ("abajo", "arriba", "lado")},
         "de_artes": True,
     } for n in range(0, 7)},
+    **{f"nexo_{n}": {
+        "nombre": f"Cetro del Nexo ({n})",
+        "zona": "arma",
+        "arte": "tierra",
+        "piezas": {d: [(f"nexo_{n}", None, "mano", AGARRE_CETRO_N[d], True)] for d in ("abajo", "arriba", "lado")},
+        "de_artes": True,
+    } for n in range(0, 7)},
+    "munequeras_runicas": {
+        "de_artes": True, "nombre": "Muñequeras rúnicas", "zona": "runa_brazos", "arte": "runa",
+        "piezas": {
+            "abajo": [("munequera_runica", MUNEQUERA, "brazo_izq", (0, 3), True), ("munequera_runica", MUNEQUERA, "brazo_der", (1, 3), True)],
+            "arriba": [("munequera_runica", MUNEQUERA, "brazo_izq", (0, 3), True), ("munequera_runica", MUNEQUERA, "brazo_der", (1, 3), True)],
+            "lado": [("munequera_runica", MUNEQUERA, "brazo", (0, 2), True)],
+        },
+    },
+    "pluma_escriba": {
+        "de_artes": True, "nombre": "Pluma de escriba", "zona": "runa_cabeza", "arte": "runa",
+        "piezas": {
+            "abajo": [("pluma_escriba", PLUMA, "cabeza", (-2, -3), True)],
+            "arriba": [("pluma_escriba_espejo", PLUMA_ESPEJO, "cabeza", (13, -3), True)],
+            "lado": [("pluma_escriba", PLUMA, "cabeza", (-2, -3), True)],
+        },
+    },
+    "estola_indice": {
+        "de_artes": True, "nombre": "Estola del Índice", "zona": "runa_torso", "arte": "runa",
+        "piezas": {
+            "abajo": [("estola_indice_abajo", ESTOLA_ABAJO, "cuerpo", (0, -1), True)],
+            "arriba": [("estola_indice_arriba", ESTOLA_ARRIBA, "cuerpo", (0, -1), True)],
+            "lado": [("estola_indice_lado", ESTOLA_LADO, "cuerpo", (0, -1), True)],
+        },
+    },
+    "sello_lacre": {
+        "de_artes": True, "nombre": "Sello de lacre", "zona": "runa_sello", "arte": "runa",
+        "piezas": {
+            "abajo": [("sello_lacre", SELLO, "cuerpo", (3, -1), True)],
+            "arriba": [],
+            "lado": [("sello_lacre_lado", SELLO_LADO, "cuerpo", (6, 0), True)],
+        },
+    },
+    "manto_escrito": {
+        "de_artes": True, "nombre": "Manto escrito", "zona": "runa_espalda", "arte": "runa",
+        "piezas": {
+            "abajo": [("manto_escrito_abajo", MANTO_ABAJO, "cuerpo", (-2, 0), False)],
+            "arriba": [("manto_escrito_arriba", MANTO_ARRIBA, "cuerpo", (-1, 1), True)],
+            "lado": [("manto_escrito_lado", MANTO_LADO, "cuerpo", (-3, 1), False)],
+        },
+    },
     "raices_piernas": {
         "de_artes": True,
         "nombre": "Raíces en las piernas",
@@ -629,6 +827,8 @@ if __name__ == "__main__":
                     a_imagen(filas).save(os.path.join(carpeta, archivo + ".png"))
                 elif archivo.startswith("cetro_") and archivo[6:].isdigit():
                     cetro_nivel(int(archivo[6:])).save(os.path.join(carpeta, archivo + ".png"))
+                elif archivo.startswith("nexo_"):
+                    cetro_nexo(int(archivo[5:])).save(os.path.join(carpeta, archivo + ".png"))
                 lista.append({
                     "fotogramas": fotogramas,
                     "textura": f"res://arte/personajes/maisha/prendas/{archivo}.png",

@@ -328,7 +328,35 @@ RAMAS = {
     "cetro": [(320, 214), (320, 186), (320, 160), (320, 134), (320, 108), (320, 84), (320, 60)],
     "aliento": [(378, 236), (420, 222), (458, 204), (490, 180), (516, 152), (536, 120), (548, 84)],
 }
-DORMIDAS = {"runa": [(262, 236), (180, 250), (100, 248), (64, 236)], "tierra": [(378, 236), (460, 250), (540, 248), (576, 236)]}
+## La Runa (NODOS_ARBOL["runa"] en mochila.gd): dormida es una ramita plateada; al despertarla Kalamu, se pinta
+## encima arbol_rama_runa.png. La Tierra, su espejo, sigue dormida.
+RUNA = [(228, 246), (192, 250), (156, 248), (122, 240), (92, 224), (70, 200), (58, 172)]
+DORMIDAS = {"runa": [(262, 236)] + RUNA, "tierra": [(378, 236)] + [(640 - x, y) for (x, y) in RUNA]}
+
+
+def arbol_rama_runa():
+    """La rama de la Runa despierta (640×360, se pinta encima de arbol_ramas.png): madera clara con vetas moradas
+    y hojitas lilas"""
+    lz = Lienzo(640, 360, s=2, semilla=311)
+    lz.alfa[:] = 0
+    corteza = vetas(lz, 0.5, 9, False, 312)
+    pts = [(262, 236)] + RUNA
+    madera = lz.trazo(pts, 9.0, 3.0)
+    lz.sumar_luz(lz.desenfocar(madera, 10), "#7a4ab0", 0.3)
+    lz.sombrear(madera, ["#2a1a08", "#4a3010", "#6e4a18", "#946a24", "#b88a34", "#d6b46e"], 3, LUZ, textura=corteza, fuerza_tex=0.55)
+    vetas_luz = (np.abs(np.sin(lz.x * 0.9 + lz.ruido(6, 2, semilla=313) * 8)) < 0.12) * madera
+    lz.sumar_luz(vetas_luz, "#c9a7e8", 0.6)
+    rng = np.random.default_rng(314)
+    hojas = np.zeros((lz.H, lz.W))
+    for (a, b) in zip(RUNA, RUNA[1:]):
+        for k in range(2):
+            t = rng.random()
+            x, y = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
+            lado = 1 if rng.random() < 0.5 else -1
+            hojas = np.maximum(hojas, lz.elipse(x + 2, y + lado * 7, 3.2, 1.4, 30 * lado))
+    lz.pintar(hojas, rampa(["#4a2a7a", "#7a4ab0", "#c9a7e8"], np.clip(lz.ruido(1, 1, semilla=315), 0, 1)), 0.9)
+    lz.sumar_luz(lz.desenfocar(hojas, 2), "#c9a7e8", 0.2)
+    return lz.sprite(tramado=0.006, umbral=0.3)
 
 
 def arbol_ramas():
@@ -532,6 +560,7 @@ def main():
         Image.fromarray(nueve(n), "RGBA").save(os.path.join(SALIDA, n + ".png"))
     Image.fromarray(sello(), "RGBA").save(os.path.join(SALIDA, "sello.png"))
     Image.fromarray(arbol_ramas(), "RGBA").save(os.path.join(SALIDA, "arbol_ramas.png"))
+    Image.fromarray(arbol_rama_runa(), "RGBA").save(os.path.join(SALIDA, "arbol_rama_runa.png"))
     Image.fromarray(bolsa_fondo(True), "RGBA").save(os.path.join(SALIDA, "bolsa_fondo.png"))
     Image.fromarray(bolsa_fondo(False), "RGBA").save(os.path.join(SALIDA, "bolsa_fondo_pleno.png"))
     tiras = [mochila(k) for k in range(6)]

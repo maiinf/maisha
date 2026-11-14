@@ -280,17 +280,18 @@ func cambiar_sigilo() -> bool:
 ## enseña Taa en el Paso de la Escarcha); la de hielo congela y endurece la tinta (Mfereji, en el Canal de Tinta);
 ## la de rayo carga bobinas, diapasones y autómatas (Nyota, en el Observatorio de la Aurora).
 func sigilo() -> bool:
-	var coste := SIGILO_COSTE * (0.6 if Estado.tiene("pluma_ligera") else 1.0)     # (la pluma de Wino: gasta menos)
+	var coste := (SIGILO_COSTE - Artes.valor("sigilo_coste")) * (0.6 if Estado.tiene("pluma_ligera") else 1.0)     # (la pluma de Wino: gasta menos)
 	var elegido := sigilo_elegido()
 	if not Estado.tiene("sigilo_" + elegido) or _espera_sigilo > 0.0 or agotada or aliento < coste:
 		return false
 	aliento -= coste
-	_espera_sigilo = SIGILO_ESPERA
+	_espera_sigilo = SIGILO_ESPERA - Artes.valor("sigilo_espera")
 	var efecto: Node2D = ({"hielo": SIGILO_HIELO, "rayo": SIGILO_RAYO}.get(elegido, SIGILO_FUEGO) as GDScript).new()
 	efecto.position = global_position + direccion_mirada() * 18.0 + Vector2(0, -6)
 	get_parent().add_child(efecto)
 	if aliento < 1.0:
 		_agotarse()
+	aliento = minf(aliento_maximo(), aliento + Artes.valor("sigilo_devuelve"))     # (Runa 4: el sello de lacre)
 	return true
 
 

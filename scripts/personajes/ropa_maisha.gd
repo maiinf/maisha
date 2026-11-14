@@ -13,7 +13,9 @@ extends Node2D
 
 signal ropa_cambiada
 
-const ZONAS := ["cabeza", "cara", "espalda", "piernas", "torso", "brazos", "hombros", "aura", "arma"]
+## (las «runa_*» son las del Arte de la Runa: van aparte para convivir con las raíces, la bufanda y la capa)
+const ZONAS := ["cabeza", "cara", "espalda", "piernas", "torso", "brazos", "hombros", "aura", "arma",
+	"runa_espalda", "runa_torso", "runa_sello", "runa_brazos", "runa_cabeza"]
 const RITMO_PRENDAS := 2.5        # fotogramas por segundo de las prendas animadas (la capa de hojas se mece)
 const ANCHO_FOTOGRAMA := 24
 const ALTO_FOTOGRAMA := 32

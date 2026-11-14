@@ -105,6 +105,7 @@ const ALTO_FILA := 26
 const ARBOL_RAMAS := preload("res://arte/interfaz/diario/arbol_ramas.png")
 const NODOS_ICONOS := preload("res://arte/interfaz/diario/nodos.png")
 const RAMAS_ARBOL := ["raiz", "cetro", "aliento"]
+const ARBOL_RAMA_RUNA := preload("res://arte/interfaz/diario/arbol_rama_runa.png")
 ## El árbol se dibuja algo más pequeño y a la derecha, para dejar sitio a Maisha (NODOS_ARBOL va en las medidas del dibujo)
 const ARBOL_ESCALA := 0.8
 const ARBOL_DESPL := Vector2(142, 34)
@@ -119,14 +120,20 @@ const RASGOS_MAISHA := preload("res://scripts/personajes/rasgos_maisha.gd")
 const NODOS_ARBOL := {
 	"raiz": [Vector2(262, 236), Vector2(220, 222), Vector2(182, 204), Vector2(150, 180), Vector2(124, 152), Vector2(104, 120), Vector2(92, 84)],
 	"cetro": [Vector2(320, 214), Vector2(320, 186), Vector2(320, 160), Vector2(320, 134), Vector2(320, 108), Vector2(320, 84), Vector2(320, 60)],
+	"runa": [Vector2(228, 246), Vector2(192, 250), Vector2(156, 248), Vector2(122, 240), Vector2(92, 224), Vector2(70, 200), Vector2(58, 172)],
 	"aliento": [Vector2(378, 236), Vector2(420, 222), Vector2(458, 204), Vector2(490, 180), Vector2(516, 152), Vector2(536, 120), Vector2(548, 84)],
 }
-const COLOR_RAMA := {"raiz": Color("8fe06a"), "cetro": Color("f9c46a"), "aliento": Color("8fd8f0")}
-const NOMBRE_RAMA := {"raiz": "RAÍZ", "cetro": "CETRO", "aliento": "ALIENTO"}
-const ICONO_RAMA := {"raiz": 0, "cetro": 1, "aliento": 2}
+const COLOR_RAMA := {"runa": Color("c9a7e8"), "raiz": Color("8fe06a"), "cetro": Color("f9c46a"), "aliento": Color("8fd8f0")}
+const NOMBRE_RAMA := {"runa": "RUNA", "raiz": "RAÍZ", "cetro": "CETRO", "aliento": "ALIENTO"}
+const ICONO_RAMA := {"runa": 3, "raiz": 0, "cetro": 1, "aliento": 2}
 ## la habilidad básica de cada rama (la raíz de la rama): índice en HABILIDADES
-const BASICA_RAMA := {"raiz": 1, "cetro": 0, "aliento": 2}
+const BASICA_RAMA := {"runa": 7, "raiz": 1, "cetro": 0, "aliento": 2}
 const MANTENER := 0.8            # segundos manteniendo Acción para despertar un nodo
+
+
+## Las ramas del árbol, de izquierda a derecha (la Runa aparece cuando Kalamu la despierta)
+func _ramas() -> Array:
+	return RAMAS_ARBOL if Artes.dormida(Artes.buscar("runa")) else ["runa"] + RAMAS_ARBOL
 ## Objetos clave: marca -> [nombre, icono, descripción]
 const CLAVE := {
 	"cetro_recibido": ["Cetro de Raíz", 4, "El cetro de la familia de Mzee Shamba. Despierta en manos de quien trae la vida de vuelta."],
@@ -137,6 +144,7 @@ const CLAVE := {
 	"semilla_primer_arbol": ["Semilla del Primer Árbol", 26, "Una semilla grande y tibia que cayó de la copa dorada del Primer Árbol. «Plántala cuando llegue el momento: de ella saldrá algo que te hará falta.»"],
 	"cuaderno_ecos": ["Cuaderno de ecos", 18, "El regalo de Msafiri. Cada eco perdido que escuchas queda apuntado aquí. Juntos cuentan qué le pasó al Primer Árbol."],
 	"mapa_norte": ["Trozo del norte del mapa", 3, "El trozo que le faltaba al mapa de Mzee Shamba: Sigilia y lo que hay más allá. Kalamu lo guardaba en el Archivo, por si alguien venía a buscarlo."],
+	"cetro_nexo": ["Cetro del Nexo", 4, "Al final de Sigilia, la Semilla del Primer Árbol brotó y abrazó tu cetro junto a la Pluma del Primer Nombre. Ahora es de piedra clara, con un cristal azul dormido. Le falta algo para despertar."],
 	"mapa_raiz": ["Mapa de Tawi", 3, "Tawi lo dibujó volando por encima de Raíz: en tu mapa ya se ven todos los lugares (los caminos hay que andarlos)."],
 }
 ## Habilidades: [nombre, tecla, marca que la desbloquea, descripción]
@@ -148,6 +156,7 @@ const HABILIDADES := [
 	["Torre del vigía", "", "vigia", "Desde el tejado de Pino, los secretos de los prados se ven desde lejos."],
 	["Escudo de corteza", "J (mantener)", "escudo_corteza", "Mantén J: Maisha levanta el escudo de corteza del Primer Árbol. Para todo lo que venga de frente (espinas, mordiscos, latigazos), pero con él anda despacio y no golpea."],
 	["Tomar sopa", "F", "receta_sopa", "Si llevas sopa de Juncia, devuelve 3 hojas de vida al momento, también en plena pelea."],
+	["Sigilo", "U", "sigilo_fuego", "Gasta Aliento. Traza delante la runa elegida (con R se cambia): el fuego enciende y derrite, el hielo congela, el rayo carga."],
 ]
 ## Lazos: [id, nombre, marca para conocerle, descripción]
 const LAZOS := [
@@ -482,7 +491,7 @@ func _lista() -> Array:
 			if Estado.tiene("bibi_meditar"):
 				for arte in Artes.lista:
 					var id := String(arte["id"])
-					if arte.has("bloqueada"):
+					if Artes.dormida(arte):
 						continue
 					var n := Artes.nivel(id)
 					var texto := String(arte["texto"])
@@ -1136,7 +1145,7 @@ func _mover_arbol(delta: float) -> void:
 	_destello_nodo = maxf(0.0, _destello_nodo - delta)
 	var antes := Vector2i(_rama, _nodo)
 	if Input.is_action_just_pressed("mover_derecha") or Input.is_action_just_pressed("ui_right"):
-		if _rama < RAMAS_ARBOL.size() - 1:
+		if _rama < _ramas().size() - 1:
 			_rama += 1
 		else:
 			_ir_a_pestana((pestana + 1) % PESTANAS.size())
@@ -1148,7 +1157,7 @@ func _mover_arbol(delta: float) -> void:
 			_ir_a_pestana((pestana - 1 + PESTANAS.size()) % PESTANAS.size())
 			return
 	if Input.is_action_just_pressed("mover_arriba") or Input.is_action_just_pressed("ui_up"):
-		_nodo = mini(_nodo + 1, NODOS_ARBOL[RAMAS_ARBOL[_rama]].size() - 1)
+		_nodo = mini(_nodo + 1, NODOS_ARBOL[_ramas()[_rama]].size() - 1)
 	elif Input.is_action_just_pressed("mover_abajo") or Input.is_action_just_pressed("ui_down"):
 		_nodo = maxi(_nodo - 1, 0)
 	if Vector2i(_rama, _nodo) != antes:
@@ -1159,7 +1168,7 @@ func _mover_arbol(delta: float) -> void:
 		_ver_antes = not _ver_antes
 		Sonido.efecto("menu_mover")
 	# mantener Acción sobre el siguiente nodo (si se puede pagar) lo despierta
-	var id: String = RAMAS_ARBOL[_rama]
+	var id: String = _ramas()[_rama]
 	if _soltar:
 		_soltar = Input.is_action_pressed("accion")
 		return
@@ -1189,8 +1198,10 @@ func _estado_nodo(id: String, i: int) -> String:
 
 func _dibujar_arbol(tinta: float) -> void:
 	_lienzo.draw_texture_rect(ARBOL_RAMAS, Rect2(ARBOL_DESPL, ARBOL_RAMAS.get_size() * ARBOL_ESCALA), false, Color(1, 1, 1, tinta))
+	if "runa" in _ramas():
+		_lienzo.draw_texture_rect(ARBOL_RAMA_RUNA, Rect2(ARBOL_DESPL, ARBOL_RAMA_RUNA.get_size() * ARBOL_ESCALA), false, Color(1, 1, 1, tinta))
 	# lo despierto de cada rama brilla por encima de la madera
-	for id in RAMAS_ARBOL:
+	for id in _ramas():
 		var pts: Array = NODOS_ARBOL[id]
 		var n := Artes.nivel(id)
 		var col: Color = COLOR_RAMA[id]
@@ -1199,15 +1210,17 @@ func _dibujar_arbol(tinta: float) -> void:
 			_lienzo.draw_line(_en_arbol(pts[i]), _en_arbol(pts[i + 1]), Color(col, 0.35 * tinta), 4.0)
 			_lienzo.draw_line(_en_arbol(pts[i]), _en_arbol(pts[i + 1]), Color(col.lightened(0.4), pulso * tinta), 2.0)
 	# las ramas dormidas: Runa y Tierra, en la niebla
-	for d in [[Vector2(64, 236), "Runa"], [Vector2(576, 236), "Tierra"]]:
+	for d in [[Vector2(58, 172), "Runa"], [Vector2(582, 172), "Tierra"]]:
+		if d[1] == "Runa" and "runa" in _ramas():
+			continue
 		var c: Vector2 = _en_arbol(d[0])
 		_lienzo.draw_circle(c, 11.0, Color(0.05, 0.06, 0.12, 0.85 * tinta))
 		_lienzo.draw_arc(c, 11.0, 0, TAU, 24, Color(0.45, 0.5, 0.7, 0.6 * tinta), 1.5)
 		_texto("?", c + Vector2(-3, 6), Color(0.6, 0.65, 0.85, 0.8 * tinta))
 		_texto(String(d[1]), c + Vector2(-_ancho(String(d[1])) / 2.0, -16), Color(TN_APAGADA, 0.8 * tinta))
 	# los nodos
-	for r in RAMAS_ARBOL.size():
-		var id: String = RAMAS_ARBOL[r]
+	for r in _ramas().size():
+		var id: String = _ramas()[r]
 		var pts: Array = NODOS_ARBOL[id]
 		for i in pts.size():
 			_dibujar_nodo(id, i, _en_arbol(pts[i]), tinta, r == _rama and i == _nodo)
@@ -1217,6 +1230,9 @@ func _dibujar_arbol(tinta: float) -> void:
 		# (al lado del último nodo: Raíz y Cetro a su derecha, Aliento a su izquierda)
 		var x_n := arriba.x - 18.0 - _ancho(nombre) if id == "aliento" else arriba.x + 18.0
 		var y_n := arriba.y + (12.0 if id == "cetro" else 5.0)
+		if id == "runa":       # (encima de su último nodo: a la derecha le queda la Raíz)
+			x_n = arriba.x - 22.0
+			y_n = arriba.y - 26.0
 		_texto(nombre, Vector2(x_n, y_n), Color(COLOR_RAMA[id], tinta))
 	_dibujar_panel_nodo(tinta)
 	_dibujar_maisha(tinta)
@@ -1279,7 +1295,7 @@ func _dibujar_nodo(id: String, i: int, p: Vector2, tinta: float, elegido: bool) 
 
 func _dibujar_panel_nodo(tinta: float) -> void:
 	var caja := Rect2(PANEL_MAISHA.end.x + 6, 248, 618 - PANEL_MAISHA.end.x - 6, 82)
-	var id: String = RAMAS_ARBOL[_rama]
+	var id: String = _ramas()[_rama]
 	var col: Color = COLOR_RAMA[id]
 	PIEL.caja(_lienzo, caja, "noche", 0.96 * tinta)
 	PIEL.esquinas_oro(_lienzo, caja, col, 0.9 * tinta, 5.0)
@@ -1361,13 +1377,13 @@ func _crear_muneco() -> void:
 
 ## ¿El nodo elegido está sin despertar? (entonces se puede ver cómo quedaría Maisha)
 func _hay_vista_previa() -> bool:
-	return _nodo > Artes.nivel(RAMAS_ARBOL[_rama])
+	return _nodo > Artes.nivel(_ramas()[_rama])
 
 
 ## Los niveles con los que se enseña a Maisha: los suyos o, en la vista previa, los del nodo elegido
 func _niveles_muneco() -> Dictionary:
 	if _hay_vista_previa() and not _ver_antes:
-		return {RAMAS_ARBOL[_rama]: _nodo}
+		return {_ramas()[_rama]: _nodo}
 	return {}
 
 
@@ -1383,7 +1399,7 @@ func _actualizar_muneco(delta: float) -> void:
 	# se viste solo cuando cambia algo
 	var niveles := _niveles_muneco()
 	var previa := _hay_vista_previa() and not _ver_antes
-	var con_cetro: bool = Estado.tiene("cetro_recibido") or (previa and RAMAS_ARBOL[_rama] == "cetro")
+	var con_cetro: bool = Estado.tiene("cetro_recibido") or (previa and _ramas()[_rama] == "cetro")
 	var clave := "%s|%s|%s|%s|%s" % [niveles, Estado.extra.get("ropa", []), Estado.extra.get("artes", {}), con_cetro, previa]
 	if clave == _muneco_clave:
 		return
@@ -1402,7 +1418,7 @@ func _actualizar_muneco(delta: float) -> void:
 ## El marco de Maisha: el pedestal, el muñeco (que es un nodo aparte) y lo que cambiaría
 func _dibujar_maisha(tinta: float) -> void:
 	var caja := PANEL_MAISHA
-	var id: String = RAMAS_ARBOL[_rama]
+	var id: String = _ramas()[_rama]
 	var col: Color = COLOR_RAMA[id]
 	var previa := _hay_vista_previa()
 	PIEL.caja(_lienzo, caja, "noche", 0.96 * tinta)

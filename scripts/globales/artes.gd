@@ -120,9 +120,14 @@ func cristales_gastados() -> int:
 	return total
 
 
+## ¿Duerme esta rama? (lleva «bloqueada» y aún no se ha puesto su marca «despierta_con»: a la Runa la despierta Kalamu)
+func dormida(arte: Dictionary) -> bool:
+	return arte.has("bloqueada") and not Estado.tiene(String(arte.get("despierta_con", "")))
+
+
 func puede_subir(id: String) -> bool:
 	var arte := buscar(id)
-	if arte.is_empty() or arte.has("bloqueada"):
+	if arte.is_empty() or dormida(arte):
 		return false
 	return nivel(id) < nivel_maximo(id) and esencia() >= coste_siguiente(id) \
 			and Tienda.cristales() >= cristales_siguiente(id)
@@ -179,6 +184,8 @@ const CAMBIO_VISIBLE := {
 		"Hombreras de corteza", "Capa de hojas", "La corona del bosque y flores"],
 	"cetro": ["Una cinta verde en el cetro", "Una gema más grande", "Cetro de corteza de roble con aro de cobre",
 		"Hojas de cobre", "Gema dorada", "El Cetro del Primer Árbol"],
+	"runa": ["Muñequeras rúnicas", "Una pluma de escriba tras la cabeza", "La Estola del Índice",
+		"Un sello de lacre en la estola", "Manto escrito", "El halo de los tres Sigilos"],
 	"aliento": ["Bufanda de brisa", "La bufanda se alarga y vuela", "Anillos de viento y un aura de luz",
 		"Un remolino bajo los pies", "Alitas de brisa", "Cuerpo y alas de brisa"],
 }
@@ -207,12 +214,37 @@ func aspecto(niveles: Dictionary = {}) -> Dictionary:
 		prendas.append("bufanda_viento")
 	elif a >= 1:
 		prendas.append("bufanda_brisa")
+	# la Runa va en zonas suyas (no quita las raíces ni la bufanda)
+	var u := int(niveles.get("runa", nivel("runa")))
+	for d in [[1, "munequeras_runicas"], [2, "pluma_escriba"], [3, "estola_indice"], [4, "sello_lacre"], [5, "manto_escrito"]]:
+		if u >= d[0]:
+			prendas.append(d[1])
 	var visibles := []
-	for d in [["brote", r >= 3], ["flores", r >= 6], ["aura", a >= 3], ["anillos", a >= 3],
+	for d in [["halo", u >= 6], ["brote", r >= 3], ["flores", r >= 6], ["aura", a >= 3], ["anillos", a >= 3],
 			["remolino", a >= 4], ["alitas", a == 5], ["alas", a >= 6], ["brisa", a >= 6]]:
 		if d[1]:
 			visibles.append(d[0])
-	return {"prendas": prendas, "cetro": "cetro_%d" % clampi(c, 0, 6), "rasgos": visibles}
+	# desde el final de Sigilia se lleva el Cetro del Nexo (crece con el Arte de la Tierra); el de antes solo se
+	# enseña en la vista previa de la rama del Cetro
+	var cetro := "cetro_%d" % clampi(c, 0, 6)
+	if Estado.tiene("cetro_nexo") and not niveles.has("cetro"):
+		cetro = "nexo_%d" % clampi(int(niveles.get("tierra", nivel("tierra"))), 0, 6)
+	return {"prendas": prendas, "cetro": cetro, "rasgos": visibles}
+
+
+## La chispa elemental del Halo (Runa 6): al prender un sigilo, daña a los enemigos de alrededor que el sigilo
+## no haya tocado ya (más allá de `desde` px y hasta 26 px fuera de su radio). La llaman los tres sigilos.
+func chispa_runa(sigilo: Node2D, radio: float, desde: float, tipo: String, color: Color) -> void:
+	if valor("sigilo_chispa") <= 0.0:
+		return
+	for nodo in sigilo.get_tree().get_nodes_in_group("daniables"):
+		var o := nodo as Node2D
+		if o == null or o.is_in_group("maisha") or o.is_in_group("cargables"):
+			continue
+		var lejos := o.global_position.distance_to(sigilo.global_position)
+		if lejos > desde and lejos <= radio + 26.0:
+			o.call("recibir_danio", 1, sigilo.global_position, tipo)
+			Impacto.chispa(o.global_position + Vector2(0, -8), Vector2.UP, color)
 
 
 # --- Los números del combate, con las Artes ------------------------------------------

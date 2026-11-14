@@ -240,6 +240,7 @@ func _cierre() -> void:
 		await CHARLA_SCRIPT.hablar(self, charla)
 	if not Estado.tiene("sigilia_libre"):
 		Estado.dar("pluma_primer_nombre")
+		Estado.marcar("cetro_nexo")        # (la Semilla brota con la Pluma: nace el Cetro del Nexo, dormido)
 		Estado.marcar("sigilia_libre")
 	Estado.guardar_pronto()
 	_mostrar_fin()

@@ -175,9 +175,11 @@ func _al_subir_arte(_id: String, _nivel: int) -> void:
 
 
 func _al_poner_marca(marca: String) -> void:
-	if marca == "cetro_recibido":
+	if marca == "cetro_recibido" or marca == "cetro_nexo":
 		_preparar_cetro()
 		_destello_cetro()
+		if marca == "cetro_nexo":
+			Sonido.efecto("cetro_nexo")
 
 
 ## El momento de recibir el cetro: un destello de luz que crece sobre Maisha

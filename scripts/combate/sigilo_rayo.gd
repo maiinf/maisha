@@ -8,11 +8,14 @@ extends Node2D
 const RADIO := 22.0
 const TRAZA := 0.25
 const DURA := 0.95
+const ECO := 0.45
 const RAYO := [Color("ffffff"), Color("fff6b0"), Color("ffd84a"), Color("7fd6ff")]
 ## la runa: un rayo en zigzag con una raya arriba y otra abajo
 const TRAZOS := [[Vector2(0.45, -1), Vector2(-0.45, -0.1), Vector2(0.4, 0.05), Vector2(-0.4, 1)],
 	[Vector2(-0.7, -1), Vector2(0.7, -1)], [Vector2(-0.7, 1), Vector2(0.7, 1)]]
 
+var radio := RADIO * (1.0 + Artes.valor("sigilo_radio"))
+var _eco := Artes.valor("sigilo_dura") > 0.0     # (Runa 2: la runa prende otra vez)
 var _t := 0.0
 var _descargo := false
 var _chispas: Array[Dictionary] = []
@@ -29,6 +32,9 @@ func _process(delta: float) -> void:
 	if _t >= TRAZA and not _descargo:
 		_descargo = true
 		_descargar()
+	if _eco and _t >= TRAZA + ECO:
+		_eco = false
+		_descargar()
 	for c in _chispas:
 		c["t"] += delta
 		c["p"] += c["v"] * delta
@@ -41,19 +47,20 @@ func _descargar() -> void:
 	Sonido.efecto("rayo_runa", 2.0, global_position, 0.15)
 	var centro := global_position + Vector2(0, 6)
 	for nodo in get_tree().get_nodes_in_group("cargables"):
-		if (nodo as Node2D).global_position.distance_to(centro) <= RADIO + 12.0:
+		if (nodo as Node2D).global_position.distance_to(centro) <= radio + 12.0:
 			nodo.call("cargar")
 			_arcos.append(_arco(Vector2(0, 6), (nodo as Node2D).global_position + Vector2(0, -14) - global_position))
 	for nodo in get_tree().get_nodes_in_group("daniables"):
 		var o := nodo as Node2D
-		if o and not o.is_in_group("cargables") and not o.is_in_group("maisha") and o.global_position.distance_to(centro) <= RADIO + 4.0:
+		if o and not o.is_in_group("cargables") and not o.is_in_group("maisha") and o.global_position.distance_to(centro) <= radio + 4.0:
 			o.call("recibir_danio", 1, centro, "rayo")
 	for i in 5:
 		var a := randf() * TAU
-		_arcos.append(_arco(Vector2(0, 6), Vector2(cos(a), sin(a) * 0.6) * RADIO + Vector2(0, 6)))
+		_arcos.append(_arco(Vector2(0, 6), Vector2(cos(a), sin(a) * 0.6) * radio + Vector2(0, 6)))
 	for i in 14:
 		var a := randf() * TAU
-		_chispas.append({"p": Vector2(cos(a), sin(a) * 0.6) * randf_range(4, RADIO), "v": Vector2(randf_range(-40, 40), randf_range(-50, 10)), "t": 0.0})
+		_chispas.append({"p": Vector2(cos(a), sin(a) * 0.6) * randf_range(4, radio), "v": Vector2(randf_range(-40, 40), randf_range(-50, 10)), "t": 0.0})
+	Artes.chispa_runa(self, radio, radio + 4.0, "rayo", Color("fff0a0"))
 	preload("res://scripts/mundo/relieve.gd").destello(get_parent(), position, Color("fff0a0"), 0.9, 0.9, 0.3)
 
 

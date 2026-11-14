@@ -182,5 +182,44 @@ func _ready() -> void:
 	await _esperar(0.5)
 	_comprobar(not diario.get("_muneco").visible, "al cerrar el diario, Maisha en grande desaparece")
 
+	print("El Arte de la Runa y el Cetro del Nexo:")
+	_comprobar(Artes.dormida(Artes.buscar("runa")) and diario.call("_ramas") == ["raiz", "cetro", "aliento"], "dormida, la Runa no sale en el diario")
+	Estado.marcar("arte_runa")
+	_comprobar(not Artes.dormida(Artes.buscar("runa")) and diario.call("_ramas")[0] == "runa", "Kalamu la despierta («arte_runa»): al árbol le sale la rama")
+	_comprobar(Artes.dormida(Artes.buscar("tierra")), "la Tierra sigue dormida")
+	var vida_antes := Artes.vida_maxima()
+	niveles = Estado.extra.get("artes", {}).duplicate()
+	niveles["runa"] = 6          # (directo, sin pagar: lo que se comprueba es lo que da)
+	Estado.extra["artes"] = niveles
+	Artes.arte_subida.emit("runa", 6)
+	_comprobar(Artes.vida_maxima() == vida_antes + 2, "Runa III y VI: dos hojas más de Vida")
+	asp = Artes.aspecto({"raiz": 0, "cetro": 0, "aliento": 0})
+	_comprobar(asp["prendas"] == ["munequeras_runicas", "pluma_escriba", "estola_indice", "sello_lacre", "manto_escrito"] and "halo" in asp["rasgos"], "muñequeras, pluma, estola, sello, manto y el halo (%s)" % [asp["prendas"]])
+	_comprobar(ropa.puestas().get("runa_torso", "") == "estola_indice" and ropa.puestas().get("torso", "") == "bufanda_viento", "la estola convive con la bufanda del Aliento")
+	Estado.marcar("sigilo_fuego")
+	Estado.extra["sigilo"] = "fuego"
+	var falso := GDScript.new()
+	falso.source_code = "extends Node2D\nvar golpes := 0\nfunc recibir_danio(_c: int, _d: Vector2, _t: String) -> bool:\n\tgolpes += 1\n\treturn true\n"
+	falso.reload()
+	var donde: Vector2 = maisha.global_position + maisha.direccion_mirada() * 18.0 + Vector2(0, -6)
+	var cerca: Node2D = falso.new()
+	var lejos: Node2D = falso.new()
+	for d in [[cerca, Vector2(6, 0)], [lejos, Vector2(42, 0)]]:
+		d[0].add_to_group("daniables")
+		maisha.get_parent().add_child(d[0])
+		d[0].global_position = donde + d[1]
+	maisha.aliento = 100.0
+	_comprobar(maisha.sigilo() and is_equal_approx(maisha.aliento, 90.0), "el Sigilo cuesta 16 y el sello devuelve 6 (%.0f)" % maisha.aliento)
+	_comprobar(is_equal_approx(maisha.get("_espera_sigilo"), 0.4), "y se recarga en 0,4 s")
+	await _esperar(1.1)
+	_comprobar(cerca.golpes == 2, "la runa prende dos veces (%d)" % cerca.golpes)
+	_comprobar(lejos.golpes == 2, "y la chispa del halo alcanza a quien estaba fuera del círculo (%d)" % lejos.golpes)
+	cerca.queue_free()
+	lejos.queue_free()
+	Estado.marcar("cetro_nexo")
+	await _esperar(0.2)
+	_comprobar(Artes.aspecto()["cetro"] == "nexo_0" and ropa.puestas().get("arma", "") == "nexo_0", "al final de Sigilia, en la mano va el Cetro del Nexo, dormido (%s)" % ropa.puestas().get("arma", ""))
+	_comprobar(Artes.aspecto({"cetro": 3})["cetro"] == "cetro_3", "en la vista previa de la rama del Cetro se sigue viendo el de roble")
+
 	print("RESULTADO: ", "todo correcto" if _fallos == 0 else "%d fallos" % _fallos)
 	get_tree().quit(_fallos)

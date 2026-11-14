@@ -984,5 +984,542 @@
    ]
   },
   "de_artes": true
+ },
+ "nexo_0": {
+  "nombre": "Cetro del Nexo (0)",
+  "zona": "arma",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_0.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_0.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_0.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      3,
+      -13
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "nexo_1": {
+  "nombre": "Cetro del Nexo (1)",
+  "zona": "arma",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_1.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_1.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_1.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      3,
+      -13
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "nexo_2": {
+  "nombre": "Cetro del Nexo (2)",
+  "zona": "arma",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_2.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_2.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_2.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      3,
+      -13
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "nexo_3": {
+  "nombre": "Cetro del Nexo (3)",
+  "zona": "arma",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_3.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_3.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_3.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      3,
+      -13
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "nexo_4": {
+  "nombre": "Cetro del Nexo (4)",
+  "zona": "arma",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_4.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_4.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_4.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      3,
+      -13
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "nexo_5": {
+  "nombre": "Cetro del Nexo (5)",
+  "zona": "arma",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_5.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_5.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_5.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      3,
+      -13
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "nexo_6": {
+  "nombre": "Cetro del Nexo (6)",
+  "zona": "arma",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_6.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_6.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      -5,
+      -13
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/nexo_6.png",
+     "ancla": "mano",
+     "desplazamiento": [
+      3,
+      -13
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "munequeras_runicas": {
+  "nombre": "Muñequeras rúnicas",
+  "zona": "runa_brazos",
+  "arte": "runa",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/munequera_runica.png",
+     "ancla": "brazo_izq",
+     "desplazamiento": [
+      0,
+      3
+     ],
+     "delante": true
+    },
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/munequera_runica.png",
+     "ancla": "brazo_der",
+     "desplazamiento": [
+      1,
+      3
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/munequera_runica.png",
+     "ancla": "brazo_izq",
+     "desplazamiento": [
+      0,
+      3
+     ],
+     "delante": true
+    },
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/munequera_runica.png",
+     "ancla": "brazo_der",
+     "desplazamiento": [
+      1,
+      3
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/munequera_runica.png",
+     "ancla": "brazo",
+     "desplazamiento": [
+      0,
+      2
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "pluma_escriba": {
+  "nombre": "Pluma de escriba",
+  "zona": "runa_cabeza",
+  "arte": "runa",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/pluma_escriba.png",
+     "ancla": "cabeza",
+     "desplazamiento": [
+      -2,
+      -3
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/pluma_escriba_espejo.png",
+     "ancla": "cabeza",
+     "desplazamiento": [
+      13,
+      -3
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/pluma_escriba.png",
+     "ancla": "cabeza",
+     "desplazamiento": [
+      -2,
+      -3
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "estola_indice": {
+  "nombre": "Estola del Índice",
+  "zona": "runa_torso",
+  "arte": "runa",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/estola_indice_abajo.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      0,
+      -1
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/estola_indice_arriba.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      0,
+      -1
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/estola_indice_lado.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      0,
+      -1
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "sello_lacre": {
+  "nombre": "Sello de lacre",
+  "zona": "runa_sello",
+  "arte": "runa",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/sello_lacre.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      3,
+      -1
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/sello_lacre_lado.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      6,
+      0
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "manto_escrito": {
+  "nombre": "Manto escrito",
+  "zona": "runa_espalda",
+  "arte": "runa",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/manto_escrito_abajo.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -2,
+      0
+     ],
+     "delante": false
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/manto_escrito_arriba.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -1,
+      1
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/manto_escrito_lado.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -3,
+      1
+     ],
+     "delante": false
+    }
+   ]
+  },
+  "de_artes": true
  }
 }
