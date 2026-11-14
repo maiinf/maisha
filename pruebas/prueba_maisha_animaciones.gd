@@ -1,7 +1,7 @@
 extends Node
 ## Prueba automática de las animaciones de Maisha.
 ## Se ejecuta sin abrir el editor:  godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_maisha_animaciones
-## Comprueba que existen las 6 animaciones con 4 fotogramas y que Maisha mira hacia donde camina.
+## Comprueba las animaciones base de Maisha (reposo/andar) y que mira hacia donde camina.
 
 var _fallos := 0
 
@@ -22,8 +22,9 @@ func _ready() -> void:
 
 	print("Animaciones:")
 	for nombre in ["reposo_abajo", "reposo_arriba", "reposo_lado", "andar_abajo", "andar_arriba", "andar_lado"]:
-		_comprobar(marcos.has_animation(nombre) and marcos.get_frame_count(nombre) == 4,
-			nombre + " tiene 4 fotogramas")
+		var esperados := 4 if nombre.begins_with("reposo_") else 6
+		_comprobar(marcos.has_animation(nombre) and marcos.get_frame_count(nombre) == esperados,
+			"%s tiene %d fotogramas" % [nombre, esperados])
 		var tex: Texture2D = marcos.get_frame_texture(nombre, 0)
 		_comprobar(tex != null and tex.get_width() == 24 and tex.get_height() == 32, nombre + " mide 24x32")
 

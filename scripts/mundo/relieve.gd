@@ -128,14 +128,17 @@ func _al_irse_penumbra() -> void:
 
 
 ## Cambia la textura del dibujo por la misma con su relieve (si lo tiene) y le pone las luces de su tabla
-func _dar_relieve(s: Sprite2D) -> void:
-	if not is_instance_valid(s) or s.texture == null or s.has_meta("relieve"):
+func _dar_relieve(s: Variant) -> void:
+	if not is_instance_valid(s) or not (s is Sprite2D):
 		return
-	var tex := s.texture
+	var sp := s as Sprite2D
+	if sp.texture == null or sp.has_meta("relieve"):
+		return
+	var tex := sp.texture
 	var ruta := tex.resource_path
 	if ruta == "":
 		return
-	s.set_meta("relieve", true)
+	sp.set_meta("relieve", true)
 	if not _cache.has(ruta):
 		_cache[ruta] = null
 		var ruta_n := ruta.get_basename() + "_n.png"
@@ -146,13 +149,13 @@ func _dar_relieve(s: Sprite2D) -> void:
 			con_relieve.resource_name = ruta      # (para quien quiera saber qué dibujo es)
 			_cache[ruta] = con_relieve
 	if _cache[ruta] != null:
-		s.texture = _cache[ruta]
+		sp.texture = _cache[ruta]
 	var puntos: Array = LUCES.get(ruta.get_file(), [])
 	if puntos.is_empty():
 		return
-	_luces_de(s, tex, puntos)
+	_luces_de(sp, tex, puntos)
 	if ruta.get_file() in CAMBIAN_AL_RECONSTRUIRSE:
-		s.frame_changed.connect(_luces_de.bind(s, tex, puntos))
+		sp.frame_changed.connect(_luces_de.bind(sp, tex, puntos))
 
 
 ## Las luces del fotograma que se ve (un edificio en ruinas no tiene las ventanas encendidas)

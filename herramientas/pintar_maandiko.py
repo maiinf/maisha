@@ -32,6 +32,7 @@ COBRE = ["#3a2408", "#6a4614", "#a07020", "#d4a034", "#f0cc60", "#fff0b0"]
 MADERA = ["#1e140c", "#33241a", "#4a3626", "#634a34", "#7e6146", "#9a7a5a"]
 NIEVE = ["#4e4870", "#7e76a2", "#b0a9cd", "#c8c2de", "#e6e3f2", "#f6f5fb"]
 TINTA = ["#06040c", "#120c1e", "#22183a", "#3a2a5a", "#5a4488", "#8a70c0"]
+TINTA_DORADA = ["#583206", "#8c5610", "#be821a", "#deaa30", "#f4d25a", "#fff2a8"]
 VENTANA = ["#7a3a10", "#d4782a", "#f9b947", "#fde27e", "#fff8d2"]
 LIBROS = ["#8c2028", "#2e5a8a", "#3e7a3e", "#a07020", "#5a3480"]
 
@@ -315,67 +316,96 @@ def puesto_tinta(k):
     return lz.sprite(contorno=0.5)
 
 
-def fuente():
+def fuente(dorada=False):
     W, H = 64, 52
     lz = Lienzo(W, H, s=5, semilla=7600)
     cx = 32
+    pal = TINTA_DORADA if dorada else TINTA
+    brillo = "#fff8cc" if dorada else "#b8a8e8"
+    halo = "#e89a1c" if dorada else "#7a2fa0"
+    veta_c = "#ffe878" if dorada else "#c27ce6"
     # la taza grande, de piedra
     taza = np.maximum(lz.elipse(cx, 38, 26, 9), lz.poligono([(6, 38), (58, 38), (56, 47), (8, 47)]))
     lz.sombrear(taza, PIEDRA, 4, LUZ)
     borde = lz.elipse(cx, 38, 26, 9) * (1 - lz.elipse(cx, 38, 23, 7))
     lz.sombrear(borde, PIEDRA[2:], 1, LUZ)
     _nieve_encima(lz, borde, 1.2, semilla=7601)
-    # la tinta helada dentro: negra, brillante, con vetas violetas
+    # la tinta dentro: negra helada en el letargo, líquida y dorada cuando Sigilia recuerda
     tinta = lz.elipse(cx, 38, 23, 7)
-    lz.sombrear(tinta, TINTA[:5], 4, LUZ)
-    lz.pintar(lz.trazo([(18, 36), (28, 34)], 0.8) * tinta, "#b8a8e8", 0.7)
+    lz.sombrear(tinta, pal[1:] if dorada else pal[:5], 4, LUZ)
+    lz.pintar(lz.trazo([(18, 36), (28, 34)], 0.8) * tinta, brillo, 0.78 if dorada else 0.7)
     vetas = lz.trazo([(20, 41), (28, 38), (36, 40), (44, 36)], 0.35) * tinta
-    lz.sumar_luz(lz.desenfocar(vetas, 0.8), "#7a2fa0", 0.6)
-    lz.pintar(vetas, "#c27ce6", 0.8)
-    # el pilar del centro con la pluma de cobre y el chorro, helado en el aire
+    lz.sumar_luz(lz.desenfocar(vetas, 0.8), halo, 0.75 if dorada else 0.6)
+    lz.pintar(vetas, veta_c, 0.85 if dorada else 0.8)
+    # el pilar del centro con la pluma de cobre y el chorro
     pilar = lz.poligono([(cx - 3, 38), (cx - 2.5, 14), (cx + 2.5, 14), (cx + 3, 38)])
     _muro(lz, pilar, 7602, 3, 5)
     lz.pintar(lz.trazo(lz.curva((cx, 14), (cx + 4, 8), (cx + 9, 6), n=10), 1.4, 0.4), COBRE[3])
     chorro = lz.trazo(lz.curva((cx + 2, 14), (cx + 10, 14), (cx + 14, 30), n=16), 1.6, 0.8)
-    lz.sombrear(chorro, TINTA[:5], 1, LUZ)
-    lz.pintar(lz.trazo(lz.curva((cx + 2, 13.5), (cx + 9.5, 13.5), (cx + 13.5, 29), n=16), 0.4), "#b8a8e8", 0.6)
-    for i in range(5):
-        cr = lz.poligono([(cx + 13 + i * 0.2, 30 + i), (cx + 14.5, 30 + i), (cx + 14, 33 + i * 0.8)])
-        lz.sombrear(cr, TINTA, 0.5, LUZ)
+    lz.sombrear(chorro, pal[1:] if dorada else pal[:5], 1, LUZ)
+    lz.pintar(lz.trazo(lz.curva((cx + 2, 13.5), (cx + 9.5, 13.5), (cx + 13.5, 29), n=16), 0.4), brillo, 0.75 if dorada else 0.6)
+    if dorada:
+        # gotas líquidas y ondas cálidas al caer en la taza
+        onda = lz.elipse(cx + 13.5, 34, 4.5, 1.6) * (1 - lz.elipse(cx + 13.5, 34, 2.8, 0.9))
+        lz.sumar_luz(lz.desenfocar(onda, 0.6), halo, 0.7)
+        lz.pintar(onda * tinta, brillo, 0.85)
+        for dx, dy in ((0.0, 2.0), (-2.0, 1.0), (2.2, 1.2)):
+            lz.pintar(lz.circulo(cx + 13.5 + dx, 30.5 + dy, 0.9), brillo, 0.9)
+    else:
+        for i in range(5):
+            cr = lz.poligono([(cx + 13 + i * 0.2, 30 + i), (cx + 14.5, 30 + i), (cx + 14, 33 + i * 0.8)])
+            lz.sombrear(cr, TINTA, 0.5, LUZ)
     return lz.sprite(contorno=0.5)
 
 
-def charco(estado):
+def charco(estado, dorada=False):
     W, H = 48, 28
     lz = Lienzo(W, H, s=6, semilla=7700 + estado)
+    pal = TINTA_DORADA if dorada else TINTA
+    brillo = "#fff8cc" if dorada else "#b8a8e8"
+    halo = "#e89a1c" if dorada else "#7a2fa0"
+    veta_c = "#ffe878" if dorada else "#c27ce6"
     cuanto = [1.0, 0.6, 0.25][estado]
     base = lz.elipse(24, 19, 22 * cuanto + 2, 6.5 * cuanto + 1)
     bulto = base * (lz.ruido(3, 2, semilla=7701) > 0.25 + (1 - cuanto) * 0.3)
     forma = np.clip(base * (0.6 if estado else 1.0) + bulto, 0, 1) > 0.5
     forma = forma.astype(float)
-    if estado == 0:
+    if estado == 0 and not dorada:
         # entero: un montón de tinta helada que sube y tapa el paso
         monton = lz.elipse(24, 14, 18, 10) * (lz.y < 19)
         forma = np.maximum(forma, monton)
-    lz.sombrear(forma, TINTA[:5], 5, LUZ, textura=lz.ruido(4, 2, semilla=7702), fuerza_tex=0.1)
-    lz.pintar(lz.trazo([(10, 13 if estado == 0 else 17), (20, 10 if estado == 0 else 16)], 0.8) * forma, "#b8a8e8", 0.7)
+    lz.sombrear(forma, pal[1:] if dorada else pal[:5], 5, LUZ, textura=lz.ruido(4, 2, semilla=7702), fuerza_tex=0.1)
+    y_brillo = 13 if (estado == 0 and not dorada) else 17
+    lz.pintar(lz.trazo([(10, y_brillo), (20, 10 if (estado == 0 and not dorada) else 16)], 0.8) * forma, brillo, 0.78 if dorada else 0.7)
     vetas = lz.trazo([(8, 20), (16, 16), (24, 19), (34, 14), (40, 18)], 0.35) * forma
-    lz.sumar_luz(lz.desenfocar(vetas, 0.8), "#7a2fa0", 0.6 * cuanto)
-    lz.pintar(vetas, "#c27ce6", 0.8 * cuanto)
-    if estado == 0:
+    lz.sumar_luz(lz.desenfocar(vetas, 0.8), halo, (0.75 if dorada else 0.6) * cuanto)
+    lz.pintar(vetas, veta_c, 0.85 * cuanto)
+    if dorada:
+        orilla = forma * (1 - lz.desenfocar(forma, 1.0) * 0.65)
+        lz.pintar(orilla * forma, pal[0], 0.45)
+        ondas = np.sin((lz.x - 24) * 0.7 + (lz.y - 18) * 1.1) > 0.45
+        lz.pintar(ondas * forma, pal[2], 0.35)
+    if estado == 0 and not dorada:
         for i in range(6):
             x0 = 12 + i * 5
             car = lz.poligono([(x0 - 1, 8 + (i % 2)), (x0 + 1, 8 + (i % 2)), (x0, 4 + (i % 3))])
             lz.sombrear(car, TINTA, 0.5, LUZ)
-    return lz.sprite(contorno=0.5)
+    return lz.sprite(contorno=0.25 if dorada else 0.5)
 
 
 def main():
     from PIL import Image
     os.makedirs(SALIDA, exist_ok=True)
+    solo_dorada = len(sys.argv) > 1 and sys.argv[1] == "dorada"
 
     def guardar(nombre, partes):
         Image.fromarray(np.concatenate(partes, axis=1) if len(partes) > 1 else partes[0], "RGBA").save(os.path.join(SALIDA, nombre))
+
+    guardar("fuente_dorada.png", [fuente(dorada=True)])
+    guardar("charco_dorado.png", [charco(k, dorada=True) for k in range(3)])
+    if solo_dorada:
+        print("Tinta dorada de Maandiko pintada en", SALIDA)
+        return
 
     guardar("casa_escriba.png", [casa_escriba(0), casa_escriba(1)])
     guardar("casa_kalamu.png", [casa_kalamu()])

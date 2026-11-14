@@ -94,7 +94,7 @@ func _process(delta: float) -> void:
 				_cambiar(Fase.SALTA)
 				_mordio = false
 				_rumbo = d.normalized() if d != Vector2.INF else Vector2.ZERO
-				Sonido.efecto("babosa_chof", -2.0, global_position, 0.2)
+				Sonido.efecto("sombra_repta", -2.0, global_position, 0.2)
 		Fase.SALTA:
 			_mover(_rumbo * 120.0 * delta)
 			if not _mordio and maisha and d.length() < 14.0:
@@ -107,7 +107,7 @@ func _process(delta: float) -> void:
 				_cambiar(Fase.REPTA)
 		Fase.FIJADA:
 			if _t >= FIJADA:
-				Sonido.efecto("babosa_chof", -6.0, global_position, 0.2)
+				Sonido.efecto("sombra_repta", -6.0, global_position, 0.2)
 				_cambiar(Fase.REPTA)
 	if _destello > 0.0:
 		_sprite.frame = 4
@@ -139,7 +139,7 @@ func _fijar() -> void:
 	if _muriendo:
 		return
 	_cambiar(Fase.FIJADA)
-	Sonido.efecto("hielo_runa", -4.0, global_position, 0.2)
+	Sonido.efecto("sombra_fijada", -2.0, global_position, 0.15)
 	Impacto.chispa(global_position + Vector2(0, -8), Vector2.UP, Color("d8d4ec"))
 
 

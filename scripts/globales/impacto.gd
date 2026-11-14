@@ -107,13 +107,14 @@ func temblar(fuerza: float, segundos: float) -> void:
 		_temblor_tiempo = 0.0
 
 
-func chispa(pos: Vector2, direccion: Vector2, color := Color("fff3c4")) -> void:
+func chispa(pos: Vector2, direccion: Vector2, color := Color("fff3c4"), escala := 1.0) -> void:
 	if not activo:
 		return
 	var nodo: Node2D = CHISPA.new()
 	nodo.global_position = pos
 	nodo.direccion = direccion
 	nodo.color = color
+	nodo.escala = escala
 	_al_mundo(nodo)
 
 
@@ -165,5 +166,6 @@ func _process(delta: float) -> void:
 			camara.offset = encuadre
 		return
 	if camara:
-		var f := _temblor * resto
+		var decay := resto * resto
+		var f := _temblor * decay
 		camara.offset = encuadre + Vector2(randf_range(-f, f), randf_range(-f, f)).round()

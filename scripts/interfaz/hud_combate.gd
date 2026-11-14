@@ -25,6 +25,7 @@ var _ayuda := true
 var texto_ayuda := "WASD mover · C correr · J golpe · K semilla · L latido"
 var _fuente: FontFile
 var _guardando := 0.0
+var _enemigos_estado := {}   # id -> {max: int, ant: int, cola: float, destello: float}
 
 
 func _ready() -> void:
@@ -102,7 +103,49 @@ func _process(delta: float) -> void:
 	var hace_falta: bool = _hay_peligro() or _maisha.segundos_desde_danio() < 3.0 \
 		or _maisha.aliento < _maisha.aliento_maximo() - 0.5 or _maisha.vida < _maisha.vida_maxima()
 	_visible = move_toward(_visible, 1.0 if hace_falta else 0.0, delta * 3.0)
+	_actualizar_enemigos(delta)
 	_lienzo.queue_redraw()
+
+
+func _actualizar_enemigos(delta: float) -> void:
+	var vivos := {}
+	for en in get_tree().get_nodes_in_group("enemigos"):
+		if not is_instance_valid(en):
+			continue
+		var v_val: Variant = en.get("vida")
+		if v_val == null:
+			continue
+		var vida := int(v_val)
+		var id := en.get_instance_id()
+		vivos[id] = true
+		var st: Dictionary = _enemigos_estado.get(id, {"max": maxi(1, vida), "ant": vida, "cola": float(vida), "destello": 0.0})
+		st["max"] = maxi(int(st["max"]), vida)
+		if vida < int(st["ant"]):
+			st["destello"] = 0.28
+		st["ant"] = vida
+		st["cola"] = move_toward(float(st["cola"]), float(vida), delta * 2.2)
+		st["destello"] = maxf(0.0, float(st["destello"]) - delta)
+		_enemigos_estado[id] = st
+	for id in _enemigos_estado.keys():
+		if not vivos.has(id):
+			_enemigos_estado.erase(id)
+
+
+func _proyectar_sobre_cabeza(en: Node2D, altura_m := 1.25, offset_2d := Vector2(0, -18)) -> Variant:
+	var esp := get_tree().root.get_node_or_null("EspejoHD2D")
+	if esp != null:
+		var cam_v: Variant = esp.get("camara")
+		if cam_v is Camera3D and is_instance_valid(cam_v):
+			var cam3 := cam_v as Camera3D
+			var wpos := Vector3(en.global_position.x * 0.0625, altura_m, en.global_position.y * 0.0625)
+			if cam3.is_position_behind(wpos):
+				return null
+			var pos_vp := cam3.unproject_position(wpos)
+			var vr := get_viewport().get_visible_rect().size
+			if vr.x > 1.0 and vr.y > 1.0:
+				pos_vp *= Vector2(640.0 / vr.x, 360.0 / vr.y)
+			return pos_vp
+	return get_viewport().get_canvas_transform() * (en.global_position + offset_2d)
 
 
 func dialogo_narrando() -> bool:
@@ -134,13 +177,18 @@ func _dibujar() -> void:
 		return
 	var alfa := _visible
 	var modal := _hay_modal()
+	if not modal:
+		_dibujar_barras_enemigos()
 	if alfa > 0.01 and not modal:
 		var mod := Color(1, 1, 1, alfa)
 		# panel de vida y aliento
 		var hojas: int = _maisha.vida_maxima()
 		var panel := Rect2(6, 6, maxi(10, hojas) * 10 + 10, 29)
+		var pulso_p := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.008)
 		PIEL.caja(_lienzo, panel.grow(2), "cuero", 0.96 * alfa)
-		PIEL.esquinas_oro(_lienzo, panel.grow(2), PIEL.ORO, 0.55 * alfa, 4.0)
+		if _maisha.vida == 1:
+			_lienzo.draw_rect(panel.grow(3), Color("de6771", (0.28 + 0.35 * pulso_p) * alfa), false, 1.0)
+		PIEL.esquinas_oro(_lienzo, panel.grow(2), Color("de6771") if _maisha.vida == 1 else PIEL.ORO, 0.65 * alfa, 4.0)
 		# vida: una hoja por bloque
 		for i in hojas:
 			var llena: bool = i < _maisha.vida
@@ -219,3 +267,64 @@ func _dibujar() -> void:
 			elif not limpio.is_empty():
 				pares.append([limpio, ""])
 		PIEL.barra_teclas(_lienzo, 320.0, 344.0, pares, _fuente, 16, 0.96, true)
+
+
+## Mini barras biseladas e indicadores de estado sobre enemigos dañados o alterados
+func _dibujar_barras_enemigos() -> void:
+	for en in get_tree().get_nodes_in_group("enemigos"):
+		if not is_instance_valid(en) or not (en is Node2D):
+			continue
+		var n2d := en as Node2D
+		if not n2d.visible or en.get("_barra") != null:
+			continue
+		var st: Dictionary = _enemigos_estado.get(en.get_instance_id(), {})
+		if st.is_empty():
+			continue
+		var vmax := int(st["max"])
+		var vida := int(st["ant"])
+		if vmax <= 0 or vmax > 8 or vida <= 0:
+			continue
+		var helado := float(en.get("_congelado")) > 0.0 if en.get("_congelado") != null else false
+		var electro := float(en.get("_electrificado")) > 0.0 if en.get("_electrificado") != null else false
+		var volcado := float(en.get("_volcado")) > 0.0 if en.get("_volcado") != null else false
+		if vida >= vmax and not (helado or electro or volcado):
+			continue
+		var p_v: Variant = _proyectar_sobre_cabeza(n2d)
+		if p_v == null:
+			continue
+		var p: Vector2 = (p_v as Vector2).round()
+		if p.x < -20.0 or p.x > 660.0 or p.y < 14.0 or p.y > 350.0:
+			continue
+		var w := clampf(float(vmax) * 7.0 + 2.0, 18.0, 44.0)
+		var caja := Rect2(roundf(p.x - w * 0.5), roundf(p.y - 6.0), w, 6.0)
+		var destello := float(st["destello"]) > 0.0
+		_lienzo.draw_rect(Rect2(caja.position + Vector2(1, 1), caja.size), Color(0, 0, 0, 0.55))
+		_lienzo.draw_rect(caja, Color(0.08, 0.05, 0.11, 0.94))
+		_lienzo.draw_rect(caja, Color("fff3c4") if destello else Color(PIEL.ORO, 0.7), false, 1.0)
+		var inner := caja.grow(-1)
+		var cola := clampf(float(st["cola"]) / float(vmax), 0.0, 1.0)
+		var frac := clampf(float(vida) / float(vmax), 0.0, 1.0)
+		if cola > frac:
+			var cw := maxf(1.0, roundf(inner.size.x * cola))
+			_lienzo.draw_rect(Rect2(inner.position, Vector2(cw, inner.size.y)), Color("f4df9a", 0.9))
+		var rw := maxf(1.0, roundf(inner.size.x * frac))
+		var col_fill := Color("d64f5e")
+		if helado:
+			col_fill = Color("7ad7f0")
+		elif electro:
+			col_fill = Color("f6e05e")
+		elif volcado:
+			col_fill = Color("ef8a26")
+		_lienzo.draw_rect(Rect2(inner.position, Vector2(rw, inner.size.y)), col_fill)
+		_lienzo.draw_rect(Rect2(inner.position, Vector2(rw, 1.0)), col_fill.lightened(0.35))
+		if vmax > 1 and vmax <= 6:
+			for k in range(1, vmax):
+				var tx := roundf(inner.position.x + inner.size.x * float(k) / float(vmax))
+				_lienzo.draw_line(Vector2(tx, inner.position.y), Vector2(tx, inner.end.y), Color(0.08, 0.05, 0.11, 0.72), 1.0)
+		# Micro insignia de estado alterado encima de la barra
+		if helado or electro or volcado:
+			var tag := "ATURDIDO" if volcado else ("RAYO" if electro else "HIELO")
+			var col_tag := Color("ef8a26") if volcado else (Color("f6e05e") if electro else Color("7ad7f0"))
+			var cx := roundf(p.x - _fuente.get_string_size(tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x * 0.5)
+			_lienzo.draw_string(_fuente, Vector2(cx + 1, caja.position.y - 2).round(), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0, 0, 0, 0.8))
+			_lienzo.draw_string(_fuente, Vector2(cx, caja.position.y - 3).round(), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, col_tag)

@@ -183,6 +183,19 @@ def latido():
     return reverb(p.entera(), 1.2, 0.2)
 
 
+def halo_chispa():
+    """Chispa elemental del Halo (Runa VI): destello rúnico ascendente con chasquido eléctrico breve."""
+    d = 0.42
+    p = Pista(d)
+    for i, f in enumerate((1174.7, 1760.0, 2637.0)):
+        p.poner(campanita(f, 0.28, 0.42 - i * 0.08), i * 0.025)
+    aro = seno(_desliz(740, 1480, 0.18, 0.55), 0.18) * caida(_n(0.18), 0.06) * 0.35
+    chispa = paso_banda(ruido(0.14), 2600, 8200) * caida(_n(0.14), 0.026) * 0.58
+    p.poner(aro, 0.0)
+    p.poner(chispa, 0.0)
+    return reverb(p.entera(), 0.75, 0.20)
+
+
 def maisha_herida():
     """A Maisha le hacen daño: un golpecito y una nota que baja."""
     d = 0.3
@@ -2328,6 +2341,187 @@ def cetro_nexo():
     return reverb(p.entera(), 2.2, 0.38)
 
 
+# =============================================================================
+# LA SECCIÓN PROHIBIDA (SIGILIA)
+# =============================================================================
+
+def pedestal_encender():
+    """Cuenco de oro y mármol de la Sección Prohibida resonando al prenderse con un sigilo."""
+    p = Pista(1.0)
+    d = 0.75
+    n = _n(d)
+    llama = paso_banda(ruido_rosa(0.32), 600, 3200) * adsr(_n(0.32), 0.02, 0.08, 0.45, 0.14) * 0.5
+    aura = (seno(_desliz(293.66, 587.33, d), d) * 0.45 + triangulo(587.33, d, 3) * 0.25) * adsr(n, 0.03, 0.18, 0.45, 0.28)
+    p.poner(llama, 0.0)
+    p.poner(aura, 0.01)
+    for k, nota in enumerate(("D5", "F#5", "A5", "D6")):
+        p.poner(campanita(nota, 0.75 - k * 0.08, 0.26 - k * 0.02), 0.02 + k * 0.045)
+    return reverb(p.entera(), 1.5, 0.30)
+
+
+def sello_abrir():
+    """El Triple Sello: tres cerrojos de latón que saltan uno a uno y una gran verja que se abre."""
+    p = Pista(1.9)
+    # tres cerrojos pesados (Fuego, Hielo, Rayo)
+    for k, f0 in enumerate((380.0, 460.0, 560.0)):
+        t0 = k * 0.18
+        golpe = paso_banda(ruido(0.08), 1100, 5200) * caida(_n(0.08), 0.02) * 0.85
+        metal = triangulo(f0, 0.14, 4) * caida(_n(0.14), 0.04) * 0.55
+        p.poner(golpe, t0)
+        p.poner(metal, t0 + 0.01)
+        p.poner(campanita(("B5", "D6", "F#6")[k], 0.35, 0.24), t0 + 0.015)
+    # y la gran verja de hierro y piedra abriéndose detrás
+    d_verja = 1.05
+    n_v = _n(d_verja)
+    arrastre = (paso_banda(ruido_rosa(d_verja), 180, 950) * 0.65
+                + sierra(_desliz(115, 72, d_verja), d_verja, 6) * 0.28) * adsr(n_v, 0.06, 0.25, 0.55, 0.30)
+    p.poner(taiko(0.65, 0.72), 0.52)
+    p.poner(arrastre, 0.54)
+    p.poner(campanita("B4", 1.1, 0.22), 0.58)
+    p.poner(campanita("F#5", 1.0, 0.18), 0.68)
+    return reverb(p.entera(), 1.9, 0.34)
+
+
+def sombra_repta():
+    """Una Sombra de Renglón se desliza y arremete como tinta húmeda sobre el mármol."""
+    d = 0.38
+    n = _n(d)
+    roce = paso_banda(ruido_rosa(d), 420, 2600) * adsr(n, 0.02, 0.10, 0.45, 0.16) * 0.68
+    desliz = (sierra(_desliz(240, 110, d, 1.3), d, 6) * 0.35 + seno(_desliz(320, 140, d), d) * 0.25) * caida(n, 0.12)
+    return reverb(roce + desliz, 0.7, 0.20)
+
+
+def sombra_fijada():
+    """Un sigilo fija la Sombra de Renglón en el suelo como tinta seca clavada en el papel."""
+    p = Pista(0.55)
+    chispazo = paso_banda(ruido(0.14), 1600, 6800) * caida(_n(0.14), 0.03) * 0.75
+    sello = triangulo(_desliz(780, 340, 0.18), 0.18, 3) * caida(_n(0.18), 0.06) * 0.45
+    p.poner(chispazo, 0.0)
+    p.poner(sello, 0.0)
+    p.poner(campanita("D6", 0.42, 0.28), 0.01)
+    p.poner(campanita("A6", 0.36, 0.20), 0.05)
+    return reverb(p.entera(), 1.0, 0.24)
+
+
+def grimorio_hojas():
+    """El Grimorio de Tinta pasa sus enormes páginas de pergamino a toda prisa."""
+    p = Pista(0.72)
+    p.poner(tambor("B1", 0.25, 0.5, golpe=0.3), 0.0)
+    for k in range(5):
+        t0 = k * 0.085
+        d = 0.11
+        n = _n(d)
+        f_lo = 1300 + k * 240
+        f_hi = 4600 + k * 350
+        hoja = paso_banda(ruido(d), f_lo, f_hi) * adsr(n, 0.015, 0.03, 0.35, 0.04) * (0.65 - k * 0.05)
+        golpecito = seno(_desliz(260 - k * 15, 130, 0.06), 0.06) * caida(_n(0.06), 0.02) * 0.22
+        p.poner(hoja, t0)
+        p.poner(golpecito, t0)
+    return reverb(p.entera(), 1.1, 0.26)
+
+
+def grimorio_rasga():
+    """Una página enorme del Grimorio se rasga de arriba abajo al activarse el pedestal contrario."""
+    p = Pista(1.1)
+    d = 0.52
+    n = _n(d)
+    # desgarro nervioso de papel grueso + acorde que cede
+    mod = 0.65 + 0.35 * np.sin(2 * np.pi * 28.0 * t(d))
+    rasgado = paso_alto(ruido(d), 1400) * mod * adsr(n, 0.01, 0.14, 0.55, 0.16) * 0.85
+    tono = sierra(_desliz(420, 140, 0.42), 0.42, 7) * caida(_n(0.42), 0.14) * 0.45
+    p.poner(rasgado, 0.0)
+    p.poner(tono, 0.02)
+    p.poner(taiko(0.75, 0.8), 0.12)
+    p.poner(campanita("B5", 0.65, 0.26), 0.14)
+    return reverb(p.entera(), 1.5, 0.30)
+
+
+def grimorio_mano():
+    """Manotazo pesado de una mano de tinta gigante contra el suelo de mármol."""
+    p = Pista(0.75)
+    d = 0.32
+    n = _n(d)
+    chof = paso_bajo(ruido_rosa(d), 950) * caida(n, 0.08) * 0.85
+    zumb = seno(_desliz(170, 52, 0.28), 0.28) * caida(_n(0.28), 0.09) * 0.72
+    palmada = paso_banda(ruido(0.12), 800, 3600) * caida(_n(0.12), 0.025) * 0.8
+    p.poner(taiko(0.45, 0.85), 0.0)
+    p.poner(chof, 0.0)
+    p.poner(palmada, 0.0)
+    p.poner(zumb, 0.01)
+    return reverb(p.entera(), 1.2, 0.28)
+
+
+def grimorio_vencido():
+    """El Grimorio queda vencido, deja de esconder los nombres y se abre limpio con un destello dorado."""
+    p = Pista(2.4)
+    # cuero y hojas asentándose en silencio
+    d_hoja = 0.45
+    p.poner(taiko(0.9, 0.7), 0.0)
+    p.poner(paso_banda(ruido_rosa(d_hoja), 700, 3400) * caida(_n(d_hoja), 0.18) * 0.5, 0.06)
+    # acorde luminoso de si mayor (liberación)
+    notas = ("B4", "D#5", "F#5", "B5", "D#6", "F#6")
+    for k, nota in enumerate(notas):
+        p.poner(campanita(nota, 1.7 - k * 0.12, 0.28 - k * 0.02), 0.18 + k * 0.11)
+    halo = coro(["B3", "F#4", "D#5"], 1.8, "a", 0.5) * 0.28
+    p.poner(halo, 0.25)
+    return reverb(p.entera(), 2.4, 0.38)
+
+
+def kaa_avisa():
+    """El Cangrejo de Geoda Kaa-Jiwe chasca las pinzas minerales antes de embestir."""
+    p = Pista(0.55)
+    for k in range(2):
+        t0 = k * 0.11
+        p.poner(paso_banda(ruido(0.05), 2400, 7200) * caida(_n(0.05), 0.009) * 0.72, t0)
+        p.poner(seno(_desliz(1650, 1080, 0.07), 0.07) * caida(_n(0.07), 0.018) * 0.36, t0)
+        p.poner(campanita("F#6" if k == 0 else "A6", 0.16, 0.14), t0)
+    p.poner(_crujido_piedra(0.18, 420, grave=False) * caida(_n(0.18), 0.06) * 0.48, 0.22)
+    return reverb(p.entera(), 0.55, 0.18)
+
+
+def kaa_embiste():
+    """Kaa-Jiwe arranca su embestida pesada arrastrando geoda y gravilla."""
+    p = Pista(0.75)
+    d = 0.55
+    n = _n(d)
+    roca = _crujido_piedra(d, 260, grave=True) * caida(n, 0.22) * 0.75
+    impulso = paso_bajo(sierra(_desliz(145, 72, 0.35), 0.35, 14), 680) * adsr(_n(0.35), 0.02, 0.08, 0.55, 0.12) * 0.52
+    p.poner(taiko(0.38, 0.78), 0.0)
+    p.poner(roca, 0.0)
+    p.poner(impulso, 0.02)
+    for k in range(4):
+        p.poner(paso_banda(ruido(0.04), 1900, 5800) * caida(_n(0.04), 0.01) * 0.38, 0.08 + k * 0.075)
+    return reverb(p.entera(), 0.75, 0.22)
+
+
+def kaa_vuelca():
+    """La Carga Sísmica vuelca a Kaa-Jiwe sobre su caparazón de cristal."""
+    p = Pista(0.95)
+    p.poner(taiko(0.45, 0.85), 0.0)
+    p.poner(_crujido_piedra(0.28, 340, grave=True) * caida(_n(0.28), 0.08) * 0.75, 0.02)
+    p.poner(campanita("D5", 0.32, 0.24), 0.04)
+    p.poner(campanita("A5", 0.26, 0.16), 0.06)
+    for k in range(6):
+        p.poner(paso_banda(ruido(0.035), 2600, 7800) * caida(_n(0.035), 0.009) * 0.32, 0.26 + k * 0.08)
+    return reverb(p.entera(), 0.65, 0.20)
+
+
+def puerta_crater():
+    """Los 3 pilares-diapasón abren la pesada Puerta del Cráter hacia Mji-Jiwe."""
+    p = Pista(1.65)
+    d = 1.25
+    n = _n(d)
+    losa = _crujido_piedra(d, 210, grave=True) * adsr(n, 0.08, 0.25, 0.65, 0.35) * 0.82
+    grave = paso_bajo(sierra(_desliz(98, 62, d), d, 12), 420) * adsr(n, 0.10, 0.20, 0.6, 0.35) * 0.48
+    p.poner(taiko(0.65, 0.85), 0.0)
+    p.poner(losa, 0.04)
+    p.poner(grave, 0.04)
+    for k, nota in enumerate(("D5", "A5", "F#6")):
+        p.poner(campanita(nota, 0.85, 0.26 - k * 0.03), 0.14 + k * 0.16)
+    p.poner(taiko(0.50, 0.72), 1.05)
+    return reverb(p.entera(), 1.6, 0.32)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -2401,6 +2595,15 @@ EFECTOS = {
     "corazon_latido": (corazon_latido, 0.8), "corazon_aro": (corazon_aro, 0.7),
     "corazon_abierto": (corazon_abierto, 0.75), "corazon_rayo": (corazon_rayo, 0.75),
     "cetro_nexo": (cetro_nexo, 0.75),
+    "pedestal_encender": (pedestal_encender, 0.7), "sello_abrir": (sello_abrir, 0.8),
+    "sombra_repta": (sombra_repta, 0.6), "sombra_fijada": (sombra_fijada, 0.7),
+    "grimorio_hojas": (grimorio_hojas, 0.65), "grimorio_rasga": (grimorio_rasga, 0.8),
+    "grimorio_mano": (grimorio_mano, 0.85), "grimorio_vencido": (grimorio_vencido, 0.85),
+    "halo_chispa": (halo_chispa, 0.72),
+    "kaa_avisa": (kaa_avisa, 0.65),
+    "kaa_embiste": (kaa_embiste, 0.80),
+    "kaa_vuelca": (kaa_vuelca, 0.72),
+    "puerta_crater": (puerta_crater, 0.85),
 }
 
 AMBIENTES = {

@@ -419,14 +419,15 @@ func _dibujar_intro() -> void:
 		_trazo_tinta(medio, punta, PIEL.VERDE, 2.0)
 		if avance > 0.62:
 			var hoja := clampf((avance - 0.62) / 0.3, 0.0, 1.0)
-			for lado: float in [-1.0, 1.0]:
-				var a := punta + Vector2(0, 4)
-				var b := a + Vector2(lado * 32.0, -14.0) * hoja
-				var arriba := a.lerp(b, 0.5) + Vector2(0, -9) * hoja
-				var abajo := a.lerp(b, 0.5) + Vector2(0, 5) * hoja
-				_lienzo.draw_colored_polygon(PackedVector2Array([a, arriba, b, abajo]), Color(PIEL.VERDE, 0.25 * hoja))
-				_lienzo.draw_polyline(PackedVector2Array([a, arriba, b, abajo, a]), Color(PIEL.VERDE, 0.9), 1.5)
-				_lienzo.draw_line(a, b, Color(PIEL.VERDE, 0.6), 1.0)
+			if hoja > 0.06:
+				for lado: float in [-1.0, 1.0]:
+					var a := punta + Vector2(0, 4)
+					var b := a + Vector2(lado * 32.0, -14.0) * hoja
+					var arriba := a.lerp(b, 0.5) + Vector2(0, -9) * hoja
+					var abajo := a.lerp(b, 0.5) + Vector2(0, 5) * hoja
+					_lienzo.draw_colored_polygon(PackedVector2Array([a, arriba, b, abajo]), Color(PIEL.VERDE, 0.25 * hoja))
+					_lienzo.draw_polyline(PackedVector2Array([a, arriba, b, abajo, a]), Color(PIEL.VERDE, 0.9), 1.5)
+					_lienzo.draw_line(a, b, Color(PIEL.VERDE, 0.6), 1.0)
 	if avance >= 1.0:
 		var nota := "lo que encontré al despertar"
 		var w := _fuente.get_string_size(nota, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x

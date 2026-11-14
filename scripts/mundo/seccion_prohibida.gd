@@ -181,8 +181,7 @@ func _abrir_sello(ahora: bool) -> void:
 	_sello_sprite.frame = 1
 	_sello.get_child(1).set_deferred("disabled", true)
 	if ahora:
-		Sonido.efecto("rueda_abrir", 0.0, _sello.global_position)
-		Sonido.efecto("arte_sube", -4.0, _sello.global_position)
+		Sonido.efecto("sello_abrir", 0.0, _sello.global_position)
 		Impacto.temblar(2.5, 0.4)
 		_hud.mostrar_mensaje("El Triple Sello se abre")
 
@@ -255,7 +254,7 @@ func _mostrar_fin() -> void:
 	fin.titulo = "Sigilia recuerda"
 	fin.subtitulo = "Fin del segundo mundo"
 	fin.pie = "Continuará en Asterhaul..."
-	fin.musica = "maandiko"
+	fin.musica = "sigilia_libre"
 	var misiones := Misiones.hechas().size()
 	fin.lineas_propias = [
 		["Tiempo de juego", -1, -1, Estado.texto_tiempo(Estado.tiempo_jugado)],

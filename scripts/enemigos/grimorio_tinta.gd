@@ -132,7 +132,7 @@ func _pasar_hojas() -> void:
 	_marcas.clear()
 	_marcar_pedestal("")
 	Sonido.efecto("libro_abrir", 0.0, global_position)
-	Sonido.efecto("pagina", -2.0, global_position, 0.2)
+	Sonido.efecto("grimorio_hojas", 0.0, global_position, 0.12)
 
 
 ## Abre el capítulo siguiente (o el que se le diga)
@@ -284,7 +284,7 @@ func _mover_manos(delta: float, m: Node2D) -> void:
 				s.offset = Vector2(-24, -44)
 				s.modulate.a = 1.0 - clampf((t - 1.5) / 0.4, 0.0, 1.0)
 		if antes < 0.7 and t >= 0.7:
-			Sonido.efecto("raiz_azota", -3.0, mano["p"], 0.2)
+			Sonido.efecto("grimorio_mano", -2.0, mano["p"], 0.15)
 			Impacto.temblar(1.5, 0.12)
 			if m and m.global_position.distance_to(mano["p"]) < 20.0:
 				m.call("recibir_danio", 1, mano["p"], "contacto")
@@ -307,8 +307,7 @@ func rasgar() -> void:
 	_golpes = 0
 	_cambiar(Fase.ATURDIDO)
 	add_to_group("daniables")
-	Sonido.efecto("pagina", 4.0, global_position)
-	Sonido.efecto("kambare_cae", -2.0, global_position)
+	Sonido.efecto("grimorio_rasga", 0.0, global_position)
 	Impacto.temblar(5.0, 0.4)
 	Impacto.fogonazo(Color(COLORES[DESHACE[capitulo]], 1.0), 0.3, 0.4)
 
@@ -351,7 +350,7 @@ func morir() -> void:
 		s.morir()
 	Estado.marcar("grimorio_vencido")
 	Bestiario.vencido("grimorio", self)
-	Sonido.efecto("mzizi_vencido", 0.0, global_position)
+	Sonido.efecto("grimorio_vencido", 0.0, global_position)
 	Sonido.musica("", 1.5)
 	if _barra:
 		_barra.queue_free()

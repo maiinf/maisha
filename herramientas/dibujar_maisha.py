@@ -163,10 +163,20 @@ BRAZO_PERFIL_QUIETO = (4, [
     "sbbs",
     ".ss.",
 ], (1, 3))
-# Al andar, el brazo solo se mece 1 píxel (con el cetro en la mano, un balanceo grande
-# hace que el cetro dé saltos). Las poses grandes quedan para el golpe.
-BRAZO_PERFIL_PASO_DELANTE = (5, BRAZO_PERFIL_QUIETO[1], BRAZO_PERFIL_QUIETO[2])
-BRAZO_PERFIL_PASO_DETRAS = (3, BRAZO_PERFIL_QUIETO[1], BRAZO_PERFIL_QUIETO[2])
+# Al andar, el hombro queda fijo y el antebrazo se inclina suavemente atrás/delante (mano ±1 px):
+# así el brazo se balancea con naturalidad sin que el cetro dé saltos bruscos (>1 px).
+BRAZO_PERFIL_PASO_DELANTE = (4, [
+    "sl...",
+    ".slb.",
+    ".sbbs",
+    "..ss.",
+], (2, 3))
+BRAZO_PERFIL_PASO_DETRAS = (3, [
+    ".sl.",
+    "slb.",
+    "lbbs",
+    ".ss.",
+], (1, 3))
 BRAZO_PERFIL_DELANTE = (6, [   # la mano se adelanta y asoma por delante
     "sl....",
     ".slb..",
@@ -200,15 +210,19 @@ BRAZO_DER = [
     "ooo.",
 ]
 
-# --- Piernas de frente: 4 filas (de pie) o 3 (cuerpo agachado al pisar) ---
+# --- Piernas de frente: 4 filas (apoyo recto), 3 (flexión/paso) o 2 (pie alzado) ---
 PIERNA_FRENTE_IZQ = ["osso", "olbo", "obbo", "oooo"]
 PIERNA_FRENTE_DER = ["osso", "obso", "obso", "oooo"]
-PIERNA_FRENTE_IZQ_PISA = ["osso", "olbo", "oooo"]
-PIERNA_FRENTE_DER_PISA = ["osso", "obso", "oooo"]
+PIERNA_FRENTE_IZQ_PISA = ["olbo", "obbo", "oooo"]
+PIERNA_FRENTE_DER_PISA = ["obbo", "obso", "oooo"]
+PIERNA_FRENTE_IZQ_PASO = ["olbo", "olbo", "oooo"]
+PIERNA_FRENTE_DER_PASO = ["obbo", "olbo", "oooo"]
+PIERNA_FRENTE_IZQ_ATRAS = ["osso", "ssso", "oooo"]
+PIERNA_FRENTE_DER_ATRAS = ["osso", "ssso", "oooo"]
 PIERNA_FRENTE_IZQ_ALZA = ["osso", "oooo"]
 PIERNA_FRENTE_DER_ALZA = ["osso", "oooo"]
 
-# --- Piernas de perfil: se dibujan juntas como un bloque, desde la fila 28 ---
+# --- Piernas de perfil: ciclo de 6 fases desde x=7 (11 cols), pies compactos y rodilla flex ---
 #     la pierna lejana va en sombra (s) y la cercana en luz (b, l)
 PIERNAS_PERFIL_QUIETO = [
     "ossooobbo.",
@@ -216,40 +230,56 @@ PIERNAS_PERFIL_QUIETO = [
     "osso.obsso",
     "oooo.ooooo",
 ]
-# Zancada (el cuerpo baja 1 píxel, por eso solo 3 filas)
-PIERNAS_PERFIL_ZANCADA_CERCA = [   # la pierna cercana delante
-    "..ossobbo...",
-    ".osso..olbbo",
-    "oooo...ooooo",
+# 1. Contacto cercana delante (talón cercano adelante, puntera lejana empuja atrás)
+PIERNAS_PERFIL_ZANCADA_CERCA = [
+    "..ossobbo..",
+    ".osssoobbo.",
+    ".oooo.olbbo",
+    ".......oooo",
 ]
-PIERNAS_PERFIL_ZANCADA_LEJOS = [   # la pierna lejana delante
-    "..obbosso...",
-    ".olbo..ossso",
-    "oooo...ooooo",
+# 2. Apoyo cercana (dy=1, peso sobre cercana centrada, lejana se recoge atrás)
+PIERNAS_PERFIL_APOYO_CERCA = [
+    "..ossobbo..",
+    "..oooobbo..",
+    ".....oooo..",
 ]
-# Paso intermedio (piernas juntas: una apoyada y la otra levantada)
-PIERNAS_PERFIL_PASO_CERCA = [      # apoya la cercana; la lejana pasa por detrás
-    "..osobbo.",
-    "..osolbo.",
-    "..ooolbbo",
-    "....ooooo",
+# 3. Paso intermedio (cercana empuja hacia atrás, lejana cruza hacia delante)
+PIERNAS_PERFIL_PASO_CERCA = [
+    "..obbosso..",
+    "..obboosso.",
+    ".obbo.oooo.",
+    ".oooo......",
 ]
-PIERNAS_PERFIL_PASO_LEJOS = [      # apoya la lejana; la cercana va levantada
-    "..osobbo.",
-    "..osolbbo",
-    "..ossoooo",
-    "..ooooo..",
+# 4. Contacto lejana delante
+PIERNAS_PERFIL_ZANCADA_LEJOS = [
+    "..obbosso..",
+    ".obbboosso.",
+    ".oooo.ossso",
+    ".......oooo",
 ]
-# Instante en el aire al correr de perfil (ambas piernas recogidas, 3 filas con dy=-1 -> despegan 2 px del suelo)
+# 5. Apoyo lejana (dy=1, peso sobre lejana, cercana flexionada recogida)
+PIERNAS_PERFIL_APOYO_LEJOS = [
+    "..obbosso..",
+    "..oooooso..",
+    ".....oooo..",
+]
+# 6. Paso intermedio (lejana empuja atrás, cercana avanza hacia la zancada)
+PIERNAS_PERFIL_PASO_LEJOS = [
+    "..ossobbo..",
+    "..ossoobbo.",
+    ".osso.oooo.",
+    ".oooo......",
+]
+# Fase aérea al correr de perfil (ambas piernas recogidas sin tocar la fila inferior 31)
 PIERNAS_PERFIL_AIRE_CERCA = [
-    ".ossobbo..",
-    ".ossoolbbo",
-    "..oooooooo",
+    ".ossobbo...",
+    "oooo.olbbo.",
+    "......oooo.",
 ]
 PIERNAS_PERFIL_AIRE_LEJOS = [
-    ".obbosso..",
-    ".olboossso",
-    "..oooooooo",
+    ".obbosso...",
+    "olbo.ooo...",
+    ".ooo.......",
 ]
 
 
@@ -363,17 +393,20 @@ def reposo_lado():
 
 
 def andar_frente(cabeza, cuerpo):
+    # Ciclo fluido de 6 tiempos: contacto, apoyo (peso), paso (cruce), simétrico en pie derecho
     return [
-        # 1. pisa con la izquierda (de la pantalla): cuerpo abajo, pierna derecha alzada
-        montar_frente(cabeza=cabeza, cuerpo=cuerpo, dy=1, brote=BROTE_A, brazo_der=1,
+        montar_frente(cabeza=cabeza, cuerpo=cuerpo, brote=BROTE_A, brazo_izq=-1, brazo_der=1,
+                      pierna_izq=PIERNA_FRENTE_IZQ, pierna_der=PIERNA_FRENTE_DER_ATRAS),
+        montar_frente(cabeza=cabeza, cuerpo=cuerpo, dy=1, brote=BROTE_B, brazo_izq=-1, brazo_der=1,
                       pierna_izq=PIERNA_FRENTE_IZQ_PISA, pierna_der=PIERNA_FRENTE_DER_ALZA),
-        # 2. paso intermedio: cuerpo arriba, el brote se retrasa
-        montar_frente(cabeza=cabeza, cuerpo=cuerpo, brote=BROTE_B),
-        # 3. pisa con la derecha
-        montar_frente(cabeza=cabeza, cuerpo=cuerpo, dy=1, brote=BROTE_A, brazo_izq=1,
+        montar_frente(cabeza=cabeza, cuerpo=cuerpo, brote=BROTE_A, brazo_izq=0, brazo_der=0,
+                      pierna_izq=PIERNA_FRENTE_IZQ, pierna_der=PIERNA_FRENTE_DER_PASO),
+        montar_frente(cabeza=cabeza, cuerpo=cuerpo, brote=BROTE_A, brazo_izq=1, brazo_der=-1,
+                      pierna_izq=PIERNA_FRENTE_IZQ_ATRAS, pierna_der=PIERNA_FRENTE_DER),
+        montar_frente(cabeza=cabeza, cuerpo=cuerpo, dy=1, brote=BROTE_B, brazo_izq=1, brazo_der=-1,
                       pierna_izq=PIERNA_FRENTE_IZQ_ALZA, pierna_der=PIERNA_FRENTE_DER_PISA),
-        # 4. paso intermedio
-        montar_frente(cabeza=cabeza, cuerpo=cuerpo, brote=BROTE_B),
+        montar_frente(cabeza=cabeza, cuerpo=cuerpo, brote=BROTE_A, brazo_izq=0, brazo_der=0,
+                      pierna_izq=PIERNA_FRENTE_IZQ_PASO, pierna_der=PIERNA_FRENTE_DER),
     ]
 
 
@@ -386,17 +419,20 @@ def andar_arriba():
 
 
 def andar_lado():
+    # Ciclo fluido de 6 tiempos con balanceo de antebrazo desde el hombro y rodilla pasante
     return [
-        # 1. zancada con la pierna cercana delante; el brazo cercano se mece un poco hacia atrás
-        montar_perfil(dy=1, brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_PASO_DETRAS,
+        montar_perfil(brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_PASO_DETRAS,
                       piernas=PIERNAS_PERFIL_ZANCADA_CERCA, piernas_x=7),
-        # 2. paso intermedio: cuerpo arriba, el brote se retrasa
-        montar_perfil(brote=BROTE_PERFIL_B, piernas=PIERNAS_PERFIL_PASO_CERCA, piernas_x=7),
-        # 3. zancada con la pierna lejana delante; el brazo cercano se mece un poco hacia delante
-        montar_perfil(dy=1, brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_PASO_DELANTE,
+        montar_perfil(dy=1, brote=BROTE_PERFIL_B, brazo=BRAZO_PERFIL_PASO_DETRAS,
+                      piernas=PIERNAS_PERFIL_APOYO_CERCA, piernas_x=7),
+        montar_perfil(brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_QUIETO,
+                      piernas=PIERNAS_PERFIL_PASO_CERCA, piernas_x=7),
+        montar_perfil(brote=BROTE_PERFIL_B, brazo=BRAZO_PERFIL_PASO_DELANTE,
                       piernas=PIERNAS_PERFIL_ZANCADA_LEJOS, piernas_x=7),
-        # 4. paso intermedio
-        montar_perfil(brote=BROTE_PERFIL_B, piernas=PIERNAS_PERFIL_PASO_LEJOS, piernas_x=7),
+        montar_perfil(dy=1, brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_PASO_DELANTE,
+                      piernas=PIERNAS_PERFIL_APOYO_LEJOS, piernas_x=7),
+        montar_perfil(brote=BROTE_PERFIL_B, brazo=BRAZO_PERFIL_QUIETO,
+                      piernas=PIERNAS_PERFIL_PASO_LEJOS, piernas_x=7),
     ]
 
 
@@ -502,15 +538,19 @@ PIERNA_SENTADA_DER = ["osso", "oooo"]
 
 
 def correr_frente(cabeza, cuerpo):
-    # como andar, pero con un instante en el aire entre paso y paso y los brazos más sueltos
+    # Carrera de 6 tiempos con impulso elástico y fase aérea limpia (sin cortar el brote arriba)
     return [
         montar_frente(cabeza=cabeza, cuerpo=cuerpo, dy=1, brote=BROTE_A, brazo_izq=-1, brazo_der=1,
                       pierna_izq=PIERNA_FRENTE_IZQ_PISA, pierna_der=PIERNA_FRENTE_DER_ALZA),
-        montar_frente(cabeza=cabeza, cuerpo=cuerpo, dy=-1, brote=BROTE_B,
+        montar_frente(cabeza=cabeza, cuerpo=cuerpo, brote=BROTE_B, brazo_izq=-1, brazo_der=1,
+                      pierna_izq=PIERNA_FRENTE_IZQ_ALZA, pierna_der=PIERNA_FRENTE_DER_PASO),
+        montar_frente(cabeza=cabeza, cuerpo=cuerpo, brote=BROTE_A, brazo_izq=0, brazo_der=0,
                       pierna_izq=PIERNA_FRENTE_IZQ_ALZA, pierna_der=PIERNA_FRENTE_DER_ALZA),
         montar_frente(cabeza=cabeza, cuerpo=cuerpo, dy=1, brote=BROTE_A, brazo_izq=1, brazo_der=-1,
                       pierna_izq=PIERNA_FRENTE_IZQ_ALZA, pierna_der=PIERNA_FRENTE_DER_PISA),
-        montar_frente(cabeza=cabeza, cuerpo=cuerpo, dy=-1, brote=BROTE_B,
+        montar_frente(cabeza=cabeza, cuerpo=cuerpo, brote=BROTE_B, brazo_izq=1, brazo_der=-1,
+                      pierna_izq=PIERNA_FRENTE_IZQ_PASO, pierna_der=PIERNA_FRENTE_DER_ALZA),
+        montar_frente(cabeza=cabeza, cuerpo=cuerpo, brote=BROTE_A, brazo_izq=0, brazo_der=0,
                       pierna_izq=PIERNA_FRENTE_IZQ_ALZA, pierna_der=PIERNA_FRENTE_DER_ALZA),
     ]
 
@@ -526,11 +566,17 @@ def correr_arriba():
 def correr_lado():
     return [
         montar_perfil(dy=1, brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_PASO_DETRAS,
+                      piernas=PIERNAS_PERFIL_APOYO_CERCA, piernas_x=7),
+        montar_perfil(brote=BROTE_PERFIL_B, brazo=BRAZO_PERFIL_QUIETO,
                       piernas=PIERNAS_PERFIL_ZANCADA_CERCA, piernas_x=7),
-        montar_perfil(dy=-1, brote=BROTE_PERFIL_B, piernas=PIERNAS_PERFIL_AIRE_CERCA, piernas_x=7),
+        montar_perfil(brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_PASO_DELANTE,
+                      piernas=PIERNAS_PERFIL_AIRE_CERCA, piernas_x=7),
         montar_perfil(dy=1, brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_PASO_DELANTE,
+                      piernas=PIERNAS_PERFIL_APOYO_LEJOS, piernas_x=7),
+        montar_perfil(brote=BROTE_PERFIL_B, brazo=BRAZO_PERFIL_QUIETO,
                       piernas=PIERNAS_PERFIL_ZANCADA_LEJOS, piernas_x=7),
-        montar_perfil(dy=-1, brote=BROTE_PERFIL_B, piernas=PIERNAS_PERFIL_AIRE_LEJOS, piernas_x=7),
+        montar_perfil(brote=BROTE_PERFIL_A, brazo=BRAZO_PERFIL_PASO_DETRAS,
+                      piernas=PIERNAS_PERFIL_AIRE_LEJOS, piernas_x=7),
     ]
 
 
@@ -619,10 +665,10 @@ def hoja(fotogramas):
 
 # Velocidad (fotogramas por segundo) y duración relativa de cada fotograma
 RITMO = {
-    "reposo": (4.0, [2.0, 1.0, 1.0, 1.0]),   # respiración tranquila: 1,25 s por ciclo
-    "andar": (8.0, [1.0, 1.0, 1.0, 1.0]),    # dos pasos cada medio segundo
-    "golpe": (16.0, [1.0, 1.0, 2.0]),        # 0,25 s: impulso, golpe, recupera (no se repite)
-    "correr": (12.0, [1.0, 1.0, 1.0, 1.0]),  # más rápido que andar, con un instante en el aire
+    "reposo": (4.0, [2.0, 1.0, 1.0, 1.0]),            # respiración tranquila: 1,25 s por ciclo
+    "andar": (10.5, [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]),   # ciclo fluido de 6 fases
+    "golpe": (16.0, [1.0, 1.0, 2.0]),                 # 0,25 s: impulso, golpe, recupera (no se repite)
+    "correr": (14.5, [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]),  # zancada rápida de 6 fases con vuelo
     "sorpresa": (10.0, [1.0, 2.0, 1.0, 3.0]),
     "danio": (10.0, [1.0, 3.0]),
     "celebrar": (8.0, [2.0, 1.0, 1.0, 2.0]),

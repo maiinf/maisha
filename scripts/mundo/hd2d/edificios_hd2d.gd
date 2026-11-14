@@ -39,18 +39,52 @@ void fragment() {
 const CATALOGO := {
 	"casa_granja.png": {
 		"tipo": "hip", "x0": 26, "x1": 170, "y_alero": 76, "y_pico": 8,
-		"rx0": 60, "rx1": 134, "eave_x0": 14, "eave_x1": 180, "fondo": 4.0, "alero_z": 0.20,
-		"techo_rect": [46, 76, 44, 68],
+		"rx0": 80, "rx1": 114, "eave_x0": 14, "eave_x1": 180, "fondo": 4.2, "alero_z": 0.20,
+		"pared_rect": [30, 62, 102, 130], "techo_rect": [44, 78, 42, 68], "cerrar_techo": true,
 		"extras": [["caja", 136, 154, 0, 38, -2.1, -1.2], ["frente_z", 86, 114, 24, 52, -0.35]],
 	},
 	"ruina_casa.png": {
-		"tipo": "hip", "x0": 4, "x1": 56, "y_alero": 28, "y_pico": 18,
-		"rx0": 14, "rx1": 46, "eave_x0": 2, "eave_x1": 58, "fondo": 2.6, "alero_z": 0.10,
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 2, 14, 24, 49, 0.02, -2.6, true, [2, 13, 30, 48]],
+			["caja", 44, 58, 24, 49, 0.02, -2.6, true, [45, 57, 30, 48]],
+			["caja", 14, 44, 28, 49, -2.15, -2.6, true, [16, 40, 32, 48]],
+		],
 	},
-	"taller.png": {
-		"tipo": "hip", "x0": 22, "x1": 124, "y_alero": 64, "y_pico": 38,
-		"rx0": 46, "rx1": 102, "eave_x0": 16, "eave_x1": 130, "fondo": 3.8, "alero_z": 0.18,
-		"extras": [["caja", 14, 34, 20, 144, -1.8, -0.6], ["frente_z", 12, 54, 0, 26, -1.2]],
+	"aldea/taller.png": {
+		"tipo": "hip", "x0": 20, "x1": 124, "y_alero": 64, "y_pico": 38,
+		"rx0": 42, "rx1": 102, "eave_x0": 14, "eave_x1": 130, "fondo": 3.8, "alero_z": 0.18, "cerrar_techo": true,
+		"extras": [["caja", 6, 17, 26, 144, -1.8, -0.5], ["frente_z", 124, 150, 96, 144, -0.6]],
+	},
+	"desfiladero/taller.png": {
+		"tipo": "gable", "x0": 11, "x1": 91, "y_alero": 48, "y_pico": 14, "cx": 51,
+		"eave_x0": 3, "eave_x1": 99, "fondo": 3.8, "alero_z": 0.20, "pared_rect": [14, 34, 54, 96],
+		"extras": [["caja", 72, 85, 5, 34, -2.0, -1.1], ["caja", 0, 26, 78, 105, -0.5, 0.08], ["frente_z", 96, 118, 12, 105, -0.5]],
+	},
+	"desfiladero/puerta.png": {
+		"tipo": "bloques", "frente_z": 0.08,
+		"partes": [
+			["caja", 2, 16, 20, 83, 0.02, -1.5, true, [3, 14, 30, 78]],
+			["caja", 56, 70, 20, 83, 0.02, -1.5, true, [58, 69, 30, 78]],
+			["capa", 6, 66, 3, 28, -0.45, 0.88],
+			["capa", 6, 66, 3, 28, -0.95, 0.76],
+		],
+	},
+	"desfiladero/muro.png": {
+		"tipo": "bloques", "frente_z": 0.06, "solo_marco": 0,
+		"partes": [
+			["caja", 6, 40, 18, 43, 0.02, -0.88, true, [8, 38, 22, 41]],
+			["capa", 2, 46, 4, 43, -0.32, 0.88],
+			["capa", 2, 46, 4, 43, -0.62, 0.78],
+		],
+	},
+	"desfiladero/derrumbe.png": {
+		"tipo": "bloques", "frente_z": 0.06, "solo_marco": 0,
+		"partes": [
+			["caja", 6, 40, 18, 43, 0.02, -0.88, true, [8, 38, 22, 41]],
+			["capa", 2, 46, 4, 43, -0.32, 0.88],
+			["capa", 2, 46, 4, 43, -0.62, 0.78],
+		],
 	},
 	"cocina.png": {
 		"tipo": "domo", "x0": 22, "x1": 98, "y_alero": 72, "y_pico": 26,
@@ -172,7 +206,7 @@ const CATALOGO := {
 	"fuente.png": {
 		"tipo": "bloques",
 		"partes": [
-			["cil", 7, 57, 35, 48, 0.25, -1.95, true, [10, 26, 40, 46], [16, 48, 36, 42]],
+			["cil", 7, 57, 38, 47, 0.25, -1.95, true, [29, 35, 16, 30], [9, 55, 31, 45], "disco"],
 			["cil", 29, 35, 16, 38, -0.67, -1.03, false, [29, 34, 18, 34]],
 			["capa", 20, 48, 4, 38, -0.85, 1.0],
 		],
@@ -244,7 +278,7 @@ const CATALOGO := {
 			["capa", 4, 89, 1, 36, -0.66, 0.70],
 		],
 	},
-	"muro.png": {
+	"objetos/muro.png": {
 		"tipo": "bloques",
 		"partes": [
 			["caja", 0, 24, 1, 12, 0.02, -0.68, true, [2, 22, 3, 10], [2, 22, 3, 8]],
@@ -271,10 +305,18 @@ func _nombre_catalogo(tex: Texture2D) -> String:
 	if tex == null:
 		return ""
 	var ruta := tex.resource_path
-	for clave: String in ["campo/molino.png", "seccion/atril.png", "estanterias/atril.png", "seccion/sello.png"]:
+	for clave: String in [
+		"desfiladero/taller.png", "desfiladero/muro.png", "desfiladero/derrumbe.png", "desfiladero/puerta.png",
+		"aldea/taller.png", "objetos/muro.png", "campo/molino.png",
+		"seccion/atril.png", "estanterias/atril.png", "seccion/sello.png",
+	]:
 		if ruta.ends_with(clave):
 			return clave
+	if ruta.contains("/desfiladero/"):
+		return ""
 	var archivo := ruta.get_file()
+	if archivo == "fuente_dorada.png":
+		return "fuente.png"
 	return archivo if CATALOGO.has(archivo) else ""
 
 
@@ -332,8 +374,27 @@ func copiar(n: Node2D, mi: MeshInstance3D, ancla: Node2D, z: int, visible: bool,
 	var sube: Vector2 = n.global_position - ancla.global_position
 	var dx_origen := (s.offset.x if s.centered else s.offset.x + fw * 0.5)
 	var dy_origen := (s.offset.y + fh * 0.5 if s.centered else s.offset.y + fh)
-	var orden := z * 0.004 + n.get_index() * 0.0015
+	var orden := z * 0.008 + _orden_en_ancla(n, ancla)
 	mi.position = pos_suelo + Vector3((sube.x + dx_origen) * PX, (-sube.y - dy_origen) * PX, orden)
+
+
+static func _orden_en_ancla(n: Node, ancla: Node) -> float:
+	if n == ancla:
+		return 0.0
+	var pasos: Array[int] = []
+	var cur := n
+	while cur != null and cur != ancla:
+		pasos.append(cur.get_index())
+		cur = cur.get_parent()
+	if cur != ancla:
+		return float(n.get_index()) * 0.0015
+	var peso := 0.0015
+	var total := 0.0
+	for i in range(pasos.size() - 1, -1, -1):
+		var paso := pasos[i] + (0 if i == pasos.size() - 1 else 1)
+		total += float(paso) * peso
+		peso *= 0.12
+	return total
 
 
 static func _textura_base(tex: Texture2D) -> Texture2D:
@@ -447,53 +508,80 @@ static func _caja_texturada(st: SurfaceTool, x0: float, x1: float, y_top: float,
 			_uv(x0, y_bot, fw, fh), _uv(x1, y_bot, fw, fh), _uv(x1, y_top, fw, fh), _uv(x0, y_top, fw, fh), Color(1.0, 1.0, 1.0))
 	else:
 		_quad_tiling(st, bl_f, br_f, tr_f, tl_f, m_pared, fw, fh, Color(0.95, 0.95, 0.95))
-	_quad_tiling(st, bl_b, bl_f, tl_f, tl_b, m_pared, fw, fh, Color(0.88, 0.89, 0.92))
-	_quad_tiling(st, br_f, br_b, tr_b, tr_f, m_pared, fw, fh, Color(0.70, 0.72, 0.78))
-	_quad_tiling(st, br_b, bl_b, tl_b, tr_b, m_pared, fw, fh, Color(0.68, 0.70, 0.76))
+	_quad_tiling(st, bl_b, bl_f, tl_f, tl_b, m_pared, fw, fh, Color(0.90, 0.91, 0.94))
+	_quad_tiling(st, br_f, br_b, tr_b, tr_f, m_pared, fw, fh, Color(0.80, 0.82, 0.87))
+	_quad_tiling(st, br_b, bl_b, tl_b, tr_b, m_pared, fw, fh, Color(0.78, 0.80, 0.85))
 	if m_top.size.x > 0.0:
 		_quad_tiling(st, tl_f, tr_f, tr_b, tl_b, m_top, fw, fh, Color(0.92, 0.91, 0.89))
 
 
-## Busca una muestra 100% opaca (idealmente ~12x14 px) dentro del rectángulo de píxeles dado
+## Comprueba si una rejilla interior de puntos de la región UV cae sobre píxeles opacos de este frame
+static func _quad_opaco(img: Image, xoff: int, yoff: int, fw: int, fh: int,
+		u0: Vector2, u1: Vector2, u2: Vector2, u3: Vector2) -> bool:
+	if img == null:
+		return true
+	for iy in 4:
+		var fy := float(iy) / 3.0
+		var ua := u0.lerp(u3, fy)
+		var ub := u1.lerp(u2, fy)
+		for ix in 4:
+			var fx := float(ix) / 3.0
+			var u := ua.lerp(ub, fx)
+			var px := xoff + clampi(roundi(u.x * float(fw)), 0, fw - 1)
+			var py := yoff + clampi(roundi(u.y * float(fh)), 0, fh - 1)
+			if img.get_pixel(px, py).a < 0.85:
+				return false
+	return true
+
+
+## Busca una muestra 100% opaca dentro del rectángulo de píxeles dado (reduce tamaño hasta hallar algo sólido)
 static func _muestra(img: Image, xoff: int, col_i: int, fw: int, fh: int,
 		rx0: int, rx1: int, ry0: int, ry1: int) -> Rect2:
-	var x0 := clampi(mini(rx0, rx1), 1, maxi(2, fw - 4))
-	var x1 := clampi(maxi(rx0, rx1), mini(x0 + 3, fw - 1), fw - 2)
-	var y0 := clampi(mini(ry0, ry1), 1, maxi(2, fh - 4))
-	var y1 := clampi(maxi(ry0, ry1), mini(y0 + 3, fh - 1), fh - 2)
-	var mejor := Rect2(float(x0) / fw, float(y0) / fh, clampf(8.0 / fw, 0.02, 0.2), clampf(10.0 / fh, 0.02, 0.2))
+	var x0 := clampi(mini(rx0, rx1), 1, maxi(2, fw - 2))
+	var x1 := clampi(maxi(rx0, rx1), mini(x0 + 1, fw - 1), fw - 1)
+	var y0 := clampi(mini(ry0, ry1), 1, maxi(2, fh - 2))
+	var y1 := clampi(maxi(ry0, ry1), mini(y0 + 1, fh - 1), fh - 1)
+	var mejor := Rect2(float(x0) / fw, float(y0) / fh, clampf(4.0 / fw, 0.01, 0.2), clampf(4.0 / fh, 0.01, 0.2))
 	if img == null:
 		return mejor
-	var mejor_score := -1e9
-	var w_muestra := mini(12, maxi(4, x1 - x0))
-	var h_muestra := mini(14, maxi(4, y1 - y0))
-	var step_x := maxi(1, (x1 - x0) / 6)
-	var step_y := maxi(1, (y1 - y0) / 5)
-	for sx in range(x0, maxi(x0 + 1, x1 - w_muestra + 1), step_x):
-		for sy in range(y0, maxi(y0 + 1, y1 - h_muestra + 1), step_y):
-			var opacos := 0
-			var total := 0
-			var lum_luz := 0.0
-			for dx in w_muestra:
-				for dy in h_muestra:
-					var px_x := xoff + sx + dx
-					var px_y := col_i * fh + sy + dy
-					if px_x < 0 or px_y < 0 or px_x >= img.get_width() or px_y >= img.get_height():
+	var cajas := [[x0, x1, y0, y1], [1, fw - 2, maxi(1, fh / 3), fh - 2]]
+	for caja: Array in cajas:
+		var cx0: int = caja[0]; var cx1: int = caja[1]; var cy0: int = caja[2]; var cy1: int = caja[3]
+		for tam: int in [12, 6, 3, 1]:
+			var w_muestra := mini(tam, maxi(1, cx1 - cx0))
+			var h_muestra := mini(tam + 2 if tam >= 6 else tam, maxi(1, cy1 - cy0))
+			var step_x := maxi(1, (cx1 - cx0) / 8)
+			var step_y := maxi(1, (cy1 - cy0) / 8)
+			var mejor_score := -1e9
+			var encontrado := false
+			for sx in range(cx0, maxi(cx0 + 1, cx1 - w_muestra + 1), step_x):
+				for sy in range(cy0, maxi(cy0 + 1, cy1 - h_muestra + 1), step_y):
+					var opacos := 0
+					var total := 0
+					var lum_luz := 0.0
+					for dx in w_muestra:
+						for dy in h_muestra:
+							var px_x := xoff + sx + dx
+							var px_y := col_i * fh + sy + dy
+							if px_x < 0 or px_y < 0 or px_x >= img.get_width() or px_y >= img.get_height():
+								continue
+							var c := img.get_pixel(px_x, px_y)
+							total += 1
+							if c.a >= 0.88:
+								opacos += 1
+								if c.r > 0.85 and c.g > 0.72 and c.b < 0.45:
+									lum_luz += 2.0
+								elif c.get_luminance() < 0.07:
+									lum_luz += 0.8
+					if total == 0 or opacos < total:
 						continue
-					var c := img.get_pixel(px_x, px_y)
-					total += 1
-					if c.a >= 0.85:
-						opacos += 1
-						if c.r > 0.85 and c.g > 0.72 and c.b < 0.45:
-							lum_luz += 2.0
-						elif c.get_luminance() < 0.07:
-							lum_luz += 0.6
-			if total == 0 or opacos < total:
-				continue
-			var score := float(opacos) * 10.0 - lum_luz * 4.0
-			if score > mejor_score:
-				mejor_score = score
-				mejor = Rect2(float(sx) / fw, float(sy) / fh, float(w_muestra) / fw, float(h_muestra) / fh)
+					var score := float(opacos) * 10.0 - lum_luz * 4.0
+					if score > mejor_score:
+						mejor_score = score
+						mejor = Rect2(float(sx) / fw, float(sy) / fh, float(w_muestra) / fw, float(h_muestra) / fh)
+						encontrado = true
+			if encontrado:
+				return mejor
 	return mejor
 
 
@@ -551,6 +639,8 @@ static func _construir_bloques(st: SurfaceTool, img: Image, cfg: Dictionary, xof
 			_p(0, fh, fz, fw, fh), _p(fw, fh, fz, fw, fh),
 			_p(fw, 0, fz, fw, fh), _p(0, 0, fz, fw, fh),
 			_uv(0, fh, fw, fh), _uv(fw, fh, fw, fh), _uv(fw, 0, fw, fh), _uv(0, 0, fw, fh), Color.WHITE)
+	if int(cfg.get("solo_marco", -1)) == 0 and (xoff > 0 or yoff > 0):
+		return
 	var col_i := yoff / fh
 	var partes: Array = cfg.get("partes", [])
 	for parte_v: Variant in partes:
@@ -585,6 +675,8 @@ static func _construir_bloques(st: SurfaceTool, img: Image, cfg: Dictionary, xof
 			var y_top_m := (float(fh) - y0) * PX
 			var segs := 12
 			var centro := Vector3(cx_m, y_top_m, zc)
+			var disco := p.size() > 10 and String(p[10]) == "disco"
+			var td_rect: Array = p[9] if p.size() > 9 else []
 			for i in segs:
 				var a0 := -PI + TAU * float(i) / float(segs)
 				var a1 := -PI + TAU * float(i + 1) / float(segs)
@@ -594,7 +686,7 @@ static func _construir_bloques(st: SurfaceTool, img: Image, cfg: Dictionary, xof
 				var t0 := Vector3(b0.x, y_top_m, b0.z)
 				var am := (a0 + a1) * 0.5
 				var sombra := 0.76 + 0.24 * clampf(cos(am), 0.0, 1.0)
-				if cos(am) >= 0.0:
+				if cos(am) >= 0.0 and not disco:
 					var px_s0 := lerpf(x0, x1, (sin(a0) + 1.0) * 0.5)
 					var px_s1 := lerpf(x0, x1, (sin(a1) + 1.0) * 0.5)
 					_quad(st, b0, b1, t1, t0,
@@ -604,7 +696,17 @@ static func _construir_bloques(st: SurfaceTool, img: Image, cfg: Dictionary, xof
 				else:
 					_quad_tiling(st, b0, b1, t1, t0, m_pared, fw, fh, Color(sombra * 0.9, sombra * 0.92, sombra * 0.96))
 				if con_top:
-					_tri_tiling(st, t0, t1, centro, m_top, fw, fh, Color(0.92, 0.92, 0.94))
+					if disco and td_rect.size() == 4:
+						var ucx := (float(td_rect[0]) + float(td_rect[1])) * 0.5
+						var ucy := (float(td_rect[2]) + float(td_rect[3])) * 0.5
+						var urx := (float(td_rect[1]) - float(td_rect[0])) * 0.5
+						var ury := (float(td_rect[3]) - float(td_rect[2])) * 0.5
+						_tri(st, t1, t0, centro,
+							_uv(ucx + sin(a1) * urx, ucy + cos(a1) * ury, fw, fh),
+							_uv(ucx + sin(a0) * urx, ucy + cos(a0) * ury, fw, fh),
+							_uv(ucx, ucy, fw, fh), Color(1.0, 1.0, 1.0))
+					else:
+						_tri_tiling(st, t1, t0, centro, m_top, fw, fh, Color(0.92, 0.92, 0.94))
 
 
 static func _construir_sello(st: SurfaceTool, cfg: Dictionary, fw: int, fh: int) -> void:
@@ -648,7 +750,7 @@ static func _construir_hip(st: SurfaceTool, img: Image, cfg: Dictionary, xoff: i
 	var m_pared := _muestra(img, xoff, yoff / fh, fw, fh, int(rect_pared[0]), int(rect_pared[1]), int(rect_pared[2]), int(rect_pared[3])) if rect_pared.size() == 4 else _muestra(img, xoff, yoff / fh, fw, fh, int(x0) + 2, int(x0) + 18, int(y_alero) + 4, fh - 6)
 	var rect_techo: Array = cfg.get("techo_rect", [])
 	var m_techo := _muestra(img, xoff, yoff / fh, fw, fh, int(rect_techo[0]), int(rect_techo[1]), int(rect_techo[2]), int(rect_techo[3])) if rect_techo.size() == 4 else _muestra(img, xoff, yoff / fh, fw, fh, int(rx0), int(rx1), int(lerpf(y_pico, y_alero, 0.35)), int(y_alero) - 3)
-	var m_tapa := m_techo if bool(cfg.get("cerrar_techo", false)) else Rect2()
+	var m_tapa := m_techo if bool(cfg.get("cerrar_techo", false)) else m_pared
 	if bool(cfg.get("cerrar_techo", false)):
 		m_tapa = m_pared if rect_pared.size() == 4 else _muestra(img, xoff, yoff / fh, fw, fh, int(x0) + 8, int(x1) - 8, int(y_alero) + 6, fh - 16)
 	_caja_texturada(st, x0, x1, y_alero, fh, 0.0, -fondo, fw, fh, m_pared, m_tapa, false)
@@ -663,10 +765,11 @@ static func _construir_hip(st: SurfaceTool, img: Image, cfg: Dictionary, xoff: i
 	_quad_tiling(st,
 		_p(ex0, y_alero, 0.0, fw, fh), _p(ex1, y_alero, 0.0, fw, fh),
 		_p(ex1, y_alero, z_frente, fw, fh), _p(ex0, y_alero, z_frente, fw, fh),
-		m_techo, fw, fh, Color(0.55, 0.54, 0.56))
+		m_techo, fw, fh, Color(0.65, 0.64, 0.66))
 
 	if y_alero - y_pico > 6.0:
 		var pasos := 5
+		var cols_uv := 4
 		for k in pasos:
 			var t0 := float(k) / float(pasos)
 			var t1 := float(k + 1) / float(pasos)
@@ -676,36 +779,42 @@ static func _construir_hip(st: SurfaceTool, img: Image, cfg: Dictionary, xoff: i
 			var lx1 := lerpf(ex0, rx0, t1)
 			var px0 := lerpf(ex1, rx1, t0)
 			var px1 := lerpf(ex1, rx1, t1)
-			var span0 := _fila_opaca(img, xoff, yoff, fw, int(py0), int(lx0), int(px0))
-			var span1 := _fila_opaca(img, xoff, yoff, fw, int(py1), int(lx1), int(px1))
-			lx0 = clampf(float(span0.x), minf(ex0, rx0), maxf(lx0 + 4.0, rx0))
-			px0 = clampf(float(span0.y), minf(px0 - 4.0, rx1), maxf(ex1, rx1))
-			lx1 = clampf(float(span1.x), minf(ex0, rx0), maxf(lx1 + 4.0, rx0))
-			px1 = clampf(float(span1.y), minf(px1 - 4.0, rx1), maxf(ex1, rx1))
 			var wy0 := lerpf(y_alero_m, y_pico_m, t0)
 			var wy1 := lerpf(y_alero_m, y_pico_m, t1)
 			var wz0 := lerpf(z_frente, z_pico, t0)
 			var wz1 := lerpf(z_frente, z_pico, t1)
-			var bl := Vector3((lx0 - fw * 0.5) * PX, wy0, wz0)
-			var br := Vector3((px0 - fw * 0.5) * PX, wy0, wz0)
-			var tr := Vector3((px1 - fw * 0.5) * PX, wy1, wz1)
-			var tl := Vector3((lx1 - fw * 0.5) * PX, wy1, wz1)
-			_quad(st, bl, br, tr, tl,
-				_uv(lx0, py0, fw, fh), _uv(px0, py0, fw, fh), _uv(px1, py1, fw, fh), _uv(lx1, py1, fw, fh),
-				Color(1.02, 1.01, 0.99))
+			for c in cols_uv:
+				var s0 := float(c) / float(cols_uv)
+				var s1 := float(c + 1) / float(cols_uv)
+				var ax0 := lerpf(lx0, px0, s0)
+				var ax1 := lerpf(lx0, px0, s1)
+				var bx0 := lerpf(lx1, px1, s0)
+				var bx1 := lerpf(lx1, px1, s1)
+				var bl := Vector3((ax0 - fw * 0.5) * PX, wy0, wz0)
+				var br := Vector3((ax1 - fw * 0.5) * PX, wy0, wz0)
+				var tr := Vector3((bx1 - fw * 0.5) * PX, wy1, wz1)
+				var tl := Vector3((bx0 - fw * 0.5) * PX, wy1, wz1)
+				var u0 := _uv(ax0, py0, fw, fh)
+				var u1 := _uv(ax1, py0, fw, fh)
+				var u2 := _uv(bx1, py1, fw, fh)
+				var u3 := _uv(bx0, py1, fw, fh)
+				if _quad_opaco(img, xoff, yoff, fw, fh, u0, u1, u2, u3):
+					_quad(st, bl, br, tr, tl, u0, u1, u2, u3, Color(1.02, 1.01, 0.99))
+				else:
+					_quad_tiling(st, bl, br, tr, tl, m_techo, fw, fh, Color(0.95, 0.94, 0.92))
 
 		var b_tl := Vector3((rx0 - fw * 0.5) * PX, y_pico_m, z_pico)
 		var b_tr := Vector3((rx1 - fw * 0.5) * PX, y_pico_m, z_pico)
 		var b_bl := Vector3((ex0 - fw * 0.5) * PX, y_alero_m, z_atras)
 		var b_br := Vector3((ex1 - fw * 0.5) * PX, y_alero_m, z_atras)
-		_quad_tiling(st, b_br, b_bl, b_tl, b_tr, m_techo, fw, fh, Color(0.76, 0.78, 0.84))
+		_quad_tiling(st, b_br, b_bl, b_tl, b_tr, m_techo, fw, fh, Color(0.80, 0.82, 0.86))
 
-		# Limas / faldones laterales triangulares con azulejos 1:1 de píxel (cero estiramiento)
+		# Limas / faldones laterales triangulares con azulejos 1:1 de píxel (cero estiramiento, unidos sin huecos)
 		var f_bl := Vector3((ex0 - fw * 0.5) * PX, y_alero_m, z_frente)
 		var f_br := Vector3((ex1 - fw * 0.5) * PX, y_alero_m, z_frente)
-		_tri_tiling(st, b_bl, f_bl, b_tl, m_techo, fw, fh, Color(0.90, 0.90, 0.93))
-		_tri_tiling(st, f_br, b_br, b_tr, m_techo, fw, fh, Color(0.72, 0.74, 0.80))
-		_quad_tiling(st, _p(x0, y_alero, -fondo, fw, fh), _p(x1, y_alero, -fondo, fw, fh), b_tr, b_tl, m_pared, fw, fh, Color(0.68, 0.70, 0.75))
+		_tri_tiling(st, b_bl, f_bl, b_tl, m_techo, fw, fh, Color(0.92, 0.92, 0.94))
+		_tri_tiling(st, f_br, b_br, b_tr, m_techo, fw, fh, Color(0.78, 0.80, 0.85))
+		_quad_tiling(st, _p(x0, y_alero, -fondo, fw, fh), _p(x1, y_alero, -fondo, fw, fh), b_tr, b_tl, m_pared, fw, fh, Color(0.76, 0.78, 0.82))
 
 	_aplicar_extras(st, img, cfg, xoff, yoff, fw, fh, m_techo)
 
@@ -721,7 +830,8 @@ static func _construir_gable(st: SurfaceTool, img: Image, cfg: Dictionary, xoff:
 	var fondo := float(cfg.get("fondo", 3.4))
 	var oh_z := float(cfg.get("alero_z", 0.18))
 
-	var m_pared := _muestra(img, xoff, yoff / fh, fw, fh, int(x0) + 2, int(x0) + 18, int(y_alero) + 4, fh - 6)
+	var rect_pared: Array = cfg.get("pared_rect", [])
+	var m_pared := _muestra(img, xoff, yoff / fh, fw, fh, int(rect_pared[0]), int(rect_pared[1]), int(rect_pared[2]), int(rect_pared[3])) if rect_pared.size() == 4 else _muestra(img, xoff, yoff / fh, fw, fh, int(x0) + 2, int(x0) + 18, int(y_alero) + 4, fh - 6)
 	var m_techo_i := _muestra(img, xoff, yoff / fh, fw, fh, int(ex0) + 2, int(cx) - 4, int(lerpf(y_pico, y_alero, 0.5)), int(y_alero))
 	var m_techo_d := _muestra(img, xoff, yoff / fh, fw, fh, int(cx) + 4, int(ex1) - 2, int(lerpf(y_pico, y_alero, 0.5)), int(y_alero))
 
@@ -742,9 +852,9 @@ static func _construir_gable(st: SurfaceTool, img: Image, cfg: Dictionary, xoff:
 			_p(cx1, 0, -fondo * 0.4, fw, fh), _p(cx0, 0, -fondo * 0.4, fw, fh),
 			_uv(cx0, cy, fw, fh), _uv(cx1, cy, fw, fh), _uv(cx1, 0, fw, fh), _uv(cx0, 0, fw, fh), Color.WHITE)
 
-	_caja_texturada(st, x0, x1, y_alero, fh, 0.0, -fondo, fw, fh, m_pared, Rect2(), false)
+	_caja_texturada(st, x0, x1, y_alero, fh, 0.0, -fondo, fw, fh, m_pared, m_pared, false)
 	_tri_tiling(st, _p(x1, y_alero, -fondo, fw, fh), _p(x0, y_alero, -fondo, fw, fh), _p(cx, y_pico, -fondo, fw, fh),
-		m_pared, fw, fh, Color(0.68, 0.70, 0.76))
+		m_pared, fw, fh, Color(0.76, 0.78, 0.83))
 
 	var zf := oh_z
 	var zb := -fondo - oh_z
@@ -779,7 +889,7 @@ static func _construir_domo(st: SurfaceTool, img: Image, cfg: Dictionary, xoff: 
 		_p(fw, y_alero, 0.02, fw, fh), _p(0, y_alero, 0.02, fw, fh),
 		_uv(0, fh, fw, fh), _uv(fw, fh, fw, fh), _uv(fw, y_alero, fw, fh), _uv(0, y_alero, fw, fh), Color.WHITE)
 
-	var segs := 12
+	var segs := 16
 	var y_alero_m := (float(fh) - y_alero) * PX
 	for i in segs:
 		var a0 := -PI + TAU * float(i) / float(segs)
@@ -788,20 +898,25 @@ static func _construir_domo(st: SurfaceTool, img: Image, cfg: Dictionary, xoff: 
 		var b1 := Vector3(cx_m + sin(a1) * rx, 0.0, zc + cos(a1) * rz)
 		var t1 := Vector3(b1.x, y_alero_m, b1.z)
 		var t0 := Vector3(b0.x, y_alero_m, b0.z)
-		var sombra := 0.72 + 0.28 * clampf(cos((a0 + a1) * 0.5), 0.0, 1.0)
+		var sombra := 0.80 + 0.20 * clampf(cos((a0 + a1) * 0.5), 0.0, 1.0)
 		if cos((a0 + a1) * 0.5) >= 0.0:
 			var px_s0 := lerpf(x0, x1, (sin(a0) + 1.0) * 0.5)
 			var px_s1 := lerpf(x0, x1, (sin(a1) + 1.0) * 0.5)
-			_quad(st, b0, b1, t1, t0,
-				_uv(px_s0, fh, fw, fh), _uv(px_s1, fh, fw, fh), _uv(px_s1, y_alero, fw, fh), _uv(px_s0, y_alero, fw, fh),
-				Color(sombra, sombra, sombra))
+			var u0 := _uv(px_s0, fh, fw, fh)
+			var u1 := _uv(px_s1, fh, fw, fh)
+			var u2 := _uv(px_s1, y_alero, fw, fh)
+			var u3 := _uv(px_s0, y_alero, fw, fh)
+			if _quad_opaco(img, xoff, yoff, fw, fh, u0, u1, u2, u3):
+				_quad(st, b0, b1, t1, t0, u0, u1, u2, u3, Color(sombra, sombra, sombra))
+			else:
+				_quad_tiling(st, b0, b1, t1, t0, m_pared, fw, fh, Color(sombra, sombra, sombra))
 		else:
-			_quad_tiling(st, b0, b1, t1, t0, m_pared, fw, fh, Color(sombra * 0.9, sombra * 0.92, sombra * 0.96))
+			_quad_tiling(st, b0, b1, t1, t0, m_pared, fw, fh, Color(sombra * 0.92, sombra * 0.94, sombra * 0.97))
 
 	var cap_rx := maxf((cap_x1 - cap_x0) * 0.5 * PX, rx)
-	var cap_rz := maxf(rz * (cap_rx / maxf(rx, 0.1)), rz)
+	var cap_rz := clampf(rz * (cap_rx / maxf(rx, 0.1)), rz, rz * 1.35)
 	var cap_h := maxf((y_alero - y_pico) * PX * 0.85, 0.5)
-	var anillos := 3
+	var anillos := 5
 	for r in anillos:
 		var t0 := float(r) / float(anillos)
 		var t1 := float(r + 1) / float(anillos)
@@ -811,6 +926,8 @@ static func _construir_domo(st: SurfaceTool, img: Image, cfg: Dictionary, xoff: 
 		var h1 := y_alero_m + cap_h * (t1 if cono else sin(t1 * PI * 0.5))
 		var py0 := lerpf(y_alero, y_pico, t0)
 		var py1 := lerpf(y_alero, y_pico, t1)
+		var sp0 := _fila_opaca(img, xoff, yoff, fw, int(py0), int(lerpf(cap_x0, (cap_x0 + cap_x1) * 0.5, 1.0 - rad0)), int(lerpf(cap_x1, (cap_x0 + cap_x1) * 0.5, 1.0 - rad0)))
+		var sp1 := _fila_opaca(img, xoff, yoff, fw, int(py1), int(lerpf(cap_x0, (cap_x0 + cap_x1) * 0.5, 1.0 - rad1)), int(lerpf(cap_x1, (cap_x0 + cap_x1) * 0.5, 1.0 - rad1)))
 		for i in segs:
 			var a0 := -PI + TAU * float(i) / float(segs)
 			var a1 := -PI + TAU * float(i + 1) / float(segs)
@@ -819,16 +936,18 @@ static func _construir_domo(st: SurfaceTool, img: Image, cfg: Dictionary, xoff: 
 			var p11 := Vector3(cx_m + sin(a1) * cap_rx * rad1, h1, zc + cos(a1) * cap_rz * rad1)
 			var p01 := Vector3(cx_m + sin(a0) * cap_rx * rad1, h1, zc + cos(a0) * cap_rz * rad1)
 			var am := (a0 + a1) * 0.5
-			var sombra := 0.78 + 0.24 * clampf(0.4 + 0.6 * cos(am) - 0.15 * sin(am), 0.0, 1.0)
+			var sombra := 0.82 + 0.20 * clampf(0.4 + 0.6 * cos(am) - 0.15 * sin(am), 0.0, 1.0)
 			if cos(am) >= 0.0:
-				_quad(st, p00, p10, p11, p01,
-					_uv(lerpf(cap_x0, cap_x1, (sin(a0) * rad0 + 1.0) * 0.5), py0, fw, fh),
-					_uv(lerpf(cap_x0, cap_x1, (sin(a1) * rad0 + 1.0) * 0.5), py0, fw, fh),
-					_uv(lerpf(cap_x0, cap_x1, (sin(a1) * rad1 + 1.0) * 0.5), py1, fw, fh),
-					_uv(lerpf(cap_x0, cap_x1, (sin(a0) * rad1 + 1.0) * 0.5), py1, fw, fh),
-					Color(sombra, sombra, sombra))
+				var u0 := _uv(lerpf(float(sp0.x) + 1.0, float(sp0.y) - 1.0, (sin(a0) + 1.0) * 0.5), py0, fw, fh)
+				var u1 := _uv(lerpf(float(sp0.x) + 1.0, float(sp0.y) - 1.0, (sin(a1) + 1.0) * 0.5), py0, fw, fh)
+				var u2 := _uv(lerpf(float(sp1.x) + 1.0, float(sp1.y) - 1.0, (sin(a1) + 1.0) * 0.5), py1, fw, fh)
+				var u3 := _uv(lerpf(float(sp1.x) + 1.0, float(sp1.y) - 1.0, (sin(a0) + 1.0) * 0.5), py1, fw, fh)
+				if _quad_opaco(img, xoff, yoff, fw, fh, u0, u1, u2, u3):
+					_quad(st, p00, p10, p11, p01, u0, u1, u2, u3, Color(sombra, sombra, sombra))
+				else:
+					_quad_tiling(st, p00, p10, p11, p01, m_techo, fw, fh, Color(sombra, sombra, sombra))
 			else:
-				_quad_tiling(st, p00, p10, p11, p01, m_techo, fw, fh, Color(sombra * 0.9, sombra * 0.92, sombra * 0.96))
+				_quad_tiling(st, p00, p10, p11, p01, m_techo, fw, fh, Color(sombra * 0.92, sombra * 0.94, sombra * 0.97))
 
 	if cfg.has("crest_y"):
 		var cy := float(cfg["crest_y"])
@@ -858,22 +977,43 @@ static func _construir_puesto(st: SurfaceTool, img: Image, cfg: Dictionary, xoff
 		_uv(0, fh, fw, fh), _uv(fw, fh, fw, fh), _uv(fw, y_pico, fw, fh), _uv(0, y_pico, fw, fh), Color.WHITE)
 	_caja_texturada(st, x0, x1, y_mos, fh, 0.0, -fondo * 0.65, fw, fh, m_madera, m_madera, false)
 
-	var pw := 3.5
-	for px in [x0, x1 - pw]:
-		_caja_texturada(st, px, px + pw, y_alero, y_mos, -fondo * 0.65, -fondo * 0.9, fw, fh, m_madera, Rect2(), false)
+	var pw := 2.0
 
-	var y_alero_m := _p(0, y_alero, 0.0, fw, fh).y
-	var y_pico_m := y_alero_m + (y_alero - y_pico) * PX * 0.72
-	var fl := Vector3((x0 - 2.0 - fw * 0.5) * PX, y_alero_m, 0.25)
-	var fr := Vector3((x1 + 2.0 - fw * 0.5) * PX, y_alero_m, 0.25)
-	var bl := Vector3((x0 - 2.0 - fw * 0.5) * PX, y_pico_m, -fondo)
-	var br := Vector3((x1 + 2.0 - fw * 0.5) * PX, y_pico_m, -fondo)
-	_quad(st, fl, fr, br, bl,
-		_uv(x0, y_alero, fw, fh), _uv(x1, y_alero, fw, fh), _uv(x1, y_pico, fw, fh), _uv(x0, y_pico, fw, fh), Color.WHITE)
-	var bl_bot := Vector3(bl.x, y_alero_m, bl.z)
-	var br_bot := Vector3(br.x, y_alero_m, br.z)
-	_tri_tiling(st, bl_bot, fl, bl, m_toldo, fw, fh, Color(0.86, 0.86, 0.88))
-	_tri_tiling(st, fr, br_bot, br, m_toldo, fw, fh, Color(0.72, 0.74, 0.78))
+	# Solo construimos toldo 3D cerrado si el sprite tiene tela casi continua (en ruina son banderines calados ~50%)
+	var opacos := 0
+	var total := 0
+	if img:
+		for sy in range(int(y_pico) + 2, maxi(int(y_pico) + 3, int(y_alero) - 1), 3):
+			for sx in range(int(x0) + 4, maxi(int(x0) + 5, int(x1) - 4), 4):
+				total += 1
+				if img.get_pixel(xoff + sx, yoff + sy).a >= 0.85:
+					opacos += 1
+	if total == 0 or float(opacos) / float(total) >= 0.80:
+		for px in [x0 + 1.0, x1 - 1.0 - pw]:
+			_caja_texturada(st, px, px + pw, y_alero, y_mos, -fondo * 0.65, -fondo * 0.88, fw, fh, m_madera, Rect2(), false)
+		var y_alero_m := _p(0, y_alero, 0.0, fw, fh).y
+		var y_pico_m := y_alero_m + (y_alero - y_pico) * PX * 0.72
+		var fl := Vector3((x0 - 2.0 - fw * 0.5) * PX, y_alero_m, 0.25)
+		var fr := Vector3((x1 + 2.0 - fw * 0.5) * PX, y_alero_m, 0.25)
+		var bl := Vector3((x0 - 2.0 - fw * 0.5) * PX, y_pico_m, -fondo)
+		var br := Vector3((x1 + 2.0 - fw * 0.5) * PX, y_pico_m, -fondo)
+		if _quad_opaco(img, xoff, yoff, fw, fh,
+				_uv(x0, y_alero, fw, fh), _uv(x1, y_alero, fw, fh), _uv(x1, y_pico, fw, fh), _uv(x0, y_pico, fw, fh)):
+			_quad(st, fl, fr, br, bl,
+				_uv(x0, y_alero, fw, fh), _uv(x1, y_alero, fw, fh), _uv(x1, y_pico, fw, fh), _uv(x0, y_pico, fw, fh), Color.WHITE)
+		else:
+			_quad_tiling(st, fl, fr, br, bl, m_toldo, fw, fh, Color(0.95, 0.95, 0.95))
+		var bl_bot := Vector3(bl.x, y_alero_m, bl.z)
+		var br_bot := Vector3(br.x, y_alero_m, br.z)
+		_tri_tiling(st, bl_bot, fl, bl, m_toldo, fw, fh, Color(0.88, 0.88, 0.90))
+		_tri_tiling(st, fr, br_bot, br, m_toldo, fw, fh, Color(0.78, 0.80, 0.84))
+		_quad_tiling(st, br_bot, bl_bot, bl, br, m_toldo, fw, fh, Color(0.78, 0.80, 0.84))
+	else:
+		# Estructura 3D abierta tipo pérgola cuando los banderines están rasgados: postes traseros completos y vigas laterales
+		for px in [x0 + 1.0, x1 - 1.0 - pw]:
+			_caja_texturada(st, px, px + pw, y_pico + 2.0, y_mos, -fondo * 0.65, -fondo * 0.88, fw, fh, m_madera, Rect2(), false)
+			_caja_texturada(st, px, px + pw, y_pico, y_pico + 2.2, 0.0, -fondo * 0.88, fw, fh, m_madera, m_madera, false)
+		_caja_texturada(st, x0 + 1.0, x1 - 1.0, y_pico, y_pico + 2.2, -fondo * 0.65, -fondo * 0.88, fw, fh, m_madera, m_madera, false)
 
 
 static func _construir_arbol(st: SurfaceTool, img: Image, cfg: Dictionary, xoff: int, yoff: int, fw: int, fh: int) -> void:
@@ -907,12 +1047,12 @@ static func _construir_arbol(st: SurfaceTool, img: Image, cfg: Dictionary, xoff:
 				_uv(lerpf(x0, x1, (sin(a1) + 1.0) * 0.5), y_copa, fw, fh),
 				_uv(lerpf(x0, x1, (sin(a0) + 1.0) * 0.5), y_copa, fw, fh), Color.WHITE)
 		else:
-			_quad_tiling(st, b0, b1, t1, t0, m_corteza, fw, fh, Color(0.75, 0.74, 0.76))
+			_quad_tiling(st, b0, b1, t1, t0, m_corteza, fw, fh, Color(0.88, 0.87, 0.89))
 
 	for z_off: float in [0.05, -fondo * 0.48, -fondo * 0.92]:
 		var s := 1.0 if z_off > -1.0 else (0.94 if z_off > -3.0 else 0.86)
 		var y_base := float(fh) if z_off > 0.0 else y_copa + 18.0
-		var shade := Color(1.0, 1.0, 1.0) if z_off > -1.0 else Color(0.84, 0.88, 0.84)
+		var shade := Color(1.0, 1.0, 1.0) if z_off > -1.0 else Color(0.90, 0.93, 0.90)
 		_quad(st,
 			_p(0, y_base, z_off, fw, fh) * s + Vector3(0, (1.0 - s) * y_copa_m, 0),
 			_p(fw, y_base, z_off, fw, fh) * s + Vector3(0, (1.0 - s) * y_copa_m, 0),

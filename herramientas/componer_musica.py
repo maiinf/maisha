@@ -1324,7 +1324,7 @@ def jefe_kuvu():
     return final(p, sala=3.2, mezcla=0.35, brillo=4600)
 
 
-NO_SE_REPITEN = ("raiz_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
+NO_SE_REPITEN = ("raiz_libre", "sigilia_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior")      # (kitovu e interior vuelven tras un silencio)
 # =============================================================================
 # PASO DE PIEDRA: misterio y curiosidad (re menor con la sexta mayor, dórico): una caja de música que se pregunta
 # cosas, el tic-tac de un reloj que nadie ha parado, el viento del paso y la flauta que contesta
@@ -2050,6 +2050,55 @@ def jefe_grimorio():
     return final(p, sala=3.6, mezcla=0.36, brillo=5500)
 
 
+def sigilia_libre():
+    """«Sigilia recuerda»: el final de Sigilia tras vencer al Grimorio de Tinta.
+    El vals de Sigilia (3/4, 76 BPM) deja atrás la sombra y se abre luminoso hacia re mayor:
+    arpegios cálidos de piano como tinta dorada que vuelve a correr, kalimba, flauta y coro,
+    enlazando el tema de Sigilia con el tema de Maisha y campanitas finales."""
+    tempo = Tempo(76)
+    pulsos = 72
+    p = Pista(tempo.s(pulsos) + 4)
+    progresion = [
+        ("B1", "m"), ("G1", "M"), ("D2", "M"), ("F#1", "m"),
+        ("E2", "m"), ("A1", "M"), ("D2", "M"), ("A1", "sus"),
+        ("D2", "M"), ("A1", "M"), ("B1", "m"), ("G1", "M"),
+        ("E2", "m"), ("A1", "M"), ("D2", "M"), ("D2", "M"),
+        ("G1", "M"), ("A1", "M"), ("D2", "M"), ("B1", "m"),
+        ("E2", "m"), ("A1", "sus"), ("D2", "M"), ("D2", "M"),
+    ]
+    colchones(p, tempo, progresion, compas=3, brillo=1300, volumen=0.30, octava_bajo=2, fuerza_bajo=0.32)
+    for i, (raiz, tipo) in enumerate(progresion):
+        notas = acorde(raiz[:-1] + "3", tipo)
+        notas = [n[:-1] + str(int(n[-1]) + 1) for n in notas] + [notas[0][:-1] + str(int(notas[0][-1]) + 2)]
+        arpegio_piano(p, tempo, notas, i * 3, 3, cada=0.5, fuerza=0.20, sostener=2.4)
+
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.50, vibrato=4.8)
+    # 1.ª vuelta: el tema de Sigilia en la kalimba y el piano cálido
+    melodia(p, tempo, TEMA_SIGILIA, desde=0, instrumento=kalimba, volumen=0.34, pan=-0.12)
+    tocar(p, tempo, transportar(TEMA_SIGILIA, -12), desde=0, fuerza=0.24, pan=0.14)
+    # 2.ª vuelta: vuelve en la flauta luminosa sobre coro suave y destellos de tinta dorada
+    melodia(p, tempo, TEMA_SIGILIA, desde=24, instrumento=flauta_, volumen=0.40, sostener=0.95, pan=0.14)
+    melodia(p, tempo, transportar(TEMA_SIGILIA, -12), desde=24, instrumento=kalimba, volumen=0.22, pan=-0.18)
+    for k, ac in enumerate((["D3", "A3", "F#4"], ["B2", "F#3", "D4"])):
+        p.poner(coro(ac, tempo.s(12) + 0.8, "a", 0.5), tempo.s(24 + k * 12), 0.24)
+
+    # Cierre: el tema de Maisha se enlaza con la cadencia final de Sigilia
+    cierre = [
+        ("D5", 0, 1.5), ("A4", 1.5, 0.5), ("E5", 2, 1), ("F#5", 3, 1.5), ("E5", 4.5, 0.5), ("D5", 5, 1),
+        ("B4", 6, 1.5), ("D5", 7.5, 0.5), ("F#5", 8, 1), ("A5", 9, 3),
+        ("G5", 12, 1), ("F#5", 13, 1), ("E5", 14, 1), ("F#5", 15, 1.5), ("E5", 16.5, 0.5), ("D5", 17, 1),
+        ("F#5", 18, 1.5), ("E5", 19.5, 0.5), ("C#5", 20, 1), ("D5", 21, 3),
+    ]
+    tocar(p, tempo, cierre, desde=48, fuerza=0.36, pan=-0.05)
+    melodia(p, tempo, cierre, desde=48, instrumento=flauta_, volumen=0.36, sostener=0.95, pan=0.12)
+    p.poner(coro(["D3", "A3", "F#4"], tempo.s(12) + 1.0, "a", 0.5), tempo.s(48), 0.26)
+    p.poner(coro(["D3", "F#3", "A3", "D4"], tempo.s(12) + 1.5, "a", 0.55), tempo.s(60), 0.28)
+    # gotas doradas que vuelven a fluir en los canales y en la fuente de Maandiko
+    for k, nota in enumerate(("D6", "F#6", "A6", "D7", "F#7")):
+        p.poner(campanita(nota, 3.0, 0.34 - k * 0.03), tempo.s(69) + k * 0.22, pan=(k - 2) * 0.14)
+    return silencio_suave(final(p, bucle=False, sala=3.4, mezcla=0.34, brillo=6200), 4.0)
+
+
 # =============================================================================
 # ASTERHAUL (MUNDO 3): «El eco de la piedra» y «La ciudad dentro del cráter»
 # Kalimba de láminas de hierro, marimba de piedra (balafón), flauta cálida y yunque en Re dórico
@@ -2496,6 +2545,7 @@ PIEZAS["observatorio_aurora"] = observatorio_aurora
 PIEZAS["jefe_kengele"] = jefe_kengele
 PIEZAS["seccion_prohibida"] = seccion_prohibida
 PIEZAS["jefe_grimorio"] = jefe_grimorio
+PIEZAS["sigilia_libre"] = sigilia_libre
 PIEZAS["desfiladero_meteorito"] = desfiladero_meteorito
 PIEZAS["mji_jiwe"] = mji_jiwe
 PIEZAS["galerias_ambar"] = galerias_ambar
@@ -2515,6 +2565,7 @@ TITULOS["observatorio_aurora"] = "Donde miran las estrellas"
 TITULOS["jefe_kengele"] = "La campana que no suena"
 TITULOS["seccion_prohibida"] = "Lo que se guardó bajo llave"
 TITULOS["jefe_grimorio"] = "El último capítulo"
+TITULOS["sigilia_libre"] = "Sigilia recuerda"
 TITULOS["desfiladero_meteorito"] = "El eco de la piedra"
 TITULOS["mji_jiwe"] = "La ciudad dentro del cráter"
 TITULOS["galerias_ambar"] = "Las vetas que cantan"

@@ -237,6 +237,7 @@ func aspecto(niveles: Dictionary = {}) -> Dictionary:
 func chispa_runa(sigilo: Node2D, radio: float, desde: float, tipo: String, color: Color) -> void:
 	if valor("sigilo_chispa") <= 0.0:
 		return
+	var sonar := false
 	for nodo in sigilo.get_tree().get_nodes_in_group("daniables"):
 		var o := nodo as Node2D
 		if o == null or o.is_in_group("maisha") or o.is_in_group("cargables"):
@@ -245,6 +246,9 @@ func chispa_runa(sigilo: Node2D, radio: float, desde: float, tipo: String, color
 		if lejos > desde and lejos <= radio + 26.0:
 			o.call("recibir_danio", 1, sigilo.global_position, tipo)
 			Impacto.chispa(o.global_position + Vector2(0, -8), Vector2.UP, color)
+			sonar = true
+	if sonar:
+		Sonido.efecto("halo_chispa", -2.0, sigilo.global_position)
 
 
 # --- Los números del combate, con las Artes ------------------------------------------

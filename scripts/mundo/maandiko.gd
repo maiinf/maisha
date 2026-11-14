@@ -42,6 +42,11 @@ const VECINOS := [
 ]
 ## los charcos de Tinta Quieta que tapan las salidas: casilla (el centro de la calle, junto a la muralla)
 const CHARCOS := [Vector2i(4, 25), Vector2i(67, 25), Vector2i(15, 3)]
+const FUENTE_DORADA := preload("res://arte/mundos/sigilia/maandiko/fuente_dorada.png")
+const CHARCO_DORADO := preload("res://arte/mundos/sigilia/maandiko/charco_dorado.png")
+const CHARCOS_PLAZA := [Vector2i(34, 29), Vector2i(38, 31)]
+
+var _tinta_dorada := false
 
 
 func _ready() -> void:
@@ -53,6 +58,8 @@ func _ready() -> void:
 	_poner_charcos()
 	_poner_faroles()
 	_poner_fichas()
+	if Estado.tiene("sigilia_libre"):
+		_dorar_tinta()
 	if not Estado.tiene("maandiko_llegada"):
 		_pensar_al_llegar.call_deferred()
 
@@ -74,12 +81,65 @@ func _poner_vecinos() -> void:
 
 
 func _poner_charcos() -> void:
+	if Estado.tiene("sigilia_libre"):
+		return
 	for c in CHARCOS:
 		var charco: StaticBody2D = CHARCO.new()
 		charco.marca = "charco/maandiko/%d,%d" % [c.x, c.y]
 		charco.position = Vector2(c) * 16.0 + Vector2(8, 14)
 		$Entidades.add_child(charco)
 		charco.derretido.connect(func() -> void: Estado.marcar("calle_deshelada"))
+
+
+func _dorar_tinta() -> void:
+	if _tinta_dorada:
+		return
+	_tinta_dorada = true
+	for hijo in $Entidades.get_children():
+		for sub in hijo.get_children():
+			if not (sub is Sprite2D):
+				continue
+			var sp := sub as Sprite2D
+			var ct := sp.texture as CanvasTexture
+			var ruta := ct.diffuse_texture.resource_path if ct and ct.diffuse_texture else (sp.texture.resource_path if sp.texture else "")
+			if not ruta.ends_with("fuente.png"):
+				continue
+			if ct:
+				var ct_d := CanvasTexture.new()
+				ct_d.diffuse_texture = FUENTE_DORADA
+				ct_d.normal_texture = ct.normal_texture
+				ct_d.specular_color = ct.specular_color
+				ct_d.specular_shininess = ct.specular_shininess
+				sp.texture = ct_d
+			else:
+				sp.texture = FUENTE_DORADA
+			var luz := PointLight2D.new()
+			luz.position = Vector2(0, -18)
+			luz.color = Color("ffd25a")
+			luz.energy = 0.65
+			luz.texture = FAROL._textura_luz()
+			luz.texture_scale = 2.4
+			luz.height = 24.0
+			hijo.add_child(luz)
+	for c in get_tree().get_nodes_in_group("charcos_tinta"):
+		if is_instance_valid(c):
+			c.queue_free()
+	for casilla in CHARCOS:
+		_poner_charco_dorado(casilla, 1)
+	for casilla in CHARCOS_PLAZA:
+		_poner_charco_dorado(casilla, 2)
+
+
+func _poner_charco_dorado(casilla: Vector2i, marco: int) -> void:
+	var sp := Sprite2D.new()
+	sp.texture = CHARCO_DORADO
+	sp.hframes = 3
+	sp.frame = marco
+	sp.centered = false
+	sp.offset = Vector2(-24, -26)
+	sp.z_index = -5
+	sp.position = Vector2(casilla) * 16.0 + Vector2(8, 14)
+	$Entidades.add_child(sp)
 
 
 func _poner_faroles() -> void:
@@ -136,6 +196,8 @@ func _poner_archivo() -> void:
 ## Cada nombre que vuelve: si ya están los doce, el Gran Archivo se abre
 func _al_poner_marca(marca: String) -> void:
 	super(marca)
+	if marca == "sigilia_libre":
+		_dorar_tinta()
 	if marca in INDICE.NOMBRES and INDICE.completo() and not Estado.tiene("indice_completo"):
 		Estado.marcar("indice_completo")
 		_hud.mostrar_mensaje("Los doce nombres han vuelto: el Gran Archivo se abre")

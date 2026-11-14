@@ -91,7 +91,7 @@ func _activar() -> bool:
 			return true
 		Estado.marcar(marca)
 	_queda = dura
-	Sonido.efecto("geoda_encender", -2.0, global_position)
+	Sonido.efecto("pedestal_encender", 0.0, global_position)
 	_poner(true)
 	preload("res://scripts/mundo/relieve.gd").destello(get_parent(), position + Vector2(0, -20), COLORES[tipo], 0.9, 0.9, 0.4)
 	activado.emit(tipo)

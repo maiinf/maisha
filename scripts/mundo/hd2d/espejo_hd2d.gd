@@ -23,7 +23,7 @@ const ALTO_PENA := 1.25            # metros que se levanta una peña (lo que mid
 ## Mapas en los que la pared pintada es el doble de alta (gargantas y montaña: pintar_suelo, «cara=2»)
 const PARED_DOBLE := ["canada_eco", "paso_piedra", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "canal_tinta"]
 ## Mapas con altura de pared propia en casillas (p. ej. Sección Prohibida: estanterías de 24 px = 1,5 casillas)
-const ALTO_MAPA := {"seccion_prohibida": 1.5}
+const ALTO_MAPA := {"seccion_prohibida": 1.5, "desfiladero_meteorito": 1.625}
 ## Mapas en los que «0» no es peña sino cielo o vacío (no se levantan bloques de roca)
 const SIN_PENAS := ["observatorio_aurora"]
 const SUELO_BAJO := -4             # dibujos con z_index por debajo: se tumban en el suelo
@@ -45,7 +45,7 @@ const DE_PIE := ["brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_
 	"recogible.gd", "arco_ruinas.gd", "portal.gd", "aldeano.gd", "taa.gd", "vecino.gd", "escriba.gd",
 	"bobina.gd", "saa.gd", "grimorio_tinta.gd", "rasgos_maisha.gd", "kimya.gd", "roca_mineral.gd", "escarcha.gd",
 	"piedra_recuerdo.gd", "primer_arbol.gd", "buibui.gd", "guardian.gd", "kambare.gd", "mamba.gd",
-	"cangrejo.gd", "rescoldo.gd", "espinas_paso.gd", "gallina_perdida.gd", "barca_bata.gd"]
+	"cangrejo.gd", "rescoldo.gd", "espinas_paso.gd", "gallina_perdida.gd", "barca_bata.gd", "chispa_golpe.gd"]
 const VENTANA := Vector2i(160, 160)       # píxeles de cada ventanita
 const VENTANA_PIE := Vector2(80, 144)     # dónde cae el pie del objeto dentro de la ventanita
 const VENTANAS := 14                      # como mucho, las de los 14 objetos de pie más cerca de la cámara
@@ -83,6 +83,28 @@ void fragment() {
 	}
 	ALBEDO = c;
 	ROUGHNESS = 1.0;
+}
+"""
+## Ventanita de pie (Rasgos / efectos con código): deshace el alfa premultiplicado del SubViewport para no oscurecer brillos
+const SOMBREADOR_PIE := """
+shader_type spatial;
+render_mode unshaded, depth_draw_never, cull_disabled, blend_mix;
+uniform sampler2D ventana : filter_nearest;
+void vertex() {
+	vec3 cam_z = normalize(vec3(INV_VIEW_MATRIX[2].x, 0.0, INV_VIEW_MATRIX[2].z));
+	vec3 cam_x = normalize(cross(vec3(0.0, 1.0, 0.0), cam_z));
+	MODELVIEW_MATRIX = VIEW_MATRIX * mat4(
+		vec4(cam_x, 0.0),
+		vec4(0.0, 1.0, 0.0, 0.0),
+		vec4(cam_z, 0.0),
+		MODEL_MATRIX[3]
+	);
+}
+void fragment() {
+	vec4 c = texture(ventana, UV);
+	if (c.a <= 0.002) { discard; }
+	ALBEDO = clamp(c.rgb / c.a, 0.0, 1.0);
+	ALPHA = c.a;
 }
 """
 ## El suelo lejano (todo el mapa): igual, pero con el suelo pintado y la máscara a la medida del mapa
@@ -378,13 +400,15 @@ func _crear_capas() -> void:
 	_velo_pantalla.add_child(cuadro)
 	add_child(_velo_pantalla)
 	# las ventanitas de lo que va de pie
+	var sombreador_pie := Shader.new()
+	sombreador_pie.code = SOMBREADOR_PIE
 	for i in VENTANAS:
 		var v := SubViewport.new()
 		v.size = VENTANA
 		v.transparent_bg = true
 		v.world_2d = vista.world_2d
 		v.canvas_cull_mask = CANAL_PIE
-		v.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		v.render_target_update_mode = SubViewport.UPDATE_DISABLED
 		v.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
 		add_child(v)
 		var g := Sprite3D.new()
@@ -395,13 +419,21 @@ func _crear_capas() -> void:
 		g.shaded = false
 		g.alpha_cut = SpriteBase3D.ALPHA_CUT_DISABLED
 		g.transparent = true
+		var mat_pie := ShaderMaterial.new()
+		mat_pie.shader = sombreador_pie
+		mat_pie.set_shader_parameter("ventana", v.get_texture())
+		g.material_override = mat_pie
 		g.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		g.offset = Vector2(VENTANA.x / 2.0 - VENTANA_PIE.x, VENTANA_PIE.y - VENTANA.y / 2.0)
 		g.visible = false
 		add_child(g)
 		_ventanas.append([v, g])
 	# la pantalla principal deja de pintar el mundo 2D (sigue vivo y viéndose en las capas); la interfaz, sí
-	_mascara_antes = vista.canvas_cull_mask
+	if vista.has_meta("_hd2d_mascara_antes"):
+		_mascara_antes = int(vista.get_meta("_hd2d_mascara_antes"))
+	else:
+		_mascara_antes = vista.canvas_cull_mask
+		vista.set_meta("_hd2d_mascara_antes", _mascara_antes)
 	vista.canvas_cull_mask = _mascara_antes & ~CANALES_MUNDO
 
 
@@ -444,11 +476,17 @@ func _mover_capas() -> void:
 
 
 func _exit_tree() -> void:
-	# todo como estaba: la escena vuelve a pintarse y cada dibujo a su canal
-	if is_instance_valid(escena) and escena.is_inside_tree():
-		escena.get_viewport().canvas_cull_mask = _mascara_antes
-	else:
-		get_viewport().canvas_cull_mask = _mascara_antes
+	# todo como estaba: solo restauramos la máscara si no queda otro espejo activo (evita carrera al pulsar H rápido)
+	var otro_activo := false
+	for h in get_tree().root.get_children():
+		if h != self and not h.is_queued_for_deletion() and h.get_script() == get_script():
+			otro_activo = true
+			break
+	if not otro_activo:
+		var v := escena.get_viewport() if is_instance_valid(escena) and escena.is_inside_tree() else get_viewport()
+		if v:
+			v.canvas_cull_mask = _mascara_antes
+			v.remove_meta("_hd2d_mascara_antes")
 	for par in _canales.values():
 		if is_instance_valid(par[0]):
 			(par[0] as CanvasItem).visibility_layer = par[1]
@@ -774,5 +812,25 @@ func _copiar(n: Node2D, g: Sprite3D, ancla: Node2D, z: int) -> void:
 	# si gira hacia abajo (p. ej. un tentáculo hacia el sur), lo alzamos lo justo para que no se hunda bajo el suelo
 	var alza := (1.0 - cos(rot)) * maxf(0.0, -(n.offset.y + (alto * 0.5 if not g.centered else 0.0)))
 	# (las capas de un mismo cuerpo, un pelín hacia la cámara según su orden de dibujo, para que no parpadeen)
-	var orden := z * 0.004 + n.get_index() * 0.0015
+	var orden := z * 0.008 + _orden_en_ancla(n, ancla)
 	g.position = _al_suelo(ancla.global_position) + Vector3(sube.x * PX, (-sube.y + alza) * PX, orden)
+
+
+## Orden de dibujo de `n` respecto a `ancla`: respeta grupos hermanos como RopaDetras < Sprite < Ropa.
+static func _orden_en_ancla(n: Node, ancla: Node) -> float:
+	if n == ancla:
+		return 0.0
+	var pasos: Array[int] = []
+	var cur := n
+	while cur != null and cur != ancla:
+		pasos.append(cur.get_index())
+		cur = cur.get_parent()
+	if cur != ancla:
+		return float(n.get_index()) * 0.0015
+	var peso := 0.0015
+	var total := 0.0
+	for i in range(pasos.size() - 1, -1, -1):
+		var paso := pasos[i] + (0 if i == pasos.size() - 1 else 1)
+		total += float(paso) * peso
+		peso *= 0.12
+	return total
