@@ -1,13 +1,13 @@
 extends StaticBody2D
-## UN PILAR-DIAPASÓN (Asterhaul, la Puerta del Cráter): una columna de basalto con una horquilla de hierro
+## UN PILAR-DIAPASÓN (Asterhaul, la Puerta del Cráter; también los HORNOS-DIAPASÓN de Mji-Jiwe, con otro dibujo): una columna de basalto con una horquilla de hierro
 ## meteórico. Dormido, no suena. Un golpe de CARGA SÍSMICA lo hace vibrar para siempre (su `marca`).
 ## Dibujo: arte/mundos/asterhaul/desfiladero/pilar.png, 0 dormido · 1 sonando.
 
 signal sonando
 
-const DIBUJO := preload("res://arte/mundos/asterhaul/desfiladero/pilar.png")
-
 @export var marca := ""
+## su dibujo (2 fotogramas), en arte/mundos/asterhaul/: el pilar, o un horno-diapasón de calle (Mji-Jiwe)
+@export var dibujo := "desfiladero/pilar"
 var radio_carga := 6.0
 var encendido := false
 var _sprite: Sprite2D
@@ -18,9 +18,9 @@ func _ready() -> void:
 	add_to_group("sismicos")
 	add_to_group("pilares_diapason")
 	_sprite = Sprite2D.new()
-	_sprite.texture = DIBUJO
+	_sprite.texture = load("res://arte/mundos/asterhaul/%s.png" % dibujo)
 	_sprite.hframes = 2
-	_sprite.offset = Vector2(0, -22)
+	_sprite.offset = Vector2(0, -_sprite.texture.get_height() / 2.0 + 4)
 	add_child(_sprite)
 	var forma := CollisionShape2D.new()
 	var caja := RectangleShape2D.new()

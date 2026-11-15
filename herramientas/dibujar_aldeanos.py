@@ -870,6 +870,117 @@ def mwamba_gris():
     return mwamba(True)
 
 
+def _engrisar(l, oscuros=("concha", "delantal", "rojo", "azul", "metal", "cobre")):
+    """Cubre un dibujo de POLVO GRIS (los artesanos de Mji-Jiwe sin pulso): todo gris, los ojos apagados."""
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            c = l.m[y][x]
+            if c is None:
+                continue
+            mat, t = c
+            if mat in ("ojo", "nariz"):
+                l.m[y][x] = ("polvo", 0)
+            elif mat == "brillo":
+                l.m[y][x] = ("polvo", 1)
+            else:
+                l.m[y][x] = ("polvo", max(1, min(3, t + (1 if mat in oscuros else 0))))
+    return l
+
+
+def mhunzi():
+    """MHUNZI: la vieja maestra fundidora de Mji-Jiwe, una damán de roca. Menuda y tiesa, con el pelo de la cabeza
+    encanecido, las gafas de soldar de ámbar subidas a la frente, un mandil de cuero largo hasta los pies lleno de
+    quemaduras, un pañuelo azul al cuello y, en la mano, unas tenazas de fragua casi tan altas como ella."""
+    l = Lienzo()
+    for y in range(8, 30):                                    # las tenazas: dos varas que se cruzan...
+        l.px(19, y, "metal", 2 if y % 4 else 1)
+    for y in range(8, 16):
+        l.px(21 if y < 12 else 20, y, "metal", 3)
+    l.px(18, 7, "metal", 3); l.px(22, 7, "metal", 3); l.px(18, 6, "metal", 2); l.px(22, 6, "metal", 2)   # ...y las bocas
+    l.px(20, 15, "laton", 3)                                  # el remache
+    _daman_base(l)
+    l.ovalo(11.5, 9.0, 4.0, 2.0, "cana")                      # el pelo de la cabeza, encanecido
+    l.ovalo(11.5, 24.5, 4.8, 6.0, "delantal")                 # el mandil largo
+    l.rect(7, 29, 16, 29, "delantal", 1)
+    l.px(9, 17, "delantal", 1); l.px(14, 17, "delantal", 1); l.px(9, 18, "delantal", 2); l.px(14, 18, "delantal", 2)
+    for (x, y) in ((9, 23), (13, 26), (11, 21), (14, 22)):    # quemaduras
+        l.px(x, y, "hollin", 2)
+    l.rect(8, 16, 15, 16, "azul", 3)                          # el pañuelo azul
+    l.px(10, 17, "azul", 2)
+    l.ovalo(17.5, 19.0, 1.7, 2.0, "daman")                    # la mano en las tenazas
+    ojos(l, 11, 9, 14, alto=2)
+    for x in (8, 9, 10, 13, 14, 15):                          # las gafas de soldar, subidas a la frente
+        l.px(x, 8, "cobre", 2)
+        l.px(x, 9, "brasa", 3 if x in (9, 14) else 2)
+    l.px(11, 8, "cobre", 1); l.px(12, 8, "cobre", 1); l.px(7, 8, "cobre", 1); l.px(16, 8, "cobre", 1)
+    l.px(9, 15, "cana", 2); l.px(14, 15, "cana", 2)
+    return l
+
+
+def chuma():
+    """CHUMA: el mercader herrero del Mercado de la Escoria, un damán de roca grandote y bonachón. Gorra plana azul,
+    un bigotazo blanco que le tapa media cara, chaleco rojo sobre el mandil, el cinturón de herramientas y, al
+    hombro, un martillo de herrero."""
+    l = Lienzo()
+    for y in range(8, 30):                                    # el martillo: el mango...
+        l.px(19, y, "concha", 2 if y % 4 else 1)
+    l.rect(17, 4, 22, 8, "metal", 2)                          # ...y la cabeza
+    l.rect(17, 4, 22, 4, "metal", 3); l.px(17, 8, "metal", 1); l.px(22, 8, "metal", 1)
+    _daman_base(l)
+    l.ovalo(11.5, 24.0, 6.2, 6.4, "daman")                    # más barriga
+    l.ovalo(11.5, 24.5, 5.0, 5.4, "delantal")                 # el mandil
+    for x in (7, 8, 15, 16):                                  # el chaleco rojo, abierto
+        for y in range(18, 26):
+            l.px(x, y, "rojo", 2 if x in (8, 15) else 1)
+    l.rect(6, 26, 17, 26, "concha", 1)                        # el cinturón...
+    l.px(9, 27, "metal", 3); l.px(9, 28, "metal", 2); l.px(14, 27, "laton", 3); l.px(14, 28, "laton", 1)   # ...con sus herramientas
+    l.ovalo(17.5, 19.0, 1.8, 2.1, "daman")
+    ojos(l, 10, 9, 14, alto=2)
+    l.ovalo(11.5, 15.0, 4.2, 1.5, "cana")                     # el bigotazo
+    l.px(11, 13, "nariz"); l.px(12, 13, "nariz")
+    l.ovalo(11.5, 7.2, 5.6, 1.9, "azul")                      # la gorra plana
+    l.rect(6, 8, 13, 8, "azul", 1)                            # la visera
+    return l
+
+
+def artesano(tipo="a"):
+    """UN ARTESANO DE MJI-JIWE, damán de roca. a: CANTERO (gorro de fieltro pardo, mandil, una maceta en la mano) ·
+    b: HERRERA (pañuelo rojo a la cabeza, guantes, unas tenazas) · c: AFINADOR (bufanda de ámbar, un diapasón)."""
+    l = Lienzo()
+    if tipo == "a":
+        for y in range(14, 27):
+            l.px(19, y, "concha", 2 if y % 4 else 1)
+        l.rect(17, 11, 21, 14, "metal", 2); l.rect(17, 11, 21, 11, "metal", 3)
+    elif tipo == "b":
+        for y in range(10, 27):
+            l.px(19, y, "metal", 2 if y % 4 else 1)
+        l.px(18, 9, "metal", 3); l.px(20, 9, "metal", 3); l.px(18, 8, "metal", 2); l.px(20, 8, "metal", 2)
+    else:
+        for y in range(15, 26):
+            l.px(19, y, "metal", 2)
+        for y in range(7, 15):
+            l.px(18, y, "metal", 3); l.px(20, y, "metal", 2)
+        l.px(19, 15, "laton", 3)
+    _daman_base(l)
+    l.ovalo(11.5, 24.5, 4.4, 5.2, "delantal")
+    l.rect(8, 19, 15, 19, "delantal", 1)
+    l.px(9, 17, "delantal", 1); l.px(14, 17, "delantal", 1); l.px(9, 18, "delantal", 2); l.px(14, 18, "delantal", 2)
+    l.ovalo(17.5, 19.0, 1.7, 2.0, "daman" if tipo != "b" else "concha")
+    ojos(l, 10, 9, 14, alto=2)
+    if tipo == "a":
+        l.ovalo(11.5, 7.0, 4.6, 2.2, "concha")                # el gorro de fieltro
+        l.rect(7, 8, 16, 8, "concha", 1)
+    elif tipo == "b":
+        l.ovalo(11.5, 7.4, 5.4, 2.4, "rojo")                  # el pañuelo a la cabeza
+        l.px(16, 9, "rojo", 2); l.px(17, 10, "rojo", 1)
+        l.rect(8, 16, 15, 16, "concha", 2)
+    else:
+        l.rect(8, 16, 15, 17, "pajaro", 2)                    # la bufanda de ámbar
+        l.rect(8, 16, 15, 16, "pajaro", 3)
+        l.px(14, 18, "pajaro", 2); l.px(14, 19, "pajaro", 1)
+    return l
+
+
 def _armino_base(l, cola_x=3):
     """El cuerpo de un armiño de Sigilia (sin ropa): esbelto, de cuello largo, cola con la punta negra."""
     for (x, y) in ((cola_x, 29), (cola_x - 1, 28), (cola_x - 1, 27), (cola_x, 26), (cola_x + 1, 25), (cola_x + 2, 25)):
@@ -1024,7 +1135,8 @@ def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
 
 
 ## Desde qué columna (y fila) se levanta lo de la mano derecha en el gesto por defecto (para no mover picos ni orejas)
-ALZA = {"mwamba": (16, 0), "mwamba_gris": (16, 0), "bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "nyota": (15, 18), "nyota_blanco": (15, 18), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
+ALZA = {"mwamba": (16, 0), "mwamba_gris": (16, 0), "mhunzi": (16, 0), "chuma": (16, 0),
+        **{"artesano_" + t + s: (16, 0) for t in "abc" for s in ("", "_gris")}, "bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "nyota": (15, 18), "nyota_blanco": (15, 18), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
         "kasia": (17, 0), "sungura": (19, 0)}
 
 
@@ -1091,7 +1203,9 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"mwamba": mwamba, "mwamba_gris": mwamba_gris, "kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "nyota": nyota, "nyota_blanco": nyota_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
+ALDEANOS = {"mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma,
+            **{"artesano_" + t: (lambda t=t: artesano(t)) for t in "abc"},
+            **{"artesano_" + t + "_gris": (lambda t=t: _engrisar(artesano(t))) for t in "abc"}, "kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "nyota": nyota, "nyota_blanco": nyota_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 
 if __name__ == "__main__":
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

@@ -1074,7 +1074,26 @@ El primer camino de Asterhaul: un cañón de roca ocre y ámbar al este del Kito
 | Arte | `herramientas/pintar_desfiladero.py` → `arte/mundos/asterhaul/desfiladero/` |
 | Diálogos y misión | `datos/dialogos/asterhaul.json` (nuevo), misión `desfiladero_meteorito` |
 | Prueba | `prueba_desfiladero_meteorito` (47 comprobaciones) |
-| Falta | Mji-Jiwe (la puerta abierta solo se mira); el botón de mando de la Carga; sonidos propios del Kaa-Jiwe |
+| Falta | El botón de mando de la Carga |
+
+## Asterhaul: Mji-Jiwe, la Ciudad del Cráter (parte 1)
+
+La ciudad de los canteros, herreros y afinadores (damanes de roca), tallada en el cráter en tres terrazas (`documentacion/mji_jiwe_captura_1.png`…`_3.png`).
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | Por la **Puerta del Cráter** del Desfiladero (puerta `crater` → `desfiladero`) |
+| Mapa | `mji_jiwe` (76×58, `crear_mji_jiwe()`): un óvalo con dos muros de contención entre terrazas (pasos al O, E, N y SO en el de fuera; en las diagonales en el de dentro). Suelo: `pintar_mji_jiwe()` en `pintar_suelo.py` (losas, adoquín en anillos, basalto con filetes de ámbar y la Losa del Núcleo con su estrella y las tres cadenas) |
+| Mhunzi | La maestra fundidora, ante su Gran Forja. Despierta el **Arte de la Tierra** (marca `arte_tierra`) y da el **mapa de Asterhaul** (`mapa_asterhaul`: se ve entero en el diario) |
+| Artesanos en gris | 8 en la ciudad (Jabali, Kokoto, Tofali, Cheche, Makaa, Bati, Mlio, Sauti), cada uno con su conversación. Son `escriba.gd` con `_gris`/`_pulso`; **cualquier Esquirla de Estrella vale** para cualquiera |
+| Yunques de Memoria | 12 en corro en la terraza baja (`scripts/mundo/asterhaul/yunques.gd`): Mwamba, los 8 de la ciudad y Kito, Moto y Pigo (los de los otros caminos). Cada pulso despierta uno; con los 12, marca `yunques_completos` |
+| Esquirlas | 2 escondidas en la ciudad (sur y oeste) + la del muro secreto del Desfiladero: ahora mismo se pueden despertar 3 artesanos de 8 |
+| Hornos-diapasón | 6 de calle (`pilar_diapason.gd` con `dibujo = "mji_jiwe/horno"`), se encienden con la Carga. Los 4 de la terraza media abren el Mercado de Chuma (`mercado_escoria`); los 6 (`hornos_mji_jiwe`), y Mwamba da 3 Cristales (`mwamba_cristales` en `datos/tienda.json`) |
+| El Gran Diapasón | En la Losa del Núcleo, sellada por tres cadenas (aún no se abre) |
+| Arte | `herramientas/pintar_mji_jiwe.py` → `arte/mundos/asterhaul/mji_jiwe/`; Mhunzi, Chuma y los artesanos (`artesano_a/b/c` y sus `_gris`) en `dibujar_aldeanos.py` |
+| Misiones | `mji_jiwe` (historia) y `yunques_memoria` (encargo largo) |
+| Prueba | `prueba_mji_jiwe` (31 comprobaciones) |
+| Falta (parte 2) | La **tienda de Chuma** por dentro (ahora abre el puesto pero aún no vende); la **rama del Arte de la Tierra** en el diario (sus 6 niveles no están decididos); las tres salidas (verjas echadas: Galerías, Fundición y Aguja no están construidas); que las cadenas se rompan al vencer a los jefes |
 
 ## Las construcciones, al nivel de la casa del castor
 

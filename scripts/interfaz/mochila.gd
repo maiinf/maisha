@@ -192,6 +192,7 @@ const CLAVE := {
 	"semilla_primer_arbol": ["Semilla del Primer Árbol", 26, "Una semilla grande y tibia que cayó de la copa dorada del Primer Árbol. «Plántala cuando llegue el momento: de ella saldrá algo que te hará falta.»"],
 	"cuaderno_ecos": ["Cuaderno de ecos", 18, "El regalo de Msafiri. Cada eco perdido que escuchas queda apuntado aquí. Juntos cuentan qué le pasó al Primer Árbol."],
 	"mapa_norte": ["Trozo del norte del mapa", 3, "El trozo que le faltaba al mapa de Mzee Shamba: Sigilia y lo que hay más allá. Kalamu lo guardaba en el Archivo, por si alguien venía a buscarlo."],
+	"mapa_asterhaul": ["Mapa de Asterhaul", 3, "El mapa del cráter, dibujado por Mhunzi sobre cuero: Mji-Jiwe en el centro, las Galerías de Ámbar al oeste, la Fundición de Escoria al este y la Aguja Caída arriba."],
 	"cetro_nexo": ["Cetro del Nexo", 4, "Al final de Sigilia, la Semilla del Primer Árbol brotó y abrazó tu cetro junto a la Pluma del Primer Nombre. Ahora es de piedra clara, con un cristal azul dormido. Le falta algo para despertar."],
 	"mapa_raiz": ["Mapa de Tawi", 3, "Tawi lo dibujó volando por encima de Raíz: en tu mapa ya se ven todos los lugares (los caminos hay que andarlos)."],
 }
@@ -1149,7 +1150,7 @@ func _config_mapa(vista: String) -> Dictionary:
 		"sigilia":
 			return {"titulo": "Sigilia", "textura": MAPA_SIGILIA, "lugares": LUGARES_SIGILIA, "caminos": CAMINOS_SIGILIA, "puntos": PUNTO_SIGILIA, "siempre_visible": Estado.tiene("mapa_norte")}
 		"asterhaul":
-			return {"titulo": "Asterhaul", "textura": MAPA_ASTERHAUL, "lugares": LUGARES_ASTERHAUL, "caminos": CAMINOS_ASTERHAUL, "puntos": PUNTO_ASTERHAUL, "siempre_visible": false}
+			return {"titulo": "Asterhaul", "textura": MAPA_ASTERHAUL, "lugares": LUGARES_ASTERHAUL, "caminos": CAMINOS_ASTERHAUL, "puntos": PUNTO_ASTERHAUL, "siempre_visible": Estado.tiene("mapa_asterhaul")}
 		_:
 			return {"titulo": "Raíz", "textura": MAPA_RAIZ, "lugares": LUGARES_RAIZ, "caminos": CAMINOS_RAIZ, "puntos": PUNTO_RAIZ, "siempre_visible": Estado.tiene("mapa_raiz")}
 

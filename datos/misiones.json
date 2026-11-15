@@ -136,7 +136,11 @@
 			"maandiko"
 		],
 		"desfiladero_meteorito": [
-			"kitovu"
+			"kitovu",
+			"mji_jiwe"
+		],
+		"mji_jiwe": [
+			"desfiladero_meteorito"
 		]
 	},
 	"misiones": [
@@ -1469,6 +1473,74 @@
 					"ir": {
 						"escena": "desfiladero_meteorito",
 						"buscar": "grupo:pilares_diapason"
+					}
+				}
+			]
+		},
+		{
+			"id": "mji_jiwe",
+			"tipo": "historia",
+			"titulo": "La Ciudad del Cráter",
+			"texto": "Detrás de la Puerta del Cráter está Mji-Jiwe, la ciudad de los canteros, los herreros y los afinadores. Sus forjas están frías y su gente, cubierta de polvo gris. Alguien sabrá por qué.",
+			"aparece": [
+				"puerta_crater_abierta"
+			],
+			"hecha": [
+				"mercado_escoria"
+			],
+			"pasos": [
+				{
+					"texto": "Cruza la Puerta del Cráter",
+					"hecho": [
+						"mji_jiwe"
+					],
+					"ir": {
+						"escena": "desfiladero_meteorito",
+						"buscar": "puerta:mji_jiwe"
+					}
+				},
+				{
+					"texto": "Busca a alguien que todavía hable",
+					"hecho": [
+						"arte_tierra"
+					],
+					"ir": {
+						"escena": "mji_jiwe",
+						"buscar": "aldeano:mhunzi"
+					}
+				},
+				{
+					"texto": "Enciende los cuatro hornos de la terraza media (Carga, I)",
+					"hecho": [
+						"mercado_escoria"
+					],
+					"ir": {
+						"escena": "mji_jiwe",
+						"buscar": "grupo:hornos_diapason"
+					}
+				}
+			]
+		},
+		{
+			"id": "yunques_memoria",
+			"tipo": "encargo",
+			"titulo": "Los doce Yunques de Memoria",
+			"texto": "A los artesanos de Mji-Jiwe les falta su trocito de estrella. Las Esquirlas andan desperdigadas por todo el cráter: por cada artesano que recupera el pulso, canta un yunque en la terraza baja.",
+			"aparece": [
+				"mhunzi_conocida"
+			],
+			"hecha": [
+				"yunques_completos"
+			],
+			"pasos": [
+				{
+					"texto": "Devuelve el pulso a los doce artesanos con Esquirlas de Estrella",
+					"hecho": [
+						"yunques_completos"
+					],
+					"ir": {
+						"escena": "mji_jiwe",
+						"buscar": "grupo:yunques_memoria"
 					}
 				}
 			]

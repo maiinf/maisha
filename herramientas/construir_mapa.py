@@ -2393,6 +2393,44 @@ def crear_desfiladero():
     return ["".join(f) for f in m], {}
 
 
+def crear_mji_jiwe():
+    """MJI-JIWE, LA CIUDAD DEL CRÁTER (Asterhaul, 76x58): un anfiteatro ovalado de tres terrazas tallado en el cráter.
+    Lo de fuera («0») es la pared del cráter; entre terraza y terraza hay un MURO DE CONTENCIÓN («0») con pasos.
+      - TERRAZA ALTA (el anillo de fuera): los talleres de los artesanos. Pasos al oeste, este, norte y suroeste.
+      - TERRAZA MEDIA: la Gran Forja de Mhunzi (norte), el Mercado de Chuma y el taller de Mwamba (sur).
+        Pasos en las cuatro diagonales.
+      - TERRAZA BAJA: los 12 Yunques de Memoria, alrededor de la LOSA DEL NÚCLEO (se pisa) con el Gran Diapasón.
+    Se entra por el suroeste (del Desfiladero del Meteorito, «_»). Las salidas del oeste (Galerías), el este
+    (Fundición) y el norte (Aguja) las pone la escena (aún cerradas). Edificios, hornos, yunques y vecinos, también."""
+    import math
+    ANCHO, ALTO = 76, 58
+    CX, CY, RX, RY = 37.5, 28.5, 36.0, 27.0
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def hueco(a, centros, medio):
+        return any(abs(math.atan2(math.sin(a - c), math.cos(a - c))) < medio for c in centros)
+
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            dx, dy = (x - CX) / RX, (y - CY) / RY
+            r = math.hypot(dx, dy)
+            a = math.atan2(dy, dx)
+            if r > 0.985:
+                continue
+            c = "%"
+            # el muro entre la terraza alta y la media: pasos al O, E, N y SO (por donde se entra)
+            if 0.70 <= r < 0.75 and not hueco(a, (math.pi, 0.0, -math.pi / 2, math.radians(140)), 0.085):
+                c = "0"
+            # el muro entre la media y la baja: pasos en las cuatro diagonales
+            if 0.42 <= r < 0.475 and not hueco(a, [math.radians(g) for g in (45, 135, -45, -135)], 0.15):
+                c = "0"
+            m[y][x] = c
+    for y in range(44, 47):                                  # la entrada del suroeste
+        for x in range(0, 12):
+            m[y][x] = "_" if x == 0 else "%"
+    return ["".join(f) for f in m], {}
+
+
 def crear_seccion():
     """LA SECCIÓN PROHIBIDA (Sigilia, 64x72, de sur a norte): las salas de mármol morado bajo el Gran Archivo. Lo que
     no es sala («0») son estanterías de libros encadenados. Se entra por el sur (del Gran Archivo de Maandiko, «_»).
@@ -3175,7 +3213,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mji_jiwe"}
 
 
 def construir_suelo(nombre):
@@ -3327,7 +3365,7 @@ if __name__ == "__main__":
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
                         "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion,
-                        "desfiladero_meteorito": crear_desfiladero}.get(nombre, crear_prados)()
+                        "desfiladero_meteorito": crear_desfiladero, "mji_jiwe": crear_mji_jiwe}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

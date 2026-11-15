@@ -518,3 +518,13 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | La vagoneta del oeste | Aparta un montón de rocas al final de su vía (un secreto). |
 | La especie de los canteros de Asterhaul | **Damanes de roca** (aprobado por Iam el 2026-11-15): rechonchos, sin cola, de roquedal. Base en `_daman_base()` de `dibujar_aldeanos.py`; Mwamba es el primero. |
 | Mji-Jiwe | Aún no existe: la Puerta del Cráter se abre y deja ver la escalera, pero no se cruza. |
+
+### 2026-11-15 · Mji-Jiwe, parte 1, construida (Claude)
+| Tema | Cómo ha quedado |
+| :--- | :--- |
+| Los 12 artesanos | Mwamba (Desfiladero), 8 en la ciudad (Jabali, Kokoto, Tofali, Cheche, Makaa, Bati, Mlio, Sauti) y Kito, Moto y Pigo (los de las Galerías, la Fundición y la Aguja). |
+| Las Esquirlas | Son intercambiables: cualquiera despierta a cualquier artesano de la ciudad (quien juega elige a quién). La de Mwamba es solo suya. |
+| Los hornos | 6: los 4 de la terraza media abren el mercado; los 6, el regalo de Mwamba (3 Cristales). |
+| La Losa del Núcleo | Se pisa (es una tapa): el pozo se abrirá con los 12 yunques y las 3 cadenas rotas. |
+| Mhunzi | No está en gris: mantiene vivo un rescoldo. Despierta el Arte de la Tierra (solo la marca: los 6 niveles de la rama están por decidir con Iam). |
+| Pendiente para la parte 2 | La tienda de Chuma por dentro y la rama del Arte de la Tierra en el diario. |

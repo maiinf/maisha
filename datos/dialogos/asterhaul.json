@@ -179,8 +179,7 @@
 				],
 				"lineas": [
 					"Detrás de la puerta, una escalera ancha baja y baja. Huele a forja fría y a piedra mojada.",
-					"Al fondo se ven tejados. Muchos. Y ni una sola chimenea echando humo.",
-					"(Mji-Jiwe, la Ciudad del Cráter, llegará en la próxima parte.)"
+					"Al fondo se ven tejados. Muchos. Y ni una sola chimenea echando humo."
 				]
 			},
 			{
@@ -199,6 +198,655 @@
 				"lineas": [
 					"Un desprendimiento tapa el sendero del este. Detrás asoma una roca rojiza, muy distinta de la de aquí.",
 					"No hay quien mueva esto. Todavía."
+				]
+			}
+		]
+	},
+	"mji_jiwe_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Es una ciudad entera metida en un agujero. Tres terrazas, una dentro de otra, como los anillos de un tronco.",
+					"Hay chimeneas por todas partes. Ninguna echa humo.",
+					"Y en el centro, abajo del todo, algo enorme de hierro, con dos brazos hacia el cielo. Parece que escucha."
+				]
+			}
+		]
+	},
+	"mhunzi": {
+		"nombre": "Mhunzi",
+		"conversaciones": [
+			{
+				"no": [
+					"mhunzi_conocida"
+				],
+				"lineas": [
+					"Alto ahí. No pises esa losa, que la acabo de barrer. ...Bah, pisa. Total, hace años que no viene nadie a mancharla.",
+					"Mhunzi. Maestra fundidora. La única que queda con la garganta limpia, porque me paso el día soplándole a este rescoldo. Si se apaga, me quedo gris como los demás.",
+					"Esta ciudad vivía del calor de la estrella. Cayó aquí hace siglos y sigue tibia, ahí abajo, bajo la losa. Con ella fundíamos, afinábamos, tallábamos. Sonaba todo el cráter.",
+					"Hasta que nos entró el miedo. Que si un día late más fuerte de la cuenta. Que si se nos viene la ciudad encima. Y le echamos tres cadenas. Tres. Yo forjé una.",
+					"Sin pulso, las forjas se enfriaron. Y la gente, con ellas. El polvo gris no es polvo, criatura: es lo que queda cuando alguien deja de dar golpes por si acaso.",
+					"A ver esas manos. ...Mwamba te ha enseñado a embestir, se te nota en los hombros. Pues eso no es un truco suelto. Es la primera palabra de un oficio entero.",
+					"Arrímate al rescoldo. Sin miedo. La tierra no se manda: se le pide con el peso. Siéntelo en las plantas de los pies... Así. Ya está despierto. Lo demás te lo irá enseñando ella.",
+					"Y toma, el mapa del cráter. Las Galerías al oeste, la Fundición al este, la Aguja arriba. En cada sitio hay una cadena, y cada cadena tiene quien la guarde."
+				],
+				"marca": [
+					"mhunzi_conocida",
+					"arte_tierra",
+					"mapa_asterhaul"
+				],
+				"aviso": "Ha despertado el ARTE DE LA TIERRA · Tienes el MAPA DE ASTERHAUL"
+			},
+			{
+				"si": [
+					"hornos_mji_jiwe"
+				],
+				"lineas": [
+					"¿Hueles? Carbón. Carbón de verdad, en los seis hornos. Se me había olvidado que la ciudad olía así.",
+					"Las verjas siguen echadas, eso sí. Las llaves las tiene quien tiene las cadenas. Paciencia, que el hierro no se dobla frío."
+				]
+			},
+			{
+				"lineas": [
+					"Los hornos de calle se apagaron los primeros. Tienen su diapasón arriba: con un buen golpe de los tuyos, vuelven a prender.",
+					"Y a mis artesanos... a esos no se les enciende a golpes. Les falta su trocito de estrella. Las esquirlas andan desperdigadas por todo el cráter.",
+					"Por cada uno que despierta, canta un yunque ahí abajo. Son doce. Yo los cuento todas las noches, por si acaso."
+				]
+			}
+		]
+	},
+	"chuma": {
+		"nombre": "Chuma",
+		"conversaciones": [
+			{
+				"si": [
+					"mercado_escoria"
+				],
+				"no": [
+					"chuma_abierto"
+				],
+				"lineas": [
+					"¡Arden! ¡Los cuatro! Mira el toldo, mira qué colores. Ya ni me acordaba de que era a rayas.",
+					"El Mercado de la Escoria vuelve a abrir. Bueno. Mañana. Dame un día, que tengo el género criando polvo desde ni se sabe cuándo.",
+					"Vuelve pronto, que a quien enciende hornos se le hace precio. Palabra de Chuma."
+				],
+				"marca": [
+					"chuma_abierto"
+				]
+			},
+			{
+				"si": [
+					"chuma_abierto"
+				],
+				"lineas": [
+					"Estoy en ello, estoy en ello. Lingotes aquí, tenazas allá... ¿Tú sabes lo que pesa ordenar un mercado entero?",
+					"Vuelve cuando lo tenga presentable. Lo bueno se hace esperar. Lo de hierro, más."
+				]
+			},
+			{
+				"lineas": [
+					"¿Comprar? Ojalá. Soy Chuma, y esto era el Mercado de la Escoria. Era.",
+					"Sin fuego en la terraza no viene nadie, y sin nadie no hay mercado. Yo no estoy gris porque hablo mucho. El género, en cambio...",
+					"Hay cuatro hornos de calle en esta terraza, la de en medio. Si alguien los volviera a encender, yo quitaba la lona ahora mismo. Lo digo por decir."
+				]
+			}
+		]
+	},
+	"mwamba_ciudad": {
+		"nombre": "Mwamba",
+		"conversaciones": [
+			{
+				"si": [
+					"hornos_mji_jiwe"
+				],
+				"no": [
+					"mwamba_cristales"
+				],
+				"lineas": [
+					"Los seis. Los he contado dos veces, que a mi edad uno ya no se fía.",
+					"Toma. Tres cristales. Los guardaba para cuando volviera a ver humo en mi calle, y mira tú por dónde.",
+					"No me des las gracias. Dale otro golpe a algo, que se te da mejor."
+				],
+				"marca": [
+					"mwamba_cristales"
+				],
+				"aviso": "Mwamba te da 3 Cristales del Nexo"
+			},
+			{
+				"si": [
+					"mwamba_cristales"
+				],
+				"lineas": [
+					"Mañana abro el taller. Pasado, como muy tarde. No me metas prisa."
+				]
+			},
+			{
+				"lineas": [
+					"Ya he bajado. Despacio, pero he bajado. Este es mi taller de verdad; lo de arriba era para estar solo.",
+					"Seis hornos de calle tiene esta ciudad. Cuatro en esta terraza y dos en la de arriba. Antes los encendía yo cada mañana, de un cabezazo.",
+					"Ahora te toca a ti. Enciéndemelos todos y te doy algo que tengo guardado."
+				]
+			}
+		]
+	},
+	"mauti_mji_jiwe": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"si": [
+					"mhunzi_conocida"
+				],
+				"lineas": [
+					"Tres cadenas para que algo no lata. ¿Te suena? A mí sí. Yo también dejé de moverme una vez, por si acaso.",
+					"Desde aquí se oye mejor. Está debajo de esa losa. No está enfadado, Maisha. Está esperando."
+				]
+			},
+			{
+				"lineas": [
+					"He bajado detrás de ti, como dije. Bueno, un poco delante al final. La costumbre.",
+					"Esa señora de las tenazas es la única que habla. Ve tú. A mí me mira como si le fuera a pisar algo."
+				]
+			}
+		]
+	},
+	"mji_diapason": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El Gran Diapasón. De cerca es tan alto como el Gran Árbol de Cuna de Musgo, pero de hierro negro, sin una hoja.",
+					"En el pie hay tres argollas, y de cada una sale una cadena que cruza la losa. Están tirantes. Algo tira de ellas desde abajo, muy despacio.",
+					"Pongo la mano en el hierro. No suena. Pero tiembla un poquito, como quien aguanta la respiración."
+				]
+			}
+		]
+	},
+	"mji_verja_oeste": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una verja de hierro con un candado de ámbar. Detrás, el camino del oeste: Las Galerías de Ámbar.",
+					"No cede ni con la Carga. Esto no se abre a golpes.",
+					"(Este camino llegará en una próxima parte.)"
+				]
+			}
+		]
+	},
+	"mji_verja_este": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una verja de hierro con un candado de ámbar. Detrás, el camino del este: La Fundición de Escoria.",
+					"No cede ni con la Carga. Esto no se abre a golpes.",
+					"(Este camino llegará en una próxima parte.)"
+				]
+			}
+		]
+	},
+	"mji_verja_norte": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una verja de hierro con un candado de ámbar. Detrás, el camino del norte: La Aguja Caída.",
+					"No cede ni con la Carga. Esto no se abre a golpes.",
+					"(Este camino llegará en una próxima parte.)"
+				]
+			}
+		]
+	},
+	"jabali": {
+		"nombre": "Jabali",
+		"conversaciones": [
+			{
+				"no": [
+					"jabali_pulso"
+				],
+				"tiene": {
+					"esquirla_estrella": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"Esta esquirla late al mismo compás que su respiración. Casi.",
+					"Le pongo la esquirla en la zarpa y se la cierro con cuidado."
+				],
+				"entrega": {
+					"esquirla_estrella": 1
+				},
+				"marca": [
+					"jabali_pulso"
+				]
+			},
+			{
+				"no": [
+					"jabali_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un cantero con un gorro de fieltro, gris de arriba abajo. Tiene la maceta levantada a medio golpe.",
+					"Lleva así tanto tiempo que le ha crecido una telaraña entre la maceta y el gorro.",
+					"No tengo ninguna Esquirla de Estrella. Habrá que buscar."
+				]
+			},
+			{
+				"si": [
+					"jabali_pulso"
+				],
+				"no": [
+					"jabali_hablado"
+				],
+				"lineas": [
+					"¡...y pum! ¿Eh? ¿Dónde está la piedra? Yo estaba dando un golpe. Tenía una piedra aquí delante.",
+					"Jabali. Cantero de bloque grande. No me mires así, que el golpe lo tenía pensadísimo.",
+					"Lo pensé tanto que no lo di. Eso nos pasó a todos, me parece. Mucho pensar el golpe."
+				],
+				"marca": [
+					"jabali_hablado"
+				]
+			},
+			{
+				"lineas": [
+					"Hoy he partido tres bloques. Sin pensarlo. Bueno, pensándolo un poco. Lo justo."
+				]
+			}
+		]
+	},
+	"kokoto": {
+		"nombre": "Kokoto",
+		"conversaciones": [
+			{
+				"no": [
+					"kokoto_pulso"
+				],
+				"tiene": {
+					"esquirla_estrella": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"A este se le ha parado el pulso contando. Con la esquirla, a lo mejor sigue.",
+					"Le pongo la esquirla en la zarpa y se la cierro con cuidado."
+				],
+				"entrega": {
+					"esquirla_estrella": 1
+				},
+				"marca": [
+					"kokoto_pulso"
+				]
+			},
+			{
+				"no": [
+					"kokoto_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un cantero pequeño, sentado en el escalón de su casa, gris como la grava. Tiene un montón de piedrecitas ordenadas por tamaño.",
+					"La última fila está a medias.",
+					"No tengo ninguna Esquirla de Estrella. Habrá que buscar."
+				]
+			},
+			{
+				"si": [
+					"kokoto_pulso"
+				],
+				"no": [
+					"kokoto_hablado"
+				],
+				"lineas": [
+					"Cuatrocientas doce. Cuatrocientas trece. ...¿Tú quién eres? Me has hecho perder la cuenta.",
+					"Kokoto. Hago grava. Alguien tiene que hacerla, y nadie dice gracias por la grava.",
+					"Me senté a contar lo que tenía hecho, por si no hacía falta picar más. No acabé nunca. Qué tontería. Siempre hace falta grava."
+				],
+				"marca": [
+					"kokoto_hablado"
+				]
+			},
+			{
+				"lineas": [
+					"Cuatrocientas catorce. Hoy sí acabo la fila. Y mañana, a picar."
+				]
+			}
+		]
+	},
+	"tofali": {
+		"nombre": "Tofali",
+		"conversaciones": [
+			{
+				"no": [
+					"tofali_pulso"
+				],
+				"tiene": {
+					"esquirla_estrella": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"Quizá con la esquirla en la mano se atreva a darlo por terminado.",
+					"Le pongo la esquirla en la zarpa y se la cierro con cuidado."
+				],
+				"entrega": {
+					"esquirla_estrella": 1
+				},
+				"marca": [
+					"tofali_pulso"
+				]
+			},
+			{
+				"no": [
+					"tofali_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Una cantera con un bloque perfecto delante, liso por las seis caras. Está gris, con la zarpa a un dedo de la piedra.",
+					"No le falta nada a ese bloque. Y aun así no lo suelta.",
+					"No tengo ninguna Esquirla de Estrella. Habrá que buscar."
+				]
+			},
+			{
+				"si": [
+					"tofali_pulso"
+				],
+				"no": [
+					"tofali_hablado"
+				],
+				"lineas": [
+					"...No. Aún no está. Le falta... ¿Eh? Uy. Hola.",
+					"Tofali. Sillares. Los míos encajan sin argamasa, pregunta a quien quieras.",
+					"Este lleva terminado no sé cuántos años. Lo sabía. Pero si lo entregaba y luego se agrietaba... Mejor repasarlo otra vez. Y otra."
+				],
+				"marca": [
+					"tofali_hablado"
+				]
+			},
+			{
+				"lineas": [
+					"Lo he entregado. El bloque. Me han dicho que estaba bien. Solo bien. Casi me da algo."
+				]
+			}
+		]
+	},
+	"cheche": {
+		"nombre": "Cheche",
+		"conversaciones": [
+			{
+				"no": [
+					"cheche_pulso"
+				],
+				"tiene": {
+					"esquirla_estrella": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"La esquirla está tibia. A una herrera eso le tiene que decir algo.",
+					"Le pongo la esquirla en la zarpa y se la cierro con cuidado."
+				],
+				"entrega": {
+					"esquirla_estrella": 1
+				},
+				"marca": [
+					"cheche_pulso"
+				]
+			},
+			{
+				"no": [
+					"cheche_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Una herrera con un pañuelo a la cabeza, gris, con las tenazas agarrando el aire.",
+					"Delante tiene un yunque pequeño y, encima, una herradura a medio doblar. Fría del todo.",
+					"No tengo ninguna Esquirla de Estrella. Habrá que buscar."
+				]
+			},
+			{
+				"si": [
+					"cheche_pulso"
+				],
+				"no": [
+					"cheche_hablado"
+				],
+				"lineas": [
+					"¡Quema, quema, quema! ...Ah, no. No quema. ¿Por qué no quema?",
+					"Cheche. Hago lo pequeño: clavos, hebillas, herraduras. Lo que no luce pero aguanta lo demás.",
+					"Dejé enfriar una pieza para mirarla bien antes de seguir. Y se me enfrió todo. La pieza, la fragua y yo."
+				],
+				"marca": [
+					"cheche_hablado"
+				]
+			},
+			{
+				"lineas": [
+					"Clavos, clavos y más clavos. No sabes las ganas que tenía de quemarme un dedo."
+				]
+			}
+		]
+	},
+	"makaa": {
+		"nombre": "Makaa",
+		"conversaciones": [
+			{
+				"no": [
+					"makaa_pulso"
+				],
+				"tiene": {
+					"esquirla_estrella": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"Si alguien sabe lo que vale algo tibio, es ella.",
+					"Le pongo la esquirla en la zarpa y se la cierro con cuidado."
+				],
+				"entrega": {
+					"esquirla_estrella": 1
+				},
+				"marca": [
+					"makaa_pulso"
+				]
+			},
+			{
+				"no": [
+					"makaa_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Una herrera grandota, gris, con un saco de carbón a los pies. El saco está cerrado con tres nudos.",
+					"Mira hacia los hornos de calle como quien mira un plato vacío.",
+					"No tengo ninguna Esquirla de Estrella. Habrá que buscar."
+				]
+			},
+			{
+				"si": [
+					"makaa_pulso"
+				],
+				"no": [
+					"makaa_hablado"
+				],
+				"lineas": [
+					"¿Eso que huelo es...? No. Todavía no. Pero casi.",
+					"Makaa. Carbonera. Sin mí aquí no se enciende ni una vela, y bien que se les olvida.",
+					"Guardé el carbón por si venía un invierno malo. Tres nudos le hice al saco. Y vino el invierno malo, claro: el que montamos nosotros solitos por no gastarlo."
+				],
+				"marca": [
+					"makaa_hablado"
+				]
+			},
+			{
+				"lineas": [
+					"He abierto el saco. Los tres nudos. Me ha costado más que cargarlo."
+				]
+			}
+		]
+	},
+	"bati": {
+		"nombre": "Bati",
+		"conversaciones": [
+			{
+				"no": [
+					"bati_pulso"
+				],
+				"tiene": {
+					"esquirla_estrella": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"Con una esquirla de las de verdad, igual se anima a acabar la suya.",
+					"Le pongo la esquirla en la zarpa y se la cierro con cuidado."
+				],
+				"entrega": {
+					"esquirla_estrella": 1
+				},
+				"marca": [
+					"bati_pulso"
+				]
+			},
+			{
+				"no": [
+					"bati_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un herrero flaco, gris, con unas tenazas largas y una chapa de hojalata a medio cortar.",
+					"La chapa tiene dibujada con tiza la forma de una estrella de doce puntas. Le faltan dos.",
+					"No tengo ninguna Esquirla de Estrella. Habrá que buscar."
+				]
+			},
+			{
+				"si": [
+					"bati_pulso"
+				],
+				"no": [
+					"bati_hablado"
+				],
+				"lineas": [
+					"Diez puntas. Me faltan dos. No me hables, que si me hablas me tuerzo.",
+					"...Vale, ya me he torcido. Bati, hojalatero. Hago las veletas, los faroles y, cuando me dejan, cosas bonitas.",
+					"Esta estrella era para la plaza. Dejé de cortarla cuando echaron las cadenas. ¿Para qué ponerle una estrella a una ciudad que le tiene miedo a la suya?"
+				],
+				"marca": [
+					"bati_hablado"
+				]
+			},
+			{
+				"lineas": [
+					"Doce puntas. La he acabado. Ahora solo falta que me dejen colgarla."
+				]
+			}
+		]
+	},
+	"mlio": {
+		"nombre": "Mlio",
+		"conversaciones": [
+			{
+				"no": [
+					"mlio_pulso"
+				],
+				"tiene": {
+					"esquirla_estrella": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"Esta esquirla sí que suena, bajito. A ver si la oye.",
+					"Le pongo la esquirla en la zarpa y se la cierro con cuidado."
+				],
+				"entrega": {
+					"esquirla_estrella": 1
+				},
+				"marca": [
+					"mlio_pulso"
+				]
+			},
+			{
+				"no": [
+					"mlio_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un afinador con una bufanda de color ámbar, gris, con un diapasón pequeño pegado a la oreja.",
+					"El diapasón no vibra. Pero él sigue escuchando.",
+					"No tengo ninguna Esquirla de Estrella. Habrá que buscar."
+				]
+			},
+			{
+				"si": [
+					"mlio_pulso"
+				],
+				"no": [
+					"mlio_hablado"
+				],
+				"lineas": [
+					"Chsss. ...Ahí. ¿Lo oyes? Un la. Un poco bajo, pero un la.",
+					"Mlio. Afinador. Yo decía cuándo un yunque sonaba como tenía que sonar.",
+					"Un día no supe decir si el Gran Diapasón estaba afinado o no. Y me quedé escuchando, para estar seguro. Hasta hoy."
+				],
+				"marca": [
+					"mlio_hablado"
+				]
+			},
+			{
+				"lineas": [
+					"Está bajo. El grande. Medio tono. Pero no lo voy a decir muy alto, que bastante tiene."
+				]
+			}
+		]
+	},
+	"sauti": {
+		"nombre": "Sauti",
+		"conversaciones": [
+			{
+				"no": [
+					"sauti_pulso"
+				],
+				"tiene": {
+					"esquirla_estrella": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"La esquirla le late justo donde tiene la zarpa.",
+					"Le pongo la esquirla en la zarpa y se la cierro con cuidado."
+				],
+				"entrega": {
+					"esquirla_estrella": 1
+				},
+				"marca": [
+					"sauti_pulso"
+				]
+			},
+			{
+				"no": [
+					"sauti_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Una afinadora con la boca entreabierta, gris, con un diapasón en una zarpa y la otra en el pecho.",
+					"Parece que iba a cantar y se quedó en la primera nota.",
+					"No tengo ninguna Esquirla de Estrella. Habrá que buscar."
+				]
+			},
+			{
+				"si": [
+					"sauti_pulso"
+				],
+				"no": [
+					"sauti_hablado"
+				],
+				"lineas": [
+					"Laaaa... ¡Ay! Perdón. Perdón. ¿He gritado? Llevaba la nota dentro desde no sé cuándo.",
+					"Sauti. Yo cantaba la hora en la terraza alta, con los hornos. Una nota por horno.",
+					"Cuando se apagaron no supe con qué nota seguir. Y me la guardé. Las notas guardadas pesan una barbaridad, que lo sepas."
+				],
+				"marca": [
+					"sauti_hablado"
+				]
+			},
+			{
+				"lineas": [
+					"Seis hornos, seis notas. Cuando ardan todos, las canto seguidas. Tápate los oídos."
 				]
 			}
 		]

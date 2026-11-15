@@ -9,7 +9,7 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ##   - LA CANTERA HUNDIDA (sureste): los KAA-JIWE (enemigos/kaa_jiwe.gd; sin la Carga no se les puede hacer nada) y
 ##     la Esquirla de Mwamba. Al norte, tras otro muro, la inscripción de los primeros canteros (un secreto).
 ##   - LA PUERTA DEL CRÁTER (noreste), tras un muro agrietado: tres PILARES-DIAPASÓN; con los tres sonando, se abre.
-##     Detrás está Mji-Jiwe (aún no construida).
+##     Detrás está Mji-Jiwe (la puerta «crater»).
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const ESCRIBA := preload("res://scripts/mundo/sigilia/escriba.gd")
@@ -46,6 +46,16 @@ var _voz: Node2D
 
 
 func _ready() -> void:
+	# (antes de super(): al volver de Mji-Jiwe, la puerta tiene que estar ya)
+	var paso: Area2D = preload("res://scripts/mundo/puerta.gd").new()
+	paso.id = "crater"
+	paso.destino = "mji_jiwe"
+	paso.destino_puerta = "desfiladero"
+	paso.salida = Vector2.DOWN
+	paso.tam = Vector2(24, 10)
+	paso.cerrada_hasta = "puerta_crater_abierta"
+	paso.position = _sitio(PUERTA) + Vector2(0, -4)
+	add_child(paso)
 	super()
 	Estado.marcar("desfiladero_meteorito")
 	_poner_cosas()

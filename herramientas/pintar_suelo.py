@@ -898,6 +898,111 @@ def pintar_desfiladero(nombre, salida=None):
     print("Suelo pintado:", destino, (lz.w, lz.h))
 
 
+def pintar_mji_jiwe(nombre, salida=None):
+    """El suelo de MJI-JIWE, LA CIUDAD DEL CRÁTER (Asterhaul): un anfiteatro ovalado. TERRAZA ALTA de losas ocres
+    irregulares; TERRAZA MEDIA de adoquín tallado en anillos; TERRAZA BAJA de basalto pulido con filetes de ámbar;
+    en el centro, la LOSA DEL NÚCLEO: un disco de basalto y bronce con una estrella de doce puntas grabada y las
+    TRES CADENAS que lo sellan. Calzadas claras hacia las salidas. Los muros de contención («0» entre terrazas) son
+    sillares; lo de fuera, la pared del cráter (morada, de noche) con su cara de roca en franjas."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=43)
+    tipos = [["pared" if c == "0" else "suelo" for c in f] for f in filas]
+    pared = mascara(lz, tipos, ("pared",), 1.4, 0.05, semilla=431)
+    fina = lz.ruido(0.8, 2, semilla=432)
+    media = lz.ruido(10, 3, semilla=433)
+    grande = lz.ruido(46, 3, semilla=434)
+    CX, CY, RX, RY = 37.5 * 16 + 8, 28.5 * 16 + 8, 36.0 * 16, 27.0 * 16
+    dx, dy = (lz.x - CX) / RX, (lz.y - CY) / RY
+    r = np.sqrt(dx * dx + dy * dy)
+    a = np.arctan2(dy, dx)
+    alta = (r >= 0.72) * 1.0
+    medi = ((r >= 0.45) & (r < 0.72)) * 1.0
+    baja = ((r >= 0.19) & (r < 0.45)) * 1.0
+    losa = (r < 0.19) * 1.0
+    # TERRAZA ALTA: losas ocres irregulares (celdas torcidas por el ruido)
+    u = lz.x + ruido_torcido_local(lz, 24, 435) * 26
+    w = lz.y + ruido_torcido_local(lz, 24, 436) * 26
+    junta_a = ((u % 22) < 1.0) | ((w % 17) < 1.0)
+    celda = (np.sin(np.floor(u / 22) * 12.9898 + np.floor(w / 17) * 78.233) * 43758.5453) % 1
+    va = 0.46 + (celda - 0.5) * 0.22 + (media - 0.5) * 0.2 + (fina - 0.5) * 0.12
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#2a1810", "#3e2416", "#573420", "#74482c", "#8e5e3a", "#a8764a", "#c0905e"], np.clip(va, 0, 1)))
+    lz.pintar(junta_a * 1.0, "#24140c", 0.6)
+    # TERRAZA MEDIA: adoquín tallado en anillos (juntas concéntricas y radiales alternas)
+    anillo = np.floor(r * 46)
+    junta_m = ((r * 46) % 1 < 0.09) | (((a * 28 + anillo * 0.5) % 1) < 0.07)
+    celda_m = (np.sin(anillo * 12.9898 + np.floor(a * 28 + anillo * 0.5) * 78.233) * 43758.5453) % 1
+    vm = 0.5 + (celda_m - 0.5) * 0.18 + (media - 0.5) * 0.16 + (fina - 0.5) * 0.1
+    lz.pintar(medi, rampa(["#3a2618", "#55381f", "#72502e", "#8f6a40", "#aa8656", "#c4a270", "#dcbe8c"], np.clip(vm, 0, 1)))
+    lz.pintar(medi * junta_m, "#2a1810", 0.6)
+    # TERRAZA BAJA: basalto pulido, con filetes de ámbar concéntricos y doce rayos (uno por yunque)
+    vb = 0.42 + (grande - 0.5) * 0.3 + (media - 0.5) * 0.2 + (fina - 0.5) * 0.1
+    lz.pintar(baja, rampa(["#14121c", "#201e2c", "#2e2c3e", "#403e54", "#56546c", "#6e6c86"], np.clip(vb, 0, 1)))
+    lz.pintar(baja * (np.abs(ruido_torcido_local(lz, 26, 437) - 0.5) < 0.012), "#8a88a0", 0.4)
+    filete = (np.abs(r - 0.225) < 0.004) | (np.abs(r - 0.40) < 0.004) | ((np.abs(((a / (np.pi / 6)) + 0.5) % 1 - 0.5) < 0.012) & (r > 0.33))
+    lz.pintar(baja * filete, "#c8741c", 0.95)
+    lz.pintar(baja * desplazar(lz, filete * 1.0, -0.5, -0.5) * filete, "#ffd070", 0.8)
+    # LA LOSA DEL NÚCLEO: disco de basalto y bronce, estrella de doce puntas grabada, y un resquicio de luz en el borde
+    vl = 0.4 + (media - 0.5) * 0.3 + (fina - 0.5) * 0.14
+    lz.pintar(losa, rampa(["#0c0a12", "#16141e", "#22202c", "#302e3c", "#42404e"], np.clip(vl, 0, 1)))
+    estrella = (r < 0.05 + 0.115 * np.abs(np.cos(a * 6)) ** 4) * losa
+    lz.pintar(estrella, rampa(["#3a2408", "#6a4612", "#9a6c20", "#c4963a"], np.clip(0.5 + (media - 0.5) * 0.6, 0, 1)), 0.9)
+    lz.pintar(np.clip(estrella - desplazar(lz, estrella, 1.0, 1.0), 0, 1), "#f0cc78", 0.7)
+    aro = (np.abs(r - 0.182) < 0.008) * 1.0
+    lz.pintar(aro, "#6a4612")
+    lz.pintar(desplazar(lz, aro, -0.6, -0.6) * aro, "#e0b860", 0.8)
+    resquicio = (np.abs(r - 0.192) < 0.003) * 1.0
+    lz.pintar(resquicio, "#ffb040", 0.9)
+    lz.sumar_luz(lz.desenfocar(resquicio, 4), "#ff9a30", 0.5)
+    # LAS TRES CADENAS: del centro a tres argollas en el borde de la losa
+    cad = np.zeros((lz.H, lz.W), np.float32)
+    S = lz.s
+    for ang in (np.pi / 2, np.pi / 2 + 2 * np.pi / 3, np.pi / 2 + 4 * np.pi / 3):
+        x1, y1 = CX + np.cos(ang) * RX * 0.215, CY + np.sin(ang) * RY * 0.215
+        n = 26
+        for i in range(n + 1):
+            t = 0.12 + 0.88 * i / n
+            px_, py_ = CX + (x1 - CX) * t, CY + (y1 - CY) * t
+            eje = (5, 3) if i % 2 else (3, 5)
+            cv2.ellipse(cad, (int(px_ * S), int(py_ * S)), (eje[0] * S // 2 + S, eje[1] * S // 2 + S), float(np.degrees(ang)), 0, 360, 1.0, S)
+        cv2.circle(cad, (int(x1 * S), int(y1 * S)), 5 * S, 1.0, 2 * S)
+    lz.pintar(desplazar(lz, cad, 1.0, 1.4) * (1 - cad), "#05040a", 0.7)
+    lz.pintar(cad, "#565a6a")
+    lz.pintar(desplazar(lz, cad, -0.5, -0.5) * cad, "#c4cad8", 0.8)
+    # LAS CALZADAS: franjas claras hacia el oeste, el este, el norte y la entrada del suroeste
+    def franja(ang, medio):
+        d = np.abs(np.arctan2(np.sin(a - ang), np.cos(a - ang)))
+        return (d < medio / np.maximum(r, 0.2)) * (r > 0.46)
+    calz = np.clip(franja(np.pi, 0.035) + franja(0.0, 0.035) + franja(-np.pi / 2, 0.045) + franja(np.radians(140), 0.04), 0, 1) * 1.0
+    calz = np.clip(calz + ((lz.y > 44 * 16) & (lz.y < 47 * 16) & (lz.x < 13 * 16)), 0, 1)
+    lz.pintar(calz, "#e8cc98", 0.28)
+    lz.pintar(np.clip(calz - desplazar(lz, calz, 0, 1.2), 0, 1) + np.clip(calz - desplazar(lz, calz, 0, -1.2), 0, 1), "#3a2414", 0.4)
+    # esquirlas de ámbar sueltas (pocas: es una ciudad barrida)
+    veta = (np.abs(ruido_torcido_local(lz, 34, 438) - 0.5) < 0.008) * (lz.ruido(40, 2, semilla=439) > 0.6) * (alta + medi)
+    lz.pintar(veta, "#c8741c", 0.8)
+    # LOS MUROS: fuera, la pared del cráter; entre terrazas, sillares de contención (más bajos y claros)
+    fuera = pared * (r > 0.9)
+    muro_t = pared * (r <= 0.9)
+    lz.pintar(fuera, rampa(["#140c18", "#1e1222", "#2a1a2c", "#382236", "#462a3c"], np.clip(0.4 + (grande - 0.5) * 0.5 + (media - 0.5) * 0.3 + (fina - 0.5) * 0.12, 0, 1)))
+    cara = np.clip(fuera - desplazar(lz, fuera, 0, -26), 0, 1)
+    franja_c = np.sin((lz.y + ruido_torcido_local(lz, 40, 440) * 30) * 0.9) * 0.5 + 0.5
+    lz.pintar(cara, rampa(["#1e100c", "#341c12", "#4c2a1a", "#663a22", "#80502e", "#9a683e"], np.clip(0.35 + (franja_c - 0.5) * 0.4 + (media - 0.5) * 0.25, 0, 1)))
+    veta_c = cara * (np.abs(franja_c - 0.5) < 0.06) * (lz.ruido(26, 2, semilla=441) > 0.55)
+    lz.pintar(veta_c, "#d8841c", 0.9)
+    lz.pintar(np.clip(fuera - cara - desplazar(lz, fuera - cara, 0, 1.6), 0, 1), "#6a4458", 0.8)
+    lz.pintar(muro_t, rampa(["#4a3220", "#64462c", "#80603c", "#9c7c52", "#b8986a"], np.clip(0.5 + (media - 0.5) * 0.3 + (fina - 0.5) * 0.15, 0, 1)))
+    cara_t = np.clip(muro_t - desplazar(lz, muro_t, 0, -12), 0, 1)
+    sillar = ((lz.y % 6) < 0.8) | (((lz.x + np.floor(lz.y / 6) * 5) % 11) < 0.8)
+    lz.pintar(cara_t, rampa(["#2e1c12", "#44291a", "#5c3a24", "#765032"], np.clip(0.5 + (media - 0.5) * 0.4, 0, 1)))
+    lz.pintar(cara_t * sillar, "#1c0e08", 0.6)
+    lz.pintar(np.clip(muro_t - cara_t - desplazar(lz, muro_t - cara_t, 0, 1.4), 0, 1), "#e0c08c", 0.7)      # el canto del muro
+    lz.pintar(np.clip(desplazar(lz, pared, 0, -4) - pared, 0, 1), "#1c0e08", 0.5)                            # la sombra al pie
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "asterhaul", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.014)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
 def ruido_torcido_local(lz, escala, semilla):
     from pintor import ruido_torcido
     return ruido_torcido(lz, escala, 4, semilla)
@@ -912,6 +1017,8 @@ def pintar(nombre, salida=None):
         return pintar_seccion(nombre, salida)
     if nombre == "desfiladero_meteorito":
         return pintar_desfiladero(nombre, salida)
+    if nombre == "mji_jiwe":
+        return pintar_mji_jiwe(nombre, salida)
     if nombre in BIBLIOTECAS:
         return pintar_biblioteca(nombre, salida)
     filas = leer(nombre)
