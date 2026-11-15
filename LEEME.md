@@ -1074,7 +1074,7 @@ El primer camino de Asterhaul: un cañón de roca ocre y ámbar al este del Kito
 | Arte | `herramientas/pintar_desfiladero.py` → `arte/mundos/asterhaul/desfiladero/` |
 | Diálogos y misión | `datos/dialogos/asterhaul.json` (nuevo), misión `desfiladero_meteorito` |
 | Prueba | `prueba_desfiladero_meteorito` (47 comprobaciones) |
-| Falta | Mji-Jiwe (la puerta abierta solo se mira); el botón de mando de la Carga; sonidos propios del Kaa-Jiwe; que la especie de los canteros (damán de roca) la confirme Iam |
+| Falta | Mji-Jiwe (la puerta abierta solo se mira); el botón de mando de la Carga; sonidos propios del Kaa-Jiwe |
 
 ## Las construcciones, al nivel de la casa del castor
 

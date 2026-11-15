@@ -516,5 +516,5 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Tecla de la Carga Sísmica | **I** (junto a J, K, L y U). Falta darle botón en el mando. |
 | La cantera antes de la Carga | La Esquirla de Mwamba está en la Cantera Hundida y se llega andando: hay que esquivar a los Kaa-Jiwe (aún no se les puede hacer nada) cubriéndose tras las peñas. El muro agrietado que el boceto ponía en su entrada está dentro, guardando la inscripción de los primeros canteros. |
 | La vagoneta del oeste | Aparta un montón de rocas al final de su vía (un secreto). |
-| ⚠️ Pendiente de Iam: la especie de los canteros | He dibujado a Mwamba como **damán de roca** (rechoncho, de roquedal). Es provisional: si Iam prefiere otra, se repinta en `dibujar_aldeanos.py`. |
+| La especie de los canteros de Asterhaul | **Damanes de roca** (aprobado por Iam el 2026-11-15): rechonchos, sin cola, de roquedal. Base en `_daman_base()` de `dibujar_aldeanos.py`; Mwamba es el primero. |
 | Mji-Jiwe | Aún no existe: la Puerta del Cráter se abre y deja ver la escalera, pero no se cruza. |
