@@ -92,7 +92,7 @@ func _process(delta: float) -> void:
 			if maisha and not maisha.get("esta_caida") and d.length() < VE:
 				_dir = d.normalized()
 				_cambiar(Fase.AVISA)
-				Sonido.efecto("clinc", -6.0, global_position, 0.3)
+				Sonido.efecto("kaa_avisa", 0.0, global_position, 0.3)
 			else:
 				if global_position.distance_to(_meta) < 2.0 or _t > 3.0:
 					_meta = _puesto + Vector2(randf_range(-28, 28), randf_range(-18, 18))
@@ -104,7 +104,7 @@ func _process(delta: float) -> void:
 			if _t >= AVISO:
 				_toco = false
 				_cambiar(Fase.EMBISTE)
-				Sonido.efecto("kifaru_embiste", -6.0, global_position, 0.2)
+				Sonido.efecto("kaa_embiste", 0.0, global_position, 0.2)
 		Fase.EMBISTE:
 			if not _mover(_dir * EMBISTE * delta):
 				Impacto.temblar(2.0, 0.15)
@@ -154,7 +154,7 @@ func recibir_carga(direccion: Vector2) -> bool:
 	if _muriendo:
 		return false
 	_cambiar(Fase.VOLCADO)
-	Sonido.efecto("cangrejo_vuelca", 0.0, global_position)
+	Sonido.efecto("kaa_vuelca", 0.0, global_position)
 	_mover(direccion * 6.0)
 	return true
 

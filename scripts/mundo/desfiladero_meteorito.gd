@@ -170,8 +170,7 @@ func _al_sonar_pilar() -> void:
 	if not is_inside_tree():
 		return
 	_abrir_puerta()
-	Sonido.efecto("roca_romper", -4.0, _sitio(PUERTA))
-	Sonido.efecto("arte_sube", -2.0, _sitio(PUERTA))
+	Sonido.efecto("puerta_crater", 0.0, _sitio(PUERTA))
 	Impacto.temblar(4.0, 0.6)
 	_hud.mostrar_mensaje("La Puerta del Cráter se abre")
 
