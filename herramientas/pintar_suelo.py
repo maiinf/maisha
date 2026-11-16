@@ -909,6 +909,71 @@ def pintar_desfiladero(nombre, salida=None):
     print("Suelo pintado:", destino, (lz.w, lz.h))
 
 
+def pintar_fundicion(nombre, salida=None):
+    """El suelo de LA FUNDICIÓN DE ESCORIA (Asterhaul): un lago de ESCORIA FUNDIDA («≈») que corre despacio de
+    oeste a este, naranja y amarilla, con costras negras que flotan; y, sobre ella, islas de LOSAS DE PIEDRA
+    tiznadas con planchas de hierro remachadas y el canto de hierro al rojo. La Gran Fragua del Este (redonda)
+    tiene un gran aro de bronce. Lo de fuera («0») es roca negra, con su cara en franjas."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=47)
+    tipos = [["pared" if c == "0" else ("lava" if c in "≈=" else "suelo") for c in f] for f in filas]      # (los muelles «=» se ven escoria: encima va la barcaza)
+    pared = mascara(lz, tipos, ("pared",), 2.0, 0.14, semilla=471)
+    lava = mascara(lz, tipos, ("lava",), 1.2, 0.05, semilla=472) * (1 - pared)
+    suelo = np.clip(1 - pared - lava, 0, 1)
+    fina = lz.ruido(0.8, 2, semilla=473)
+    media = lz.ruido(10, 3, semilla=474)
+    grande = lz.ruido(46, 3, semilla=475)
+    # LAS LOSAS: piedra gris parda tiznada, en sillares grandes, con planchas de hierro remachadas aquí y allá
+    hilada = np.floor(lz.y / 24)
+    junta = ((lz.y % 24) < 1.0) | (((lz.x + hilada * 20) % 40) < 1.0)
+    celda = (np.sin(hilada * 12.9898 + np.floor((lz.x + hilada * 20) / 40) * 78.233) * 43758.5453) % 1
+    v = 0.45 + (celda - 0.5) * 0.2 + (grande - 0.5) * 0.25 + (media - 0.5) * 0.2 + (fina - 0.5) * 0.12
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#1c1614", "#2e2420", "#44362e", "#5c4a3e", "#766050", "#907864", "#a89078"], np.clip(v, 0, 1)))
+    lz.pintar(junta * 1.0, "#140e0c", 0.65)
+    plancha = (celda > 0.78) * (1 - junta)
+    lz.pintar(plancha, rampa(["#22262e", "#343a46", "#4a5262", "#62697c"], np.clip(0.5 + (media - 0.5) * 0.5 + (fina - 0.5) * 0.2, 0, 1)), 0.9)
+    remache = plancha * ((np.abs((lz.x + hilada * 20) % 40 - 5) < 1.2) | (np.abs((lz.x + hilada * 20) % 40 - 35) < 1.2)) * ((np.abs(lz.y % 24 - 5) < 1.2) | (np.abs(lz.y % 24 - 19) < 1.2))
+    lz.pintar(remache, "#9aa2b6", 0.9)
+    lz.pintar((lz.ruido(5, 3, semilla=476) > 0.62) * 1.0, "#0e0a08", 0.3)                      # el tizne
+    # el aro de bronce de la Gran Fragua
+    ra = np.sqrt(((lz.x - 68.5 * 16) / (11.5 * 16)) ** 2 + ((lz.y - 29.5 * 16) / (11.5 * 16)) ** 2)
+    aro = ((np.abs(ra - 0.78) < 0.012) | (np.abs(ra - 0.3) < 0.016)) * 1.0
+    lz.pintar(aro, "#6a4612")
+    lz.pintar(desplazar(lz, aro, -0.6, -0.6) * aro, "#e0b860", 0.8)
+    # LA ESCORIA: corre de oeste a este (vetas largas), con costras negras de borde encendido
+    corre = ruido_torcido_local(lz, 60, 477)
+    vetas_l = np.sin((lz.y + corre * 90) * 0.10 + lz.ruido(60, 2, semilla=478) * 3) * 0.5 + 0.5
+    vl = 0.46 + (vetas_l - 0.5) * 0.34 + (grande - 0.5) * 0.2 + (fina - 0.5) * 0.06
+    lz.pintar(lava, rampa(["#7a1c04", "#b83a08", "#e86a10", "#f89a20", "#ffc848", "#fff0a0"], np.clip(vl, 0, 1)))
+    costra_r = lz.ruido(22, 3, semilla=479) + (lz.ruido(4, 2, semilla=480) - 0.5) * 0.12
+    costra = lava * (costra_r > 0.66)
+    borde_c = lava * (costra_r > 0.64) * (costra_r <= 0.66)
+    lz.pintar(borde_c, "#ffe070", 0.9)
+    lz.pintar(costra, rampa(["#1c0a06", "#2e120a", "#44200e"], np.clip(0.5 + (fina - 0.5) * 0.8, 0, 1)))
+    lz.pintar(costra * (np.abs(ruido_torcido_local(lz, 9, 481) - 0.5) < 0.02), "#f87a18", 0.8)   # grietas al rojo en la costra
+    # el canto de las islas: hierro al rojo junto a la escoria, y el resplandor que sube a las losas
+    dist_l = lz.distancia(1 - lava)
+    canto = suelo * (dist_l < 3.2)
+    lz.pintar(canto, "#2a1408", 0.85)
+    lz.pintar(suelo * (np.abs(dist_l - 3.0) < 0.6), "#f8a040", 0.7)
+    lz.sumar_luz(lz.desenfocar(lava, 14) * suelo, "#ff7a18", 0.55)
+    lz.sumar_luz(lz.desenfocar(lava, 5) * lava, "#ffb040", 0.15)
+    lz.pintar(np.clip(desplazar(lz, suelo, 0, 4) - suelo, 0, 1) * lava, "#3a0e02", 0.75)        # el lado sur de cada isla, en sombra
+    # LA ROCA DE FUERA: negra, con su cara en franjas y el reflejo naranja de la escoria
+    lz.pintar(pared, rampa(["#0a0706", "#120c0a", "#1a120e", "#241812", "#2e2018"], np.clip(0.4 + (grande - 0.5) * 0.5 + (media - 0.5) * 0.3 + (fina - 0.5) * 0.12, 0, 1)))
+    cara = np.clip(pared - desplazar(lz, pared, 0, -26), 0, 1)
+    franja = np.sin((lz.y + ruido_torcido_local(lz, 40, 482) * 30) * 0.9) * 0.5 + 0.5
+    lz.pintar(cara, rampa(["#1e100c", "#341c12", "#4c2a1a", "#663a22", "#80502e"], np.clip(0.35 + (franja - 0.5) * 0.4 + (media - 0.5) * 0.25, 0, 1)))
+    lz.sumar_luz(cara * lz.desenfocar(lava, 10), "#ff7a18", 0.6)
+    encima = np.clip(pared - cara, 0, 1)
+    lz.pintar(np.clip(encima - desplazar(lz, encima, 0, 1.6), 0, 1), "#5a3420", 0.8)
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "asterhaul", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.014)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
 def pintar_mji_jiwe(nombre, salida=None):
     """El suelo de MJI-JIWE, LA CIUDAD DEL CRÁTER (Asterhaul): un anfiteatro ovalado. TERRAZA ALTA de losas ocres
     irregulares; TERRAZA MEDIA de adoquín tallado en anillos; TERRAZA BAJA de basalto pulido con filetes de ámbar;
@@ -1030,6 +1095,8 @@ def pintar(nombre, salida=None):
         return pintar_desfiladero(nombre, salida)
     if nombre == "mji_jiwe":
         return pintar_mji_jiwe(nombre, salida)
+    if nombre == "fundicion_escoria":
+        return pintar_fundicion(nombre, salida)
     if nombre in BIBLIOTECAS:
         return pintar_biblioteca(nombre, salida)
     filas = leer(nombre)

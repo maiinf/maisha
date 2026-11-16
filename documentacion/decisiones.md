@@ -538,3 +538,13 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | La Bóveda | A oscuras solo ella; las geodas encendidas se quedan encendidas. Las cinco dan un secreto. |
 | El Kifaru | Dos maneras de abrirle la coraza: que se estampe contra un pilar (hay 4) o una vagoneta lanzada (la de la cámara, o la del Cruce si se mete dentro). |
 | Las Esquirlas de la mina | La de Kito (solo suya), la de la Bóveda y la del Kifaru (estas dos valen para cualquier artesano de la ciudad). |
+
+### 2026-11-16 · La Fundición de Escoria y Nyundo, construidos (Claude)
+| Tema | Cómo ha quedado |
+| :--- | :--- |
+| Entrada | La verja del este de Mji-Jiwe se abre sola al romperse la Cadena del Oeste. |
+| Tecla del Pulso Magnético | **O** (junto a la I de la Carga). Falta darle botón en el mando. |
+| «Atrae o repele» con una sola tecla | La regla es: **lo quieto viene; lo que viene, se va**. Barcazas, bloques y Kovu vienen; subida al hierro, el hierro se va y la lleva; las tenazas y los bloques que Nyundo le lanza se dan la vuelta. |
+| Cómo se llega a la Esquirla de Moto sin el Pulso | La primera barcaza tiene cabrestante (un golpe y sale): el boceto la ponía tras una barcaza de Pulso, y el Pulso lo enseña Moto al recibirla. |
+| La escoria | No hace daño: no se pisa (como el agua). |
+| Nyundo | No se mueve del sitio. Las dos maneras de abollarle el peto son devolverle la tenaza o el bloque. |

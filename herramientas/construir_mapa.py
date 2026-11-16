@@ -2472,6 +2472,41 @@ def crear_galerias():
     return ["".join(f) for f in m], {}
 
 
+def crear_fundicion():
+    """LA FUNDICIÓN DE ESCORIA (Asterhaul, 84x60): cinco islas de piedra en un lago de ESCORIA FUNDIDA («≈»: no se
+    pisa; la escena le pone el choque). Lo de fuera («0») es roca. Se entra por el oeste (de Mji-Jiwe, «_»).
+      1. LA CASETA DE MOTO (oeste).            2. EL CRISOL NORTE (la Esquirla de Moto).
+      3. LA PLATAFORMA DE LOS IMANES (centro). 4. LA NAVE DE LAS GRÚAS (sur; un muro con compuerta la parte en dos).
+      5. LA GRAN FRAGUA DEL ESTE (redonda): Nyundo.
+    Entre las islas no hay puentes: se cruza en las BARCAZAS de hierro (las pone la escena, con todo lo demás);
+    sus muelles son los huecos de «=»."""
+    ANCHO, ALTO = 84, 60
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y][x] = c
+
+    rect(12, 4, 81, 56, "≈")                                 # el lago de escoria
+    rect(2, 22, 22, 38, "%")                                 # 1. la Caseta de Moto
+    rect(0, 29, 1, 31, "%")
+    rect(0, 29, 0, 31, "_")
+    rect(18, 7, 34, 15, "%")                                 # 2. el Crisol Norte
+    rect(34, 22, 48, 36, "%")                                # 3. la Plataforma de los Imanes
+    rect(30, 44, 60, 54, "%")                                # 4. la Nave de las Grúas...
+    rect(52, 44, 52, 54, "0")                                # ...partida por un muro
+    rect(52, 48, 52, 50, "%")                                # (el hueco de su compuerta)
+    for y in range(ALTO):                                    # 5. la Gran Fragua del Este (redonda)
+        for x in range(ANCHO):
+            if ((x - 68.0) / 11.5) ** 2 + ((y - 29.0) / 11.5) ** 2 <= 1.0:
+                m[y][x] = "%"
+    # los muelles de las cuatro barcazas (3x3 cada hueco; «=»: se pisa solo si la barcaza está ahí)
+    for (x, y) in ((19, 19), (19, 16), (23, 28), (31, 28), (49, 28), (54, 28), (40, 37), (40, 41)):
+        rect(x, y, x + 2, y + 2, "=")
+    return ["".join(f) for f in m], {}
+
+
 def crear_seccion():
     """LA SECCIÓN PROHIBIDA (Sigilia, 64x72, de sur a norte): las salas de mármol morado bajo el Gran Archivo. Lo que
     no es sala («0») son estanterías de libros encadenados. Se entra por el sur (del Gran Archivo de Maandiko, «_»).
@@ -3254,7 +3289,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mji_jiwe", "galerias_ambar"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mji_jiwe", "galerias_ambar", "fundicion_escoria"}
 
 
 def construir_suelo(nombre):
@@ -3406,7 +3441,7 @@ if __name__ == "__main__":
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
                         "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion,
-                        "desfiladero_meteorito": crear_desfiladero, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias}.get(nombre, crear_prados)()
+                        "desfiladero_meteorito": crear_desfiladero, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

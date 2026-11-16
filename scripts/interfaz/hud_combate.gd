@@ -18,6 +18,8 @@ const TEXTO := Color("fff3c4")
 const INFO_ENEMIGO := {
 	"kaa_jiwe.gd": {"prop": "fase", "aviso": [1], "debil": "sismica"},
 	"mchimbaji.gd": {"prop": "fase", "aviso": [], "debil": "sismica"},
+	"kovu.gd": {"prop": "fase", "aviso": [1], "debil": "magnetico"},
+	"nyundo.gd": {"prop": "fase", "aviso": [2, 4], "debil": "magnetico"},
 	"kifaru.gd": {"prop": "fase", "aviso": [2], "debil": "sismica"},
 	"saa.gd": {"prop": "fase", "aviso": [2], "debil": "rayo"},
 	"jabali.gd": {"prop": "fase", "aviso": [1], "debil": "escudo"},

@@ -141,9 +141,13 @@
 		],
 		"mji_jiwe": [
 			"desfiladero_meteorito",
-			"galerias_ambar"
+			"galerias_ambar",
+			"fundicion_escoria"
 		],
 		"galerias_ambar": [
+			"mji_jiwe"
+		],
+		"fundicion_escoria": [
 			"mji_jiwe"
 		]
 	},
@@ -1628,6 +1632,80 @@
 					],
 					"ir": {
 						"escena": "galerias_ambar",
+						"buscar": "grupo:jefes"
+					}
+				}
+			]
+		},
+		{
+			"id": "fundicion_escoria",
+			"tipo": "historia",
+			"titulo": "La Fundición de Escoria",
+			"texto": "La segunda cadena del Núcleo sale de la Gran Fragua, al este de Mji-Jiwe, al otro lado de un lago de escoria fundida. No hay puentes: allí todo se mueve con hierro, cadenas... y algo más que solo sabe el gruista.",
+			"aparece": [
+				"cadena_oeste_rota"
+			],
+			"hecha": [
+				"nyundo_vencido"
+			],
+			"pasos": [
+				{
+					"texto": "Sal de Mji-Jiwe por la verja del este",
+					"hecho": [
+						"fundicion_escoria"
+					],
+					"ir": {
+						"escena": "mji_jiwe",
+						"buscar": "puerta:fundicion_escoria"
+					}
+				},
+				{
+					"texto": "Mira qué le pasa al gruista",
+					"hecho": [
+						"moto_visto"
+					],
+					"ir": {
+						"escena": "fundicion_escoria",
+						"buscar": "aldeano:moto_gris"
+					}
+				},
+				{
+					"texto": "Dale al torno, súbete a la barcaza y busca su Esquirla en el Crisol Norte",
+					"hecho": [
+						"esquirla/moto"
+					],
+					"ir": {
+						"escena": "fundicion_escoria",
+						"buscar": "grupo:cabrestantes"
+					}
+				},
+				{
+					"texto": "Devuélvele la Esquirla a Moto",
+					"hecho": [
+						"pulso_magnetico"
+					],
+					"ir": {
+						"escena": "fundicion_escoria",
+						"buscar": "aldeano:moto_gris"
+					}
+				},
+				{
+					"texto": "Lleva los dos bloques-imán a sus placas con el Pulso (O)",
+					"hecho": [
+						"fundicion/compuerta_este"
+					],
+					"ir": {
+						"escena": "fundicion_escoria",
+						"buscar": "grupo:bloques_iman"
+					}
+				},
+				{
+					"texto": "Suelta la Cadena del Este",
+					"hecho": [
+						"nyundo_vencido"
+					],
+					"ir": {
+						"escena": "fundicion_escoria",
 						"buscar": "grupo:jefes"
 					}
 				}

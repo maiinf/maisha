@@ -943,6 +943,33 @@ def chuma():
     return l
 
 
+def moto():
+    """MOTO: el maestro gruista de la Fundición, un damán de roca ancho de hombros. Casco de cobre abollado con
+    una lamparilla, chaleco azul de faena sobre el mandil, guantes de cuero gordos y, al hombro, un gancho de grúa
+    de hierro con su trozo de cadena."""
+    l = Lienzo()
+    for y in range(9, 24):                                    # la cadena...
+        l.px(19, y, "metal", 3 if y % 2 else 1)
+    for (x, y) in ((19, 24), (19, 25), (19, 26), (20, 27), (21, 27), (22, 26), (22, 25), (22, 24)):   # ...y el gancho
+        l.px(x, y, "metal", 2)
+    l.px(19, 8, "metal", 2); l.px(18, 8, "metal", 1); l.px(20, 8, "metal", 1)
+    _daman_base(l)
+    l.ovalo(11.5, 24.0, 6.0, 6.2, "daman")                    # ancho
+    l.ovalo(11.5, 24.5, 4.6, 5.2, "delantal")
+    for x in (6, 7, 8, 15, 16, 17):                           # el chaleco azul
+        for y in range(18, 27):
+            l.px(x, y, "azul", 2 if x in (8, 15) else 1)
+    l.px(8, 21, "laton", 3); l.px(15, 21, "laton", 3)         # los botones
+    l.ovalo(17.5, 18.5, 2.0, 2.2, "concha")                   # el guante en la cadena
+    l.ovalo(5.5, 24.5, 1.8, 2.0, "concha")                    # el otro guante
+    ojos(l, 10, 9, 14, alto=2)
+    l.ovalo(11.5, 6.6, 5.6, 3.0, "cobre")                     # el casco de cobre
+    l.rect(6, 8, 17, 8, "cobre", 1)
+    l.px(11, 5, "brasa", 3); l.px(12, 5, "brasa", 3); l.px(11, 4, "laton", 2); l.px(12, 4, "laton", 2)   # la lamparilla
+    l.px(14, 6, "cobre", 0)                                   # la abolladura
+    return l
+
+
 def kito():
     """KITO: la talladora de ámbar de las Galerías, una damán de roca joven y menuda. Una cinta de ámbar en la
     frente, una lupa de latón sujeta sobre un ojo, mandil corto con el bolsillo lleno de buriles y, en la mano, un
@@ -1159,7 +1186,7 @@ def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
 
 
 ## Desde qué columna (y fila) se levanta lo de la mano derecha en el gesto por defecto (para no mover picos ni orejas)
-ALZA = {"mwamba": (16, 0), "mwamba_gris": (16, 0), "mhunzi": (16, 0), "chuma": (16, 0), "kito": (16, 0), "kito_gris": (16, 0),
+ALZA = {"mwamba": (16, 0), "mwamba_gris": (16, 0), "mhunzi": (16, 0), "chuma": (16, 0), "kito": (16, 0), "kito_gris": (16, 0), "moto": (16, 0), "moto_gris": (16, 0),
         **{"artesano_" + t + s: (16, 0) for t in "abc" for s in ("", "_gris")}, "bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "nyota": (15, 18), "nyota_blanco": (15, 18), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
         "kasia": (17, 0), "sungura": (19, 0)}
 
@@ -1227,7 +1254,7 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma, "kito": kito, "kito_gris": (lambda: _engrisar(kito(), ("delantal", "laton", "pajaro", "brasa", "metal"))),
+ALDEANOS = {"mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma, "moto": moto, "moto_gris": (lambda: _engrisar(moto(), ("delantal", "cobre", "azul", "concha", "metal", "brasa", "laton"))), "kito": kito, "kito_gris": (lambda: _engrisar(kito(), ("delantal", "laton", "pajaro", "brasa", "metal"))),
             **{"artesano_" + t: (lambda t=t: artesano(t)) for t in "abc"},
             **{"artesano_" + t + "_gris": (lambda t=t: _engrisar(artesano(t))) for t in "abc"}, "kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "nyota": nyota, "nyota_blanco": nyota_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 

@@ -66,6 +66,8 @@ const OBJETOS := {
 		"texto": "Una ficha del Índice manchada por las dos caras, como si hubiera estado dentro de un tintero: «Chapa, impresora del Archivo. Tipos de plomo y prensa de mano»."},
 	"esquirla_mwamba": {"uno": "Esquirla de Estrella", "encargo": 0, "hecho": "", "icono": 27,
 		"texto": "Un trozo de ámbar tibio en forma de estrella rota. Late despacio, como un corazón pequeño. Se le cayó a alguien que estaba picando en la Cantera Hundida."},
+	"esquirla_moto": {"uno": "Esquirla de Estrella", "encargo": 0, "hecho": "", "icono": 27,
+		"texto": "Un trozo de ámbar tibio en forma de estrella rota, con una limadura de hierro pegada que no hay manera de quitarle. Tira un poquito hacia lo que es de metal."},
 	"esquirla_kito": {"uno": "Esquirla de Estrella", "encargo": 0, "hecho": "", "icono": 27,
 		"texto": "Un trozo de ámbar tibio en forma de estrella rota, con una muesca finísima de buril en un canto. Hace un ruidito muy bajo, como si escuchara."},
 	"esquirla_estrella": {"uno": "Esquirla de Estrella", "varios": "Esquirlas de Estrella", "encargo": 0, "hecho": "", "icono": 27,

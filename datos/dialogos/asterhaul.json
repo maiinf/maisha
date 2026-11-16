@@ -242,6 +242,30 @@
 			},
 			{
 				"si": [
+					"cadena_oeste_rota",
+					"cadena_este_rota"
+				],
+				"lineas": [
+					"Dos. Dos cadenas. La losa ya no está quieta del todo: pon la mano y verás.",
+					"Queda la de arriba, la de la Aguja. Esa no la guardan ni piedra ni hierro. Esa la guarda el aire.",
+					"(El camino de La Aguja Caída llegará en una próxima parte.)"
+				]
+			},
+			{
+				"si": [
+					"cadena_oeste_rota"
+				],
+				"no": [
+					"cadena_este_rota"
+				],
+				"lineas": [
+					"La he oído caer. La del oeste. Treinta años tensa, y hoy se ha soltado como un cordón de bota.",
+					"El Diapasón ha dado una nota él solo. Una. Me he tenido que sentar.",
+					"La verja del este ya está abierta: la Fundición. Allí mandaba Moto, el gruista. No pises nada que brille naranja, y lo que sea de hierro, que te lo explique él."
+				]
+			},
+			{
+				"si": [
 					"hornos_mji_jiwe"
 				],
 				"lineas": [
@@ -384,8 +408,7 @@
 			{
 				"lineas": [
 					"Una verja de hierro con un candado de ámbar. Detrás, el camino del este: La Fundición de Escoria.",
-					"No cede ni con la Carga. Esto no se abre a golpes.",
-					"(Este camino llegará en una próxima parte.)"
+					"Está caliente al tacto. No cede ni con la Carga: algo la tiene trabada desde lejos."
 				]
 			}
 		]
@@ -983,6 +1006,132 @@
 					"El Kifaru se echa despacio, como quien se sienta por fin. Las placas del lomo se le quedan abiertas y el ámbar de dentro late tranquilo.",
 					"La argolla del centro se parte con un chasquido. La cadena se escurre por el agujero, eslabón a eslabón, y tarda mucho en dejar de oírse.",
 					"Muy lejos, en la ciudad, algo grande de hierro da una nota. Baja. Solo una."
+				]
+			}
+		]
+	},
+	"fundicion_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Calor. Del que se mete por los pies. Todo lo que no es piedra es un lago naranja que se mueve muy despacio.",
+					"No hay puentes. Hay planchas de hierro flotando, amarradas con cadenas, y un torno con manivela.",
+					"Y algo nada ahí dentro. Se le ve una cresta. No sé qué puede vivir en eso, pero no quiero que me lo explique."
+				]
+			}
+		]
+	},
+	"estela_pulso": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una laja de hierro azulado, fría aunque todo arda alrededor. Tiene grabados dos arcos enfrentados y un punto en medio.",
+					"Debajo, a punzón: «El hierro de la estrella se acuerda de dónde vino. Llámalo, y viene. Y a lo que ya viene hacia ti, dile que no: se va».",
+					"Y más abajo, con otra letra: «No os subáis a la barcaza sin mirar quién nada cerca. — Moto»."
+				]
+			}
+		]
+	},
+	"moto": {
+		"nombre": "Moto",
+		"conversaciones": [
+			{
+				"no": [
+					"moto_pulso"
+				],
+				"tiene": {
+					"esquirla_moto": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"La esquirla tira un poquito hacia su gancho, como una aguja de coser hacia un imán.",
+					"Se la cuelgo de la cadena. Ahí la va a notar."
+				],
+				"entrega": {
+					"esquirla_moto": 1
+				},
+				"marca": [
+					"moto_pulso"
+				]
+			},
+			{
+				"no": [
+					"moto_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Un damán grandote con un casco de cobre, gris de polvo, con un gancho de grúa al hombro. Mira al norte, a la isla de enfrente.",
+					"Tiene un guante levantado, como quien va a dar una orden y no la da.",
+					"El torno de al lado todavía funciona. Si le doy a la manivela, la barcaza saldrá hacia allá. Habrá que subirse deprisa."
+				],
+				"marca": [
+					"moto_visto"
+				]
+			},
+			{
+				"si": [
+					"moto_pulso"
+				],
+				"no": [
+					"moto_hablado"
+				],
+				"lineas": [
+					"...¡ARRIBA! ¡Arriba esa carga! ...¿Qué carga? ¿Dónde está mi cuadrilla?",
+					"Moto. Gruista mayor. Yo movía el hierro de un lado a otro de este lago sin que se me cayera ni un tornillo. Ni uno, en cuarenta años.",
+					"Hasta que pensé: ¿y el día que se me caiga? Y me quedé con la orden en la boca. Una grúa parada no deja caer nada, eso es verdad. Tampoco levanta.",
+					"Tú has cruzado a pulso de manivela, que es como cruzan los aprendices. Ven, que te enseño cómo se hace de verdad.",
+					"El hierro de aquí es de la estrella, y la estrella tira. Tú solo tienes que tirar con ella. Pon el cetro así, y llama. ...¡Eso! ¿Has visto cómo ha temblado la barcaza?",
+					"Lo que está quieto, viene: las barcazas, los bloques, hasta esos bichos de la cresta, que se enfrían en cuanto tocan piedra. Y si te subes al hierro y llamas, el hierro se va y te lleva.",
+					"Y una cosa más, que te va a hacer falta al fondo: a lo que ya viene hacia ti, el pulso le dice que no. Se da la vuelta. Acuérdate cuando veas las tenazas."
+				],
+				"marca": [
+					"moto_hablado",
+					"pulso_magnetico"
+				]
+			},
+			{
+				"si": [
+					"nyundo_vencido"
+				],
+				"lineas": [
+					"Lo he visto desde aquí. Su propia tenaza, en todo el peto. Cuarenta años engrasándole los codos y nunca pensé que le vería agachar la cabeza.",
+					"Mañana pongo a andar la grúa grande. Si se me cae algo, pues se cae. Se recoge y ya está."
+				]
+			},
+			{
+				"lineas": [
+					"En la Plataforma de los Imanes hay dos bloques y dos placas. Bloque en placa, compuerta arriba. No tiene más ciencia, pero hay que ponerse en el sitio antes de llamar.",
+					"Y en la Gran Fragua está Nyundo. Lo hicimos nosotros, para forjar las cadenas. Luego le mandamos guardar una. Es obediente. Ese es el problema."
+				]
+			}
+		]
+	},
+	"nyundo_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una fragua redonda, y en el centro, atornillada al suelo, una cosa de bronce con forma de huevo y un yelmo encima.",
+					"Tiene cuatro brazos recogidos, cada uno con una tenaza. De su pie sale una cadena que se hunde en la escoria.",
+					"La mirilla del yelmo se enciende. Las cuatro tenazas se abren a la vez. Clac."
+				]
+			}
+		]
+	},
+	"nyundo_vencido": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Nyundo baja los cuatro brazos despacio, uno detrás de otro, y se queda mirando al suelo. La mirilla se apaga.",
+					"La cadena de su pie se afloja y se hunde en la escoria sin salpicar. El lago entero baja un dedo, como si respirase.",
+					"Lejos, en la ciudad, el Gran Diapasón da otra nota. Más alta que la primera. Las dos juntas casi suenan a algo."
 				]
 			}
 		]

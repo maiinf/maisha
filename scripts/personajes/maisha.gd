@@ -27,6 +27,9 @@ const ESCENA_CARGA := preload("res://scripts/combate/carga_sismica.gd")
 const CARGA_COSTE := 20.0       # Aliento que gasta la Carga Sísmica
 const CARGA_ESPERA := 0.9       # segundos entre carga y carga
 const CARGA_IMPULSO := 240.0    # el empujón de la embestida (unos 48 px)
+const ESCENA_PULSO := preload("res://scripts/combate/pulso_magnetico.gd")
+const PULSO_COSTE := 15.0       # Aliento que gasta el Pulso Magnético
+const PULSO_ESPERA := 0.6       # segundos entre pulso y pulso
 const SIGILO_ESPERA := 0.7      # segundos entre sigilo y sigilo
 const RELIEVE := preload("res://scripts/mundo/relieve.gd")
 const RASGOS := preload("res://scripts/personajes/rasgos_maisha.gd")
@@ -52,6 +55,7 @@ var _espera_golpe := 0.0
 var _espera_latido := 0.0
 var _espera_sigilo := 0.0
 var _espera_carga := 0.0
+var _espera_pulso := 0.0
 var _golpeando := false
 var _tiempo_agotada := 0.0
 var _desde_ultima_semilla := 99.0
@@ -88,6 +92,7 @@ func _physics_process(delta: float) -> void:
 	_espera_latido = maxf(0.0, _espera_latido - delta)
 	_espera_sigilo = maxf(0.0, _espera_sigilo - delta)
 	_espera_carga = maxf(0.0, _espera_carga - delta)
+	_espera_pulso = maxf(0.0, _espera_pulso - delta)
 	_invulnerable = maxf(0.0, _invulnerable - delta)
 	pegajoso = maxf(0.0, pegajoso - delta)
 	hundida = maxf(0.0, hundida - delta)
@@ -157,6 +162,8 @@ func _physics_process(delta: float) -> void:
 			cambiar_sigilo()
 		if Input.is_action_just_pressed("carga"):
 			carga()
+		if Input.is_action_just_pressed("pulso"):
+			pulso()
 
 	if Input.is_action_just_pressed("usar"):
 		tomar_sopa()
@@ -325,6 +332,24 @@ func carga() -> bool:
 	efecto.maisha = self
 	efecto.direccion = direccion_mirada()
 	get_parent().add_child(efecto)
+	if aliento < 1.0:
+		_agotarse()
+	return true
+
+
+## El Pulso Magnético (arte Tierra, Asterhaul; lo enseña Moto en la Fundición de Escoria): un latido del cetro
+## que tira del hierro meteórico. Todo lo que es «magneticos» recibe `recibir_pulso(dónde está Maisha)` y decide
+## qué hace: lo quieto VIENE (las barcazas, los bloques-imán, los Kovu); lo que viene SE VA (las tenazas de Nyundo).
+func pulso() -> bool:
+	if not Estado.tiene("pulso_magnetico") or _espera_pulso > 0.0 or agotada or escudo or aliento < PULSO_COSTE:
+		return false
+	aliento -= PULSO_COSTE
+	_espera_pulso = PULSO_ESPERA
+	var efecto: Node2D = ESCENA_PULSO.new()
+	efecto.position = global_position
+	get_parent().add_child(efecto)
+	for nodo in get_tree().get_nodes_in_group("magneticos"):
+		nodo.call("recibir_pulso", global_position)
 	if aliento < 1.0:
 		_agotarse()
 	return true

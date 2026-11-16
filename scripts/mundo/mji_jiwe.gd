@@ -10,8 +10,9 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ##     Con los cuatro de la terraza media, CHUMA abre el MERCADO DE LA ESCORIA («mercado_escoria»); con los seis
 ##     («hornos_mji_jiwe»), MWAMBA lo agradece (y la tienda da 3 Cristales: datos/tienda.json).
 ##   - EL GRAN DIAPASÓN, en la LOSA DEL NÚCLEO, sellada por tres cadenas (aún no se abre).
-##   - La salida del oeste lleva a LAS GALERÍAS DE ÁMBAR (la verja se abre con «arte_tierra»). Las del este
-##     (Fundición de Escoria) y el norte (La Aguja Caída) tienen la VERJA echada: aún no están construidas.
+##   - La salida del oeste lleva a LAS GALERÍAS DE ÁMBAR (la verja se abre con «arte_tierra») y la del este, a LA
+##     FUNDICIÓN DE ESCORIA (con «cadena_oeste_rota»). La del norte (La Aguja Caída) tiene la VERJA echada: aún
+##     no está construida.
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const ESCRIBA := preload("res://scripts/mundo/sigilia/escriba.gd")
@@ -52,24 +53,33 @@ const HORNOS := [[Vector2i(22, 17), "media"], [Vector2i(53, 17), "media"], [Vect
 ## las dos Esquirlas de Estrella escondidas en la ciudad: [casilla, marca]
 const ESQUIRLAS := [[Vector2i(58, 48), "esquirla/mji_jiwe_sur"], [Vector2i(8, 33), "esquirla/mji_jiwe_oeste"]]
 ## verja: [casilla, lo que se lee]
-const VERJAS := [[Vector2i(3, 28), "mji_verja_oeste"], [Vector2i(72, 28), "mji_verja_este"], [Vector2i(37, 3), "mji_verja_norte"]]
+## (las que llevan a un camino ya construido: además, la marca que la abre, el nombre de su puerta, la escena, la puerta de llegada y hacia dónde sale Maisha al volver)
+const VERJAS := [
+	[Vector2i(3, 28), "mji_verja_oeste", "arte_tierra", "galerias", "galerias_ambar", "este", Vector2.RIGHT],
+	[Vector2i(72, 28), "mji_verja_este", "cadena_oeste_rota", "fundicion", "fundicion_escoria", "oeste", Vector2.LEFT],
+	[Vector2i(37, 3), "mji_verja_norte"],
+]
 
 var _yunques: Array[Sprite2D] = []
 var _mercado: Sprite2D
-var _verja_oeste: Array = []
+## marca que abre una verja → [la verja, su cartel]
+var _verjas := {}
 
 
 func _ready() -> void:
-	# (antes de super(): al volver de las Galerías, la puerta tiene que estar ya)
-	var oeste: Area2D = preload("res://scripts/mundo/puerta.gd").new()
-	oeste.id = "galerias"
-	oeste.destino = "galerias_ambar"
-	oeste.destino_puerta = "este"
-	oeste.salida = Vector2.RIGHT
-	oeste.tam = Vector2(12, 36)
-	oeste.cerrada_hasta = "arte_tierra"
-	oeste.position = _sitio(VERJAS[0][0]) + Vector2(-2, -6)
-	add_child(oeste)
+	# (antes de super(): al volver de un camino, su puerta tiene que estar ya)
+	for v in VERJAS:
+		if v.size() < 7:
+			continue
+		var paso: Area2D = preload("res://scripts/mundo/puerta.gd").new()
+		paso.id = v[3]
+		paso.destino = v[4]
+		paso.destino_puerta = v[5]
+		paso.salida = v[6]
+		paso.tam = Vector2(12, 36)
+		paso.cerrada_hasta = v[2]
+		paso.position = _sitio(v[0]) + Vector2(-2.0 * (v[6] as Vector2).x, -6)
+		add_child(paso)
 	super()
 	Estado.marcar("mji_jiwe")
 	_poner_cosas()
@@ -87,12 +97,12 @@ func _poner_cosas() -> void:
 	_mercado = _poner_adorno("mji_jiwe/mercado", MERCADO, 100, 1 if Estado.tiene("mercado_escoria") else 0).get_child(0)
 	_leer("mji_diapason", _sitio(Vector2i(37, 29)) + Vector2(0, 6))
 	for v in VERJAS:
-		if v[1] == "mji_verja_oeste" and Estado.tiene("arte_tierra"):
-			continue                                   # (Mhunzi la deja abierta: es la puerta a las Galerías)
+		if v.size() >= 7 and Estado.tiene(v[2]):
+			continue                                   # (ya abierta: es la puerta a su camino)
 		var verja := _poner_adorno("mji_jiwe/verja", v[0], 44, -1)
 		var cartel := _leer(v[1], _sitio(v[0]) + Vector2(0, 6))
-		if v[1] == "mji_verja_oeste":
-			_verja_oeste = [verja, cartel]
+		if v.size() >= 7:
+			_verjas[v[2]] = [verja, cartel]
 	for v in VECINOS:
 		if v[3] != "" and not Estado.tiene(v[3]):
 			continue
@@ -218,9 +228,9 @@ func _al_poner_marca(marca: String) -> void:
 		_hud.mostrar_mensaje("Todos los hornos de Mji-Jiwe arden")
 	elif marca == "arte_tierra":
 		_hud.mostrar_mensaje("Ha despertado el Arte de la Tierra")
-		for n in _verja_oeste:
-			if is_instance_valid(n):
-				n.queue_free()
+	for n in _verjas.get(marca, []):
+		if is_instance_valid(n):
+			n.queue_free()
 
 
 func _pensar_al_llegar() -> void:

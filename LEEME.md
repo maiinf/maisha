@@ -1093,7 +1093,7 @@ La ciudad de los canteros, herreros y afinadores (damanes de roca), tallada en e
 | Arte | `herramientas/pintar_mji_jiwe.py` → `arte/mundos/asterhaul/mji_jiwe/`; Mhunzi, Chuma y los artesanos (`artesano_a/b/c` y sus `_gris`) en `dibujar_aldeanos.py` |
 | Misiones | `mji_jiwe` (historia) y `yunques_memoria` (encargo largo) |
 | Prueba | `prueba_mji_jiwe` (31 comprobaciones) |
-| Falta (parte 2) | La **tienda de Chuma** por dentro (ahora abre el puesto pero aún no vende); la **rama del Arte de la Tierra** en el diario (sus 6 niveles no están decididos); las salidas del este y el norte (verjas echadas: la Fundición y la Aguja no están construidas); que en la ciudad se vea rota la cadena de cada jefe vencido |
+| Falta (parte 2) | La **tienda de Chuma** por dentro (ahora abre el puesto pero aún no vende); la **rama del Arte de la Tierra** en el diario (sus 6 niveles no están decididos); la salida del norte (verja echada: la Aguja no está construida); que en la ciudad se vea rota la cadena de cada jefe vencido |
 
 ## Asterhaul: Las Galerías de Ámbar y el Kifaru de Basalto
 
@@ -1114,6 +1114,25 @@ La mina de los canteros, al oeste de Mji-Jiwe (`documentacion/galerias_captura_1
 | Arte | `herramientas/pintar_galerias.py` → `arte/mundos/asterhaul/galerias/`; Kito en `dibujar_aldeanos.py` |
 | Prueba | `prueba_galerias_ambar` (52 comprobaciones) |
 | Falta | Sonidos propios del Mchimbaji y del Kifaru (pedidos a Gemini); que al volver, las vagonetas se queden donde se dejaron (ahora vuelven a su sitio); verla en HD-2D |
+
+## Asterhaul: La Fundición de Escoria y Nyundo
+
+Cinco islas de piedra en un lago de escoria fundida, al este de Mji-Jiwe (`documentacion/fundicion_captura_1.png`…`_4.png`). Lo suyo es el **hierro**: no hay puentes, se cruza en barcazas.
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | Por la **verja del este de Mji-Jiwe** (se abre con `cadena_oeste_rota`, al vencer al Kifaru: puerta `fundicion` → `oeste`) |
+| Mapa | `fundicion_escoria` (84×60, `crear_fundicion()`): la Caseta de Moto, el Crisol Norte, la Plataforma de los Imanes, la Nave de las Grúas y la Gran Fragua del Este. La escoria es la letra `≈` (su choque lo pone la escena); los muelles de las barcazas, `=`. Suelo: `pintar_fundicion()` en `pintar_suelo.py` |
+| **Pulso Magnético** (tecla **O**, acción `pulso`) | `maisha.gd → pulso()` + `scripts/combate/pulso_magnetico.gd`: 15 de Aliento, 0,6 s de espera. Todo lo que está en el grupo `magneticos` recibe `recibir_pulso(dónde está Maisha)`. La regla: **lo quieto viene; lo que viene, se va**. Lo enseña Moto (marca `pulso_magnetico`) |
+| Barcaza | `scripts/mundo/asterhaul/barcaza.gd`: plancha de 3×3 entre dos muelles. Con Maisha encima, el Pulso la despega y la lleva; desde la orilla del hueco vacío, la llama. El hueco donde no está no se pisa |
+| Cabrestante | `asterhaul/cabrestante.gd`: un golpe y, al cabo de 1,3 s, la barcaza del norte sale (da tiempo a subirse). Es la única manera de cruzar antes de saber el Pulso |
+| Bloque-imán, placa y compuerta | `asterhaul/bloque_iman.gd`: el Pulso lo trae en línea recta hasta quedar al lado de Maisha... o hasta encajar en una placa. Con todas las placas de un juego pisadas se abre su compuerta (`asterhaul/compuerta.gd`): dos bloques en la Plataforma (`fundicion/compuerta_este`) y uno en la Nave (`fundicion/compuerta_nave`). También paran lo que escupen los Kovu |
+| Moto | El maestro gruista, en gris junto a la primera barcaza. Su Esquirla (`esquirla_moto`) está en el Crisol Norte. Es el 11.º de los Yunques (`moto_pulso`) |
+| Kovu de Escoria | `scripts/enemigos/kovu.gd`: nada por la escoria; si te acercas a la orilla, asoma y escupe (1 hoja). En el lago no hay forma de darle: el Pulso lo saca de un tirón a la piedra, donde se enfría 5 s (3 de vida) |
+| **Nyundo, el Herrero de 4 Tenazas** | `scripts/enemigos/nyundo.gd`, 12 de vida, atornillado al centro (los brazos se dibujan con código). Tenazazo (avisa con una línea; 1 hoja) y bloque lanzado (su sombra avisa). Un Pulso con la tenaza ya encima —o con el bloque ya cayendo— se lo devuelve: una abolladura. A la segunda se le abre el peto 5 s o 4 golpes. En la furia: avisa menos y da dos tenazazos seguidos. Vencido: `nyundo_vencido`, `cadena_este_rota` y una Esquirla |
+| Arte | `herramientas/pintar_fundicion.py` → `arte/mundos/asterhaul/fundicion/`; Moto en `dibujar_aldeanos.py` |
+| Prueba | `prueba_fundicion_escoria` (57 comprobaciones) |
+| Falta | El botón de mando del Pulso; el icono de debilidad «magnético» en el Bestiario (pedido a Gemini); sonidos propios de Nyundo y las barcazas; que la escoria se mueva (ahora está pintada, quieta); verla en HD-2D |
 
 ## Las construcciones, al nivel de la casa del castor
 
