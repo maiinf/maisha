@@ -1093,7 +1093,27 @@ La ciudad de los canteros, herreros y afinadores (damanes de roca), tallada en e
 | Arte | `herramientas/pintar_mji_jiwe.py` → `arte/mundos/asterhaul/mji_jiwe/`; Mhunzi, Chuma y los artesanos (`artesano_a/b/c` y sus `_gris`) en `dibujar_aldeanos.py` |
 | Misiones | `mji_jiwe` (historia) y `yunques_memoria` (encargo largo) |
 | Prueba | `prueba_mji_jiwe` (31 comprobaciones) |
-| Falta (parte 2) | La **tienda de Chuma** por dentro (ahora abre el puesto pero aún no vende); la **rama del Arte de la Tierra** en el diario (sus 6 niveles no están decididos); las tres salidas (verjas echadas: Galerías, Fundición y Aguja no están construidas); que las cadenas se rompan al vencer a los jefes |
+| Falta (parte 2) | La **tienda de Chuma** por dentro (ahora abre el puesto pero aún no vende); la **rama del Arte de la Tierra** en el diario (sus 6 niveles no están decididos); las salidas del este y el norte (verjas echadas: la Fundición y la Aguja no están construidas); que en la ciudad se vea rota la cadena de cada jefe vencido |
+
+## Asterhaul: Las Galerías de Ámbar y el Kifaru de Basalto
+
+La mina de los canteros, al oeste de Mji-Jiwe (`documentacion/galerias_captura_1.png`…`_4.png`). Lo suyo son las **vías**: lo que rueda va por donde mandan las agujas.
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | Por la **verja del oeste de Mji-Jiwe** (se abre con `arte_tierra`: puerta `galerias` → `este`) |
+| Mapa | `galerias_ambar` (88×60, `crear_galerias()`): el Taller de Kito, la Veta Norte, el Cruce Mayor, la Bóveda de las Geodas y la Cámara del Ancla Oeste (ovalada). Suelo: `pintar_desfiladero()` con `mina` (roca negra arriba, la Bóveda azulada, el aro de la Cámara) |
+| Las vías | `scripts/mundo/asterhaul/via.gd`: `seguir()` (manda la aguja; si no, recto; si no, gira) y `tope()` (lo que corta la vía: grupo `topes_via`). Las vías son continuas: las cortan las barricadas, la reja y las vagonetas paradas |
+| Cambio de agujas | `asterhaul/aguja.gd`: un golpe de cetro gira la palanca al siguiente ramal; se guarda en `Estado.extra["agujas"]`. Hay dos: el del Taller (oeste / norte) y el triple del Cruce (oeste / norte / sur) |
+| Vagoneta | Ahora obedece a las agujas, se para ante los topes, rompe la barricada que tenga delante, **aplasta a los Mchimbaji** y **abre la coraza del Kifaru** |
+| Barricada y reja | La barricada es un `muro_agrietado.gd` con `dibujo = "galerias/barricada"` y `con_carga = false` (solo la rompe una vagoneta). La reja (`asterhaul/reja.gd`) la abre Kito (`kito_hablado`) |
+| Kito | La talladora de ámbar, en gris junto al primer cambio de agujas. Su Esquirla (`esquirla_kito`) está en la Veta Norte, tras la primera barricada. Es la 10.ª de los Yunques (`kito_pulso`) |
+| Mchimbaji | `scripts/enemigos/mchimbaji.gd`: rueda por las vías sin parar (1 hoja a quien pille); el cetro rebota y una Carga lo manda por donde venía. Desviado al **ramal muerto** se estampa contra el parachoques y queda panza arriba (2 de vida). Una vagoneta lo aplasta |
+| Bóveda de las Geodas | A oscuras (`CanvasModulate` que se apaga al bajar; Maisha alumbra un poco). Las geodas (`asterhaul/geoda.gd`) se encienden de un golpe y se quedan encendidas; con las cinco, un secreto. Al fondo, una Esquirla |
+| **El Kifaru de Basalto** | `scripts/enemigos/kifaru.gd`, 12 de vida. Pasea, avisa (se ve la franja por donde va a pasar) y embiste. El cetro y la Carga rebotan. Si se estampa contra un **pilar de basalto** (4, se parten) o le da una **vagoneta lanzada**, se le abre la coraza 5 s o 4 golpes. En la furia (mitad de vida): avisa menos, embiste dos veces y caen piedras del techo. Vencido: `kifaru_vencido`, `cadena_oeste_rota` y una Esquirla |
+| Arte | `herramientas/pintar_galerias.py` → `arte/mundos/asterhaul/galerias/`; Kito en `dibujar_aldeanos.py` |
+| Prueba | `prueba_galerias_ambar` (52 comprobaciones) |
+| Falta | Sonidos propios del Mchimbaji y del Kifaru (pedidos a Gemini); que al volver, las vagonetas se queden donde se dejaron (ahora vuelven a su sitio); verla en HD-2D |
 
 ## Las construcciones, al nivel de la casa del castor
 

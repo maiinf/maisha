@@ -230,7 +230,8 @@
 					"Sin pulso, las forjas se enfriaron. Y la gente, con ellas. El polvo gris no es polvo, criatura: es lo que queda cuando alguien deja de dar golpes por si acaso.",
 					"A ver esas manos. ...Mwamba te ha enseñado a embestir, se te nota en los hombros. Pues eso no es un truco suelto. Es la primera palabra de un oficio entero.",
 					"Arrímate al rescoldo. Sin miedo. La tierra no se manda: se le pide con el peso. Siéntelo en las plantas de los pies... Así. Ya está despierto. Lo demás te lo irá enseñando ella.",
-					"Y toma, el mapa del cráter. Las Galerías al oeste, la Fundición al este, la Aguja arriba. En cada sitio hay una cadena, y cada cadena tiene quien la guarde."
+					"Y toma, el mapa del cráter. Las Galerías al oeste, la Fundición al este, la Aguja arriba. En cada sitio hay una cadena, y cada cadena tiene quien la guarde.",
+					"La verja del oeste te la dejo abierta. Empieza por las Galerías: allí abajo está Kito, que es la que mejor oído tiene para el ámbar. Si es que todavía oye."
 				],
 				"marca": [
 					"mhunzi_conocida",
@@ -371,8 +372,7 @@
 			{
 				"lineas": [
 					"Una verja de hierro con un candado de ámbar. Detrás, el camino del oeste: Las Galerías de Ámbar.",
-					"No cede ni con la Carga. Esto no se abre a golpes.",
-					"(Este camino llegará en una próxima parte.)"
+					"No cede ni con la Carga. Alguien en la ciudad tendrá la llave."
 				]
 			}
 		]
@@ -847,6 +847,142 @@
 			{
 				"lineas": [
 					"Seis hornos, seis notas. Cuando ardan todos, las canto seguidas. Tápate los oídos."
+				]
+			}
+		]
+	},
+	"galerias_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Aquí el techo está cerca y todo huele a resina vieja. Las paredes tienen vetas que brillan un poco, como brasas dormidas.",
+					"Hay vías por todas partes. Se cruzan, se separan... Y algo rueda por ellas, lejos. Se oye venir y se oye irse.",
+					"Una vagoneta parada. Una palanca con una flecha. Y una damán gris, quieta, mirando un trozo de ámbar muy de cerca."
+				]
+			}
+		]
+	},
+	"galerias_aguja": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un cartel de hojalata clavado en una laja, con letra pequeña y apretada:",
+					"«CAMBIO DE AGUJAS. Un golpe a la palanca y la vía cambia de idea. Mirad la flecha ANTES de soltar la vagoneta, no después. — K.»",
+					"Debajo, más pequeño todavía: «Y si oís rodar algo que no es una vagoneta, apartaos de la vía»."
+				]
+			}
+		]
+	},
+	"galerias_reja": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una reja de mina, con un candado de ámbar tallado en forma de oreja.",
+					"La vía sigue por debajo, hacia el oeste. Quien puso este candado sabía lo que hacía."
+				]
+			}
+		]
+	},
+	"kito": {
+		"nombre": "Kito",
+		"conversaciones": [
+			{
+				"no": [
+					"kito_pulso"
+				],
+				"tiene": {
+					"esquirla_kito": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"La esquirla y el trozo de ámbar que tiene en la mano hacen el mismo ruidito, muy bajo. Como si se conocieran.",
+					"Se la pongo junto a la lupa, donde la vea."
+				],
+				"entrega": {
+					"esquirla_kito": 1
+				},
+				"marca": [
+					"kito_pulso"
+				]
+			},
+			{
+				"no": [
+					"kito_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Una damán joven, gris de polvo, con una lupa de latón sobre un ojo. Mira un trozo de ámbar a un dedo de la nariz.",
+					"No parpadea. El buril lo tiene levantado, pero no llega a tocar la piedra.",
+					"Le falta algo, como a Mwamba. Las vías suben hacia el norte, a una veta... pero hay una barricada en medio."
+				],
+				"marca": [
+					"kito_vista"
+				]
+			},
+			{
+				"si": [
+					"kito_pulso"
+				],
+				"no": [
+					"kito_hablado"
+				],
+				"lineas": [
+					"...Ahí. ¿Lo oyes? Tiene una grieta dentro. Pequeñita. Si corto por aquí, se parte. Si corto por allí... ¡Ay! ¿Cuánto llevas ahí?",
+					"Kito. Tallo ámbar. Bueno, lo escucho. Tallar es lo de menos: cada trozo te dice por dónde quiere abrirse, si te callas lo bastante.",
+					"Y este no me lo decía. Me quedé esperando a estar segura. No quería estropearlo, ¿entiendes? Era el más bonito que había sacado nunca.",
+					"Has movido las agujas tú, ¿no? Se oye desde aquí. Bien hecho. Casi nadie mira la flecha antes.",
+					"Te abro la reja del Cruce. Detrás hay un desvío de tres: al sur, la Bóveda de las Geodas, que está a oscuras... dale un golpe a las geodas y verás. Al norte, un ramal muerto, que viene muy bien para lo que rueda.",
+					"Y al oeste, la Cámara del Ancla. Ahí engancharon la cadena. Y ahí metieron al Kifaru, para que nadie fuera a soltarla. No le pegues de frente. Es basalto. Que se pegue él."
+				],
+				"marca": [
+					"kito_hablado"
+				]
+			},
+			{
+				"si": [
+					"kifaru_vencido"
+				],
+				"lineas": [
+					"Lo he oído caer desde aquí. Y luego la cadena. Suena distinto la mina sin ella, ¿a que sí? Más ancha.",
+					"He terminado el trozo. Al final quería abrirse por donde yo pensaba el primer día. Qué tonta."
+				]
+			},
+			{
+				"lineas": [
+					"Al Kifaru no le hagas caso al cuerno: mírale los pies. Escarba antes de embestir, siempre.",
+					"Y si ves un pilar entre él y tú, no te muevas de detrás hasta el último momento. O lánzale una vagoneta. Las vagonetas no dudan."
+				]
+			}
+		]
+	},
+	"kifaru_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una cámara redonda, enorme. En el centro, una argolla de hierro tan gruesa como yo, y una cadena que baja por un agujero del suelo.",
+					"Al fondo hay un montón de piedras negras. ...No. Las piedras negras tienen un ojo. Y un cuerno.",
+					"Vale. No es un montón de piedras."
+				]
+			}
+		]
+	},
+	"kifaru_vencido": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El Kifaru se echa despacio, como quien se sienta por fin. Las placas del lomo se le quedan abiertas y el ámbar de dentro late tranquilo.",
+					"La argolla del centro se parte con un chasquido. La cadena se escurre por el agujero, eslabón a eslabón, y tarda mucho en dejar de oírse.",
+					"Muy lejos, en la ciudad, algo grande de hierro da una nota. Baja. Solo una."
 				]
 			}
 		]

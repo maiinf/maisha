@@ -943,6 +943,30 @@ def chuma():
     return l
 
 
+def kito():
+    """KITO: la talladora de ámbar de las Galerías, una damán de roca joven y menuda. Una cinta de ámbar en la
+    frente, una lupa de latón sujeta sobre un ojo, mandil corto con el bolsillo lleno de buriles y, en la mano, un
+    trozo de ámbar a medio tallar que mira muy de cerca."""
+    l = Lienzo()
+    _daman_base(l)
+    l.ovalo(11.5, 24.0, 4.2, 4.4, "delantal")                 # el mandil corto
+    l.rect(8, 19, 15, 19, "delantal", 1)
+    l.px(9, 17, "delantal", 1); l.px(14, 17, "delantal", 1); l.px(9, 18, "delantal", 2); l.px(14, 18, "delantal", 2)
+    l.rect(9, 23, 13, 25, "delantal", 1)                      # el bolsillo...
+    for (x, c) in ((10, "metal"), (11, "laton"), (12, "metal")):   # ...con los buriles
+        l.px(x, 21, c, 3); l.px(x, 22, c, 2)
+    l.ovalo(17.5, 18.0, 1.7, 2.0, "daman")                    # la mano con el ámbar
+    l.rect(17, 13, 20, 16, "brasa", 2)
+    l.px(17, 13, "brasa", 3); l.px(18, 13, "brasa", 3); l.px(20, 16, "brasa", 1); l.px(19, 12, "brasa", 3)
+    ojos(l, 10, 9, 14, alto=2)
+    for (x, y) in ((13, 9), (14, 9), (15, 9), (16, 9), (13, 12), (14, 12), (15, 12), (16, 12), (12, 10), (12, 11), (17, 10), (17, 11)):   # la lupa
+        l.px(x, y, "laton", 2)
+    l.px(14, 10, "lente", 3); l.px(15, 10, "lente", 2); l.px(14, 11, "ojo"); l.px(15, 11, "ojo")
+    l.rect(7, 8, 16, 8, "pajaro", 3)                          # la cinta de ámbar
+    l.px(6, 9, "pajaro", 2); l.px(5, 10, "pajaro", 1)
+    return l
+
+
 def artesano(tipo="a"):
     """UN ARTESANO DE MJI-JIWE, damán de roca. a: CANTERO (gorro de fieltro pardo, mandil, una maceta en la mano) ·
     b: HERRERA (pañuelo rojo a la cabeza, guantes, unas tenazas) · c: AFINADOR (bufanda de ámbar, un diapasón)."""
@@ -1135,7 +1159,7 @@ def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
 
 
 ## Desde qué columna (y fila) se levanta lo de la mano derecha en el gesto por defecto (para no mover picos ni orejas)
-ALZA = {"mwamba": (16, 0), "mwamba_gris": (16, 0), "mhunzi": (16, 0), "chuma": (16, 0),
+ALZA = {"mwamba": (16, 0), "mwamba_gris": (16, 0), "mhunzi": (16, 0), "chuma": (16, 0), "kito": (16, 0), "kito_gris": (16, 0),
         **{"artesano_" + t + s: (16, 0) for t in "abc" for s in ("", "_gris")}, "bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "nyota": (15, 18), "nyota_blanco": (15, 18), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
         "kasia": (17, 0), "sungura": (19, 0)}
 
@@ -1203,7 +1227,7 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma,
+ALDEANOS = {"mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma, "kito": kito, "kito_gris": (lambda: _engrisar(kito(), ("delantal", "laton", "pajaro", "brasa", "metal"))),
             **{"artesano_" + t: (lambda t=t: artesano(t)) for t in "abc"},
             **{"artesano_" + t + "_gris": (lambda t=t: _engrisar(artesano(t))) for t in "abc"}, "kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "nyota": nyota, "nyota_blanco": nyota_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 

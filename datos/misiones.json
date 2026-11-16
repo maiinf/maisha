@@ -140,7 +140,11 @@
 			"mji_jiwe"
 		],
 		"mji_jiwe": [
-			"desfiladero_meteorito"
+			"desfiladero_meteorito",
+			"galerias_ambar"
+		],
+		"galerias_ambar": [
+			"mji_jiwe"
 		]
 	},
 	"misiones": [
@@ -1541,6 +1545,90 @@
 					"ir": {
 						"escena": "mji_jiwe",
 						"buscar": "grupo:yunques_memoria"
+					}
+				}
+			]
+		},
+		{
+			"id": "galerias_ambar",
+			"tipo": "historia",
+			"titulo": "Las Galerías de Ámbar",
+			"texto": "La primera cadena del Núcleo está enganchada en lo más hondo de la mina, al oeste de Mji-Jiwe. Para llegar hay que entender las vías: las vagonetas van por donde mandan las agujas.",
+			"aparece": [
+				"arte_tierra"
+			],
+			"hecha": [
+				"kifaru_vencido"
+			],
+			"pasos": [
+				{
+					"texto": "Sal de Mji-Jiwe por la verja del oeste",
+					"hecho": [
+						"galerias_ambar"
+					],
+					"ir": {
+						"escena": "mji_jiwe",
+						"buscar": "puerta:galerias_ambar"
+					}
+				},
+				{
+					"texto": "Mira qué le pasa a la talladora",
+					"hecho": [
+						"kito_vista"
+					],
+					"ir": {
+						"escena": "galerias_ambar",
+						"buscar": "aldeano:kito_gris"
+					}
+				},
+				{
+					"texto": "Desvía una vagoneta al norte para romper la barricada (golpea la palanca; luego, Carga)",
+					"hecho": [
+						"galerias/barricada_veta"
+					],
+					"ir": {
+						"escena": "galerias_ambar",
+						"buscar": "grupo:agujas"
+					}
+				},
+				{
+					"texto": "Busca la Esquirla de Kito en la Veta Norte",
+					"hecho": [
+						"esquirla/kito"
+					],
+					"ir": {
+						"escena": "galerias_ambar",
+						"buscar": "grupo:recogibles"
+					}
+				},
+				{
+					"texto": "Devuélvele la Esquirla a Kito",
+					"hecho": [
+						"kito_hablado"
+					],
+					"ir": {
+						"escena": "galerias_ambar",
+						"buscar": "aldeano:kito_gris"
+					}
+				},
+				{
+					"texto": "Lanza una vagoneta al oeste por el Cruce Mayor",
+					"hecho": [
+						"galerias/barricada_camara"
+					],
+					"ir": {
+						"escena": "galerias_ambar",
+						"buscar": "grupo:agujas"
+					}
+				},
+				{
+					"texto": "Suelta la Cadena del Oeste",
+					"hecho": [
+						"kifaru_vencido"
+					],
+					"ir": {
+						"escena": "galerias_ambar",
+						"buscar": "grupo:jefes"
 					}
 				}
 			]

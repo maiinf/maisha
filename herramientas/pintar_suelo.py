@@ -820,8 +820,19 @@ def pintar_desfiladero(nombre, salida=None):
     v = 0.42 + (grande - 0.5) * 0.35 + (media - 0.5) * 0.25 + (fina - 0.5) * 0.14 + (estrato - 0.5) * 0.1
     v += np.clip(dist / 40.0, 0, 1) * 0.12
     lz.pintar(np.ones((lz.H, lz.W)), rampa(["#2a1810", "#3e2416", "#573420", "#74482c", "#8e5e3a", "#a8764a", "#c0905e", "#d4a874"], np.clip(v, 0, 1)))
+    mina = nombre == "galerias_ambar"
+    if mina:
+        # LAS GALERÍAS DE ÁMBAR: la BÓVEDA DE LAS GEODAS (sur) es de piedra azulada y fría; la CÁMARA DEL ANCLA
+        # (oeste, ovalada) tiene un gran aro de bronce en el suelo y una argolla en el centro
+        boveda = ((lz.y > 37.5 * 16) & (lz.x > 33 * 16) & (lz.x < 76 * 16)) * 1.0
+        lz.pintar(boveda, rampa(["#12141e", "#1c2030", "#2a3044", "#3a4258", "#4c566e"], np.clip(0.4 + (grande - 0.5) * 0.4 + (media - 0.5) * 0.3 + (fina - 0.5) * 0.14, 0, 1)), 0.85)
+        ra = np.sqrt(((lz.x - 14.5 * 16) / (13.0 * 16)) ** 2 + ((lz.y - 27.5 * 16) / (11.0 * 16)) ** 2)
+        aro = ((np.abs(ra - 0.8) < 0.012) | (np.abs(ra - 0.2) < 0.02)) * 1.0
+        lz.pintar(aro, "#6a4612")
+        lz.pintar(desplazar(lz, aro, -0.6, -0.6) * aro, "#e0b860", 0.8)
+        lz.pintar((ra < 0.18) * 1.0, "#2a1810", 0.45)
     # LA CANTERA HUNDIDA (sureste): bancales tallados que bajan hacia el centro, con las marcas del cincel
-    cantera = ((lz.x > 46 * 16) & (lz.x < 78 * 16) & (lz.y > 36 * 16) & (lz.y < 55 * 16)) * 1.0
+    cantera = ((lz.x > 46 * 16) & (lz.x < 78 * 16) & (lz.y > 36 * 16) & (lz.y < 55 * 16)) * (0.0 if mina else 1.0)
     borde = np.minimum(np.minimum(lz.x - 46 * 16, 78 * 16 - lz.x), np.minimum(lz.y - 36 * 16, 55 * 16 - lz.y))
     for k, d0 in enumerate((30.0, 62.0, 98.0)):
         dentro = cantera * (borde > d0)
@@ -878,8 +889,8 @@ def pintar_desfiladero(nombre, salida=None):
     lz.pintar(desplazar(lz, rail, 0.6, 1.0) * (1 - rail), "#140a06", 0.6)
     lz.pintar(rail, "#565a6a")
     lz.pintar(desplazar(lz, rail, -0.5, -0.5) * rail, "#b8bccc", 0.8)
-    # LAS PAREDES DEL CAÑÓN: la meseta de arriba (morada, de noche) y, al sur, la cara de roca en franjas
-    lz.pintar(pared, rampa(["#140c18", "#1e1222", "#2a1a2c", "#382236", "#462a3c"], np.clip(0.4 + (grande - 0.5) * 0.5 + (media - 0.5) * 0.3 + (fina - 0.5) * 0.12, 0, 1)))
+    # LAS PAREDES DEL CAÑÓN: la meseta de arriba (morada, de noche; en la mina, roca negra) y, al sur, la cara de roca en franjas
+    lz.pintar(pared, rampa(["#0a0706", "#120c0a", "#1a120e", "#241812", "#2e2018"] if mina else ["#140c18", "#1e1222", "#2a1a2c", "#382236", "#462a3c"], np.clip(0.4 + (grande - 0.5) * 0.5 + (media - 0.5) * 0.3 + (fina - 0.5) * 0.12, 0, 1)))
     lz.pintar(pared * (np.abs(ruido_torcido_local(lz, 18, 421) - 0.5) < 0.014), "#0c0610", 0.6)
     cara = np.clip(pared - desplazar(lz, pared, 0, -26), 0, 1)
     franja = np.sin((lz.y + ruido_torcido_local(lz, 40, 422) * 30) * 0.9) * 0.5 + 0.5
@@ -1015,7 +1026,7 @@ def pintar(nombre, salida=None):
         return pintar_observatorio(nombre, salida)
     if nombre == "seccion_prohibida":
         return pintar_seccion(nombre, salida)
-    if nombre == "desfiladero_meteorito":
+    if nombre in ("desfiladero_meteorito", "galerias_ambar"):
         return pintar_desfiladero(nombre, salida)
     if nombre == "mji_jiwe":
         return pintar_mji_jiwe(nombre, salida)

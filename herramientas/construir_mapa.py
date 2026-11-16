@@ -2431,6 +2431,47 @@ def crear_mji_jiwe():
     return ["".join(f) for f in m], {}
 
 
+def crear_galerias():
+    """LAS GALERÍAS DE ÁMBAR (Asterhaul, 88x60): la mina de los canteros, al oeste de Mji-Jiwe. Lo que no es suelo
+    («0») es roca. Se entra por el este (de Mji-Jiwe, «_»). Las VÍAS («=») son continuas: las cortan las barricadas
+    y la reja (los pone la escena).
+      1. EL TALLER DE KITO (este): la vía mayor (este-oeste) y el primer CAMBIO DE AGUJAS, con un ramal al norte.
+      2. LA VETA NORTE (noreste), tras una barricada: la Esquirla de Kito.
+      3. EL CRUCE MAYOR (centro), tras la reja de Kito: el desvío triple (oeste, norte —un ramal muerto con
+         parachoques— y sur).
+      4. LA BÓVEDA DE LAS GEODAS (sur), tras una barricada: a oscuras.
+      5. LA CÁMARA DEL ANCLA OESTE (oeste, ovalada), tras otra barricada: el Kifaru de Basalto.
+    Vagonetas, agujas, barricadas, la reja, Kito, los Mchimbaji, las geodas, los pilares y el Kifaru los pone la escena."""
+    ANCHO, ALTO = 88, 60
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y][x] = c
+
+    rect(50, 20, 84, 34, "%")                                # 1. el Taller de Kito
+    rect(85, 26, 86, 28, "%")
+    rect(87, 26, 87, 28, "_")
+    rect(52, 4, 78, 15, "%")                                 # 2. la Veta Norte...
+    rect(63, 16, 65, 19, "%")                                # ...y su paso (lo tapa una barricada)
+    rect(30, 20, 48, 34, "%")                                # 3. el Cruce Mayor (el hueco de la reja, en la vía)
+    rect(34, 38, 74, 54, "%")                                # 4. la Bóveda de las Geodas...
+    rect(39, 35, 41, 37, "%")                                # ...y su paso (lo tapa una barricada)
+    for y in range(ALTO):                                    # 5. la Cámara del Ancla Oeste (ovalada)
+        for x in range(ANCHO):
+            if ((x - 14.0) / 13.0) ** 2 + ((y - 27.0) / 11.0) ** 2 <= 1.0:
+                m[y][x] = "%"
+    rect(6, 27, 82, 27, "=")                                 # la vía mayor, de punta a punta
+    rect(64, 9, 64, 26, "=")                                 # el ramal de la Veta Norte...
+    rect(56, 9, 63, 9, "=")
+    rect(40, 22, 40, 26, "=")                                # el ramal muerto del norte...
+    rect(33, 22, 39, 22, "=")
+    rect(40, 28, 40, 44, "=")                                # ...y el del sur, a la Bóveda
+    rect(41, 44, 68, 44, "=")
+    return ["".join(f) for f in m], {}
+
+
 def crear_seccion():
     """LA SECCIÓN PROHIBIDA (Sigilia, 64x72, de sur a norte): las salas de mármol morado bajo el Gran Archivo. Lo que
     no es sala («0») son estanterías de libros encadenados. Se entra por el sur (del Gran Archivo de Maandiko, «_»).
@@ -3213,7 +3254,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mji_jiwe"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mji_jiwe", "galerias_ambar"}
 
 
 def construir_suelo(nombre):
@@ -3365,7 +3406,7 @@ if __name__ == "__main__":
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
                         "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion,
-                        "desfiladero_meteorito": crear_desfiladero, "mji_jiwe": crear_mji_jiwe}.get(nombre, crear_prados)()
+                        "desfiladero_meteorito": crear_desfiladero, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

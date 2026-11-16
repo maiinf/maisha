@@ -17,6 +17,8 @@ const TEXTO := Color("fff3c4")
 ## Metadatos tácticos por script de enemigo: telegrafía de ataque e icono de debilidad
 const INFO_ENEMIGO := {
 	"kaa_jiwe.gd": {"prop": "fase", "aviso": [1], "debil": "sismica"},
+	"mchimbaji.gd": {"prop": "fase", "aviso": [], "debil": "sismica"},
+	"kifaru.gd": {"prop": "fase", "aviso": [2], "debil": "sismica"},
 	"saa.gd": {"prop": "fase", "aviso": [2], "debil": "rayo"},
 	"jabali.gd": {"prop": "fase", "aviso": [1], "debil": "escudo"},
 	"tintero.gd": {"prop": "fase", "aviso": [1], "debil": "fuego"},

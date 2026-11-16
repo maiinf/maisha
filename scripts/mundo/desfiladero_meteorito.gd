@@ -121,7 +121,7 @@ func _poner_muro(casilla: Vector2i, marca: String, con_carga: bool) -> StaticBod
 	var muro: StaticBody2D = MURO.new()
 	muro.marca = marca
 	muro.con_carga = con_carga
-	muro.dibujo = "muro" if con_carga else "derrumbe"
+	muro.dibujo = "desfiladero/muro" if con_carga else "desfiladero/derrumbe"
 	muro.position = _sitio(casilla)
 	$Entidades.add_child(muro)
 	return muro

@@ -103,6 +103,7 @@ const LUGARES_ASTERHAUL := [
 ]
 const CAMINOS_ASTERHAUL := [
 	["Senda del Cráter", "desfiladero_meteorito", [Vector2(58, 196), Vector2(80, 182), Vector2(106, 168), Vector2(148, 146), Vector2(182, 126)]],
+	["Vía del Oeste", "galerias_ambar", [Vector2(206, 106), Vector2(170, 100), Vector2(134, 92), Vector2(96, 86)]],
 ]
 const PUNTO_ASTERHAUL := {
 	"desfiladero_meteorito": Vector2(106, 168), "mji_jiwe": Vector2(220, 108),
@@ -111,7 +112,7 @@ const PUNTO_ASTERHAUL := {
 }
 const DEBILIDAD_BESTIA := {
 	"pagina": ["fuego"], "tintero": ["fuego"], "ruba": ["hielo"], "pweza": ["hielo"],
-	"saa": ["rayo"], "kengele": ["rayo"], "kaa_jiwe": ["sismica"],
+	"saa": ["rayo"], "kengele": ["rayo"], "kaa_jiwe": ["sismica"], "mchimbaji": ["sismica"], "kifaru": ["sismica"],
 	"sombra_renglon": ["fuego", "hielo", "rayo"], "grimorio": ["fuego", "hielo", "rayo"],
 	"jabali": ["escudo"], "cangrejo": ["atras"], "espino": ["semilla"],
 	"bundi": ["escudo"], "buibui": ["semilla"], "murcielago": ["latido"],

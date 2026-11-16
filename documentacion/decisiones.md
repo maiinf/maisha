@@ -528,3 +528,13 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | La Losa del Núcleo | Se pisa (es una tapa): el pozo se abrirá con los 12 yunques y las 3 cadenas rotas. |
 | Mhunzi | No está en gris: mantiene vivo un rescoldo. Despierta el Arte de la Tierra (solo la marca: los 6 niveles de la rama están por decidir con Iam). |
 | Pendiente para la parte 2 | La tienda de Chuma por dentro y la rama del Arte de la Tierra en el diario. |
+
+### 2026-11-16 · Las Galerías de Ámbar y el Kifaru, construidos (Claude)
+| Tema | Cómo ha quedado |
+| :--- | :--- |
+| Entrada | La verja del oeste de Mji-Jiwe la abre Mhunzi al despertar el Arte de la Tierra. |
+| Las vías | Continuas por toda la mina. Lo que rueda obedece a la aguja de cada desvío; las barricadas, la reja y las vagonetas paradas cortan la vía. |
+| Cómo se vence al Mchimbaji | Desviándolo al ramal muerto del Cruce (se estampa y queda panza arriba) o con una vagoneta lanzada. Una Carga de frente solo lo manda por donde venía. |
+| La Bóveda | A oscuras solo ella; las geodas encendidas se quedan encendidas. Las cinco dan un secreto. |
+| El Kifaru | Dos maneras de abrirle la coraza: que se estampe contra un pilar (hay 4) o una vagoneta lanzada (la de la cámara, o la del Cruce si se mete dentro). |
+| Las Esquirlas de la mina | La de Kito (solo suya), la de la Bóveda y la del Kifaru (estas dos valen para cualquier artesano de la ciudad). |
