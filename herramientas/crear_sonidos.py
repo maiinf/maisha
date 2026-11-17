@@ -2522,6 +2522,362 @@ def puerta_crater():
     return reverb(p.entera(), 1.6, 0.32)
 
 
+def horno_encender():
+    """Un horno-diapasón de Mji-Jiwe prende su fuego de ámbar tras el golpe sísmico."""
+    p = Pista(1.35)
+    p.poner(taiko(0.35, 0.72), 0.0)
+    p.poner(campanita("D5", 1.05, 0.34), 0.0)
+    p.poner(campanita("A5", 0.95, 0.24), 0.04)
+    d = 0.95
+    n = _n(d)
+    llama = paso_banda(ruido_rosa(d), 220, 1500) * adsr(n, 0.08, 0.22, 0.52, 0.38) * 0.58
+    brillo_aire = paso_banda(ruido(0.45), 2600, 6800) * adsr(_n(0.45), 0.04, 0.15, 0.3, 0.2) * 0.18
+    p.poner(llama, 0.06)
+    p.poner(brillo_aire, 0.12)
+    p.poner(seno(293.66, 0.9) * adsr(_n(0.9), 0.05, 0.2, 0.4, 0.45) * 0.20, 0.08)
+    return reverb(p.entera(), 1.3, 0.28)
+
+
+def yunque_canta():
+    """Un artesano de Mji-Jiwe recupera el pulso y su Yunque de Memoria canta con brillo metálico."""
+    p = Pista(1.5)
+    martillo = paso_banda(ruido(0.08), 1900, 7400) * caida(_n(0.08), 0.018) * 0.58
+    p.poner(taiko(0.24, 0.65), 0.0)
+    p.poner(martillo, 0.0)
+    for k, (nota, t0, vol) in enumerate((("D5", 0.01, 0.42), ("A5", 0.03, 0.36), ("F#6", 0.06, 0.28), ("A6", 0.12, 0.20))):
+        p.poner(campanita(nota, 1.25 - k * 0.1, vol), t0)
+    p.poner(seno(587.33, 1.0) * adsr(_n(1.0), 0.02, 0.18, 0.42, 0.5) * 0.16, 0.04)
+    return reverb(p.entera(), 1.6, 0.30)
+
+
+def mercado_abre():
+    """Chuma descorre la lona y abre el Mercado de la Escoria en Mji-Jiwe."""
+    p = Pista(1.45)
+    lona = paso_banda(ruido_rosa(0.32), 650, 2600) * adsr(_n(0.32), 0.04, 0.10, 0.45, 0.14) * 0.44
+    p.poner(lona, 0.0)
+    for k, nota in enumerate(("D5", "F#5", "A5", "D6")):
+        p.poner(kalimba(nota, 0.65) * 0.55, 0.10 + k * 0.07)
+        p.poner(campanita(nota, 0.55, 0.22), 0.16 + k * 0.08)
+    p.poner(campanita("A6", 0.85, 0.22), 0.44)
+    return reverb(p.entera(), 1.35, 0.26)
+
+
+# =============================================================================
+# ASTERHAUL · GALERÍAS, FUNDICIÓN Y AGUJA CAÍDA
+# =============================================================================
+
+def mchimbaji_rueda():
+    """El Mchimbaji rueda sobre su barrena de piedra por los túneles."""
+    p = Pista(0.55)
+    d = 0.45
+    n = _n(d)
+    rodar = paso_banda(ruido_rosa(d), 140, 950) * adsr(n, 0.03, 0.08, 0.7, 0.14) * 0.65
+    barrena = sierra(_desliz(78, 96, d), d, 6) * adsr(n, 0.04, 0.1, 0.6, 0.12) * 0.35
+    p.poner(paso_bajo(rodar + barrena, 1100), 0.0)
+    for k in range(3):
+        p.poner(tambor(0.08) * 0.38, 0.05 + k * 0.13)
+    return reverb(p.entera(), 0.6, 0.18)
+
+
+def mchimbaji_estampa():
+    """El Mchimbaji estampa su taladro contra la galería al chocar."""
+    p = Pista(0.65)
+    d = 0.42
+    n = _n(d)
+    p.poner(taiko(0.38, 0.85), 0.0)
+    p.poner(_crujido_piedra(d, 260, grave=True) * caida(n, 0.16) * 0.75, 0.01)
+    p.poner(campanita("D5", 0.35, 0.25), 0.03)
+    return reverb(p.entera(), 0.75, 0.22)
+
+
+def kifaru_avisa():
+    """El Kifaru de Basalto escarba la vía y brama antes de embestir."""
+    p = Pista(0.85)
+    d = 0.68
+    n = _n(d)
+    for k in range(2):
+        scrape = paso_banda(ruido(0.14), 500, 2400) * caida(_n(0.14), 0.05) * 0.55
+        p.poner(scrape, k * 0.16)
+    bramido = paso_bajo(sierra(_desliz(95, 165, 0.45), 0.45, 12), 820) * adsr(_n(0.45), 0.05, 0.12, 0.65, 0.14) * 0.65
+    p.poner(bramido, 0.18)
+    return reverb(p.entera(), 0.85, 0.22)
+
+
+def kifaru_choca():
+    """El Kifaru se estrella contra una vagoneta o un pilar de hierro."""
+    p = Pista(1.1)
+    d = 0.7
+    n = _n(d)
+    p.poner(taiko(0.55, 0.95), 0.0)
+    p.poner(_crujido_piedra(d, 300, grave=True) * caida(n, 0.22) * 0.85, 0.0)
+    hierro = paso_banda(ruido(0.35), 900, 4800) * caida(_n(0.35), 0.08) * 0.75
+    p.poner(hierro, 0.01)
+    p.poner(campanita("A4", 0.75, 0.42), 0.01)
+    p.poner(campanita("E5", 0.55, 0.28), 0.02)
+    return reverb(p.entera(), 1.15, 0.26)
+
+
+def kifaru_abre():
+    """La coraza de basalto del Kifaru se resquebraja y abre su núcleo de ámbar."""
+    p = Pista(0.95)
+    d = 0.55
+    n = _n(d)
+    grieta = _crujido_piedra(d, 340, grave=False) * caida(n, 0.16) * 0.85
+    p.poner(grieta, 0.0)
+    for k, nota in enumerate(("D5", "A5", "D6")):
+        p.poner(campanita(nota, 0.65 - k * 0.08, 0.34), 0.04 + k * 0.055)
+    return reverb(p.entera(), 1.0, 0.25)
+
+
+def kifaru_vencido():
+    """El Kifaru de Basalto se derrumba en pedazos en las profundidades."""
+    p = Pista(1.85)
+    p.poner(taiko(0.65, 0.95), 0.0)
+    p.poner(_crujido_piedra(1.1, 240, grave=True) * caida(_n(1.1), 0.42) * 0.9, 0.03)
+    for k, nota in enumerate(("D6", "A5", "F#5", "D5")):
+        p.poner(campanita(nota, 0.85, 0.28), 0.18 + k * 0.14)
+    return reverb(p.entera(), 1.6, 0.30)
+
+
+def barcaza_mueve():
+    """La barcaza de hierro se despega del muelle sobre la escoria fundida."""
+    p = Pista(0.9)
+    d = 0.75
+    n = _n(d)
+    roce = paso_banda(ruido(d), 260, 1600) * adsr(n, 0.05, 0.15, 0.6, 0.25) * 0.62
+    cadena = paso_alto(ruido(0.28), 2200) * caida(_n(0.28), 0.07) * 0.36
+    p.poner(roce, 0.0)
+    p.poner(cadena, 0.02)
+    p.poner(seno(_desliz(72, 110, 0.45), 0.45) * adsr(_n(0.45), 0.04, 0.1, 0.5, 0.2) * 0.4, 0.05)
+    return reverb(p.entera(), 0.85, 0.22)
+
+
+def cabrestante_gira():
+    """El cabrestante de hierro gira diente a diente tensando la cadena."""
+    p = Pista(0.7)
+    for k in range(4):
+        tk = k * 0.11
+        clic = paso_banda(ruido(0.06), 1400, 5600) * caida(_n(0.06), 0.018) * 0.72
+        p.poner(clic, tk)
+        p.poner(campanita("D5" if k < 3 else "A5", 0.16, 0.26), tk + 0.005)
+    p.poner(tambor(0.18) * 0.55, 0.35)
+    return reverb(p.entera(), 0.65, 0.18)
+
+
+def compuerta_abre():
+    """Una compuerta pesada de fundición sube rechinando sobre cadenas."""
+    p = Pista(1.15)
+    d = 0.9
+    n = _n(d)
+    roce = paso_banda(ruido_rosa(d), 180, 1300) * adsr(n, 0.06, 0.2, 0.65, 0.25) * 0.65
+    p.poner(roce, 0.0)
+    for k in range(3):
+        p.poner(campanita("A4", 0.22, 0.25), 0.08 + k * 0.18)
+    p.poner(taiko(0.32, 0.72), 0.72)
+    return reverb(p.entera(), 1.0, 0.24)
+
+
+def placa_pisa():
+    """Un bloque-imán encaja con peso magnético sobre una placa de presión."""
+    p = Pista(0.55)
+    p.poner(taiko(0.24, 0.75), 0.0)
+    golpe = paso_banda(ruido(0.12), 900, 3800) * caida(_n(0.12), 0.03) * 0.65
+    p.poner(golpe, 0.0)
+    p.poner(campanita("F#5", 0.38, 0.34), 0.02)
+    p.poner(campanita("B5", 0.42, 0.26), 0.07)
+    return reverb(p.entera(), 0.7, 0.2)
+
+
+def kovu_escupe():
+    """Un Kovu lanza goterones ardientes de escoria desde el crisol."""
+    p = Pista(0.55)
+    d = 0.38
+    n = _n(d)
+    pop = seno(_desliz(240, 90, 0.16), 0.16) * caida(_n(0.16), 0.05) * 0.6
+    chispa = barrido_bajo(ruido(d), 4200, 950) * caida(n, 0.12) * 0.58
+    p.poner(pop, 0.0)
+    p.poner(chispa, 0.02)
+    return reverb(p.entera(), 0.6, 0.18)
+
+
+def nyundo_avisa():
+    """Nyundo chasquea sus tenazas al rojo vivo antes de lanzar el agarre."""
+    p = Pista(0.75)
+    for k, fnota in enumerate(("D5", "F#5", "A5")):
+        tk = k * 0.11
+        chas = paso_banda(ruido(0.08), 1800, 6800) * caida(_n(0.08), 0.022) * 0.78
+        p.poner(chas, tk)
+        p.poner(campanita(fnota, 0.24, 0.3), tk)
+    brasa = paso_bajo(sierra(_desliz(120, 210, 0.3), 0.3, 10), 950) * adsr(_n(0.3), 0.04, 0.08, 0.5, 0.1) * 0.45
+    p.poner(brasa, 0.25)
+    return reverb(p.entera(), 0.85, 0.22)
+
+
+def nyundo_abolla():
+    """El hierro candente de Nyundo se abolla bajo el golpe del cetro o del imán."""
+    p = Pista(0.7)
+    d = 0.35
+    n = _n(d)
+    p.poner(taiko(0.3, 0.75), 0.0)
+    lata = paso_banda(ruido(d), 1000, 4400) * caida(n, 0.08) * 0.75
+    p.poner(lata, 0.0)
+    p.poner(seno(_desliz(460, 290, 0.28), 0.28) * caida(_n(0.28), 0.09) * 0.45, 0.01)
+    p.poner(campanita("E5", 0.35, 0.3), 0.02)
+    return reverb(p.entera(), 0.8, 0.22)
+
+
+def nyundo_abre():
+    """Las compuertas del horno pectoral de Nyundo saltan al quedar aturdido."""
+    p = Pista(1.0)
+    d = 0.65
+    n = _n(d)
+    cerrojo = paso_banda(ruido(0.18), 1600, 6000) * caida(_n(0.18), 0.04) * 0.8
+    soplo = paso_banda(ruido_rosa(d), 500, 3000) * caida(n, 0.22) * 0.55
+    p.poner(cerrojo, 0.0)
+    p.poner(soplo, 0.04)
+    for k, nota in enumerate(("D5", "G5", "A5", "D6")):
+        p.poner(campanita(nota, 0.65, 0.30 - k * 0.03), 0.05 + k * 0.05)
+    return reverb(p.entera(), 1.15, 0.26)
+
+
+def nyundo_vencido():
+    """Nyundo, el Herrero de Cuatro Tenazas, se apaga y se desploma en la Gran Fragua."""
+    p = Pista(2.1)
+    p.poner(taiko(0.7, 0.95), 0.0)
+    vapor = paso_alto(ruido_rosa(1.2), 1800) * caida(_n(1.2), 0.42) * 0.62
+    p.poner(vapor, 0.06)
+    for k, nota in enumerate(("D5", "B4", "G4", "D4")):
+        tk = 0.08 + k * 0.19
+        p.poner(paso_banda(ruido(0.12), 1200, 5200) * caida(_n(0.12), 0.03) * 0.68, tk)
+        p.poner(campanita(nota, 0.65, 0.36 - k * 0.04), tk)
+    p.poner(taiko(0.6, 0.85), 0.72)
+    return reverb(p.entera(), 1.75, 0.32)
+
+
+def caida_vacio():
+    """Maisha resbala por el borde y se precipita al vacío astral."""
+    p = Pista(0.95)
+    d = 0.78
+    n = _n(d)
+    silbido = seno(_desliz(760, 175, d, 0.8), d) * adsr(n, 0.03, 0.15, 0.5, 0.28) * 0.46
+    viento = barrido_bajo(ruido_rosa(d), 2400, 320) * caida(n, 0.32) * 0.55
+    p.poner(silbido + viento, 0.0)
+    p.poner(campanita("A5", 0.3, 0.18), 0.02)
+    p.poner(campanita("D5", 0.35, 0.15), 0.18)
+    return reverb(p.entera(), 1.25, 0.28)
+
+
+def monolito_calla():
+    """Un monolito-diapasón deja de cantar y el cristal vuelve al silencio."""
+    p = Pista(0.85)
+    d = 0.65
+    n = _n(d)
+    zumbido = seno(_desliz(440, 220, d), d) * caida(n, 0.24) * 0.34
+    p.poner(zumbido, 0.0)
+    for k, nota in enumerate(("D6", "A5", "D5")):
+        p.poner(campanita(nota, 0.45, 0.22 - k * 0.04), k * 0.08)
+    return reverb(p.entera(), 1.15, 0.26)
+
+
+def penasco_llega():
+    """Un peñasco flotante atraca suavemente en su muelle astral."""
+    p = Pista(0.65)
+    d = 0.45
+    n = _n(d)
+    p.poner(taiko(0.28, 0.62), 0.0)
+    grava = _crujido_piedra(d, 210, grave=True) * caida(n, 0.15) * 0.55
+    p.poner(grava, 0.01)
+    p.poner(campanita("A5", 0.5, 0.22), 0.04)
+    return reverb(p.entera(), 0.9, 0.24)
+
+
+def popo_cae():
+    """Un Popo Astral cae aturdido por la resonancia entre sus alas de ámbar."""
+    p = Pista(0.6)
+    d = 0.35
+    chirp = seno(_desliz(1850, 520, d), d) * adsr(_n(d), 0.01, 0.08, 0.4, 0.15) * 0.48
+    aleteo = paso_banda(ruido_rosa(0.22), 700, 2800) * caida(_n(0.22), 0.08) * 0.38
+    p.poner(chirp, 0.0)
+    p.poner(aleteo, 0.05)
+    p.poner(tambor(0.14) * 0.48, 0.24)
+    return reverb(p.entera(), 0.75, 0.22)
+
+
+def kipanga_avisa():
+    """Kipanga Astral lanza un grito agudo en lo alto antes de caer en picado."""
+    p = Pista(0.85)
+    d = 0.55
+    n = _n(d)
+    grito = (seno(_desliz(1550, 2850, d, 0.65), d) * 0.68 + seno(_desliz(2850, 1380, d, 1.3), d) * 0.32) * adsr(n, 0.02, 0.12, 0.65, 0.2) * 0.58
+    viento = paso_banda(ruido_rosa(d), 1100, 4200) * adsr(n, 0.08, 0.1, 0.5, 0.2) * 0.38
+    p.poner(grito + viento, 0.0)
+    return reverb(p.entera(), 1.25, 0.28)
+
+
+def kipanga_cae():
+    """Kipanga se desploma desde el viento astral sobre la piedra de estrella."""
+    p = Pista(1.0)
+    d = 0.6
+    n = _n(d)
+    p.poner(taiko(0.45, 0.9), 0.0)
+    plumas = paso_banda(ruido_rosa(0.35), 500, 3200) * caida(_n(0.35), 0.12) * 0.62
+    roca = _crujido_piedra(d, 280, grave=True) * caida(n, 0.18) * 0.65
+    p.poner(plumas, 0.0)
+    p.poner(roca, 0.02)
+    p.poner(campanita("D5", 0.55, 0.28), 0.03)
+    return reverb(p.entera(), 1.1, 0.26)
+
+
+def kipanga_remonta():
+    """Kipanga bate sus alas estelares y vuelve a remontar el vuelo."""
+    p = Pista(0.95)
+    for k in range(3):
+        tk = k * 0.16
+        ala = paso_banda(ruido_rosa(0.24), 320, 1900) * adsr(_n(0.24), 0.03, 0.06, 0.5, 0.1) * (0.55 + k * 0.08)
+        p.poner(ala, tk)
+    vuelo = seno(_desliz(320, 980, 0.55), 0.55) * adsr(_n(0.55), 0.08, 0.12, 0.5, 0.2) * 0.3
+    p.poner(vuelo, 0.15)
+    return reverb(p.entera(), 1.1, 0.26)
+
+
+def pluma_rompe():
+    """Una pluma-cuchilla de obsidiana estelar estalla en esquirlas."""
+    p = Pista(0.55)
+    d = 0.28
+    n = _n(d)
+    filo = paso_alto(ruido(d), 2600) * caida(n, 0.06) * 0.72
+    p.poner(filo, 0.0)
+    for k, nota in enumerate(("A6", "F#6", "D6")):
+        p.poner(campanita(nota, 0.28, 0.26 - k * 0.04), k * 0.035)
+    return reverb(p.entera(), 0.75, 0.22)
+
+
+def kipanga_vencido():
+    """Kipanga Astral cae definitivamente en lluvia de estrellas sobre el Nido."""
+    p = Pista(2.15)
+    p.poner(taiko(0.6, 0.9), 0.0)
+    grito = seno(_desliz(2400, 480, 0.9), 0.9) * caida(_n(0.9), 0.35) * 0.48
+    brillo = paso_alto(ruido_rosa(1.2), 2400) * caida(_n(1.2), 0.45) * 0.45
+    p.poner(grito, 0.02)
+    p.poner(brillo, 0.02)
+    for k, nota in enumerate(("D6", "B5", "A5", "F#5", "D5")):
+        p.poner(campanita(nota, 0.95, 0.30), 0.12 + k * 0.14)
+    return reverb(p.entera(), 1.85, 0.34)
+
+
+def cadena_rota():
+    """¡Una de las tres grandes cadenas de hierro del Cráter se parte en dos!"""
+    p = Pista(2.1)
+    tension = paso_banda(ruido(0.22), 1800, 6200) * adsr(_n(0.22), 0.08, 0.05, 0.6, 0.04) * 0.52
+    p.poner(tension, 0.0)
+    p.poner(taiko(0.75, 0.95), 0.14)
+    estallido = paso_banda(ruido(0.45), 900, 5800) * caida(_n(0.45), 0.12) * 0.88
+    p.poner(estallido, 0.14)
+    for k in range(4):
+        p.poner(campanita(("A4", "D5", "F#5", "A5")[k], 1.15, 0.36), 0.16 + k * 0.09)
+    return reverb(p.entera(), 1.9, 0.34)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -2604,6 +2960,34 @@ EFECTOS = {
     "kaa_embiste": (kaa_embiste, 0.80),
     "kaa_vuelca": (kaa_vuelca, 0.72),
     "puerta_crater": (puerta_crater, 0.85),
+    "horno_encender": (horno_encender, 0.78),
+    "yunque_canta": (yunque_canta, 0.78),
+    "mercado_abre": (mercado_abre, 0.75),
+    "mchimbaji_rueda": (mchimbaji_rueda, 0.65),
+    "mchimbaji_estampa": (mchimbaji_estampa, 0.75),
+    "kifaru_avisa": (kifaru_avisa, 0.78),
+    "kifaru_choca": (kifaru_choca, 0.88),
+    "kifaru_abre": (kifaru_abre, 0.78),
+    "kifaru_vencido": (kifaru_vencido, 0.88),
+    "barcaza_mueve": (barcaza_mueve, 0.72),
+    "cabrestante_gira": (cabrestante_gira, 0.68),
+    "compuerta_abre": (compuerta_abre, 0.75),
+    "placa_pisa": (placa_pisa, 0.65),
+    "kovu_escupe": (kovu_escupe, 0.65),
+    "nyundo_avisa": (nyundo_avisa, 0.75),
+    "nyundo_abolla": (nyundo_abolla, 0.75),
+    "nyundo_abre": (nyundo_abre, 0.78),
+    "nyundo_vencido": (nyundo_vencido, 0.88),
+    "caida_vacio": (caida_vacio, 0.72),
+    "monolito_calla": (monolito_calla, 0.62),
+    "penasco_llega": (penasco_llega, 0.68),
+    "popo_cae": (popo_cae, 0.68),
+    "kipanga_avisa": (kipanga_avisa, 0.75),
+    "kipanga_cae": (kipanga_cae, 0.82),
+    "kipanga_remonta": (kipanga_remonta, 0.75),
+    "pluma_rompe": (pluma_rompe, 0.65),
+    "kipanga_vencido": (kipanga_vencido, 0.88),
+    "cadena_rota": (cadena_rota, 0.90),
 }
 
 AMBIENTES = {

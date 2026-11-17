@@ -4,6 +4,8 @@ extends Node
 ## la sigue), las peñas se levantan y se recuerda al cambiar de escena.
 ## Se ejecuta sin abrir el editor:  godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_hd2d
 
+const PIEL := preload("res://scripts/interfaz/piel.gd")
+
 var _fallos := 0
 
 
@@ -86,6 +88,67 @@ func _ready() -> void:
 			if par[1] is MeshInstance3D:
 				edificios_3d += 1
 	_comprobar(edificios_3d > 0, "los edificios de Cuna de Musgo se construyen como mallas 3D con volumen (%d)" % edificios_3d)
+
+	await _ir("mji_jiwe", "")
+	espejo = _espejo()
+	var mji_edifs := 0
+	if espejo:
+		for par in espejo.get("_gemelos").values():
+			if par[1] is MeshInstance3D:
+				mji_edifs += 1
+	_comprobar(mji_edifs >= 12, "los edificios y verjas de Mji-Jiwe se construyen en 3D con volumen (%d)" % mji_edifs)
+	_comprobar(espejo != null and absf(float(espejo.get("_alto_pena")) - 0.75) < 0.01, "los muros de terraza de Mji-Jiwe usan su altura baja (0,75)")
+
+	print("Rutas de Asterhaul y plataformas horizontales:")
+	await _ir("galerias_ambar", "")
+	espejo = _espejo()
+	var gal_edifs := 0
+	var ventanas_malla := 0
+	if espejo:
+		for par in espejo.get("_gemelos").values():
+			if par[1] is MeshInstance3D and String(par[4]) != "__plataforma__":
+				gal_edifs += 1
+		for vpar in espejo.get("_ventanas"):
+			if vpar[1] is MeshInstance3D and (vpar[1] as MeshInstance3D).mesh is ArrayMesh:
+				ventanas_malla += 1
+	_comprobar(espejo != null and absf(float(espejo.get("_alto_pena")) - 1.625) < 0.01, "Galerías de Ámbar usa muros de acantilado altos (1,625)")
+	_comprobar(gal_edifs >= 2, "taller y barricadas de Galerías se construyen en 3D (%d)" % gal_edifs)
+	_comprobar(ventanas_malla > 0 and espejo != null and not espejo.get("_moduladores").is_empty(), "las ventanitas usan malla doblada y sigue el CanvasModulate de penumbra")
+
+	await _ir("fundicion_escoria", "")
+	espejo = _espejo()
+	var barcazas_3d := 0
+	if espejo:
+		for par in espejo.get("_gemelos").values():
+			if String(par[4]) == "__plataforma__" and par[1] is MeshInstance3D and (par[1] as MeshInstance3D).mesh is PlaneMesh:
+				barcazas_3d += 1
+	_comprobar(espejo != null and bool(espejo.get("_es_escoria")) and absf(float(espejo.get("_alto_pena")) - 1.625) < 0.01, "Fundición de Escoria activa el modo escoria y muros 1,625")
+	_comprobar(barcazas_3d >= 4, "las 4 barcazas de hierro flotan como plataformas 3D horizontales (%d)" % barcazas_3d)
+
+	await _ir("aguja_caida", "")
+	espejo = _espejo()
+	var penas_aguja := false
+	var penascos_3d := 0
+	var maisha_node := get_tree().get_first_node_in_group("maisha") as Node2D
+	var sprite_m := maisha_node.get_node_or_null("Sprite") as Node2D if maisha_node else null
+	if espejo:
+		for h in espejo.get_children():
+			if h is MeshInstance3D and (h as MeshInstance3D).layers == 2:
+				penas_aguja = true
+		for par in espejo.get("_gemelos").values():
+			if String(par[4]) == "__plataforma__" and par[1] is MeshInstance3D and (par[1] as MeshInstance3D).mesh is PlaneMesh:
+				penascos_3d += 1
+	_comprobar(espejo != null and not penas_aguja, "La Aguja Caída respeta el abismo en los bordes «0» (sin muros falsos)")
+	_comprobar(penascos_3d >= 2, "los peñascos flotantes de La Aguja usan plataforma horizontal 3D (%d)" % penascos_3d)
+	if espejo and maisha_node and sprite_m:
+		maisha_node.set_physics_process(false)
+		maisha_node.modulate.a = 0.4
+		await _esperar(0.1)
+		var g_maisha := espejo.get("_gemelos").get(sprite_m.get_instance_id())[1] as Sprite3D
+		_comprobar(g_maisha != null and g_maisha.alpha_cut == SpriteBase3D.ALPHA_CUT_DISABLED and g_maisha.modulate.a < 0.5, "al desvanecer al padre al caer al vacío, el gemelo 3D también transparenta")
+		maisha_node.modulate.a = 1.0
+		maisha_node.set_physics_process(true)
+	_comprobar(PIEL.TACTICO_INFO.has("magnetico") and PIEL.TACTICO_INFO.has("resonancia"), "el HUD táctico y bestiario registran magnetico y resonancia")
 
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")

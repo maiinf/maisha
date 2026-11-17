@@ -71,6 +71,7 @@ var _j_mantenida := 0.0
 var _escudo_dibujo: Sprite2D
 var _emocion := 0.0           # mientras dure, se ve una expresión (sorpresa, daño, celebrar...) y no se pisa
 var _paso_polvo := 0.0
+var _bloqueada_antes := false
 
 @onready var _sprite: AnimatedSprite2D = $Sprite
 @onready var _ropa: Node = $Ropa
@@ -111,8 +112,11 @@ func _physics_process(delta: float) -> void:
 
 	if esta_caida or not puede_actuar:
 		velocity = Vector2.ZERO
-		modulate.a = 1.0
+		if not _bloqueada_antes:
+			_bloqueada_antes = true
+			modulate.a = 1.0
 		return
+	_bloqueada_antes = false
 
 	var direccion := Input.get_vector("mover_izquierda", "mover_derecha", "mover_arriba", "mover_abajo")
 	if direccion.length() < ZONA_MUERTA:

@@ -86,6 +86,39 @@ const CATALOGO := {
 			["capa", 2, 46, 4, 43, -0.62, 0.78],
 		],
 	},
+	"galerias/barricada.png": {
+		"tipo": "bloques", "frente_z": 0.06, "solo_marco": 0,
+		"partes": [
+			["caja", 4, 44, 14, 42, 0.02, -0.85, true, [7, 40, 20, 40]],
+			["capa", 2, 46, 4, 42, -0.30, 0.88],
+			["capa", 2, 46, 4, 42, -0.58, 0.78],
+		],
+	},
+	"mji_jiwe/gran_forja.png": {
+		"tipo": "gable", "x0": 10, "x1": 122, "y_alero": 62, "y_pico": 18, "cx": 66,
+		"eave_x0": 4, "eave_x1": 128, "fondo": 4.2, "alero_z": 0.20,
+		"pared_rect": [14, 38, 66, 120], "techo_rect": [44, 88, 34, 54],
+		"extras": [["caja", 100, 122, 2, 70, -2.6, -1.4], ["frente_z", 122, 144, 86, 114, -1.6], ["frente_z", 14, 38, 110, 132, 0.12]],
+	},
+	"mji_jiwe/casa.png": {
+		"tipo": "gable", "x0": 6, "x1": 66, "y_alero": 40, "y_pico": 12, "cx": 36,
+		"eave_x0": 1, "eave_x1": 71, "fondo": 3.4, "alero_z": 0.18,
+		"pared_rect": [8, 38, 42, 74], "techo_rect": [22, 48, 22, 36],
+		"extras": [["caja", 50, 58, 8, 30, -2.0, -1.25], ["frente_z", 62, 76, 65, 80, 0.08]],
+	},
+	"mji_jiwe/mercado.png": {
+		"tipo": "puesto", "x0": 8, "x1": 104, "y_mostrador": 60,
+		"y_alero": 33, "y_pico": 12, "fondo": 2.8,
+	},
+	"mji_jiwe/verja.png": {
+		"tipo": "bloques", "frente_z": 0.06,
+		"partes": [
+			["caja", 3, 12, 24, 63, 0.02, -0.95, true, [4, 11, 28, 60]],
+			["caja", 44, 53, 24, 63, 0.02, -0.95, true, [45, 52, 28, 60]],
+			["capa", 3, 53, 3, 30, -0.34, 0.88],
+			["capa", 3, 53, 3, 30, -0.68, 0.78],
+		],
+	},
 	"cocina.png": {
 		"tipo": "domo", "x0": 22, "x1": 98, "y_alero": 72, "y_pico": 26,
 		"fondo": 3.4, "cono": true, "crest_x0": 52, "crest_x1": 74, "crest_y": 28,
@@ -307,12 +340,14 @@ func _nombre_catalogo(tex: Texture2D) -> String:
 	var ruta := tex.resource_path
 	for clave: String in [
 		"desfiladero/taller.png", "desfiladero/muro.png", "desfiladero/derrumbe.png", "desfiladero/puerta.png",
+		"galerias/barricada.png",
+		"mji_jiwe/gran_forja.png", "mji_jiwe/casa.png", "mji_jiwe/mercado.png", "mji_jiwe/verja.png",
 		"aldea/taller.png", "objetos/muro.png", "campo/molino.png",
 		"seccion/atril.png", "estanterias/atril.png", "seccion/sello.png",
 	]:
 		if ruta.ends_with(clave):
 			return clave
-	if ruta.contains("/desfiladero/"):
+	if ruta.contains("/desfiladero/") or ruta.contains("/mji_jiwe/") or ruta.contains("/galerias/") or ruta.contains("/fundicion/") or ruta.contains("/aguja/"):
 		return ""
 	var archivo := ruta.get_file()
 	if archivo == "fuente_dorada.png":
@@ -832,8 +867,9 @@ static func _construir_gable(st: SurfaceTool, img: Image, cfg: Dictionary, xoff:
 
 	var rect_pared: Array = cfg.get("pared_rect", [])
 	var m_pared := _muestra(img, xoff, yoff / fh, fw, fh, int(rect_pared[0]), int(rect_pared[1]), int(rect_pared[2]), int(rect_pared[3])) if rect_pared.size() == 4 else _muestra(img, xoff, yoff / fh, fw, fh, int(x0) + 2, int(x0) + 18, int(y_alero) + 4, fh - 6)
-	var m_techo_i := _muestra(img, xoff, yoff / fh, fw, fh, int(ex0) + 2, int(cx) - 4, int(lerpf(y_pico, y_alero, 0.5)), int(y_alero))
-	var m_techo_d := _muestra(img, xoff, yoff / fh, fw, fh, int(cx) + 4, int(ex1) - 2, int(lerpf(y_pico, y_alero, 0.5)), int(y_alero))
+	var rect_techo: Array = cfg.get("techo_rect", [])
+	var m_techo_i := _muestra(img, xoff, yoff / fh, fw, fh, int(rect_techo[0]), int(rect_techo[1]), int(rect_techo[2]), int(rect_techo[3])) if rect_techo.size() == 4 else _muestra(img, xoff, yoff / fh, fw, fh, int(ex0) + 2, int(cx) - 4, int(lerpf(y_pico, y_alero, 0.5)), int(y_alero))
+	var m_techo_d := m_techo_i if rect_techo.size() == 4 else _muestra(img, xoff, yoff / fh, fw, fh, int(cx) + 4, int(ex1) - 2, int(lerpf(y_pico, y_alero, 0.5)), int(y_alero))
 
 	_quad(st,
 		_p(0, fh, 0.02, fw, fh), _p(fw, fh, 0.02, fw, fh),

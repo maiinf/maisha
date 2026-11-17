@@ -321,6 +321,8 @@ const TACTICO_INFO := {
 	"hielo": ["Hielo", Color("7ad7f0")],
 	"rayo": ["Rayo", Color("f6e05e")],
 	"sismica": ["Carga Sísmica", Color("f8b040")],
+	"magnetico": ["Pulso Magnético", Color("6ad0f0")],
+	"resonancia": ["Resonancia de Ámbar", Color("ffd878")],
 	"semilla": ["Semilla", Color("8fe06a")],
 	"escudo": ["Escudo", Color("d6b46e")],
 	"latido": ["Latido", Color("e6a852")],
@@ -356,6 +358,21 @@ static func icono_tactico(lienzo: CanvasItem, centro: Vector2, clave: String, es
 		"sismica":
 			lienzo.draw_arc(c, 3.2 * escala, -PI * 0.85, -PI * 0.15, 8, ct, 1.5)
 			lienzo.draw_line((c + Vector2(-2.8, 1.8) * escala).round(), (c + Vector2(2.8, 1.8) * escala).round(), ct, 1.5)
+		"magnetico":
+			lienzo.draw_arc((c + Vector2(0, 0.4) * escala).round(), 2.4 * escala, 0.0, PI, 8, ct, 1.4)
+			lienzo.draw_line((c + Vector2(-2.4, 0.4) * escala).round(), (c + Vector2(-2.4, -2.5) * escala).round(), ct, 1.4)
+			lienzo.draw_line((c + Vector2(2.4, 0.4) * escala).round(), (c + Vector2(2.4, -2.5) * escala).round(), ct, 1.4)
+			lienzo.draw_line((c + Vector2(-2.4, -2.2) * escala).round(), (c + Vector2(-2.4, -3.4) * escala).round(), Color("e6f8ff", alfa), 1.5)
+			lienzo.draw_line((c + Vector2(2.4, -2.2) * escala).round(), (c + Vector2(2.4, -3.4) * escala).round(), Color("e6f8ff", alfa), 1.5)
+		"resonancia":
+			lienzo.draw_line((c + Vector2(0, 0.8) * escala).round(), (c + Vector2(0, 3.6) * escala).round(), ct, 1.4)
+			lienzo.draw_polyline(PackedVector2Array([
+				(c + Vector2(-1.8, -2.8) * escala).round(),
+				(c + Vector2(-1.8, 0.6) * escala).round(),
+				(c + Vector2(1.8, 0.6) * escala).round(),
+				(c + Vector2(1.8, -2.8) * escala).round(),
+			]), ct, 1.3)
+			lienzo.draw_arc((c + Vector2(0, -1.5) * escala).round(), 3.6 * escala, -PI * 0.72, -PI * 0.28, 6, Color("fff3c4", 0.85 * alfa), 1.0)
 		"semilla":
 			lienzo.draw_circle(c, 2.3 * escala, ct)
 			lienzo.draw_line(c.round(), (c + Vector2(0, -4.0) * escala).round(), Color("fff3c4", alfa), 1.0)
