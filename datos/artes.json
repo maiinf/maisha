@@ -7,7 +7,8 @@
 		"Efectos: vida_maxima (+hojas), aliento_maximo (+), ritmo_aliento (multiplica), semilla_coste (-), semilla_alcance (+casillas),",
 		"  semilla_raices (+píxeles), semilla_mecha (-segundos), latido_coste (-), latido_radio (+píxeles), golpe_recarga (+Aliento por golpe).",
 		"  Arte de la Runa: sigilo_coste (-), sigilo_dura (segundo pulso), sigilo_radio (multiplica), sigilo_devuelve (+Aliento), sigilo_espera (-s), sigilo_chispa.",
-		"Una rama con «bloqueada» duerme hasta que se pone la marca «despierta_con»."
+		"Una rama con «bloqueada» duerme hasta que se pone la marca «despierta_con».",
+		"  Arte de la Tierra: carga_coste (-), tierra_alcance (multiplica), carga_danio (+), carga_devuelve (+Aliento), carga_espera (-s), carga_onda."
 	],
 	"esencia_por_marca": [
 		{
@@ -284,9 +285,60 @@
 			"id": "tierra",
 			"nombre": "Arte de la Tierra",
 			"color": "e6a852",
-			"bloqueada": "Despierta en Asterhaul",
-			"texto": "La Carga sísmica y el Mineral. Aún duerme: su eco viene de las estrellas.",
-			"niveles": []
+			"bloqueada": "Aún duerme: Mhunzi, en Mji-Jiwe, sabrá despertarla",
+			"texto": "La Carga, el Pulso y la Resonancia. Hace que la tierra responda a Maisha con más fuerza, y que el Cetro del Nexo crezca.",
+			"niveles": [
+				{
+					"nombre": "Grebas de basalto",
+					"texto": "La Carga Sísmica gasta menos Aliento (16 en vez de 20).",
+					"efectos": {
+						"carga_coste": 4
+					}
+				},
+				{
+					"nombre": "Cinto de ámbar",
+					"texto": "La Carga y la Resonancia llegan un 20 % más lejos.",
+					"efectos": {
+						"tierra_alcance": 0.2
+					}
+				},
+				{
+					"nombre": "Hombrera de geoda",
+					"texto": "Una hoja más de Vida, y la Carga quita 2 a los enemigos en vez de 1.",
+					"efectos": {
+						"vida_maxima": 1,
+						"carga_danio": 1
+					},
+					"grande": true,
+					"cristales": 2
+				},
+				{
+					"nombre": "Guantes de imán",
+					"texto": "Cada vez que la Carga rompe o enciende algo, devuelve 6 de Aliento.",
+					"efectos": {
+						"carga_devuelve": 6
+					}
+				},
+				{
+					"nombre": "Faldón de forja",
+					"texto": "La Carga se recupera antes: una cada 0,55 s en vez de cada 0,9 s.",
+					"efectos": {
+						"carga_espera": 0.35
+					}
+				},
+				{
+					"nombre": "Aura de la Semilla",
+					"texto": "Otra hoja más de Vida, y la Carga suelta al final una onda de ámbar que daña a los enemigos de alrededor.",
+					"efectos": {
+						"vida_maxima": 1,
+						"carga_onda": 1
+					},
+					"rasgo": "aura_semilla",
+					"grande": true,
+					"cristales": 4
+				}
+			],
+			"despierta_con": "arte_tierra"
 		}
 	]
 }

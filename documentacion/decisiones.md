@@ -571,3 +571,10 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | La semilla mayor y Mauti | Siempre en neutro. Mauti es quien entiende que la semilla tenía miedo; las dos manos la calman. |
 | El Cetro del Nexo | Despierta del todo al final (`nexo_6`), aunque la rama del Arte de la Tierra aún no esté hecha. Cuando se haga, el cetro despierto se mantiene. |
 | El cuarto mundo | Sin nombre todavía: la pantalla de fin dice «Continuará...». |
+
+### 2026-11-17 · El Arte de la Tierra y el Mercado de la Escoria (Decidido con Iam, sobre `documentacion/boceto_arte_tierra.png`)
+| Qué | Decisión |
+| :--- | :--- |
+| Los 6 niveles del Arte de la Tierra | **Opción A · Oficio del Cráter**: 1 Grebas de basalto (la Carga cuesta 16 de Aliento) · 2 Cinto de ámbar (+20 % de alcance de la Carga y la Resonancia) · 3 ✦ Hombrera de geoda (2 Cristales: +1 hoja de Vida y la Carga quita 2) · 4 Guantes de imán (+6 de Aliento cada vez que la Carga rompe o enciende algo) · 5 Faldón de forja (una Carga cada 0,55 s) · 6 ✦ Aura de la Semilla (4 Cristales: +1 hoja de Vida y la Carga suelta una onda de ámbar que daña alrededor). |
+| El Cetro del Nexo | Sube con la rama (`nexo_0` … `nexo_6`); al calmar el Corazón despierta del todo (`nexo_6`) aunque la rama no esté llena. |
+| El Mercado de la Escoria (Chuma, con `mercado_escoria`) | Los cuatro artículos del boceto: **Piedra de amolar** (4 Cristales: la Carga empuja más), **Fuelle de rescoldo** (5: +15 % de recarga de Aliento), **Farol de geoda** (6: más luz en las minas y las Esquirlas brillan desde lejos) y **Delantal de forja** (8: prenda). |

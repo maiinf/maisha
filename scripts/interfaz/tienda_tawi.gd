@@ -1,5 +1,5 @@
 extends CanvasLayer
-## LA TIENDA (de Tawi, en Cuna de Musgo; de Wino, en Maandiko): se abre al hablar con el tendero.
+## LA TIENDA (de Tawi, en Cuna de Musgo; de Wino, en Maandiko; de Chuma, en Mji-Jiwe): se abre al hablar con el tendero.
 ## A la izquierda, el puesto por dentro con Tawi detrás del mostrador (parpadea, habla, se alegra al vender);
 ## a la derecha, lo que vende, con su precio en Cristales del Nexo.
 ##   ↑ ↓ elegir · Acción comprar · Tab o Esc salir
@@ -21,6 +21,11 @@ const TENDEROS := {
 		"¡Bienvenida la luz! Mira, mira: la tinta ya se mueve en los botes.",
 		"Plumas, tinta y papel. Y un par de cosas que no salen en ningún libro... todavía.",
 		"¿Cristales del Nexo? Aquí se cambian por algo que escriba solo. Bueno, casi solo."]},
+	"chuma": {"fondo": preload("res://arte/interfaz/tienda_chuma_fondo.png"), "dibujo": preload("res://arte/interfaz/tienda_chuma.png"),
+		"nombre": "Chuma", "rotulo": "Mercado de la Escoria", "saludos": [
+		"¡Pasa, pasa, que el género no muerde! Bueno, la piedra de amolar un poco.",
+		"Todo forjado aquí mismo, con fuego de verdad. Hacía años que no lo decía.",
+		"¿Cristales del Nexo? Los aceptamos. Y si traes los hornos encendidos, también la sonrisa."]},
 }
 const ICONOS := preload("res://arte/interfaz/objetos.png")
 const CRISTAL := preload("res://arte/interfaz/cristal.png")

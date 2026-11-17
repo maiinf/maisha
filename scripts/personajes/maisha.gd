@@ -333,11 +333,13 @@ func sigilo() -> bool:
 ## hacia donde mira con una onda de ámbar por delante (combate/carga_sismica.gd). Rompe muros agrietados, empuja
 ## vagonetas, hace sonar los pilares-diapasón y vuelca a los Kaa-Jiwe. Mientras embiste no le hacen daño.
 func carga() -> bool:
-	if not Estado.tiene("carga_sismica") or _espera_carga > 0.0 or agotada or escudo or aliento < CARGA_COSTE:
+	var coste := CARGA_COSTE - Artes.valor("carga_coste")
+	if not Estado.tiene("carga_sismica") or _espera_carga > 0.0 or agotada or escudo or aliento < coste:
 		return false
-	aliento -= CARGA_COSTE
-	_espera_carga = CARGA_ESPERA
-	_empuje = direccion_mirada() * CARGA_IMPULSO
+	aliento -= coste
+	_espera_carga = CARGA_ESPERA - Artes.valor("carga_espera")
+	# (el cinto de ámbar la alarga; la piedra de amolar de Chuma, también)
+	_empuje = direccion_mirada() * CARGA_IMPULSO * (1.0 + Artes.valor("tierra_alcance")) * (1.15 if Estado.tiene("piedra_amolar") else 1.0)
 	_invulnerable = maxf(_invulnerable, 0.4)
 	var efecto: Node2D = ESCENA_CARGA.new()
 	efecto.maisha = self

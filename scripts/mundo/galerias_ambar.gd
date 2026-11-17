@@ -173,7 +173,7 @@ func _poner_oscuridad() -> void:
 	add_child(_penumbra)
 	_luz_maisha = PointLight2D.new()
 	_luz_maisha.texture = preload("res://scripts/mundo/relieve.gd").textura_luz(256)
-	_luz_maisha.texture_scale = 1.0
+	_luz_maisha.texture_scale = 1.6 if Estado.tiene("farol_geoda") else 1.0              # (el farol de geoda de Chuma)
 	_luz_maisha.color = Color(1.0, 0.92, 0.75)
 	_luz_maisha.energy = 0.0
 	_luz_maisha.position = Vector2(0, -10)

@@ -1093,7 +1093,25 @@ La ciudad de los canteros, herreros y afinadores (damanes de roca), tallada en e
 | Arte | `herramientas/pintar_mji_jiwe.py` → `arte/mundos/asterhaul/mji_jiwe/`; Mhunzi, Chuma y los artesanos (`artesano_a/b/c` y sus `_gris`) en `dibujar_aldeanos.py` |
 | Misiones | `mji_jiwe` (historia) y `yunques_memoria` (encargo largo) |
 | Prueba | `prueba_mji_jiwe` (31 comprobaciones) |
-| Falta (parte 2) | La **tienda de Chuma** por dentro (ahora abre el puesto pero aún no vende); la **rama del Arte de la Tierra** en el diario (sus 6 niveles no están decididos); que en la ciudad se vea rota la cadena de cada jefe vencido |
+| Falta |  que en la ciudad se vea rota la cadena de cada jefe vencido |
+
+## Mji-Jiwe, parte 2: el Arte de la Tierra y el Mercado de la Escoria
+
+La quinta rama del diario y la tienda de Chuma (`documentacion/tierra_diario.png`, `tierra_prendas.png`, `chuma_tienda.png`). Decidido con Iam sobre el boceto de Gemini: **Opción A, Oficio del Cráter**.
+
+| Qué | Cómo |
+| --- | --- |
+| Despertar | Mhunzi (`arte_tierra`). La rama sale a la derecha del árbol del diario (espejo de la Runa: `arbol_rama_tierra.png`, `NODOS_ARBOL["tierra"]`); su raíz es la **Carga Sísmica (I)**. El Pulso (O) y la Resonancia (P) ya salen en la lista de habilidades |
+| I · Grebas de basalto | La Carga cuesta 16 de Aliento (`carga_coste`) |
+| II · Cinto de ámbar | La Carga y la Resonancia llegan un 20 % más lejos (`tierra_alcance`) |
+| III ✦ Hombrera de geoda | +1 hoja de Vida y la Carga quita 2 (`carga_danio`) · 2 Cristales |
+| IV · Guantes de imán | +6 de Aliento cada vez que la Carga rompe o enciende algo (`carga_devuelve`) |
+| V · Faldón de forja | Una Carga cada 0,55 s (`carga_espera`) |
+| VI ✦ Aura de la Semilla | +1 hoja de Vida y al acabar la Carga, una onda de ámbar que daña alrededor (`carga_onda`) · 4 Cristales |
+| Lo que se ve | Prendas en zonas propias (`tierra_piernas`, `tierra_cintura`, `tierra_hombros`, `tierra_brazos`, `tierra_falda`) en `dibujar_prendas.py`; el aura, en `rasgos_maisha.gd` (`aura_semilla`); el Cetro del Nexo sube con la rama (`nexo_0` … `nexo_6`) y al final de Asterhaul se queda en `nexo_6` |
+| El Mercado de la Escoria | Chuma abre su tienda al encender los cuatro hornos de la terraza media (`tienda_chuma`, `herramientas/pintar_tienda_chuma.py`). Vende: **Piedra de amolar** (4: la Carga empuja más), **Fuelle de rescoldo** (5: +15 % de recarga de Aliento), **Farol de geoda** (6: más luz en las grutas y las minas, y las Esquirlas brillan desde lejos) y **Delantal de forja** (8: prenda) |
+| Pruebas | `prueba_artes` (apartado «El Arte de la Tierra») y `prueba_mji_jiwe` («El Mercado de la Escoria») |
+| Falta | Que la piedra de amolar afecte también al golpe del cetro (ahora solo a la Carga); el icono propio de cada artículo |
 
 ## Asterhaul: Las Galerías de Ámbar y el Kifaru de Basalto
 

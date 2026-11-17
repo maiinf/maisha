@@ -15,7 +15,8 @@ signal ropa_cambiada
 
 ## (las «runa_*» son las del Arte de la Runa: van aparte para convivir con las raíces, la bufanda y la capa)
 const ZONAS := ["cabeza", "cara", "espalda", "piernas", "torso", "brazos", "hombros", "aura", "arma",
-	"runa_espalda", "runa_torso", "runa_sello", "runa_brazos", "runa_cabeza"]
+	"runa_espalda", "runa_torso", "runa_sello", "runa_brazos", "runa_cabeza",
+	"tierra_piernas", "tierra_cintura", "tierra_hombros", "tierra_brazos", "tierra_falda"]
 const RITMO_PRENDAS := 2.5        # fotogramas por segundo de las prendas animadas (la capa de hojas se mece)
 const ANCHO_FOTOGRAMA := 24
 const ALTO_FOTOGRAMA := 32

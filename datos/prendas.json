@@ -1521,5 +1521,308 @@
    ]
   },
   "de_artes": true
+ },
+ "grebas_basalto": {
+  "nombre": "Grebas de basalto",
+  "zona": "tierra_piernas",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/greba.png",
+     "ancla": "pie_izq",
+     "desplazamiento": [
+      -1,
+      -4
+     ],
+     "delante": true
+    },
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/greba.png",
+     "ancla": "pie_der",
+     "desplazamiento": [
+      -1,
+      -4
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/greba.png",
+     "ancla": "pie_izq",
+     "desplazamiento": [
+      -1,
+      -4
+     ],
+     "delante": true
+    },
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/greba.png",
+     "ancla": "pie_der",
+     "desplazamiento": [
+      -1,
+      -4
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/greba_lado.png",
+     "ancla": "piernas",
+     "desplazamiento": [
+      -1,
+      0
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "cinto_ambar": {
+  "nombre": "Cinto de ámbar",
+  "zona": "tierra_cintura",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/cinto_ambar.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      0,
+      5
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/cinto_ambar.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      0,
+      5
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/cinto_ambar_lado.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      2,
+      5
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "hombrera_geoda": {
+  "nombre": "Hombrera de geoda",
+  "zona": "tierra_hombros",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/hombrera_geoda.png",
+     "ancla": "brazo_izq",
+     "desplazamiento": [
+      -2,
+      -3
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/hombrera_geoda_espejo.png",
+     "ancla": "brazo_der",
+     "desplazamiento": [
+      0,
+      -3
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/hombrera_geoda.png",
+     "ancla": "brazo",
+     "desplazamiento": [
+      -3,
+      -3
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "guantes_iman": {
+  "nombre": "Guantes de imán",
+  "zona": "tierra_brazos",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/guante_iman.png",
+     "ancla": "brazo_izq",
+     "desplazamiento": [
+      0,
+      5
+     ],
+     "delante": true
+    },
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/guante_iman.png",
+     "ancla": "brazo_der",
+     "desplazamiento": [
+      1,
+      5
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/guante_iman.png",
+     "ancla": "brazo_izq",
+     "desplazamiento": [
+      0,
+      5
+     ],
+     "delante": true
+    },
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/guante_iman.png",
+     "ancla": "brazo_der",
+     "desplazamiento": [
+      1,
+      5
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/guante_iman.png",
+     "ancla": "brazo",
+     "desplazamiento": [
+      0,
+      4
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "faldon_forja": {
+  "nombre": "Faldón de forja",
+  "zona": "tierra_falda",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/faldon_forja_abajo.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      0,
+      6
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/faldon_forja_arriba.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      0,
+      6
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/faldon_forja_lado.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      3,
+      6
+     ],
+     "delante": true
+    }
+   ]
+  },
+  "de_artes": true
+ },
+ "delantal_forja": {
+  "nombre": "Delantal de forja",
+  "zona": "torso",
+  "arte": "tierra",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/delantal_forja_abajo.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      0,
+      1
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/delantal_forja_arriba.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      0,
+      0
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/delantal_forja_lado.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      1,
+      1
+     ],
+     "delante": true
+    }
+   ]
+  }
  }
 }

@@ -221,5 +221,28 @@ func _ready() -> void:
 	_comprobar(Artes.aspecto()["cetro"] == "nexo_0" and ropa.puestas().get("arma", "") == "nexo_0", "al final de Sigilia, en la mano va el Cetro del Nexo, dormido (%s)" % ropa.puestas().get("arma", ""))
 	_comprobar(Artes.aspecto({"cetro": 3})["cetro"] == "cetro_3", "en la vista previa de la rama del Cetro se sigue viendo el de roble")
 
+	print("El Arte de la Tierra:")
+	_comprobar(Artes.dormida(Artes.buscar("tierra")) and not ("tierra" in diario.call("_ramas")), "dormida, la Tierra no sale en el diario")
+	Estado.marcar("arte_tierra")
+	_comprobar(not Artes.dormida(Artes.buscar("tierra")) and diario.call("_ramas").back() == "tierra", "Mhunzi la despierta («arte_tierra»): al árbol le sale la rama, a la derecha")
+	vida_antes = Artes.vida_maxima()
+	niveles = Estado.extra.get("artes", {}).duplicate()
+	niveles["tierra"] = 3
+	Estado.extra["artes"] = niveles
+	Artes.arte_subida.emit("tierra", 3)
+	_comprobar(Artes.vida_maxima() == vida_antes + 1 and Artes.aspecto()["cetro"] == "nexo_3", "Tierra III: una hoja más, y el Cetro del Nexo sube con la rama (%s)" % Artes.aspecto()["cetro"])
+	niveles["tierra"] = 6
+	Estado.extra["artes"] = niveles
+	Artes.arte_subida.emit("tierra", 6)
+	asp = Artes.aspecto({"raiz": 0, "cetro": 0, "aliento": 0, "runa": 0})
+	_comprobar(asp["prendas"] == ["grebas_basalto", "cinto_ambar", "hombrera_geoda", "guantes_iman", "faldon_forja"] and "aura_semilla" in asp["rasgos"], "grebas, cinto, hombrera, guantes, faldón y el aura de la Semilla (%s)" % [asp["prendas"]])
+	_comprobar(ropa.puestas().get("tierra_cintura", "") == "cinto_ambar" and ropa.puestas().get("runa_torso", "") == "estola_indice", "las prendas de la Tierra conviven con las de la Runa")
+	Estado.marcar("carga_sismica")
+	maisha.aliento = 100.0
+	maisha.set("_espera_carga", 0.0)
+	_comprobar(maisha.carga() and is_equal_approx(maisha.aliento, 84.0) and is_equal_approx(maisha.get("_espera_carga"), 0.55), "la Carga cuesta 16 y se recupera en 0,55 s (%.0f)" % maisha.aliento)
+	await _esperar(0.6)
+
+
 	print("RESULTADO: ", "todo correcto" if _fallos == 0 else "%d fallos" % _fallos)
 	get_tree().quit(_fallos)

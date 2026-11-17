@@ -55,6 +55,18 @@ COLORES = {
     "Z": "B8B0D0",  # pluma en sombra
     "e": "7A1A1E",  # lacre oscuro
     "E": "D0453A",  # lacre
+    # Tierra (lo que da el Arte de la Tierra: basalto, ámbar, imán, cuero de forja)
+    "s": "1C1A26",  # basalto oscuro (contorno)
+    "S": "3A3850",  # basalto
+    "t": "6A6884",  # basalto con luz
+    "n": "9A4A0C",  # ámbar oscuro
+    "N": "F8B040",  # ámbar
+    "i": "1A5A78",  # imán oscuro
+    "I": "6AD0F0",  # imán
+    "x": "464C5C",  # hierro
+    "L": "3E2416",  # cuero de forja oscuro (contorno)
+    "M": "7C5234",  # cuero de forja
+    "D": "A8784C",  # cuero de forja con luz
     # flor
     "f": "FFD7E0",  # pétalo
     "F": "F9D36A",  # centro
@@ -465,6 +477,82 @@ MANTO_LADO = [
 
 
 # ---------------------------------------------------------------------------
+# PRENDAS DE LA TIERRA (las da el Arte de la Tierra; en zonas suyas) y el DELANTAL DE FORJA (el Mercado de Chuma)
+# ---------------------------------------------------------------------------
+GREBA = [          # Tierra 1: una greba de basalto en cada pierna, con una veta de ámbar
+    "sSts",
+    "sSNs",
+    "ssss",
+]
+GREBA_LADO = [
+    "sSttSs",
+    "sSNNSs",
+    "ssssss",
+]
+CINTO = [          # Tierra 2: un cinto de cuero con hebilla de ámbar
+    "LLLLnNnLLL",
+    "....nn....",
+]
+CINTO_LADO = [
+    "LLLnNnLL",
+    "...nn...",
+]
+HOMBRERA_GEODA = [ # Tierra 3: una hombrera de roca partida, con la geoda de ámbar por dentro
+    ".sSs..",
+    "sSNNs.",
+    "stNnSs",
+    "sSSSSs",
+    ".ssss.",
+]
+HOMBRERA_GEODA_ESPEJO = [f[::-1] for f in HOMBRERA_GEODA]
+GUANTE = [         # Tierra 4: guantes de cuero con una placa de imán
+    "LIL",
+    "LML",
+]
+FALDON_ABAJO = [   # Tierra 5: un faldón de cuero de forja que cuelga del cinto
+    "LMDLLLLDML",
+    "LMD.LL.DML",
+    "LM..LL..ML",
+    "L...LL...L",
+]
+FALDON_ARRIBA = [
+    "LMMMMMMMML",
+    "LMDMMMMDML",
+    "LM.MMMM.ML",
+    "L..LLLL..L",
+]
+FALDON_LADO = [
+    "LMDMML",
+    "LMD.ML",
+    "LM..ML",
+    "L....L",
+]
+DELANTAL_ABAJO = [ # el Delantal de forja de Chuma: cuero hasta las rodillas, con un martillito en el bolsillo
+    "LL......LL",
+    ".LMMMMMML.",
+    ".LMDxxDML.",
+    ".LMMxMMML.",
+    ".LMMMMMML.",
+    ".LMDMMDML.",
+    "..LLLLLL..",
+]
+DELANTAL_ARRIBA = [
+    "L........L",
+    ".L......L.",
+    "..L....L..",
+    "...LLLL...",
+]
+DELANTAL_LADO = [
+    "...LL",
+    "..LMM",
+    "..LxM",
+    "..LMM",
+    "..LMD",
+    "...LL",
+]
+
+
+# ---------------------------------------------------------------------------
 # PRENDAS GRANDES DE LA RAÍZ (las da el Arte de la Raíz)
 # ---------------------------------------------------------------------------
 # RAÍCES EN LAS PIERNAS (zona: piernas · Raíz 1; con hojas, Raíz 2). Una raíz enroscada en cada pierna.
@@ -643,6 +731,54 @@ PRENDAS = {
             "abajo": [("manto_escrito_abajo", MANTO_ABAJO, "cuerpo", (-2, 0), False)],
             "arriba": [("manto_escrito_arriba", MANTO_ARRIBA, "cuerpo", (-1, 1), True)],
             "lado": [("manto_escrito_lado", MANTO_LADO, "cuerpo", (-3, 1), False)],
+        },
+    },
+    "grebas_basalto": {
+        "de_artes": True, "nombre": "Grebas de basalto", "zona": "tierra_piernas", "arte": "tierra",
+        "piezas": {
+            "abajo": [("greba", GREBA, "pie_izq", (-1, -4), True), ("greba", GREBA, "pie_der", (-1, -4), True)],
+            "arriba": [("greba", GREBA, "pie_izq", (-1, -4), True), ("greba", GREBA, "pie_der", (-1, -4), True)],
+            "lado": [("greba_lado", GREBA_LADO, "piernas", (-1, 0), True)],
+        },
+    },
+    "cinto_ambar": {
+        "de_artes": True, "nombre": "Cinto de ámbar", "zona": "tierra_cintura", "arte": "tierra",
+        "piezas": {
+            "abajo": [("cinto_ambar", CINTO, "cuerpo", (0, 5), True)],
+            "arriba": [("cinto_ambar", CINTO, "cuerpo", (0, 5), True)],
+            "lado": [("cinto_ambar_lado", CINTO_LADO, "cuerpo", (2, 5), True)],
+        },
+    },
+    "hombrera_geoda": {
+        "de_artes": True, "nombre": "Hombrera de geoda", "zona": "tierra_hombros", "arte": "tierra",
+        "piezas": {
+            "abajo": [("hombrera_geoda", HOMBRERA_GEODA, "brazo_izq", (-2, -3), True)],
+            "arriba": [("hombrera_geoda_espejo", HOMBRERA_GEODA_ESPEJO, "brazo_der", (0, -3), True)],
+            "lado": [("hombrera_geoda", HOMBRERA_GEODA, "brazo", (-3, -3), True)],
+        },
+    },
+    "guantes_iman": {
+        "de_artes": True, "nombre": "Guantes de imán", "zona": "tierra_brazos", "arte": "tierra",
+        "piezas": {
+            "abajo": [("guante_iman", GUANTE, "brazo_izq", (0, 5), True), ("guante_iman", GUANTE, "brazo_der", (1, 5), True)],
+            "arriba": [("guante_iman", GUANTE, "brazo_izq", (0, 5), True), ("guante_iman", GUANTE, "brazo_der", (1, 5), True)],
+            "lado": [("guante_iman", GUANTE, "brazo", (0, 4), True)],
+        },
+    },
+    "faldon_forja": {
+        "de_artes": True, "nombre": "Faldón de forja", "zona": "tierra_falda", "arte": "tierra",
+        "piezas": {
+            "abajo": [("faldon_forja_abajo", FALDON_ABAJO, "cuerpo", (0, 6), True)],
+            "arriba": [("faldon_forja_arriba", FALDON_ARRIBA, "cuerpo", (0, 6), True)],
+            "lado": [("faldon_forja_lado", FALDON_LADO, "cuerpo", (3, 6), True)],
+        },
+    },
+    "delantal_forja": {
+        "nombre": "Delantal de forja", "zona": "torso", "arte": "tierra",
+        "piezas": {
+            "abajo": [("delantal_forja_abajo", DELANTAL_ABAJO, "cuerpo", (0, 1), True)],
+            "arriba": [("delantal_forja_arriba", DELANTAL_ARRIBA, "cuerpo", (0, 0), True)],
+            "lado": [("delantal_forja_lado", DELANTAL_LADO, "cuerpo", (1, 1), True)],
         },
     },
     "raices_piernas": {

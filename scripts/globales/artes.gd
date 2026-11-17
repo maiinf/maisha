@@ -186,6 +186,8 @@ const CAMBIO_VISIBLE := {
 		"Hojas de cobre", "Gema dorada", "El Cetro del Primer Árbol"],
 	"runa": ["Muñequeras rúnicas", "Una pluma de escriba tras la cabeza", "La Estola del Índice",
 		"Un sello de lacre en la estola", "Manto escrito", "El halo de los tres Sigilos"],
+	"tierra": ["Grebas de basalto", "Un cinto con hebilla de ámbar", "Una hombrera de geoda",
+		"Guantes de imán", "Faldón de forja", "El aura de la Semilla"],
 	"aliento": ["Bufanda de brisa", "La bufanda se alarga y vuela", "Anillos de viento y un aura de luz",
 		"Un remolino bajo los pies", "Alitas de brisa", "Cuerpo y alas de brisa"],
 }
@@ -219,8 +221,13 @@ func aspecto(niveles: Dictionary = {}) -> Dictionary:
 	for d in [[1, "munequeras_runicas"], [2, "pluma_escriba"], [3, "estola_indice"], [4, "sello_lacre"], [5, "manto_escrito"]]:
 		if u >= d[0]:
 			prendas.append(d[1])
+	# la Tierra, también en zonas suyas
+	var tr := int(niveles.get("tierra", nivel("tierra")))
+	for d in [[1, "grebas_basalto"], [2, "cinto_ambar"], [3, "hombrera_geoda"], [4, "guantes_iman"], [5, "faldon_forja"]]:
+		if tr >= d[0]:
+			prendas.append(d[1])
 	var visibles := []
-	for d in [["halo", u >= 6], ["brote", r >= 3], ["flores", r >= 6], ["aura", a >= 3], ["anillos", a >= 3],
+	for d in [["aura_semilla", tr >= 6], ["halo", u >= 6], ["brote", r >= 3], ["flores", r >= 6], ["aura", a >= 3], ["anillos", a >= 3],
 			["remolino", a >= 4], ["alitas", a == 5], ["alas", a >= 6], ["brisa", a >= 6]]:
 		if d[1]:
 			visibles.append(d[0])
@@ -262,7 +269,7 @@ func aliento_maximo() -> float:
 
 
 func ritmo_aliento() -> float:
-	return 1.0 + valor("ritmo_aliento")
+	return (1.0 + valor("ritmo_aliento")) * (1.15 if Estado.tiene("fuelle_rescoldo") else 1.0)     # (el fuelle de Chuma)
 
 
 func semilla_coste() -> float:

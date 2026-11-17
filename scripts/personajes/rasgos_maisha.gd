@@ -8,6 +8,7 @@ extends Node2D
 ##   remolino     (Aliento 4)  un remolino de aire bajo los pies
 ##   alitas       (Aliento 5)  alitas de brisa que aletean
 ##   alas         (Aliento 6)  alas grandes de brisa
+##   aura_semilla (Tierra 6)   motas de ámbar que giran despacio alrededor, por detrás, con un resplandor tibio
 ##   halo         (Runa 6)     tres chispas (fuego, hielo y rayo) que dan vueltas despacio sobre la cabeza
 ##   brisa        (Aliento 6)  el cuerpo se vuelve un poco transparente y deja una estela al moverse
 ## Todo es sutil a propósito y sin brillitos sueltos: con todo despierto, Maisha no debe verse cargada.
@@ -262,6 +263,13 @@ func _dibujar_detras() -> void:
 		var c := Vector2(0, -15)
 		for i in 3:
 			_aura.draw_circle(c, 10.0 + i * 4.0 + pulso * 2.0, Color(0.55, 0.8, 1.0, 0.03 + 0.012 * pulso))
+	if "aura_semilla" in _rasgos:
+		var c := Vector2(0, -14)
+		_aura.draw_circle(c, 13.0 + sin(_tiempo * 1.4) * 1.5, Color(1.0, 0.72, 0.3, 0.06))
+		for i in 5:
+			var a := _tiempo * 0.9 + i * TAU / 5.0
+			var p := (c + Vector2(cos(a) * 13.0, sin(a) * 5.0 + sin(_tiempo * 2.0 + i) * 2.0)).round()
+			_aura.draw_rect(Rect2(p, Vector2(2, 2)), Color(1.0, 0.82, 0.45, 0.7))
 	if "anillos" in _rasgos:
 		_dibujar_anillos(false, _aura)
 	if "remolino" in _rasgos:

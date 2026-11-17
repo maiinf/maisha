@@ -333,21 +333,22 @@
 				],
 				"lineas": [
 					"¡Arden! ¡Los cuatro! Mira el toldo, mira qué colores. Ya ni me acordaba de que era a rayas.",
-					"El Mercado de la Escoria vuelve a abrir. Bueno. Mañana. Dame un día, que tengo el género criando polvo desde ni se sabe cuándo.",
-					"Vuelve pronto, que a quien enciende hornos se le hace precio. Palabra de Chuma."
+					"El Mercado de la Escoria vuelve a abrir. ¡Hoy mismo! Le he quitado el polvo al género mientras encendías el último. Más o menos.",
+					"Pasa, pasa. A quien enciende hornos se le hace precio. Palabra de Chuma."
 				],
 				"marca": [
 					"chuma_abierto"
-				]
+				],
+				"abre": "tienda_chuma"
 			},
 			{
 				"si": [
 					"chuma_abierto"
 				],
 				"lineas": [
-					"Estoy en ello, estoy en ello. Lingotes aquí, tenazas allá... ¿Tú sabes lo que pesa ordenar un mercado entero?",
-					"Vuelve cuando lo tenga presentable. Lo bueno se hace esperar. Lo de hierro, más."
-				]
+					"¡Mi cliente favorito! Bueno, el único que tengo. Mira, mira, que hoy tengo de todo."
+				],
+				"abre": "tienda_chuma"
 			},
 			{
 				"lineas": [

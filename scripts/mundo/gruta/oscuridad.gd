@@ -29,7 +29,7 @@ func _ready() -> void:
 	var maisha := get_tree().get_first_node_in_group("maisha") as Node2D
 	_luz_maisha = PointLight2D.new()
 	_luz_maisha.texture = tex
-	_luz_maisha.texture_scale = 1.45
+	_luz_maisha.texture_scale = 1.45 * (1.5 if Estado.tiene("farol_geoda") else 1.0)     # (el farol de geoda de Chuma)
 	_luz_maisha.energy = 1.25
 	_luz_maisha.color = Color(1.0, 0.92, 0.75)
 	_luz_maisha.position = Vector2(0, -10)

@@ -81,8 +81,9 @@ func _coger() -> void:
 
 func _dibujar_halo() -> void:
 	var pulso := 0.6 + 0.4 * sin(_tiempo * 3.0)
+	var grande := 2.2 if objeto.begins_with("esquirla") and Estado.tiene("farol_geoda") else 1.0       # (el farol de geoda de Chuma)
 	for i in 4:
-		_halo.draw_circle(Vector2.ZERO, (5.0 + i * 5.0) * (0.9 + 0.1 * pulso), Color(color_halo, 0.13 * pulso))
+		_halo.draw_circle(Vector2.ZERO, (5.0 + i * 5.0) * grande * (0.9 + 0.1 * pulso), Color(color_halo, 0.13 * pulso))
 	# chispitas que suben despacio
 	for k in 3:
 		var t := fmod(_tiempo * 0.6 + k / 3.0, 1.0)

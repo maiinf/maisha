@@ -191,6 +191,31 @@ func _ready() -> void:
 	await _hablar(m, _vecino("mwamba"))
 	_comprobar(Estado.tiene("mwamba_cristales") and Tienda.cristales() == cristales + 3, "Mwamba da 3 Cristales (%d → %d)" % [cristales, Tienda.cristales()])
 
+	print("El Mercado de la Escoria:")
+	_vecino("chuma").interactuar()
+	var tienda: CanvasLayer = null
+	for i in 60:
+		for n in get_tree().current_scene.get_children():
+			if n.get("tendero") == "chuma":
+				tienda = n
+		if tienda != null:
+			break
+		await get_tree().process_frame
+		var dialogo := get_tree().get_first_node_in_group("dialogo")
+		if dialogo.hablando:
+			dialogo.pasar()
+		await _esperar(0.08)
+	_comprobar(tienda != null and tienda.abierto and Estado.tiene("chuma_abierto"), "con el Mercado abierto, Chuma abre su tienda")
+	var lista: Array = tienda.call("_lista")
+	_comprobar(lista.size() == 4, "vende cuatro cosas (%d)" % lista.size())
+	Estado.extra["cristales_gastados"] = 0
+	Estado.marcar("rango/oro/prueba_chuma")
+	var antes := Artes.ritmo_aliento()
+	_comprobar(Tienda.comprar("fuelle_rescoldo") == "ok" and Estado.tiene("fuelle_rescoldo"), "se compra el Fuelle de rescoldo")
+	_comprobar(is_equal_approx(Artes.ritmo_aliento(), antes * 1.15), "y el Aliento se recupera un 15 % más rápido")
+	tienda.cerrar()
+	await _esperar(0.6)
+
 	print("Volver:")
 	await _ir("mji_jiwe", "desfiladero", "MjiJiwe")
 	_comprobar(_artesano("jabali").id == "artesano_a" and _yunques_despiertos() == 3, "al volver, los artesanos y los yunques siguen despiertos")
