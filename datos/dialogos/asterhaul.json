@@ -242,13 +242,26 @@
 			},
 			{
 				"si": [
+					"cadena_norte_rota"
+				],
+				"lineas": [
+					"Tres. Lo he oído desde la forja: un acorde. El Diapasón no daba un acorde desde antes de que yo tuviera canas.",
+					"Ya no hay nada que sujete la losa. Solo falta que se atreva a abrirse... y que vuelvan los que faltan a sus yunques.",
+					"(El Núcleo de la Estrella llegará en una próxima parte.)"
+				]
+			},
+			{
+				"si": [
 					"cadena_oeste_rota",
 					"cadena_este_rota"
 				],
 				"lineas": [
 					"Dos. Dos cadenas. La losa ya no está quieta del todo: pon la mano y verás.",
 					"Queda la de arriba, la de la Aguja. Esa no la guardan ni piedra ni hierro. Esa la guarda el aire.",
-					"(El camino de La Aguja Caída llegará en una próxima parte.)"
+					"La verja del norte ya cede: el ascensor de cadena vuelve a tirar. Sube con cuidado, que allí el suelo se acaba donde se acaba el sonido. Y pregunta por Pigo. Bajito, que no le gusta que le griten."
+				],
+				"no": [
+					"cadena_norte_rota"
 				]
 			},
 			{
@@ -419,9 +432,8 @@
 		"conversaciones": [
 			{
 				"lineas": [
-					"Una verja de hierro con un candado de ámbar. Detrás, el camino del norte: La Aguja Caída.",
-					"No cede ni con la Carga. Esto no se abre a golpes.",
-					"(Este camino llegará en una próxima parte.)"
+					"Una verja de hierro con un candado de ámbar. Detrás hay una plataforma colgada de una cadena que sube y sube: el ascensor de La Aguja Caída.",
+					"La cadena está floja. Le falta tensión. O le sobra peso en la otra punta."
 				]
 			}
 		]
@@ -1132,6 +1144,145 @@
 					"Nyundo baja los cuatro brazos despacio, uno detrás de otro, y se queda mirando al suelo. La mirilla se apaga.",
 					"La cadena de su pie se afloja y se hunde en la escoria sin salpicar. El lago entero baja un dedo, como si respirase.",
 					"Lejos, en la ciudad, el Gran Diapasón da otra nota. Más alta que la primera. Las dos juntas casi suenan a algo."
+				]
+			}
+		]
+	},
+	"aguja_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El ascensor me deja en una losa suelta, en mitad del cielo. Abajo no hay abajo: hay viento, y estrellas donde no debería haberlas.",
+					"Las terrazas flotan. Entre una y otra hay como un puente dibujado a puntos... pero no hay puente.",
+					"Y qué silencio. Un silencio raro, de sitio hecho para sonar."
+				]
+			}
+		]
+	},
+	"estela_resonancia": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una laja clara con tres anillos grabados alrededor de un punto, como cuando cae una piedra al agua.",
+					"Debajo, con letra menuda y muy recta: «El cristal no aguanta peso. Aguanta nota. Donde llega el canto hay suelo; donde no llega, no lo hay».",
+					"Y más abajo: «No crucéis con el último eco. — Pigo»."
+				]
+			}
+		]
+	},
+	"aguja_islote_este": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Alguien dejó aquí una campana pequeña, boca abajo, y debajo un papel sujeto con una piedra:",
+					"«La di mal. Una nota, una sola vez. No se cayó nadie. Lo apunto aquí para acordarme de que no se cayó nadie».",
+					"La letra es la misma que la de la estela."
+				]
+			}
+		]
+	},
+	"pigo": {
+		"nombre": "Pigo",
+		"conversaciones": [
+			{
+				"no": [
+					"pigo_pulso"
+				],
+				"tiene": {
+					"esquirla_pigo": 1
+				},
+				"estilo": "pensamiento",
+				"lineas": [
+					"La esquirla zumba un poquito, y la campanilla pequeña de su vara le contesta sola.",
+					"Se la dejo en la zarpa que tiene libre. Con cuidado, que no suene de golpe."
+				],
+				"entrega": {
+					"esquirla_pigo": 1
+				},
+				"marca": [
+					"pigo_pulso"
+				]
+			},
+			{
+				"no": [
+					"pigo_pulso"
+				],
+				"estilo": "pensamiento",
+				"lineas": [
+					"Una damán flaca y muy tiesa, gris de polvo, con unas orejeras y una vara con tres campanillas.",
+					"Tiene un martillito levantado junto a la campanilla más pequeña. No llega a darle.",
+					"A los lados del puente hay dos piedras altas, hendidas arriba como un diapasón. Si a Mwamba le sirvió un cabezazo, a lo mejor a ellas también."
+				],
+				"marca": [
+					"pigo_vista"
+				]
+			},
+			{
+				"si": [
+					"pigo_pulso"
+				],
+				"no": [
+					"pigo_hablado"
+				],
+				"lineas": [
+					"...medio tono. Está medio tono baja. No, espera. ¿Quién ha...? Ah. Tú. No grites, por favor. Aquí arriba se oye todo.",
+					"Pigo. Afino las campanas de la Aguja. Y los monolitos, que son campanas que no saben que lo son.",
+					"Hace mucho di una nota mal. Una sola. Se rajó un puente entero, con gente a punto de cruzar. No pasó nada. Pero pudo. Y desde entonces prefiero no tocar.",
+					"Tú les has dado un campanazo a los de la Base, ¿a que sí? A lo bruto. Se oía desde aquí. Sirve, pero dura lo que dura un susto.",
+					"Así no se hace. Al monolito no se le pega: se le da la nota, y él la sigue cantando solo. Sujeta el cetro flojo, como si fuera un pájaro. Y deja salir el aire... Eso es.",
+					"¿Lo has oído? Y si hay otro cerca, se le pega la nota. Y a ese, otro. Cada vez más bajito: a la tercera ya no pasa de ahí. Con tres bien puestos se cruza el puente alto.",
+					"El cristal aguanta donde suena y ni un paso más allá. Los peñascos acuden al que canta. Y a los Popo... a los Popo les sienta fatal que les contesten."
+				],
+				"marca": [
+					"pigo_hablado",
+					"resonancia_ambar"
+				]
+			},
+			{
+				"si": [
+					"kipanga_vencido"
+				],
+				"lineas": [
+					"Lo he oído posarse. Y luego, silencio. Pero del bueno: del que hay entre dos notas.",
+					"Voy a afinar el puente alto. Le falta medio tono desde hace años. Hoy me atrevo."
+				]
+			},
+			{
+				"lineas": [
+					"Arriba, en el Nido, anida Kipanga. Vino con la estrella, dicen. No le des la nota a él: dásela a los monolitos y espera a que pase por encima.",
+					"Y si clava una pluma junto a un monolito, rómpela. Zumban. Desafinan todo lo que tocan. No lo soporto."
+				]
+			}
+		]
+	},
+	"kipanga_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El Nido. Un cerco de lascas negras, afiladas, y en el centro una argolla con una cadena que cuelga hacia abajo, hacia la ciudad.",
+					"Encima de la argolla hay un pájaro. Decir pájaro es quedarse muy corto. Tiene las alas hechas de cuchillas y un cristal en el pecho que late.",
+					"Abre un ojo. Luego el otro. Luego las alas. Tapan el cielo."
+				]
+			}
+		]
+	},
+	"kipanga_vencido": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Kipanga se posa despacio y pliega las alas, lasca a lasca. El cristal del pecho deja de latir tan fuerte y se queda en un pulso tranquilo.",
+					"La argolla se abre sola. La cadena cae hacia la ciudad, muy abajo, y tarda tanto en llegar que casi se me olvida que estaba cayendo.",
+					"Y entonces sube el sonido. El Gran Diapasón, desde el fondo del cráter. Tres notas, juntas. Es un acorde."
 				]
 			}
 		]

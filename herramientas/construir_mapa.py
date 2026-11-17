@@ -2507,6 +2507,51 @@ def crear_fundicion():
     return ["".join(f) for f in m], {}
 
 
+def crear_aguja():
+    """LA AGUJA CAÍDA (Asterhaul, 72x80, de sur a norte): terrazas de piedra de estrella colgadas sobre el VIENTO
+    ASTRAL. Lo que no es terraza («0») es abismo: no se pisa. Se entra por el sur (de Mji-Jiwe, «_»).
+      1. LA BASE (abajo): Pigo en gris, la Estela de la Resonancia y dos monolitos junto al primer puente.
+      2. LA CRESTA DE LOS DIAPASONES (en medio), con un ISLOTE a cada lado (se llega en un peñasco flotante).
+      3. EL NIDO DE LA CIMA (arriba, redondo): Kipanga Astral.
+    Las casillas «=» son VACÍO QUE SE PUEDE PISAR si algo lo sostiene: los PUENTES DE CRISTAL (solo aguantan donde
+    llega la onda de un monolito) y los pasillos de los PEÑASCOS FLOTANTES. Sin sostén, Maisha cae.
+    Junto al puente alto hay dos peñas sueltas con un monolito cada una (no se llega: cantan por simpatía).
+    Monolitos, puentes, peñascos, Pigo, los Popo, las Esquirlas y Kipanga los pone la escena."""
+    ANCHO, ALTO = 72, 80
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y][x] = c
+
+    def terraza(x0, y0, x1, y1, n):
+        """Un rectángulo de suelo con las cuatro esquinas cortadas en chaflán (n casillas)"""
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                if min(x - x0, x1 - x) + min(y - y0, y1 - y) >= n:
+                    m[y][x] = "%"
+
+    rect(34, 74, 37, 78, "%")                                # la entrada del sur
+    rect(34, 79, 37, 79, "_")
+    terraza(22, 62, 49, 73, 3)                               # 1. la Base
+    rect(34, 58, 37, 61, "=")                                # el primer puente de cristal
+    terraza(16, 44, 55, 57, 3)                               # 2. la Cresta de los Diapasones
+    rect(8, 49, 15, 50, "=")                                 # el pasillo del peñasco del oeste...
+    terraza(2, 47, 7, 53, 1)                                 # ...y su islote
+    rect(56, 49, 63, 50, "=")                                # el pasillo del peñasco del este...
+    terraza(64, 47, 69, 53, 1)                               # ...y su islote
+    rect(34, 34, 37, 43, "=")                                # el puente alto
+    rect(40, 39, 41, 40, "%")                                # las dos peñas sueltas de los monolitos que cantan solos
+    rect(40, 34, 41, 35, "%")
+    for y in range(ALTO):                                    # 3. el Nido de la Cima (redondo)
+        for x in range(ANCHO):
+            if ((x - 35.5) / 15.0) ** 2 + ((y - 22.0) / 11.0) ** 2 <= 1.0:
+                m[y][x] = "%"
+    rect(34, 32, 37, 33, "%")                                # el rellano donde acaba el puente
+    return ["".join(f) for f in m], {}
+
+
 def crear_seccion():
     """LA SECCIÓN PROHIBIDA (Sigilia, 64x72, de sur a norte): las salas de mármol morado bajo el Gran Archivo. Lo que
     no es sala («0») son estanterías de libros encadenados. Se entra por el sur (del Gran Archivo de Maandiko, «_»).
@@ -3289,7 +3334,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mji_jiwe", "galerias_ambar", "fundicion_escoria"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mji_jiwe", "galerias_ambar", "fundicion_escoria", "aguja_caida"}
 
 
 def construir_suelo(nombre):
@@ -3441,7 +3486,7 @@ if __name__ == "__main__":
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
                         "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion,
-                        "desfiladero_meteorito": crear_desfiladero, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion}.get(nombre, crear_prados)()
+                        "desfiladero_meteorito": crear_desfiladero, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion, "aguja_caida": crear_aguja}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

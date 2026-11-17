@@ -909,6 +909,86 @@ def pintar_desfiladero(nombre, salida=None):
     print("Suelo pintado:", destino, (lz.w, lz.h))
 
 
+def pintar_aguja(nombre, salida=None):
+    """El suelo de LA AGUJA CAÍDA (Asterhaul): terrazas de PIEDRA DE ESTRELLA (pizarra azulada en lajas, con vetas
+    de cristal turquesa) colgadas sobre el VIENTO ASTRAL: un abismo añil con estrellas y rachas de luz que corren
+    en diagonal. Cada terraza enseña por el sur su canto de roca, que se afila hacia abajo. El NIDO DE LA CIMA
+    (redondo) tiene un cerco de lascas de obsidiana y, en el centro, la argolla de la tercera cadena. Las casillas
+    «=» (puentes de cristal y pasillos de peñasco) son abismo con el fantasma del cristal dibujado a puntos."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=53)
+    tipos = [["vacio" if c in "0=" else "suelo" for c in f] for f in filas]
+    vacio = mascara(lz, tipos, ("vacio",), 1.4, 0.06, semilla=531)
+    suelo = np.clip(1 - vacio, 0, 1)
+    fina = lz.ruido(0.8, 2, semilla=532)
+    media = lz.ruido(10, 3, semilla=533)
+    grande = lz.ruido(46, 3, semilla=534)
+    S = lz.s
+    # EL VIENTO ASTRAL: añil hondo, más claro hacia el centro, con rachas diagonales y estrellas
+    racha = np.sin((lz.x * 0.55 + lz.y) * 0.035 + ruido_torcido_local(lz, 70, 535) * 9) * 0.5 + 0.5
+    vv = 0.3 + (grande - 0.5) * 0.4 + (racha - 0.5) * 0.3 + (media - 0.5) * 0.12
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#05040c", "#0a0a1c", "#11142e", "#1a2044", "#24305c", "#304474"], np.clip(vv, 0, 1)))
+    hilo = (np.abs(((lz.x * 0.55 + lz.y + ruido_torcido_local(lz, 50, 536) * 60) % 46) - 23) < 0.5) * (lz.ruido(30, 2, semilla=537) > 0.52)
+    lz.pintar(hilo * 1.0, "#7fd6e6", 0.3)
+    rng = np.random.default_rng(538)
+    estrellas = np.zeros((lz.H, lz.W), np.float32)
+    for _ in range(520):
+        x, y = int(rng.integers(2, lz.w - 2)), int(rng.integers(2, lz.h - 2))
+        if filas[y // CASILLA][x // CASILLA] in "0=":
+            cv2.rectangle(estrellas, (x * S, y * S), (x * S + S - 1, y * S + S - 1), float(rng.uniform(0.4, 1.0)), -1)
+    lz.pintar(estrellas, "#dff4ff", 0.9)
+    # el fantasma de los puentes y los pasillos: losas de cristal dibujadas a puntos
+    fantasma = np.zeros((lz.H, lz.W), np.float32)
+    for y in range(alto):
+        for x in range(ancho):
+            if filas[y][x] == "=":
+                x0, y0 = x * CASILLA, y * CASILLA
+                for k in range(0, 16, 4):
+                    for (ax, ay) in ((x0 + k, y0), (x0 + k, y0 + 15), (x0, y0 + k), (x0 + 15, y0 + k)):
+                        cv2.rectangle(fantasma, (ax * S, ay * S), (ax * S + 2 * S - 1, ay * S + S - 1), 1.0, -1)
+    lz.pintar(fantasma, "#6ad0f0", 0.28)
+    # el canto de roca de cada terraza, por el sur: se afila hacia abajo, con cristales que cuelgan
+    canto = np.clip(desplazar(lz, suelo, 0, 22) - suelo, 0, 1)
+    afila = np.clip(1.0 - lz.distancia(suelo) / 22.0, 0, 1)
+    diente = (np.sin(lz.x * 0.35 + lz.ruido(6, 2, semilla=539) * 5) * 0.5 + 0.5)
+    canto = canto * (afila > diente * 0.55)
+    lz.pintar(canto, rampa(["#0c1020", "#182036", "#28344e", "#3a4a68", "#506084"], np.clip(0.3 + afila * 0.5 + (media - 0.5) * 0.3, 0, 1)))
+    lz.pintar(canto * (np.abs(ruido_torcido_local(lz, 14, 540) - 0.5) < 0.02), "#6ad0f0", 0.7)
+    # LA PIEDRA DE ESTRELLA: lajas de pizarra azulada, irregulares
+    u = lz.x + ruido_torcido_local(lz, 22, 541) * 22
+    w = lz.y + ruido_torcido_local(lz, 22, 542) * 22
+    junta = ((u % 26) < 0.9) | ((w % 15) < 0.9)
+    celda = (np.sin(np.floor(u / 26) * 12.9898 + np.floor(w / 15) * 78.233) * 43758.5453) % 1
+    vs = 0.46 + (celda - 0.5) * 0.24 + (grande - 0.5) * 0.2 + (media - 0.5) * 0.18 + (fina - 0.5) * 0.12
+    lz.pintar(suelo, rampa(["#2c3246", "#3e4862", "#546280", "#6e7e9e", "#8a9ab8", "#a8b6ce", "#c6d2e2"], np.clip(vs, 0, 1)))
+    lz.pintar(suelo * junta, "#1a2034", 0.6)
+    lz.pintar(suelo * desplazar(lz, junta * 1.0, 0.7, 0.7) * (1 - junta), "#e4eef8", 0.2)
+    veta = suelo * (np.abs(ruido_torcido_local(lz, 30, 543) - 0.5) < 0.009) * (lz.ruido(36, 2, semilla=544) > 0.5)
+    lz.pintar(veta, "#2e9ac0", 0.9)
+    lz.pintar(desplazar(lz, veta, -0.5, -0.5) * veta, "#c0f4ff", 0.8)
+    lz.sumar_luz(lz.desenfocar(veta, 2), "#6ad0f0", 0.25)
+    # el borde de las terrazas: un filo claro (la piedra pulida por el viento)
+    dist = lz.distancia(suelo)
+    lz.pintar(suelo * (dist < 2.2), "#0e1220", 0.55)
+    lz.pintar(suelo * (np.abs(dist - 3.0) < 0.6), "#c0f4ff", 0.35)
+    # EL NIDO DE LA CIMA: un cerco de lascas de obsidiana y la argolla de la cadena en el centro
+    cx, cy = 35.5 * 16 + 8, 22.0 * 16 + 8
+    rn = np.sqrt(((lz.x - cx) / (15.0 * 16)) ** 2 + ((lz.y - cy) / (11.0 * 16)) ** 2)
+    an = np.arctan2((lz.y - cy) / 11.0, (lz.x - cx) / 15.0)
+    lasca = suelo * (rn > 0.78) * (rn < 0.78 + 0.14 * (np.abs(np.sin(an * 23 + lz.ruido(5, 2, semilla=545) * 4)) ** 3))
+    lz.pintar(lasca, rampa(["#06060c", "#0e0e1a", "#1a1a2c", "#2c2c44"], np.clip(0.4 + (fina - 0.5) * 0.9, 0, 1)))
+    lz.pintar(np.clip(lasca - desplazar(lz, lasca, 0.8, 0.8), 0, 1), "#8a9ad8", 0.6)
+    aro = suelo * ((np.abs(rn - 0.16) < 0.022) | (np.abs(rn - 0.5) < 0.008))
+    lz.pintar(aro, "#3a4658")
+    lz.pintar(desplazar(lz, aro, -0.6, -0.6) * aro, "#c4cad8", 0.8)
+    lz.pintar(suelo * (rn < 0.135), "#080a14", 0.55)
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "asterhaul", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.014)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
 def pintar_fundicion(nombre, salida=None):
     """El suelo de LA FUNDICIÓN DE ESCORIA (Asterhaul): un lago de ESCORIA FUNDIDA («≈») que corre despacio de
     oeste a este, naranja y amarilla, con costras negras que flotan; y, sobre ella, islas de LOSAS DE PIEDRA
@@ -1097,6 +1177,8 @@ def pintar(nombre, salida=None):
         return pintar_mji_jiwe(nombre, salida)
     if nombre == "fundicion_escoria":
         return pintar_fundicion(nombre, salida)
+    if nombre == "aguja_caida":
+        return pintar_aguja(nombre, salida)
     if nombre in BIBLIOTECAS:
         return pintar_biblioteca(nombre, salida)
     filas = leer(nombre)

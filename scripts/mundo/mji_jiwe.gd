@@ -10,9 +10,9 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ##     Con los cuatro de la terraza media, CHUMA abre el MERCADO DE LA ESCORIA («mercado_escoria»); con los seis
 ##     («hornos_mji_jiwe»), MWAMBA lo agradece (y la tienda da 3 Cristales: datos/tienda.json).
 ##   - EL GRAN DIAPASÓN, en la LOSA DEL NÚCLEO, sellada por tres cadenas (aún no se abre).
-##   - La salida del oeste lleva a LAS GALERÍAS DE ÁMBAR (la verja se abre con «arte_tierra») y la del este, a LA
-##     FUNDICIÓN DE ESCORIA (con «cadena_oeste_rota»). La del norte (La Aguja Caída) tiene la VERJA echada: aún
-##     no está construida.
+##   - La salida del oeste lleva a LAS GALERÍAS DE ÁMBAR (la verja se abre con «arte_tierra»); la del este, a LA
+##     FUNDICIÓN DE ESCORIA (con «cadena_oeste_rota»); y la del norte, a LA AGUJA CAÍDA (con «aguja_abierta»: las
+##     dos primeras cadenas rotas).
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const ESCRIBA := preload("res://scripts/mundo/sigilia/escriba.gd")
@@ -57,7 +57,7 @@ const ESQUIRLAS := [[Vector2i(58, 48), "esquirla/mji_jiwe_sur"], [Vector2i(8, 33
 const VERJAS := [
 	[Vector2i(3, 28), "mji_verja_oeste", "arte_tierra", "galerias", "galerias_ambar", "este", Vector2.RIGHT],
 	[Vector2i(72, 28), "mji_verja_este", "cadena_oeste_rota", "fundicion", "fundicion_escoria", "oeste", Vector2.LEFT],
-	[Vector2i(37, 3), "mji_verja_norte"],
+	[Vector2i(37, 3), "mji_verja_norte", "aguja_abierta", "aguja", "aguja_caida", "sur", Vector2.DOWN],
 ]
 
 var _yunques: Array[Sprite2D] = []
@@ -67,18 +67,22 @@ var _verjas := {}
 
 
 func _ready() -> void:
+	# con las dos primeras cadenas rotas, el ascensor de la Aguja vuelve a tirar
+	if Estado.tiene("cadena_oeste_rota") and Estado.tiene("cadena_este_rota"):
+		Estado.marcar("aguja_abierta")
 	# (antes de super(): al volver de un camino, su puerta tiene que estar ya)
 	for v in VERJAS:
 		if v.size() < 7:
 			continue
+		var sale: Vector2 = v[6]
 		var paso: Area2D = preload("res://scripts/mundo/puerta.gd").new()
 		paso.id = v[3]
 		paso.destino = v[4]
 		paso.destino_puerta = v[5]
-		paso.salida = v[6]
-		paso.tam = Vector2(12, 36)
+		paso.salida = sale
+		paso.tam = Vector2(12, 36) if sale.x != 0.0 else Vector2(36, 12)
 		paso.cerrada_hasta = v[2]
-		paso.position = _sitio(v[0]) + Vector2(-2.0 * (v[6] as Vector2).x, -6)
+		paso.position = _sitio(v[0]) + (Vector2(-2.0 * sale.x, -6) if sale.x != 0.0 else Vector2(0, -8))
 		add_child(paso)
 	super()
 	Estado.marcar("mji_jiwe")

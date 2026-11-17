@@ -142,12 +142,16 @@
 		"mji_jiwe": [
 			"desfiladero_meteorito",
 			"galerias_ambar",
-			"fundicion_escoria"
+			"fundicion_escoria",
+			"aguja_caida"
 		],
 		"galerias_ambar": [
 			"mji_jiwe"
 		],
 		"fundicion_escoria": [
+			"mji_jiwe"
+		],
+		"aguja_caida": [
 			"mji_jiwe"
 		]
 	},
@@ -1706,6 +1710,80 @@
 					],
 					"ir": {
 						"escena": "fundicion_escoria",
+						"buscar": "grupo:jefes"
+					}
+				}
+			]
+		},
+		{
+			"id": "aguja_caida",
+			"tipo": "historia",
+			"titulo": "La Aguja Caída",
+			"texto": "La tercera cadena del Núcleo cuelga de la punta de la estrella, muy por encima de Mji-Jiwe, donde las terrazas flotan en el viento. Allí arriba el suelo se acaba donde se acaba el sonido.",
+			"aparece": [
+				"aguja_abierta"
+			],
+			"hecha": [
+				"kipanga_vencido"
+			],
+			"pasos": [
+				{
+					"texto": "Sube por la verja del norte de Mji-Jiwe",
+					"hecho": [
+						"aguja_caida"
+					],
+					"ir": {
+						"escena": "mji_jiwe",
+						"buscar": "puerta:aguja_caida"
+					}
+				},
+				{
+					"texto": "Mira qué le pasa a la afinadora",
+					"hecho": [
+						"pigo_vista"
+					],
+					"ir": {
+						"escena": "aguja_caida",
+						"buscar": "aldeano:pigo_gris"
+					}
+				},
+				{
+					"texto": "Dale un campanazo a un monolito (Carga, I) y cruza corriendo: su Esquirla está en la Cresta",
+					"hecho": [
+						"esquirla/pigo"
+					],
+					"ir": {
+						"escena": "aguja_caida",
+						"buscar": "grupo:monolitos"
+					}
+				},
+				{
+					"texto": "Devuélvele la Esquirla a Pigo",
+					"hecho": [
+						"resonancia_ambar"
+					],
+					"ir": {
+						"escena": "aguja_caida",
+						"buscar": "aldeano:pigo_gris"
+					}
+				},
+				{
+					"texto": "Haz cantar tres monolitos en cadena (Resonancia, P) y cruza el puente alto",
+					"hecho": [
+						"kipanga_visto"
+					],
+					"ir": {
+						"escena": "aguja_caida",
+						"buscar": "grupo:puentes_cristal"
+					}
+				},
+				{
+					"texto": "Suelta la Cadena del Norte",
+					"hecho": [
+						"kipanga_vencido"
+					],
+					"ir": {
+						"escena": "aguja_caida",
 						"buscar": "grupo:jefes"
 					}
 				}

@@ -30,6 +30,9 @@ const CARGA_IMPULSO := 240.0    # el empujón de la embestida (unos 48 px)
 const ESCENA_PULSO := preload("res://scripts/combate/pulso_magnetico.gd")
 const PULSO_COSTE := 15.0       # Aliento que gasta el Pulso Magnético
 const PULSO_ESPERA := 0.6       # segundos entre pulso y pulso
+const ESCENA_RESONANCIA := preload("res://scripts/combate/resonancia_ambar.gd")
+const RESONANCIA_COSTE := 18.0  # Aliento que gasta la Resonancia de Ámbar
+const RESONANCIA_ESPERA := 0.8  # segundos entre una y otra
 const SIGILO_ESPERA := 0.7      # segundos entre sigilo y sigilo
 const RELIEVE := preload("res://scripts/mundo/relieve.gd")
 const RASGOS := preload("res://scripts/personajes/rasgos_maisha.gd")
@@ -56,6 +59,7 @@ var _espera_latido := 0.0
 var _espera_sigilo := 0.0
 var _espera_carga := 0.0
 var _espera_pulso := 0.0
+var _espera_resonancia := 0.0
 var _golpeando := false
 var _tiempo_agotada := 0.0
 var _desde_ultima_semilla := 99.0
@@ -93,6 +97,7 @@ func _physics_process(delta: float) -> void:
 	_espera_sigilo = maxf(0.0, _espera_sigilo - delta)
 	_espera_carga = maxf(0.0, _espera_carga - delta)
 	_espera_pulso = maxf(0.0, _espera_pulso - delta)
+	_espera_resonancia = maxf(0.0, _espera_resonancia - delta)
 	_invulnerable = maxf(0.0, _invulnerable - delta)
 	pegajoso = maxf(0.0, pegajoso - delta)
 	hundida = maxf(0.0, hundida - delta)
@@ -164,6 +169,8 @@ func _physics_process(delta: float) -> void:
 			carga()
 		if Input.is_action_just_pressed("pulso"):
 			pulso()
+		if Input.is_action_just_pressed("resonancia"):
+			resonancia()
 
 	if Input.is_action_just_pressed("usar"):
 		tomar_sopa()
@@ -350,6 +357,22 @@ func pulso() -> bool:
 	get_parent().add_child(efecto)
 	for nodo in get_tree().get_nodes_in_group("magneticos"):
 		nodo.call("recibir_pulso", global_position)
+	if aliento < 1.0:
+		_agotarse()
+	return true
+
+
+## La Resonancia de Ámbar (arte Tierra, Asterhaul; la enseña Pigo en la Aguja Caída): una nota del cetro que hace
+## CANTAR a los monolitos-diapasón que alcanza (combate/resonancia_ambar.gd). Maisha solo despierta monolitos: son
+## ellos, cantando, los que sostienen el cristal, llaman a los peñascos y rompen el vuelo de lo que pasa cerca.
+func resonancia() -> bool:
+	if not Estado.tiene("resonancia_ambar") or _espera_resonancia > 0.0 or agotada or escudo or aliento < RESONANCIA_COSTE:
+		return false
+	aliento -= RESONANCIA_COSTE
+	_espera_resonancia = RESONANCIA_ESPERA
+	var efecto: Node2D = ESCENA_RESONANCIA.new()
+	efecto.position = global_position
+	get_parent().add_child(efecto)
 	if aliento < 1.0:
 		_agotarse()
 	return true

@@ -19,6 +19,8 @@ const INFO_ENEMIGO := {
 	"kaa_jiwe.gd": {"prop": "fase", "aviso": [1], "debil": "sismica"},
 	"mchimbaji.gd": {"prop": "fase", "aviso": [], "debil": "sismica"},
 	"kovu.gd": {"prop": "fase", "aviso": [1], "debil": "magnetico"},
+	"popo.gd": {"prop": "fase", "aviso": [1], "debil": "resonancia"},
+	"kipanga.gd": {"prop": "fase", "aviso": [2, 3], "debil": "resonancia"},
 	"nyundo.gd": {"prop": "fase", "aviso": [2, 4], "debil": "magnetico"},
 	"kifaru.gd": {"prop": "fase", "aviso": [2], "debil": "sismica"},
 	"saa.gd": {"prop": "fase", "aviso": [2], "debil": "rayo"},

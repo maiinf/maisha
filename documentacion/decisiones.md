@@ -548,3 +548,15 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Cómo se llega a la Esquirla de Moto sin el Pulso | La primera barcaza tiene cabrestante (un golpe y sale): el boceto la ponía tras una barcaza de Pulso, y el Pulso lo enseña Moto al recibirla. |
 | La escoria | No hace daño: no se pisa (como el agua). |
 | Nyundo | No se mueve del sitio. Las dos maneras de abollarle el peto son devolverle la tenaza o el bloque. |
+
+### 2026-11-17 · La Aguja Caída y Kipanga Astral, construidos (Claude)
+| Tema | Cómo ha quedado |
+| :--- | :--- |
+| Entrada | La verja del norte de Mji-Jiwe (el ascensor) se abre al tener rotas las dos primeras cadenas. |
+| Tecla de la Resonancia de Ámbar | **P** (junto a la O del Pulso). Falta darle botón en el mando. |
+| Para que no fuera «otro Observatorio» | En planta se parecen (terrazas sobre el vacío y puentes que se encienden), así que aquí la regla es otra: **el sonido se contagia**. Maisha solo hace cantar monolitos; su onda despierta al siguiente (3 → 2 → 1), el cristal solo aguanta donde llega una onda, y los peñascos acuden al que canta. |
+| Cómo se llega a la Esquirla de Pigo sin la Resonancia | Con un golpe de Carga a un monolito de la Base: un campanazo corto que tiende el primer puente lo justo para cruzarlo corriendo. El boceto la ponía en la Cresta, y la Resonancia la enseña Pigo al recibirla. |
+| El vacío | Aquí sí se cae: 1 hoja y de vuelta al último suelo firme. |
+| «Aturde» del Popo | Los controles van al revés 1,6 s (lo mismo que las esporas de Kuvu). Bajo la onda de un monolito, a Maisha no le afecta. |
+| Kipanga | Solo se le tira con la onda de un monolito del Nido. Su respuesta es enmudecer ese monolito con dos plumas-cuchilla: hay que romperlas o cambiar de monolito. |
+| Las tres cadenas | Rotas las tres (`cadena_oeste_rota`, `cadena_este_rota`, `cadena_norte_rota`). El Núcleo de la Estrella aún no está construido. |

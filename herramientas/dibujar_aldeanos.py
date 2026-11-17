@@ -943,6 +943,35 @@ def chuma():
     return l
 
 
+def pigo():
+    """PIGO: la afinadora de campanas de la Aguja Caída, una damán de roca flaca y muy tiesa. Orejeras de fieltro
+    turquesa (trabaja entre campanas), una bufanda a juego, mandil corto y, al hombro, una vara con tres
+    campanillas de latón de tamaños distintos y un martillito de afinar colgado del cinto."""
+    l = Lienzo()
+    for y in range(4, 30):                                    # la vara
+        l.px(19, y, "concha", 2 if y % 4 else 1)
+    for (x, y, t) in ((17, 7, 3), (21, 10, 3), (17, 13, 2)):  # las tres campanillas, a un lado y a otro
+        l.px(x, y - 1, "laton", 1)
+        l.px(x, y, "laton", t); l.px(x - 1, y + 1, "laton", 2); l.px(x, y + 1, "laton", 3); l.px(x + 1, y + 1, "laton", 1)
+        l.px(x, y + 2, "hollin", 2)
+    _daman_base(l)
+    l.ovalo(11.5, 24.0, 4.0, 4.6, "delantal")                 # el mandil corto
+    l.rect(8, 19, 15, 19, "delantal", 1)
+    l.px(9, 17, "delantal", 1); l.px(14, 17, "delantal", 1); l.px(9, 18, "delantal", 2); l.px(14, 18, "delantal", 2)
+    l.rect(7, 26, 16, 26, "concha", 1)                        # el cinto...
+    l.px(14, 27, "metal", 3); l.px(14, 28, "concha", 2); l.px(13, 27, "metal", 2)   # ...con el martillito
+    l.rect(8, 16, 15, 16, "escarabajo", 3)                    # la bufanda turquesa
+    l.px(9, 17, "escarabajo", 2); l.px(9, 18, "escarabajo", 1)
+    l.ovalo(17.5, 19.0, 1.7, 2.0, "daman")                    # la mano en la vara
+    ojos(l, 10, 9, 14, alto=2)
+    for x in range(7, 17):                                    # la diadema de las orejeras
+        l.px(x, 6, "metal", 2)
+    for cx_ in (6, 17):                                       # las orejeras, redondas
+        l.ovalo(cx_, 9.5, 1.6, 2.4, "escarabajo")
+        l.px(cx_, 9, "escarabajo", 3)
+    return l
+
+
 def moto():
     """MOTO: el maestro gruista de la Fundición, un damán de roca ancho de hombros. Casco de cobre abollado con
     una lamparilla, chaleco azul de faena sobre el mandil, guantes de cuero gordos y, al hombro, un gancho de grúa
@@ -1186,7 +1215,7 @@ def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
 
 
 ## Desde qué columna (y fila) se levanta lo de la mano derecha en el gesto por defecto (para no mover picos ni orejas)
-ALZA = {"mwamba": (16, 0), "mwamba_gris": (16, 0), "mhunzi": (16, 0), "chuma": (16, 0), "kito": (16, 0), "kito_gris": (16, 0), "moto": (16, 0), "moto_gris": (16, 0),
+ALZA = {"mwamba": (16, 0), "mwamba_gris": (16, 0), "mhunzi": (16, 0), "chuma": (16, 0), "kito": (16, 0), "kito_gris": (16, 0), "moto": (16, 0), "moto_gris": (16, 0), "pigo": (16, 0), "pigo_gris": (16, 0),
         **{"artesano_" + t + s: (16, 0) for t in "abc" for s in ("", "_gris")}, "bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "nyota": (15, 18), "nyota_blanco": (15, 18), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
         "kasia": (17, 0), "sungura": (19, 0)}
 
@@ -1254,7 +1283,7 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma, "moto": moto, "moto_gris": (lambda: _engrisar(moto(), ("delantal", "cobre", "azul", "concha", "metal", "brasa", "laton"))), "kito": kito, "kito_gris": (lambda: _engrisar(kito(), ("delantal", "laton", "pajaro", "brasa", "metal"))),
+ALDEANOS = {"mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma, "pigo": pigo, "pigo_gris": (lambda: _engrisar(pigo(), ("delantal", "laton", "escarabajo", "concha", "metal", "hollin"))), "moto": moto, "moto_gris": (lambda: _engrisar(moto(), ("delantal", "cobre", "azul", "concha", "metal", "brasa", "laton"))), "kito": kito, "kito_gris": (lambda: _engrisar(kito(), ("delantal", "laton", "pajaro", "brasa", "metal"))),
             **{"artesano_" + t: (lambda t=t: artesano(t)) for t in "abc"},
             **{"artesano_" + t + "_gris": (lambda t=t: _engrisar(artesano(t))) for t in "abc"}, "kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "nyota": nyota, "nyota_blanco": nyota_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 

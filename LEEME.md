@@ -1093,7 +1093,7 @@ La ciudad de los canteros, herreros y afinadores (damanes de roca), tallada en e
 | Arte | `herramientas/pintar_mji_jiwe.py` → `arte/mundos/asterhaul/mji_jiwe/`; Mhunzi, Chuma y los artesanos (`artesano_a/b/c` y sus `_gris`) en `dibujar_aldeanos.py` |
 | Misiones | `mji_jiwe` (historia) y `yunques_memoria` (encargo largo) |
 | Prueba | `prueba_mji_jiwe` (31 comprobaciones) |
-| Falta (parte 2) | La **tienda de Chuma** por dentro (ahora abre el puesto pero aún no vende); la **rama del Arte de la Tierra** en el diario (sus 6 niveles no están decididos); la salida del norte (verja echada: la Aguja no está construida); que en la ciudad se vea rota la cadena de cada jefe vencido |
+| Falta (parte 2) | La **tienda de Chuma** por dentro (ahora abre el puesto pero aún no vende); la **rama del Arte de la Tierra** en el diario (sus 6 niveles no están decididos); que en la ciudad se vea rota la cadena de cada jefe vencido |
 
 ## Asterhaul: Las Galerías de Ámbar y el Kifaru de Basalto
 
@@ -1133,6 +1133,27 @@ Cinco islas de piedra en un lago de escoria fundida, al este de Mji-Jiwe (`docum
 | Arte | `herramientas/pintar_fundicion.py` → `arte/mundos/asterhaul/fundicion/`; Moto en `dibujar_aldeanos.py` |
 | Prueba | `prueba_fundicion_escoria` (57 comprobaciones) |
 | Falta | El botón de mando del Pulso; el icono de debilidad «magnético» en el Bestiario (pedido a Gemini); sonidos propios de Nyundo y las barcazas; que la escoria se mueva (ahora está pintada, quieta); verla en HD-2D |
+
+## Asterhaul: La Aguja Caída y Kipanga Astral
+
+Terrazas de piedra de estrella colgadas sobre el viento astral, al norte de Mji-Jiwe (`documentacion/aguja_captura_1.png`…`_5.png`). Lo suyo es el **sonido**: el suelo se acaba donde se acaba la nota.
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | Por la **verja del norte de Mji-Jiwe** (el ascensor de cadena): se abre con `aguja_abierta`, que se pone al tener rotas las dos primeras cadenas (puerta `aguja` → `sur`) |
+| Mapa | `aguja_caida` (72×80, `crear_aguja()`): la Base, la Cresta de los Diapasones con un islote a cada lado, y el Nido de la Cima. Lo que no es terraza (`0`) es abismo. Las casillas `=` son **vacío que se puede pisar si algo lo sostiene**. Suelo: `pintar_aguja()` en `pintar_suelo.py` |
+| **Resonancia de Ámbar** (tecla **P**, acción `resonancia`) | `maisha.gd → resonancia()` + `scripts/combate/resonancia_ambar.gd`: 18 de Aliento, 0,8 s de espera. Hace **cantar** a los monolitos que alcanza (104 px). Maisha solo despierta monolitos: todo lo demás lo hacen ellos. La enseña Pigo (marca `resonancia_ambar`) |
+| Monolito-diapasón | `scripts/mundo/asterhaul/monolito.gd`: cantando, su onda llega a 112 px. **La nota se contagia**: la onda de uno que canta con fuerza 3 despierta a otro con fuerza 2, y ese a otro con fuerza 1 (ahí se acaba). Canta 7 s. Un golpe de **Carga** le da un campanazo (fuerza 1, 3,5 s, no se contagia). Quien quiere saber si suena en un punto pregunta `Monolito.que_suena_en()` |
+| Puente de cristal | `asterhaul/puente_cristal.gd`: cada losa solo existe donde llega la onda de un monolito que canta (y 1,2 s más). El primero se cruza con un campanazo, corriendo; el puente alto necesita **tres monolitos en cadena** (el de la Cresta y los dos de las peñas sueltas, que solo despiertan por simpatía) |
+| Peñasco flotante | `asterhaul/penasco.gd`: suelto, flota en medio del vacío. **Acude al monolito que canta** y se queda en su orilla mientras lo oye; luego vuelve al medio con quien lleve encima. Desde el medio, la Resonancia alcanza al monolito del islote |
+| Las caídas | La escena mira si Maisha pisa una casilla `=` sin nada que la sostenga (grupo `sostenes` → `firme()`): cae, pierde 1 hoja y vuelve al último suelo firme |
+| Pigo | La afinadora de campanas, en gris en la Base. Su Esquirla (`esquirla_pigo`) está en la Cresta. Es la 12.ª de los Yunques (`pigo_pulso`) |
+| Popo de Obsidiana | `scripts/enemigos/popo.gd`: revolotea fuera del alcance del cetro. Chilla: un anillo que **aturde** (los controles van al revés 1,6 s) y se tira en picado (1 hoja). Si chilla bajo la onda de un monolito, el eco le vuelve y cae (2 de vida). Si la onda alcanza a Maisha, el chillido no le hace nada |
+| **Kipanga Astral** | `scripts/enemigos/kipanga.gd`, 12 de vida. Planea en círculos (en el aire no se le da), lanza abanicos de **plumas-cuchilla** y cae en picado sobre su sombra. La onda de un monolito del Nido (hay 4) le **rompe el vuelo**: aturdido 5 s o 4 golpes. Al remontar le clava dos plumas al monolito que lo tiró: lo **enmudecen** hasta que se rompen de un golpe (`asterhaul/pluma_cuchilla.gd`). En la furia: más plumas y dos picados seguidos. Vencido: `kipanga_vencido`, `cadena_norte_rota` y una Esquirla |
+| Esquirlas y secreto | La de Pigo, la del islote del oeste y la de Kipanga; en el islote del este, un secreto |
+| Arte | `herramientas/pintar_aguja.py` → `arte/mundos/asterhaul/aguja/`; Pigo en `dibujar_aldeanos.py` |
+| Prueba | `prueba_aguja_caida` (58 comprobaciones) |
+| Falta | El botón de mando de la Resonancia; el icono de debilidad «resonancia» (pedido a Gemini); sonidos propios (caída al vacío, peñasco, Kipanga); verla en HD-2D; **el Núcleo de la Estrella** (con las tres cadenas rotas aún no se abre nada) |
 
 ## Las construcciones, al nivel de la casa del castor
 

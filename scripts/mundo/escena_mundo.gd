@@ -14,7 +14,7 @@ extends Node2D
 
 ## Música y ambiente de cada escena (por el nombre de su archivo)
 const RELIEVE := preload("res://scripts/mundo/relieve.gd")
-const MUSICA_DE := {"kitovu": "kitovu", "prados_del_eco": "prados", "cuna_de_musgo": "aldea", "bosque_cobrizo": "bosque", "cienaga_quieta": "cienaga", "campo_segado": "campo", "sendero_del_puente": "sendero", "las_pasarelas": "pasarelas", "camino_cobrizo": "cobrizo", "senda_surcos": "surcos", "canada_eco": "canada", "lago_espejo": "lago", "orilla_juncos": "orilla", "embarcadero_junco": "embarcadero", "la_travesia": "travesia", "gruta_raices": "gruta", "paso_piedra": "paso", "sendero_olvidado": "olvidado", "ruinas_primer_arbol": "ruinas", "paso_escarcha": "escarcha", "maandiko": "maandiko", "estanterias_colgantes": "maandiko", "canal_tinta": "canal_tinta", "observatorio_aurora": "observatorio_aurora", "seccion_prohibida": "seccion_prohibida", "desfiladero_meteorito": "desfiladero_meteorito", "mji_jiwe": "mji_jiwe", "galerias_ambar": "galerias_ambar", "fundicion_escoria": "fundicion_escoria", "casa_nungu": "paso", "cueva_setas": "setas", "casa_shamba": "interior",
+const MUSICA_DE := {"kitovu": "kitovu", "prados_del_eco": "prados", "cuna_de_musgo": "aldea", "bosque_cobrizo": "bosque", "cienaga_quieta": "cienaga", "campo_segado": "campo", "sendero_del_puente": "sendero", "las_pasarelas": "pasarelas", "camino_cobrizo": "cobrizo", "senda_surcos": "surcos", "canada_eco": "canada", "lago_espejo": "lago", "orilla_juncos": "orilla", "embarcadero_junco": "embarcadero", "la_travesia": "travesia", "gruta_raices": "gruta", "paso_piedra": "paso", "sendero_olvidado": "olvidado", "ruinas_primer_arbol": "ruinas", "paso_escarcha": "escarcha", "maandiko": "maandiko", "estanterias_colgantes": "maandiko", "canal_tinta": "canal_tinta", "observatorio_aurora": "observatorio_aurora", "seccion_prohibida": "seccion_prohibida", "desfiladero_meteorito": "desfiladero_meteorito", "mji_jiwe": "mji_jiwe", "galerias_ambar": "galerias_ambar", "fundicion_escoria": "fundicion_escoria", "aguja_caida": "aguja_caida", "casa_nungu": "paso", "cueva_setas": "setas", "casa_shamba": "interior",
 	"casa_pino": "interior", "taller_corteza": "interior", "claro_de_calma": "interior"}
 ## (los pájaros no se usan aquí: quedan guardados para un bioma de selva)
 const AMBIENTE_DE := {
@@ -33,6 +33,7 @@ const AMBIENTE_DE := {
 	"mji_jiwe": {"viento": 0.2, "fuego": 0.15},
 	"galerias_ambar": {"viento": 0.15},
 	"fundicion_escoria": {"fuego": 0.6},
+	"aguja_caida": {"viento": 0.85},
 	"bosque_cobrizo": {"viento": 0.45, "brisa": 0.4},
 	"cienaga_quieta": {"cienaga": 0.7, "brisa": 0.2},
 	"campo_segado": {"viento": 0.6, "brisa": 0.35},
