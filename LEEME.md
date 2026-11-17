@@ -1153,7 +1153,25 @@ Terrazas de piedra de estrella colgadas sobre el viento astral, al norte de Mji-
 | Esquirlas y secreto | La de Pigo, la del islote del oeste y la de Kipanga; en el islote del este, un secreto |
 | Arte | `herramientas/pintar_aguja.py` → `arte/mundos/asterhaul/aguja/`; Pigo en `dibujar_aldeanos.py` |
 | Prueba | `prueba_aguja_caida` (58 comprobaciones) |
-| Falta | El botón de mando de la Resonancia; el icono de debilidad «resonancia» (pedido a Gemini); sonidos propios (caída al vacío, peñasco, Kipanga); verla en HD-2D; **el Núcleo de la Estrella** (con las tres cadenas rotas aún no se abre nada) |
+| Falta | El botón de mando de la Resonancia; el icono de debilidad «resonancia» (pedido a Gemini); sonidos propios (caída al vacío, peñasco, Kipanga); verla en HD-2D |
+
+## Asterhaul: El Núcleo de la Estrella y el Corazón del Meteorito (el final del tercer mundo)
+
+El pozo bajo la Losa de Mji-Jiwe, hasta el corazón de la estrella (`documentacion/nucleo_captura_1.png`…`_4.png` y la ilustración del final, `documentacion/nucleo_final.png`).
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | La **Losa del Núcleo** de Mji-Jiwe se abre (`nucleo_abierto`) con las tres cadenas rotas y los **doce Yunques** cantando (`yunques_completos`). Aparece el **pozo** (puerta `nucleo` → `pozo`); antes, la Losa explica qué falta (`mji_losa_cerrada`) |
+| Mapa | `nucleo_estrella` (84×76, `crear_nucleo()`): el Atrio, tres Cámaras, la Puerta Triple y el Santuario. La letra `=` cambia según la sala: vía (Sísmica), muelle de barcaza (Magnética) y vacío (Resonancia). Suelo: `pintar_nucleo()` en `pintar_suelo.py` |
+| Las tres Cámaras, en orden | **Sísmica** (oeste): muro agrietado, Kaa-Jiwe, vagoneta contra un derrumbe y el **pilar** del primer sello (Carga). **Magnética** (la abre el primer sello): escoria con barcaza, Kovu y un bloque-imán a su **placa** (segundo sello). **Resonancia** (la abre el segundo): vacío, un puente de cristal que sostienen dos monolitos en cadena, Popo, y el **monolito del sello**, que solo despierta con la nota de verdad (fuerza 3: ni eco ni campanazo). Se reutilizan las piezas de los tres caminos |
+| Las caídas | Ya no las lleva cada escena: `scripts/mundo/asterhaul/vacio.gd` (con una `zona`); lo usan la Aguja y el Núcleo |
+| Puerta Triple | `asterhaul/puerta_triple.gd`: un ojo por sello; con los tres se abre (`nucleo/puerta_triple`) |
+| **El Corazón del Meteorito** | `scripts/enemigos/corazon_meteorito.gd`, 12 de vida en la barra: 2 por aro y 6 el núcleo. Siempre **late** (una onda que se abre: 1 hoja en su borde). **Aro sísmico**: tras latir se posa; una Carga lo agrieta. **Aro magnético**: lanza fragmentos de hierro; un Pulso con el fragmento cayendo se lo devuelve. **Aro de ámbar**: deriva y dispara rayos (con su línea de aviso); la onda de un monolito que canta lo raja. **Núcleo**: baja casi al suelo y el cetro le llega. No muere: **se calma** (`corazon_calmado`) |
+| El final | Mauti llega; dentro del Corazón está **la semilla mayor**; las dos manos lo calman y el **Cetro del Nexo despierta del todo** (`nexo_despierto`: en la mano, `nexo_6`). Marca `asterhaul_libre` y la pantalla «Asterhaul late · Fin del tercer mundo» con la ilustración `25_asterhaul_libre` (`cinematicas_asterhaul.py`) |
+| Arte | `herramientas/pintar_nucleo.py` → `arte/mundos/asterhaul/nucleo/` (el Corazón, la Puerta Triple y el pozo; los aros se dibujan en el juego) |
+| Misión | `nucleo_estrella` («Lo que cayó del cielo»): de los doce yunques al Corazón |
+| Prueba | `prueba_nucleo_estrella` (47 comprobaciones) |
+| Falta | Verlo en HD-2D; sonidos propios del pozo, la Puerta Triple y el final; el nombre del cuarto mundo (la pantalla dice «Continuará...») |
 
 ## Las construcciones, al nivel de la casa del castor
 

@@ -560,3 +560,14 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | «Aturde» del Popo | Los controles van al revés 1,6 s (lo mismo que las esporas de Kuvu). Bajo la onda de un monolito, a Maisha no le afecta. |
 | Kipanga | Solo se le tira con la onda de un monolito del Nido. Su respuesta es enmudecer ese monolito con dos plumas-cuchilla: hay que romperlas o cambiar de monolito. |
 | Las tres cadenas | Rotas las tres (`cadena_oeste_rota`, `cadena_este_rota`, `cadena_norte_rota`). El Núcleo de la Estrella aún no está construido. |
+
+### 2026-11-17 · El Núcleo de la Estrella y el Corazón del Meteorito, construidos (Claude)
+| Tema | Cómo ha quedado |
+| :--- | :--- |
+| Cuándo se abre | La Losa de Mji-Jiwe, con las tres cadenas rotas **y** los doce yunques. Con las Esquirlas que hay se pueden despertar los doce (sobra una). |
+| Las tres Cámaras | En orden (cada sello abre la siguiente): Sísmica → Magnética → Resonancia. Reutilizan las piezas de los tres caminos para que el final sea un repaso de lo aprendido. |
+| El tercer sello | Un monolito que solo cuenta la Resonancia de Maisha (ni el eco de otro monolito ni un campanazo de la Carga): hay que cruzar el puente. |
+| El Corazón | No se le «mata»: los aros se rompen por fases (Carga, Pulso, monolito) y el núcleo se golpea con el cetro hasta que se calma. |
+| La semilla mayor y Mauti | Siempre en neutro. Mauti es quien entiende que la semilla tenía miedo; las dos manos la calman. |
+| El Cetro del Nexo | Despierta del todo al final (`nexo_6`), aunque la rama del Arte de la Tierra aún no esté hecha. Cuando se haga, el cetro despierto se mantiene. |
+| El cuarto mundo | Sin nombre todavía: la pantalla de fin dice «Continuará...». |

@@ -909,6 +909,127 @@ def pintar_desfiladero(nombre, salida=None):
     print("Suelo pintado:", destino, (lz.w, lz.h))
 
 
+def pintar_nucleo(nombre, salida=None):
+    """El suelo de EL NÚCLEO DE LA ESTRELLA (Asterhaul): BASALTO negro labrado en losas hexagonales con filetes de
+    ámbar que laten hacia el centro; cada cámara con su tinte (la Sísmica, ocre; la Magnética, hierro; la de la
+    Resonancia, piedra de estrella azulada). La escoria («≈») y los muelles de la Cámara Magnética, al rojo; las
+    vías («=») de la Sísmica, raíles; el vacío («=» y «0») de la de la Resonancia, abismo estrellado. El SANTUARIO
+    tiene una estrella de doce puntas de ámbar y tres arcos de hierro grabados (los aros del Corazón)."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=59)
+    S = lz.s
+    resonancia = lambda x, y: x >= 59 and 34 <= y <= 48
+    tipos = []
+    for y, f in enumerate(filas):
+        fila = []
+        for x, c in enumerate(f):
+            if c == "≈" or (c == "=" and 32 <= y <= 46 and 36 <= x <= 48):
+                fila.append("lava")
+            elif resonancia(x, y) and c in "0=":
+                fila.append("vacio")
+            elif c == "0":
+                fila.append("pared")
+            else:
+                fila.append("suelo")
+        tipos.append(fila)
+    pared = mascara(lz, tipos, ("pared",), 1.6, 0.1, semilla=591)
+    lava = mascara(lz, tipos, ("lava",), 1.2, 0.05, semilla=592)
+    vacio = mascara(lz, tipos, ("vacio",), 1.2, 0.05, semilla=593)
+    suelo = np.clip(1 - pared - lava - vacio, 0, 1)
+    fina = lz.ruido(0.8, 2, semilla=594)
+    media = lz.ruido(10, 3, semilla=595)
+    grande = lz.ruido(46, 3, semilla=596)
+    # EL BASALTO: losas hexagonales (una rejilla de hexágonos de 14 px)
+    hx = lz.x / 12.0
+    hy = lz.y / 10.4 + (np.floor(hx) % 2) * 0.5
+    junta = (np.abs((hx % 1) - 0.5) > 0.44) | (np.abs((hy % 1) - 0.5) > 0.45)
+    celda = (np.sin(np.floor(hx) * 12.9898 + np.floor(hy) * 78.233) * 43758.5453) % 1
+    v = 0.42 + (celda - 0.5) * 0.18 + (grande - 0.5) * 0.22 + (media - 0.5) * 0.16 + (fina - 0.5) * 0.1
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#0e0c12", "#1a1720", "#282430", "#383242", "#4a4256", "#5e566c"], np.clip(v, 0, 1)))
+    # el tinte de cada cámara
+    zona = lambda x0, y0, x1, y1: ((lz.x >= x0 * 16) & (lz.x < (x1 + 1) * 16) & (lz.y >= y0 * 16) & (lz.y < (y1 + 1) * 16)) * 1.0
+    lz.pintar(zona(3, 34, 25, 56), "#8e5e3a", 0.28)
+    lz.pintar(zona(30, 32, 54, 46), "#62697c", 0.26)
+    lz.pintar(zona(59, 34, 81, 48), "#546280", 0.32)
+    lz.pintar(suelo * junta, "#08060c", 0.75)
+    lz.pintar(suelo * desplazar(lz, junta * 1.0, 0.7, 0.7) * (1 - junta), "#9a90b0", 0.12)
+    # los filetes de ámbar: hilos que bajan por las juntas hacia el Santuario y laten
+    hilo = suelo * junta * (np.abs(ruido_torcido_local(lz, 40, 597) - 0.5) < 0.05)
+    lz.pintar(hilo, "#c8741c", 0.9)
+    lz.sumar_luz(lz.desenfocar(hilo, 2), "#ffb040", 0.35)
+    # EL SANTUARIO: la estrella de doce puntas y los tres arcos de hierro grabados
+    cx, cy = 42.5 * 16, 14.5 * 16
+    d = np.hypot((lz.x - cx) / 1.0, (lz.y - cy) / 0.72)
+    a = np.arctan2((lz.y - cy) / 0.72, lz.x - cx)
+    estrella = suelo * (d < 30 + 70 * np.abs(np.cos(a * 6)) ** 6) * (d > 26)
+    lz.pintar(estrella, rampa(["#5a2406", "#9a4a0c", "#d8841c"], np.clip(0.5 + (media - 0.5) * 0.8, 0, 1)), 0.75)
+    lz.pintar(np.clip(estrella - desplazar(lz, estrella, 1.0, 1.0), 0, 1), "#ffd878", 0.7)
+    for r in (40.0, 54.0, 68.0):
+        aro = suelo * (np.abs(d - r) < 1.2)
+        lz.pintar(aro, "#3a3e4c")
+        lz.pintar(desplazar(lz, aro, -0.6, -0.6) * aro, "#9aa2b6", 0.7)
+    lz.pintar(suelo * (d < 24), "#05030a", 0.6)
+    lz.sumar_luz(lz.desenfocar(suelo * (d < 24), 10), "#ff9a30", 0.35)
+    # LAS VÍAS de la Cámara Sísmica: traviesas y raíles
+    trav = np.zeros((lz.H, lz.W), np.float32)
+    rail = np.zeros((lz.H, lz.W), np.float32)
+    for y in range(alto):
+        for x in range(ancho):
+            if filas[y][x] == "=" and x < 30:
+                x0, y0 = x * CASILLA, y * CASILLA
+                for k in (-3, 3):
+                    cv2.line(rail, (x0 * S, (y0 + 8 + k) * S), ((x0 + 16) * S, (y0 + 8 + k) * S), 1.0, S)
+                for t in (2, 10):
+                    cv2.line(trav, ((x0 + t) * S, (y0 + 3) * S), ((x0 + t) * S, (y0 + 13) * S), 1.0, 2 * S)
+    lz.pintar(trav, "#523420")
+    lz.pintar(rail, "#565a6a")
+    lz.pintar(desplazar(lz, rail, -0.5, -0.5) * rail, "#b8bccc", 0.8)
+    # LA ESCORIA
+    corre = ruido_torcido_local(lz, 60, 598)
+    vetas_l = np.sin((lz.y + corre * 90) * 0.10 + lz.ruido(60, 2, semilla=599) * 3) * 0.5 + 0.5
+    vl = 0.46 + (vetas_l - 0.5) * 0.34 + (grande - 0.5) * 0.2 + (fina - 0.5) * 0.06
+    lz.pintar(lava, rampa(["#7a1c04", "#b83a08", "#e86a10", "#f89a20", "#ffc848", "#fff0a0"], np.clip(vl, 0, 1)))
+    costra_r = lz.ruido(22, 3, semilla=600)
+    lz.pintar(lava * (costra_r > 0.66), "#2e120a")
+    lz.pintar(lava * (costra_r > 0.64) * (costra_r <= 0.66), "#ffe070", 0.9)
+    lz.sumar_luz(lz.desenfocar(lava, 12) * suelo, "#ff7a18", 0.5)
+    # EL ABISMO de la Cámara de la Resonancia: añil con estrellas, y el fantasma del puente a puntos
+    lz.pintar(vacio, rampa(["#05040c", "#0a0a1c", "#11142e", "#1a2044"], np.clip(0.4 + (grande - 0.5) * 0.5, 0, 1)))
+    rng = np.random.default_rng(601)
+    est = np.zeros((lz.H, lz.W), np.float32)
+    for _ in range(220):
+        x, y = int(rng.integers(59 * 16, 82 * 16)), int(rng.integers(34 * 16, 49 * 16))
+        if tipos[y // CASILLA][x // CASILLA] == "vacio":
+            cv2.rectangle(est, (x * S, y * S), (x * S + S - 1, y * S + S - 1), float(rng.uniform(0.4, 1.0)), -1)
+    lz.pintar(est, "#dff4ff", 0.9)
+    fant = np.zeros((lz.H, lz.W), np.float32)
+    for y in range(alto):
+        for x in range(ancho):
+            if filas[y][x] == "=" and resonancia(x, y):
+                for k in range(0, 16, 4):
+                    for (ax, ay) in ((x * 16 + k, y * 16), (x * 16 + k, y * 16 + 15), (x * 16, y * 16 + k), (x * 16 + 15, y * 16 + k)):
+                        cv2.rectangle(fant, (ax * S, ay * S), (ax * S + 2 * S - 1, ay * S + S - 1), 1.0, -1)
+    lz.pintar(fant, "#6ad0f0", 0.3)
+    canto = np.clip(desplazar(lz, suelo, 0, 18) - suelo, 0, 1) * vacio
+    lz.pintar(canto, "#28344e")
+    # LA ROCA: negra, con la cara al sur en franjas y vetas de ámbar
+    lz.pintar(pared, rampa(["#06050a", "#0e0c14", "#18141e", "#221c2a"], np.clip(0.4 + (grande - 0.5) * 0.5 + (media - 0.5) * 0.3, 0, 1)))
+    cara = np.clip(pared - desplazar(lz, pared, 0, -22), 0, 1)
+    franja = np.sin((lz.y + ruido_torcido_local(lz, 40, 602) * 30) * 0.9) * 0.5 + 0.5
+    lz.pintar(cara, rampa(["#140e12", "#241a20", "#36262e", "#4a343c"], np.clip(0.35 + (franja - 0.5) * 0.4 + (media - 0.5) * 0.25, 0, 1)))
+    veta_c = cara * (np.abs(franja - 0.5) < 0.05) * (lz.ruido(26, 2, semilla=603) > 0.55)
+    lz.pintar(veta_c, "#d8841c", 0.9)
+    lz.sumar_luz(lz.desenfocar(veta_c, 3), "#ffb040", 0.3)
+    encima = np.clip(pared - cara, 0, 1)
+    lz.pintar(np.clip(encima - desplazar(lz, encima, 0, 1.6), 0, 1), "#4a3a4c", 0.8)
+    lz.pintar(np.clip(desplazar(lz, pared, 0, -4) - pared, 0, 1), "#05030a", 0.5)
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "asterhaul", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.014)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
 def pintar_aguja(nombre, salida=None):
     """El suelo de LA AGUJA CAÍDA (Asterhaul): terrazas de PIEDRA DE ESTRELLA (pizarra azulada en lajas, con vetas
     de cristal turquesa) colgadas sobre el VIENTO ASTRAL: un abismo añil con estrellas y rachas de luz que corren
@@ -1179,6 +1300,8 @@ def pintar(nombre, salida=None):
         return pintar_fundicion(nombre, salida)
     if nombre == "aguja_caida":
         return pintar_aguja(nombre, salida)
+    if nombre == "nucleo_estrella":
+        return pintar_nucleo(nombre, salida)
     if nombre in BIBLIOTECAS:
         return pintar_biblioteca(nombre, salida)
     filas = leer(nombre)

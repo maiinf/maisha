@@ -13,8 +13,7 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ##     peñas sueltas, que solo despiertan por simpatía).
 ##   - EL NIDO DE LA CIMA: KIPANGA ASTRAL (enemigos/kipanga.gd) y cuatro monolitos. Despierta al entrar. Al
 ##     vencerlo se rompe la tercera Cadena («cadena_norte_rota»).
-##   - LAS CAÍDAS: las casillas «=» son vacío. Si Maisha pisa una sin nada que la sostenga (grupo «sostenes» →
-##     `firme()`), cae: pierde 1 hoja y vuelve al último suelo firme.
+##   - LAS CAÍDAS: las casillas «=» son vacío (asterhaul/vacio.gd: si nada la sostiene, Maisha cae).
 
 const CHARLA_SCRIPT := preload("res://scripts/mundo/charla.gd")
 const ESCRIBA := preload("res://scripts/mundo/sigilia/escriba.gd")
@@ -25,6 +24,7 @@ const PUENTE := preload("res://scripts/mundo/asterhaul/puente_cristal.gd")
 const PENASCO := preload("res://scripts/mundo/asterhaul/penasco.gd")
 const POPO := preload("res://scripts/enemigos/popo.gd")
 const KIPANGA := preload("res://scripts/enemigos/kipanga.gd")
+const VACIO := preload("res://scripts/mundo/asterhaul/vacio.gd")
 const ARTE := "res://arte/mundos/asterhaul/"
 ## (todo en casillas)
 const PIGO := Vector2i(36, 68)
@@ -48,15 +48,15 @@ const RADIOS := Vector2(240, 176)
 var _kipanga: Node2D = null
 var _despertando := false
 var _filas: PackedStringArray
-var _firme := Vector2.ZERO             # el último suelo de verdad que pisó Maisha
-var _cayendo := false
 
 
 func _ready() -> void:
 	super()
 	Estado.marcar("aguja_caida")
 	_filas = $Region._filas
-	_firme = _maisha.global_position
+	var vacio: Node = VACIO.new()
+	vacio.name = "Vacio"
+	add_child(vacio)
 	_poner_cosas()
 	if not Estado.tiene("aguja_llegada"):
 		_pensar_al_llegar.call_deferred()
@@ -135,33 +135,18 @@ func _leer(charla: String, donde: Vector2) -> void:
 	$Entidades.add_child(lectura)
 
 
-func _letra(p: Vector2) -> String:
-	var x := floori(p.x / 16.0)
-	var y := floori(p.y / 16.0)
-	return _filas[y][x] if y >= 0 and y < _filas.size() and x >= 0 and x < _filas[y].length() else "0"
-
-
-## ¿Hay algo bajo ese punto de vacío? (una losa de cristal sonando, un peñasco)
+## ¿Hay algo bajo ese punto de vacío? (lo sabe el vigía de las caídas)
 func sostenida(p: Vector2) -> bool:
-	for s in get_tree().get_nodes_in_group("sostenes"):
-		if s.call("firme", p):
-			return true
-	return false
+	return $Vacio.sostenida(p)
 
 
 func _process(delta: float) -> void:
 	var maisha := _maisha
 	if maisha == null:
 		return
-	# las caídas
-	if not _cayendo and not maisha.get("esta_caida"):
-		var letra := _letra(maisha.global_position)
-		if letra == "=" and not sostenida(maisha.global_position):
-			_caer()
-		elif letra == "%":
-			_firme = maisha.global_position
-			if maisha.global_position.x > 64.0 * 16.0 and not Estado.tiene("secreto/aguja_caida/islote_este"):
-				Estado.marcar("secreto/aguja_caida/islote_este")
+	if maisha.global_position.x > 64.0 * 16.0 and _filas[floori(maisha.global_position.y / 16.0)][floori(maisha.global_position.x / 16.0)] == "%" \
+			and not Estado.tiene("secreto/aguja_caida/islote_este"):
+		Estado.marcar("secreto/aguja_caida/islote_este")
 	# Kipanga: despierta al entrar en el Nido; mientras pelean, la cámara se va hacia la mitad entre Maisha y él
 	var hacia := Vector2.ZERO
 	if _despertando and is_instance_valid(_kipanga) and not Estado.tiene("kipanga_vencido"):
@@ -176,37 +161,6 @@ func _process(delta: float) -> void:
 			await CHARLA_SCRIPT.hablar(self, "kipanga_encuentro")
 		if is_instance_valid(_kipanga):
 			_kipanga.despertar()
-
-
-## Maisha pisa el vacío: cae, pierde 1 hoja y vuelve al último suelo firme
-func _caer() -> void:
-	_cayendo = true
-	_maisha.set("puede_actuar", false)
-	Sonido.efecto("kipanga_picado", -4.0, _maisha.global_position, 0.3)
-	var sprite := _maisha.get_node("Sprite") as Node2D
-	var t := create_tween().set_parallel(true)
-	t.tween_property(sprite, "scale", Vector2(0.3, 0.3), 0.45)
-	t.tween_property(_maisha, "modulate:a", 0.0, 0.45)
-	await t.finished
-	if not is_inside_tree():
-		return
-	_maisha.set("_invulnerable", 0.0)
-	_maisha.call("recibir_danio", 1, _maisha.global_position, "caida")
-	var volver := func() -> void:
-		sprite.scale = Vector2.ONE
-		_maisha.modulate.a = 1.0
-		_maisha.set("puede_actuar", true)
-		_cayendo = false
-	if _maisha.get("esta_caida"):
-		# (era su última hoja: se levanta en la entrada, como siempre)
-		_maisha.global_position = _firme
-		volver.call()
-		return
-	_hud.fundido(func() -> void:
-		_maisha.global_position = _firme
-		_maisha.set("_empuje", Vector2.ZERO)
-		_maisha.set("mareo", 0.0)
-		volver.call())
 
 
 func _exit_tree() -> void:

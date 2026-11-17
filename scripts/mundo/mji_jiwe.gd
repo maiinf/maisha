@@ -9,7 +9,8 @@ extends "res://scripts/mundo/escena_mundo.gd"
 ##   - LOS HORNOS-DIAPASÓN de calle (asterhaul/pilar_diapason.gd con su dibujo): se encienden con la Carga Sísmica.
 ##     Con los cuatro de la terraza media, CHUMA abre el MERCADO DE LA ESCORIA («mercado_escoria»); con los seis
 ##     («hornos_mji_jiwe»), MWAMBA lo agradece (y la tienda da 3 Cristales: datos/tienda.json).
-##   - EL GRAN DIAPASÓN, en la LOSA DEL NÚCLEO, sellada por tres cadenas (aún no se abre).
+##   - EL GRAN DIAPASÓN, en la LOSA DEL NÚCLEO, sellada por tres cadenas. Con las tres rotas y los doce yunques
+##     cantando se abre el POZO («nucleo_abierto»): baja a EL NÚCLEO DE LA ESTRELLA.
 ##   - La salida del oeste lleva a LAS GALERÍAS DE ÁMBAR (la verja se abre con «arte_tierra»); la del este, a LA
 ##     FUNDICIÓN DE ESCORIA (con «cadena_oeste_rota»); y la del norte, a LA AGUJA CAÍDA (con «aguja_abierta»: las
 ##     dos primeras cadenas rotas).
@@ -34,6 +35,8 @@ const ADORNOS := [
 	["mji_jiwe/diapason", Vector2i(37, 29), 44, -1],
 ]
 const MERCADO := Vector2i(45, 44)
+## el pozo del Núcleo, en la Losa, al pie del Gran Diapasón
+const POZO := Vector2i(37, 33)
 ## vecino: [dibujo, conversación, casilla, marca que hace falta]
 const VECINOS := [
 	["mhunzi", "mhunzi", Vector2i(33, 15), ""],
@@ -62,6 +65,7 @@ const VERJAS := [
 
 var _yunques: Array[Sprite2D] = []
 var _mercado: Sprite2D
+var _pozo: Node2D = null
 ## marca que abre una verja → [la verja, su cartel]
 var _verjas := {}
 
@@ -70,6 +74,18 @@ func _ready() -> void:
 	# con las dos primeras cadenas rotas, el ascensor de la Aguja vuelve a tirar
 	if Estado.tiene("cadena_oeste_rota") and Estado.tiene("cadena_este_rota"):
 		Estado.marcar("aguja_abierta")
+	_mirar_losa()
+	# el pozo del Núcleo, en la Losa (se abre con las tres cadenas rotas y los doce yunques)
+	var pozo: Area2D = preload("res://scripts/mundo/puerta.gd").new()
+	pozo.id = "nucleo"
+	pozo.destino = "nucleo_estrella"
+	pozo.destino_puerta = "pozo"
+	pozo.salida = Vector2.DOWN
+	pozo.tam = Vector2(32, 16)
+	pozo.cerrada_hasta = "nucleo_abierto"
+	pozo.position = _sitio(POZO)
+	add_child(pozo)
+	pozo.cerrada.connect(func() -> void: CHARLA_SCRIPT.hablar(self, "mji_losa_cerrada"))
 	# (antes de super(): al volver de un camino, su puerta tiene que estar ya)
 	for v in VERJAS:
 		if v.size() < 7:
@@ -159,6 +175,24 @@ func _poner_cosas() -> void:
 		$Entidades.add_child(yunque)
 		_yunques.append(sprite)
 	_despertar_yunques()
+	_poner_pozo()
+
+
+## Las tres cadenas rotas y los doce yunques: la Losa se abre
+func _mirar_losa() -> void:
+	if not Estado.tiene("nucleo_abierto") and Estado.tiene("yunques_completos") \
+			and Estado.tiene("cadena_oeste_rota") and Estado.tiene("cadena_este_rota") and Estado.tiene("cadena_norte_rota"):
+		Estado.marcar("nucleo_abierto")
+
+
+func _poner_pozo() -> void:
+	if _pozo != null or not Estado.tiene("nucleo_abierto"):
+		return
+	_pozo = Sprite2D.new()
+	_pozo.texture = load(ARTE + "nucleo/pozo.png")
+	_pozo.z_index = -3
+	_pozo.position = _sitio(POZO) + Vector2(0, -12)
+	add_child(_pozo)
 
 
 ## Un adorno que no se atraviesa: su dibujo de pie (o un fotograma de su tira de dos) y una caja en la base
@@ -223,11 +257,17 @@ func _al_poner_marca(marca: String) -> void:
 		_despertar_yunques()
 		if YUNQUES.completo():
 			Estado.marcar("yunques_completos")
+			_mirar_losa()
 		_hud.mostrar_mensaje("Yunques de Memoria: %d de %d" % [YUNQUES.cuantos(), YUNQUES.ARTESANOS.size()])
 	elif marca == "mercado_escoria":
 		_mercado.frame = 1
 		Sonido.efecto("arte_sube", -4.0, _sitio(MERCADO))
 		_hud.mostrar_mensaje("Chuma abre el Mercado de la Escoria")
+	elif marca == "nucleo_abierto":
+		_poner_pozo()
+		Sonido.efecto("puerta_crater", 2.0, _sitio(POZO))
+		Impacto.temblar(5.0, 1.0)
+		_hud.mostrar_mensaje("La Losa del Núcleo se abre")
 	elif marca == "hornos_mji_jiwe":
 		_hud.mostrar_mensaje("Todos los hornos de Mji-Jiwe arden")
 	elif marca == "arte_tierra":

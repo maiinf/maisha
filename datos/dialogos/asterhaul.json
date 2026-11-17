@@ -242,12 +242,38 @@
 			},
 			{
 				"si": [
+					"asterhaul_libre"
+				],
+				"lineas": [
+					"Late. ¿Lo notas en los pies? Toda la ciudad late con ella. Despacio, sin prisa, como un corazón que duerme a gusto.",
+					"Mañana encendemos todas las forjas a la vez. A ver qué pasa. Si se nos viene algo encima, lo levantamos entre todos.",
+					"Y tú... ese cetro ya no es el que bajó. Cuídalo. Y cuídate. Aquí tienes una ciudad entera que te debe una."
+				]
+			},
+			{
+				"si": [
+					"nucleo_abierto"
+				],
+				"no": [
+					"asterhaul_libre"
+				],
+				"lineas": [
+					"Se ha abierto. La losa. Treinta años barriéndola y hoy se ha apartado como quien deja pasar a alguien.",
+					"Abajo hay una escalera que nadie de esta ciudad ha bajado. La tallaron los primeros, cuando la estrella aún humeaba.",
+					"Tres pruebas, dicen las canciones: la de la tierra que empuja, la del hierro que llama y la de la piedra que canta. Lo que tú has aprendido. Por algo será."
+				]
+			},
+			{
+				"si": [
 					"cadena_norte_rota"
 				],
 				"lineas": [
 					"Tres. Lo he oído desde la forja: un acorde. El Diapasón no daba un acorde desde antes de que yo tuviera canas.",
-					"Ya no hay nada que sujete la losa. Solo falta que se atreva a abrirse... y que vuelvan los que faltan a sus yunques.",
-					"(El Núcleo de la Estrella llegará en una próxima parte.)"
+					"Ya no hay nada que sujete la losa. Pero no se abre. Sabe que falta gente: los yunques. Mientras haya uno callado, no se fía.",
+					"Esquirlas, criatura. Las que queden. Y a cada artesano en gris, la suya. Doce yunques, y la losa se abre sola."
+				],
+				"no": [
+					"nucleo_abierto"
 				]
 			},
 			{
@@ -1283,6 +1309,141 @@
 					"Kipanga se posa despacio y pliega las alas, lasca a lasca. El cristal del pecho deja de latir tan fuerte y se queda en un pulso tranquilo.",
 					"La argolla se abre sola. La cadena cae hacia la ciudad, muy abajo, y tarda tanto en llegar que casi se me olvida que estaba cayendo.",
 					"Y entonces sube el sonido. El Gran Diapasón, desde el fondo del cráter. Tres notas, juntas. Es un acorde."
+				]
+			}
+		]
+	},
+	"mji_losa_cerrada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"si": [
+					"cadena_oeste_rota",
+					"cadena_este_rota",
+					"cadena_norte_rota"
+				],
+				"lineas": [
+					"La losa ya no tiene cadenas, pero sigue cerrada. Bajo la mano se nota un latido, despacio, como quien espera.",
+					"Faltan yunques por cantar. Mhunzi dice que la losa no se abrirá mientras quede alguno callado."
+				]
+			},
+			{
+				"lineas": [
+					"La Losa del Núcleo. Debajo late algo: se nota en los pies.",
+					"Mientras las tres cadenas la sujeten, no hay forma de abrirla."
+				]
+			}
+		]
+	},
+	"nucleo_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La escalera da vueltas y vueltas hacia abajo, y cuanto más bajo, más calor y más luz. Una luz de ámbar, tibia, que no sale de ningún farol.",
+					"Las paredes son de basalto labrado. Hay hilos de ámbar en las juntas, y laten. Todos a la vez.",
+					"Abajo hay alguien esperando. Conozco esas hojas de cobre."
+				]
+			}
+		]
+	},
+	"nucleo_atrio": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una inscripción en la pared, muy antigua, con las doce marcas de familia, como las del Desfiladero:",
+					"«Al fondo duerme lo que cayó. Para llegar hay que saber empujar, saber llamar y saber cantar. Quien sepa las tres cosas, que baje. Quien no, que aprenda».",
+					"Debajo, tres dibujos: una ola de tierra, un imán y una horquilla."
+				]
+			}
+		]
+	},
+	"mauti_nucleo": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"si": [
+					"asterhaul_libre"
+				],
+				"lineas": [
+					"Me quedo un rato más aquí. Con ella. Que no se sienta sola otra vez.",
+					"Luego te alcanzo. Esta vez sí: detrás de ti."
+				]
+			},
+			{
+				"no": [
+					"mauti_nucleo_hablado"
+				],
+				"lineas": [
+					"Te estaba esperando. ¿Lo oyes? Es más fuerte aquí abajo. No es un ruido: es un pulso, como el de un pecho.",
+					"He intentado pasar sola a la primera sala. Sin ti. Otra vez. Y la puerta no se ha movido. Me parece que no me estaba esperando a mí.",
+					"Hay tres salas, Maisha. Una para cada cosa que te han enseñado aquí. Empieza por la del oeste. Yo me quedo aquí, escuchando.",
+					"Y cuando llegues al fondo... no le pegues de primeras. Escúchalo antes. Prométemelo."
+				],
+				"marca": [
+					"mauti_nucleo_hablado"
+				]
+			},
+			{
+				"lineas": [
+					"Empujar, llamar, cantar. Una cosa en cada sala.",
+					"Cuando estén los tres sellos encendidos, la puerta del medio se abre. Ahí es."
+				]
+			}
+		]
+	},
+	"corazon_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El Santuario. Una sala redonda con una estrella de ámbar grabada en el suelo, y en el centro flota... eso.",
+					"Un corazón de ámbar, del tamaño de una casa, metido en tres aros de hierro que giran. Late. Cada latido se nota en los dientes.",
+					"No me mira. No tiene ojos. Pero sabe que estoy aquí. Los aros se aprietan."
+				]
+			}
+		]
+	},
+	"nucleo_final_semilla": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El Corazón deja de latir fuerte. Se posa en la estrella del suelo, despacio, como algo muy pesado que por fin puede descansar.",
+					"Por las grietas del ámbar sale luz blanca. Y dentro... dentro hay una semilla. Grande, dorada, con un brote enroscado que no termina de abrirse.",
+					"Es como la mía. Como la del Primer Árbol. Pero mucho más vieja. Llegó del cielo antes que nadie, y la tierra se la tragó del susto."
+				]
+			}
+		]
+	},
+	"nucleo_final_mauti": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Ya está. Ya está, ya está. Shhh.",
+					"No estaba enfadada, Maisha. Tenía miedo. La encadenaron por si latía demasiado fuerte... y ella latía más fuerte para que alguien la oyera.",
+					"La semilla mayor. Cayó antes que tú. Antes que todo. Y se ha pasado siglos aquí abajo, sola, esperando a que alguien bajara a escucharla.",
+					"Pon la mano. Yo pongo la mía. Sin prisa. Que note que no vamos a irnos."
+				]
+			}
+		]
+	},
+	"nucleo_final_cetro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Mi mano y la de Mauti sobre el ámbar tibio. El latido se calma hasta ir al mismo paso que el mío.",
+					"Y el cetro contesta. El cristal azul que dormía arriba se enciende de golpe, dorado, y la pluma y el brote se enroscan en él como si siempre hubieran estado ahí.",
+					"Arriba, en Mji-Jiwe, todas las forjas se encienden a la vez. Y en algún sitio muy lejos, algo responde. Algo que todavía no conozco."
 				]
 			}
 		]

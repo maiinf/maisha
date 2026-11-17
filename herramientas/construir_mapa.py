@@ -2552,6 +2552,57 @@ def crear_aguja():
     return ["".join(f) for f in m], {}
 
 
+def crear_nucleo():
+    """EL NÚCLEO DE LA ESTRELLA (Asterhaul, 84x76): el pozo bajo la Losa de Mji-Jiwe, hasta el corazón de la estrella.
+    Lo que no es suelo («0») es roca (o, en la Cámara de la Resonancia, abismo). Se entra por el sur («_»).
+      ATRIO DE LA ESTRELLA (abajo, en medio): Mauti espera. Un pasillo al oeste.
+      1. CÁMARA SÍSMICA (oeste): un muro agrietado, una vía («=») con su vagoneta y, tras un derrumbe, el
+         PILAR del primer sello.
+      2. CÁMARA MAGNÉTICA (en medio): un río de ESCORIA («≈») con una barcaza (sus muelles, «=»); al otro lado,
+         un bloque-imán y la PLACA del segundo sello. Arriba, la PUERTA TRIPLE.
+      3. CÁMARA DE LA RESONANCIA (este): un puente de cristal sobre el abismo («=»: vacío que sostienen las ondas),
+         una peña suelta con su monolito y, en la isla del fondo, el MONOLITO del tercer sello.
+      SANTUARIO (arriba, ovalado): el Corazón del Meteorito.
+    Las compuertas entre cámaras, los sellos, la Puerta Triple y todo lo demás los pone la escena."""
+    ANCHO, ALTO = 84, 76
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y][x] = c
+
+    rect(40, 65, 43, 74, "%")                                # la escalera del pozo
+    rect(40, 75, 43, 75, "_")
+    rect(32, 52, 51, 64, "%")                                # el Atrio de la Estrella
+    rect(26, 53, 31, 55, "%")                                # el pasillo a la Cámara Sísmica
+    # 1. la Cámara Sísmica
+    rect(3, 34, 25, 56, "%")
+    rect(3, 43, 25, 44, "0")                                 # el muro que la parte en dos...
+    rect(5, 43, 7, 44, "%")                                  # ...con un hueco (lo tapa un muro agrietado)
+    rect(18, 34, 18, 42, "0")                                # el tabique del rincón del sello...
+    rect(18, 37, 18, 39, "%")                                # ...con su paso (lo tapa un derrumbe)
+    rect(5, 38, 17, 38, "=")                                 # la vía (acaba en el derrumbe)
+    rect(26, 38, 29, 40, "%")                                # el paso a la Cámara Magnética (compuerta)
+    # 2. la Cámara Magnética
+    rect(30, 32, 54, 46, "%")
+    rect(36, 32, 48, 46, "≈")                                # el río de escoria...
+    rect(36, 37, 38, 39, "=")                                # ...con los muelles de la barcaza
+    rect(46, 37, 48, 39, "=")
+    rect(55, 38, 58, 40, "%")                                # el paso a la Cámara de la Resonancia (compuerta)
+    rect(50, 24, 53, 31, "%")                                # la Puerta Triple y su subida al Santuario
+    # 3. la Cámara de la Resonancia
+    rect(59, 35, 63, 45, "%")                                # la cornisa de entrada
+    rect(64, 39, 71, 40, "=")                                # el puente de cristal
+    rect(65, 36, 67, 37, "%")                                # la peña suelta
+    rect(72, 35, 80, 47, "%")                                # la isla del fondo
+    for y in range(ALTO):                                    # el Santuario (ovalado)
+        for x in range(ANCHO):
+            if ((x - 42.0) / 17.0) ** 2 + ((y - 14.0) / 11.0) ** 2 <= 1.0:
+                m[y][x] = "%"
+    return ["".join(f) for f in m], {}
+
+
 def crear_seccion():
     """LA SECCIÓN PROHIBIDA (Sigilia, 64x72, de sur a norte): las salas de mármol morado bajo el Gran Archivo. Lo que
     no es sala («0») son estanterías de libros encadenados. Se entra por el sur (del Gran Archivo de Maandiko, «_»).
@@ -3334,7 +3385,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mji_jiwe", "galerias_ambar", "fundicion_escoria", "aguja_caida"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mji_jiwe", "galerias_ambar", "fundicion_escoria", "aguja_caida", "nucleo_estrella"}
 
 
 def construir_suelo(nombre):
@@ -3486,7 +3537,7 @@ if __name__ == "__main__":
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
                         "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion,
-                        "desfiladero_meteorito": crear_desfiladero, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion, "aguja_caida": crear_aguja}.get(nombre, crear_prados)()
+                        "desfiladero_meteorito": crear_desfiladero, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion, "aguja_caida": crear_aguja, "nucleo_estrella": crear_nucleo}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

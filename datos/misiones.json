@@ -143,7 +143,8 @@
 			"desfiladero_meteorito",
 			"galerias_ambar",
 			"fundicion_escoria",
-			"aguja_caida"
+			"aguja_caida",
+			"nucleo_estrella"
 		],
 		"galerias_ambar": [
 			"mji_jiwe"
@@ -152,6 +153,9 @@
 			"mji_jiwe"
 		],
 		"aguja_caida": [
+			"mji_jiwe"
+		],
+		"nucleo_estrella": [
 			"mji_jiwe"
 		]
 	},
@@ -1784,6 +1788,90 @@
 					],
 					"ir": {
 						"escena": "aguja_caida",
+						"buscar": "grupo:jefes"
+					}
+				}
+			]
+		},
+		{
+			"id": "nucleo_estrella",
+			"tipo": "historia",
+			"titulo": "Lo que cayó del cielo",
+			"texto": "Las tres Cadenas del Cráter están rotas. Bajo la Losa de Mji-Jiwe late algo que lleva siglos esperando. Pero la losa no se abrirá mientras quede un solo yunque callado.",
+			"aparece": [
+				"cadena_norte_rota"
+			],
+			"hecha": [
+				"asterhaul_libre"
+			],
+			"pasos": [
+				{
+					"texto": "Despierta los doce Yunques de Memoria",
+					"hecho": [
+						"nucleo_abierto"
+					],
+					"ir": {
+						"escena": "mji_jiwe",
+						"buscar": "grupo:yunques_memoria"
+					}
+				},
+				{
+					"texto": "Baja por el pozo de la Losa",
+					"hecho": [
+						"nucleo_estrella"
+					],
+					"ir": {
+						"escena": "mji_jiwe",
+						"buscar": "puerta:nucleo_estrella"
+					}
+				},
+				{
+					"texto": "Enciende el sello de la Cámara Sísmica (oeste)",
+					"hecho": [
+						"nucleo/sello_sismico"
+					],
+					"ir": {
+						"escena": "nucleo_estrella",
+						"buscar": "grupo:pilares_diapason"
+					}
+				},
+				{
+					"texto": "Enciende el sello de la Cámara Magnética",
+					"hecho": [
+						"nucleo/sello_magnetico"
+					],
+					"ir": {
+						"escena": "nucleo_estrella",
+						"buscar": "grupo:bloques_iman"
+					}
+				},
+				{
+					"texto": "Enciende el sello de la Cámara de la Resonancia (este)",
+					"hecho": [
+						"nucleo/sello_resonante"
+					],
+					"ir": {
+						"escena": "nucleo_estrella",
+						"buscar": "grupo:monolito_sello"
+					}
+				},
+				{
+					"texto": "Cruza la Puerta Triple y baja al Santuario",
+					"hecho": [
+						"corazon_visto"
+					],
+					"ir": {
+						"escena": "nucleo_estrella",
+						"buscar": "grupo:puertas_triples"
+					}
+				},
+				{
+					"texto": "Calma el Corazón del Meteorito",
+					"hecho": [
+						"asterhaul_libre"
+					],
+					"ir": {
+						"escena": "nucleo_estrella",
 						"buscar": "grupo:jefes"
 					}
 				}

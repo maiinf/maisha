@@ -228,7 +228,7 @@ func aspecto(niveles: Dictionary = {}) -> Dictionary:
 	# enseña en la vista previa de la rama del Cetro
 	var cetro := "cetro_%d" % clampi(c, 0, 6)
 	if Estado.tiene("cetro_nexo") and not niveles.has("cetro"):
-		cetro = "nexo_%d" % clampi(int(niveles.get("tierra", nivel("tierra"))), 0, 6)
+		cetro = "nexo_%d" % (6 if Estado.tiene("nexo_despierto") else clampi(int(niveles.get("tierra", nivel("tierra"))), 0, 6))
 	return {"prendas": prendas, "cetro": cetro, "rasgos": visibles}
 
 
