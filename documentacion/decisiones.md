@@ -570,7 +570,7 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | El Corazón | No se le «mata»: los aros se rompen por fases (Carga, Pulso, monolito) y el núcleo se golpea con el cetro hasta que se calma. |
 | La semilla mayor y Mauti | Siempre en neutro. Mauti es quien entiende que la semilla tenía miedo; las dos manos la calman. |
 | El Cetro del Nexo | Despierta del todo al final (`nexo_6`), aunque la rama del Arte de la Tierra aún no esté hecha. Cuando se haga, el cetro despierto se mantiene. |
-| El cuarto mundo | Sin nombre todavía: la pantalla de fin dice «Continuará...». |
+| El cuarto mundo | Sin nombre todavía: la pantalla de fin dice «Continuará...». (Ya decidido: el Valle del Ocaso, ver 2026-11-18.) |
 
 ### 2026-11-17 · El Arte de la Tierra y el Mercado de la Escoria (Decidido con Iam, sobre `documentacion/boceto_arte_tierra.png`)
 | Qué | Decisión |
@@ -578,3 +578,12 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Los 6 niveles del Arte de la Tierra | **Opción A · Oficio del Cráter**: 1 Grebas de basalto (la Carga cuesta 16 de Aliento) · 2 Cinto de ámbar (+20 % de alcance de la Carga y la Resonancia) · 3 ✦ Hombrera de geoda (2 Cristales: +1 hoja de Vida y la Carga quita 2) · 4 Guantes de imán (+6 de Aliento cada vez que la Carga rompe o enciende algo) · 5 Faldón de forja (una Carga cada 0,55 s) · 6 ✦ Aura de la Semilla (4 Cristales: +1 hoja de Vida y la Carga suelta una onda de ámbar que daña alrededor). |
 | El Cetro del Nexo | Sube con la rama (`nexo_0` … `nexo_6`); al calmar el Corazón despierta del todo (`nexo_6`) aunque la rama no esté llena. |
 | El Mercado de la Escoria (Chuma, con `mercado_escoria`) | Los cuatro artículos del boceto: **Piedra de amolar** (4 Cristales: la Carga empuja más), **Fuelle de rescoldo** (5: +15 % de recarga de Aliento), **Farol de geoda** (6: más luz en las minas y las Esquirlas brillan desde lejos) y **Delantal de forja** (8: prenda). |
+
+### 2026-11-18 · El cuarto mundo: el Valle del Ocaso (Decidido con Iam, sobre el pergamino del diario `documentacion/cuarto_mundo_mapa.png`)
+| Qué | Decisión |
+| :--- | :--- |
+| Nombre y lugar | **El Valle del Ocaso**, al sur del Kitovu (la mancha morada del pergamino). Es el último mundo: lo abre el Cetro del Nexo despierto. |
+| El miedo de Giza | **A · Miedo a que llegue la noche**: el valle está detenido en un atardecer eterno; sus habitantes pararon el sol para que el día no se acabara nunca. Es donde nace Giza («el miedo a que las cosas acaben»). |
+| Mecánica propia | Luz y sombra: mover el sol (o su luz) y usar las sombras largas del atardecer como caminos y puentes. Los detalles, con el boceto. |
+| Quién vive allí | **A · Zorros fénec farolilleros** (*mbweha*), que cuidan los faroles del atardecer. |
+| Boceto | **A · Lo hace Gemini** (pedido en `coordinacion.md`); Claude construye cuando Iam lo apruebe. |
