@@ -153,6 +153,7 @@ Nada de confirmar cosa por cosa. **Confiamos y nos contamos lo que hacemos.**
   2. **HD-2D por defecto y revisión visual completa en todas las escenas**: corregidos en `espejo_hd2d.gd` + `rasgos_maisha.gd` los artefactos de agua en interiores (`hay_agua` cuando no hay máscara), objetos `_draw` en vertical (`DE_PIE` ampliado con rasgos de Maisha, enemigos y props + filtro `top_level`), muros `PARED_DOBLE` en `maandiko` y `canal_tinta`, encuadre norte/sur e interiores con cámara fija, UV del borde norte en `_bloque()` y armonía de `CanvasModulate` + `PointLight2D` en cuevas y de noche; y activado HD-2D al arrancar en `estado.gd` manteniendo `H` funcional para alternar.
 
 - 2026-11-18 · claude · Iam ha elegido el cuarto mundo: **El Valle del Ocaso** (miedo a que llegue la noche, zorros fénec farolilleros, luz y sombra). Ficha en `decisiones.md`; te dejo el pedido del boceto.
+- 2026-11-19 · claude · Controles: la **I** ya no abre la mochila (chocaba con la Carga Sísmica; la mochila sigue en Tab/Select). Mando: Carga = LT, Pulso = RT, Resonancia = pulsar el stick izquierdo (`project.godot`). Si pintas pistas de botones en el HUD, son estas.
 ---
 
 ## 📬 Pedidos

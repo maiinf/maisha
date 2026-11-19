@@ -135,7 +135,7 @@ Como en otros juegos, el Kitovu enseña las acciones parando el mundo (`scripts/
 - **El Latido (L)**: en la segunda mancha, la primera vez que un Petrino se le echa encima.
 - En las pruebas, `pruebas/ayudante_lecciones.gd` pulsa la tecla que pide cada lección.
 
-## La mochila (Tab, I o Select)
+## La mochila (Tab o Select)
 
 El diario tiene estilo **noche mágica** (`herramientas/pintar_interfaz.py`): tapas de cuero azul noche cosidas con hilo de oro y cantoneras doradas, páginas de cielo nocturno (nebulosa suave, estrellas, constelaciones) con borde de filigrana dorada, y la tapa con el Gran Árbol, la luna y estrellas en oro. Las letras de las páginas usan su propia paleta clara (`TN_*` en `mochila.gd`): títulos en oro, texto en crema, la historia en coral y lo cumplido en gris azulado; la fila elegida, en tinta oscura sobre la banda dorada. El mapa sigue siendo de pergamino.
 
@@ -767,7 +767,7 @@ No hace falta ejecutarlas; sirven para detectar si algo se rompe al cambiar el c
 | --- | --- | --- |
 | Moverse | WASD o flechas | Stick izquierdo o cruceta |
 | Acción (hablar, leer…) | Espacio o E | A |
-| Mochila | Tab o I (mantener: rueda rápida) | Select (mantener: rueda rápida) |
+| Mochila | Tab (mantener: rueda rápida) | Select (mantener: rueda rápida) |
 | Pestañas de la mochila | 1 a 5 (M: mapa) | — |
 | Golpe con el cetro | J | X |
 | Semilla (explosivo) | K | Y |
@@ -776,6 +776,10 @@ No hace falta ejecutarlas; sirven para detectar si algo se rompe al cambiar el c
 | Sigilo (Sigilia: cuando se aprende) | U | RB |
 | Cambiar de semilla | Q | — |
 | Tomar sopa | F | Stick derecho (pulsar) |
+| Carga Sísmica (Asterhaul) | I | Gatillo izquierdo (LT) |
+| Pulso Magnético (Asterhaul) | O | Gatillo derecho (RT) |
+| Resonancia de Ámbar (Asterhaul) | P | Stick izquierdo (pulsar) |
+| Cambiar de sigilo (Sigilia) | R | — |
 | Menú | Esc | Start |
 
 (Se pueden cambiar en Godot: Proyecto → Configuración del proyecto → Mapa de entrada.)
