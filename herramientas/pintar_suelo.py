@@ -1119,7 +1119,7 @@ def pintar_mirador(nombre, salida=None):
     filas = leer(nombre)
     alto, ancho = len(filas), len(filas[0])
     lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=61)
-    tipos = [["vacio" if c in "0=" else "suelo" for c in f] for f in filas]
+    tipos = [["vacio" if c in "0=" else "suelo" for c in f] for f in filas]       # (en Jioni, «0» es abismo con pretil)
     vacio = mascara(lz, tipos, ("vacio",), 2.4, 0.24, semilla=611)
     suelo = np.clip(1 - vacio, 0, 1)
     fina = lz.ruido(0.8, 2, semilla=612)
@@ -1153,24 +1153,46 @@ def pintar_mirador(nombre, salida=None):
     # el camino de losas: de la entrada a la plaza y del arco a la bajada
     S = lz.s
     camino = np.zeros((lz.H, lz.W), np.float32)
-    for (x0, y0, x1, y1) in ((36, 1, 38, 10), (30, 38, 56, 41)):
+    jioni = nombre == "jioni"
+    calles = ((30, 0, 33, 14), (0, 20, 26, 22), (38, 26, 63, 28), (29, 30, 34, 43), (52, 29, 56, 43), (42, 26, 56, 30)) if jioni \
+        else ((36, 1, 38, 10), (30, 38, 56, 41))
+    for (x0, y0, x1, y1) in calles:
         cv2.rectangle(camino, (x0 * 16 * S, y0 * 16 * S), ((x1 + 1) * 16 * S - 1, (y1 + 1) * 16 * S - 1), 1.0, -1)
     camino = lz.desenfocar(camino, 3) > 0.5
     cw = (lz.y % 9) < 0.8
     cu = ((lz.x + np.floor(lz.y / 9) * 7) % 14) < 0.8            # (las losas, a matajunta)
     lz.pintar(camino * 1.0, rampa(["#7a4a3a", "#a06a50", "#c08a66", "#d8a880"], np.clip(0.5 + (fina - 0.5) * 0.6 + (media - 0.5) * 0.3, 0, 1)))
     lz.pintar(camino * (cu | cw), "#5a2e2a", 0.35)
+    if jioni:
+        # LA PLAZA DE LOS DOCE FAROLES: un gran disco de losas en corro
+        cx, cy = 32.0 * 16, 22.0 * 16
+        rp = np.hypot(lz.x - cx, (lz.y - cy) * 1.45)
+        plaza = (rp < 150) * 1.0
+        anillo = np.floor(rp / 22)
+        sector = np.floor((np.arctan2(lz.y - cy, lz.x - cx) + np.pi) / (2 * np.pi) * (12 + anillo * 4))
+        celda = (np.sin(anillo * 12.9898 + sector * 78.233) * 43758.5453) % 1
+        lz.pintar(plaza, rampa(["#8a5444", "#b07a5e", "#cc9a74", "#e2b892"], np.clip(0.45 + (celda - 0.5) * 0.4 + (fina - 0.5) * 0.3, 0, 1)))
+        junta_p = plaza * ((np.abs((rp % 22) - 11) > 10.2) | (np.abs(((np.arctan2(lz.y - cy, lz.x - cx) + np.pi) / (2 * np.pi) * (12 + anillo * 4)) % 1 - 0.5) > 0.47))
+        lz.pintar(junta_p, "#5a2e2a", 0.45)
+        lz.pintar(plaza * (np.abs(rp - 150) < 2.0), "#5a2e2a", 0.8)
     # LA ESFERA DEL RELOJ DE SOL, grabada en la plaza (alrededor del reloj)
-    cx, cy = 42.5 * 16, 23.0 * 16
+    cx, cy = (32.0 * 16, 22.0 * 16) if jioni else (42.5 * 16, 23.0 * 16)
     r = np.hypot(lz.x - cx, (lz.y - cy) * 1.25)
     an = np.arctan2(lz.y - cy, lz.x - cx)
-    esfera = suelo * ((np.abs(r - 70) < 1.2) | (np.abs(r - 58) < 0.8) | ((r > 58) & (r < 70) & (np.abs(((an * 12 / np.pi) % 2) - 1) < 0.06)))
+    e0, e1 = (40, 52) if jioni else (58, 70)
+    esfera = suelo * ((np.abs(r - e1) < 1.2) | (np.abs(r - e0) < 0.8) | ((r > e0) & (r < e1) & (np.abs(((an * 12 / np.pi) % 2) - 1) < 0.06)))
     lz.pintar(esfera, "#6a3430", 0.75)
     lz.pintar(desplazar(lz, esfera, 0.7, 0.7) * (1 - esfera) * suelo, "#f8d0a0", 0.35)
     # el borde de las mesetas: un filo oscuro y un brillo cálido (les da el sol de lado)
     dist = lz.distancia(suelo)
     lz.pintar(suelo * (dist < 2.0), "#3a1420", 0.55)
     lz.pintar(suelo * (np.abs(dist - 3.0) < 0.6), "#ffd8a0", 0.3)
+    if nombre == "jioni":
+        # el pretil: un murete de arenisca al borde de la meseta
+        pretil = suelo * (dist < 7.0)
+        lz.pintar(pretil, rampa(["#5a2a2a", "#8a4a3e", "#b46a52", "#d48c66"], np.clip(0.4 + (7.0 - dist) / 14.0 + (fina - 0.5) * 0.3, 0, 1)))
+        lz.pintar(suelo * (np.abs(dist - 7.0) < 0.8), "#3a1420", 0.7)
+        lz.pintar(pretil * ((lz.x % 18) < 0.8), "#5a2a2a", 0.6)
     destino = salida or os.path.join(RAIZ, "arte", "mundos", "ocaso", "suelos", nombre + "_suelo.png")
     os.makedirs(os.path.dirname(destino), exist_ok=True)
     lz.guardar(destino, tramado=0.014)
@@ -1367,7 +1389,7 @@ def pintar(nombre, salida=None):
         return pintar_fundicion(nombre, salida)
     if nombre == "aguja_caida":
         return pintar_aguja(nombre, salida)
-    if nombre == "mirador_ocaso":
+    if nombre in ("mirador_ocaso", "jioni"):
         return pintar_mirador(nombre, salida)
     if nombre == "nucleo_estrella":
         return pintar_nucleo(nombre, salida)

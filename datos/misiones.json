@@ -160,7 +160,11 @@
 			"mji_jiwe"
 		],
 		"mirador_ocaso": [
-			"kitovu"
+			"kitovu",
+			"jioni"
+		],
+		"jioni": [
+			"mirador_ocaso"
 		]
 	},
 	"misiones": [
@@ -1931,6 +1935,61 @@
 					"ir": {
 						"escena": "mirador_ocaso",
 						"buscar": "grupo:espejos"
+					}
+				}
+			]
+		},
+		{
+			"id": "jioni",
+			"tipo": "historia",
+			"titulo": "La Ciudad de los Faroles",
+			"texto": "Al pie del Arco del Atardecer hay una ciudad donde nadie duerme desde que ataron el sol. En su plaza, doce postes esperan sus faroles.",
+			"aparece": [
+				"arco_atardecer_abierto"
+			],
+			"hecha": [
+				"kibatari_caminos"
+			],
+			"pasos": [
+				{
+					"texto": "Baja la escalera del Arco del Atardecer",
+					"hecho": [
+						"jioni"
+					],
+					"ir": {
+						"escena": "mirador_ocaso",
+						"buscar": "puerta:jioni"
+					}
+				},
+				{
+					"texto": "Habla con el aprendiz de farolillero de la plaza",
+					"hecho": [
+						"kibatari_conocido"
+					],
+					"ir": {
+						"escena": "jioni",
+						"buscar": "aldeano:kibatari"
+					}
+				},
+				{
+					"texto": "Cuelga los Faroles de la Hora en la plaza ({n}/{total})",
+					"cuenta": {
+						"prefijo": "farol/colgado_",
+						"total": 2
+					},
+					"ir": {
+						"escena": "jioni",
+						"buscar": "grupo:postes_farol"
+					}
+				},
+				{
+					"texto": "Vuelve a hablar con Kibatari",
+					"hecho": [
+						"kibatari_caminos"
+					],
+					"ir": {
+						"escena": "jioni",
+						"buscar": "aldeano:kibatari"
 					}
 				}
 			]

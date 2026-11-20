@@ -1215,6 +1215,24 @@ El cuarto mundo, al sur del Kitovu: un valle parado en un atardecer que no se ac
 | Prueba | `prueba_mirador_ocaso` |
 | Falta | Jioni (el arco abierto aún no lleva a ninguna parte: Maisha lo dice); música propia (ahora suena la del Lago); sonidos de reloj, sombra y espejo; verlo en HD-2D; icono de debilidad «sol» |
 
+## El Valle del Ocaso: Jioni, la Ciudad de los Faroles (parte 1)
+
+La ciudad de los zorros fénec, al pie del Arco del Atardecer (`documentacion/boceto_jioni.png`, pintado por Claude con `boceto_jioni.py`; capturas en `documentacion/jioni_captura_1.png`…). Desde que ataron el sol **nadie duerme**: los vecinos están **desvelados**, con ojeras, repitiendo su faena.
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | Por el Arco del Atardecer del Mirador (`arco_atardecer_abierto`): la puerta `jioni` del Mirador lleva a la escalera (`mirador`) |
+| Mapa | `jioni` (64×44, `crear_jioni()`): una meseta con pretil (no se cae). La Escalera del Arco, la Plaza de los Doce Faroles, la Torre del Reloj de Arena, el Barrio de las Cortinas (oeste), el Mercado del Crepúsculo (este). Suelo: `pintar_mirador()` con calles y la plaza en corro |
+| La Plaza de los Doce Faroles | Doce postes (`scripts/mundo/ocaso/poste_farol.gd`): con Acción y un **Farol de la Hora**, se cuelga y se queda encendido (`farol/colgado_NN`). Sin farol, no |
+| Los Desvelados | Seis vecinos (`dibujar_aldeanos.py`: `kesho`, `mto`, `ndoto`, `pazia`, `ufagio`, `kikombe`, cada uno con su versión `_desvelado`). Con cada farol colgado **descansa uno** (orden: Kikombe, Kesho, Mto, Pazia, Ufagio, Ndoto; `jioni/descansa_<nombre>`): se le van las ojeras, abre sus cortinas o su puesto y habla de otra manera. Con los dos faroles del Mirador descansan Kikombe y Kesho |
+| Kibatari | El aprendiz de Mwanga, en el centro de la plaza (`kibatari()`). Pide los faroles y, con dos colgados, cuenta los tres caminos y las tres pesas del reloj (`kibatari_caminos`) |
+| La Torre del Reloj de Arena | Se lee: el reloj parado y las tres cadenas que suben al sol |
+| Las salidas | Dunas de Penumbra (oeste), Jardín de los Faroles (este), Calzada de los Obeliscos (sureste): aún no existen (Maisha lo piensa). La **Puerta del Horizonte** (sur), sellada hasta `tres_pesos` |
+| Arte | `herramientas/pintar_jioni.py` → `arte/mundos/ocaso/jioni/` (casa con cortinas, puesto, torre, poste, Puerta del Horizonte) |
+| Misión | `jioni` («La Ciudad de los Faroles») |
+| Prueba | `prueba_jioni` |
+| Falta | Parte 2: el Mercado del Crepúsculo (tienda) y lo que dan los vecinos al descansar; los tres caminos; música propia (ahora suena la del Mirador); verlo en HD-2D |
+
 ## Las construcciones, al nivel de la casa del castor
 
 Todas las casas y construcciones antiguas se han repintado con el pintor de las cinemáticas (volumen, luz, materiales y objetos de su dueño), casi al doble de tamaño. Capturas: `documentacion/aldea_edificios.png` y `documentacion/casas_caminos.png`.

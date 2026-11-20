@@ -921,6 +921,88 @@ def mwanga():
     return l
 
 
+def _mbweha_base(l, ropa, cansado=False, joven=False):
+    """El cuerpo de un zorro fénec (mbweha) del Valle del Ocaso, con su ropa (un material) hasta los pies. Cansado: las
+    orejas caídas hacia los lados y ojeras moradas (no duerme desde que se paró el sol). Joven: más pequeño."""
+    def tri(p, mat):
+        (ax, ay), (bx, by), (cx, cy) = p
+        for y in range(ALTO):
+            for x in range(ANCHO):
+                px_, py_ = x + 0.5, y + 0.5
+                d1 = (px_ - bx) * (ay - by) - (ax - bx) * (py_ - by)
+                d2 = (px_ - cx) * (by - cy) - (bx - cx) * (py_ - cy)
+                d3 = (px_ - ax) * (cy - ay) - (cx - ax) * (py_ - ay)
+                if not ((d1 < 0 or d2 < 0 or d3 < 0) and (d1 > 0 or d2 > 0 or d3 > 0)):
+                    l.px(x, y, mat, 2)
+    cab = 12.5 if joven else 11.0
+    punta = (0.5, 7.0) if cansado else (1.0, 1.5 if not joven else 3.5)
+    for lado in (0, 1):
+        f = (lambda x: x) if lado == 0 else (lambda x: 24 - x)
+        tri(((f(7.0), cab - 0.5), (f(punta[0]), punta[1]), (f(11.0), cab - 3.5)), "fenec")
+        tri(((f(7.5), cab - 1.5), (f(punta[0] + 2.0), punta[1] + 1.8), (f(9.8), cab - 3.5)), "oreja_i")
+    alto_cuerpo = 5.5 if joven else 7.0
+    l.ovalo(11.5, 30 - alto_cuerpo, 4.6 if joven else 5.2, alto_cuerpo, ropa)
+    l.rect(8, 28, 15, 29, ropa, 1)
+    l.ovalo(11.5, cab, 4.8 if joven else 5.2, 4.2, "fenec")
+    l.ovalo(11.5, cab + 2.6, 2.6, 1.7, "hocico", plano=True)
+    l.px(11, int(cab + 1), "nariz"); l.px(12, int(cab + 1), "nariz")
+    ojos(l, int(cab - 1), 9, 14, alto=1 if cansado else 2)
+    if cansado:
+        for x in (8, 9, 14, 15):
+            l.px(x, int(cab), "malva", 3)
+    l.ovalo(4.5, 26.0, 2.4, 1.8, "fenec")
+    l.px(3, 26, "cana", 3)
+    l.rect(9, 30, 10, 30, "fenec", 1); l.rect(13, 30, 14, 30, "fenec", 1)
+
+
+def kibatari():
+    """KIBATARI: el aprendiz de Mwanga, en Jioni. Joven, con una capa corta del color del crepúsculo y una linterna
+    de mano atada a la cintura. Nunca ha visto la noche."""
+    l = Lienzo()
+    _mbweha_base(l, "malva", joven=True)
+    l.rect(7, 19, 16, 20, "coral", 3)                         # la capa corta, coral por dentro
+    l.rect(6, 21, 7, 25, "coral", 2); l.rect(16, 21, 17, 25, "coral", 2)
+    l.rect(13, 24, 15, 27, "laton", 2)                        # la linterna de la cintura...
+    l.px(14, 25, "ambar_f", 3); l.px(14, 26, "ambar_f", 2)    # ...apagada a medias
+    return l
+
+
+VECINOS_OCASO = {
+    # nombre: (ropa, accesorio)
+    "kesho": ("delantal", "pan"),        # el panadero: amasa y amasa la misma hogaza
+    "mto": ("flor", "cojin"),            # quien teje cojines que nadie usa
+    "ndoto": ("azul", ""),               # el más pequeño: nunca ha soñado
+    "pazia": ("morado", "cortina"),      # quien cose cortinas para fingir la noche
+    "ufagio": ("concha", "escoba"),      # quien barre la arena que vuelve
+    "kikombe": ("coral", "tetera"),      # quien sirve té, taza tras taza
+}
+
+
+def vecino_ocaso(nombre, cansado):
+    ropa, cosa = VECINOS_OCASO[nombre]
+    l = Lienzo()
+    _mbweha_base(l, ropa, cansado=cansado, joven=nombre == "ndoto")
+    if cosa == "pan":
+        l.ovalo(18.0, 22.0, 3.0, 2.0, "pecho")
+        l.px(17, 21, "delantal", 2); l.px(19, 22, "delantal", 2)
+    elif cosa == "cojin":
+        l.rect(15, 19, 20, 23, "rosa", 2); l.rect(15, 19, 20, 19, "rosa", 3)
+        l.px(17, 21, "flor", 1)
+    elif cosa == "cortina":
+        for y in range(16, 28):
+            l.px(18, y, "morado", 3 if y % 3 else 2); l.px(19, y, "morado", 2)
+    elif cosa == "escoba":
+        for y in range(12, 28):
+            l.px(18, y, "concha", 2)
+        l.rect(16, 27, 20, 29, "paja", 2)
+    elif cosa == "tetera":
+        l.ovalo(18.0, 22.0, 2.6, 2.2, "metal")
+        l.px(21, 21, "metal", 2); l.px(18, 19, "metal", 3)
+    if not cansado:
+        l.px(10, 16, "rubor"); l.px(13, 16, "rubor")
+    return l
+
+
 def _engrisar(l, oscuros=("concha", "delantal", "rojo", "azul", "metal", "cobre")):
     """Cubre un dibujo de POLVO GRIS (los artesanos de Mji-Jiwe sin pulso): todo gris, los ojos apagados."""
     for y in range(ALTO):
@@ -1334,7 +1416,9 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"mwanga": mwanga, "mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma, "pigo": pigo, "pigo_gris": (lambda: _engrisar(pigo(), ("delantal", "laton", "escarabajo", "concha", "metal", "hollin"))), "moto": moto, "moto_gris": (lambda: _engrisar(moto(), ("delantal", "cobre", "azul", "concha", "metal", "brasa", "laton"))), "kito": kito, "kito_gris": (lambda: _engrisar(kito(), ("delantal", "laton", "pajaro", "brasa", "metal"))),
+ALDEANOS = {"mwanga": mwanga, "kibatari": kibatari,
+            **{n: (lambda n=n: vecino_ocaso(n, False)) for n in VECINOS_OCASO},
+            **{n + "_desvelado": (lambda n=n: vecino_ocaso(n, True)) for n in VECINOS_OCASO}, "mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma, "pigo": pigo, "pigo_gris": (lambda: _engrisar(pigo(), ("delantal", "laton", "escarabajo", "concha", "metal", "hollin"))), "moto": moto, "moto_gris": (lambda: _engrisar(moto(), ("delantal", "cobre", "azul", "concha", "metal", "brasa", "laton"))), "kito": kito, "kito_gris": (lambda: _engrisar(kito(), ("delantal", "laton", "pajaro", "brasa", "metal"))),
             **{"artesano_" + t: (lambda t=t: artesano(t)) for t in "abc"},
             **{"artesano_" + t + "_gris": (lambda t=t: _engrisar(artesano(t))) for t in "abc"}, "kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "nyota": nyota, "nyota_blanco": nyota_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 

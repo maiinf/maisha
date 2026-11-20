@@ -594,3 +594,10 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Guía mbweha | **A · Mwanga, el Viejo Farolillero** (`boceto_personajes_ocaso.png`): encendió el último farol antes de que pararan el sol; gafas de latón y vara con farol de ámbar. |
 | Jefe final | **A · Jua-Giza, el Sol Encadenado**: disco solar agrietado entre aros de reloj; pelea de luz y sombra; Maisha y Mauti no lo destruyen: sueltan los pesos del reloj y llega la primera noche. |
 | Mapa y primera zona | **Tal cual**: Mirador del Ocaso → Jioni (Ciudad de los Faroles) → Dunas de Penumbra (Kivuli) / Jardín de los Faroles (Mondo) / Calzada de los Obeliscos (Saa-Mchanga) → El Horizonte Inmóvil. 12 Faroles de la Hora y 3 secretos. Se empieza por **El Mirador del Ocaso** (`boceto_mirador_ocaso.png`). |
+
+### 2026-11-21 · Jioni, la Ciudad de los Faroles (Decidido con Iam, sobre `documentacion/boceto_jioni.png`, pintado por Claude porque el de Gemini no estaba)
+| Qué | Decisión |
+| :--- | :--- |
+| Qué le pasa a la ciudad | **A · Los Desvelados**: sin noche nadie duerme; los fénec están agotados, con ojeras, repitiendo su faena. Cada **Farol de la Hora** colgado en la Plaza de los Doce Faroles devuelve una hora de la tarde: alguien por fin descansa y ayuda. |
+| Guía | **A · Kibatari**, el joven aprendiz de Mwanga, que nunca ha visto la noche. |
+| Trazado | **Tal cual**: la Escalera del Arco (desde el Mirador), la Plaza de los Doce Faroles, la Torre del Reloj de Arena (ata el sol con tres cadenas), el Barrio de las Cortinas (oeste), el Mercado del Crepúsculo (este) y cuatro salidas: Dunas de Penumbra (oeste), Jardín de los Faroles (este), Calzada de los Obeliscos (sureste) y la Puerta del Horizonte (sur, sellada). |

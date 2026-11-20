@@ -126,5 +126,312 @@
 				]
 			}
 		]
+	},
+	"jioni_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La escalera baja y baja. Cuando por fin acaba, estoy en una ciudad de tejados corales, con la luz de las cinco de la tarde pegada a todo.",
+					"Hay gente por todas partes. Zorros de orejas enormes, barriendo, amasando, cosiendo. Nadie se para. Nadie se sienta.",
+					"Y todos tienen la misma cara. Unas ojeras moradas que les llegan casi al hocico.",
+					"En el centro de la plaza hay doce postes en corro. Todos con su gancho. Todos vacíos."
+				]
+			}
+		]
+	},
+	"jioni_torre": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una torre de arenisca con un reloj de arena enorme en la cara. Casi toda la arena está arriba, quieta. No cae ni un grano.",
+					"De lo alto salen tres cadenas gruesas que suben y suben, hasta perderse en el sol.",
+					"Así que es aquí. Aquí lo ataron."
+				]
+			}
+		]
+	},
+	"jioni_poste_vacio": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un poste de hierro con un gancho vacío. El hueco justo para un farol."
+				]
+			}
+		]
+	},
+	"jioni_poste_lleno": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El Farol de la Hora cuelga tranquilo. La llama, que en el valle estaba quieta, aquí tiembla un poco. Como si respirara."
+				]
+			}
+		]
+	},
+	"jioni_salida_dunas": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Al oeste, el camino se hunde en un mar de dunas violetas. Desde aquí se oye algo que repta por la arena.",
+					"Todavía no. Primero, la ciudad."
+				]
+			}
+		]
+	},
+	"jioni_salida_jardin": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Al este, una verja de hierro con enredaderas. Detrás brilla un jardín entero de faroles... y algo que revolotea alrededor de las luces.",
+					"Todavía no. Primero, la ciudad."
+				]
+			}
+		]
+	},
+	"jioni_salida_calzada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Al sureste baja una calzada de losas, flanqueada por obeliscos. Sus sombras se mueven todas a la vez, como un reloj gigante.",
+					"Todavía no. Primero, la ciudad."
+				]
+			}
+		]
+	},
+	"jioni_salida_horizonte": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La Puerta del Horizonte. Dos hojas de bronce bajo un arco morado, y detrás, un frío que no es de este valle.",
+					"Tiene tres huecos redondos, del tamaño de una pesa. Vacíos.",
+					"Por aquí se va a donde se paró todo. Lo noto en el pecho."
+				]
+			}
+		]
+	},
+	"kibatari": {
+		"nombre": "Kibatari",
+		"conversaciones": [
+			{
+				"no": [
+					"kibatari_conocido"
+				],
+				"lineas": [
+					"¡Eh! ¡Tú no eres de aquí! ¿Bajas del Mirador? ¿Has visto a Mwanga? ¿Está bien? ¿Sigue sentado en su piedra?",
+					"Soy Kibatari. Su aprendiz. Bueno, aprendiz de farolillero en una ciudad donde nunca anochece. Ya ves qué oficio.",
+					"Me sé de memoria cómo se enciende un farol. Lo que no he hecho nunca es encender uno. Ni he visto la noche. Nadie de mi edad la ha visto.",
+					"Mira a tu alrededor: aquí nadie duerme desde que ataron el sol. No pueden. Hay tanta luz que se les olvidó cómo se hace.",
+					"Mwanga dice que cada uno de esos doce postes era una hora de la tarde. Que cuando colgaba el farol, la ciudad sabía que el día iba terminando, y se iba calmando.",
+					"Si encuentras Faroles de la Hora, cuélgalos aquí. A lo mejor... a lo mejor alguien consigue cerrar los ojos un ratito."
+				],
+				"marca": [
+					"kibatari_conocido"
+				]
+			},
+			{
+				"si": [
+					"kibatari_conocido"
+				],
+				"no": [
+					"jioni/descansa_kikombe"
+				],
+				"lineas": [
+					"Los postes de la plaza. Si llevas un Farol de la Hora, acércate a uno y cuélgalo. Yo no puedo: Mwanga no me dejó llevarme ninguno.",
+					"Y no te preocupes por el orden. Las horas ya se apañan solas."
+				]
+			},
+			{
+				"si": [
+					"kibatari_conocido",
+					"jioni/descansa_kesho"
+				],
+				"no": [
+					"kibatari_caminos"
+				],
+				"lineas": [
+					"¿Lo has visto? ¡Kikombe se ha sentado! ¡Sentado! Lleva no sé cuánto sirviendo té de pie y ahora se ha sentado a bebérselo.",
+					"Y a Kesho se le han cerrado los ojos con la masa en las manos. Está roncando. Ronca fatal. Es precioso.",
+					"Vale. Vale, me centro. Faltan diez faroles, y Mwanga siempre decía que se perdieron por los tres caminos.",
+					"Al oeste, las Dunas de Penumbra: allí vive Kivuli, un alacrán de sombra del tamaño de una casa. Al este, el Jardín de los Faroles, con una polilla enorme, Mondo, que no deja que se apague ninguna luz.",
+					"Y al sureste, la Calzada de los Obeliscos. Allí está Saa-Mchanga, el relojero. Es quien ajustó las cadenas de la torre.",
+					"Cada uno guarda una pesa del reloj. Con las tres, la Puerta del Horizonte se abre. Y detrás... detrás está el sol, atado del todo."
+				],
+				"marca": [
+					"kibatari_caminos"
+				]
+			},
+			{
+				"si": [
+					"kibatari_caminos"
+				],
+				"lineas": [
+					"Dunas al oeste, Jardín al este, Calzada al sureste. Tres pesas para la Puerta del Horizonte.",
+					"Y los faroles que encuentres, aquí, a la plaza. Yo me quedo vigilándolos. Es lo único que sé hacer de farolillero, de momento."
+				]
+			}
+		]
+	},
+	"jioni_kikombe": {
+		"nombre": "Kikombe",
+		"conversaciones": [
+			{
+				"no": [
+					"jioni/descansa_kikombe"
+				],
+				"lineas": [
+					"¿Té? ¿Quieres té? Hay té. Siempre hay té. Te sirvo una taza. ¿Otra? Otra.",
+					"Es que si paro de servir me quedo quieta, y si me quedo quieta me doy cuenta de lo cansada que estoy. Así que sirvo.",
+					"¿Ves? Otra taza. Ya ni sé para quién."
+				]
+			},
+			{
+				"si": [
+					"jioni/descansa_kikombe"
+				],
+				"lineas": [
+					"Ay... perdona que no me levante. Es la primera vez en no sé cuánto que me siento.",
+					"Cuando has colgado ese farol, la luz se ha puesto un poquito más naranja. Y de pronto he notado las piernas. Y me he sentado. Así, sin más.",
+					"Toma, esta taza sí es para ti. Para que la bebas despacio. Aquí se nos había olvidado hacer las cosas despacio."
+				]
+			}
+		]
+	},
+	"jioni_kesho": {
+		"nombre": "Kesho",
+		"conversaciones": [
+			{
+				"no": [
+					"jioni/descansa_kesho"
+				],
+				"lineas": [
+					"Amasa, dobla, amasa. Amasa, dobla, amasa. Esta hogaza lleva... no sé cuánto en mis manos.",
+					"No la meto al horno porque, si la meto, se hace. Y si se hace, se acaba. Y luego habría que hacer otra.",
+					"Amasa, dobla, amasa..."
+				]
+			},
+			{
+				"si": [
+					"jioni/descansa_kesho"
+				],
+				"lineas": [
+					"Mmh... ¿eh? Me he dormido. Con las manos en la masa. Literalmente.",
+					"He soñado con un horno. Uno de verdad, con la puerta abierta y el pan dentro, y olía... cómo olía.",
+					"Creo que voy a meterla al horno. Esta. Que se acabe. Mañana haré otra. Qué palabra tan rara, mañana."
+				]
+			}
+		]
+	},
+	"jioni_mto": {
+		"nombre": "Mto",
+		"conversaciones": [
+			{
+				"no": [
+					"jioni/descansa_mto"
+				],
+				"lineas": [
+					"Cojines. Hago cojines. Tengo la casa llena de cojines y nadie se sienta en ellos.",
+					"¿Para qué vas a apoyar la cabeza si no vas a dormir? Pero yo coso. Un cojín, otro cojín.",
+					"Me han dicho que antes la gente los abrazaba por la noche. Qué cosas."
+				]
+			},
+			{
+				"si": [
+					"jioni/descansa_mto"
+				],
+				"lineas": [
+					"He abrazado uno. Uno de los míos. Y me he quedado así un rato, con la cara en el cojín.",
+					"No he llegado a dormirme. Pero casi. Casi es mucho más de lo que había."
+				]
+			}
+		]
+	},
+	"jioni_pazia": {
+		"nombre": "Pazia",
+		"conversaciones": [
+			{
+				"no": [
+					"jioni/descansa_pazia"
+				],
+				"lineas": [
+					"Cortinas. Más gruesas. Más oscuras. Tienen que ser más oscuras.",
+					"Si consigo que dentro de casa esté oscuro, a lo mejor es de noche dentro de casa. A lo mejor.",
+					"Nunca funciona. La luz se cuela por la costura."
+				]
+			},
+			{
+				"si": [
+					"jioni/descansa_pazia"
+				],
+				"lineas": [
+					"He abierto las cortinas. Para ver el farol de la plaza. Es raro, ¿verdad? Toda la vida tapando la luz y ahora quiero mirar esa.",
+					"Es que esa no quema. Esa avisa. Dice: ya va siendo hora."
+				]
+			}
+		]
+	},
+	"jioni_ufagio": {
+		"nombre": "Ufagio",
+		"conversaciones": [
+			{
+				"no": [
+					"jioni/descansa_ufagio"
+				],
+				"lineas": [
+					"Barro la arena. La arena vuelve. Barro la arena. La arena vuelve.",
+					"El viento la trae de las dunas, del oeste. Antes, de noche, el viento paraba. Ahora no para nunca.",
+					"¿Te importa apartarte? Estás encima de mi arena."
+				]
+			},
+			{
+				"si": [
+					"jioni/descansa_ufagio"
+				],
+				"lineas": [
+					"Me he apoyado en la escoba. Solo un momento. Y la arena... ha seguido viniendo, claro.",
+					"Pero me da igual. Que venga. Ya la barreré luego. Luego. Qué bien suena luego."
+				]
+			}
+		]
+	},
+	"jioni_ndoto": {
+		"nombre": "Ndoto",
+		"conversaciones": [
+			{
+				"no": [
+					"jioni/descansa_ndoto"
+				],
+				"lineas": [
+					"¿Tú has soñado alguna vez? Kibatari dice que soñar es como ver cosas con los ojos cerrados.",
+					"Yo cierro los ojos muy fuerte y solo veo naranja. Naranja y naranja.",
+					"Mi abuela dice que antes de que pararan el sol ella soñaba con estrellas. Yo no sé qué son las estrellas."
+				]
+			},
+			{
+				"si": [
+					"jioni/descansa_ndoto"
+				],
+				"lineas": [
+					"¡He visto algo! Con los ojos cerrados. Era oscuro, oscuro, y había puntitos que brillaban.",
+					"La abuela dice que eso eran estrellas. ¡Estrellas!",
+					"Quiero volver a verlas. ¿Me ayudas a que vuelva la noche? Pero de verdad, ¿eh? Entera."
+				]
+			}
+		]
 	}
 }
