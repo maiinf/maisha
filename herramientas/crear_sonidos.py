@@ -3026,6 +3026,77 @@ def vecino_descansa():
     return reverb(p.entera(), 2.0, 0.38)
 
 
+def arena_hunde():
+    """Hundirse despacio en la arena movediza de las Dunas de Penumbra."""
+    p = Pista(0.95)
+    succion = paso_banda(ruido_rosa(0.75), 140, 680) * adsr(_n(0.75), 0.08, 0.18, 0.55, 0.32) * 0.62
+    p.poner(succion, 0.0)
+    granos = paso_banda(ruido(0.68), 1800, 5200) * adsr(_n(0.68), 0.06, 0.15, 0.40, 0.28) * 0.28
+    p.poner(granos, 0.04)
+    caida = seno(_desliz(170, 72, 0.72), 0.72) * adsr(_n(0.72), 0.05, 0.15, 0.45, 0.28) * 0.30
+    p.poner(caida, 0.0)
+    return reverb(p.entera(), 1.1, 0.22)
+
+
+def kivuli_arena():
+    """El gran alacrán Kivuli se entierra y avanza rápido bajo la arena del Cráter."""
+    p = Pista(1.15)
+    temblor = paso_bajo(ruido_rosa(0.92), 380) * adsr(_n(0.92), 0.10, 0.18, 0.62, 0.35) * 0.68
+    p.poner(temblor, 0.0)
+    arena = paso_banda(ruido(0.85), 1600, 4800) * adsr(_n(0.85), 0.08, 0.16, 0.45, 0.30) * 0.32
+    p.poner(arena, 0.04)
+    p.poner(tambor("D1", 0.45, 0.42, golpe=0.35), 0.02)
+    return reverb(p.entera(), 1.35, 0.26)
+
+
+def kivuli_emerge():
+    """Kivuli rompe la superficie del Cráter lanzando arena y chasqueando sus pinzas."""
+    p = Pista(1.05)
+    p.poner(taiko(0.60, 0.85), 0.0)
+    chorro = paso_banda(ruido_rosa(0.55), 350, 2600) * adsr(_n(0.55), 0.02, 0.12, 0.45, 0.26) * 0.65
+    p.poner(chorro, 0.02)
+    pinza = paso_banda(ruido(0.09), 1500, 4800) * adsr(_n(0.09), 0.003, 0.02, 0.25, 0.04) * 0.58
+    p.poner(pinza, 0.12)
+    p.poner(pinza, 0.24)
+    return reverb(p.entera(), 1.4, 0.28)
+
+
+def kivuli_vuelca():
+    """El sol deslumbra a Kivuli: chispazo solar, vuelco pesado de obsidiana y reloj de cristal expuesto."""
+    p = Pista(1.45)
+    p.poner(taiko(0.75, 0.88), 0.12)
+    luz = seno(_desliz(720, 1480, 0.36), 0.36) * adsr(_n(0.36), 0.02, 0.08, 0.40, 0.16) * 0.28
+    p.poner(luz, 0.0)
+    cruje = paso_banda(ruido_rosa(0.42), 280, 1800) * adsr(_n(0.42), 0.02, 0.10, 0.45, 0.18) * 0.52
+    p.poner(cruje, 0.10)
+    for k, nota in enumerate(("F5", "A5", "D6")):
+        p.poner(campanita(nota, 0.95, 0.24 - k * 0.03), 0.16 + k * 0.07)
+    return reverb(p.entera(), 1.75, 0.34)
+
+
+def espejo_desentierra():
+    """Una Carga Sísmica libera un espejo de bronce enterrado en la arena."""
+    p = Pista(1.1)
+    p.poner(tambor("E2", 0.34, 0.55, golpe=0.50), 0.0)
+    arena = paso_banda(ruido_rosa(0.46), 360, 2800) * adsr(_n(0.46), 0.02, 0.10, 0.40, 0.20) * 0.58
+    p.poner(arena, 0.02)
+    p.poner(campanita("E5", 0.85, 0.28), 0.10)
+    p.poner(campanita("B5", 0.95, 0.24), 0.20)
+    return reverb(p.entera(), 1.5, 0.32)
+
+
+def puente_funde():
+    """El rayo de los dos espejos funde la arena movediza en un puente de cristal dorado."""
+    p = Pista(2.3)
+    calor = paso_banda(ruido_rosa(1.25), 320, 2400) * adsr(_n(1.25), 0.14, 0.26, 0.55, 0.45) * 0.44
+    p.poner(calor, 0.0)
+    rayo = seno(_desliz(420, 1180, 0.95), 0.95) * adsr(_n(0.95), 0.10, 0.20, 0.50, 0.35) * 0.22
+    p.poner(rayo, 0.05)
+    for k, nota in enumerate(("D5", "F#5", "A5", "C#6", "D6")):
+        p.poner(campanita(nota, 1.35, 0.26 - k * 0.02), 0.35 + k * 0.14)
+    return reverb(p.entera(), 2.2, 0.40)
+
+
 def viento_arena(dur=30.0):
     """Viento cálido de las Dunas de Penumbra arrastrando arena fina sobre la arenisca."""
     n = _n(dur + 4)
@@ -3163,6 +3234,12 @@ EFECTOS = {
     "kivuli_muere": (kivuli_muere, 0.76),
     "farol_colgar": (farol_colgar, 0.78),
     "vecino_descansa": (vecino_descansa, 0.72),
+    "arena_hunde": (arena_hunde, 0.74),
+    "kivuli_arena": (kivuli_arena, 0.76),
+    "kivuli_emerge": (kivuli_emerge, 0.84),
+    "kivuli_vuelca": (kivuli_vuelca, 0.84),
+    "espejo_desentierra": (espejo_desentierra, 0.76),
+    "puente_funde": (puente_funde, 0.84),
 }
 
 AMBIENTES = {

@@ -30,6 +30,7 @@ const ALTO_MAPA := {
 	"galerias_ambar": 1.625,
 	"fundicion_escoria": 1.625,
 	"nucleo_estrella": 1.625,
+	"dunas_penumbra": 1.25,
 }
 ## Mapas en los que «0» no es peña sino cielo o vacío (no se levantan bloques de roca)
 const SIN_PENAS := ["observatorio_aurora", "aguja_caida", "mirador_ocaso", "jioni"]

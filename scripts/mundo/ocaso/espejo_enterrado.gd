@@ -47,7 +47,7 @@ func recibir_carga(_direccion: Vector2) -> bool:
 	if _arena:
 		_arena.queue_free()
 	_sprite.visible = true
-	Sonido.efecto("roca_romper", -4.0, global_position, 0.2)
+	Sonido.efecto("espejo_desentierra", -1.5, global_position, 0.12)
 	Impacto.chispa(global_position + Vector2(0, -8), Vector2.UP, Color("c8a4b8"))
 	for e in get_tree().get_nodes_in_group("espejos"):
 		e.comprobar()

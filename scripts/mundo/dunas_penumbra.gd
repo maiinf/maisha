@@ -169,7 +169,7 @@ func _al_girar_espejo() -> void:
 			_hud.mostrar_mensaje("Espejos encendidos: %d de %d" % [n, _espejos.size()])
 		return
 	puente.fundir()
-	Sonido.efecto("arco_ocaso", 0.0, Vector2(PUENTE_CASILLAS.get_center()) * 16.0)
+	Sonido.efecto("puente_funde", 0.0, Vector2(PUENTE_CASILLAS.get_center()) * 16.0)
 	Impacto.temblar(3.0, 0.5)
 	_hud.mostrar_mensaje("El rayo funde la arena en cristal")
 

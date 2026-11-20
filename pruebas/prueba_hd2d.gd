@@ -225,6 +225,23 @@ func _ready() -> void:
 	_comprobar(jioni_edifs >= 9, "las casas, puestos, Torre y Puerta del Horizonte de Jioni se construyen en 3D (%d)" % jioni_edifs)
 	_comprobar(postes_pie == 12, "los 12 postes de la Plaza de los Faroles dibujan su halo de pie (%d)" % postes_pie)
 
+	print("Las Dunas de Penumbra en HD-2D:")
+	await _ir("dunas_penumbra", "jioni")
+	espejo = _espejo()
+	var dunas_altas := false
+	var puente_suelo := false
+	var sol_dunas_suelo := false
+	if espejo:
+		for h in espejo.get_children():
+			if h is MeshInstance3D and (h as MeshInstance3D).layers == 2:
+				dunas_altas = true
+		var p_n := get_tree().current_scene.get_node_or_null("Puente") as CanvasItem
+		var s_n := get_tree().current_scene.get_node_or_null("Sol") as CanvasItem
+		puente_suelo = p_n != null and p_n.visibility_layer == (1 << 12)
+		sol_dunas_suelo = s_n != null and s_n.visibility_layer == (1 << 12)
+	_comprobar(espejo != null and dunas_altas and absf(float(espejo.get("_alto_pena")) - 1.25) < 0.01, "Las Dunas levantan sus bordes «0» como dunas altas (1,25) sobre arena a ras")
+	_comprobar(puente_suelo and sol_dunas_suelo, "el puente de cristal y las sombras de las velas quedan tumbados en el suelo")
+
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")
 	espejo = _espejo()

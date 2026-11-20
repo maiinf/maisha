@@ -116,7 +116,7 @@ func _buscar_sombra() -> Vector2:
 func _enterrarse() -> void:
 	_meta = _buscar_sombra()
 	_cambiar(Fase.ENTERRADO)
-	Sonido.efecto("sombra_repta", -2.0, global_position, 0.2)
+	Sonido.efecto("kivuli_arena", -1.5, global_position, 0.15)
 
 
 func expuesto() -> bool:
@@ -137,7 +137,7 @@ func _process(delta: float) -> void:
 			global_position = global_position.move_toward(_meta, (ENTERRADO_VEL_FURIA if furia() else ENTERRADO_VEL) * delta)
 			if global_position.distance_to(_meta) < 2.0:
 				_cambiar(Fase.EMERGE)
-				Sonido.efecto("kivuli_pica", -2.0, global_position, 0.1)
+				Sonido.efecto("kivuli_emerge", -1.0, global_position, 0.08)
 				Impacto.temblar(2.0, 0.3)
 		Fase.EMERGE:
 			if _t >= EMERGE:
@@ -181,7 +181,7 @@ func _picar(maisha: Node2D, d: Vector2) -> void:
 func _volcar() -> void:
 	_cambiar(Fase.VOLCADO)
 	_golpes = 0
-	Sonido.efecto("kivuli_deslumbra", 0.0, global_position)
+	Sonido.efecto("kivuli_vuelca", 0.0, global_position)
 	Impacto.temblar(3.0, 0.4)
 	Impacto.chispa(global_position + Vector2(0, -30), Vector2.UP, Color(1.0, 0.85, 0.5))
 

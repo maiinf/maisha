@@ -411,7 +411,7 @@ func _nombre_catalogo(tex: Texture2D) -> String:
 	]:
 		if ruta.ends_with(clave):
 			return clave
-	if ruta.contains("/desfiladero/") or ruta.contains("/mji_jiwe/") or ruta.contains("/galerias/") or ruta.contains("/fundicion/") or ruta.contains("/aguja/") or ruta.contains("/nucleo/") or ruta.contains("/mirador/") or ruta.contains("/jioni/"):
+	if ruta.contains("/desfiladero/") or ruta.contains("/mji_jiwe/") or ruta.contains("/galerias/") or ruta.contains("/fundicion/") or ruta.contains("/aguja/") or ruta.contains("/nucleo/") or ruta.contains("/mirador/") or ruta.contains("/jioni/") or ruta.contains("/dunas/"):
 		return ""
 	var archivo := ruta.get_file()
 	if archivo == "fuente_dorada.png":

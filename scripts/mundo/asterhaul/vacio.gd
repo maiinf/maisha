@@ -50,7 +50,7 @@ func _caer() -> void:
 	cayendo = true
 	var maisha: Node2D = _escena._maisha
 	maisha.set("puede_actuar", false)
-	Sonido.efecto("sombra_repta" if hundir else "kipanga_picado", -4.0, maisha.global_position, 0.3)
+	Sonido.efecto("arena_hunde" if hundir else "kipanga_picado", -3.0, maisha.global_position, 0.2)
 	var sprite := maisha.get_node("Sprite") as Node2D
 	var y_sprite := sprite.position.y
 	var t := create_tween().set_parallel(true)
