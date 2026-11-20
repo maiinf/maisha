@@ -72,6 +72,8 @@ const OBJETOS := {
 		"texto": "Un trozo de ámbar tibio en forma de estrella rota, con una limadura de hierro pegada que no hay manera de quitarle. Tira un poquito hacia lo que es de metal."},
 	"esquirla_kito": {"uno": "Esquirla de Estrella", "encargo": 0, "hecho": "", "icono": 27,
 		"texto": "Un trozo de ámbar tibio en forma de estrella rota, con una muesca finísima de buril en un canto. Hace un ruidito muy bajo, como si escuchara."},
+	"farol_hora": {"uno": "Farol de la Hora", "varios": "Faroles de la Hora", "encargo": 0, "hecho": "", "icono": 27,
+		"texto": "Un farol de latón con el cristal de ámbar. La llama está quieta, sin temblar, como si se hubiera parado a la vez que el sol. En Jioni hay doce huecos esperando a estos faroles."},
 	"esquirla_estrella": {"uno": "Esquirla de Estrella", "varios": "Esquirlas de Estrella", "encargo": 0, "hecho": "", "icono": 27,
 		"texto": "Un trozo de ámbar tibio en forma de estrella rota. Late despacio. En Mji-Jiwe habrá quien la eche de menos."},
 	"ficha_nyota": {"uno": "Ficha del Índice", "encargo": 0, "hecho": "", "icono": 27,

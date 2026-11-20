@@ -2603,6 +2603,41 @@ def crear_nucleo():
     return ["".join(f) for f in m], {}
 
 
+def crear_mirador():
+    """EL MIRADOR DEL OCASO (el Valle del Ocaso, 72x50): mesetas de arenisca colgadas sobre el abismo del
+    atardecer (lo que no es meseta es vacío, «=»: quien lo pisa cae). Se entra por el norte (del Kitovu, «_»).
+      1. LA ENTRADA (arriba, centro): el primer obelisco; con el sol al oeste, su sombra larga cruza al este.
+      1B. EL BALCÓN ESTE: el 1.er Farol de la Hora y un Kivuli; una rampa baja a la plaza.
+      2. LA PLAZA DEL RELOJ (centro): Mwanga y el 1.er Reloj de Sol. Con el sol al este, la sombra del obelisco
+         del oeste cruza a las Terrazas; con el sol al sur, la del Arco sube hasta la plaza.
+      3. LAS TERRAZAS DE PENUMBRA (oeste): dos Kivuli y el 2.º Reloj; al norte, por otra sombra, el SECRETO.
+      4. EL ARCO DEL ATARDECER (sur): dos espejos de bronce y, al este, la bajada a Jioni.
+    Obeliscos, relojes, sombras, espejos, Mwanga, los Kivuli y los faroles los pone la escena."""
+    ANCHO, ALTO = 72, 50
+    m = [["=" for _ in range(ANCHO)] for _ in range(ALTO)]
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            if x in (0, ANCHO - 1) or y in (0, ALTO - 1):
+                m[y][x] = "0"
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y][x] = c
+
+    rect(36, 1, 38, 1, "%")
+    rect(36, 0, 38, 0, "_")
+    rect(30, 2, 44, 10, "%")                                 # 1. la Entrada
+    rect(54, 3, 68, 13, "%")                                 # 1B. el Balcón Este...
+    rect(58, 14, 60, 21, "%")                                # ...y su rampa a la plaza
+    rect(51, 19, 60, 21, "%")
+    rect(28, 18, 50, 30, "%")                                # 2. la Plaza del Reloj
+    rect(4, 16, 20, 34, "%")                                 # 3. las Terrazas de Penumbra
+    rect(6, 3, 16, 9, "%")                                   # el Secreto
+    rect(26, 37, 56, 46, "%")                                # 4. el Arco del Atardecer
+    return ["".join(f) for f in m], {}
+
+
 def crear_seccion():
     """LA SECCIÓN PROHIBIDA (Sigilia, 64x72, de sur a norte): las salas de mármol morado bajo el Gran Archivo. Lo que
     no es sala («0») son estanterías de libros encadenados. Se entra por el sur (del Gran Archivo de Maandiko, «_»).
@@ -3385,7 +3420,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mji_jiwe", "galerias_ambar", "fundicion_escoria", "aguja_caida", "nucleo_estrella"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mirador_ocaso", "mji_jiwe", "galerias_ambar", "fundicion_escoria", "aguja_caida", "nucleo_estrella"}
 
 
 def construir_suelo(nombre):
@@ -3537,7 +3572,7 @@ if __name__ == "__main__":
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
                         "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion,
-                        "desfiladero_meteorito": crear_desfiladero, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion, "aguja_caida": crear_aguja, "nucleo_estrella": crear_nucleo}.get(nombre, crear_prados)()
+                        "desfiladero_meteorito": crear_desfiladero, "mirador_ocaso": crear_mirador, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion, "aguja_caida": crear_aguja, "nucleo_estrella": crear_nucleo}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

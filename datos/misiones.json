@@ -13,7 +13,8 @@
 		"kitovu": [
 			"prados_del_eco",
 			"casa_shamba",
-			"desfiladero_meteorito"
+			"desfiladero_meteorito",
+			"mirador_ocaso"
 		],
 		"casa_shamba": [
 			"kitovu"
@@ -157,6 +158,9 @@
 		],
 		"nucleo_estrella": [
 			"mji_jiwe"
+		],
+		"mirador_ocaso": [
+			"kitovu"
 		]
 	},
 	"misiones": [
@@ -1873,6 +1877,60 @@
 					"ir": {
 						"escena": "nucleo_estrella",
 						"buscar": "grupo:jefes"
+					}
+				}
+			]
+		},
+		{
+			"id": "mirador_ocaso",
+			"tipo": "historia",
+			"titulo": "El Mirador del Ocaso",
+			"texto": "Con el Cetro del Nexo despierto, el arco de piedra del sur del Kitovu se ha encendido. Al otro lado, un valle donde el sol lleva siglos a punto de ponerse.",
+			"aparece": [
+				"nexo_despierto"
+			],
+			"hecha": [
+				"arco_atardecer_abierto"
+			],
+			"pasos": [
+				{
+					"texto": "Cruza el arco del sur del Kitovu",
+					"hecho": [
+						"mirador_ocaso"
+					],
+					"ir": {
+						"escena": "kitovu",
+						"buscar": "puerta:mirador_ocaso"
+					}
+				},
+				{
+					"texto": "Habla con el viejo farolillero de la plaza",
+					"hecho": [
+						"mwanga_reloj"
+					],
+					"ir": {
+						"escena": "mirador_ocaso",
+						"buscar": "aldeano:mwanga"
+					}
+				},
+				{
+					"texto": "Gira el sol hacia el sur con un Reloj de Sol",
+					"hecho": [
+						"mirador/sol_sur"
+					],
+					"ir": {
+						"escena": "mirador_ocaso",
+						"buscar": "grupo:relojes_sol"
+					}
+				},
+				{
+					"texto": "Enciende los dos espejos del Arco del Atardecer",
+					"hecho": [
+						"arco_atardecer_abierto"
+					],
+					"ir": {
+						"escena": "mirador_ocaso",
+						"buscar": "grupo:espejos"
 					}
 				}
 			]

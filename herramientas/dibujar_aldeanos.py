@@ -68,6 +68,12 @@ MATERIALES = {
     "daman":    ["3A2A22", "6E5444", "9A7A62", "C2A486"],   # pelo pardo de damán de roca
     "polvo":    ["5E5A58", "86827E", "A6A29C", "C4C0B8"],   # el polvo gris que deja mudos a los canteros
     "en_blanco": ["8A869A", "B4B0C2", "CDCAD8", "E0DEE8"],  # lo que la Tinta Quieta deja sin color
+    # EL VALLE DEL OCASO
+    "fenec":    ["6A4424", "B8864E", "E0B47A", "F6DCA8"],   # pelo de zorro fénec (arena al atardecer)
+    "oreja_i":  ["8A4A4A", "C87A6E", "E8A898", "F8CCC0"],   # el dentro de las orejas
+    "malva":    ["2A1638", "4E2A5E", "7A4A86", "A276AA"],   # la túnica malva del farolillero
+    "coral":    ["6A2420", "A8443A", "D8705A", "F4A080"],   # la bufanda coral
+    "ambar_f":  ["8A4A10", "E89A2A", "FCC860", "FFF0B0"],   # la luz del farol
 }
 ANCHO, ALTO = 24, 32
 
@@ -870,6 +876,51 @@ def mwamba_gris():
     return mwamba(True)
 
 
+def mwanga():
+    """MWANGA: el viejo farolillero de los zorros fénec (mbweha) del Valle del Ocaso. Orejas altísimas que oyen
+    pasar el tiempo, unas gafas de latón subidas a la frente, una bufanda coral, la túnica malva hasta los pies y,
+    en la mano, la vara con el farol de ámbar que encendió antes de que pararan el sol."""
+    l = Lienzo()
+    for y in range(6, 30):                                    # la vara...
+        l.px(19, y, "concha", 2 if y % 4 else 1)
+    l.rect(20, 6, 21, 6, "concha", 2)                         # ...su gancho...
+    l.rect(20, 7, 22, 12, "laton", 1)                         # ...y el farol colgado
+    l.rect(21, 8, 21, 11, "ambar_f", 3); l.px(20, 9, "ambar_f", 2); l.px(22, 10, "ambar_f", 2)
+    l.rect(20, 7, 22, 7, "laton", 3)
+    def oreja(tri, mat):                                       # un triángulo relleno
+        (ax, ay), (bx, by), (cx, cy) = tri
+        for y in range(ALTO):
+            for x in range(ANCHO):
+                px_, py_ = x + 0.5, y + 0.5
+                d1 = (px_ - bx) * (ay - by) - (ax - bx) * (py_ - by)
+                d2 = (px_ - cx) * (by - cy) - (bx - cx) * (py_ - cy)
+                d3 = (px_ - ax) * (cy - ay) - (cx - ax) * (py_ - ay)
+                if not ((d1 < 0 or d2 < 0 or d3 < 0) and (d1 > 0 or d2 > 0 or d3 > 0)):
+                    l.px(x, y, mat, 2)
+    for lado in (0, 1):                                       # las orejas, enormes y abiertas hacia fuera
+        f = (lambda x: x) if lado == 0 else (lambda x: 24 - x)
+        oreja(((f(6.5), 10.0), (f(0.5), 0.5), (f(11.0), 7.5)), "fenec")
+        oreja(((f(7.0), 8.5), (f(2.5), 2.5), (f(9.5), 7.0)), "oreja_i")
+    l.ovalo(11.5, 23.0, 5.2, 7.0, "malva")                    # la túnica hasta los pies
+    l.rect(8, 28, 15, 29, "malva", 1)
+    l.ovalo(11.5, 11.0, 5.2, 4.4, "fenec")                    # la cabeza
+    l.ovalo(11.5, 13.6, 2.8, 1.8, "hocico", plano=True)
+    l.px(11, 12, "nariz"); l.px(12, 12, "nariz")
+    l.rect(7, 7, 16, 7, "laton", 2)                           # las gafas de latón, en la frente
+    l.ovalo(9.0, 7.5, 1.4, 1.2, "ambar_f"); l.ovalo(14.0, 7.5, 1.4, 1.2, "ambar_f")
+    ojos(l, 10, 9, 14, alto=2)
+    for x in (8, 9, 14, 15):                                  # las cejas blancas de viejo
+        l.px(x, 9, "cana", 3)
+    l.rect(7, 16, 16, 17, "coral", 2)                         # la bufanda coral...
+    l.rect(13, 18, 14, 21, "coral", 1)                        # ...con su punta colgando
+    l.px(13, 22, "coral", 1)
+    l.ovalo(17.5, 18.5, 1.7, 1.9, "fenec")                    # la mano en la vara
+    l.ovalo(4.5, 26.0, 2.6, 2.0, "fenec")                     # la cola asomando...
+    l.px(3, 26, "cana", 3); l.px(2, 26, "cana", 2)            # ...con la punta clara
+    l.rect(9, 30, 10, 30, "fenec", 1); l.rect(13, 30, 14, 30, "fenec", 1)
+    return l
+
+
 def _engrisar(l, oscuros=("concha", "delantal", "rojo", "azul", "metal", "cobre")):
     """Cubre un dibujo de POLVO GRIS (los artesanos de Mji-Jiwe sin pulso): todo gris, los ojos apagados."""
     for y in range(ALTO):
@@ -1215,7 +1266,7 @@ def alza_derecha(l, filas=2, desde_x=17, desde_y=0):
 
 
 ## Desde qué columna (y fila) se levanta lo de la mano derecha en el gesto por defecto (para no mover picos ni orejas)
-ALZA = {"mwamba": (16, 0), "mwamba_gris": (16, 0), "mhunzi": (16, 0), "chuma": (16, 0), "kito": (16, 0), "kito_gris": (16, 0), "moto": (16, 0), "moto_gris": (16, 0), "pigo": (16, 0), "pigo_gris": (16, 0),
+ALZA = {"mwanga": (16, 0), "mwamba": (16, 0), "mwamba_gris": (16, 0), "mhunzi": (16, 0), "chuma": (16, 0), "kito": (16, 0), "kito_gris": (16, 0), "moto": (16, 0), "moto_gris": (16, 0), "pigo": (16, 0), "pigo_gris": (16, 0),
         **{"artesano_" + t + s: (16, 0) for t in "abc" for s in ("", "_gris")}, "bibi": (19, 0), "mfereji": (16, 0), "mfereji_blanco": (16, 0), "nyota": (15, 18), "nyota_blanco": (15, 18), "msafiri": (20, 0), "korongo": (20, 0), "mbuzi": (19, 0), "mdiria": (16, 15), "bata": (19, 0),
         "kasia": (17, 0), "sungura": (19, 0)}
 
@@ -1283,7 +1334,7 @@ def fotogramas(nombre):
     return [base, respira(base), parpadea(base), g]
 
 
-ALDEANOS = {"mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma, "pigo": pigo, "pigo_gris": (lambda: _engrisar(pigo(), ("delantal", "laton", "escarabajo", "concha", "metal", "hollin"))), "moto": moto, "moto_gris": (lambda: _engrisar(moto(), ("delantal", "cobre", "azul", "concha", "metal", "brasa", "laton"))), "kito": kito, "kito_gris": (lambda: _engrisar(kito(), ("delantal", "laton", "pajaro", "brasa", "metal"))),
+ALDEANOS = {"mwanga": mwanga, "mwamba": mwamba, "mwamba_gris": mwamba_gris, "mhunzi": mhunzi, "chuma": chuma, "pigo": pigo, "pigo_gris": (lambda: _engrisar(pigo(), ("delantal", "laton", "escarabajo", "concha", "metal", "hollin"))), "moto": moto, "moto_gris": (lambda: _engrisar(moto(), ("delantal", "cobre", "azul", "concha", "metal", "brasa", "laton"))), "kito": kito, "kito_gris": (lambda: _engrisar(kito(), ("delantal", "laton", "pajaro", "brasa", "metal"))),
             **{"artesano_" + t: (lambda t=t: artesano(t)) for t in "abc"},
             **{"artesano_" + t + "_gris": (lambda t=t: _engrisar(artesano(t))) for t in "abc"}, "kalamu": kalamu, "wino": wino, "escriba": escriba, "escriba_blanco": escriba_blanco, "taa": taa, "taa_blanco": taa_blanco, "mfereji": mfereji, "mfereji_blanco": mfereji_blanco, "nyota": nyota, "nyota_blanco": nyota_blanco, "bata": bata, "kasia": kasia, "mdiria": mdiria, "mbuzi": mbuzi, "sungura": sungura, "fuko": fuko, "korongo": korongo, "msafiri": msafiri, "bibi": bibi, "pino": pino, "corteza": corteza, "juncia": juncia, "tawi": tawi}
 

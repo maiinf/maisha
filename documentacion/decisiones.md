@@ -587,3 +587,10 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Mecánica propia | Luz y sombra: mover el sol (o su luz) y usar las sombras largas del atardecer como caminos y puentes. Los detalles, con el boceto. |
 | Quién vive allí | **A · Zorros fénec farolilleros** (*mbweha*), que cuidan los faroles del atardecer. |
 | Boceto | **A · Lo hace Gemini** (pedido en `coordinacion.md`); Claude construye cuando Iam lo apruebe. |
+
+### 2026-11-20 · El Valle del Ocaso: guía, jefe final y mapa (Decidido con Iam, sobre los bocetos de Gemini)
+| Qué | Decisión |
+| :--- | :--- |
+| Guía mbweha | **A · Mwanga, el Viejo Farolillero** (`boceto_personajes_ocaso.png`): encendió el último farol antes de que pararan el sol; gafas de latón y vara con farol de ámbar. |
+| Jefe final | **A · Jua-Giza, el Sol Encadenado**: disco solar agrietado entre aros de reloj; pelea de luz y sombra; Maisha y Mauti no lo destruyen: sueltan los pesos del reloj y llega la primera noche. |
+| Mapa y primera zona | **Tal cual**: Mirador del Ocaso → Jioni (Ciudad de los Faroles) → Dunas de Penumbra (Kivuli) / Jardín de los Faroles (Mondo) / Calzada de los Obeliscos (Saa-Mchanga) → El Horizonte Inmóvil. 12 Faroles de la Hora y 3 secretos. Se empieza por **El Mirador del Ocaso** (`boceto_mirador_ocaso.png`). |

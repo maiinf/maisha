@@ -253,9 +253,9 @@ func _actualizar_luz() -> void:
 	var noche := 1.0 - dia if ciclo else 0.0
 	var encendidas := smoothstep(0.15, 0.6, noche)
 	for d in _de_noche:
+		if not is_instance_valid(d["luz"]):
+			continue                               # (una luz que ya no está: un objeto recogido)
 		var luz: PointLight2D = d["luz"]
-		if not is_instance_valid(luz):
-			continue
 		var vacila := 0.12 * sin(_tiempo * (7.0 if d["fuego"] else 2.0) + d["fase"]) \
 				+ (0.08 * sin(_tiempo * 13.0 + d["fase"] * 2.0) if d["fuego"] else 0.0)
 		luz.energy = float(d["fuerza"]) * encendidas * (1.0 + vacila)

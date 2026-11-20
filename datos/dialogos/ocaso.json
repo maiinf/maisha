@@ -1,0 +1,130 @@
+{
+	"_ayuda": [
+		"Los diálogos del VALLE DEL OCASO (mundo 4, el último). El mismo formato que raiz.json, sigilia.json y asterhaul.json."
+	],
+	"kitovu_arco_sur": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un arco de piedra rosada, plantado en el sur del Kitovu como si siempre hubiera estado aquí. Dentro no hay camino: hay una sombra violeta que no deja ver nada.",
+					"Tiene un sol tallado en lo alto. Lo toco con el cetro y no pasa nada. Está frío. Como si esperase a algo más fuerte."
+				]
+			}
+		]
+	},
+	"mirador_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Al cruzar el arco, el aire se vuelve tibio de golpe. Huele a piedra caliente.",
+					"El sol está ahí delante, enorme y naranja, a un palmo del horizonte. A punto de ponerse.",
+					"Lo miro un rato largo. No baja. Ni un pelo.",
+					"Y debajo no hay suelo: hay más cielo. Las mesetas cuelgan sobre el atardecer como islas sueltas.",
+					"El único camino es la sombra del obelisco, larguísima, tendida sobre el vacío. ...¿Se puede pisar una sombra?"
+				]
+			}
+		]
+	},
+	"mirador_obelisco": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un obelisco de arenisca con las horas grabadas de arriba abajo. Cada una tiene una gotita de ámbar incrustada.",
+					"Bajo la última hora, alguien ha rayado con prisas, torcido: «Aquí se paró la tarde».",
+					"Su sombra cae lejísimos. Al tocarla, el suelo está firme. Más firme que la propia piedra."
+				]
+			}
+		]
+	},
+	"mirador_reloj_atascado": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Le doy con el cetro y rebota. La aguja de bronce no se mueve: está agarrotada, como si llevara siglos sin girar.",
+					"Tiene que haber un truco. Alguien de aquí sabrá."
+				]
+			}
+		]
+	},
+	"mirador_arco": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El arco está tapado por un velo violeta que ondea sin viento. Frío al tacto, como la Tinta Quieta de Sigilia, pero hecho de anochecer.",
+					"A los lados hay dos espejos de bronce sobre sus pies, mirando cada uno a su aire."
+				]
+			}
+		]
+	},
+	"mirador_arco_abierto": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Al otro lado del arco baja una escalera larguísima, tallada en la roca.",
+					"Abajo, muy lejos, asoman los tejados de Jioni. Hay una plaza con doce postes vacíos, donde tendrían que colgar faroles.",
+					"Desde aquí arriba parece una ciudad dormida a media tarde. Bajaré. Pero ese camino es largo, y todavía no."
+				]
+			}
+		]
+	},
+	"mwanga": {
+		"nombre": "Mwanga",
+		"conversaciones": [
+			{
+				"no": [
+					"mwanga_reloj"
+				],
+				"lineas": [
+					"¡Anda! Una visita. Perdona que no me levante, es que hace un rato que estoy aquí sentado. Un rato de... bueno, aquí todo es el mismo rato.",
+					"Me llamo Mwanga. Era el farolillero de Jioni, la ciudad de ahí abajo. Cada tarde, cuando se iba el sol, encendía los doce faroles de la plaza. Uno por hora.",
+					"El último que encendí fue esta tarde. Esta. No ha habido otra desde entonces.",
+					"Los míos le tenían tanto miedo a la noche que ataron el sol al cielo con relojes. Que no se vaya, decían. Que no se acabe el día, que no se nos acabe nada.",
+					"Y sin noche, para qué quieres faroles. Se apagaron solos y se perdieron por el valle. Doce Faroles de la Hora, rodando por ahí.",
+					"Pero bueno, no te aburro. Te enseño el único truco que me queda. ¿Ves ese reloj de sol? Dale un golpecito, sin miedo.",
+					"El sol se corre un poco: del oeste al sur, del sur al este, y vuelta a empezar. Y las sombras de los obeliscos giran con él.",
+					"Aquí las sombras son tan viejas que se han endurecido. Se puede andar por ellas. Eso sí: si giras el sol con los pies encima de una... al vacío.",
+					"Ah, y ojo con los Kivuli, unos bichos de sombra con pinzas. En la penumbra no hay quien los toque. Pero el sol solo calienta el lado del valle donde está, y si les da de lleno, se quedan pasmados."
+				],
+				"marca": [
+					"mwanga_reloj"
+				],
+				"aviso": "Ya puedes girar los Relojes de Sol (golpe de cetro)"
+			},
+			{
+				"si": [
+					"mwanga_reloj"
+				],
+				"no": [
+					"arco_atardecer_abierto"
+				],
+				"lineas": [
+					"Al oeste, el sol da en las terrazas. Al este, en el balcón. Al sur, en el Arco. Si un Kivuli no se deja, mira dónde está el sol.",
+					"Abajo, en el Arco del Atardecer, hay dos espejos. El primero tiene que mirar al sol. El segundo, al primero. Con los dos llenos de luz, el arco se abre.",
+					"Y si te cruzas con un Farol de la Hora, guárdalo, ¿eh? Algún día habrá que volver a encenderlos. Digo yo."
+				]
+			},
+			{
+				"si": [
+					"arco_atardecer_abierto"
+				],
+				"lineas": [
+					"¿Has abierto el Arco? Vaya. Hacía tanto que nadie bajaba a Jioni que ya no me acordaba del ruido que hace.",
+					"Ve con cuidado ahí abajo. Allí el miedo es más grande que aquí. Están muy cerca de donde se paró todo.",
+					"Y si alguien te pregunta por mí, dile que Mwanga aún tiene la mecha seca. Que está esperando."
+				]
+			}
+		]
+	}
+}

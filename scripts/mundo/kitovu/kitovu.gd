@@ -49,6 +49,7 @@ var _avisos_kuku := 0
 
 func _ready() -> void:
 	_poner_sendero_este()        # (antes de super(): si se llega por ella, la puerta tiene que estar ya)
+	_poner_arco_sur()
 	super()
 	$Corrupcion.registrar_oasis(GRANJA, GRANJA_RADIOS, 40.0)
 	for z in get_tree().get_nodes_in_group("zonas"):
@@ -317,6 +318,41 @@ func _poner_sendero_este() -> void:
 	puerta.position = rocas.position + Vector2(0, -6)
 	add_child(puerta)
 	puerta.cerrada.connect(func() -> void: preload("res://scripts/mundo/charla.gd").hablar(self, "kitovu_derrumbe"))
+
+
+## EL ARCO DEL SUR (al Valle del Ocaso: el Mirador): un arco de arenisca frío hasta que el Cetro del Nexo
+## despierta del todo (al calmar el Corazón del Meteorito): entonces se enciende con el atardecer de dentro.
+const ARCO_SUR := Vector2i(46, 40)
+
+
+func _poner_arco_sur() -> void:
+	var abierto := Estado.tiene("nexo_despierto")
+	var arco := StaticBody2D.new()
+	arco.position = Vector2(ARCO_SUR) * 16.0 + Vector2(8, 14)
+	var sprite := Sprite2D.new()
+	sprite.texture = load("res://arte/mundos/ocaso/mirador/arco_kitovu.png")
+	sprite.hframes = 2
+	sprite.frame = 1 if abierto else 0
+	sprite.offset = Vector2(0, -24)
+	arco.add_child(sprite)
+	for x in [-18.0, 18.0]:
+		var forma := CollisionShape2D.new()
+		var caja := RectangleShape2D.new()
+		caja.size = Vector2(10, 8)
+		forma.shape = caja
+		forma.position = Vector2(x, -4)
+		arco.add_child(forma)
+	$Entidades.add_child(arco)
+	var puerta: Area2D = preload("res://scripts/mundo/puerta.gd").new()
+	puerta.id = "ocaso"
+	puerta.destino = "mirador_ocaso"
+	puerta.destino_puerta = "norte"
+	puerta.salida = Vector2.UP
+	puerta.tam = Vector2(20, 10)
+	puerta.cerrada_hasta = "nexo_despierto"
+	puerta.position = arco.position + Vector2(0, -4)
+	add_child(puerta)
+	puerta.cerrada.connect(func() -> void: preload("res://scripts/mundo/charla.gd").hablar(self, "kitovu_arco_sur"))
 
 
 func _al_golpear_espantapajaros(veces: int) -> void:

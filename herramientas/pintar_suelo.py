@@ -1110,6 +1110,73 @@ def pintar_aguja(nombre, salida=None):
     print("Suelo pintado:", destino, (lz.w, lz.h))
 
 
+def pintar_mirador(nombre, salida=None):
+    """El suelo de EL MIRADOR DEL OCASO (el Valle del Ocaso): mesetas de ARENISCA ROSADA, con ondas de arena que el
+    viento peina y losas gastadas, colgadas sobre el ABISMO DEL ATARDECER: un cielo que se ve hacia abajo, malva
+    arriba y coral y ámbar al fondo, con bancos de nubes quietas. Cada meseta enseña por el sur su canto de roca en
+    franjas. La PLAZA lleva grabada la esfera de un gran reloj de sol; la ENTRADA y el ARCO, un camino de losas.
+    Las sombras largas de los obeliscos las dibuja el juego."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=61)
+    tipos = [["vacio" if c in "0=" else "suelo" for c in f] for f in filas]
+    vacio = mascara(lz, tipos, ("vacio",), 2.4, 0.24, semilla=611)
+    suelo = np.clip(1 - vacio, 0, 1)
+    fina = lz.ruido(0.8, 2, semilla=612)
+    media = lz.ruido(10, 3, semilla=613)
+    grande = lz.ruido(46, 3, semilla=614)
+    # EL ABISMO DEL ATARDECER: de malva (arriba) a coral y ámbar (abajo), con nubes quietas en bandas
+    alto_px = alto * CASILLA
+    fondo = np.clip(lz.y / alto_px, 0, 1)
+    nube = np.clip((lz.ruido(60, 3, semilla=615) - 0.45) * 3.0, 0, 1) * (np.sin(lz.y * 0.05 + grande * 4) * 0.5 + 0.5)
+    vv = 0.15 + fondo * 0.55 + (grande - 0.5) * 0.25 + nube * 0.25
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#1a0e26", "#2e1640", "#4a2256", "#6e3062", "#9a4462", "#c45e5a", "#e8885a", "#f8b46a"], np.clip(vv, 0, 1)))
+    lz.pintar(nube * (fina > 0.4), "#ffd8a8", 0.18)
+    hilo = (np.abs(((lz.y + ruido_torcido_local(lz, 80, 616) * 40) % 38) - 19) < 0.5) * (lz.ruido(30, 2, semilla=617) > 0.55)
+    lz.pintar(hilo * 1.0, "#ffc890", 0.25)
+    # el canto de roca de cada meseta, por el sur: franjas de arenisca que se oscurecen hacia abajo
+    canto = np.clip(desplazar(lz, suelo, 0, 34) - suelo, 0, 1)
+    baja = np.clip(lz.distancia(suelo) / 34.0, 0, 1)
+    franja = np.sin((lz.y + ruido_torcido_local(lz, 16, 618) * 10) * 0.55) * 0.5 + 0.5
+    canto = canto * (baja < 0.95 - (np.sin(lz.x * 0.3 + media * 6) * 0.5 + 0.5) * 0.35)
+    lz.pintar(canto, rampa(["#2a1020", "#4a1c2c", "#6e2c38", "#944044", "#b45a50"], np.clip(0.75 - baja * 0.6 + (franja - 0.5) * 0.25, 0, 1)))
+    # LA ARENISCA: rosa y albaricoque, con ondas de arena y lajas gastadas
+    onda = np.sin((lz.x * 0.6 + lz.y + ruido_torcido_local(lz, 24, 619) * 26) * 0.32) * 0.5 + 0.5
+    vs = 0.52 + (grande - 0.5) * 0.22 + (media - 0.5) * 0.12 + (fina - 0.5) * 0.07 + (onda - 0.5) * 0.1
+    lz.pintar(suelo, rampa(["#5a2a2a", "#7a3e36", "#9a5642", "#b87050", "#d08c62", "#e2a878", "#f0c494"], np.clip(vs, 0, 1)))
+    lz.pintar(suelo * (onda > 0.88) * (media > 0.45), "#f8d8a8", 0.35)
+    u = lz.x + ruido_torcido_local(lz, 22, 620) * 22
+    w = lz.y + ruido_torcido_local(lz, 22, 621) * 22
+    junta = ((u % 30) < 0.8) | ((w % 18) < 0.8)
+    laja = suelo * (lz.ruido(40, 3, semilla=622) > 0.56)
+    lz.pintar(laja * junta, "#6a3430", 0.55)
+    # el camino de losas: de la entrada a la plaza y del arco a la bajada
+    S = lz.s
+    camino = np.zeros((lz.H, lz.W), np.float32)
+    for (x0, y0, x1, y1) in ((36, 1, 38, 10), (30, 38, 56, 41)):
+        cv2.rectangle(camino, (x0 * 16 * S, y0 * 16 * S), ((x1 + 1) * 16 * S - 1, (y1 + 1) * 16 * S - 1), 1.0, -1)
+    camino = lz.desenfocar(camino, 3) > 0.5
+    cw = (lz.y % 9) < 0.8
+    cu = ((lz.x + np.floor(lz.y / 9) * 7) % 14) < 0.8            # (las losas, a matajunta)
+    lz.pintar(camino * 1.0, rampa(["#7a4a3a", "#a06a50", "#c08a66", "#d8a880"], np.clip(0.5 + (fina - 0.5) * 0.6 + (media - 0.5) * 0.3, 0, 1)))
+    lz.pintar(camino * (cu | cw), "#5a2e2a", 0.35)
+    # LA ESFERA DEL RELOJ DE SOL, grabada en la plaza (alrededor del reloj)
+    cx, cy = 42.5 * 16, 23.0 * 16
+    r = np.hypot(lz.x - cx, (lz.y - cy) * 1.25)
+    an = np.arctan2(lz.y - cy, lz.x - cx)
+    esfera = suelo * ((np.abs(r - 70) < 1.2) | (np.abs(r - 58) < 0.8) | ((r > 58) & (r < 70) & (np.abs(((an * 12 / np.pi) % 2) - 1) < 0.06)))
+    lz.pintar(esfera, "#6a3430", 0.75)
+    lz.pintar(desplazar(lz, esfera, 0.7, 0.7) * (1 - esfera) * suelo, "#f8d0a0", 0.35)
+    # el borde de las mesetas: un filo oscuro y un brillo cálido (les da el sol de lado)
+    dist = lz.distancia(suelo)
+    lz.pintar(suelo * (dist < 2.0), "#3a1420", 0.55)
+    lz.pintar(suelo * (np.abs(dist - 3.0) < 0.6), "#ffd8a0", 0.3)
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "ocaso", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.014)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
 def pintar_fundicion(nombre, salida=None):
     """El suelo de LA FUNDICIÓN DE ESCORIA (Asterhaul): un lago de ESCORIA FUNDIDA («≈») que corre despacio de
     oeste a este, naranja y amarilla, con costras negras que flotan; y, sobre ella, islas de LOSAS DE PIEDRA
@@ -1300,6 +1367,8 @@ def pintar(nombre, salida=None):
         return pintar_fundicion(nombre, salida)
     if nombre == "aguja_caida":
         return pintar_aguja(nombre, salida)
+    if nombre == "mirador_ocaso":
+        return pintar_mirador(nombre, salida)
     if nombre == "nucleo_estrella":
         return pintar_nucleo(nombre, salida)
     if nombre in BIBLIOTECAS:

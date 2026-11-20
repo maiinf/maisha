@@ -1195,6 +1195,26 @@ El pozo bajo la Losa de Mji-Jiwe, hasta el corazón de la estrella (`documentaci
 | Prueba | `prueba_nucleo_estrella` (47 comprobaciones) |
 | Falta | Verlo en HD-2D; sonidos propios del pozo, la Puerta Triple y el final; el nombre del cuarto mundo (la pantalla dice «Continuará...») |
 
+## El Valle del Ocaso (mundo 4, el último): El Mirador del Ocaso
+
+El cuarto mundo, al sur del Kitovu: un valle parado en un atardecer que no se acaba, porque sus habitantes ataron el sol al cielo por miedo a la noche (`documentacion/boceto_mapa_valle_ocaso.png`, `boceto_mirador_ocaso.png`, `boceto_personajes_ocaso.png`, de Gemini; capturas en `documentacion/mirador_captura_1.png`…).
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | El **arco de arenisca del sur del Kitovu** (`kitovu.gd`, `_poner_arco_sur()`) está frío hasta que el Cetro del Nexo despierta del todo (`nexo_despierto`); entonces se enciende y lleva al Mirador (puerta `ocaso` → `norte`) |
+| Mapa | `mirador_ocaso` (72×50, `crear_mirador()`): mesetas de arenisca sobre el **abismo del atardecer** (`=`, vacío: se cae, con `asterhaul/vacio.gd`). La Entrada, el Balcón Este, la Plaza del Reloj, las Terrazas de Penumbra, el Secreto y el Arco del Atardecer. Suelo: `pintar_mirador()` en `pintar_suelo.py` (arte en `arte/mundos/ocaso/`) |
+| **Luz y Sombra** | `scripts/mundo/ocaso/sol.gd`: el sol está **al oeste, al sur o al este** (se guarda). Cada **obelisco** echa una **sombra larga** hacia el lado contrario, y la sombra es **sólida**: se anda por ella sobre el vacío. Si se gira el sol con Maisha encima de una sombra... al vacío. El sol solo da de lleno en **su lado** del valle |
+| Relojes de Sol | `ocaso/reloj_sol.gd`: un golpe de cetro gira el sol a la hora siguiente (oeste → sur → este). Atascados hasta que Mwanga enseña (`mwanga_reloj`) |
+| Mwanga | El viejo farolillero fénec (*mbweha*), en la plaza (`dibujar_aldeanos.py`, `mwanga()`). Cuenta por qué se paró el sol y enseña los relojes |
+| Kivuli menor | `scripts/enemigos/kivuli.gd`: el alacrán de sombra. **En penumbra**, el cetro y las semillas lo atraviesan; **al sol** se queda deslumbrado y se le puede golpear (3 de vida). En la sombra de un obelisco vuelve a estar a salvo. Cuatro: Balcón, dos en las Terrazas y el Arco. En el Bestiario |
+| Faroles de la Hora | Objeto `farol_hora` (12 por todo el valle). Aquí, dos: el Balcón Este (sol al oeste) y el Secreto (sombra al norte con el sol al sur) |
+| El Arco del Atardecer | Dos **espejos de bronce** (`ocaso/espejo.gd`, un golpe los gira un cuarto): el primero tiene que mirar al sol y el segundo, al primero. Con los dos encendidos, el arco se abre (`arco_atardecer_abierto`) hacia Jioni |
+| Arte | `herramientas/pintar_mirador.py` → `arte/mundos/ocaso/mirador/` (obelisco, reloj, espejo, farol, los dos arcos, Kivuli) |
+| Diálogos | `datos/dialogos/ocaso.json` (cargado en `charla.gd`) |
+| Misión | `mirador_ocaso` («El Mirador del Ocaso»): del arco del Kitovu a los dos espejos |
+| Prueba | `prueba_mirador_ocaso` |
+| Falta | Jioni (el arco abierto aún no lleva a ninguna parte: Maisha lo dice); música propia (ahora suena la del Lago); sonidos de reloj, sombra y espejo; verlo en HD-2D; icono de debilidad «sol» |
+
 ## Las construcciones, al nivel de la casa del castor
 
 Todas las casas y construcciones antiguas se han repintado con el pintor de las cinemáticas (volumen, luz, materiales y objetos de su dueño), casi al doble de tamaño. Capturas: `documentacion/aldea_edificios.png` y `documentacion/casas_caminos.png`.
