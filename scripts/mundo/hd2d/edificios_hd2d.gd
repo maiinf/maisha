@@ -70,6 +70,15 @@ const CATALOGO := {
 			["capa", 6, 66, 3, 28, -0.95, 0.76],
 		],
 	},
+	"nucleo/puerta_triple.png": {
+		"tipo": "bloques", "frente_z": 0.08,
+		"partes": [
+			["caja", 2, 14, 24, 83, 0.02, -1.4, true, [3, 13, 32, 78]],
+			["caja", 58, 70, 24, 83, 0.02, -1.4, true, [59, 69, 32, 78]],
+			["capa", 6, 66, 3, 30, -0.45, 0.88],
+			["capa", 6, 66, 3, 30, -0.95, 0.76],
+		],
+	},
 	"desfiladero/muro.png": {
 		"tipo": "bloques", "frente_z": 0.06, "solo_marco": 0,
 		"partes": [
@@ -340,14 +349,14 @@ func _nombre_catalogo(tex: Texture2D) -> String:
 	var ruta := tex.resource_path
 	for clave: String in [
 		"desfiladero/taller.png", "desfiladero/muro.png", "desfiladero/derrumbe.png", "desfiladero/puerta.png",
-		"galerias/barricada.png",
+		"galerias/barricada.png", "nucleo/puerta_triple.png",
 		"mji_jiwe/gran_forja.png", "mji_jiwe/casa.png", "mji_jiwe/mercado.png", "mji_jiwe/verja.png",
 		"aldea/taller.png", "objetos/muro.png", "campo/molino.png",
 		"seccion/atril.png", "estanterias/atril.png", "seccion/sello.png",
 	]:
 		if ruta.ends_with(clave):
 			return clave
-	if ruta.contains("/desfiladero/") or ruta.contains("/mji_jiwe/") or ruta.contains("/galerias/") or ruta.contains("/fundicion/") or ruta.contains("/aguja/"):
+	if ruta.contains("/desfiladero/") or ruta.contains("/mji_jiwe/") or ruta.contains("/galerias/") or ruta.contains("/fundicion/") or ruta.contains("/aguja/") or ruta.contains("/nucleo/"):
 		return ""
 	var archivo := ruta.get_file()
 	if archivo == "fuente_dorada.png":

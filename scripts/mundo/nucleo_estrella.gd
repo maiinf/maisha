@@ -244,7 +244,7 @@ func _al_calmar() -> void:
 	await get_tree().create_timer(2.0).timeout
 	if not is_inside_tree():
 		return
-	Sonido.musica("nucleo_estrella", 1.5)
+	Sonido.musica("asterhaul_libre", 1.5, "nucleo_estrella")
 	var mauti: StaticBody2D = VECINO.new()
 	mauti.id = "mauti"
 	mauti.charla = "mauti_nucleo"
@@ -272,8 +272,8 @@ func _mostrar_fin() -> void:
 	fin.ilustracion = load("res://arte/historia/25_asterhaul_libre.png")
 	fin.titulo = "Asterhaul late"
 	fin.subtitulo = "Fin del tercer mundo"
-	fin.pie = "Continuará..."
-	fin.musica = "mji_jiwe"
+	fin.pie = "Hacia el Valle del Ocaso..."
+	fin.musica = "asterhaul_libre"
 	var misiones := Misiones.hechas().size()
 	var poderes := ["carga_sismica", "pulso_magnetico", "resonancia_ambar"].filter(func(s: String) -> bool: return Estado.tiene(s)).size()
 	var cadenas := ["cadena_oeste_rota", "cadena_este_rota", "cadena_norte_rota"].filter(func(s: String) -> bool: return Estado.tiene(s)).size()

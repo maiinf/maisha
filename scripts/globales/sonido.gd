@@ -14,7 +14,7 @@ extends Node
 const MUSICA := "res://audio/musica/%s.ogg"
 const EFECTOS := "res://audio/sonidos/%s.ogg"
 const AMBIENTES := "res://audio/ambiente/%s.ogg"
-const NO_SE_REPITEN := ["raiz_libre", "sigilia_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior"]
+const NO_SE_REPITEN := ["raiz_libre", "sigilia_libre", "asterhaul_libre", "despertar", "purga", "victoria", "objeto", "tarea", "recuerdo", "noche", "amanece", "kitovu", "interior"]
 ## El título de cada pieza (los mismos que en herramientas/componer_musica.py)
 const TITULOS := {
 	"despertar": "Un largo letargo", "kitovu": "Raíces dormidas", "inicio": "El tema de Maisha",
@@ -25,7 +25,7 @@ const TITULOS := {
 	"bosque": "Hojas de cobre", "jefe_pembe": "Pembe, el ciervo de hierro",
 	"cienaga": "Agua quieta", "jefe_konokono": "Konokono, la caracola de óxido",
 	"campo": "Surcos de hierro", "jefe_cosechadora": "La Cosechadora Oxidada",
-	"tienda": "El puesto de Tawi", "raiz_libre": "Raíz respira", "sigilia_libre": "Sigilia recuerda", "sendero": "El puente viejo", "pasarelas": "Entre juncos",
+	"tienda": "El puesto de Tawi", "raiz_libre": "Raíz respira", "sigilia_libre": "Sigilia recuerda", "asterhaul_libre": "Asterhaul late", "sendero": "El puente viejo", "pasarelas": "Entre juncos",
 }
 ## Piezas tranquilas que no suenan sin parar: al acabar, un rato de silencio (solo ambiente) y vuelven
 const CON_SILENCIO := {"kitovu": Vector2(25, 55), "interior": Vector2(15, 35)}
@@ -100,12 +100,15 @@ const VOLUMEN := {
 	"pluma_rompe": -4.0,
 	"kipanga_vencido": -1.5,
 	"cadena_rota": -1.0,
+	"pozo_abre": -1.5,
+	"puerta_triple": -1.5,
+	"sello_enciende": -2.5,
 }
 ## Nivel de cada bus (0 a 10) y su volumen en dB con el nivel al máximo (la música, sutil)
 const BUSES := {"Musica": -9.0, "Ambiente": -10.0, "Efectos": -3.0}
 ## Ajuste fino (dB) de las piezas musicales cuyo nivel medio se aparta de la referencia (-15,5 dBFS)
 const VOLUMEN_MUSICA := {
-	"raiz_libre": -3.0, "sigilia_libre": -2.0, "ruinas": -1.5, "pasarelas_viva": -1.5, "pasarelas": -1.0,
+	"raiz_libre": -3.0, "sigilia_libre": -2.0, "asterhaul_libre": -2.0, "ruinas": -1.5, "pasarelas_viva": -1.5, "pasarelas": -1.0,
 	"embarcadero_viva": -1.0, "gruta": -1.0, "jefe_pembe": -1.5, "jefe_konokono": -1.0, "jefe_kambare": -1.5,
 	"bosque": 1.5, "bosque_gris": 2.0, "bosque_viva": 2.5,
 	"cueva": 2.0, "surcos_gris": 2.0, "pasarelas_gris": 1.5,

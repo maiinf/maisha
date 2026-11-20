@@ -265,7 +265,7 @@ func _al_poner_marca(marca: String) -> void:
 		_hud.mostrar_mensaje("Chuma abre el Mercado de la Escoria")
 	elif marca == "nucleo_abierto":
 		_poner_pozo()
-		Sonido.efecto("puerta_crater", 2.0, _sitio(POZO))
+		Sonido.efecto("pozo_abre", 0.0, _sitio(POZO))
 		Impacto.temblar(5.0, 1.0)
 		_hud.mostrar_mensaje("La Losa del Núcleo se abre")
 	elif marca == "hornos_mji_jiwe":

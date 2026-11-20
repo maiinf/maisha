@@ -2536,6 +2536,45 @@ def jefe_corazon():
     return final(p, sala=3.2, mezcla=0.34, brillo=6000)
 
 
+def asterhaul_libre():
+    """«Asterhaul late»: cierre íntimo y luminoso del tercer mundo (las dos manos sobre el Corazón, 74 BPM).
+    En Re mayor / lidio cálido: latido sereno que se vuelve paz, arpegios de kalimba y campanitas de ámbar,
+    coro tierno y la flauta cantando el tema de Asterhaul resuelto en luz."""
+    tempo = Tempo(74)
+    pulsos = 64
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "M7"), ("A1", "M"), ("B1", "m7"), ("G1", "M7"),
+        ("D2", "M7"), ("F#1", "m7"), ("G1", "M7"), ("A1", "sus"),
+        ("G1", "M7"), ("A1", "M"), ("B1", "m7"), ("F#1", "m7"),
+        ("G1", "M7"), ("A1", "M"), ("D2", "M7"), ("D2", "M7"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=1050, volumen=0.28, octava_bajo=1, fuerza_bajo=0.34)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.18, pan=-0.24, patron=(0, 1, 2, 3, 2, 1, 2, 0))
+        if i % 2 == 0:
+            notas = acorde(raiz[:-1] + "5", tipo)
+            p.poner(campanita(notas[-1], 2.2, 0.11), tempo.s(i * 4 + 2), pan=0.28)
+    # Latido suave y sereno de la semilla calmada (se detiene en los últimos compases para respirar)
+    for b in range(0, 52, 4):
+        p.poner(tambor("D1", 0.42, 0.24, golpe=0.22), tempo.s(b), pan=0.0)
+        p.poner(tambor("D1", 0.30, 0.14, golpe=0.20), tempo.s(b + 0.85), pan=0.0)
+    p.poner(coro(["D3", "F#3", "A3", "E4"], tempo.s(16)), tempo.s(16), 0.085)
+    p.poner(coro(["G3", "B3", "D4", "F#4"], tempo.s(16)), tempo.s(32), 0.09)
+    p.poner(coro(["D3", "F#3", "A3", "D4"], tempo.s(16)), tempo.s(48), 0.095)
+    tema_calma = [
+        ("F#5", 0, 2), ("A5", 2, 1.5), ("G5", 3.5, 0.5), ("F#5", 4, 2), ("E5", 6, 2),
+        ("D5", 8, 1.5), ("E5", 9.5, 0.5), ("F#5", 10, 2), ("B4", 12, 4),
+        ("D5", 16, 1.5), ("F#5", 17.5, 0.5), ("A5", 18, 2), ("B5", 20, 2), ("A5", 22, 2),
+        ("G5", 24, 1.5), ("F#5", 25.5, 0.5), ("E5", 26, 2), ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.44, vibrato=4.2)
+    melodia(p, tempo, tema_calma, desde=4, instrumento=kalimba, volumen=0.34, pan=-0.12)
+    melodia(p, tempo, tema_calma, desde=32, instrumento=flauta_, volumen=0.42, sostener=0.95, pan=0.12)
+    melodia(p, tempo, transportar(tema_calma, -12), desde=32, instrumento=kalimba, volumen=0.20, pan=-0.22)
+    return final(p, sala=4.2, mezcla=0.40, brillo=5200)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2556,6 +2595,7 @@ PIEZAS["aguja_caida"] = aguja_caida
 PIEZAS["jefe_kipanga"] = jefe_kipanga
 PIEZAS["nucleo_estrella"] = nucleo_estrella
 PIEZAS["jefe_corazon"] = jefe_corazon
+PIEZAS["asterhaul_libre"] = asterhaul_libre
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -2576,6 +2616,7 @@ TITULOS["aguja_caida"] = "Donde canta el cristal"
 TITULOS["jefe_kipanga"] = "Alas de obsidiana"
 TITULOS["nucleo_estrella"] = "Lo que cayó del cielo"
 TITULOS["jefe_corazon"] = "El pulso de la estrella"
+TITULOS["asterhaul_libre"] = "Asterhaul late"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

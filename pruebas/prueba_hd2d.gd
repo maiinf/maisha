@@ -150,6 +150,37 @@ func _ready() -> void:
 		maisha_node.set_physics_process(true)
 	_comprobar(PIEL.TACTICO_INFO.has("magnetico") and PIEL.TACTICO_INFO.has("resonancia"), "el HUD táctico y bestiario registran magnetico y resonancia")
 
+	print("El Núcleo de la Estrella y el Pozo en HD-2D:")
+	Estado.marcar("nucleo_abierto")
+	await _ir("mji_jiwe", "")
+	espejo = _espejo()
+	var pozo_tumbado := false
+	if espejo:
+		var pozo_n := get_tree().current_scene.get("_pozo") as CanvasItem
+		if pozo_n != null:
+			pozo_tumbado = pozo_n.visibility_layer == (1 << 12) and not espejo.get("_gemelos").has(pozo_n.get_instance_id())
+	_comprobar(pozo_tumbado, "el pozo abierto de Mji-Jiwe queda tumbado en el suelo (CANAL_SUELO)")
+
+	await _ir("nucleo_estrella", "")
+	espejo = _espejo()
+	var puerta_3d := false
+	var corazon_pie := false
+	var puerta_pie := false
+	if espejo:
+		for par in espejo.get("_gemelos").values():
+			if String(par[4]) == "nucleo/puerta_triple.png":
+				puerta_3d = true
+		for n_pie in espejo.get("_de_pie").values():
+			if is_instance_valid(n_pie) and n_pie.get_script():
+				var rp := String(n_pie.get_script().resource_path)
+				if rp.ends_with("/corazon_meteorito.gd"):
+					corazon_pie = true
+				elif rp.ends_with("/puerta_triple.gd"):
+					puerta_pie = true
+	_comprobar(espejo != null and bool(espejo.get("_es_escoria")) and absf(float(espejo.get("_alto_pena")) - 1.625) < 0.01, "El Núcleo de la Estrella activa escoria y muros 1,625")
+	_comprobar(puerta_3d and puerta_pie, "la Puerta Triple tiene volumen 3D y sus ojos se dibujan de pie")
+	_comprobar(corazon_pie, "el Corazón del Meteorito dibuja sus tres aros de pie y el latido en el suelo")
+
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")
 	espejo = _espejo()

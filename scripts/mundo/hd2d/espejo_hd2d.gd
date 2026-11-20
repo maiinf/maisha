@@ -29,6 +29,7 @@ const ALTO_MAPA := {
 	"mji_jiwe": 0.75,
 	"galerias_ambar": 1.625,
 	"fundicion_escoria": 1.625,
+	"nucleo_estrella": 1.625,
 }
 ## Mapas en los que «0» no es peña sino cielo o vacío (no se levantan bloques de roca)
 const SIN_PENAS := ["observatorio_aurora", "aguja_caida"]
@@ -45,7 +46,15 @@ const CANAL_GEMELO := 1 << 13
 const CANAL_PANTALLA := 1 << 14
 const CANAL_NADA := 1 << 15
 const CANAL_PIE := 1 << 16
-const CANALES_MUNDO := CANAL_SUELO | CANAL_GEMELO | CANAL_PANTALLA | CANAL_NADA | CANAL_PIE
+## Un bit distinto por cada ventanita de pie (14 bits libres en 0..19) para que un objeto cercano no se cuele en la ventana de otro
+const PIE_BITS: Array[int] = [
+	1 << 16, 1 << 17, 1 << 18, 1 << 19,
+	1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6, 1 << 7, 1 << 8, 1 << 9, 1 << 10, 1 << 11,
+]
+const CANAL_PIE_TODOS := (1 << 16) | (1 << 17) | (1 << 18) | (1 << 19) \
+	| (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 6) | (1 << 7) \
+	| (1 << 8) | (1 << 9) | (1 << 10) | (1 << 11)
+const CANALES_MUNDO := CANAL_SUELO | CANAL_GEMELO | CANAL_PANTALLA | CANAL_NADA | CANAL_PIE_TODOS
 ## Los que dibujan con código algo que va DE PIE (llamas, halos, el «!» de los aldeanos, la niebla de un arco):
 ## lo que dibujan ellos (o sus hijos sin script) se ve en una VENTANITA de pie sobre ellos (_ventanas)
 const DE_PIE := ["brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_perdido.gd", "esencia.gd",
@@ -53,7 +62,7 @@ const DE_PIE := ["brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_
 	"bobina.gd", "saa.gd", "grimorio_tinta.gd", "rasgos_maisha.gd", "kimya.gd", "roca_mineral.gd", "escarcha.gd",
 	"piedra_recuerdo.gd", "primer_arbol.gd", "buibui.gd", "guardian.gd", "kambare.gd", "mamba.gd",
 	"cangrejo.gd", "rescoldo.gd", "espinas_paso.gd", "gallina_perdida.gd", "barca_bata.gd", "chispa_golpe.gd",
-	"nyundo.gd", "popo.gd", "pluma_cuchilla.gd"]
+	"nyundo.gd", "popo.gd", "pluma_cuchilla.gd", "corazon_meteorito.gd", "puerta_triple.gd"]
 const VENTANA := Vector2i(320, 288)       # píxeles de cada ventanita (cubre tenazas de Nyundo y ondas de Popo)
 const VENTANA_PIE := Vector2(160, 176)     # dónde cae el pie del objeto dentro de la ventanita
 const VENTANAS := 14                      # como mucho, las de los 14 objetos de pie más cerca de la cámara
@@ -188,6 +197,7 @@ var _plano_capa: MeshInstance3D
 var _capa_pantalla: SubViewport
 var _ventanas: Array = []          # [SubViewport, MeshInstance3D] (se reparten entre los objetos de pie más cercanos)
 var _de_pie := {}                  # id del objeto de pie (su cuerpo) -> el cuerpo
+var _de_pie_nodos := {}            # id del objeto de pie (su cuerpo) -> Array[CanvasItem] que dibuja de pie
 var _velo_pantalla: CanvasLayer
 var _mascara_antes := 0xFFFFFFFF
 var _motas_mm: MultiMesh
@@ -207,7 +217,7 @@ func _ready() -> void:
 		_registrar(n)
 	# la raíz de la escena, en los canales de las dos capas (si no, se llevaría por delante a todos sus hijos)
 	_canales[escena.get_instance_id()] = [escena, escena.visibility_layer]
-	escena.visibility_layer = escena.visibility_layer | CANAL_SUELO | CANAL_PANTALLA | CANAL_PIE
+	escena.visibility_layer = escena.visibility_layer | CANAL_SUELO | CANAL_PANTALLA | CANAL_PIE_TODOS
 	escena.get_tree().node_added.connect(_registrar)
 	escena.get_tree().node_removed.connect(_quitar)
 
@@ -267,7 +277,7 @@ func _crear_suelo() -> void:
 		return
 	var tex := _textura_suelo()
 	var mapa_n := String(region.get("mapa"))
-	_es_escoria = mapa_n == "fundicion_escoria"
+	_es_escoria = mapa_n in ["fundicion_escoria", "nucleo_estrella"]
 	_alto_pena = float(ALTO_MAPA.get(mapa_n, ALTO_PENA * (2.0 if mapa_n in PARED_DOBLE else 1.0)))
 	var filas: PackedStringArray = region.get("_filas")
 	var ancho: float = filas[0].length()
@@ -300,7 +310,7 @@ func _crear_suelo() -> void:
 	for y in filas.size():
 		for x in filas[y].length():
 			var c := filas[y][x]
-			var hundir := (c == "≈" or (c == "=" and y >= 32 and y <= 46 and x >= 36 and x <= 48)) if _es_escoria else LETRAS_AGUA.contains(c)
+			var hundir := (c == "≈" or (mapa_n == "fundicion_escoria" and c == "=" and y >= 32 and y <= 46 and x >= 36 and x <= 48)) if _es_escoria else LETRAS_AGUA.contains(c)
 			if not hundir:
 				continue
 			img.set_pixel(x, y, Color.WHITE)
@@ -341,7 +351,7 @@ func _crear_suelo() -> void:
 func _es_pena(filas: PackedStringArray, x: int, y: int) -> bool:
 	if y < 0 or y >= filas.size() or x < 0 or x >= filas[y].length():
 		return false
-	if _es_escoria and x >= 59 and y >= 34 and y <= 48:
+	if _es_escoria and x >= 59 and x <= 80 and y >= 34 and y <= 48:
 		return false
 	return filas[y][x] == "0"
 
@@ -455,7 +465,7 @@ func _crear_capas() -> void:
 		v.size = VENTANA
 		v.transparent_bg = true
 		v.world_2d = vista.world_2d
-		v.canvas_cull_mask = CANAL_PIE
+		v.canvas_cull_mask = PIE_BITS[i]
 		v.render_target_update_mode = SubViewport.UPDATE_DISABLED
 		v.canvas_item_default_texture_filter = Viewport.DEFAULT_CANVAS_ITEM_TEXTURE_FILTER_NEAREST
 		add_child(v)
@@ -504,18 +514,20 @@ func _mover_capas() -> void:
 	for mat in _mats_capa:
 		mat.set_shader_parameter("origen", centro - Vector2(LADO_CAPA, LADO_CAPA) / 2.0)
 	_capa_pantalla.canvas_transform = escena.get_viewport().canvas_transform
-	# las ventanitas: para los objetos de pie más cercanos a la cámara, cada una mirando su trocito de la escena
+	# las ventanitas: para los objetos de pie más cercanos a la cámara, cada una mirando SOLO a su objeto (bit propio)
 	var cerca := []
 	for id in _de_pie.keys():
 		# (comprobarlo antes de guardarlo en una variable Node2D: guardar uno ya borrado da error y corta la función)
 		if not is_instance_valid(_de_pie[id]):
 			_de_pie.erase(id)
+			_de_pie_nodos.erase(id)
 			continue
 		var c: Node2D = _de_pie[id]
 		var d := _al_suelo(c.global_position).distance_to(_foco)
 		if d < LEJOS * 0.7:
-			cerca.append([d, c])
+			cerca.append([d, c, id])
 	cerca.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+	var activos := {}
 	for i in _ventanas.size():
 		var v: SubViewport = _ventanas[i][0]
 		var g: MeshInstance3D = _ventanas[i][1]
@@ -525,10 +537,26 @@ func _mover_capas() -> void:
 			continue
 		v.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 		var c: Node2D = cerca[i][1]
+		var cid: int = cerca[i][2]
+		var bit_i: int = PIE_BITS[i]
+		activos[cid] = bit_i
+		v.canvas_cull_mask = bit_i
 		var pie := c.global_position.round()
 		v.canvas_transform = Transform2D(0.0, -(pie - VENTANA_PIE))
-		g.position = _al_suelo(pie) + Vector3(0, 0, 0.06)        # (un pelín hacia la cámara: por delante de su dibujo)
+		g.position = _al_suelo(pie) + Vector3(0, 0, 0.11)        # (por delante de su dibujo o marco 3D)
 		g.visible = true
+	for cid in _de_pie_nodos.keys():
+		var capa_obj: int = activos.get(cid, CANAL_NADA)
+		var lista: Array = _de_pie_nodos[cid]
+		for j in range(lista.size() - 1, -1, -1):
+			if not is_instance_valid(lista[j]):
+				lista.remove_at(j)
+				continue
+			var ci: CanvasItem = lista[j]
+			if ci.visibility_layer != capa_obj:
+				ci.visibility_layer = capa_obj
+		if lista.is_empty():
+			_de_pie_nodos.erase(cid)
 
 
 func _exit_tree() -> void:
@@ -615,18 +643,26 @@ func _registrar(n: Node) -> void:
 		ci.visibility_layer = CANAL_PANTALLA
 		return
 	var plat := (n is Sprite2D or n is AnimatedSprite2D) and _es_plataforma(n)
-	var plano_suelo := n is Sprite2D and (n as Sprite2D).texture != null and String((n as Sprite2D).texture.resource_path).ends_with("/placa.png")
+	var ruta_tex := String((n as Sprite2D).texture.resource_path) if (n is Sprite2D and (n as Sprite2D).texture != null) else ""
+	var plano_suelo := ruta_tex.ends_with("/placa.png") or ruta_tex.ends_with("/pozo.png")
 	if not plat and (plano_suelo or not (n is Sprite2D or n is AnimatedSprite2D) or _z(n) <= SUELO_BAJO):
 		var dueno := _dueno_de_pie(n)
 		if _contenedor(n):
 			# un contenedor (no pinta nada): en todos los canales, para que sus hijos se vean en su capa
-			ci.visibility_layer = CANAL_SUELO | CANAL_PIE
-		else:
-			# lo que pinta (con código, o un sprite pegado al suelo): de pie (en su ventanita) o en el suelo
-			ci.visibility_layer = CANAL_PIE if dueno and _dibuja(n) else CANAL_SUELO
-		if dueno:
+			ci.visibility_layer = CANAL_SUELO | CANAL_PIE_TODOS
+		elif dueno and _dibuja(n):
+			# lo que pinta (con código) de pie: espera su bit exclusivo en _mover_capas()
+			ci.visibility_layer = CANAL_NADA
 			var cuerpo := _ancla(dueno as Node2D)
-			_de_pie[cuerpo.get_instance_id()] = cuerpo
+			var cid := cuerpo.get_instance_id()
+			_de_pie[cid] = cuerpo
+			if not _de_pie_nodos.has(cid):
+				_de_pie_nodos[cid] = []
+			var lista: Array = _de_pie_nodos[cid]
+			if not lista.has(ci):
+				lista.append(ci)
+		else:
+			ci.visibility_layer = CANAL_SUELO
 		return
 	ci.visibility_layer = CANAL_GEMELO
 	if _gemelos.has(n.get_instance_id()):
@@ -747,6 +783,8 @@ func _quitar(n: Node) -> void:
 		_luces_2d.erase(n)
 	var id := n.get_instance_id()
 	_canales.erase(id)
+	_de_pie.erase(id)
+	_de_pie_nodos.erase(id)
 	if _gemelos.has(id):
 		(_gemelos[id][1] as Node).queue_free()
 		_gemelos.erase(id)

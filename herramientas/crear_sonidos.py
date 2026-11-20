@@ -2878,6 +2878,43 @@ def cadena_rota():
     return reverb(p.entera(), 1.9, 0.34)
 
 
+def pozo_abre():
+    """La gran Losa del Núcleo de Mji-Jiwe se desliza y abre el pozo hacia la estrella."""
+    p = Pista(2.6)
+    p.poner(taiko(1.1, 0.92), 0.0)
+    roce = paso_bajo(ruido_rosa(1.65), 420) * adsr(_n(1.65), 0.14, 0.25, 0.72, 0.55) * 0.68
+    p.poner(roce, 0.06)
+    grave = seno(_desliz(78, 52, 1.8), 1.8) * adsr(_n(1.8), 0.18, 0.35, 0.65, 0.55) * 0.38
+    p.poner(grave, 0.08)
+    for k, nota in enumerate(("D4", "A4", "D5", "F#5")):
+        p.poner(campanita(nota, 1.25, 0.24), 0.95 + k * 0.16)
+    return reverb(p.entera(), 2.2, 0.38)
+
+
+def puerta_triple():
+    """Las tres hojas de basalto de la Puerta Triple se recogen hacia el Santuario."""
+    p = Pista(2.4)
+    for k in range(3):
+        t0 = k * 0.34
+        p.poner(taiko(0.55, 0.78), t0)
+        hoja = paso_banda(ruido_rosa(0.48), 180, 950) * adsr(_n(0.48), 0.05, 0.12, 0.6, 0.16) * 0.56
+        p.poner(hoja, t0 + 0.04)
+        p.poner(campanita(("D5", "F#5", "A5")[k], 1.15, 0.26), t0 + 0.08)
+    p.poner(campanita("D6", 1.5, 0.32), 1.12)
+    return reverb(p.entera(), 2.0, 0.36)
+
+
+def sello_enciende():
+    """Uno de los tres ojos de la Puerta Triple se enciende con luz de ámbar/estrella."""
+    p = Pista(1.5)
+    p.poner(tambor("D2", 0.32, 0.44, golpe=0.45), 0.0)
+    for k, nota in enumerate(("D5", "A5", "D6")):
+        p.poner(campanita(nota, 1.15, 0.32 - k * 0.05), k * 0.09)
+    brillo = seno(_desliz(440, 880, 0.45), 0.45) * adsr(_n(0.45), 0.06, 0.12, 0.45, 0.18) * 0.18
+    p.poner(brillo, 0.05)
+    return reverb(p.entera(), 1.65, 0.34)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -2988,6 +3025,9 @@ EFECTOS = {
     "pluma_rompe": (pluma_rompe, 0.65),
     "kipanga_vencido": (kipanga_vencido, 0.88),
     "cadena_rota": (cadena_rota, 0.90),
+    "pozo_abre": (pozo_abre, 0.88),
+    "puerta_triple": (puerta_triple, 0.86),
+    "sello_enciende": (sello_enciende, 0.78),
 }
 
 AMBIENTES = {

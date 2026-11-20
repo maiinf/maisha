@@ -45,7 +45,7 @@ func esta_abierta() -> bool:
 
 func _al_poner_marca(m: String) -> void:
 	if m in sellos:
-		Sonido.efecto("diapason_ambar", 0.0, global_position)
+		Sonido.efecto("sello_enciende", 0.0, global_position)
 		if encendidos() == sellos.size() and not Estado.tiene(marca):
 			Estado.marcar(marca)
 	elif m == marca and not esta_abierta():
@@ -56,7 +56,7 @@ func _abrir(con_sonido: bool) -> void:
 	_sprite.frame = 1
 	_forma.set_deferred("disabled", true)
 	if con_sonido:
-		Sonido.efecto("puerta_crater", 0.0, global_position)
+		Sonido.efecto("puerta_triple", 0.0, global_position)
 		Impacto.temblar(4.0, 0.6)
 		abierta.emit()
 
