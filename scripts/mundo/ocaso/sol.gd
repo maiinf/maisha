@@ -16,7 +16,8 @@ const COLOR_SOMBRA := Color(0.07, 0.02, 0.12, 0.8)
 const COLOR_FILO := Color(1.0, 0.78, 0.48, 0.85)       # el filo de la sombra, donde le da el sol
 
 var hora := OESTE
-var obeliscos: Array = []                 # [[Vector2i pie, int largo], ...]
+var obeliscos: Array = []                 # [[Vector2i pie, int largo], ...] o [pie, largo, nodo] si echa sombra
+                                          # solo a veces (una Vela de Sombra: nodo.proyecta(hora))
 var luz := {}                             # {hora: Rect2}
 var _sombra := {}                         # casilla → true (las de la hora de ahora)
 var _cambio := 0.0                        # el fundido de las sombras al girar
@@ -41,9 +42,21 @@ func sombra_de(pie: Vector2i, largo: int) -> Array[Vector2i]:
 	return casillas
 
 
+## ¿Echa sombra ahora? (un obelisco, siempre; una vela, solo si el sol le da de cara)
+func proyecta(o: Array) -> bool:
+	return o.size() < 3 or o[2].proyecta(hora)
+
+
+func recalcular() -> void:
+	_cambio = 1.0
+	_calcular()
+
+
 func _calcular() -> void:
 	_sombra.clear()
 	for o in obeliscos:
+		if not proyecta(o):
+			continue
 		for c in sombra_de(o[0], o[1]):
 			_sombra[c] = true
 	queue_redraw()
@@ -89,6 +102,8 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	var a := 1.0 - _cambio
 	for o in obeliscos:
+		if not proyecta(o):
+			continue
 		var casillas := sombra_de(o[0], o[1])
 		var largo: int = o[1]
 		for i in casillas.size():

@@ -5,6 +5,8 @@ extends Node
 
 ## dónde cuenta el vacío (por defecto, todo el mapa)
 var zona := Rect2(-100000, -100000, 200000, 200000)
+## en las Dunas de Penumbra no se cae: se HUNDE en la arena movediza (baja despacio en vez de encogerse)
+var hundir := false
 var cayendo := false
 var _escena: Node
 var _filas: PackedStringArray
@@ -48,11 +50,16 @@ func _caer() -> void:
 	cayendo = true
 	var maisha: Node2D = _escena._maisha
 	maisha.set("puede_actuar", false)
-	Sonido.efecto("kipanga_picado", -4.0, maisha.global_position, 0.3)
+	Sonido.efecto("sombra_repta" if hundir else "kipanga_picado", -4.0, maisha.global_position, 0.3)
 	var sprite := maisha.get_node("Sprite") as Node2D
+	var y_sprite := sprite.position.y
 	var t := create_tween().set_parallel(true)
-	t.tween_property(sprite, "scale", Vector2(0.3, 0.3), 0.45)
-	t.tween_property(maisha, "modulate:a", 0.0, 0.45)
+	if hundir:
+		t.tween_property(sprite, "position:y", sprite.position.y + 14.0, 0.7)
+		t.tween_property(maisha, "modulate:a", 0.0, 0.7).set_delay(0.2)
+	else:
+		t.tween_property(sprite, "scale", Vector2(0.3, 0.3), 0.45)
+		t.tween_property(maisha, "modulate:a", 0.0, 0.45)
 	await t.finished
 	if not is_inside_tree():
 		return
@@ -60,6 +67,8 @@ func _caer() -> void:
 	maisha.call("recibir_danio", 1, maisha.global_position, "caida")
 	var volver := func() -> void:
 		sprite.scale = Vector2.ONE
+		if hundir:
+			sprite.position.y = y_sprite
 		maisha.modulate.a = 1.0
 		maisha.set("puede_actuar", true)
 		cayendo = false

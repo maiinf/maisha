@@ -433,5 +433,62 @@
 				]
 			}
 		]
+	},
+	"dunas_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Al salir de Jioni, el suelo se vuelve blando. Dunas violetas hasta donde llega la vista, y la arena se mueve sola, despacio, como si respirara.",
+					"Piso un poco más allá del camino y el pie se me hunde hasta el tobillo. Lo saco de un tirón.",
+					"Arenas movedizas. Aquí no hay vacío: hay algo peor, que te traga.",
+					"Delante hay una vela de tela oscura plantada en la roca, como la de un barco. Su sombra se tiende larga sobre la arena..."
+				]
+			}
+		]
+	},
+	"dunas_cartel": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un poste con un trapo morado atado y una tablilla tallada a punta de navaja:",
+					"«La arena no traga lo que está a la sombra. Pon la vela de cara al sol y cruza por debajo».",
+					"Y más abajo, con otra letra: «Y no os acerquéis al Cráter. Él también vive a la sombra»."
+				]
+			}
+		]
+	},
+	"kivuli_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El Cráter está en silencio. Tres obeliscos, tres relojes de sol... y en medio, la arena se abomba.",
+					"Algo enorme se mueve ahí debajo. De sombra en sombra, sin asomar ni una pinza al sol.",
+					"Sale. Un alacrán negro como el carbón, con un reloj de arena dorado en la tripa. Me mira con unos ojos que brillan morados.",
+					"Kivuli. El sol no le gusta nada. Y aquí hay tres relojes para moverlo."
+				]
+			}
+		]
+	},
+	"kivuli_vencido": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Kivuli se queda quieto, panza arriba. La arena de su reloj empieza a caer, por fin, grano a grano.",
+					"Entre sus pinzas hay una pesa de bronce con un sol grabado. La Pesa del Oeste. Pesa muchísimo para lo pequeña que es.",
+					"Y la arena del reloj sigue cayendo. Como si alguien hubiera vuelto a darle cuerda al tiempo."
+				],
+				"recibe": {
+					"peso_oeste": 1
+				}
+			}
+		]
 	}
 }

@@ -164,7 +164,11 @@
 			"jioni"
 		],
 		"jioni": [
-			"mirador_ocaso"
+			"mirador_ocaso",
+			"dunas_penumbra"
+		],
+		"dunas_penumbra": [
+			"jioni"
 		]
 	},
 	"misiones": [
@@ -1990,6 +1994,61 @@
 					"ir": {
 						"escena": "jioni",
 						"buscar": "aldeano:kibatari"
+					}
+				}
+			]
+		},
+		{
+			"id": "dunas_penumbra",
+			"tipo": "historia",
+			"titulo": "Las Dunas de Penumbra",
+			"texto": "Al oeste de Jioni, un mar de arenas movedizas violetas. En el fondo, en un cráter, vive a la sombra un alacrán que guarda la primera pesa del reloj.",
+			"aparece": [
+				"kibatari_caminos"
+			],
+			"hecha": [
+				"kivuli_vencido"
+			],
+			"pasos": [
+				{
+					"texto": "Sal de Jioni por el oeste, a las Dunas",
+					"hecho": [
+						"dunas_penumbra"
+					],
+					"ir": {
+						"escena": "jioni",
+						"buscar": "puerta:dunas_penumbra"
+					}
+				},
+				{
+					"texto": "Saca de la arena los espejos del Cañón (Carga, I)",
+					"cuenta": {
+						"prefijo": "dunas/fuera_",
+						"total": 2
+					},
+					"ir": {
+						"escena": "dunas_penumbra",
+						"buscar": "grupo:espejos"
+					}
+				},
+				{
+					"texto": "Enciende los dos espejos para fundir el puente",
+					"hecho": [
+						"dunas/puente_cristal"
+					],
+					"ir": {
+						"escena": "dunas_penumbra",
+						"buscar": "grupo:espejos"
+					}
+				},
+				{
+					"texto": "Vence a Kivuli en el Cráter del Alacrán",
+					"hecho": [
+						"kivuli_vencido"
+					],
+					"ir": {
+						"escena": "dunas_penumbra",
+						"buscar": "grupo:jefes"
 					}
 				}
 			]

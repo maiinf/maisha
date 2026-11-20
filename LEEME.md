@@ -1233,6 +1233,24 @@ La ciudad de los zorros fénec, al pie del Arco del Atardecer (`documentacion/bo
 | Prueba | `prueba_jioni` |
 | Falta | Parte 2: el Mercado del Crepúsculo (tienda) y lo que dan los vecinos al descansar; los tres caminos; música propia (ahora suena la del Mirador); verlo en HD-2D |
 
+## El Valle del Ocaso: Las Dunas de Penumbra y Kivuli
+
+El camino del oeste de Jioni (`documentacion/boceto_dunas_penumbra.png`, de Gemini; capturas en `documentacion/dunas_captura_1.png`…`_4.png`).
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | Por la salida oeste de Jioni (puerta `dunas` → `jioni`). La misión aparece cuando Kibatari cuenta los tres caminos |
+| Mapa | `dunas_penumbra` (74×54, `crear_dunas()`): mesetas de roca entre **arenas movedizas** (`=`). Desde Jioni, la Meseta de las Velas, el Oasis secreto, el Cañón de los Espejos y el Cráter del Alacrán. Suelo: `pintar_mirador()` con dunas violetas |
+| Arena movediza | `asterhaul/vacio.gd` con `hundir = true`: Maisha se hunde, pierde una hoja y vuelve a la roca |
+| Velas de Sombra | `scripts/mundo/ocaso/vela_sombra.gd`: un golpe las pone **de cara** o **de canto**. Solo echan su sombra larga si el sol les da en la tela: de cara con el sol al oeste o al este; de canto con el sol al sur (`sol.gd`, `proyecta()`). Se guardan |
+| Espejos semienterrados | `ocaso/espejo_enterrado.gd`: el cetro no los mueve; la **Carga Sísmica** los saca. El primero mira al sol, el segundo al primero; con los dos encendidos, el rayo funde la arena en un **puente de cristal** (`ocaso/puente_vidrio.gd`, `dunas/puente_cristal`) hasta el Cráter |
+| **Kivuli** | `scripts/enemigos/kivuli_jefe.gd`, 9 de vida. Viaja **enterrado** hasta la sombra de un obelisco cerca de Maisha, **emerge** y acecha; si te acercas, avisa y pica. En su sombra no hay forma de darle. **Gira el sol** con un Reloj del Cráter mientras acecha: su sombra se va, se deslumbra y **se vuelca**: el reloj del vientre al aire (cetro 1, semillas 2; a los 3 golpes se entierra otra vez). Furia a la mitad. Vencido: **Pesa del Oeste** (`peso_oeste`) y un Farol |
+| Faroles de la Hora | Tres: el Oasis (vela del norte de canto y sol al sur), el Cañón y el que suelta Kivuli |
+| Arte | `herramientas/pintar_dunas.py` → `arte/mundos/ocaso/dunas/` (vela, espejo enterrado, pesa, Kivuli) |
+| Misión | `dunas_penumbra` |
+| Prueba | `prueba_dunas_penumbra` |
+| Falta | Música propia y la de Kivuli (ahora suena la del Mirador y, en la pelea, la del Kifaru); verlo pulido en HD-2D |
+
 ## Las construcciones, al nivel de la casa del castor
 
 Todas las casas y construcciones antiguas se han repintado con el pintor de las cinemáticas (volumen, luz, materiales y objetos de su dueño), casi al doble de tamaño. Capturas: `documentacion/aldea_edificios.png` y `documentacion/casas_caminos.png`.

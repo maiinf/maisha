@@ -601,3 +601,9 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Qué le pasa a la ciudad | **A · Los Desvelados**: sin noche nadie duerme; los fénec están agotados, con ojeras, repitiendo su faena. Cada **Farol de la Hora** colgado en la Plaza de los Doce Faroles devuelve una hora de la tarde: alguien por fin descansa y ayuda. |
 | Guía | **A · Kibatari**, el joven aprendiz de Mwanga, que nunca ha visto la noche. |
 | Trazado | **Tal cual**: la Escalera del Arco (desde el Mirador), la Plaza de los Doce Faroles, la Torre del Reloj de Arena (ata el sol con tres cadenas), el Barrio de las Cortinas (oeste), el Mercado del Crepúsculo (este) y cuatro salidas: Dunas de Penumbra (oeste), Jardín de los Faroles (este), Calzada de los Obeliscos (sureste) y la Puerta del Horizonte (sur, sellada). |
+
+### 2026-11-21 · Los tres caminos del Valle del Ocaso (Decidido con Iam, sobre los bocetos de Gemini)
+| Qué | Decisión |
+| :--- | :--- |
+| Orden | Primero **Las Dunas de Penumbra** (oeste, `boceto_dunas_penumbra.png`); después el Jardín de los Faroles y la Calzada de los Obeliscos. |
+| Jefes | Las tres **opciones A**: **Kivuli, el Alacrán de Reloj de Arena** (se hunde en su sombra; girando el sol para que le dé de lleno se vuelca y deja el reloj expuesto) · **Mondo, el Serval de Mil Reflejos** · **Saa-Mchanga, el Autómata Reloj de Arena**. |

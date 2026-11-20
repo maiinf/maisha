@@ -1132,6 +1132,21 @@ def pintar_mirador(nombre, salida=None):
     vv = 0.15 + fondo * 0.55 + (grande - 0.5) * 0.25 + nube * 0.25
     lz.pintar(np.ones((lz.H, lz.W)), rampa(["#1a0e26", "#2e1640", "#4a2256", "#6e3062", "#9a4462", "#c45e5a", "#e8885a", "#f8b46a"], np.clip(vv, 0, 1)))
     lz.pintar(nube * (fina > 0.4), "#ffd8a8", 0.18)
+    if nombre == "dunas_penumbra":
+        # LAS ARENAS MOVEDIZAS: dunas violetas con ondas que el viento peina y remolinos hundidos; las dunas altas
+        # («0»), más claras y con la cresta iluminada
+        ondas = np.sin((lz.x * 0.35 + lz.y * 0.9 + ruido_torcido_local(lz, 40, 630) * 40) * 0.22) * 0.5 + 0.5
+        va = 0.4 + (grande - 0.5) * 0.3 + (ondas - 0.5) * 0.3 + (fina - 0.5) * 0.1
+        lz.pintar(vacio, rampa(["#1e1030", "#2e1846", "#44245e", "#5e3474", "#7a4a88", "#9a6aa0"], np.clip(va, 0, 1)))
+        lz.pintar(vacio * (ondas > 0.9), "#c8a0d0", 0.35)
+        alta = np.zeros((lz.H, lz.W), np.float32)
+        for y in range(alto):
+            for x in range(ancho):
+                if filas[y][x] == "0":
+                    cv2.rectangle(alta, (x * 16 * lz.s, y * 16 * lz.s), ((x + 1) * 16 * lz.s - 1, (y + 1) * 16 * lz.s - 1), 1.0, -1)
+        alta = lz.desenfocar(alta, 4) > 0.45
+        lz.pintar(alta * 1.0, rampa(["#4a2a5a", "#6e4478", "#94629a", "#b884b4"], np.clip(0.5 + (grande - 0.5) * 0.5 + (fina - 0.5) * 0.2, 0, 1)))
+        lz.pintar(alta * (desplazar(lz, alta * 1.0, 0, 4) < 0.5), "#e0b8d8", 0.6)
     hilo = (np.abs(((lz.y + ruido_torcido_local(lz, 80, 616) * 40) % 38) - 19) < 0.5) * (lz.ruido(30, 2, semilla=617) > 0.55)
     lz.pintar(hilo * 1.0, "#ffc890", 0.25)
     # el canto de roca de cada meseta, por el sur: franjas de arenisca que se oscurecen hacia abajo
@@ -1156,6 +1171,8 @@ def pintar_mirador(nombre, salida=None):
     jioni = nombre == "jioni"
     calles = ((30, 0, 33, 14), (0, 20, 26, 22), (38, 26, 63, 28), (29, 30, 34, 43), (52, 29, 56, 43), (42, 26, 56, 30)) if jioni \
         else ((36, 1, 38, 10), (30, 38, 56, 41))
+    if nombre == "dunas_penumbra":
+        calles = ((61, 26, 73, 28),)
     for (x0, y0, x1, y1) in calles:
         cv2.rectangle(camino, (x0 * 16 * S, y0 * 16 * S), ((x1 + 1) * 16 * S - 1, (y1 + 1) * 16 * S - 1), 1.0, -1)
     camino = lz.desenfocar(camino, 3) > 0.5
@@ -1181,8 +1198,9 @@ def pintar_mirador(nombre, salida=None):
     an = np.arctan2(lz.y - cy, lz.x - cx)
     e0, e1 = (40, 52) if jioni else (58, 70)
     esfera = suelo * ((np.abs(r - e1) < 1.2) | (np.abs(r - e0) < 0.8) | ((r > e0) & (r < e1) & (np.abs(((an * 12 / np.pi) % 2) - 1) < 0.06)))
-    lz.pintar(esfera, "#6a3430", 0.75)
-    lz.pintar(desplazar(lz, esfera, 0.7, 0.7) * (1 - esfera) * suelo, "#f8d0a0", 0.35)
+    if nombre != "dunas_penumbra":
+        lz.pintar(esfera, "#6a3430", 0.75)
+        lz.pintar(desplazar(lz, esfera, 0.7, 0.7) * (1 - esfera) * suelo, "#f8d0a0", 0.35)
     # el borde de las mesetas: un filo oscuro y un brillo cálido (les da el sol de lado)
     dist = lz.distancia(suelo)
     lz.pintar(suelo * (dist < 2.0), "#3a1420", 0.55)
@@ -1389,7 +1407,7 @@ def pintar(nombre, salida=None):
         return pintar_fundicion(nombre, salida)
     if nombre == "aguja_caida":
         return pintar_aguja(nombre, salida)
-    if nombre in ("mirador_ocaso", "jioni"):
+    if nombre in ("mirador_ocaso", "jioni", "dunas_penumbra"):
         return pintar_mirador(nombre, salida)
     if nombre == "nucleo_estrella":
         return pintar_nucleo(nombre, salida)
