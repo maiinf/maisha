@@ -129,6 +129,7 @@ func _al_colgar_farol() -> void:
 			continue
 		Estado.marcar("jioni/descansa_" + nombre)
 		var viejo: Node2D = _vecinos[nombre]
+		Sonido.efecto("vecino_descansa", -1.5, viejo.global_position)
 		var t := create_tween()
 		t.tween_property(viejo, "modulate:a", 0.0, 0.5)
 		t.tween_callback(func() -> void:

@@ -105,6 +105,33 @@ const CATALOGO := {
 			["capa", 5, 15, 2, 16, -0.44, 0.76],
 		],
 	},
+	"jioni/casa.png": {
+		"tipo": "hip", "x0": 4, "x1": 68, "y_alero": 37, "y_pico": 10,
+		"rx0": 14, "rx1": 58, "eave_x0": 1, "eave_x1": 71, "fondo": 3.0, "alero_z": 0.16,
+		"pared_rect": [8, 32, 42, 72], "techo_rect": [18, 52, 14, 32],
+		"extras": [["caja", 47, 56, 2, 14, -1.9, -1.25]],
+	},
+	"jioni/puesto.png": {
+		"tipo": "puesto", "x0": 4, "x1": 56, "y_mostrador": 33,
+		"y_alero": 18, "y_pico": 4, "fondo": 2.0,
+	},
+	"jioni/torre.png": {
+		"tipo": "bloques", "frente_z": 0.06,
+		"partes": [
+			["caja", 16, 80, 34, 167, 0.02, -2.5, true, [20, 76, 46, 160]],
+			["capa", 14, 82, 2, 36, -0.75, 0.90],
+			["capa", 14, 82, 2, 36, -1.50, 0.80],
+		],
+	},
+	"jioni/horizonte.png": {
+		"tipo": "bloques", "frente_z": 0.06,
+		"partes": [
+			["caja", 2, 15, 26, 83, 0.02, -1.25, true, [3, 14, 30, 78]],
+			["caja", 65, 78, 26, 83, 0.02, -1.25, true, [66, 77, 30, 78]],
+			["capa", 4, 76, 2, 28, -0.42, 0.88],
+			["capa", 4, 76, 2, 28, -0.84, 0.76],
+		],
+	},
 	"desfiladero/muro.png": {
 		"tipo": "bloques", "frente_z": 0.06, "solo_marco": 0,
 		"partes": [
@@ -377,13 +404,14 @@ func _nombre_catalogo(tex: Texture2D) -> String:
 		"desfiladero/taller.png", "desfiladero/muro.png", "desfiladero/derrumbe.png", "desfiladero/puerta.png",
 		"galerias/barricada.png", "nucleo/puerta_triple.png",
 		"mirador/arco.png", "mirador/arco_kitovu.png", "mirador/obelisco.png",
+		"jioni/casa.png", "jioni/puesto.png", "jioni/torre.png", "jioni/horizonte.png",
 		"mji_jiwe/gran_forja.png", "mji_jiwe/casa.png", "mji_jiwe/mercado.png", "mji_jiwe/verja.png",
 		"aldea/taller.png", "objetos/muro.png", "campo/molino.png",
 		"seccion/atril.png", "estanterias/atril.png", "seccion/sello.png",
 	]:
 		if ruta.ends_with(clave):
 			return clave
-	if ruta.contains("/desfiladero/") or ruta.contains("/mji_jiwe/") or ruta.contains("/galerias/") or ruta.contains("/fundicion/") or ruta.contains("/aguja/") or ruta.contains("/nucleo/") or ruta.contains("/mirador/"):
+	if ruta.contains("/desfiladero/") or ruta.contains("/mji_jiwe/") or ruta.contains("/galerias/") or ruta.contains("/fundicion/") or ruta.contains("/aguja/") or ruta.contains("/nucleo/") or ruta.contains("/mirador/") or ruta.contains("/jioni/"):
 		return ""
 	var archivo := ruta.get_file()
 	if archivo == "fuente_dorada.png":
@@ -1055,10 +1083,12 @@ static func _construir_puesto(st: SurfaceTool, img: Image, cfg: Dictionary, xoff
 	var opacos := 0
 	var total := 0
 	if img:
+		var iw := img.get_width() - 1
+		var ih := img.get_height() - 1
 		for sy in range(int(y_pico) + 2, maxi(int(y_pico) + 3, int(y_alero) - 1), 3):
 			for sx in range(int(x0) + 4, maxi(int(x0) + 5, int(x1) - 4), 4):
 				total += 1
-				if img.get_pixel(xoff + sx, yoff + sy).a >= 0.85:
+				if img.get_pixel(clampi(xoff + sx, 0, iw), clampi(yoff + sy, 0, ih)).a >= 0.85:
 					opacos += 1
 	if total == 0 or float(opacos) / float(total) >= 0.80:
 		for px in [x0 + 1.0, x1 - 1.0 - pw]:

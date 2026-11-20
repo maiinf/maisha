@@ -205,6 +205,26 @@ func _ready() -> void:
 	_comprobar(arco_ocaso_3d and obeliscos_3d == 4, "el Arco del Atardecer y los 4 obeliscos se construyen en 3D (%d)" % obeliscos_3d)
 	_comprobar(sol_suelo and PIEL.TACTICO_INFO.has("sol"), "las sombras-puente quedan tumbadas en el suelo y el icono táctico 'sol' existe")
 
+	print("Jioni en HD-2D:")
+	await _ir("jioni", "mirador")
+	espejo = _espejo()
+	var penas_jioni := false
+	var jioni_edifs := 0
+	var postes_pie := 0
+	if espejo:
+		for h in espejo.get_children():
+			if h is MeshInstance3D and (h as MeshInstance3D).layers == 2:
+				penas_jioni = true
+		for par in espejo.get("_gemelos").values():
+			if String(par[4]).begins_with("jioni/"):
+				jioni_edifs += 1
+		for n_pie in espejo.get("_de_pie").values():
+			if is_instance_valid(n_pie) and n_pie.get_script() and String(n_pie.get_script().resource_path).ends_with("/poste_farol.gd"):
+				postes_pie += 1
+	_comprobar(espejo != null and not penas_jioni, "Jioni respeta el abismo con pretil sin muros falsos")
+	_comprobar(jioni_edifs >= 9, "las casas, puestos, Torre y Puerta del Horizonte de Jioni se construyen en 3D (%d)" % jioni_edifs)
+	_comprobar(postes_pie == 12, "los 12 postes de la Plaza de los Faroles dibujan su halo de pie (%d)" % postes_pie)
+
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")
 	espejo = _espejo()

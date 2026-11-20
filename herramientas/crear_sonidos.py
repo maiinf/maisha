@@ -3001,6 +3001,45 @@ def kivuli_muere():
     return reverb(p.entera(), 1.35, 0.32)
 
 
+def farol_colgar():
+    """Un Farol de la Hora se cuelga del gancho de hierro y prende su luz tibia en la plaza."""
+    p = Pista(1.35)
+    gancho = paso_banda(ruido(0.06), 1400, 4200) * adsr(_n(0.06), 0.002, 0.02, 0.2, 0.03) * 0.42
+    p.poner(gancho, 0.0)
+    p.poner(campanita("G5", 0.55, 0.20), 0.01)
+    llama = paso_banda(ruido_rosa(0.52), 260, 1100) * adsr(_n(0.52), 0.08, 0.14, 0.45, 0.22) * 0.34
+    p.poner(llama, 0.08)
+    for k, nota in enumerate(("C5", "E5", "G5", "B5")):
+        p.poner(campanita(nota, 1.05, 0.22 - k * 0.025), 0.10 + k * 0.07)
+    return reverb(p.entera(), 1.85, 0.36)
+
+
+def vecino_descansa():
+    """Suspiro largo de alivio y suave arrullo cuando un vecino desvelado por fin descansa."""
+    p = Pista(1.7)
+    suspiro = paso_banda(ruido_rosa(1.15), 220, 920) * adsr(_n(1.15), 0.22, 0.28, 0.45, 0.45) * 0.46
+    p.poner(suspiro, 0.0)
+    voz = seno(_desliz(320, 210, 0.95), 0.95) * adsr(_n(0.95), 0.18, 0.22, 0.40, 0.38) * 0.20
+    p.poner(voz, 0.06)
+    p.poner(campanita("A4", 1.15, 0.16), 0.32)
+    p.poner(campanita("E5", 1.25, 0.14), 0.52)
+    return reverb(p.entera(), 2.0, 0.38)
+
+
+def viento_arena(dur=30.0):
+    """Viento cálido de las Dunas de Penumbra arrastrando arena fina sobre la arenisca."""
+    n = _n(dur + 4)
+    x = ruido_rosa(dur + 4)
+    rng = np.random.default_rng(19)
+    lento = np.interp(np.arange(n), np.linspace(0, n, 14), rng.uniform(0.35, 1.0, 14))
+    rafaga = np.interp(np.arange(n), np.linspace(0, n, 28), rng.uniform(0.15, 1.0, 28)) ** 2
+    grave = barrido_bajo(x, 260, 260) * lento * 0.95
+    arena = paso_banda(ruido(dur + 4), 2200, 5600) * rafaga * 0.22
+    silbido = paso_banda(x, 520, 1200) * (lento ** 2.5) * 0.30
+    y = np.stack([grave + silbido * 0.65 + arena * 0.85, np.roll(grave, 1100) + silbido + np.roll(arena, 450)], axis=1)
+    return _cerrar_bucle(y, dur)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -3122,11 +3161,14 @@ EFECTOS = {
     "kivuli_pica": (kivuli_pica, 0.72),
     "kivuli_deslumbra": (kivuli_deslumbra, 0.68),
     "kivuli_muere": (kivuli_muere, 0.76),
+    "farol_colgar": (farol_colgar, 0.78),
+    "vecino_descansa": (vecino_descansa, 0.72),
 }
 
 AMBIENTES = {
     "pajaros": lambda: pajaros(36.0, 1.0),
     "viento": viento,
+    "viento_arena": viento_arena,
     "fuego": fuego,
     "agua": agua,
     "brisa": brisa,

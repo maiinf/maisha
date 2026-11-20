@@ -2623,6 +2623,55 @@ def mirador_ocaso():
     return final(p, sala=3.9, mezcla=0.38, brillo=4800)
 
 
+def jioni():
+    """«La ciudad que no cierra los ojos» (Jioni, Ciudad de los Faroles, 74 BPM, vals 3/4 en bucle):
+    una nana cansada pero entrañable de faroles de papel y tejados de arenisca. En Sol mayor / Mi menor cálido:
+    acordes suaves de atardecer, vals de kalimba y campanitas de farol, coro de arrullo y flauta íntima."""
+    tempo = Tempo(74)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("G2", "M7"), ("E2", "m7"), ("C2", "M7"), ("D2", "sus"),
+        ("G2", "M7"), ("B1", "m7"), ("C2", "M7"), ("A1", "m7"),
+        ("E2", "m7"), ("B1", "m7"), ("C2", "M7"), ("G2", "M"),
+        ("A1", "m7"), ("D2", "M"), ("G2", "M7"), ("D2", "sus"),
+        ("C2", "M7"), ("D2", "M"), ("B1", "m7"), ("E2", "m7"),
+        ("A1", "m7"), ("C2", "M7"), ("D2", "sus"), ("G2", "M7"),
+        ("E2", "m7"), ("C2", "M7"), ("A1", "m7"), ("D2", "M"),
+        ("C2", "M7"), ("B1", "m7"), ("A1", "m7"), ("D2", "sus"),
+    ]
+    colchones(p, tempo, progresion, compas=3, brillo=1020, volumen=0.25, octava_bajo=1, fuerza_bajo=0.28)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 3, 3, cada=0.5, volumen=0.17, pan=-0.24, patron=(0, 1, 2, 3, 2, 1))
+        if i % 2 == 0:
+            notas = acorde(raiz[:-1] + "5", tipo)
+            p.poner(campanita(notas[-1], 1.85, 0.09), tempo.s(i * 3 + 2), pan=0.30)
+    for b in range(0, pulsos, 3):
+        p.poner(tambor("G1", 0.34, 0.14, golpe=0.16), tempo.s(b), pan=0.0)
+    p.poner(coro(["G3", "B3", "D4", "F#4"], tempo.s(24)), tempo.s(24), 0.072)
+    p.poner(coro(["E3", "G3", "B3", "D4"], tempo.s(24)), tempo.s(48), 0.078)
+    p.poner(coro(["C3", "E3", "G3", "B3"], tempo.s(24)), tempo.s(72), 0.075)
+    vals_a = [
+        ("B5", 0, 1.5), ("A5", 1.5, 0.5), ("G5", 2, 1), ("F#5", 3, 2), ("E5", 5, 1),
+        ("G5", 6, 2), ("A5", 8, 1), ("F#5", 9, 3),
+        ("B5", 12, 1.5), ("C6", 13.5, 0.5), ("D6", 14, 1), ("B5", 15, 2), ("A5", 17, 1),
+        ("G5", 18, 2), ("E5", 20, 1), ("F#5", 21, 3),
+    ]
+    vals_b = [
+        ("E5", 0, 1.5), ("G5", 1.5, 0.5), ("B5", 2, 1), ("A5", 3, 2), ("F#5", 5, 1),
+        ("G5", 6, 1.5), ("A5", 7.5, 0.5), ("B5", 8, 1), ("G5", 9, 3),
+        ("A5", 12, 1.5), ("G5", 13.5, 0.5), ("E5", 14, 1), ("F#5", 15, 2), ("D5", 17, 1),
+        ("G5", 18, 2.5), ("A5", 20.5, 0.5), ("G5", 21, 3),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.40, vibrato=4.2)
+    melodia(p, tempo, vals_a, desde=0, instrumento=kalimba, volumen=0.28, pan=0.14)
+    melodia(p, tempo, vals_a, desde=24, instrumento=flauta_, volumen=0.38, sostener=0.95, pan=0.08)
+    melodia(p, tempo, vals_b, desde=48, instrumento=flauta_, volumen=0.38, sostener=0.95, pan=0.08)
+    melodia(p, tempo, transportar(vals_a, -12), desde=72, instrumento=kalimba, volumen=0.22, pan=-0.18)
+    melodia(p, tempo, vals_b, desde=72, instrumento=flauta_, volumen=0.34, sostener=0.95, pan=0.12)
+    return final(p, sala=3.8, mezcla=0.36, brillo=5000)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2645,6 +2694,7 @@ PIEZAS["nucleo_estrella"] = nucleo_estrella
 PIEZAS["jefe_corazon"] = jefe_corazon
 PIEZAS["asterhaul_libre"] = asterhaul_libre
 PIEZAS["mirador_ocaso"] = mirador_ocaso
+PIEZAS["jioni"] = jioni
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -2667,6 +2717,7 @@ TITULOS["nucleo_estrella"] = "Lo que cayó del cielo"
 TITULOS["jefe_corazon"] = "El pulso de la estrella"
 TITULOS["asterhaul_libre"] = "Asterhaul late"
 TITULOS["mirador_ocaso"] = "El sol detenido"
+TITULOS["jioni"] = "La ciudad que no cierra los ojos"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

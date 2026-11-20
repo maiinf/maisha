@@ -32,7 +32,7 @@ const ALTO_MAPA := {
 	"nucleo_estrella": 1.625,
 }
 ## Mapas en los que «0» no es peña sino cielo o vacío (no se levantan bloques de roca)
-const SIN_PENAS := ["observatorio_aurora", "aguja_caida", "mirador_ocaso"]
+const SIN_PENAS := ["observatorio_aurora", "aguja_caida", "mirador_ocaso", "jioni"]
 const SUELO_BAJO := -4             # dibujos con z_index <= SUELO_BAJO: se tumban en el suelo
 const PLATAFORMAS := ["barcaza.gd", "penasco.gd"] # plataformas elevadas sobre vacío o escoria
 const CAMARA_INCLINACION := -48.0  # grados (mirando hacia abajo)
@@ -62,7 +62,7 @@ const DE_PIE := ["brasero.gd", "fogata.gd", "farol.gd", "farol_runico.gd", "eco_
 	"bobina.gd", "saa.gd", "grimorio_tinta.gd", "rasgos_maisha.gd", "kimya.gd", "roca_mineral.gd", "escarcha.gd",
 	"piedra_recuerdo.gd", "primer_arbol.gd", "buibui.gd", "guardian.gd", "kambare.gd", "mamba.gd",
 	"cangrejo.gd", "rescoldo.gd", "espinas_paso.gd", "gallina_perdida.gd", "barca_bata.gd", "chispa_golpe.gd",
-	"nyundo.gd", "popo.gd", "pluma_cuchilla.gd", "corazon_meteorito.gd", "puerta_triple.gd"]
+	"nyundo.gd", "popo.gd", "pluma_cuchilla.gd", "corazon_meteorito.gd", "puerta_triple.gd", "poste_farol.gd"]
 const VENTANA := Vector2i(320, 288)       # píxeles de cada ventanita (cubre tenazas de Nyundo y ondas de Popo)
 const VENTANA_PIE := Vector2(160, 176)     # dónde cae el pie del objeto dentro de la ventanita
 const VENTANAS := 14                      # como mucho, las de los 14 objetos de pie más cerca de la cámara

@@ -13,6 +13,7 @@ var marca := ""
 var radio_interaccion := 22.0
 var _sprite: Sprite2D
 var _luz: PointLight2D
+var _tiempo := 0.0
 
 
 ## Cuántos faroles hay colgados en la plaza
@@ -67,5 +68,23 @@ func _encender(ahora: bool) -> void:
 	_luz.position = Vector2(5, -26)
 	add_child(_luz)
 	if ahora:
-		Sonido.efecto("espejo_enciende", 0.0, global_position)
+		Sonido.efecto("farol_colgar", 0.0, global_position)
 		Impacto.chispa(global_position + Vector2(5, -26), Vector2.UP, Color(1.0, 0.8, 0.4))
+	queue_redraw()
+
+
+func _process(delta: float) -> void:
+	if _luz != null:
+		_tiempo += delta
+		queue_redraw()
+
+
+func _draw() -> void:
+	if _luz == null:
+		return
+	var p := Vector2(5.5, -23.5)
+	var late := 0.86 + 0.14 * sin(_tiempo * 3.4 + global_position.x * 0.13)
+	draw_circle(p, 13.0 * late, Color(1.0, 0.68, 0.22, 0.16 * late))
+	draw_circle(p, 8.0 * late, Color(1.0, 0.80, 0.34, 0.30 * late))
+	draw_circle(p, 4.2, Color(1.0, 0.92, 0.58, 0.52 * late))
+	draw_circle(p + Vector2(-0.5, -0.5), 1.8, Color(1.0, 0.99, 0.88, 0.88))
