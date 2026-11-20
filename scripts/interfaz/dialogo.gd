@@ -54,6 +54,8 @@ var _ilustracion_objetivo := 0.0
 var _retrato_base: Texture2D        # el retrato normal de quien habla (las caras salen de él)
 var _ilustracion_pedida := false     # hay (o va a haber enseguida) una ilustración en pantalla
 var _caja_n := CAJA_NARRADOR         # dónde habla el narrador en esta conversación
+var _anim_abre := 0.0
+var _pulso_linea := 0.0
 
 
 func _ready() -> void:
@@ -98,9 +100,9 @@ func decir(nombre: String, lineas: Array, estilo := "normal", retrato: Texture2D
 	var caja := _caja_n if estilo == "narrador" else CAJA
 	_texto.position = caja.position + Vector2(12, 9)
 	_texto.size = Vector2(caja.size.x - 24, caja.size.y - 14)
-	# en el pergamino se escribe con tinta; el narrador, en dorado sobre la noche
-	_texto.add_theme_color_override("font_color", NARRADOR if estilo == "narrador" else (PIEL.TINTA_SUAVE if estilo == "pensamiento" else PIEL.TINTA))
-	_texto.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.6) if estilo == "narrador" else Color(0, 0, 0, 0))
+	# Texto marfil cálido con sombra suave sobre terciopelo translúcido (narrador en dorado, pensamiento en crema suave)
+	_texto.add_theme_color_override("font_color", NARRADOR if estilo == "narrador" else (PENSAMIENTO if estilo == "pensamiento" else TEXTO))
+	_texto.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.72))
 	_texto.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER if estilo == "narrador" else HORIZONTAL_ALIGNMENT_LEFT
 	if estilo == "narrador" and not get_tree().paused:
 		get_tree().paused = true      # el mundo se para mientras habla el narrador
@@ -140,6 +142,7 @@ func _poner_linea() -> void:
 	_texto.text = linea
 	_texto.visible_characters = 0
 	_letras = 0.0
+	_pulso_linea = 1.0
 
 
 func _linea_completa() -> bool:
@@ -173,6 +176,8 @@ func susurrar(nodo: Node2D, texto: String, segundos := 3.5) -> void:
 
 func _process(delta: float) -> void:
 	_tiempo += delta
+	_anim_abre = PIEL.resorte(_anim_abre, 1.0 if hablando else 0.0, delta, 18.0)
+	_pulso_linea = maxf(0.0, _pulso_linea - delta * 4.5)
 	_ilustracion_alfa = move_toward(_ilustracion_alfa, _ilustracion_objetivo, delta * 4.0)
 	for su in _susurros:
 		su["vida"] += delta
@@ -182,6 +187,9 @@ func _process(delta: float) -> void:
 		_lienzo.queue_redraw()
 		return
 	if hablando:
+		var caja_base := _caja_n if _estilo == "narrador" else CAJA
+		var dy_a := roundf((1.0 - _anim_abre) * 6.0)
+		_texto.position = caja_base.position + Vector2(12, 9 + dy_a)
 		if not _linea_completa():
 			_letras += delta * LETRAS_POR_SEGUNDO
 			_texto.visible_characters = int(_letras)
@@ -193,6 +201,19 @@ func _process(delta: float) -> void:
 		if _cerca and Input.is_action_just_pressed("accion") and not Estado.cambiando:
 			_cerca.call("interactuar")
 	_lienzo.queue_redraw()
+
+
+func _unhandled_input(evento: InputEvent) -> void:
+	if evento is InputEventMouseButton and evento.button_index == MOUSE_BUTTON_LEFT and evento.pressed:
+		if hablando and Engine.get_process_frames() != _abierto_en:
+			pasar()
+			get_viewport().set_input_as_handled()
+		elif not hablando and _cerca and not get_tree().paused and not Estado.cambiando:
+			var arriba: float = _cerca.get("altura_bocadillo") if _cerca.get("altura_bocadillo") != null else 36.0
+			var p: Vector2 = get_viewport().get_canvas_transform() * (_cerca.global_position + Vector2(0, -arriba))
+			if p.distance_to(evento.position) < 28.0:
+				_cerca.call("interactuar")
+				get_viewport().set_input_as_handled()
 
 
 ## Acción: completa la línea que se está escribiendo o pasa a la siguiente
@@ -266,66 +287,78 @@ func _dibujar() -> void:
 		p = (p - Vector2(ancho / 2.0, su["vida"] * 3.0)).round()
 		_lienzo.draw_string(_fuente, p + Vector2(1, 1), texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0, 0, 0, 0.7 * a))
 		_lienzo.draw_string(_fuente, p, texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(PENSAMIENTO, a))
-	# bocadillo sobre lo que se puede usar: papelito cosido con tres puntos de tinta
+	# bocadillo sobre lo que se puede usar: píldora cálida con anillo expansivo suave
 	if _cerca and not hablando:
 		var arriba: float = _cerca.get("altura_bocadillo") if _cerca.get("altura_bocadillo") != null else 36.0
 		var p: Vector2 = get_viewport().get_canvas_transform() * (_cerca.global_position + Vector2(0, -arriba))
-		p = p.round() + Vector2(0, round(sin(_tiempo * 4.0)))
-		var caja := Rect2(p - Vector2(10, 8), Vector2(20, 13))
-		_lienzo.draw_rect(Rect2(caja.position + Vector2(1, 2), caja.size), Color(0, 0, 0, 0.4))
+		p = p.round() + Vector2(0, round(sin(_tiempo * 4.2)))
+		var onda := fmod(_tiempo * 1.1, 1.0)
+		_lienzo.draw_arc(p, 9.0 + onda * 9.0, 0.0, TAU, 20, Color(PIEL.ORO_BRILLO, (1.0 - onda) * 0.42), 1.0)
+		var caja := Rect2(p - Vector2(11, 8), Vector2(22, 14))
+		PIEL.sombra_suave(_lienzo, caja, 0.85, 2)
 		_lienzo.draw_rect(caja, Color("efe0bc"))
-		_lienzo.draw_line(caja.position + Vector2(1, 1), Vector2(caja.end.x - 1, caja.position.y + 1), Color.WHITE * Color(1, 1, 1, 0.45), 1.0)
+		_lienzo.draw_line(caja.position + Vector2(1, 1), Vector2(caja.end.x - 1, caja.position.y + 1), Color(1, 1, 1, 0.55), 1.0)
 		_lienzo.draw_rect(caja, Color("6b4a2e"), false, 1.0)
-		_lienzo.draw_colored_polygon(PackedVector2Array([p + Vector2(-2, 5), p + Vector2(2, 5), p + Vector2(0, 8)]), Color("6b4a2e"))
+		_lienzo.draw_colored_polygon(PackedVector2Array([p + Vector2(-2, 6), p + Vector2(2, 6), p + Vector2(0, 9)]), Color("6b4a2e"))
 		for i in 3:
-			_lienzo.draw_rect(Rect2(p + Vector2(-5 + i * 4, -2), Vector2(2, 2)), PIEL.TINTA)
+			var bote := -1.0 if int(_tiempo * 5.0) % 3 == i else 0.0
+			_lienzo.draw_rect(Rect2(p + Vector2(-5 + i * 4, -2 + bote), Vector2(2, 2)), PIEL.TINTA)
 	if not hablando:
 		return
+	var a_dlg := clampf(_anim_abre, 0.05, 1.0)
+	var dy_dlg := roundf((1.0 - a_dlg) * 6.0)
 	if _estilo == "narrador":
-		# la voz del narrador: un panel de noche con filigrana dorada (abajo si hay una ilustración en pantalla)
-		var cn := _caja_n
-		PIEL.caja(_lienzo, cn, "noche")
-		PIEL.esquinas_oro(_lienzo, cn, PIEL.ORO, 0.9, 6.0)
+		# la voz del narrador: un panel de terciopelo con filigrana dorada (abajo si hay una ilustración en pantalla)
+		var cn := Rect2(_caja_n.position + Vector2(0, dy_dlg), _caja_n.size)
+		PIEL.caja(_lienzo, cn, "terciopelo", a_dlg)
+		PIEL.esquinas_oro(_lienzo, cn, PIEL.ORO, 0.9 * a_dlg, 6.0)
 		if _linea_completa():
 			var dy := roundf(sin(_tiempo * 6.0))
-			var wt := PIEL.tecla(_lienzo, cn.end - Vector2(72, 7), "Espacio", _fuente, 16, 0.95, true)
+			var wt := PIEL.tecla(_lienzo, cn.end - Vector2(72, 7), "Espacio", _fuente, 16, 0.95 * a_dlg, true)
 			var qn := Vector2(cn.end.x - 66 + wt, cn.end.y + dy)
 			_lienzo.draw_colored_polygon(PackedVector2Array([qn + Vector2(-3, -3), qn + Vector2(3, -3), qn + Vector2(0, 2)]), NARRADOR)
 		return
-	# caja de texto: pergamino con borde de cuero (los pensamientos, en un papel suelto)
+	# Degradado oscuro inferior suave (gradient scrim) que ancla la conversación al mundo HD-2D
+	for k in 6:
+		var fk := float(k) / 6.0
+		var y_scrim := 236.0 + fk * 20.0
+		_lienzo.draw_rect(Rect2(0, y_scrim, 640, 22), Color(0.03, 0.02, 0.06, 0.09 * (fk + 0.3) * a_dlg))
+	var caja_actual := Rect2(CAJA.position + Vector2(0, dy_dlg), CAJA.size)
+	# Caja de diálogo moderna y respirable: cristal en pensamientos, terciopelo translúcido en diálogos
 	if _estilo == "pensamiento":
-		PIEL.caja(_lienzo, CAJA, "papel", 0.97)
+		PIEL.caja(_lienzo, caja_actual, "cristal", 0.94 * a_dlg)
 	else:
-		PIEL.caja(_lienzo, CAJA, "pergamino")
-		PIEL.esquinas_oro(_lienzo, CAJA, PIEL.ORO, 0.75, 6.0)
-	# retrato de quien habla, encima de la caja a la derecha, en marco rebajado con remaches
+		PIEL.caja(_lienzo, caja_actual, "terciopelo", 0.95 * a_dlg)
+		PIEL.esquinas_oro(_lienzo, caja_actual, PIEL.ORO, 0.78 * a_dlg, 5.0)
+	# retrato de quien habla en medallón limpio sin marco recargado, con deslizamiento lateral y respiración viva
 	if _retrato and _estilo == "normal" and _ilustracion_alfa < 0.05:
-		var marco := Rect2(CAJA.end.x - 80, CAJA.position.y - 80, 76, 76)
-		PIEL.caja(_lienzo, marco, "cuero")
-		PIEL.marco_retrato(_lienzo, Rect2(marco.position + Vector2(4, 4), Vector2(68, 68)), PIEL.ORO)
-		_lienzo.draw_rect(Rect2(marco.position + Vector2(5, 5), Vector2(66, 66)), Color("e6d3a8"))
-		_lienzo.draw_texture(_retrato, marco.position + Vector2(6, 6))
-	# pestaña con el nombre (los pensamientos llevan una nubecita)
+		var dx_ret := roundf((1.0 - a_dlg) * 10.0)
+		var resp := roundf(sin(_tiempo * 2.8) * 0.8 - _pulso_linea * 2.0)
+		var marco := Rect2(caja_actual.end.x - 80 + dx_ret, caja_actual.position.y - 78 + resp, 74, 74)
+		PIEL.caja(_lienzo, marco, "terciopelo", a_dlg)
+		_lienzo.draw_rect(Rect2(marco.position + Vector2(4, 4), Vector2(66, 66)), Color(0.14, 0.12, 0.20, 0.85 * a_dlg))
+		_lienzo.draw_texture(_retrato, marco.position + Vector2(5, 5), Color(1, 1, 1, a_dlg))
+		_lienzo.draw_rect(Rect2(marco.position + Vector2(4, 4), Vector2(66, 66)), Color(PIEL.ORO_BRILLO, 0.48 * a_dlg), false, 1.0)
+	# pestaña con el nombre (los pensamientos llevan una nubecita luminosa)
 	if _estilo == "pensamiento":
-		var base := CAJA.position + Vector2(14, -6)
+		var base := caja_actual.position + Vector2(14, -6)
 		for c: Vector3 in [Vector3(0, 2, 2.0), Vector3(7, -2, 3.0), Vector3(16, -6, 4.0)]:
-			_lienzo.draw_circle(base + Vector2(c.x, c.y), c.z + 1.0, Color("6b4a2e"))
-			_lienzo.draw_circle(base + Vector2(c.x, c.y), c.z, Color("efe0bc"))
+			_lienzo.draw_circle(base + Vector2(c.x, c.y), c.z + 1.0, Color(0.06, 0.05, 0.12, 0.9 * a_dlg))
+			_lienzo.draw_circle(base + Vector2(c.x, c.y), c.z, Color(PENSAMIENTO, 0.92 * a_dlg))
 		if _nombre != "":
 			var ancho_n := _fuente.get_string_size(_nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-			PIEL.caja(_lienzo, Rect2(base + Vector2(22, -14), Vector2(ancho_n + 14, 18)), "cuero", 1.0, false)
-			_lienzo.draw_string(_fuente, base + Vector2(29, 0), _nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color("b8ef8e"))
+			PIEL.caja(_lienzo, Rect2(base + Vector2(22, -14), Vector2(ancho_n + 16, 18)), "cristal", a_dlg, false)
+			_lienzo.draw_string(_fuente, base + Vector2(30, 0), _nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color("b8ef8e", a_dlg))
 	elif _nombre != "":
 		var ancho := _fuente.get_string_size(_nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-		var pestana := Rect2(CAJA.position + Vector2(12, -19), Vector2(ancho + 28, 21))
-		PIEL.caja(_lienzo, pestana, "cuero")
-		PIEL.esquinas_oro(_lienzo, pestana, PIEL.ORO, 0.7, 4.0)
+		var pestana := Rect2(caja_actual.position + Vector2(12, -18 - roundf(_pulso_linea * 1.5)), Vector2(ancho + 26, 20))
+		PIEL.caja(_lienzo, pestana, "cristal", 0.96 * a_dlg)
 		var dc := Vector2(pestana.position.x + 10, pestana.position.y + 10)
-		_lienzo.draw_colored_polygon(PackedVector2Array([dc + Vector2(0, -3), dc + Vector2(3, 0), dc + Vector2(0, 3), dc + Vector2(-3, 0)]), PIEL.ORO)
-		_lienzo.draw_string(_fuente, pestana.position + Vector2(17, 15), _nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PIEL.CREMA)
+		_lienzo.draw_colored_polygon(PackedVector2Array([dc + Vector2(0, -3), dc + Vector2(3, 0), dc + Vector2(0, 3), dc + Vector2(-3, 0)]), Color(PIEL.ORO_BRILLO, a_dlg))
+		_lienzo.draw_string(_fuente, pestana.position + Vector2(17, 15), _nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(PIEL.ORO_BRILLO, a_dlg))
 	# indicador tactil sobre el borde inferior derecho cuando la linea esta completa
 	if _linea_completa():
 		var dy := roundf(sin(_tiempo * 6.0))
-		var wt := PIEL.tecla(_lienzo, CAJA.end - Vector2(74, 7), "Espacio", _fuente, 16, 0.96, true)
-		var q := Vector2(CAJA.end.x - 67 + wt, CAJA.end.y + dy)
-		_lienzo.draw_colored_polygon(PackedVector2Array([q + Vector2(-3, -3), q + Vector2(3, -3), q + Vector2(0, 2)]), PIEL.ROJO)
+		var wt := PIEL.tecla(_lienzo, caja_actual.end - Vector2(74, 7), "Espacio", _fuente, 16, 0.96 * a_dlg, true)
+		var q := Vector2(caja_actual.end.x - 67 + wt, caja_actual.end.y + dy)
+		_lienzo.draw_colored_polygon(PackedVector2Array([q + Vector2(-3, -3), q + Vector2(3, -3), q + Vector2(0, 2)]), Color(PIEL.ORO_BRILLO, a_dlg))

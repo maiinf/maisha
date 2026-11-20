@@ -51,6 +51,13 @@ var texto_ayuda := "WASD mover · C correr · J golpe · K semilla · L latido"
 var _fuente: FontFile
 var _guardando := 0.0
 var _enemigos_estado := {}   # id -> {max: int, ant: int, cola: float, destello: float}
+var _vida_ant := -1
+var _aliento_cola := 1.0
+var _golpe_hoja_t := 0.0
+var _golpe_hoja_idx := -1
+var _pulso_curacion := 0.0
+var _chispas_hud: Array = []
+var _pulso_tecla := {}       # etiqueta -> tiempo restante de iluminacion
 
 
 func _ready() -> void:
@@ -127,7 +134,31 @@ func _process(delta: float) -> void:
 		_ayuda = false
 	var hace_falta: bool = _hay_peligro() or _maisha.segundos_desde_danio() < 3.0 \
 		or _maisha.aliento < _maisha.aliento_maximo() - 0.5 or _maisha.vida < _maisha.vida_maxima()
-	_visible = move_toward(_visible, 1.0 if hace_falta else 0.0, delta * 3.0)
+	_visible = move_toward(_visible, 1.0 if hace_falta else 0.0, delta * 3.2)
+	var v_act := int(_maisha.vida)
+	if _vida_ant >= 0:
+		if v_act < _vida_ant:
+			_golpe_hoja_t = 0.45
+			_golpe_hoja_idx = v_act
+			PIEL.emitir_chispas(_chispas_hud, Vector2(14 + v_act * 11, 14), 10, AGOTADA)
+		elif v_act > _vida_ant:
+			_pulso_curacion = 0.55
+			PIEL.emitir_chispas(_chispas_hud, Vector2(14 + (v_act - 1) * 11, 14), 12, Color("9be07a"))
+	_vida_ant = v_act
+	_golpe_hoja_t = maxf(0.0, _golpe_hoja_t - delta)
+	_pulso_curacion = maxf(0.0, _pulso_curacion - delta)
+	var prop_al := clampf(float(_maisha.aliento) / maxf(float(_maisha.aliento_maximo()), 0.01), 0.0, 1.0)
+	if prop_al < _aliento_cola:
+		_aliento_cola = move_toward(_aliento_cola, prop_al, delta * 0.85)
+	else:
+		_aliento_cola = prop_al
+	for par_acc in [["WASD", "mover_izquierda"], ["WASD", "mover_derecha"], ["WASD", "mover_arriba"], ["WASD", "mover_abajo"],
+			["C", "correr"], ["J", "golpe"], ["K", "explosivo"], ["L", "latido"], ["U", "sigilo"], ["R", "cambiar_sigilo"],
+			["I", "carga"], ["O", "pulso"], ["P", "resonancia"], ["F", "usar"]]:
+		if InputMap.has_action(par_acc[1]) and Input.is_action_pressed(par_acc[1]):
+			_pulso_tecla[par_acc[0]] = 0.18
+	for k_t in _pulso_tecla.keys():
+		_pulso_tecla[k_t] = maxf(0.0, float(_pulso_tecla[k_t]) - delta)
 	_actualizar_enemigos(delta)
 	_lienzo.queue_redraw()
 
@@ -205,66 +236,83 @@ func _dibujar() -> void:
 	if not modal:
 		_dibujar_barras_enemigos()
 	if alfa > 0.01 and not modal:
-		var mod := Color(1, 1, 1, alfa)
-		# panel de vida y aliento
+		var t_sec := float(Time.get_ticks_msec()) * 0.001
+		var desliz_hud := (1.0 - alfa) * -8.0
 		var hojas: int = _maisha.vida_maxima()
-		var panel := Rect2(6, 6, maxi(10, hojas) * 10 + 10, 29)
-		var pulso_p := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.008)
-		PIEL.caja(_lienzo, panel.grow(2), "cuero", 0.96 * alfa)
-		if _maisha.vida == 1:
-			_lienzo.draw_rect(panel.grow(3), Color("de6771", (0.28 + 0.35 * pulso_p) * alfa), false, 1.0)
-		PIEL.esquinas_oro(_lienzo, panel.grow(2), Color("de6771") if _maisha.vida == 1 else PIEL.ORO, 0.65 * alfa, 4.0)
-		# vida: una hoja por bloque
+		var panel := Rect2(8 + desliz_hud, 7, maxi(10, hojas) * 11 + 12, 30)
+		var pulso_p := 0.5 + 0.5 * sin(t_sec * 8.0)
+		PIEL.caja(_lienzo, panel, "cristal", 0.90 * alfa, true)
+		# Barra lateral izquierda de acento vital
+		var col_acento := AGOTADA if _maisha.vida <= 2 else (Color("9be07a") if _pulso_curacion > 0.0 else PIEL.ORO)
+		_lienzo.draw_rect(Rect2(panel.position.x, panel.position.y + 2, 2.0, panel.size.y - 4.0), Color(col_acento, 0.92 * alfa))
+		if _maisha.vida <= 2:
+			_lienzo.draw_rect(panel.grow(1), Color("de6771", (0.20 + 0.30 * pulso_p) * alfa), false, 1.0)
+		# vida: hojas con latido en vida crítica y destello al perder/curar
 		for i in hojas:
 			var llena: bool = i < _maisha.vida
-			_lienzo.draw_texture_rect_region(HOJAS, Rect2(10 + i * 10, 9, 9, 8),
-				Rect2(0 if llena else 9, 0, 9, 8), mod)
-		# aliento con medidor biselado y muesca de semilla
-		var barra := Rect2(10, 22, panel.size.x - 10, 6)
+			var dy_h := 0.0
+			if llena and _maisha.vida <= 2:
+				dy_h = roundf(sin(t_sec * 9.0 + float(i) * 0.8) * 1.2)
+			elif llena and _pulso_curacion > 0.0:
+				dy_h = -1.0
+			var hrect := Rect2(panel.position.x + 7 + i * 11, panel.position.y + 4 + dy_h, 9, 8)
+			if llena:
+				_lienzo.draw_circle(hrect.get_center(), 5.2, Color("9be07a", (0.14 + 0.16 * _pulso_curacion) * alfa))
+			_lienzo.draw_texture_rect_region(HOJAS, hrect, Rect2(0 if llena else 9, 0, 9, 8), Color(1, 1, 1, alfa))
+			if i == _golpe_hoja_idx and _golpe_hoja_t > 0.0:
+				var af_g := (_golpe_hoja_t / 0.45) * alfa
+				_lienzo.draw_rect(hrect.grow(1.0), Color(AGOTADA, 0.65 * af_g), false, 1.0)
+		# aliento con cola líquida, brillo de onda y muesca de semilla
+		var barra := Rect2(panel.position.x + 7, panel.position.y + 19, panel.size.x - 13, 6)
 		var parte: float = _maisha.aliento / _maisha.aliento_maximo()
 		var color := ALIENTO_LLENO if parte >= 0.999 else ALIENTO
 		if _maisha.agotada:
 			color = AGOTADA if int(Time.get_ticks_msec() / 150) % 2 == 0 else ALIENTO
 		var umbral := Artes.semilla_coste() / maxf(_maisha.aliento_maximo(), 0.01)
-		PIEL.medidor(_lienzo, barra, parte, color, -1.0, Color.WHITE, alfa, 4, umbral)
+		PIEL.medidor(_lienzo, barra, parte, color, _aliento_cola, Color("f4df9a"), alfa, 4, umbral)
+		if parte > 0.08:
+			var rw_onda := (barra.size.x - 2.0) * clampf(parte, 0.0, 1.0)
+			var ox := fmod(t_sec * 38.0, maxf(8.0, rw_onda))
+			if ox + 6.0 < rw_onda:
+				_lienzo.draw_rect(Rect2(barra.position.x + 1.0 + ox, barra.position.y + 1.0, 5.0, 2.0), Color(1.0, 1.0, 0.9, 0.28 * alfa))
+		PIEL.actualizar_chispas(_lienzo, _chispas_hud, get_process_delta_time(), alfa)
 		# sopas que lleva (se toman con F)
 		var sopas := Estado.cuantos("sopa")
 		if sopas > 0:
 			var sx := panel.end.x + 6
-			var scaja := Rect2(sx, 5, 52, 29)
-			PIEL.caja(_lienzo, scaja, "cuero", 0.96 * alfa)
-			_lienzo.draw_texture_rect_region(OBJETOS, Rect2(sx + 4, 11, 16, 16), Rect2(160, 0, 16, 16), mod)
-			_lienzo.draw_string(_fuente, Vector2(sx + 21, 20), str(sopas), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(TEXTO, alfa))
-			PIEL.tecla(_lienzo, Vector2(sx + 33, 12), "F", _fuente, 16, 0.92 * alfa)
+			var scaja := Rect2(sx, 7, 52, 26)
+			PIEL.caja(_lienzo, scaja, "cristal", 0.88 * alfa, true)
+			_lienzo.draw_texture_rect_region(OBJETOS, Rect2(sx + 4, 12, 16, 16), Rect2(160, 0, 16, 16), Color(1, 1, 1, alfa))
+			_lienzo.draw_string(_fuente, Vector2(sx + 21, 22), str(sopas), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(TEXTO, alfa))
+			PIEL.tecla(_lienzo, Vector2(sx + 33, 13), "F", _fuente, 16, 0.92 * alfa, float(_pulso_tecla.get("F", 0.0)) > 0.0)
 		# el sigilo elegido (con más de uno aprendido)
 		if (Estado.tiene("sigilo_hielo") or Estado.tiene("sigilo_rayo")) and _maisha.has_method("sigilo_elegido"):
-			var caja := Rect2(6, panel.end.y + 6, 42, 22)
-			PIEL.caja(_lienzo, caja, "cuero", 0.96 * alfa)
+			var caja := Rect2(panel.position.x, panel.end.y + 5, 44, 21)
+			PIEL.caja(_lienzo, caja, "cristal", 0.88 * alfa, true)
 			var hielo: bool = _maisha.sigilo_elegido() == "hielo"
 			var rayo: bool = _maisha.sigilo_elegido() == "rayo"
 			var col := Color(0.75, 0.92, 1.0, alfa) if hielo else (Color(1.0, 0.92, 0.45, alfa) if rayo else Color(1.0, 0.62, 0.2, alfa))
-			var c := caja.position + Vector2(11, 11)
+			var c := caja.position + Vector2(11, 10)
+			_lienzo.draw_circle(c, 6.5, Color(col, 0.16 * alfa))
 			if rayo:
-				_lienzo.draw_polyline(PackedVector2Array([c + Vector2(3, -6), c + Vector2(-3, -1), c + Vector2(3, 0), c + Vector2(-3, 6)]), col, 1.0)
-				_lienzo.draw_line(c + Vector2(-5, -6), c + Vector2(5, -6), col, 1.0)
-				_lienzo.draw_line(c + Vector2(-5, 6), c + Vector2(5, 6), col, 1.0)
+				_lienzo.draw_polyline(PackedVector2Array([c + Vector2(3, -5), c + Vector2(-3, -1), c + Vector2(3, 0), c + Vector2(-3, 5)]), col, 1.2)
 			elif hielo:
-				_lienzo.draw_polyline(PackedVector2Array([c + Vector2(0, -6), c + Vector2(4, 0), c + Vector2(0, 6), c + Vector2(-4, 0), c + Vector2(0, -6)]), col, 1.0)
-				_lienzo.draw_line(c + Vector2(-6, -3), c + Vector2(6, 3), col, 1.0)
-				_lienzo.draw_line(c + Vector2(-6, 3), c + Vector2(6, -3), col, 1.0)
+				_lienzo.draw_polyline(PackedVector2Array([c + Vector2(0, -5), c + Vector2(4, 0), c + Vector2(0, 5), c + Vector2(-4, 0), c + Vector2(0, -5)]), col, 1.2)
+				_lienzo.draw_line(c + Vector2(-5, -2), c + Vector2(5, 2), col, 1.0)
+				_lienzo.draw_line(c + Vector2(-5, 2), c + Vector2(5, -2), col, 1.0)
 			else:
-				_lienzo.draw_line(c + Vector2(0, 6), c + Vector2(0, -5), col, 1.0)
-				_lienzo.draw_polyline(PackedVector2Array([c + Vector2(-5, -1), c + Vector2(0, 2), c + Vector2(5, -1)]), col, 1.0)
-				_lienzo.draw_line(c + Vector2(-3, 5), c + Vector2(3, 5), col, 1.0)
-			PIEL.tecla(_lienzo, caja.position + Vector2(21, 4), "R", _fuente, 16, 0.92 * alfa)
+				_lienzo.draw_line(c + Vector2(0, 5), c + Vector2(0, -4), col, 1.2)
+				_lienzo.draw_polyline(PackedVector2Array([c + Vector2(-4, -1), c + Vector2(0, 2), c + Vector2(4, -1)]), col, 1.2)
+			PIEL.tecla(_lienzo, caja.position + Vector2(22, 3), "R", _fuente, 16, 0.92 * alfa, float(_pulso_tecla.get("R", 0.0)) > 0.0)
 	# mensaje centrado arriba (salvo si está hablando el narrador o hay modal abierto)
 	var narrando: bool = dialogo_narrando()
 	if _texto_tiempo > 0.0 and not narrando and not modal:
-		var a := clampf(_texto_tiempo / 0.4, 0.0, 1.0)
+		var a := clampf(minf((3.0 - _texto_tiempo) / 0.25, _texto_tiempo / 0.4), 0.0, 1.0)
 		var tam := _fuente.get_string_size(_texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16)
-		var pos := Vector2(round((640 - tam.x) / 2.0), 52 if get_tree().get_first_node_in_group("barra_jefe") == null else 86)
-		var caja_msg := Rect2(pos - Vector2(18, 19), Vector2(tam.x + 36, 28))
-		PIEL.caja(_lienzo, caja_msg, "noche", 0.96 * a)
+		var dy_m := roundf((1.0 - a) * -6.0)
+		var pos := Vector2(round((640 - tam.x) / 2.0), (50 if get_tree().get_first_node_in_group("barra_jefe") == null else 86) + dy_m)
+		var caja_msg := Rect2(pos - Vector2(22, 19), Vector2(tam.x + 44, 28))
+		PIEL.caja(_lienzo, caja_msg, "terciopelo", 0.94 * a)
 		PIEL.esquinas_oro(_lienzo, caja_msg, PIEL.ORO, 0.85 * a, 5.0)
 		_lienzo.draw_string(_fuente, pos + Vector2(1, 1), _texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0, 0, 0, 0.75 * a))
 		_lienzo.draw_string(_fuente, pos, _texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(TEXTO, a))
@@ -277,13 +325,18 @@ func _dibujar() -> void:
 		var pos := Vector2(640 - 12 - ancho, base_y)
 		var parpadeo := 1.0 if int(_guardando * 4.0) % 2 == 0 or _guardando < 1.0 else 0.4
 		var gcaja := Rect2(pos + Vector2(-22, -16), Vector2(ancho + 32, 22))
-		PIEL.caja(_lienzo, gcaja, "cuero", 0.96 * a, false)
+		PIEL.caja(_lienzo, gcaja, "cristal", 0.92 * a, false)
 		_lienzo.draw_texture_rect_region(HOJAS, Rect2(pos + Vector2(-14, -9), Vector2(9, 8)), Rect2(0, 0, 9, 8), Color(1, 1, 1, a * parpadeo))
 		_lienzo.draw_string(_fuente, pos + Vector2(1, 1), texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(0, 0, 0, 0.6 * a))
 		_lienzo.draw_string(_fuente, pos, texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(TEXTO, a))
-	# ayuda de controles hasta que se usan (en barra con pastillas tactiles)
+	# ayuda de controles contextual con pastillas translúcidas e iluminación al pulsar
 	if _ayuda and texto_ayuda != "" and not modal:
 		var pares := []
+		var hay_pulso := false
+		for k_p in _pulso_tecla.values():
+			if float(k_p) > 0.0:
+				hay_pulso = true
+				break
 		for trozo: String in texto_ayuda.split(" · "):
 			var limpio := trozo.strip_edges()
 			var sp := limpio.find(" ")
@@ -291,7 +344,45 @@ func _dibujar() -> void:
 				pares.append([limpio.substr(0, sp), limpio.substr(sp + 1).capitalize()])
 			elif not limpio.is_empty():
 				pares.append([limpio, ""])
-		PIEL.barra_teclas(_lienzo, 320.0, 344.0, pares, _fuente, 16, 0.96, true)
+		var alfa_barra := 0.92 if (_visible > 0.1 or hay_pulso) else 0.68
+		_dibujar_barra_contextual(320.0, 345.0, pares, alfa_barra)
+
+
+func _dibujar_barra_contextual(cx: float, y_centro: float, items: Array, alfa: float) -> void:
+	if items.is_empty() or alfa <= 0.01:
+		return
+	var total := 0.0
+	var anchos_t := []
+	var anchos_d := []
+	for par: Array in items:
+		var tk := String(par[0])
+		var ds := String(par[1])
+		var wt := roundf(_fuente.get_string_size(tk, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 9.0)
+		var wd := roundf(_fuente.get_string_size(ds, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x) if not ds.is_empty() else 0.0
+		anchos_t.append(wt)
+		anchos_d.append(wd)
+		total += wt + (4.0 + wd if wd > 0.0 else 0.0)
+	total += float(maxi(items.size() - 1, 0)) * 9.0
+	var alto := 20.0
+	var x_ini := clampf(roundf(cx - total * 0.5 - 8.0), 6.0, maxf(6.0, 634.0 - roundf(total + 16.0)))
+	var marco := Rect2(x_ini, roundf(y_centro - alto * 0.5), roundf(total + 16.0), alto)
+	PIEL.caja(_lienzo, marco, "cristal", alfa, true)
+	var x := marco.position.x + 8.0
+	var ty := PIEL.texto_centrado_y(marco.position.y, marco.size.y, _fuente, 16)
+	for i in items.size():
+		var par: Array = items[i]
+		var tk := String(par[0])
+		var ds := String(par[1])
+		var activa := float(_pulso_tecla.get(tk.to_upper(), 0.0)) > 0.0
+		var dy := -1.0 if activa else 0.0
+		var wt := PIEL.tecla(_lienzo, Vector2(x, roundf(marco.position.y + 3.0 + dy)), tk, _fuente, 16, alfa, activa)
+		x += wt
+		if not ds.is_empty():
+			x += 4.0
+			var col_d := Color(PIEL.ORO_BRILLO, alfa) if activa else Color(PIEL.CREMA, 0.90 * alfa)
+			_lienzo.draw_string(_fuente, Vector2(x, ty + dy), ds, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, col_d)
+			x += float(anchos_d[i])
+		x += 9.0
 
 
 ## Mini barras biseladas, telegrafía e indicadores tácticos sobre enemigos

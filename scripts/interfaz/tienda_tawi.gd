@@ -60,6 +60,10 @@ var _letras := 0.0                 # cuántas letras de la frase se ven ya (Tawi
 var _contento := 0.0
 var _parpadeo := 2.5
 var _chispas: Array[Dictionary] = []
+var _fondo_blur: ColorRect
+var _sel_y := -1.0
+var _cristales_vis := -1.0
+var _sacudida_error := 0.0
 
 
 func _ready() -> void:
@@ -68,6 +72,7 @@ func _ready() -> void:
 	layer = 30
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_fuente = FUENTE
+	_fondo_blur = PIEL.crear_fondo_desenfoque(self, 0.30)
 	_lienzo = Control.new()
 	_lienzo.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_lienzo.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -125,6 +130,12 @@ func _process(delta: float) -> void:
 	_tiempo += delta
 	_letras += delta * 38.0
 	_contento = maxf(0.0, _contento - delta)
+	_sacudida_error = maxf(0.0, _sacudida_error - delta * 5.0)
+	PIEL.actualizar_desenfoque(_fondo_blur, _alfa, 0.30)
+	var dest_y := _y_fila(seleccion)
+	_sel_y = dest_y if _sel_y < 0.0 else PIEL.resorte(_sel_y, dest_y, delta, 20.0)
+	var cr_real := float(Tienda.cristales())
+	_cristales_vis = cr_real if _cristales_vis < 0.0 else PIEL.resorte(_cristales_vis, cr_real, delta, 12.0)
 	_parpadeo -= delta
 	if _parpadeo < -0.15:
 		_parpadeo = randf_range(2.0, 4.0)
@@ -140,6 +151,37 @@ func _input(evento: InputEvent) -> void:
 	if not abierto or Engine.get_process_frames() == _abierto_en or evento.is_echo():
 		return
 	var n := _lista().size()
+	if evento is InputEventMouseMotion and n > 0:
+		for i in n:
+			var fy := _y_fila(i)
+			var r_f := Rect2(LISTA.position.x + 8, fy - 4, LISTA.size.x - 16, 24)
+			if r_f.has_point(evento.position):
+				if seleccion != i:
+					seleccion = i
+					Sonido.efecto("menu_mover")
+				break
+		return
+	if evento is InputEventMouseButton and evento.pressed:
+		if evento.button_index == MOUSE_BUTTON_WHEEL_DOWN and n > 0:
+			seleccion = (seleccion + 1) % n
+			Sonido.efecto("menu_mover")
+			get_viewport().set_input_as_handled()
+			return
+		elif evento.button_index == MOUSE_BUTTON_WHEEL_UP and n > 0:
+			seleccion = (seleccion - 1 + n) % n
+			Sonido.efecto("menu_mover")
+			get_viewport().set_input_as_handled()
+			return
+		elif evento.button_index == MOUSE_BUTTON_LEFT:
+			for i in n:
+				var fy := _y_fila(i)
+				var r_f := Rect2(LISTA.position.x + 8, fy - 4, LISTA.size.x - 16, 24)
+				if r_f.has_point(evento.position):
+					seleccion = i
+					comprar_elegido()
+					get_viewport().set_input_as_handled()
+					return
+			return
 	if evento.is_action_pressed("mochila") or evento.is_action_pressed("menu"):
 		cerrar()
 	elif n > 0 and (evento.is_action_pressed("mover_abajo") or evento.is_action_pressed("ui_down")):
@@ -171,6 +213,7 @@ func comprar_elegido() -> String:
 			_chispas.append({"p": centro, "v": Vector2(cos(ang), sin(ang) - 0.6) * randf_range(30, 90), "t": 0.0})
 	else:
 		Sonido.efecto("menu_atras")
+		_sacudida_error = 1.0
 		_decir(String(RESPUESTAS.get(r, "Hmm... eso no lo tengo.")))
 	return r
 
@@ -218,15 +261,19 @@ func _y_fila(i: int) -> float:
 
 func _dibujar() -> void:
 	var a := _alfa
-	_lienzo.draw_rect(Rect2(0, 0, 640, 360), Color(0.02, 0.02, 0.03, 0.6 * a))
-	var sube := (1.0 - a) * 16.0
+	PIEL.motas_ambiente(_lienzo, _tiempo, a, 16, PIEL.ORO_BRILLO)
+	var sube := (1.0 - a) * 14.0
+	var sx_err := roundf(sin(_tiempo * 50.0) * 3.0 * _sacudida_error) if _sacudida_error > 0.01 else 0.0
 	# ---- el puesto con su tendero
 	var fondo: Texture2D = TENDEROS[tendero]["fondo"]
 	var dibujo: Texture2D = TENDEROS[tendero]["dibujo"]
 	var nombre: String = TENDEROS[tendero]["nombre"]
 	var pf := POS_FONDO + Vector2(0, sube)
-	_caja(Rect2(pf - Vector2(6, 6), Vector2(fondo.get_width() + 12, fondo.get_height() + 12)), a, "cuero")
+	_caja(Rect2(pf - Vector2(6, 6), Vector2(fondo.get_width() + 12, fondo.get_height() + 12)), a, "terciopelo")
 	_lienzo.draw_texture(fondo, pf, Color(1, 1, 1, a))
+	# Viñeta cálida en el escaparate del puesto
+	_lienzo.draw_rect(Rect2(pf, Vector2(fondo.get_width(), 12)), Color(0.02, 0.01, 0.04, 0.28 * a))
+	_lienzo.draw_circle(pf + Vector2(fondo.get_width() * 0.5, 42), 68.0, Color(1.0, 0.78, 0.38, (0.06 + 0.04 * _contento) * a))
 	var f := 0
 	if _contento > 0.0:
 		f = 3
@@ -234,7 +281,7 @@ func _dibujar() -> void:
 		f = 2
 	elif _parpadeo < 0.0:
 		f = 1
-	var respira := roundf(sin(_tiempo * 2.4) * 0.8)
+	var respira := roundf(sin(_tiempo * 2.4) * 0.8 - (_contento * 2.0 if _contento > 0.0 else 0.0))
 	var pt := pf + Vector2(62, 54 + respira)
 	_lienzo.draw_texture_rect_region(dibujo, Rect2(pt, Vector2(96, 84)), Rect2(f * 96, 0, 96, 84), Color(1, 1, 1, a))
 	# el mostrador por delante de Tawi
@@ -243,9 +290,9 @@ func _dibujar() -> void:
 	# ---- lo que dice Tawi (letra a letra)
 	var bocadillo := Rect2(pf.x - 4, pf.y + fondo.get_height() + 14, fondo.get_width() + 8, 100)
 	_caja(bocadillo, a)
-	var etiqueta := Rect2(bocadillo.position + Vector2(10, -10), Vector2(_ancho(nombre) + 16, 18))
-	_caja(etiqueta, a, "cuero")
-	_texto(nombre, etiqueta.position + Vector2(8, 14), Color(PIEL.CREMA, a), 16, false)
+	var etiqueta := Rect2(bocadillo.position + Vector2(10, -10), Vector2(_ancho(nombre) + 18, 18))
+	_caja(etiqueta, a, "terciopelo")
+	_texto(nombre, etiqueta.position + Vector2(9, 14), Color(PIEL.CREMA, a), 16, false)
 	var visible_txt := _frase.substr(0, int(_letras))
 	var y := bocadillo.position.y + 38
 	for linea in _lineas(visible_txt, bocadillo.size.x - 20):
@@ -255,24 +302,28 @@ func _dibujar() -> void:
 	var lista_r := Rect2(LISTA.position + Vector2(0, sube), LISTA.size)
 	_caja(lista_r, a)
 	_texto(String(TENDEROS[tendero]["rotulo"]), lista_r.position + Vector2(12, 22), Color(AMBAR, a))
-	var cr := "%d" % Tienda.cristales()
-	var w_cr := _ancho(cr) + 22.0
-	var b_cr := Rect2(lista_r.end.x - 10.0 - w_cr, lista_r.position.y + 7.0, w_cr, 18.0)
-	PIEL.caja(_lienzo, b_cr, "cuero", a, false)
+	var cr_num := int(roundf(_cristales_vis if _cristales_vis >= 0.0 else float(Tienda.cristales())))
+	var cr := "%d" % cr_num
+	var w_cr := _ancho(cr) + 24.0
+	var b_cr := Rect2(lista_r.end.x - 10.0 - w_cr + sx_err, lista_r.position.y + 7.0, w_cr, 18.0)
+	PIEL.caja(_lienzo, b_cr, "terciopelo", a, false)
 	_lienzo.draw_texture(CRISTAL, b_cr.position + Vector2(5, 4), Color(1, 1, 1, a))
-	_texto(cr, b_cr.position + Vector2(17, 14), Color(Color("9ee6ff"), a), 16, false)
+	_texto(cr, b_cr.position + Vector2(18, 14), Color(Color("9ee6ff") if _sacudida_error <= 0.01 else ROJO, a), 16, false)
 	PIEL.divisor(_lienzo, lista_r.position.x + 12, lista_r.end.x - 12, lista_r.position.y + 32, PIEL.TINTA_SUAVE, 0.6 * a)
 	var lista := _lista()
+	if not lista.is_empty() and seleccion < lista.size():
+		var py_sel := (_sel_y if _sel_y >= 0.0 else _y_fila(seleccion)) + sube
+		PIEL.subrayar(_lienzo, Rect2(lista_r.position.x + 18 + sx_err, py_sel - 3, lista_r.size.x - 30, 22), _tiempo, a)
+		PIEL.marcapaginas(_lienzo, Vector2(lista_r.position.x + 14 + sx_err, py_sel + 8), a)
 	for i in lista.size():
 		var art: Dictionary = lista[i]
 		var fy := _y_fila(i) + sube
-		var fila := Rect2(lista_r.position.x + 8, fy - 4, lista_r.size.x - 16, 24)
 		var elegida := i == seleccion
-		if elegida:
-			PIEL.subrayar(_lienzo, Rect2(fila.position + Vector2(10, 1), fila.size - Vector2(14, 2)), _tiempo, a)
-			PIEL.marcapaginas(_lienzo, fila.position + Vector2(6, 12), a)
+		var dx_f := sx_err if elegida else 0.0
+		var fila := Rect2(lista_r.position.x + 8 + dx_f, fy - 4, lista_r.size.x - 16, 24)
 		var icono := int(art.get("icono", 0))
-		_lienzo.draw_texture_rect_region(ICONOS, Rect2(fila.position + Vector2(12, 4), Vector2(16, 16)), Rect2(icono * 16, 0, 16, 16), Color(1, 1, 1, a))
+		var esc_ic := 1.0 if not elegida else 1.0
+		_lienzo.draw_texture_rect_region(ICONOS, Rect2(fila.position + Vector2(12, 4 - (1.0 if elegida else 0.0)), Vector2(16, 16) * esc_ic), Rect2(icono * 16, 0, 16, 16), Color(1, 1, 1, a))
 		var agotado: bool = Tienda.agotado(art)
 		var color_n := APAGADO if agotado else TEXTO
 		_texto(String(art["nombre"]), fila.position + Vector2(34, 17), Color(color_n, a))
@@ -299,8 +350,10 @@ func _dibujar() -> void:
 			_texto(linea, Vector2(lista_r.position.x + 12, dy + 8), Color(APAGADO, a))
 			dy += 17
 	PIEL.barra_teclas(_lienzo, lista_r.get_center().x, lista_r.end.y + 19.0,
-		[["↑↓", "Elegir"], ["E", "Comprar"], ["Tab", "Salir"]], _fuente, 16, a, true)
-	# chispas al comprar
+		[["↑↓ / Ratón", "Elegir"], ["E / Clic", "Comprar"], ["Tab", "Salir"]], _fuente, 16, a, true)
+	# chispas doradas y celestes al comprar
 	for c in _chispas:
 		var v: float = 1.0 - c["t"] / 0.9
-		_lienzo.draw_rect(Rect2(c["p"].round(), Vector2(2, 2)), Color(0.75, 0.92, 1.0, v * a))
+		var pc: Vector2 = c["p"].round()
+		_lienzo.draw_circle(pc, 2.8, Color(PIEL.ORO_BRILLO, 0.25 * v * a))
+		_lienzo.draw_rect(Rect2(pc, Vector2(2, 2)), Color(PIEL.ORO_BRILLO, v * a))

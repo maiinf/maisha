@@ -115,7 +115,7 @@ func _dibujar() -> void:
 	var caja := Rect2(roundf((640.0 - ancho_caja) / 2.0 + sx), y, ancho_caja, 32.0 if ira < 0.0 else 40.0)
 	var col_borde: Color = GIZA if etapa < 2 else (COLOR_IRA[etapa] as Color)
 	var pulso := 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.008)
-	PIEL.caja(_lienzo, caja.grow(2), "noche")
+	PIEL.caja(_lienzo, caja.grow(2), "terciopelo", 0.94)
 	if etapa >= 2 or _destello_fase > 0.01:
 		var af := maxf(0.16 + 0.18 * pulso if etapa >= 2 else 0.0, _destello_fase * 0.65)
 		var cb := col_borde if _destello_fase <= 0.01 else Color("ffd878").lerp(col_borde, 0.5)
@@ -170,7 +170,7 @@ func _dibujar() -> void:
 		_dibujar_banner(caja.end.y + (28.0 if not partes.is_empty() else 10.0))
 
 
-## Cartel cinemático breve de presentación al iniciar un combate contra jefe
+## Cartel cinemático teatral de presentación al iniciar un combate contra jefe
 func _dibujar_banner(y_base: float) -> void:
 	var entrada := clampf((2.4 - _banner_t) / 0.35, 0.0, 1.0)
 	var salida := clampf(_banner_t / 0.45, 0.0, 1.0)
@@ -179,22 +179,29 @@ func _dibujar_banner(y_base: float) -> void:
 		return
 	var w_nom := FUENTE.get_string_size(nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x
 	var w_sub := FUENTE.get_string_size(subtitulo, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x if subtitulo != "" else 0.0
-	var ancho := clampf(maxf(w_nom, w_sub) + 52.0, 220.0, 540.0)
-	var alto := 42.0 if subtitulo != "" else 28.0
+	var ancho := clampf(maxf(w_nom, w_sub) + 64.0, 260.0, 560.0)
+	var alto := 44.0 if subtitulo != "" else 30.0
 	var despl := (1.0 - entrada) * 8.0
 	var marco := Rect2(roundf(320.0 - ancho * 0.5), roundf(y_base + despl), ancho, alto)
-	PIEL.caja(_lienzo, marco, "noche", 0.94 * a)
+	# Banda teatral horizontal con degradado en los extremos
+	for k in 8:
+		var fk := float(k) / 8.0
+		var pad := (1.0 - fk) * 56.0
+		var r_banda := Rect2(marco.position.x - pad, marco.position.y + 2.0, marco.size.x + pad * 2.0, marco.size.y - 4.0)
+		_lienzo.draw_rect(r_banda, Color(0.04, 0.02, 0.08, 0.11 * a))
+	PIEL.caja(_lienzo, marco, "terciopelo", 0.94 * a)
 	PIEL.esquinas_oro(_lienzo, marco, GIZA.lerp(PIEL.ORO, 0.55), 0.92 * a, 7.0)
 	var tx := roundf(320.0 - w_nom * 0.5)
 	var ty := roundf(marco.position.y + 20.0)
-	_dibujar_rombo(Vector2(tx - 10.0, ty - 5.0), Color(GIZA, a))
-	_dibujar_rombo(Vector2(tx + w_nom + 10.0, ty - 5.0), Color(GIZA, a))
-	_lienzo.draw_string(FUENTE, Vector2(tx + 1, ty + 1), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(0, 0, 0, 0.8 * a))
+	_dibujar_rombo(Vector2(tx - 12.0, ty - 5.0), Color(GIZA.lightened(0.15), a))
+	_dibujar_rombo(Vector2(tx + w_nom + 12.0, ty - 5.0), Color(GIZA.lightened(0.15), a))
+	_lienzo.draw_string(FUENTE, Vector2(tx + 1, ty + 1), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(0, 0, 0, 0.85 * a))
 	_lienzo.draw_string(FUENTE, Vector2(tx, ty), nombre, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(TEXTO, a))
 	if subtitulo != "":
-		PIEL.raya(_lienzo, Vector2(marco.position.x + 18.0, ty + 4.0), Vector2(marco.end.x - 18.0, ty + 4.0), PIEL.ORO, 0.55 * a)
+		var semi_linea := (marco.size.x * 0.5 - 18.0) * clampf(entrada * 1.25, 0.0, 1.0)
+		PIEL.divisor(_lienzo, 320.0 - semi_linea, 320.0 + semi_linea, ty + 5.0, PIEL.ORO, 0.72 * a)
 		var sx := roundf(320.0 - w_sub * 0.5)
-		_lienzo.draw_string(FUENTE, Vector2(sx, marco.position.y + 36.0).round(), subtitulo, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(PIEL.ORO_BRILLO, 0.92 * a))
+		_lienzo.draw_string(FUENTE, Vector2(sx, marco.position.y + 37.0).round(), subtitulo, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(PIEL.ORO_BRILLO, 0.94 * a))
 
 
 ## Pequeño cristal ornamental flanqueando el nombre del jefe

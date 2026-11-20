@@ -130,33 +130,45 @@ func _a_pantalla(n: Variant) -> Vector2:
 	return en_pantalla
 
 
+func _unhandled_input(evento: InputEvent) -> void:
+	if activa and _fuerza > 0.6 and evento is InputEventMouseButton and evento.button_index == MOUSE_BUTTON_LEFT and evento.pressed:
+		if evento.position.distance_to(Vector2(320, 260)) < 48.0:
+			pulsada.emit()
+			get_viewport().set_input_as_handled()
+
+
 func _dibujar() -> void:
 	var fuente: Font = FUENTE
 	if _fuerza > 0.02:
 		var a := _fuerza
-		# la tecla: pergamino cosido con esquineras doradas, que late
-		var late := 1.0 + 0.08 * sin(_tiempo * 6.0)
-		var centro := Vector2(320, 260)
-		var tam := (Vector2(38, 38) * late).round()
+		# la tecla con pulsación física simulada (press down) y doble onda expansiva
+		var onda_pulso := 0.5 + 0.5 * sin(_tiempo * 6.0)
+		var hundimiento := roundf(onda_pulso * 2.5)
+		var centro := Vector2(320, 258 + hundimiento)
+		var tam := Vector2(40, 38)
+		var base_sombra := Rect2(Vector2(320, 262) - tam / 2.0, tam)
+		_lienzo.draw_rect(base_sombra, Color(0.05, 0.03, 0.02, 0.85 * a))
 		var caja := Rect2(centro - tam / 2.0, tam)
-		PIEL.caja(_lienzo, caja, "pergamino", a)
-		PIEL.esquinas_oro(_lienzo, caja, PIEL.ORO, a, 5.0)
+		PIEL.caja(_lienzo, caja, "pergamino", a, false)
+		PIEL.esquinas_oro(_lienzo, caja, PIEL.ORO_BRILLO, a, 5.0)
 		var ancho_l := fuente.get_string_size(_tecla, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x
 		_lienzo.draw_string(fuente, centro + Vector2(-ancho_l / 2.0, 8), _tecla, HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(TINTA, a))
-		# el halo que se abre alrededor de la tecla
-		var f := fmod(_tiempo * 0.9, 1.0)
-		_lienzo.draw_arc(centro, 24.0 + f * 18.0, 0, TAU, 32, Color(AMBAR, (1.0 - f) * 0.65 * a), 1.5)
-		# el texto, debajo dentro de una cartela de noche
+		# dos halos concéntricos que se abren alrededor de la tecla
+		for k in 2:
+			var f := fmod(_tiempo * 0.85 + float(k) * 0.5, 1.0)
+			_lienzo.draw_arc(Vector2(320, 259), 22.0 + f * 20.0, 0, TAU, 32, Color(AMBAR, (1.0 - f) * 0.55 * a), 1.4)
+		# el texto debajo en una tarjeta moderna translúcida con resorte
 		var tw := fuente.get_string_size(_texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
-		var tcaja := Rect2(roundf(320.0 - tw / 2.0 - 12.0), 289, tw + 24.0, 24.0)
-		PIEL.caja(_lienzo, tcaja, "noche", a)
+		var dy_t := roundf((1.0 - a) * 8.0)
+		var tcaja := Rect2(roundf(320.0 - tw / 2.0 - 16.0), 289 + dy_t, tw + 32.0, 26.0)
+		PIEL.caja(_lienzo, tcaja, "terciopelo", 0.94 * a)
 		PIEL.esquinas_oro(_lienzo, tcaja, PIEL.ORO, 0.85 * a, 4.0)
-		_texto_sombra(_texto, Vector2(320, 305), 16, Color(PERGAMINO, a))
+		_texto_sombra(_texto, Vector2(320, 306 + dy_t), 16, Color(PERGAMINO, a))
 	if _lenta:
 		var parpadeo := 0.7 + 0.3 * sin(_tiempo * 10.0)
 		var aw := fuente.get_string_size(_aviso_lento, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x
-		var acaja := Rect2(roundf(320.0 - aw / 2.0 - 14.0), 50, aw + 28.0, 28.0)
-		PIEL.caja(_lienzo, acaja, "noche", 0.96)
+		var acaja := Rect2(roundf(320.0 - aw / 2.0 - 16.0), 50, aw + 32.0, 28.0)
+		PIEL.caja(_lienzo, acaja, "terciopelo", 0.94)
 		PIEL.esquinas_oro(_lienzo, acaja, AMBAR, parpadeo, 5.0)
 		_texto_sombra(_aviso_lento, Vector2(320, 70), 18, Color(AMBAR, parpadeo))
 

@@ -24,8 +24,11 @@ const PIEL := preload("res://scripts/interfaz/piel.gd")
 var abierto := false
 var _lista: Control
 var _lienzo: Control
+var _fondo_blur: ColorRect
 var _fuente: FontFile
 var _acciones: Array[String] = []
+var _alfa := 0.0
+var _tiempo := 0.0
 
 
 func _ready() -> void:
@@ -37,6 +40,7 @@ func _ready() -> void:
 	_fuente.antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	_fuente.hinting = TextServer.HINTING_NONE
 	_fuente.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
+	_fondo_blur = PIEL.crear_fondo_desenfoque(self, 0.22)
 	_lienzo = Control.new()
 	_lienzo.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_lienzo.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -52,13 +56,18 @@ func _ready() -> void:
 	visible = false
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_tiempo += delta
 	if Input.is_action_just_pressed("menu"):
 		if abierto:
 			cerrar()
 		elif _se_puede_abrir():
 			abrir()
 	if abierto:
+		_alfa = PIEL.resorte(_alfa, 1.0, delta, 18.0)
+		PIEL.actualizar_desenfoque(_fondo_blur, _alfa, 0.22)
+		_lista.position = CAJA_MENU.position + Vector2(12, 42 + roundf((1.0 - _alfa) * 8.0))
+		_lista.modulate.a = _alfa
 		_lienzo.queue_redraw()
 
 
@@ -75,6 +84,8 @@ func abrir() -> void:
 	Sonido.efecto("pausa")
 	abierto = true
 	visible = true
+	_alfa = 0.05
+	PIEL.actualizar_desenfoque(_fondo_blur, _alfa, 0.22)
 	get_tree().paused = true
 	_montar()
 	_lista.seleccion = 0
@@ -84,6 +95,7 @@ func abrir() -> void:
 func cerrar() -> void:
 	abierto = false
 	visible = false
+	PIEL.actualizar_desenfoque(_fondo_blur, 0.0, 0.22)
 	get_tree().paused = false
 
 
@@ -158,34 +170,44 @@ func _texto(texto: String, pos: Vector2, color: Color) -> void:
 	_lienzo.draw_string(_fuente, pos, texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(tinta, color.a))
 
 
-func _caja(r: Rect2) -> void:
-	PIEL.caja(_lienzo, r, "pergamino")
-	PIEL.esquinas_oro(_lienzo, r, PIEL.TINTA_SUAVE, 0.55, 5.0)
+func _caja(r: Rect2, a := 1.0) -> void:
+	PIEL.caja(_lienzo, r, "pergamino", a)
+	PIEL.esquinas_oro(_lienzo, r, PIEL.TINTA_SUAVE, 0.55 * a, 5.0)
 
 
 func _dibujar() -> void:
-	# oscurece el juego detrás
-	_lienzo.draw_rect(Rect2(0, 0, 640, 360), Color(0.03, 0.02, 0.05, 0.62))
-	_caja(CAJA_MENU)
-	_texto("Pausa", CAJA_MENU.position + Vector2(16, 23), AMBAR)
-	PIEL.divisor(_lienzo, CAJA_MENU.position.x + 12, CAJA_MENU.end.x - 12, CAJA_MENU.position.y + 32, PIEL.TINTA_SUAVE, 0.55)
-	_caja(CAJA_INFO)
-	var p := CAJA_INFO.position + Vector2(16, 23)
-	_texto(Estado.lugar if Estado.lugar != "" else "Raíz", p, AMBAR)
+	var a := clampf(_alfa, 0.05, 1.0)
+	var dy := roundf((1.0 - a) * 8.0)
+	PIEL.motas_ambiente(_lienzo, _tiempo, a, 16, PIEL.ORO_BRILLO)
+	var c_menu := Rect2(CAJA_MENU.position + Vector2(0, dy), CAJA_MENU.size)
+	var c_info := Rect2(CAJA_INFO.position + Vector2(0, dy), CAJA_INFO.size)
+	_caja(c_menu, a)
+	_texto("Pausa", c_menu.position + Vector2(16, 23), Color(AMBAR, a))
+	PIEL.divisor(_lienzo, c_menu.position.x + 12, c_menu.end.x - 12, c_menu.position.y + 32, PIEL.TINTA_SUAVE, 0.55 * a)
+	_caja(c_info, a)
+	var p := c_info.position + Vector2(16, 23)
 	var t_txt := Estado.texto_tiempo(Estado.tiempo_jugado)
 	var w_t := _fuente.get_string_size(t_txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x + 12.0
-	PIEL.insignia(_lienzo, Vector2(CAJA_INFO.end.x - 14.0 - w_t, CAJA_INFO.position.y + 10), t_txt, _fuente, PIEL.CUERO_OSCURO, PIEL.ORO, PIEL.CREMA, 0.92)
-	PIEL.divisor(_lienzo, CAJA_INFO.position.x + 12, CAJA_INFO.end.x - 12, CAJA_INFO.position.y + 32, PIEL.TINTA_SUAVE, 0.55)
-	# lo que lleva Maisha (en dos columnas para que no se salga de la caja aunque lleve muchos objetos)
+	var lugar_txt := Estado.lugar if Estado.lugar != "" else "Raíz"
+	var max_lug := c_info.size.x - w_t - 38.0
+	var tam_lug := 16
+	if _fuente.get_string_size(lugar_txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x > max_lug:
+		tam_lug = 14
+	if _fuente.get_string_size(lugar_txt, HORIZONTAL_ALIGNMENT_LEFT, -1, tam_lug).x > max_lug:
+		tam_lug = 13
+	_lienzo.draw_string(_fuente, p, lugar_txt, HORIZONTAL_ALIGNMENT_LEFT, -1, tam_lug, Color(PIEL.ROJO, a))
+	PIEL.insignia(_lienzo, Vector2(c_info.end.x - 14.0 - w_t, c_info.position.y + 10), t_txt, _fuente, PIEL.CUERO_OSCURO, PIEL.ORO, PIEL.CREMA, 0.92 * a)
+	PIEL.divisor(_lienzo, c_info.position.x + 12, c_info.end.x - 12, c_info.position.y + 32, PIEL.TINTA_SUAVE, 0.55 * a)
+	# lo que lleva Maisha (en dos columnas con pastillas suaves)
 	p.y += 28
-	_texto("Lleva", p, TEXTO)
+	_texto("Lleva", p, Color(TEXTO, a))
 	p.y += 6
 	var llevados: Array[String] = []
 	for o in Estado.OBJETOS:
 		if Estado.cuantos(o) > 0:
 			llevados.append(o)
 	if llevados.is_empty():
-		_texto("Nada, por ahora", p + Vector2(0, 16), Color(APAGADO, 0.65))
+		_texto("Nada, por ahora", p + Vector2(0, 16), Color(APAGADO, 0.65 * a))
 		p.y += 22
 	else:
 		var dos_col := llevados.size() > 3
@@ -194,26 +216,27 @@ func _dibujar() -> void:
 			var n := Estado.cuantos(o)
 			var col := (idx % 2) if dos_col else 0
 			var fila := (idx / 2) if dos_col else idx
-			var pos_o := p + Vector2(col * 138, fila * 20)
+			var pos_o := p + Vector2(col * 138, fila * 21)
+			_lienzo.draw_rect(Rect2(pos_o + Vector2(-2, 1), Vector2(132 if dos_col else 268, 18)), Color(PIEL.TINTA_SUAVE, 0.08 * a))
 			var idx_icono: int = int(Estado.OBJETOS[o].get("icono", -1))
 			if idx_icono >= 0:
 				_lienzo.draw_texture_rect_region(OBJETOS_TEX, Rect2(pos_o + Vector2(0, 2), Vector2(16, 16)),
-					Rect2(idx_icono * 16, 0, 16, 16))
-			_texto("%s x%d" % [Estado.OBJETOS[o]["uno"], n], pos_o + Vector2(19, 15), APAGADO)
+					Rect2(idx_icono * 16, 0, 16, 16), Color(1, 1, 1, a))
+			_texto("%s x%d" % [Estado.OBJETOS[o]["uno"], n], pos_o + Vector2(19, 15), Color(APAGADO, a))
 		var filas_usadas := ((llevados.size() + 1) / 2) if dos_col else llevados.size()
-		p.y += filas_usadas * 20
+		p.y += filas_usadas * 21
 	# mejoras
-	p.y = minf(p.y + 16, CAJA_INFO.end.y - 68)
-	PIEL.divisor(_lienzo, CAJA_INFO.position.x + 12, CAJA_INFO.end.x - 12, p.y - 12, PIEL.TINTA_SUAVE, 0.45)
-	_texto("Mejoras", p, TEXTO)
+	p.y = minf(p.y + 16, c_info.end.y - 68)
+	PIEL.divisor(_lienzo, c_info.position.x + 12, c_info.end.x - 12, p.y - 12, PIEL.TINTA_SUAVE, 0.45 * a)
+	_texto("Mejoras", p, Color(TEXTO, a))
 	var hay_mejoras := false
 	for m in MEJORAS:
 		if Estado.tiene(m):
 			hay_mejoras = true
 			p.y += 18
 			var dc := p + Vector2(4, -4)
-			_lienzo.draw_colored_polygon(PackedVector2Array([dc + Vector2(0, -3), dc + Vector2(3, 0), dc + Vector2(0, 3), dc + Vector2(-3, 0)]), PIEL.VERDE)
-			_texto(String(MEJORAS[m]), p + Vector2(10, 0), APAGADO)
+			_lienzo.draw_colored_polygon(PackedVector2Array([dc + Vector2(0, -3), dc + Vector2(3, 0), dc + Vector2(0, 3), dc + Vector2(-3, 0)]), Color(PIEL.VERDE, a))
+			_texto(String(MEJORAS[m]), p + Vector2(10, 0), Color(APAGADO, a))
 	if not hay_mejoras:
-		_texto("Ninguna, por ahora", p + Vector2(0, 18), Color(APAGADO, 0.65))
-	PIEL.barra_teclas(_lienzo, 320.0, 314.0, [["↑↓", "Elegir"], ["←→", "Ajustar"], ["Espacio", "Aceptar"], ["Esc", "Volver"]], _fuente, 16, 0.96, true)
+		_texto("Ninguna, por ahora", p + Vector2(0, 18), Color(APAGADO, 0.65 * a))
+	PIEL.barra_teclas(_lienzo, 320.0, 314.0 + dy, [["↑↓ / Ratón", "Elegir"], ["←→", "Ajustar"], ["Espacio", "Aceptar"], ["Esc", "Volver"]], _fuente, 16, 0.96 * a, true)

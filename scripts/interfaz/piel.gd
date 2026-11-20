@@ -55,40 +55,92 @@ static func _estilo_con_alfa(tipo: String, alfa: float) -> StyleBoxTexture:
 	return _estilos_alfa[clave]
 
 
+static func sombra_suave(lienzo: CanvasItem, rect: Rect2, alfa := 1.0, capas := 3) -> void:
+	if alfa <= 0.01:
+		return
+	var r := _redondo(rect)
+	for i in range(capas, 0, -1):
+		var fi := float(i)
+		var sr := _redondo(Rect2(r.position + Vector2(fi * 0.8, fi * 1.4), r.size + Vector2(fi * 0.6, fi * 0.6)))
+		var a_capa := (0.24 / fi) * alfa
+		# Esquinas biseladas 1px para evitar bloques negros cuadrados
+		lienzo.draw_rect(Rect2(sr.position.x + 1.0, sr.position.y, maxf(1.0, sr.size.x - 2.0), sr.size.y), Color(0.0, 0.0, 0.0, a_capa))
+		lienzo.draw_rect(Rect2(sr.position.x, sr.position.y + 1.0, sr.size.x, maxf(1.0, sr.size.y - 2.0)), Color(0.0, 0.0, 0.0, a_capa * 0.5))
+
+
 static func caja(lienzo: CanvasItem, rect: Rect2, tipo := "pergamino", alfa := 1.0, sombra := true) -> void:
 	if alfa <= 0.01:
 		return
 	var r := _redondo(rect)
 	if sombra:
-		lienzo.draw_rect(Rect2(r.position + Vector2(3, 4), r.size), Color(0.0, 0.0, 0.0, 0.36 * alfa))
-		lienzo.draw_rect(Rect2(r.position + Vector2(2, 2), r.size), Color(0.0, 0.0, 0.0, 0.18 * alfa))
+		sombra_suave(lienzo, r, alfa, 3)
+	if tipo in ["cristal", "terciopelo"]:
+		var col_top := Color(0.115, 0.095, 0.175, 0.90 * alfa) if tipo == "terciopelo" else Color(0.085, 0.075, 0.13, 0.80 * alfa)
+		var col_bot := Color(0.045, 0.038, 0.082, 0.95 * alfa) if tipo == "terciopelo" else Color(0.035, 0.030, 0.068, 0.88 * alfa)
+		# Gradiente vertical sedoso por vértice (sin cortes horizontales) con esquinas biseladas
+		var pts := PackedVector2Array([
+			Vector2(r.position.x + 1.0, r.position.y),
+			Vector2(r.end.x - 1.0, r.position.y),
+			Vector2(r.end.x - 1.0, r.end.y),
+			Vector2(r.position.x + 1.0, r.end.y),
+		])
+		lienzo.draw_polygon(pts, PackedColorArray([col_top, col_top, col_bot, col_bot]))
+		lienzo.draw_rect(Rect2(r.position.x, r.position.y + 1.0, 1.0, maxf(1.0, r.size.y - 2.0)), col_bot)
+		lienzo.draw_rect(Rect2(r.end.x - 1.0, r.position.y + 1.0, 1.0, maxf(1.0, r.size.y - 2.0)), col_bot)
+		# Bisel superior especular cálido y contorno fino
+		lienzo.draw_line(r.position + Vector2(2, 1), Vector2(r.end.x - 2, r.position.y + 1), Color(ORO_BRILLO, 0.44 * alfa), 1.0)
+		lienzo.draw_rect(Rect2(r.position + Vector2(1, 1), r.size - Vector2(2, 2)), Color(ORO, 0.30 * alfa), false, 1.0)
+		if r.size.x >= 44.0 and r.size.y >= 26.0:
+			lienzo.draw_rect(Rect2(r.position + Vector2(3, 3), r.size - Vector2(6, 6)), Color(ORO, 0.09 * alfa), false, 1.0)
+		return
 	lienzo.draw_style_box(_estilo_con_alfa(tipo, alfa), r)
-	if tipo == "noche" and r.size.x >= 44.0 and r.size.y >= 32.0:
-		# Terciopelo uniforme sobre el centro de noche.png + filete dorado interior sutil
-		var inner := Rect2(r.position + Vector2(7, 7), r.size - Vector2(14, 14))
-		lienzo.draw_rect(inner, Color(NOCHE_FONDO, 0.92 * alfa))
-		lienzo.draw_rect(Rect2(r.position + Vector2(4, 4), r.size - Vector2(8, 8)), Color(ORO, 0.32 * alfa), false, 1.0)
+	if tipo == "noche" and r.size.x >= 44.0 and r.size.y >= 26.0:
+		# Terciopelo profundo con brillo especular superior y filete dorado fino
+		var inner := Rect2(r.position + Vector2(6, 6), r.size - Vector2(12, 12))
+		lienzo.draw_rect(inner, Color(NOCHE_FONDO, 0.94 * alfa))
+		lienzo.draw_rect(Rect2(inner.position, Vector2(inner.size.x, minf(12.0, inner.size.y * 0.35))), Color(0.18, 0.15, 0.28, 0.28 * alfa))
+		lienzo.draw_line(r.position + Vector2(5, 4), Vector2(r.end.x - 5, r.position.y + 4), Color(ORO_BRILLO, 0.45 * alfa), 1.0)
+		lienzo.draw_rect(Rect2(r.position + Vector2(4, 4), r.size - Vector2(8, 8)), Color(ORO, 0.34 * alfa), false, 1.0)
 	elif tipo == "cuero" and r.size.x >= 28.0 and r.size.y >= 18.0:
-		lienzo.draw_line(r.position + Vector2(3, 2), Vector2(r.end.x - 3, r.position.y + 2), Color(ORO, 0.24 * alfa), 1.0)
-		lienzo.draw_rect(Rect2(r.position + Vector2(2, 2), r.size - Vector2(4, 4)), Color(CUERO_OSCURO, 0.28 * alfa), false, 1.0)
+		lienzo.draw_line(r.position + Vector2(3, 2), Vector2(r.end.x - 3, r.position.y + 2), Color(ORO_BRILLO, 0.32 * alfa), 1.0)
+		lienzo.draw_rect(Rect2(r.position + Vector2(2, 2), r.size - Vector2(4, 4)), Color(CUERO_OSCURO, 0.24 * alfa), false, 1.0)
 	elif tipo == "pergamino" and r.size.x >= 80.0 and r.size.y >= 60.0:
-		lienzo.draw_rect(Rect2(r.position + Vector2(8, 8), r.size - Vector2(16, 16)), Color(TINTA_SUAVE, 0.16 * alfa), false, 1.0)
+		lienzo.draw_line(r.position + Vector2(8, 7), Vector2(r.end.x - 8, r.position.y + 7), Color(1.0, 0.98, 0.9, 0.35 * alfa), 1.0)
+		lienzo.draw_rect(Rect2(r.position + Vector2(8, 8), r.size - Vector2(16, 16)), Color(TINTA_SUAVE, 0.14 * alfa), false, 1.0)
 
 
-## Un subrayado de rotulador amarillo, con los bordes algo irregulares (lo elegido en una lista)
-static func subrayar(lienzo: CanvasItem, rect: Rect2, _tiempo := 0.0, alfa := 1.0) -> void:
+## Píldora de selección moderna con gradiente cálido, barra lateral luminosa y barrido metálico animado
+static func subrayar(lienzo: CanvasItem, rect: Rect2, tiempo := 0.0, alfa := 1.0) -> void:
+	if alfa <= 0.01:
+		return
 	var r := _redondo(rect)
-	lienzo.draw_rect(Rect2(r.position + Vector2(2, 1), r.size - Vector2(4, 2)), Color(MARCADOR, 0.44 * alfa))
-	lienzo.draw_rect(Rect2(r.position + Vector2(1, 0), Vector2(2, r.size.y)), Color(ORO, 0.85 * alfa))
-	var x := r.position.x
-	var k := 0
-	while x < r.end.x:
-		var arriba := 1.0 if (k * 7) % 3 == 0 else 0.0
-		var abajo := 1.0 if (k * 5) % 4 == 0 else 0.0
-		var paso := minf(3.0, r.end.x - x)
-		lienzo.draw_rect(Rect2(x, r.position.y + arriba, paso, maxf(1.0, r.size.y - arriba - abajo)), Color(MARCADOR, 0.22 * alfa))
-		x += 3.0
-		k += 1
+	# Halo exterior sutil
+	lienzo.draw_rect(r.grow(1.0), Color(MARCADOR, 0.10 * alfa), false, 1.0)
+	# Degradado horizontal suave por vértice (sin bloques escalonados)
+	var c_izq := Color(MARCADOR, 0.42 * alfa)
+	var c_der := Color(MARCADOR, 0.14 * alfa)
+	var pts := PackedVector2Array([
+		r.position + Vector2(1.0, 1.0),
+		Vector2(r.end.x - 1.0, r.position.y + 1.0),
+		r.end - Vector2(1.0, 1.0),
+		Vector2(r.position.x + 1.0, r.end.y - 1.0),
+	])
+	lienzo.draw_polygon(pts, PackedColorArray([c_izq, c_der, c_der, c_izq]))
+	# Filo superior e inferior luminosos
+	lienzo.draw_line(r.position + Vector2(2, 1), Vector2(r.end.x - 2, r.position.y + 1), Color(ORO_BRILLO, 0.62 * alfa), 1.0)
+	lienzo.draw_line(Vector2(r.position.x + 2, r.end.y - 1), Vector2(r.end.x - 2, r.end.y - 1), Color(ORO, 0.30 * alfa), 1.0)
+	# Barra vertical izquierda de acento con núcleo brillante
+	lienzo.draw_rect(Rect2(r.position.x, r.position.y + 1.0, 3.0, maxf(1.0, r.size.y - 2.0)), Color(ORO_BRILLO, 0.95 * alfa))
+	lienzo.draw_rect(Rect2(r.position.x + 3.0, r.position.y + 2.0, 2.0, maxf(1.0, r.size.y - 4.0)), Color(MARCADOR, 0.35 * alfa))
+	# Barrido especular diagonal suave si se pasa tiempo
+	if r.size.x > 24.0:
+		var t_uso := tiempo if tiempo > 0.0 else float(Time.get_ticks_msec()) * 0.001
+		var fase := fmod(t_uso * 0.55, 1.35)
+		if fase <= 1.0:
+			var sx := roundf(r.position.x + 6.0 + (r.size.x - 16.0) * fase)
+			var sw := minf(14.0, r.end.x - sx - 2.0)
+			if sw > 2.0:
+				lienzo.draw_rect(Rect2(sx, r.position.y + 1.0, sw, maxf(1.0, r.size.y - 2.0)), Color(1.0, 0.97, 0.82, 0.16 * alfa))
 
 
 ## Una cinta roja de marcapáginas que señala una fila
@@ -393,3 +445,145 @@ static func icono_tactico(lienzo: CanvasItem, centro: Vector2, clave: String, es
 
 static func _redondo(r: Rect2) -> Rect2:
 	return Rect2(r.position.round(), r.size.round())
+
+
+## Crea un ColorRect con el shader de desenfoque cinematográfico detrás de un modal
+static func crear_fondo_desenfoque(padre: Node, calidez := 0.25) -> ColorRect:
+	var cr := ColorRect.new()
+	cr.set_anchors_preset(Control.PRESET_FULL_RECT)
+	cr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sh := load("res://shaders/interfaz_desenfoque.gdshader") as Shader
+	if sh != null:
+		var mat := ShaderMaterial.new()
+		mat.shader = sh
+		mat.set_shader_parameter("fuerza", 0.0)
+		mat.set_shader_parameter("calidez", calidez)
+		cr.material = mat
+	else:
+		cr.color = Color(0.04, 0.03, 0.08, 0.8)
+	padre.add_child(cr)
+	padre.move_child(cr, 0)
+	return cr
+
+
+static func actualizar_desenfoque(cr: ColorRect, fuerza: float, calidez := 0.25) -> void:
+	if cr == null:
+		return
+	var f := clampf(fuerza, 0.0, 1.0)
+	cr.visible = f > 0.01
+	if cr.material is ShaderMaterial:
+		var mat := cr.material as ShaderMaterial
+		mat.set_shader_parameter("fuerza", f)
+		mat.set_shader_parameter("calidez", calidez)
+	else:
+		cr.color = Color(0.04, 0.03, 0.08, 0.78 * f)
+
+
+## Interpolación exponencial independiente de FPS
+static func resorte(actual: float, destino: float, delta: float, rapidez := 16.0) -> float:
+	return lerpf(actual, destino, clampf(1.0 - exp(-rapidez * delta), 0.0, 1.0))
+
+
+## Tarjeta interactiva moderna con bisel luminoso superior, respuesta de hover y barrido metálico
+static func tarjeta(lienzo: CanvasItem, rect: Rect2, alfa := 1.0, seleccionada := false,
+		hover := false, col_acento := ORO, tiempo := 0.0, sombra := true) -> void:
+	if alfa <= 0.01:
+		return
+	var r := _redondo(rect)
+	if sombra:
+		sombra_suave(lienzo, r, alfa * (0.95 if seleccionada or hover else 0.65), 2)
+	var col_fondo := Color(0.16, 0.12, 0.20, 0.92 * alfa) if seleccionada else (
+		Color(0.13, 0.10, 0.17, 0.88 * alfa) if hover else Color(0.09, 0.07, 0.13, 0.82 * alfa))
+	lienzo.draw_rect(Rect2(r.position.x + 1.0, r.position.y, maxf(1.0, r.size.x - 2.0), r.size.y), col_fondo)
+	lienzo.draw_rect(Rect2(r.position.x, r.position.y + 1.0, r.size.x, maxf(1.0, r.size.y - 2.0)), col_fondo)
+	# Franja superior cálida
+	lienzo.draw_rect(Rect2(r.position.x + 1.0, r.position.y + 1.0, maxf(1.0, r.size.x - 2.0), minf(8.0, r.size.y * 0.35)),
+		Color(col_acento, (0.16 if seleccionada else (0.10 if hover else 0.04)) * alfa))
+	# Contorno y bisel superior
+	var borde_a := 0.85 if seleccionada else (0.55 if hover else 0.24)
+	lienzo.draw_rect(Rect2(r.position + Vector2(1, 1), r.size - Vector2(2, 2)), Color(col_acento, borde_a * alfa), false, 1.0)
+	lienzo.draw_line(r.position + Vector2(2, 1), Vector2(r.end.x - 2, r.position.y + 1),
+		Color(ORO_BRILLO if seleccionada or hover else col_acento, (0.75 if seleccionada else 0.38) * alfa), 1.0)
+	if seleccionada:
+		lienzo.draw_rect(Rect2(r.position.x, r.position.y + 2.0, 3.0, maxf(2.0, r.size.y - 4.0)), Color(ORO_BRILLO, 0.95 * alfa))
+		if r.size.x > 28.0:
+			var t_uso := tiempo if tiempo > 0.0 else float(Time.get_ticks_msec()) * 0.001
+			var fase := fmod(t_uso * 0.5, 1.4)
+			if fase <= 1.0:
+				var sx := roundf(r.position.x + 6.0 + (r.size.x - 16.0) * fase)
+				var sw := minf(16.0, r.end.x - sx - 2.0)
+				if sw > 2.0:
+					lienzo.draw_rect(Rect2(sx, r.position.y + 1.0, sw, maxf(1.0, r.size.y - 2.0)), Color(ORO_BRILLO, 0.11 * alfa))
+
+
+## Motas/brasas doradas flotantes suaves para el fondo de menús modales
+static func motas_ambiente(lienzo: CanvasItem, tiempo: float, alfa := 1.0, cantidad := 18, col := ORO_BRILLO) -> void:
+	if alfa <= 0.01:
+		return
+	for i in cantidad:
+		var fi := float(i)
+		var velocidad := 6.0 + fmod(fi * 3.7, 9.0)
+		var x := fmod(fi * 47.3 + sin(tiempo * 0.45 + fi * 1.9) * 18.0 + 640.0, 640.0)
+		var y := 360.0 - fmod(tiempo * velocidad + fi * 29.1, 360.0)
+		var parpadeo := 0.35 + 0.65 * (0.5 + 0.5 * sin(tiempo * (1.6 + fmod(fi, 3.0) * 0.4) + fi * 2.3))
+		var tam := 2.0 if i % 4 == 0 else 1.0
+		var pos := Vector2(roundf(x), roundf(y))
+		if tam > 1.5:
+			lienzo.draw_circle(pos, 2.6, Color(col, 0.09 * parpadeo * alfa))
+		lienzo.draw_rect(Rect2(pos, Vector2(tam, tam)), Color(col, 0.34 * parpadeo * alfa))
+
+
+## Anillo de progreso circular fluido («Mantén pulsado» o carga)
+static func anillo_progreso(lienzo: CanvasItem, centro: Vector2, radio: float, progreso: float,
+		col := ORO_BRILLO, alfa := 1.0, grosor := 2.2) -> void:
+	var p := clampf(progreso, 0.0, 1.0)
+	if p <= 0.005 or alfa <= 0.01:
+		return
+	var c := centro.round()
+	lienzo.draw_arc(c, radio, 0.0, TAU, 28, Color(0.05, 0.04, 0.09, 0.65 * alfa), grosor + 1.4)
+	var a0 := -PI * 0.5
+	var a1 := a0 + TAU * p
+	lienzo.draw_arc(c, radio, a0, a1, 28, Color(col, 0.95 * alfa), grosor)
+	var punta := c + Vector2(cos(a1), sin(a1)) * radio
+	lienzo.draw_circle(punta, grosor + 0.8, Color(1.0, 0.98, 0.88, 0.92 * alfa))
+
+
+## Emite chispas de UI en `origen` dentro del array `chispas`
+static func emitir_chispas(chispas: Array, origen: Vector2, cantidad := 14, col := ORO_BRILLO) -> void:
+	for i in cantidad:
+		var ang := (TAU * float(i) / float(maxi(1, cantidad))) + randf_range(-0.22, 0.22)
+		var vel := randf_range(26.0, 78.0)
+		chispas.append({
+			"p": origen,
+			"v": Vector2(cos(ang), sin(ang)) * vel + Vector2(0, -14.0),
+			"t": 0.0,
+			"d": randf_range(0.32, 0.58),
+			"c": col.lightened(randf_range(0.0, 0.25)),
+			"s": 2.0 if i % 3 == 0 else 1.0,
+		})
+
+
+## Actualiza y dibuja chispas de UI activas
+static func actualizar_chispas(lienzo: CanvasItem, chispas: Array, delta: float, alfa := 1.0) -> void:
+	for i in range(chispas.size() - 1, -1, -1):
+		var ch: Dictionary = chispas[i]
+		var t := float(ch["t"]) + delta
+		var d := float(ch["d"])
+		if t >= d:
+			chispas.remove_at(i)
+			continue
+		var v: Vector2 = ch["v"]
+		v.y += 95.0 * delta
+		v *= exp(-3.5 * delta)
+		var p: Vector2 = ch["p"] + v * delta
+		ch["t"] = t
+		ch["v"] = v
+		ch["p"] = p
+		chispas[i] = ch
+		var a := (1.0 - t / d) * alfa
+		var col: Color = ch["c"]
+		var tam := float(ch["s"])
+		var pr := p.round()
+		if tam > 1.5:
+			lienzo.draw_circle(pr, 2.5, Color(col, 0.22 * a))
+		lienzo.draw_rect(Rect2(pr, Vector2(tam, tam)), Color(col, a))

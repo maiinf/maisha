@@ -49,6 +49,9 @@ var _abriendo := -1.0       # tiempo desde que se eligió empezar o continuar (-
 var _tras_abrir := ""       # "intro" o "continuar"
 var _negro := 0.0           # el fundido final a negro
 var _letras_antes := 0
+var _mesa_sprite: Sprite2D
+var _paralaje := Vector2.ZERO
+var _chispas_inicio: Array = []
 
 
 func _ready() -> void:
@@ -64,6 +67,7 @@ func _ready() -> void:
 	mesa.texture = MESA
 	mesa.centered = false
 	add_child(mesa)
+	_mesa_sprite = mesa
 	# todo lo demás, en una capa por encima: el diario, la tarjeta, la llama, las motas y los textos
 	var capa := CanvasLayer.new()
 	capa.layer = 5
@@ -182,10 +186,28 @@ func _abrir(despues: String) -> void:
 	_tras_abrir = despues
 	_abriendo = 0.0
 	_lista.activa = false
+	PIEL.emitir_chispas(_chispas_inicio, LLAMA, 18, PIEL.ORO_BRILLO)
+
+
+func _unhandled_input(evento: InputEvent) -> void:
+	if _intro >= 0 and _intro_tiempo > 0.4 and evento is InputEventMouseButton and evento.button_index == MOUSE_BUTTON_LEFT and evento.pressed:
+		Sonido.efecto("dialogo_pasar")
+		_intro += 1
+		_intro_tiempo = 0.0
+		_letras_antes = 0
+		if _intro >= INTRO.size():
+			_intro = -2
+			Estado.ir_a("kitovu", "")
+		get_viewport().set_input_as_handled()
 
 
 func _process(delta: float) -> void:
 	_tiempo += delta
+	var mp := get_viewport().get_mouse_position()
+	var obj_par := ((mp - Vector2(320.0, 180.0)) / Vector2(320.0, 180.0)).clamp(Vector2(-1.0, -1.0), Vector2(1.0, 1.0)) * 3.0
+	_paralaje = _paralaje.lerp(obj_par, clampf(delta * 6.0, 0.0, 1.0))
+	if _mesa_sprite:
+		_mesa_sprite.position = (-_paralaje * 0.4).round()
 	_animar_motas(delta)
 	if _abriendo >= 0.0:
 		_abriendo += delta
@@ -268,11 +290,14 @@ func _dibujar() -> void:
 		_dibujar_intro()
 	# pie: controles en barra tactil sobre la mesa
 	if menu > 0.0:
-		PIEL.barra_teclas(_lienzo, 134.0, 344.0, [["↑↓", "Elegir"], ["Espacio", "Aceptar"]], _fuente, 16, menu, true)
+		PIEL.barra_teclas(_lienzo, 152.0, 344.0, [["↑↓ / Ratón", "Elegir"], ["Espacio / Clic", "Aceptar"]], _fuente, 16, menu, true)
+	PIEL.actualizar_chispas(_lienzo, _chispas_inicio, get_process_delta_time(), 1.0)
 	# la pregunta antes de borrar una partida
 	if _pregunta.visible:
+		_lienzo.draw_rect(Rect2(0, 0, 640, 360), Color(0.03, 0.02, 0.05, 0.55))
 		var caja := Rect2(222, 150, 228, 112)
 		PIEL.caja(_lienzo, caja, "pergamino")
+		PIEL.esquinas_oro(_lienzo, caja, PIEL.ROJO, 0.75, 5.0)
 		_lienzo.draw_string(_fuente, caja.position + Vector2(18, 26), "Se borrará la partida guardada.", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PIEL.ROJO)
 		_lienzo.draw_string(_fuente, caja.position + Vector2(18, 46), "¿Empezar de cero?", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, PIEL.TINTA)
 	if _negro > 0.0:
@@ -352,11 +377,18 @@ func _dibujar_llama(alfa: float) -> void:
 func _dibujar_motas(alfa: float) -> void:
 	if alfa <= 0.01:
 		return
-	for m in _motas:
+	for i in _motas.size():
+		var m: Dictionary = _motas[i]
 		var vida: float = m["vida"] / m["dura"]
-		var cerca := clampf(1.0 - m["pos"].distance_to(LLAMA) / 140.0, 0.0, 1.0)
+		var cerca := clampf(1.0 - m["pos"].distance_to(LLAMA) / 145.0, 0.0, 1.0)
 		var brillo := sin(vida * PI) * (0.5 + 0.5 * sin(m["vida"] * 3.0 + m["fase"])) * cerca * alfa
-		_lienzo.draw_rect(Rect2(m["pos"].round(), Vector2.ONE), Color(1.0, 0.86, 0.6, 0.8 * brillo))
+		var p_m: Vector2 = (m["pos"] + _paralaje * (1.2 if i % 3 == 0 else 0.6)).round()
+		if i % 3 == 0:
+			# Mota en primer plano con halo cálido desenfocado
+			_lienzo.draw_circle(p_m, 2.8, Color(1.0, 0.78, 0.42, 0.18 * brillo))
+			_lienzo.draw_rect(Rect2(p_m, Vector2(2, 2)), Color(1.0, 0.92, 0.72, 0.85 * brillo))
+		else:
+			_lienzo.draw_rect(Rect2(p_m, Vector2.ONE), Color(1.0, 0.86, 0.6, 0.8 * brillo))
 
 
 ## La luz de la vela, sumada: un halo que tiembla y un baño cálido sobre la mesa y el diario

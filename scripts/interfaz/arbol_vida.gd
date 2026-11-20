@@ -40,6 +40,9 @@ var _abierto_en := -1
 var _aviso := ""
 var _aviso_t := 0.0
 var _maisha_tex: Texture2D
+var _fondo_blur: ColorRect
+var _ondas: Array[Dictionary] = []
+var _raton_mantenido := false
 
 
 func _ready() -> void:
@@ -48,6 +51,7 @@ func _ready() -> void:
 	layer = 30
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_fuente = FUENTE
+	_fondo_blur = PIEL.crear_fondo_desenfoque(self, 0.16)
 	_lienzo = Control.new()
 	_lienzo.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_lienzo.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -105,24 +109,31 @@ func _arte() -> Dictionary:
 func _process(delta: float) -> void:
 	_tiempo += delta
 	if not abierto:
+		PIEL.actualizar_desenfoque(_fondo_blur, 0.0, 0.16)
 		_lienzo.queue_redraw()
 		return
-	_alfa = move_toward(_alfa, 1.0, delta * 2.0)
+	_alfa = move_toward(_alfa, 1.0, delta * 3.2)
+	PIEL.actualizar_desenfoque(_fondo_blur, _alfa * 0.9, 0.16)
 	_aviso_t = maxf(0.0, _aviso_t - delta)
 	for d in _destellos:
 		d["t"] += delta
 		d["p"] += d["v"] * delta
 		d["v"] *= 0.96
 	_destellos = _destellos.filter(func(d: Dictionary) -> bool: return d["t"] < d["vida"])
+	for o in _ondas:
+		o["t"] += delta
+	_ondas = _ondas.filter(func(o: Dictionary) -> bool: return o["t"] < 0.65)
 	_lienzo.queue_redraw()
 	if Engine.get_process_frames() == _abierto_en:
 		return
 	var arte := _arte()
-	# mantener Acción para despertar el siguiente nivel
-	if Input.is_action_pressed("accion") and Artes.puede_subir(String(arte.get("id", ""))):
+	var manteniendo := Input.is_action_pressed("accion") or _raton_mantenido
+	# mantener Acción o clic para despertar el siguiente nivel
+	if manteniendo and Artes.puede_subir(String(arte.get("id", ""))):
 		_carga += delta
 		if _carga >= MANTENER:
 			_carga = 0.0
+			_raton_mantenido = false
 			_subir()
 	else:
 		if Input.is_action_just_pressed("accion") and not Artes.puede_subir(String(arte.get("id", ""))):
@@ -132,9 +143,38 @@ func _process(delta: float) -> void:
 		_carga = maxf(0.0, _carga - delta * 3.0)
 
 
-## Las pulsaciones sueltas (salir, cambiar de Arte, mirar niveles) van por eventos
+## Las pulsaciones sueltas (salir, cambiar de Arte, mirar niveles o ratón) van por eventos
 func _input(evento: InputEvent) -> void:
 	if not abierto or Engine.get_process_frames() == _abierto_en or evento.is_echo():
+		return
+	if evento is InputEventMouseButton and evento.button_index == MOUSE_BUTTON_LEFT and not evento.pressed:
+		_raton_mantenido = false
+		return
+	if evento is InputEventMouseMotion or (evento is InputEventMouseButton and evento.button_index == MOUSE_BUTTON_LEFT and evento.pressed):
+		var mp: Vector2 = evento.position
+		for i in ORDEN.size():
+			var id_r: String = ORDEN[i]
+			var total_n := maxi(Artes.nivel_maximo(id_r), 6)
+			for n in total_n:
+				if mp.distance_to(_nudo(id_r, n)) <= 13.0:
+					if _elegida != i or _mirando != n:
+						_elegida = i
+						_mirando = n
+						_carga = 0.0
+						Sonido.efecto("menu_mover")
+					if evento is InputEventMouseButton and evento.pressed:
+						if n == Artes.nivel(id_r) and Artes.puede_subir(id_r):
+							_raton_mantenido = true
+						elif not Artes.puede_subir(id_r):
+							Sonido.efecto("menu_atras")
+							_aviso = _por_que_no()
+							_aviso_t = 2.0
+						get_viewport().set_input_as_handled()
+					return
+			if mp.distance_to(_punto_rama(id_r, 1.0)) <= 28.0 and evento is InputEventMouseButton and evento.pressed:
+				_elegir(i)
+				get_viewport().set_input_as_handled()
+				return
 		return
 	if evento.is_action_pressed("mochila") or evento.is_action_pressed("menu"):
 		cerrar()
@@ -197,6 +237,7 @@ func _subir() -> void:
 	var nivel := Artes.nivel(id)
 	var p := _nudo(id, nivel - 1)
 	var color := Color(String(_arte()["color"]))
+	_ondas.append({"p": p, "c": color, "t": 0.0})
 	var azar := RandomNumberGenerator.new()
 	for i in 26:
 		var a := azar.randf() * TAU
@@ -267,8 +308,8 @@ func _dibujar() -> void:
 	var a := _alfa
 	if a <= 0.01:
 		return
-	# fondo: noche verde muy oscura con motas de luz que suben
-	_lienzo.draw_rect(Rect2(0, 0, 640, 360), Color(0.02, 0.04, 0.03, 0.97 * a))
+	# fondo: desenfoque nocturno vivo con halo esmeralda y motas de luz que suben
+	_lienzo.draw_rect(Rect2(0, 0, 640, 360), Color(0.02, 0.04, 0.03, 0.72 * a))
 	for i in 6:
 		_lienzo.draw_circle(Vector2(320, 240), 260.0 - i * 40.0, Color(0.15, 0.3, 0.12, 0.035 * a))
 	for m in _motas:
@@ -279,6 +320,11 @@ func _dibujar() -> void:
 		_lienzo.draw_circle(Vector2(x, y), float(m["r"]), Color(0.75, 1.0, 0.6, 0.35 * parpadeo * a))
 	_dibujar_arbol(a)
 	_dibujar_maisha(a)
+	for o in _ondas:
+		var prog := clampf(float(o["t"]) / 0.65, 0.0, 1.0)
+		var col_o: Color = o["c"]
+		_lienzo.draw_arc(o["p"], 8.0 + prog * 48.0, 0.0, TAU, 32, Color(col_o, (1.0 - prog) * 0.85 * a), 2.2)
+		_lienzo.draw_arc(o["p"], 4.0 + prog * 28.0, 0.0, TAU, 24, Color(1.0, 1.0, 0.9, (1.0 - prog) * 0.6 * a), 1.2)
 	for d in _destellos:
 		if d["t"] < 0.0:
 			continue
@@ -321,14 +367,20 @@ func _dibujar_arbol(a: float) -> void:
 		if elegida:
 			_lienzo.draw_polyline(puntos, Color(color, 0.18 * a), grosor + 8.0)
 		_lienzo.draw_polyline(puntos, Color(0.45, 0.32, 0.2, a) if not bloqueada else Color(gris, 0.7 * a), grosor)
-		# la parte ya despierta de la rama brilla con su color
+		# la parte ya despierta de la rama brilla con su color y lleva pulsos de luz viajando
 		if nivel > 0:
 			var hasta := 0.28 + 0.72 * float(nivel) / maxi(Artes.nivel_maximo(id), 6)
 			var vivo := PackedVector2Array()
 			for k in 17:
 				var t := hasta * k / 16.0
 				vivo.append(_punto_rama(id, t))
-			_lienzo.draw_polyline(vivo, Color(color, 0.85 * a), 2.0)
+			_lienzo.draw_polyline(vivo, Color(color, 0.28 * a), 6.0)
+			_lienzo.draw_polyline(vivo, Color(color, 0.90 * a), 2.2)
+			for p_idx in 2:
+				var tp := fmod(_tiempo * 0.48 + float(p_idx) * 0.5, 1.0) * hasta
+				var pp := _punto_rama(id, tp)
+				_lienzo.draw_circle(pp, 3.4, Color(color, 0.32 * a))
+				_lienzo.draw_circle(pp, 1.6, Color(1.0, 1.0, 0.92, 0.92 * a))
 		# hojitas a lo largo de la rama
 		for k in range(2, 16, 3):
 			var t := k / 16.0
@@ -357,7 +409,7 @@ func _dibujar_arbol(a: float) -> void:
 				_lienzo.draw_circle(p, r, Color(0.08, 0.1, 0.08, a))
 				_lienzo.draw_arc(p, r, 0, TAU, 20, Color(color, (0.5 + 0.5 * latido) * a if puede else 0.45 * a), 1.5)
 				if elegida and _carga > 0.0:
-					_lienzo.draw_arc(p, r + 3.0, -PI / 2, -PI / 2 + TAU * _carga / MANTENER, 24, Color(1, 1, 0.85, a), 2.0)
+					PIEL.anillo_progreso(_lienzo, p, r + 4.0, _carga / MANTENER, color.lightened(0.25), a, 2.2)
 			else:
 				_lienzo.draw_circle(p, r, Color(0.06, 0.06, 0.07, a))
 				_lienzo.draw_arc(p, r, 0, TAU, 16, Color(gris, 0.8 * a), 1.0)

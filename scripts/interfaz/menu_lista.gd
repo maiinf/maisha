@@ -30,6 +30,9 @@ var activa := true
 var _fuente: FontFile
 var _tiempo := 0.0
 var _abierta_en := -1
+var _sel_y := -1.0
+var _sel_h := 20.0
+var _chispas: Array = []
 
 
 func _ready() -> void:
@@ -49,6 +52,14 @@ func reiniciar() -> void:
 
 func _process(delta: float) -> void:
 	_tiempo += delta
+	var dest_y := _y_de(seleccion)
+	var dest_h := float(ALTO_LINEA + (ALTO_NOTA if seleccion < opciones.size() and String(opciones[seleccion].get("nota", "")) != "" else 0)) - 2.0
+	if _sel_y < 0.0:
+		_sel_y = dest_y
+		_sel_h = dest_h
+	else:
+		_sel_y = PIEL.resorte(_sel_y, dest_y, delta, 20.0)
+		_sel_h = PIEL.resorte(_sel_h, dest_h, delta, 20.0)
 	queue_redraw()
 	if not activa or not is_visible_in_tree() or opciones.is_empty() or Engine.get_process_frames() == _abierta_en:
 		return
@@ -64,6 +75,7 @@ func _process(delta: float) -> void:
 		ajustada.emit(seleccion, 1)
 	elif Input.is_action_just_pressed("accion") or Input.is_action_just_pressed("ui_accept"):
 		Sonido.efecto("menu_aceptar")
+		PIEL.emitir_chispas(_chispas, Vector2(24.0, _y_de(seleccion) + 10.0), 10, PIEL.ORO_BRILLO)
 		elegida.emit(seleccion)
 
 
@@ -89,11 +101,21 @@ func _gui_input(evento: InputEvent) -> void:
 					Sonido.efecto("menu_mover")
 				seleccion = i
 				if evento is InputEventMouseButton and evento.pressed and evento.button_index == MOUSE_BUTTON_LEFT:
-					elegida.emit(i)
+					var op_c: Dictionary = opciones[i]
+					if op_c.has("valor") and evento.position.x >= size.x - 102.0:
+						var mitad := size.x - 56.0
+						ajustada.emit(i, 1 if evento.position.x >= mitad else -1)
+					else:
+						PIEL.emitir_chispas(_chispas, Vector2(minf(evento.position.x, 48.0), _y_de(i) + 10.0), 10, PIEL.ORO_BRILLO)
+						elegida.emit(i)
 				break
 
 
 func _draw() -> void:
+	# Píldora deslizante continua detrás de la fila seleccionada
+	if activa and not opciones.is_empty() and _sel_y >= 0.0:
+		var ancho_p := maxf(68.0, size.x - 14.0)
+		PIEL.subrayar(self, Rect2(8.0, _sel_y + 1.0, ancho_p, 19.0), _tiempo, 0.95 if en_papel else 0.72)
 	for i in opciones.size():
 		var y := _y_de(i)
 		var op: Dictionary = opciones[i]
@@ -103,23 +125,20 @@ func _draw() -> void:
 		var color := TEXTO if elegida_ahora else APAGADO
 		if op.get("apagada", false):
 			color = Color(APAGADO, 0.45)
-		var ancho_t := _fuente.get_string_size(texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16).x
 		if en_papel:
 			color = PIEL.TINTA if elegida_ahora else PIEL.TINTA_SUAVE
 			if op.get("apagada", false):
 				color = PIEL.TINTA_APAGADA
-			if elegida_ahora:
-				var ancho_sel := maxf(ancho_t + 14.0, size.x - 22.0) if size.x > 80.0 else ancho_t + 12.0
-				PIEL.subrayar(self, Rect2(x - 4.0, y + 1.0, minf(ancho_sel, size.x - 10.0), 19.0), _tiempo)
 		else:
 			draw_string(_fuente, Vector2(x + 1, y + 16), texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, SOMBRA)
 		draw_string(_fuente, Vector2(x, y + 15), texto, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, color)
 		if elegida_ahora:
 			var vaiven := roundf(sin(_tiempo * 5.0))
+			var py_c := _sel_y if _sel_y >= 0.0 else y
 			if en_papel:
-				PIEL.marcapaginas(self, Vector2(8.0 + vaiven, y + 11.0), 0.95)
+				PIEL.marcapaginas(self, Vector2(8.0 + vaiven, py_c + 11.0), 0.95)
 			else:
-				draw_texture(CURSOR, Vector2(vaiven, y + 6))
+				draw_texture(CURSOR, Vector2(vaiven, py_c + 6))
 		if op.has("valor"):
 			var r_val := Rect2(size.x - 94.0, y + 4.0, 76.0, 12.0)
 			PIEL.deslizador(self, r_val, float(op["valor"]), elegida_ahora, PIEL.ROJO if en_papel else PIEL.ORO)
@@ -131,3 +150,4 @@ func _draw() -> void:
 				draw_string(_fuente, Vector2(x + 1, y + 29), nota, HORIZONTAL_ALIGNMENT_LEFT, -1, 16, SOMBRA)
 			draw_string(_fuente, Vector2(x, y + 28), nota, HORIZONTAL_ALIGNMENT_LEFT, -1, 16,
 				Color(PIEL.ROJO if en_papel else NOTA, 0.9 if elegida_ahora else 0.65))
+	PIEL.actualizar_chispas(self, _chispas, get_process_delta_time(), 1.0)

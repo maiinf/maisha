@@ -32,6 +32,7 @@ var _texto_anterior := ""
 var _cambio := 1.0                   # 0 → 1 al cambiar el texto del paso (se desliza)
 var _esencias: Array[Dictionary] = []   # «+2 Esencia» que salen arriba a la izquierda: {n, motivo, t}
 var _y_panel := 8.0
+var _chispas_obj: Array = []
 
 
 func _ready() -> void:
@@ -81,6 +82,7 @@ func _al_cumplir_mision(m: Dictionary) -> void:
 
 func _al_cumplir_paso(_m: Dictionary) -> void:
 	_destello = 1.0
+	PIEL.emitir_chispas(_chispas_obj, Vector2(540, _y_panel + 20.0), 12, VERDE)
 	Sonido.efecto("mision_paso")
 
 
@@ -206,13 +208,13 @@ func _dibujar_esencia(e: Dictionary) -> void:
 	var texto := ("+%d Cristal" + ("es" if int(e["n"]) != 1 else "")) % int(e["n"]) if cristal else "+%d Esencia" % int(e["n"])
 	var motivo := String(e["motivo"])
 	var ancho := _ancho(texto) + 24 + (_ancho(" · " + motivo) if motivo != "" else 0.0)
-	var caja := Rect2(8 - (1.0 - a) * 10.0, 38, ancho + 8, 20)
+	var caja := Rect2(8 - (1.0 - a) * 12.0, 40, ancho + 8, 20)
 	var tinte := Color(0.6, 0.85, 1.0) if cristal else Color(0.75, 1.0, 0.55)
-	PIEL.caja(_lienzo, caja.grow(2), "cuero", 0.94 * a)
-	PIEL.esquinas_oro(_lienzo, caja.grow(2), tinte, 0.7 * a, 4.0)
+	PIEL.caja(_lienzo, caja.grow(2), "cristal", 0.90 * a)
+	_lienzo.draw_rect(Rect2(caja.position.x - 1.0, caja.position.y, 2.0, caja.size.y), Color(tinte, 0.95 * a))
 	var c := caja.position + Vector2(11, 10)
 	for i in 3:
-		_lienzo.draw_circle(c, 3.0 + i * 2.5, Color(tinte, 0.12 * a / (i + 1)))
+		_lienzo.draw_circle(c, 3.0 + i * 2.5, Color(tinte, 0.14 * a / (i + 1)))
 	if cristal:
 		_lienzo.draw_texture(CRISTAL, c - Vector2(4, 5), Color(1, 1, 1, a))
 	else:
@@ -230,25 +232,37 @@ func _dibujar_panel() -> void:
 	var titulo := String(m["titulo"])
 	var color_tipo: Color = COLOR_TIPO.get(m.get("tipo", ""), AMBAR)
 	var lineas := _lineas("› " + _texto_paso, ANCHO_MAX - 16)
-	var ancho := maxf(_ancho(titulo) + 26, 0.0)
+	var ancho := maxf(_ancho(titulo) + 32, 0.0)
 	for l in lineas:
-		ancho = maxf(ancho, _ancho(l) + 16)
+		ancho = maxf(ancho, _ancho(l) + 18)
 	ancho = minf(ancho, ANCHO_MAX)
-	var alto := 26.0 + lineas.size() * 15.0
-	var caja := Rect2(640 - 8 - ancho, roundf(_y_panel), ancho, alto)
-	PIEL.caja(_lienzo, caja.grow(3), "cuero", 0.92 * a)
-	PIEL.esquinas_oro(_lienzo, caja.grow(3), color_tipo, 0.7 * a, 5.0)
+	var alto := 28.0 + lineas.size() * 15.0
+	var desliz_entrada := roundf((1.0 - a) * 18.0)
+	var caja := Rect2(640 - 8 - ancho + desliz_entrada, roundf(_y_panel), ancho, alto)
+	PIEL.caja(_lienzo, caja.grow(2), "cristal", 0.86 * a, true)
+	# Barra vertical izquierda luminosa del color de misión
+	_lienzo.draw_rect(Rect2(caja.position.x - 1.0, caja.position.y + 1.0, 3.0, caja.size.y - 2.0), Color(color_tipo, 0.95 * a))
 	if _destello > 0.0:
-		_lienzo.draw_rect(caja.grow(1), Color(VERDE, _destello * a), false, 1.0)
-	# rombo del tipo de misión
+		_lienzo.draw_rect(caja.grow(2), Color(VERDE, _destello * 0.75 * a), false, 1.0)
+	# Progreso de pasos compacto a la derecha si tiene varios pasos
+	var pasos_arr := Misiones.pasos_visibles(m)
 	var r := caja.position + Vector2(10, 11)
 	_lienzo.draw_colored_polygon(PackedVector2Array([r + Vector2(0, -4), r + Vector2(4, 0), r + Vector2(0, 4), r + Vector2(-4, 0)]), Color(color_tipo, a))
-	_texto(titulo, caja.position + Vector2(18, 15), Color(color_tipo, a))
-	PIEL.divisor(_lienzo, caja.position.x + 8, caja.end.x - 8, caja.position.y + 19, PIEL.ORO, 0.45 * a)
-	# el paso (se desliza un poco al cambiar)
-	var desliz := (1.0 - _cambio) * 6.0
+	_texto(titulo, caja.position + Vector2(18, 15), Color(color_tipo.lightened(0.12), a))
+	if pasos_arr.size() > 1:
+		var hechos := 0
+		for p_d: Dictionary in pasos_arr:
+			if p_d.get("hecho", false):
+				hechos += 1
+		var barra_p := Rect2(caja.position.x + 8, caja.position.y + 19, caja.size.x - 16, 3)
+		PIEL.medidor(_lienzo, barra_p, float(hechos) / float(pasos_arr.size()), color_tipo, -1.0, Color.WHITE, 0.85 * a, pasos_arr.size())
+	else:
+		PIEL.divisor(_lienzo, caja.position.x + 8, caja.end.x - 8, caja.position.y + 19, PIEL.ORO, 0.38 * a)
+	# el paso (se desliza suavemente al cambiar)
+	var desliz := (1.0 - _cambio) * 8.0
 	for i in lineas.size():
-		_texto(lineas[i], caja.position + Vector2(8 + desliz, 33 + i * 15), Color(TEXTO, a * _cambio))
+		_texto(lineas[i], caja.position + Vector2(9 + desliz, 34 + i * 15), Color(TEXTO, a * _cambio))
+	PIEL.actualizar_chispas(_lienzo, _chispas_obj, get_process_delta_time(), a)
 
 
 func _dibujar_flecha() -> void:
