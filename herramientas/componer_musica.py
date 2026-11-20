@@ -2575,6 +2575,54 @@ def asterhaul_libre():
     return final(p, sala=4.2, mezcla=0.40, brillo=5200)
 
 
+def mirador_ocaso():
+    """«El sol detenido» (El Mirador del Ocaso, 78 BPM, bucle continuo): atardecer suspendido sobre mesetas de
+    arenisca y abismo malva. En Fa lidio / Re menor cálido: colchón dorado suave, arpegios de kalimba como
+    reloj de arena, campanitas de farol lejano y una melodía de flauta nostálgica y serena."""
+    tempo = Tempo(78)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("F2", "M7"), ("G2", "M"), ("E2", "m7"), ("A1", "m7"),
+        ("D2", "m7"), ("G1", "sus"), ("C2", "M7"), ("C2", "M7"),
+        ("F2", "M7"), ("G2", "M"), ("A1", "m7"), ("E2", "m7"),
+        ("D2", "m7"), ("F2", "M7"), ("G1", "sus"), ("A1", "m7"),
+        ("F2", "M7"), ("E2", "m7"), ("D2", "m7"), ("C2", "M7"),
+        ("D2", "m7"), ("F2", "M7"), ("G1", "M"), ("C2", "M7"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=980, volumen=0.26, octava_bajo=1, fuerza_bajo=0.30)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.16, pan=-0.28, patron=(0, 2, 1, 3, 2, 1, 0, 2))
+        if i % 2 == 1:
+            notas = acorde(raiz[:-1] + "5", tipo)
+            p.poner(campanita(notas[-1], 2.0, 0.085), tempo.s(i * 4 + 3), pan=0.34)
+    # Pulso pausado de tambor lejano como un reloj de sol que casi no avanza
+    for b in range(0, pulsos, 4):
+        p.poner(tambor("F1", 0.36, 0.16, golpe=0.18), tempo.s(b), pan=0.0)
+        if b % 8 == 4:
+            p.poner(tambor("C2", 0.24, 0.10, golpe=0.16), tempo.s(b + 2.5), pan=0.18)
+    p.poner(coro(["F3", "A3", "C4", "E4"], tempo.s(32)), tempo.s(32), 0.075)
+    p.poner(coro(["D3", "F3", "A3", "C4"], tempo.s(32)), tempo.s(64), 0.080)
+    tema_a = [
+        ("A5", 0, 2), ("B5", 2, 1), ("C6", 3, 1), ("B5", 4, 2), ("G5", 6, 2),
+        ("E5", 8, 1.5), ("G5", 9.5, 0.5), ("A5", 10, 2), ("E5", 12, 4),
+        ("F5", 16, 1.5), ("G5", 17.5, 0.5), ("A5", 18, 2), ("G5", 20, 2), ("D5", 22, 2),
+        ("E5", 24, 2.5), ("G5", 26.5, 1.5), ("E5", 28, 4),
+    ]
+    tema_b = [
+        ("C6", 0, 2), ("B5", 2, 1), ("A5", 3, 1), ("G5", 4, 2), ("E5", 6, 2),
+        ("F5", 8, 1.5), ("A5", 9.5, 0.5), ("G5", 10, 2), ("E5", 12, 4),
+        ("D5", 16, 1.5), ("E5", 17.5, 0.5), ("F5", 18, 2), ("A5", 20, 2), ("G5", 22, 2),
+        ("E5", 24, 2), ("D5", 26, 2), ("C5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.42, vibrato=4.5)
+    melodia(p, tempo, tema_a, desde=4, instrumento=kalimba, volumen=0.30, pan=0.14)
+    melodia(p, tempo, tema_a, desde=32, instrumento=flauta_, volumen=0.40, sostener=0.95, pan=0.10)
+    melodia(p, tempo, tema_b, desde=64, instrumento=flauta_, volumen=0.38, sostener=0.95, pan=0.10)
+    melodia(p, tempo, transportar(tema_b, -12), desde=64, instrumento=kalimba, volumen=0.18, pan=-0.22)
+    return final(p, sala=3.9, mezcla=0.38, brillo=4800)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2596,6 +2644,7 @@ PIEZAS["jefe_kipanga"] = jefe_kipanga
 PIEZAS["nucleo_estrella"] = nucleo_estrella
 PIEZAS["jefe_corazon"] = jefe_corazon
 PIEZAS["asterhaul_libre"] = asterhaul_libre
+PIEZAS["mirador_ocaso"] = mirador_ocaso
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -2617,6 +2666,7 @@ TITULOS["jefe_kipanga"] = "Alas de obsidiana"
 TITULOS["nucleo_estrella"] = "Lo que cayó del cielo"
 TITULOS["jefe_corazon"] = "El pulso de la estrella"
 TITULOS["asterhaul_libre"] = "Asterhaul late"
+TITULOS["mirador_ocaso"] = "El sol detenido"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

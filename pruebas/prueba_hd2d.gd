@@ -181,6 +181,30 @@ func _ready() -> void:
 	_comprobar(puerta_3d and puerta_pie, "la Puerta Triple tiene volumen 3D y sus ojos se dibujan de pie")
 	_comprobar(corazon_pie, "el Corazón del Meteorito dibuja sus tres aros de pie y el latido en el suelo")
 
+	print("El Mirador del Ocaso en HD-2D:")
+	Estado.marcar("nexo_despierto")
+	await _ir("mirador_ocaso", "norte")
+	espejo = _espejo()
+	var penas_ocaso := false
+	var arco_ocaso_3d := false
+	var obeliscos_3d := 0
+	var sol_suelo := false
+	if espejo:
+		for h in espejo.get_children():
+			if h is MeshInstance3D and (h as MeshInstance3D).layers == 2:
+				penas_ocaso = true
+		for par in espejo.get("_gemelos").values():
+			if String(par[4]) == "mirador/arco.png":
+				arco_ocaso_3d = true
+			elif String(par[4]) == "mirador/obelisco.png":
+				obeliscos_3d += 1
+		var sol_n := get_tree().current_scene.get_node_or_null("Sol") as CanvasItem
+		if sol_n != null:
+			sol_suelo = sol_n.visibility_layer == (1 << 12)
+	_comprobar(espejo != null and not penas_ocaso, "El Mirador del Ocaso respeta el abismo del atardecer (sin muros falsos)")
+	_comprobar(arco_ocaso_3d and obeliscos_3d == 4, "el Arco del Atardecer y los 4 obeliscos se construyen en 3D (%d)" % obeliscos_3d)
+	_comprobar(sol_suelo and PIEL.TACTICO_INFO.has("sol"), "las sombras-puente quedan tumbadas en el suelo y el icono táctico 'sol' existe")
+
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")
 	espejo = _espejo()

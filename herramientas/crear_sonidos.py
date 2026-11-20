@@ -2915,6 +2915,92 @@ def sello_enciende():
     return reverb(p.entera(), 1.65, 0.34)
 
 
+def reloj_sol():
+    """El Reloj de Sol gira un tercio: arenisca que rueda y un tañido cálido de bronce."""
+    p = Pista(1.35)
+    roce = paso_banda(ruido_rosa(0.42), 240, 1200) * adsr(_n(0.42), 0.03, 0.10, 0.55, 0.18) * 0.58
+    p.poner(roce, 0.0)
+    p.poner(tambor("F2", 0.28, 0.36, golpe=0.4), 0.02)
+    p.poner(campanita("C5", 0.95, 0.28), 0.10)
+    p.poner(campanita("G5", 1.05, 0.24), 0.22)
+    return reverb(p.entera(), 1.75, 0.32)
+
+
+def sombra_tiende():
+    """Las sombras largas de los obeliscos se tienden en silencio sobre el abismo del atardecer."""
+    p = Pista(1.25)
+    soplo = paso_banda(ruido_rosa(0.95), 140, 720) * adsr(_n(0.95), 0.14, 0.22, 0.50, 0.38) * 0.52
+    p.poner(soplo, 0.0)
+    velo = seno(_desliz(240, 155, 0.9), 0.9) * adsr(_n(0.9), 0.12, 0.20, 0.55, 0.35) * 0.22
+    p.poner(velo, 0.05)
+    p.poner(campanita("A4", 0.95, 0.14), 0.18)
+    return reverb(p.entera(), 2.1, 0.38)
+
+
+def espejo_gira():
+    """Un espejo de bronce gira un cuarto sobre su eje tallado."""
+    p = Pista(0.55)
+    clic = paso_banda(ruido(0.08), 900, 3200) * adsr(_n(0.08), 0.004, 0.02, 0.25, 0.04) * 0.48
+    p.poner(clic, 0.0)
+    p.poner(campanita("E5", 0.42, 0.22), 0.02)
+    p.poner(campanita("B5", 0.36, 0.12), 0.08)
+    return reverb(p.entera(), 0.9, 0.22)
+
+
+def espejo_enciende():
+    """El espejo atrapa el rayo del sol detenido y destella en bronce dorado."""
+    p = Pista(1.4)
+    brillo = seno(_desliz(520, 1046, 0.52), 0.52) * adsr(_n(0.52), 0.05, 0.14, 0.45, 0.22) * 0.20
+    p.poner(brillo, 0.0)
+    for k, nota in enumerate(("F5", "A5", "C6", "E6")):
+        p.poner(campanita(nota, 1.05, 0.26 - k * 0.03), k * 0.07)
+    return reverb(p.entera(), 1.8, 0.36)
+
+
+def arco_ocaso():
+    """El velo púrpura del Arco del Atardecer se disuelve y abre la bajada a Jioni."""
+    p = Pista(2.5)
+    p.poner(taiko(0.95, 0.72), 0.0)
+    velo = paso_banda(ruido_rosa(1.4), 220, 1500) * adsr(_n(1.4), 0.16, 0.30, 0.60, 0.50) * 0.42
+    p.poner(velo, 0.08)
+    for k, nota in enumerate(("F4", "A4", "C5", "E5", "G5", "C6")):
+        p.poner(campanita(nota, 1.45, 0.24 - k * 0.015), 0.18 + k * 0.14)
+    return reverb(p.entera(), 2.4, 0.42)
+
+
+def kivuli_pica():
+    """El alacrán de sombra Kivuli menor suelta un aguijonazo seco en penumbra."""
+    p = Pista(0.55)
+    chasq = paso_banda(ruido(0.11), 1200, 4600) * adsr(_n(0.11), 0.003, 0.03, 0.2, 0.05) * 0.62
+    p.poner(chasq, 0.0)
+    siseo = seno(_desliz(640, 190, 0.28), 0.28) * adsr(_n(0.28), 0.01, 0.06, 0.35, 0.12) * 0.42
+    p.poner(siseo, 0.02)
+    return reverb(p.entera(), 0.75, 0.20)
+
+
+def kivuli_deslumbra():
+    """La luz directa del sol deslumbra al Kivuli: chisporroteo solar y quejido breve."""
+    p = Pista(0.75)
+    luz = seno(_desliz(780, 1320, 0.26), 0.26) * adsr(_n(0.26), 0.02, 0.06, 0.40, 0.12) * 0.26
+    p.poner(luz, 0.0)
+    chispa = paso_banda(ruido(0.32), 2000, 6200) * adsr(_n(0.32), 0.01, 0.08, 0.35, 0.15) * 0.35
+    p.poner(chispa, 0.02)
+    p.poner(campanita("A5", 0.55, 0.20), 0.06)
+    return reverb(p.entera(), 1.1, 0.28)
+
+
+def kivuli_muere():
+    """El Kivuli se deshace al sol en astillas de sombra cristalina."""
+    p = Pista(1.1)
+    polvo = paso_banda(ruido_rosa(0.68), 450, 3200) * adsr(_n(0.68), 0.01, 0.14, 0.35, 0.35) * 0.54
+    p.poner(polvo, 0.0)
+    caida = seno(_desliz(540, 120, 0.55), 0.55) * adsr(_n(0.55), 0.01, 0.12, 0.30, 0.28) * 0.32
+    p.poner(caida, 0.0)
+    for k, nota in enumerate(("E5", "C5", "A4")):
+        p.poner(campanita(nota, 0.52, 0.18 - k * 0.03), 0.04 + k * 0.07)
+    return reverb(p.entera(), 1.35, 0.32)
+
+
 EFECTOS = {
     "dialogo_pasar": (dialogo_pasar, 0.5), "dialogo_cerrar": (dialogo_cerrar, 0.45),
     "menu_mover": (menu_mover, 0.35), "menu_aceptar": (menu_aceptar, 0.55), "menu_atras": (menu_atras, 0.5),
@@ -3028,6 +3114,14 @@ EFECTOS = {
     "pozo_abre": (pozo_abre, 0.88),
     "puerta_triple": (puerta_triple, 0.86),
     "sello_enciende": (sello_enciende, 0.78),
+    "reloj_sol": (reloj_sol, 0.76),
+    "sombra_tiende": (sombra_tiende, 0.68),
+    "espejo_gira": (espejo_gira, 0.66),
+    "espejo_enciende": (espejo_enciende, 0.76),
+    "arco_ocaso": (arco_ocaso, 0.84),
+    "kivuli_pica": (kivuli_pica, 0.72),
+    "kivuli_deslumbra": (kivuli_deslumbra, 0.68),
+    "kivuli_muere": (kivuli_muere, 0.76),
 }
 
 AMBIENTES = {

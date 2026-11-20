@@ -79,6 +79,32 @@ const CATALOGO := {
 			["capa", 6, 66, 3, 30, -0.95, 0.76],
 		],
 	},
+	"mirador/arco.png": {
+		"tipo": "bloques", "frente_z": 0.06,
+		"partes": [
+			["caja", 2, 14, 26, 67, 0.02, -1.15, true, [3, 13, 30, 64]],
+			["caja", 50, 62, 26, 67, 0.02, -1.15, true, [51, 61, 30, 64]],
+			["capa", 4, 60, 2, 28, -0.38, 0.88],
+			["capa", 4, 60, 2, 28, -0.78, 0.76],
+		],
+	},
+	"mirador/arco_kitovu.png": {
+		"tipo": "bloques", "frente_z": 0.06,
+		"partes": [
+			["caja", 1, 10, 20, 51, 0.02, -0.90, true, [2, 9, 24, 48]],
+			["caja", 38, 47, 20, 51, 0.02, -0.90, true, [39, 46, 24, 48]],
+			["capa", 3, 45, 2, 22, -0.30, 0.88],
+			["capa", 3, 45, 2, 22, -0.62, 0.76],
+		],
+	},
+	"mirador/obelisco.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 4, 16, 12, 59, 0.01, -0.68, true, [5, 15, 16, 56]],
+			["capa", 5, 15, 2, 16, -0.22, 0.88],
+			["capa", 5, 15, 2, 16, -0.44, 0.76],
+		],
+	},
 	"desfiladero/muro.png": {
 		"tipo": "bloques", "frente_z": 0.06, "solo_marco": 0,
 		"partes": [
@@ -350,13 +376,14 @@ func _nombre_catalogo(tex: Texture2D) -> String:
 	for clave: String in [
 		"desfiladero/taller.png", "desfiladero/muro.png", "desfiladero/derrumbe.png", "desfiladero/puerta.png",
 		"galerias/barricada.png", "nucleo/puerta_triple.png",
+		"mirador/arco.png", "mirador/arco_kitovu.png", "mirador/obelisco.png",
 		"mji_jiwe/gran_forja.png", "mji_jiwe/casa.png", "mji_jiwe/mercado.png", "mji_jiwe/verja.png",
 		"aldea/taller.png", "objetos/muro.png", "campo/molino.png",
 		"seccion/atril.png", "estanterias/atril.png", "seccion/sello.png",
 	]:
 		if ruta.ends_with(clave):
 			return clave
-	if ruta.contains("/desfiladero/") or ruta.contains("/mji_jiwe/") or ruta.contains("/galerias/") or ruta.contains("/fundicion/") or ruta.contains("/aguja/") or ruta.contains("/nucleo/"):
+	if ruta.contains("/desfiladero/") or ruta.contains("/mji_jiwe/") or ruta.contains("/galerias/") or ruta.contains("/fundicion/") or ruta.contains("/aguja/") or ruta.contains("/nucleo/") or ruta.contains("/mirador/"):
 		return ""
 	var archivo := ruta.get_file()
 	if archivo == "fuente_dorada.png":

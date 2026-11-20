@@ -189,7 +189,7 @@ func _al_girar_espejo() -> void:
 		return
 	Estado.marcar("arco_atardecer_abierto")
 	(_arco.get_child(0) as Sprite2D).frame = 1
-	Sonido.efecto("puerta_crater", 0.0, _arco.global_position)
+	Sonido.efecto("arco_ocaso", 0.0, _arco.global_position)
 	Impacto.temblar(3.0, 0.5)
 	_hud.mostrar_mensaje("El Arco del Atardecer se abre")
 

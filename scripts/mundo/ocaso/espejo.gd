@@ -16,6 +16,7 @@ var lado := 0
 var mira_al_sol := false
 var fuente: Node2D = null
 var encendido := false
+var _listo := false
 var _sprite: Sprite2D
 var _sol: Node
 
@@ -39,15 +40,19 @@ func _ready() -> void:
 	_sol = get_tree().get_first_node_in_group("sol")
 	_sol.cambiada.connect(func(_h: int) -> void: comprobar())
 	comprobar()
+	_listo = true
 
 
 func comprobar() -> void:
+	var antes := encendido
 	if mira_al_sol:
 		encendido = lado == AL_SOL[_sol.hora]
 	elif fuente != null:
 		var hacia := (fuente.global_position - global_position).normalized()
 		encendido = fuente.get("encendido") and DIRECCION[lado].dot(hacia) > 0.9
 	_sprite.frame = lado + (4 if encendido else 0)
+	if _listo and encendido and not antes:
+		Sonido.efecto("espejo_enciende", -1.0, global_position)
 
 
 func recibir_golpe(_danio: int, _direccion: Vector2) -> bool:
@@ -57,7 +62,7 @@ func recibir_golpe(_danio: int, _direccion: Vector2) -> bool:
 		espejos[marca] = lado
 		Estado.extra["espejos"] = espejos
 		Estado.guardar_pronto()
-	Sonido.efecto("aguja_cambiar", -3.0, global_position, 0.2)
+	Sonido.efecto("espejo_gira", -2.0, global_position, 0.08)
 	for e in get_tree().get_nodes_in_group("espejos"):
 		e.comprobar()                       # (primero el que mira al sol: va antes en el árbol)
 	girado.emit()

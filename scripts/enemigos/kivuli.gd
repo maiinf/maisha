@@ -66,7 +66,9 @@ func _process(delta: float) -> void:
 	var maisha := get_tree().get_first_node_in_group("maisha") as Node2D
 	var d := (maisha.global_position - global_position) if maisha else Vector2.INF
 	if al_sol():
-		fase = Fase.DESLUMBRADO
+		if fase != Fase.DESLUMBRADO:
+			fase = Fase.DESLUMBRADO
+			Sonido.efecto("kivuli_deslumbra", -2.0, global_position, 0.08)
 	elif fase == Fase.DESLUMBRADO:
 		fase = Fase.ANDA
 	match fase:
@@ -83,6 +85,7 @@ func _process(delta: float) -> void:
 				_andar(maisha.global_position, PERSIGUE, delta)
 				if d.length() < 12.0 and _pica <= 0.0:
 					_pica = PICA_CADA
+					Sonido.efecto("kivuli_pica", -1.5, global_position, 0.1)
 					maisha.call("recibir_danio", 1, global_position, "contacto")
 	_dibujar()
 
@@ -134,7 +137,7 @@ func morir() -> void:
 		return
 	_muriendo = true
 	Bestiario.vencido("kivuli_menor", self)
-	Sonido.efecto("roca_romper", -6.0, global_position, 0.3)
+	Sonido.efecto("kivuli_muere", -1.5, global_position, 0.12)
 	for g in ["enemigos", "golpeables", "daniables", "kivulis"]:
 		remove_from_group(g)
 	var astillas: Node2D = ASTILLAS.new()

@@ -36,7 +36,7 @@ func recibir_golpe(_danio: int, _direccion: Vector2) -> bool:
 		atascado.emit()
 		return false
 	_sol.girar()
-	Sonido.efecto("aguja_cambiar", 0.0, global_position, 0.1)
+	Sonido.efecto("reloj_sol", 0.0, global_position, 0.06)
 	Impacto.temblar(1.5, 0.3)
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud:

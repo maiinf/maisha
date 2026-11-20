@@ -32,7 +32,7 @@ const ALTO_MAPA := {
 	"nucleo_estrella": 1.625,
 }
 ## Mapas en los que «0» no es peña sino cielo o vacío (no se levantan bloques de roca)
-const SIN_PENAS := ["observatorio_aurora", "aguja_caida"]
+const SIN_PENAS := ["observatorio_aurora", "aguja_caida", "mirador_ocaso"]
 const SUELO_BAJO := -4             # dibujos con z_index <= SUELO_BAJO: se tumban en el suelo
 const PLATAFORMAS := ["barcaza.gd", "penasco.gd"] # plataformas elevadas sobre vacío o escoria
 const CAMARA_INCLINACION := -48.0  # grados (mirando hacia abajo)
@@ -203,11 +203,13 @@ var _mascara_antes := 0xFFFFFFFF
 var _motas_mm: MultiMesh
 var _motas_datos: Array = []
 var _motas_t := 0.0
+var _sol_ocaso: Node = null
 
 
 func _ready() -> void:
 	region = escena.get_node_or_null("Region")
 	_maisha = escena.get_tree().get_first_node_in_group("maisha") as Node2D
+	_sol_ocaso = escena.get_node_or_null("Sol") if (region != null and String(region.get("mundo")) == "ocaso") else null
 	_crear_ambiente()
 	_crear_suelo()
 	_crear_camara()
@@ -248,9 +250,10 @@ func _crear_ambiente() -> void:
 	add_child(mundo)
 	sol = DirectionalLight3D.new()
 	sol.shadow_enabled = true
-	sol.light_energy = 0.27
-	sol.light_color = Color(1.0, 0.95, 0.86)
-	sol.rotation_degrees = Vector3(-50, -35, 0)          # (desde arriba a la izquierda y algo por detrás: sombras hacia delante y a la derecha, como las pintadas)
+	var es_ocaso := region != null and String(region.get("mundo")) == "ocaso"
+	sol.light_energy = 0.26 if es_ocaso else 0.27
+	sol.light_color = Color(1.0, 0.88, 0.72) if es_ocaso else Color(1.0, 0.95, 0.86)
+	sol.rotation_degrees = _angulo_sol_ocaso() if es_ocaso else Vector3(-50, -35, 0)          # (desde arriba a la izquierda y algo por detrás: sombras hacia delante y a la derecha, como las pintadas)
 	sol.directional_shadow_max_distance = 60.0
 	add_child(sol)
 	# (en cuevas o de noche, un resplandor suave alrededor de Maisha solo sobre los muros para que la roca cercana se distinga)
@@ -850,6 +853,8 @@ func _process(_delta: float) -> void:
 	_colocar_camara(0.12)
 	_mover_capas()
 	_actualizar_motas(_delta)
+	if sol and is_instance_valid(_sol_ocaso):
+		sol.rotation_degrees = sol.rotation_degrees.lerp(_angulo_sol_ocaso(), clampf(_delta * 5.0, 0.0, 1.0))
 	# La capa 2D del suelo y las ventanitas ya reciben LuzDelDia / Penumbra; aquí igualamos el suelo lejano, las peñas y los gemelos
 	var mod := Color.WHITE
 	for i in range(_moduladores.size() - 1, -1, -1):
@@ -1034,6 +1039,18 @@ static func _orden_en_ancla(n: Node, ancla: Node) -> float:
 	return total
 
 
+func _angulo_sol_ocaso() -> Vector3:
+	var val: Variant = _sol_ocaso.get("hora") if is_instance_valid(_sol_ocaso) else null
+	var h := int(val) if val != null else 0
+	match h % 3:
+		0:
+			return Vector3(-36.0, -78.0, 0.0)   # sol al oeste -> sombras hacia el este
+		1:
+			return Vector3(-36.0, 0.0, 0.0)     # sol al sur -> sombras hacia el norte
+		_:
+			return Vector3(-36.0, 78.0, 0.0)    # sol al este -> sombras hacia el oeste
+
+
 ## Partículas atmosféricas suaves por bioma en HD-2D (esporas, nieve fina, motas doradas o polvo mineral)
 func _crear_motas() -> void:
 	if region == null:
@@ -1059,6 +1076,10 @@ func _crear_motas() -> void:
 		col_a = Color("ffcb72")
 		col_b = Color("d88450")
 		vel_y = 0.30
+	elif mundo == "ocaso":
+		col_a = Color("ffbe68")
+		col_b = Color("e8788a")
+		vel_y = 0.16
 	var mat := StandardMaterial3D.new()
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

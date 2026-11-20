@@ -59,6 +59,7 @@ func poner(h: int) -> void:
 	Estado.guardar_pronto()
 	_cambio = 1.0
 	_calcular()
+	Sonido.efecto("sombra_tiende", -2.5)
 	cambiada.emit(hora)
 
 

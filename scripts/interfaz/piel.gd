@@ -379,6 +379,7 @@ const TACTICO_INFO := {
 	"escudo": ["Escudo", Color("d6b46e")],
 	"latido": ["Latido", Color("e6a852")],
 	"atras": ["Por la espalda", Color("c8a0f0")],
+	"sol": ["Luz del sol", Color("ffd466")],
 }
 
 
@@ -441,6 +442,13 @@ static func icono_tactico(lienzo: CanvasItem, centro: Vector2, clave: String, es
 				(c + Vector2(-3.0, -1.5) * escala).round(), (c + Vector2(0, -3.2) * escala).round(), (c + Vector2(3.0, 0) * escala).round(),
 			]), ct, 1.4)
 			lienzo.draw_circle((c + Vector2(2.5, 1.5) * escala).round(), 1.3 * escala, ct)
+		"sol":
+			lienzo.draw_circle(c, 2.0 * escala, ct)
+			lienzo.draw_circle(c, 1.0 * escala, Color("fff6cf", alfa))
+			for i in 8:
+				var ang := float(i) * TAU / 8.0
+				var dir := Vector2(cos(ang), sin(ang))
+				lienzo.draw_line((c + dir * 2.5 * escala).round(), (c + dir * 3.9 * escala).round(), ct, 1.1)
 
 
 static func _redondo(r: Rect2) -> Rect2:
