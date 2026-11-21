@@ -2861,6 +2861,102 @@ def jefe_mondo():
     return final(p, sala=2.9, mezcla=0.34, brillo=6400)
 
 
+def calzada_obeliscos():
+    """«Puentes de sombra larga» (La Calzada de los Obeliscos, 76 BPM, bucle continuo):
+    solemne viaducto colgado sobre el abismo del atardecer. En Mi dórico: paso medido como un péndulo
+    de bronce, campanitas lejanas de piedra, colchón majestuoso y melodía de flauta llena de vértigo y calma."""
+    tempo = Tempo(76)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("E2", "m7"), ("D2", "M"), ("C2", "M7"), ("B1", "m7"),
+        ("E2", "m7"), ("G2", "M7"), ("A1", "m7"), ("B1", "sus"),
+        ("C2", "M7"), ("D2", "M"), ("E2", "m7"), ("B1", "m7"),
+        ("A1", "m7"), ("C2", "M7"), ("D2", "sus"), ("E2", "m7"),
+        ("G2", "M7"), ("D2", "M"), ("A1", "m7"), ("E2", "m7"),
+        ("C2", "M7"), ("A1", "m7"), ("B1", "sus"), ("E2", "m7"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=980, volumen=0.26, octava_bajo=1, fuerza_bajo=0.34)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.16, pan=-0.24, patron=(0, 1, 2, 3, 2, 1, 0, 2))
+        notas = acorde(raiz[:-1] + "5", tipo)
+        p.poner(campanita(notas[0], 2.2, 0.085), tempo.s(i * 4 + 2.0), pan=0.32 if i % 2 == 0 else -0.32)
+    # Tictac solemne de péndulo de piedra cada dos tiempos
+    for b in range(0, pulsos, 2):
+        if b % 4 == 0:
+            p.poner(tambor("E1", 0.42, 0.24, golpe=0.22), tempo.s(b), pan=0.0)
+        else:
+            p.poner(tambor("B1", 0.24, 0.14, golpe=0.22), tempo.s(b), pan=0.18)
+    p.poner(coro(["E3", "G3", "B3", "D4"], tempo.s(32)), tempo.s(32), 0.080)
+    p.poner(coro(["C3", "E3", "G3", "B3"], tempo.s(32)), tempo.s(64), 0.082)
+    tema_a = [
+        ("E5", 0, 2), ("F#5", 2, 1), ("G5", 3, 1), ("F#5", 4, 2), ("D5", 6, 2),
+        ("E5", 8, 1.5), ("G5", 9.5, 0.5), ("B5", 10, 2), ("F#5", 12, 4),
+        ("G5", 16, 1.5), ("A5", 17.5, 0.5), ("B5", 18, 2), ("A5", 20, 2), ("F#5", 22, 2),
+        ("G5", 24, 2), ("F#5", 26, 2), ("E5", 28, 4),
+    ]
+    tema_b = [
+        ("B5", 0, 2), ("C6", 2, 1), ("B5", 3, 1), ("A5", 4, 2), ("G5", 6, 2),
+        ("F#5", 8, 1.5), ("G5", 9.5, 0.5), ("A5", 10, 2), ("E5", 12, 4),
+        ("G5", 16, 1.5), ("F#5", 17.5, 0.5), ("E5", 18, 2), ("D5", 20, 2), ("B4", 22, 2),
+        ("C5", 24, 2), ("D5", 26, 2), ("E5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.42, vibrato=4.5)
+    melodia(p, tempo, tema_a, desde=4, instrumento=kalimba, volumen=0.30, pan=0.12)
+    melodia(p, tempo, tema_a, desde=32, instrumento=flauta_, volumen=0.41, sostener=0.95, pan=0.06)
+    melodia(p, tempo, tema_b, desde=64, instrumento=flauta_, volumen=0.40, sostener=0.95, pan=0.06)
+    melodia(p, tempo, transportar(tema_b, -12), desde=64, instrumento=kalimba, volumen=0.20, pan=-0.20)
+    return final(p, sala=4.3, mezcla=0.40, brillo=5000)
+
+
+def jefe_saa():
+    """«El coloso de arena y bronce» (Saa-Mchanga, el Autómata Reloj de Arena, 118 BPM, bucle de jefe):
+    marcha monumental de relojería en Do menor: taiko implacable como engranajes gigantes,
+    campanadas de bronce, arpegios mecánicos y un tema épico que barre la Rotonda."""
+    tempo = Tempo(118)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("C2", "m"), ("C2", "m"), ("G#1", "M"), ("G1", "M"),
+        ("C2", "m"), ("A#1", "M"), ("G#1", "M"), ("G1", "sus"),
+        ("F1", "m"), ("C2", "m"), ("G#1", "M"), ("G1", "M"),
+        ("F1", "m"), ("D#2", "M"), ("D2", "m"), ("G1", "M"),
+        ("C2", "m"), ("D#2", "M"), ("F1", "m"), ("G1", "M"),
+        ("G#1", "M"), ("A#1", "M"), ("G1", "sus"), ("C2", "m"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=1320, volumen=0.30, octava_bajo=1, fuerza_bajo=0.46)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.25, volumen=0.19, pan=-0.26, patron=(0, 2, 1, 2, 0, 2, 3, 2))
+        notas = acorde(raiz[:-1] + "5", tipo)
+        p.poner(campanita(notas[0], 1.1, 0.13), tempo.s(i * 4), pan=0.34)
+        p.poner(campanita(notas[-1], 0.9, 0.10), tempo.s(i * 4 + 2.0), pan=-0.34)
+    for b in range(0, pulsos, 4):
+        p.poner(taiko(0.55, 0.62), tempo.s(b), pan=0.0)
+        p.poner(tambor("C2", 0.20, 0.30, golpe=0.40), tempo.s(b + 1.0), pan=0.22)
+        p.poner(taiko(0.45, 0.50), tempo.s(b + 2.0), pan=0.0)
+        p.poner(tambor("G1", 0.22, 0.34, golpe=0.40), tempo.s(b + 3.0), pan=-0.22)
+        p.poner(tambor("C2", 0.14, 0.24, golpe=0.38), tempo.s(b + 3.5), pan=0.18)
+    p.poner(coro(["C3", "D#3", "G3", "C4"], tempo.s(32)), tempo.s(32), 0.095)
+    p.poner(coro(["G#2", "C3", "D#3", "G3"], tempo.s(32)), tempo.s(64), 0.100)
+    tema_s = [
+        ("C5", 0, 1.5), ("D5", 1.5, 0.5), ("D#5", 2, 1), ("G5", 3, 1),
+        ("F5", 4, 1.5), ("D#5", 5.5, 0.5), ("D5", 6, 2),
+        ("D#5", 8, 1.5), ("F5", 9.5, 0.5), ("G5", 10, 1), ("C6", 11, 1),
+        ("B5", 12, 2), ("G5", 14, 2),
+        ("G#5", 16, 1.5), ("G5", 17.5, 0.5), ("F5", 18, 1), ("D#5", 19, 1),
+        ("F5", 20, 1.5), ("D#5", 21.5, 0.5), ("D5", 22, 2),
+        ("D#5", 24, 1.5), ("D5", 25.5, 0.5), ("C5", 26, 1), ("B4", 27, 1),
+        ("C5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.46, vibrato=5.0)
+    melodia(p, tempo, tema_s, desde=0, instrumento=kalimba, volumen=0.34, pan=0.14)
+    melodia(p, tempo, tema_s, desde=32, instrumento=flauta_, volumen=0.46, sostener=0.92, pan=0.05)
+    melodia(p, tempo, transportar(tema_s, -12), desde=32, instrumento=kalimba, volumen=0.28, pan=-0.20)
+    melodia(p, tempo, tema_s, desde=64, instrumento=flauta_, volumen=0.47, sostener=0.92, pan=0.0)
+    melodia(p, tempo, transportar(tema_s, 12), desde=64, instrumento=kalimba, volumen=0.20, pan=0.24)
+    return final(p, sala=3.3, mezcla=0.35, brillo=5800)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2888,6 +2984,8 @@ PIEZAS["dunas_penumbra"] = dunas_penumbra
 PIEZAS["jefe_kivuli"] = jefe_kivuli
 PIEZAS["jardin_faroles"] = jardin_faroles
 PIEZAS["jefe_mondo"] = jefe_mondo
+PIEZAS["calzada_obeliscos"] = calzada_obeliscos
+PIEZAS["jefe_saa"] = jefe_saa
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -2915,6 +3013,8 @@ TITULOS["dunas_penumbra"] = "Arena que no duerme"
 TITULOS["jefe_kivuli"] = "El reloj bajo la arena"
 TITULOS["jardin_faroles"] = "Prismas de papel"
 TITULOS["jefe_mondo"] = "Mil reflejos de bronce"
+TITULOS["calzada_obeliscos"] = "Puentes de sombra larga"
+TITULOS["jefe_saa"] = "El coloso de arena y bronce"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

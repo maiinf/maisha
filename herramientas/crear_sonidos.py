@@ -3221,6 +3221,95 @@ def mondo_muere():
     return reverb(p.entera(), 2.2, 0.40)
 
 
+def centinela_piedra():
+    """El Centinela de Reloj queda petrificado al darle la luz directa del sol."""
+    p = Pista(0.85)
+    p.poner(tambor("C2", 0.30, 0.48, golpe=0.45), 0.0)
+    grano = paso_banda(ruido_rosa(0.38), 300, 1800) * adsr(_n(0.38), 0.02, 0.10, 0.45, 0.18) * 0.52
+    p.poner(grano, 0.02)
+    p.poner(campanita("G4", 0.65, 0.20), 0.06)
+    return reverb(p.entera(), 1.25, 0.28)
+
+
+def centinela_golpe():
+    """Alabardazo pesado de bronce del Centinela de Reloj."""
+    p = Pista(0.65)
+    corte = paso_banda(ruido_rosa(0.22), 340, 2600) * adsr(_n(0.22), 0.01, 0.06, 0.35, 0.10) * 0.64
+    p.poner(corte, 0.0)
+    p.poner(taiko(0.34, 0.58), 0.05)
+    p.poner(campanita("C5", 0.42, 0.18), 0.06)
+    return reverb(p.entera(), 0.95, 0.24)
+
+
+def centinela_rompe():
+    """Una Carga Sísmica vuelca y hace pedazos al Centinela petrificado."""
+    p = Pista(1.15)
+    p.poner(taiko(0.55, 0.80), 0.0)
+    piedra = paso_banda(ruido_rosa(0.58), 260, 2400) * adsr(_n(0.58), 0.01, 0.14, 0.42, 0.26) * 0.66
+    p.poner(piedra, 0.02)
+    for k, nota in enumerate(("E5", "C5", "G4")):
+        p.poner(campanita(nota, 0.55, 0.18 - k * 0.03), 0.05 + k * 0.08)
+    return reverb(p.entera(), 1.45, 0.30)
+
+
+def saa_barre():
+    """El ojo de Saa-Mchanga dispara su rayo solar y empieza a barrer la Rotonda."""
+    p = Pista(1.65)
+    p.poner(taiko(0.65, 0.72), 0.0)
+    haz = seno(_desliz(320, 880, 1.15), 1.15) * adsr(_n(1.15), 0.10, 0.22, 0.58, 0.40) * 0.26
+    p.poner(haz, 0.04)
+    soplo = paso_banda(ruido_rosa(1.25), 520, 3200) * adsr(_n(1.25), 0.12, 0.24, 0.55, 0.42) * 0.46
+    p.poner(soplo, 0.02)
+    p.poner(campanita("G5", 1.25, 0.24), 0.08)
+    p.poner(campanita("C6", 1.20, 0.20), 0.18)
+    return reverb(p.entera(), 1.9, 0.36)
+
+
+def saa_inclina():
+    """Con la arena gastada, el coloso de bronce cruje y se inclina vulnerable."""
+    p = Pista(1.15)
+    cruje = paso_banda(ruido_rosa(0.62), 180, 1100) * adsr(_n(0.62), 0.06, 0.16, 0.52, 0.24) * 0.58
+    p.poner(cruje, 0.0)
+    caida = seno(_desliz(240, 115, 0.70), 0.70) * adsr(_n(0.70), 0.05, 0.15, 0.45, 0.28) * 0.30
+    p.poner(caida, 0.02)
+    p.poner(campanita("D5", 0.75, 0.20), 0.12)
+    return reverb(p.entera(), 1.4, 0.30)
+
+
+def saa_endereza():
+    """Saa-Mchanga vuelve a erguirse con un golpe de engranajes y arena."""
+    p = Pista(1.10)
+    p.poner(tambor("C2", 0.36, 0.54, golpe=0.46), 0.0)
+    sube = seno(_desliz(120, 290, 0.65), 0.65) * adsr(_n(0.65), 0.08, 0.14, 0.50, 0.24) * 0.28
+    p.poner(sube, 0.04)
+    engrane = paso_banda(ruido(0.28), 900, 3600) * adsr(_n(0.28), 0.02, 0.08, 0.40, 0.12) * 0.36
+    p.poner(engrane, 0.12)
+    p.poner(campanita("G5", 0.75, 0.22), 0.16)
+    return reverb(p.entera(), 1.35, 0.28)
+
+
+def saa_vuelca():
+    """Una Carga Sísmica o un giro del sol vuelca al coloso con estruendo de bronce y cristal."""
+    p = Pista(1.55)
+    p.poner(taiko(0.85, 0.92), 0.08)
+    golpe = paso_banda(ruido_rosa(0.55), 220, 2000) * adsr(_n(0.55), 0.02, 0.12, 0.48, 0.22) * 0.64
+    p.poner(golpe, 0.06)
+    for k, nota in enumerate(("G5", "D#5", "C5")):
+        p.poner(campanita(nota, 1.15, 0.28 - k * 0.03), 0.12 + k * 0.08)
+    return reverb(p.entera(), 1.85, 0.36)
+
+
+def saa_muere():
+    """Saa-Mchanga se detiene para siempre: gran campanada grave y cascada de arena liberada."""
+    p = Pista(2.3)
+    p.poner(taiko(1.1, 0.92), 0.0)
+    arena = paso_banda(ruido_rosa(1.25), 360, 3200) * adsr(_n(1.25), 0.04, 0.26, 0.45, 0.50) * 0.50
+    p.poner(arena, 0.08)
+    for k, nota in enumerate(("C5", "G5", "D#5", "C6", "G4")):
+        p.poner(campanita(nota, 1.45, 0.28 - k * 0.02), 0.10 + k * 0.13)
+    return reverb(p.entera(), 2.4, 0.42)
+
+
 def viento_arena(dur=30.0):
     """Viento cálido de las Dunas de Penumbra arrastrando arena fina sobre la arenisca."""
     n = _n(dur + 4)
@@ -3376,6 +3465,14 @@ EFECTOS = {
     "mondo_esfuma": (mondo_esfuma, 0.74),
     "mondo_aturdido": (mondo_aturdido, 0.84),
     "mondo_muere": (mondo_muere, 0.86),
+    "centinela_piedra": (centinela_piedra, 0.74),
+    "centinela_golpe": (centinela_golpe, 0.78),
+    "centinela_rompe": (centinela_rompe, 0.84),
+    "saa_barre": (saa_barre, 0.82),
+    "saa_inclina": (saa_inclina, 0.76),
+    "saa_endereza": (saa_endereza, 0.76),
+    "saa_vuelca": (saa_vuelca, 0.88),
+    "saa_muere": (saa_muere, 0.90),
 }
 
 AMBIENTES = {

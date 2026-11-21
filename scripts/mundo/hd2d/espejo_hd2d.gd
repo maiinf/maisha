@@ -33,7 +33,7 @@ const ALTO_MAPA := {
 	"dunas_penumbra": 1.25,
 }
 ## Mapas en los que «0» no es peña sino cielo o vacío (no se levantan bloques de roca)
-const SIN_PENAS := ["observatorio_aurora", "aguja_caida", "mirador_ocaso", "jioni"]
+const SIN_PENAS := ["observatorio_aurora", "aguja_caida", "mirador_ocaso", "jioni", "calzada_obeliscos"]
 const SUELO_BAJO := -4             # dibujos con z_index <= SUELO_BAJO: se tumban en el suelo
 const PLATAFORMAS := ["barcaza.gd", "penasco.gd"] # plataformas elevadas sobre vacío o escoria
 const CAMARA_INCLINACION := -48.0  # grados (mirando hacia abajo)
@@ -657,7 +657,7 @@ func _registrar(n: Node) -> void:
 		if not _pasarelas_nodos.has(n):
 			_pasarelas_nodos.append(n)
 		return
-	if n.get_parent() and n.get_parent().get_script() and String(n.get_parent().get_script().resource_path).ends_with("espejo_alto.gd") and _dibuja(n):
+	if n.get_parent() and n.get_parent().get_script() and (String(n.get_parent().get_script().resource_path).ends_with("espejo_alto.gd") or String(n.get_parent().get_script().resource_path).ends_with("saa_mchanga.gd")) and _dibuja(n):
 		ci.visibility_layer = CANAL_NADA
 		return
 	if _de_pantalla(n):
@@ -1150,9 +1150,12 @@ func _actualizar_motas(delta: float) -> void:
 		_motas_mm.set_instance_color(i, Color(col.r, col.g, col.b, pulso * alt_a))
 
 
-## Rayos volumétricos 3D (luz_jardin.gd + espejo_alto.gd) y pasarelas sobre el Estanque (pasarela_espejo.gd)
+## Rayos volumétricos 3D (luz_jardin.gd, espejo_alto.gd, saa_mchanga.gd) y pasarelas sobre el Estanque (pasarela_espejo.gd)
 func _crear_efectos_jardin() -> void:
-	if region == null or String(region.get("mapa")) != "jardin_faroles":
+	if region == null:
+		return
+	var mapa_n := String(region.get("mapa"))
+	if not mapa_n in ["jardin_faroles", "calzada_obeliscos"]:
 		return
 	_rayos_mesh = ImmediateMesh.new()
 	var mat_r := StandardMaterial3D.new()
@@ -1169,6 +1172,8 @@ func _crear_efectos_jardin() -> void:
 	_rayos_mi.extra_cull_margin = 100.0
 	add_child(_rayos_mi)
 
+	if mapa_n != "jardin_faroles":
+		return
 	_pasarelas_mesh = ImmediateMesh.new()
 	var mat_p := StandardMaterial3D.new()
 	mat_p.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
@@ -1216,12 +1221,21 @@ func _actualizar_efectos_jardin() -> void:
 		var luz_n := escena.get_node_or_null("Luz")
 		var segs: Array = luz_n.get("segmentos") if luz_n != null else []
 		var altos := escena.get_tree().get_nodes_in_group("espejos_altos")
+		var saas := escena.get_tree().get_nodes_in_group("saa_mchanga")
 		var latido := 0.80 + 0.16 * sin(_motas_t * 4.2)
 		if not segs.is_empty():
 			hay_trazos = true
-		else:
+		if not hay_trazos:
 			for e in altos:
 				if is_instance_valid(e) and e.call("activo"):
+					hay_trazos = true
+					break
+		if not hay_trazos:
+			for s_j in saas:
+				if not is_instance_valid(s_j):
+					continue
+				var f_saa := int(s_j.get("fase"))
+				if f_saa == 2 or (f_saa == 1 and float(s_j.get("_t")) > 2.2 * 0.6):
 					hay_trazos = true
 					break
 		if hay_trazos:
@@ -1259,6 +1273,30 @@ func _actualizar_efectos_jardin() -> void:
 				_cinta_3d(_rayos_mesh, a, b, 0.62, Color(col, 0.32 * f), true)
 				_cinta_3d(_rayos_mesh, a, b, 0.18, Color(1.0, 1.0, 0.94, 0.95 * f), false)
 				_cinta_3d(_rayos_mesh, a, b, 0.16, Color(1.0, 1.0, 0.94, 0.90 * f), true)
+			for s_j in saas:
+				if not is_instance_valid(s_j):
+					continue
+				var f_saa := int(s_j.get("fase"))
+				var orig2: Vector2 = s_j.call("_origen")
+				var ojo := Vector3(orig2.x * PX, 2.88, orig2.y * PX + 0.12)
+				var col_saa := Color(1.0, 0.86, 0.44)
+				if f_saa == 1 and float(s_j.get("_t")) > 2.2 * 0.6:
+					var r_ojo := 0.45 + 0.14 * sin(_motas_t * 28.0)
+					_cinta_3d(_rayos_mesh, ojo - Vector3(r_ojo, 0, 0), ojo + Vector3(r_ojo, 0, 0), r_ojo * 1.1, Color(col_saa, 0.72), true)
+					_cinta_3d(_rayos_mesh, ojo - Vector3(0, 0, r_ojo), ojo + Vector3(0, 0, r_ojo), r_ojo * 1.1, Color(1.0, 0.96, 0.76, 0.85), false)
+				var puntas: Array = s_j.call("rayos")
+				for punta: Vector2 in puntas:
+					var fin2 := orig2 + punta
+					var b_ojo := Vector3(fin2.x * PX, 0.52, fin2.y * PX)
+					var a_suelo := Vector3(orig2.x * PX, 0.05, orig2.y * PX)
+					var b_suelo := Vector3(fin2.x * PX, 0.05, fin2.y * PX)
+					# Franja de peligro en el suelo (hitbox exacto) + rayo monumental desde el ojo del coloso
+					_cinta_3d(_rayos_mesh, a_suelo, b_suelo, 1.25, Color(col_saa, 0.24 * latido), false)
+					_cinta_3d(_rayos_mesh, a_suelo, b_suelo, 0.42, Color(1.0, 0.94, 0.66, 0.50 * latido), false)
+					_cinta_3d(_rayos_mesh, ojo, b_ojo, 0.82, Color(col_saa, 0.36 * latido), false)
+					_cinta_3d(_rayos_mesh, ojo, b_ojo, 0.70, Color(col_saa, 0.32 * latido), true)
+					_cinta_3d(_rayos_mesh, ojo, b_ojo, 0.22, Color(1.0, 0.99, 0.88, 0.96), false)
+					_cinta_3d(_rayos_mesh, ojo, b_ojo, 0.18, Color(1.0, 0.99, 0.88, 0.90), true)
 			_rayos_mesh.surface_end()
 	if _pasarelas_mesh != null:
 		_pasarelas_mesh.clear_surfaces()

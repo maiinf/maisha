@@ -259,6 +259,28 @@ func _ready() -> void:
 	_comprobar(jardin_edifs >= 3, "pabellón, pérgola y verja del Jardín se construyen en 3D (%d)" % jardin_edifs)
 	_comprobar(rayos_3d and pasarelas_3d, "los rayos volumétricos 3D y las pasarelas sobre el Estanque se dibujan en 3D")
 
+	print("La Calzada de los Obeliscos en HD-2D:")
+	await _ir("calzada_obeliscos", "jioni")
+	espejo = _espejo()
+	var penas_calzada := false
+	var pilares_3d := 0
+	var rayo_saa_ok := false
+	if espejo:
+		for h in espejo.get_children():
+			if h is MeshInstance3D and (h as MeshInstance3D).layers == 2:
+				penas_calzada = true
+		for par in espejo.get("_gemelos").values():
+			if String(par[4]) == "calzada/pilar.png":
+				pilares_3d += 1
+		var saa_n := get_tree().get_first_node_in_group("saa_mchanga")
+		if saa_n != null:
+			saa_n.set("fase", 2)
+			await _esperar(0.1)
+			var r_mesh: Mesh = espejo.get("_rayos_mesh")
+			rayo_saa_ok = r_mesh != null and r_mesh.get_surface_count() > 0
+	_comprobar(espejo != null and not penas_calzada and pilares_3d == 4, "La Calzada respeta el abismo y construye sus 4 pilares en 3D (%d)" % pilares_3d)
+	_comprobar(rayo_saa_ok, "el rayo que barre de Saa-Mchanga se dibuja en 3D desde el ojo del coloso")
+
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")
 	espejo = _espejo()

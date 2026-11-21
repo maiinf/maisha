@@ -25,7 +25,7 @@ const TITULOS := {
 	"bosque": "Hojas de cobre", "jefe_pembe": "Pembe, el ciervo de hierro",
 	"cienaga": "Agua quieta", "jefe_konokono": "Konokono, la caracola de óxido",
 	"campo": "Surcos de hierro", "jefe_cosechadora": "La Cosechadora Oxidada",
-	"tienda": "El puesto de Tawi", "raiz_libre": "Raíz respira", "sigilia_libre": "Sigilia recuerda", "asterhaul_libre": "Asterhaul late", "mirador_ocaso": "El sol detenido", "jioni": "La ciudad que no cierra los ojos", "dunas_penumbra": "Arena que no duerme", "jefe_kivuli": "El reloj bajo la arena", "jardin_faroles": "Prismas de papel", "jefe_mondo": "Mil reflejos de bronce", "sendero": "El puente viejo", "pasarelas": "Entre juncos",
+	"tienda": "El puesto de Tawi", "raiz_libre": "Raíz respira", "sigilia_libre": "Sigilia recuerda", "asterhaul_libre": "Asterhaul late", "mirador_ocaso": "El sol detenido", "jioni": "La ciudad que no cierra los ojos", "dunas_penumbra": "Arena que no duerme", "jefe_kivuli": "El reloj bajo la arena", "jardin_faroles": "Prismas de papel", "jefe_mondo": "Mil reflejos de bronce", "calzada_obeliscos": "Puentes de sombra larga", "jefe_saa": "El coloso de arena y bronce", "sendero": "El puente viejo", "pasarelas": "Entre juncos",
 }
 ## Piezas tranquilas que no suenan sin parar: al acabar, un rato de silencio (solo ambiente) y vuelven
 const CON_SILENCIO := {"kitovu": Vector2(25, 55), "interior": Vector2(15, 35)}
@@ -131,6 +131,14 @@ const VOLUMEN := {
 	"mondo_esfuma": -2.5,
 	"mondo_aturdido": -1.5,
 	"mondo_muere": -1.5,
+	"centinela_piedra": -2.5,
+	"centinela_golpe": -2.0,
+	"centinela_rompe": -1.5,
+	"saa_barre": -1.5,
+	"saa_inclina": -2.0,
+	"saa_endereza": -2.0,
+	"saa_vuelca": -1.0,
+	"saa_muere": -1.0,
 }
 ## Nivel de cada bus (0 a 10) y su volumen en dB con el nivel al máximo (la música, sutil)
 const BUSES := {"Musica": -9.0, "Ambiente": -10.0, "Efectos": -3.0}
