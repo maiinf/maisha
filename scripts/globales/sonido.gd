@@ -25,7 +25,17 @@ const TITULOS := {
 	"bosque": "Hojas de cobre", "jefe_pembe": "Pembe, el ciervo de hierro",
 	"cienaga": "Agua quieta", "jefe_konokono": "Konokono, la caracola de óxido",
 	"campo": "Surcos de hierro", "jefe_cosechadora": "La Cosechadora Oxidada",
-	"tienda": "El puesto de Tawi", "tienda_kikombe": "Té tibio en el crepúsculo", "raiz_libre": "Raíz respira", "sigilia_libre": "Sigilia recuerda", "asterhaul_libre": "Asterhaul late", "mirador_ocaso": "El sol detenido", "jioni": "La ciudad que no cierra los ojos", "jioni_noche": "La ciudad que por fin duerme", "dunas_penumbra": "Arena que no duerme", "jefe_kivuli": "El reloj bajo la arena", "jardin_faroles": "Prismas de papel", "jefe_mondo": "Mil reflejos de bronce", "calzada_obeliscos": "Puentes de sombra larga", "jefe_saa": "El coloso de arena y bronce", "jefe_jua_giza": "El Sol Encadenado", "ocaso_libre": "La Primera Noche", "sendero": "El puente viejo", "pasarelas": "Entre juncos",
+	"tienda": "El puesto de Tawi", "tienda_kikombe": "Té tibio en el crepúsculo", "raiz_libre": "Raíz respira", "sigilia_libre": "Sigilia recuerda", "asterhaul_libre": "Asterhaul late",
+	"jefe_arbol": "El miedo bajo las raíces", "escarcha": "La nieve que escribe", "maandiko": "Las calles del Índice",
+	"jefe_bibliotecario": "El vals de las páginas perdidas", "canal_tinta": "Lo que lleva la corriente", "jefe_pweza": "El tintero del abismo",
+	"observatorio_aurora": "Donde miran las estrellas", "jefe_kengele": "La campana que no suena", "seccion_prohibida": "Lo que se guardó bajo llave", "jefe_grimorio": "El último capítulo",
+	"desfiladero_meteorito": "El eco de la piedra", "mji_jiwe": "La ciudad dentro del cráter", "galerias_ambar": "Las vetas que cantan", "jefe_kifaru": "El cuerno de basalto",
+	"fundicion_escoria": "El hierro que no duerme", "jefe_nyundo": "Las cuatro tenazas del crisol", "aguja_caida": "Donde canta el cristal", "jefe_kipanga": "Alas de obsidiana",
+	"nucleo_estrella": "Lo que cayó del cielo", "jefe_corazon": "El pulso de la estrella",
+	"mirador_ocaso": "El sol detenido", "jioni": "La ciudad que no cierra los ojos", "jioni_noche": "La ciudad que por fin duerme",
+	"dunas_penumbra": "Arena que no duerme", "jefe_kivuli": "El reloj bajo la arena", "jardin_faroles": "Prismas de papel", "jefe_mondo": "Mil reflejos de bronce",
+	"calzada_obeliscos": "Puentes de sombra larga", "jefe_saa": "El coloso de arena y bronce", "horizonte_inmovil": "El borde del atardecer",
+	"jefe_jua_giza": "El Sol Encadenado", "ocaso_libre": "La Primera Noche", "sendero": "El puente viejo", "pasarelas": "Entre juncos",
 }
 ## Piezas tranquilas que no suenan sin parar: al acabar, un rato de silencio (solo ambiente) y vuelven
 const CON_SILENCIO := {"kitovu": Vector2(25, 55), "interior": Vector2(15, 35)}
@@ -150,6 +160,15 @@ const VOLUMEN := {
 	"jua_ola": -2.0,
 	"candado_brilla": -2.0,
 	"candado_golpe": -1.5,
+	"hielo_runa": -2.5, "hielo_pisar": -4.0, "hielo_romper": -2.5,
+	"rayo_runa": -2.5, "bobina_encender": -2.5, "bobina_apagar": -3.5,
+	"saa_tictac": -5.0, "saa_mazazo": -2.0, "saa_sobrecarga": -1.5,
+	"kengele_tanido": -1.5, "kengele_embiste": -1.5, "kengele_resuena": -1.0, "kengele_vencida": -1.0,
+	"carga_sismica": -2.0, "roca_romper": -1.5, "diapason_ambar": -2.5, "vagoneta_rodar": -3.0,
+	"aguja_cambiar": -3.0, "geoda_encender": -2.5, "kifaru_embiste": -1.5,
+	"pulso_magnetico": -2.0, "bloque_atraer": -2.5, "kovu_sumerge": -3.0, "kovu_enfria": -2.5, "nyundo_tenaza": -2.0,
+	"resonancia_ambar": -2.0, "puente_cristal": -2.5, "popo_chillido": -3.0, "kipanga_picado": -2.0, "kipanga_pluma": -2.5,
+	"corazon_latido": -1.5, "corazon_aro": -2.0, "corazon_abierto": -1.5, "corazon_rayo": -1.5, "cetro_nexo": -1.0,
 }
 ## Nivel de cada bus (0 a 10) y su volumen en dB con el nivel al máximo (la música, sutil)
 const BUSES := {"Musica": -9.0, "Ambiente": -10.0, "Efectos": -3.0}

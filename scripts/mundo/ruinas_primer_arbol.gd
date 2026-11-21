@@ -135,7 +135,7 @@ func _al_vencer() -> void:
 		return
 	arbol.call("curar")
 	Impacto.fogonazo(Color(1.0, 0.9, 0.6), 0.6, 0.8)
-	Sonido.efecto("raiz_libre", 0.0, _centro)
+	Sonido.efecto("ola_purga", 0.0, _centro)
 	await get_tree().create_timer(1.5).timeout
 	_liberar_mauti(true)
 	await get_tree().create_timer(1.0).timeout

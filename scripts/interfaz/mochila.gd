@@ -19,6 +19,7 @@ const MAPA_ENTERO := preload("res://arte/interfaz/mapa_mundo_entero.png")
 const MAPA_RAIZ := preload("res://arte/interfaz/mapa_raiz.png")
 const MAPA_SIGILIA := preload("res://arte/interfaz/mapa_sigilia.png")
 const MAPA_ASTERHAUL := preload("res://arte/interfaz/mapa_asterhaul.png")
+const MAPA_OCASO := preload("res://arte/interfaz/mapa_ocaso.png")
 const MAPA_ESCALA := 1.32                 # el mapa de Raíz se ve ampliado (los nombres no: se escriben aparte)
 const MAPA_MUNDO_ESCALA := 1.6            # y el del mundo, igual
 ## Los nombres del mapa del mundo: [nombre, dónde (en píxeles del dibujo)].
@@ -112,6 +113,26 @@ const PUNTO_ASTERHAUL := {
 	"desfiladero_meteorito": Vector2(106, 168), "mji_jiwe": Vector2(220, 108),
 	"galerias_ambar": Vector2(96, 86), "fundicion_escoria": Vector2(334, 112),
 	"aguja_caida": Vector2(220, 38), "nucleo_estrella": Vector2(220, 108),
+}
+const LUGARES_OCASO := [
+	["Mirador del Ocaso", Vector2(210, 42), "visto/mirador_ocaso"],
+	["Jioni", Vector2(210, 102), "visto/jioni"],
+	["Dunas de Penumbra", Vector2(84, 108), "visto/dunas_penumbra"],
+	["Jardín de los Faroles", Vector2(338, 108), "visto/jardin_faroles"],
+	["Calzada de Obeliscos", Vector2(316, 168), "visto/calzada_obeliscos"],
+	["Horizonte Inmóvil", Vector2(210, 180), "visto/horizonte_inmovil"],
+]
+const CAMINOS_OCASO := [
+	["Bajada del Arco", "jioni", [Vector2(210, 56), Vector2(210, 74), Vector2(210, 90)]],
+	["Sendero de Arena", "dunas_penumbra", [Vector2(182, 104), Vector2(146, 106), Vector2(114, 108)]],
+	["Vereda de Prismas", "jardin_faroles", [Vector2(238, 104), Vector2(274, 106), Vector2(308, 108)]],
+	["Tramo de Sombras", "calzada_obeliscos", [Vector2(232, 118), Vector2(266, 140), Vector2(294, 158)]],
+	["Puerta del Horizonte", "horizonte_inmovil", [Vector2(210, 122), Vector2(210, 146), Vector2(210, 166)]],
+]
+const PUNTO_OCASO := {
+	"mirador_ocaso": Vector2(210, 42), "jioni": Vector2(210, 102),
+	"dunas_penumbra": Vector2(84, 108), "jardin_faroles": Vector2(338, 108),
+	"calzada_obeliscos": Vector2(316, 168), "horizonte_inmovil": Vector2(210, 180),
 }
 const DEBILIDAD_BESTIA := {
 	"pagina": ["fuego"], "tintero": ["fuego"], "ruba": ["hielo"], "pweza": ["hielo"],
@@ -454,7 +475,7 @@ func _manejar_raton_diario(evento: InputEvent) -> bool:
 					var tex_m: Texture2D = MAPA_ENTERO if completo else MAPA
 					var tam_m := Vector2(tex_m.get_size()) * MAPA_MUNDO_ESCALA
 					var pos_m := (Rect2(16, 36, 608, 296).position + (Vector2(608, 296) - tam_m) / 2.0 - Vector2(0, 6)).round()
-					var mapa_clics := {"Raíz": "raiz", "Asterhaul": "asterhaul", "Sigilia": "sigilia"}
+					var mapa_clics := {"Raíz": "raiz", "Asterhaul": "asterhaul", "Sigilia": "sigilia", "Valle del Ocaso": "ocaso"}
 					var lug_m := LUGARES_MUNDO.duplicate()
 					if completo:
 						lug_m.append(["Sigilia", LUGAR_SIGILIA_MUNDO])
@@ -1318,7 +1339,7 @@ func _cargar_retrato(id: String) -> Texture2D:
 	return _retratos[id]
 
 
-const VISTA_NOMBRE := {"raiz": "Raíz", "sigilia": "Sigilia", "asterhaul": "Asterhaul", "mundo": "Mundo"}
+const VISTA_NOMBRE := {"raiz": "Raíz", "sigilia": "Sigilia", "asterhaul": "Asterhaul", "ocaso": "Ocaso", "mundo": "Mundo"}
 
 
 func _algun_lugar_visto(lugares: Array) -> bool:
@@ -1341,6 +1362,10 @@ func _asterhaul_conocida() -> bool:
 	return PUNTO_ASTERHAUL.has(Estado.escena_actual) or _algun_lugar_visto(LUGARES_ASTERHAUL)
 
 
+func _ocaso_conocido() -> bool:
+	return PUNTO_OCASO.has(Estado.escena_actual) or _algun_lugar_visto(LUGARES_OCASO) or Estado.tiene("mirador_ocaso")
+
+
 func _regiones_disponibles() -> Array:
 	var vistas: Array = []
 	if _raiz_conocida():
@@ -1349,6 +1374,8 @@ func _regiones_disponibles() -> Array:
 		vistas.append("sigilia")
 	if _asterhaul_conocida():
 		vistas.append("asterhaul")
+	if _ocaso_conocido():
+		vistas.append("ocaso")
 	if Estado.tiene("mapa_partido"):
 		vistas.append("mundo")
 	return vistas
@@ -1356,7 +1383,9 @@ func _regiones_disponibles() -> Array:
 
 func _elegir_mapa_inicial() -> void:
 	var vistas := _regiones_disponibles()
-	if PUNTO_ASTERHAUL.has(Estado.escena_actual) and vistas.has("asterhaul"):
+	if PUNTO_OCASO.has(Estado.escena_actual) and vistas.has("ocaso"):
+		_vista_mapa = "ocaso"
+	elif PUNTO_ASTERHAUL.has(Estado.escena_actual) and vistas.has("asterhaul"):
 		_vista_mapa = "asterhaul"
 	elif PUNTO_SIGILIA.has(Estado.escena_actual) and vistas.has("sigilia"):
 		_vista_mapa = "sigilia"
@@ -1375,6 +1404,8 @@ func _config_mapa(vista: String) -> Dictionary:
 			return {"titulo": "Sigilia", "textura": MAPA_SIGILIA, "lugares": LUGARES_SIGILIA, "caminos": CAMINOS_SIGILIA, "puntos": PUNTO_SIGILIA, "siempre_visible": Estado.tiene("mapa_norte")}
 		"asterhaul":
 			return {"titulo": "Asterhaul", "textura": MAPA_ASTERHAUL, "lugares": LUGARES_ASTERHAUL, "caminos": CAMINOS_ASTERHAUL, "puntos": PUNTO_ASTERHAUL, "siempre_visible": Estado.tiene("mapa_asterhaul")}
+		"ocaso":
+			return {"titulo": "Valle del Ocaso", "textura": MAPA_OCASO, "lugares": LUGARES_OCASO, "caminos": CAMINOS_OCASO, "puntos": PUNTO_OCASO, "siempre_visible": Estado.tiene("kibatari_caminos")}
 		_:
 			return {"titulo": "Raíz", "textura": MAPA_RAIZ, "lugares": LUGARES_RAIZ, "caminos": CAMINOS_RAIZ, "puntos": PUNTO_RAIZ, "siempre_visible": Estado.tiene("mapa_raiz")}
 

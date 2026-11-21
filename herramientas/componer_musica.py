@@ -3134,6 +3134,46 @@ def jioni_noche():
     return final(p, sala=3.8, mezcla=0.38, brillo=4600)
 
 
+def horizonte_inmovil():
+    """«El borde del atardecer»: llegada a El Horizonte Inmóvil y la Pasarela de los Tres Pesos antes de despertar a
+    Jua-Giza. Solemne, suspendida sobre el abismo en re menor a 72 BPM: acordes lentos de piano, coro lejano, viento
+    suave de altura y una flauta solitaria que prepara el último paso."""
+    tempo = Tempo(72)
+    pulsos = 80
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m"), ("A#1", "M7"), ("C2", "sus"), ("D2", "m"),
+        ("G1", "m7"), ("D2", "m"), ("A#1", "M7"), ("A1", "sus"),
+        ("D2", "m"), ("F2", "M7"), ("C2", "M"), ("A1", "sus"),
+        ("A#1", "M7"), ("G1", "m7"), ("A1", "sus"), ("D2", "m"),
+        ("G1", "m7"), ("A#1", "M7"), ("A1", "sus"), ("D2", "m"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=840, volumen=0.20, octava_bajo=1, fuerza_bajo=0.28)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=1.0, volumen=0.14, pan=-0.20, patron=(0, 2, 1, 3))
+        notas = acorde(raiz[:-1] + "3", tipo)
+        p.poner(acorde_piano(notas, tempo.s(3.6), 0.16, 0.05), tempo.s(i * 4), 1.0, pan=0.16)
+        if i % 2 == 0:
+            p.poner(campanita(acorde(raiz[:-1] + "5", tipo)[0], 2.4, 0.08), tempo.s(i * 4 + 2.0), pan=0.30)
+    p.poner(coro(["D3", "A3", "D4"], tempo.s(32)), tempo.s(16), 0.085)
+    p.poner(coro(["A#2", "F3", "A3"], tempo.s(32)), tempo.s(48), 0.090)
+    tema_h = [
+        ("A4", 0, 2.5), ("D5", 2.5, 1.5),
+        ("F5", 4, 2), ("E5", 6, 2),
+        ("D5", 8, 2.5), ("C5", 10.5, 1.5),
+        ("A4", 12, 4),
+        ("A#4", 16, 2), ("C5", 18, 1), ("D5", 19, 1),
+        ("E5", 20, 2.5), ("D5", 22.5, 1.5),
+        ("C5", 24, 2), ("A4", 26, 2),
+        ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.36, vibrato=4.0)
+    melodia(p, tempo, tema_h, desde=8, instrumento=flauta_, volumen=0.33, sostener=0.95, pan=-0.04)
+    tocar(p, tempo, tema_h, desde=44, fuerza=0.20, pan=0.12)
+    melodia(p, tempo, tema_h, desde=44, instrumento=flauta_, volumen=0.34, sostener=0.95, pan=-0.08)
+    return final(p, sala=4.2, mezcla=0.40, brillo=4800)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -3167,6 +3207,7 @@ PIEZAS["tienda_kikombe"] = tienda_kikombe
 PIEZAS["jefe_jua_giza"] = jefe_jua_giza
 PIEZAS["ocaso_libre"] = ocaso_libre
 PIEZAS["jioni_noche"] = jioni_noche
+PIEZAS["horizonte_inmovil"] = horizonte_inmovil
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -3200,6 +3241,7 @@ TITULOS["tienda_kikombe"] = "Té tibio en el crepúsculo"
 TITULOS["jefe_jua_giza"] = "El Sol Encadenado"
 TITULOS["ocaso_libre"] = "La Primera Noche"
 TITULOS["jioni_noche"] = "La ciudad que por fin duerme"
+TITULOS["horizonte_inmovil"] = "El borde del atardecer"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

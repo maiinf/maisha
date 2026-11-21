@@ -205,11 +205,77 @@ def mapa_asterhaul() -> Image.Image:
     return img
 
 
+def mapa_ocaso() -> Image.Image:
+    w, h = 420, 220
+    img = _pergamino_base(w, h, 73)
+    px = img.load()
+    d = ImageDraw.Draw(img)
+    # Valle del Ocaso: mesetas de arenisca rojiza sobre el abismo violeta del atardecer
+    _mancha(px, w, h, 210, 112, 166, 86, _rgb("#5a2d5c"), _rgb("#2c1434"), 13)
+    _mancha(px, w, h, 210, 42, 48, 22, _rgb("#c97b52"), _rgb("#683226"), 19)
+    _mancha(px, w, h, 210, 102, 54, 34, _rgb("#d98b54"), _rgb("#703624"), 23)
+    _mancha(px, w, h, 84, 108, 48, 32, _rgb("#7b467a"), _rgb("#3c1d44"), 29)
+    _mancha(px, w, h, 338, 108, 48, 32, _rgb("#3b4f6e"), _rgb("#1b263c"), 37)
+    _mancha(px, w, h, 316, 168, 46, 22, _rgb("#c27048"), _rgb("#602e22"), 43)
+    _mancha(px, w, h, 210, 180, 46, 22, _rgb("#e69c56"), _rgb("#7a3a22"), 53)
+
+    # El Mirador del Ocaso (norte): Arco del Atardecer y obelisco con sombra
+    mx, my = 210, 42
+    d.rectangle([mx - 12, my - 6, mx - 7, my + 6], fill=_rgb("#7c4430"), outline=_rgb("#361a14"))
+    d.rectangle([mx + 7, my - 6, mx + 12, my + 6], fill=_rgb("#7c4430"), outline=_rgb("#361a14"))
+    d.pieslice([mx - 12, my - 13, mx + 12, my + 2], 180, 360, fill=_rgb("#a85c42"), outline=_rgb("#361a14"))
+    d.polygon([(mx + 18, my - 9), (mx + 16, my + 5), (mx + 20, my + 5)], fill=_rgb("#5e3628"))
+
+    # Jioni (centro): Plaza de los 12 Faroles y Torre del Reloj
+    jx, jy = 210, 102
+    d.ellipse([jx - 18, jy - 12, jx + 18, jy + 12], fill=_rgb("#c27e50"), outline=_rgb("#5c2e1e"))
+    for k in range(12):
+        a = k * math.tau / 12.0
+        fx = int(round(jx + math.cos(a) * 13))
+        fy = int(round(jy + math.sin(a) * 8))
+        d.point((fx, fy), fill=_rgb("#fff09c"))
+    d.rectangle([jx + 16, jy - 17, jx + 25, jy - 2], fill=_rgb("#8c4e36"), outline=_rgb("#361a14"))
+    d.polygon([(jx + 20, jy - 22), (jx + 15, jy - 17), (jx + 26, jy - 17)], fill=_rgb("#e6a852"))
+
+    # Las Dunas de Penumbra (oeste): olas de arena violeta y 2 velas doradas
+    dx, dy = 84, 108
+    for oy in (-6, 4, 12):
+        d.arc([dx - 26, dy + oy - 6, dx + 26, dy + oy + 8], 190, 350, fill=_rgb("#d48a62"))
+    for vx, vy in ((dx - 10, dy - 2), (dx + 12, dy + 4)):
+        d.polygon([(vx, vy - 10), (vx - 5, vy + 3), (vx + 5, vy + 3)], fill=_rgb("#f6c66a"), outline=_rgb("#5c321a"))
+
+    # El Jardín de los Faroles (este): estanque espejo, pabellón morado y haz de prisma
+    ex, ey = 338, 108
+    d.ellipse([ex - 16, ey - 7, ex + 16, ey + 9], fill=_rgb("#202e48"), outline=_rgb("#9cc4e8"))
+    d.line([(ex - 14, ey + 1), (ex + 14, ey + 1)], fill=_rgb("#ffd878"))
+    d.polygon([(ex, ey - 16), (ex - 11, ey - 6), (ex + 11, ey - 6)], fill=_rgb("#6c3a88"), outline=_rgb("#281438"))
+    d.rectangle([ex - 7, ey - 6, ex + 7, ey + 1], fill=_rgb("#c8845a"), outline=_rgb("#361a14"))
+
+    # La Calzada de los Obeliscos (sureste): 3 islas unidas por sombras largas
+    cx, cy = 316, 168
+    d.line([(cx - 18, cy), (cx + 18, cy)], fill=_rgb("#241232"), width=3)
+    for ix in (-18, 0, 18):
+        d.rectangle([cx + ix - 6, cy - 4, cx + ix + 6, cy + 5], fill=_rgb("#d48454"), outline=_rgb("#54281a"))
+        d.polygon([(cx + ix, cy - 11), (cx + ix - 2, cy - 2), (cx + ix + 2, cy - 2)], fill=_rgb("#4a2822"))
+
+    # El Horizonte Inmóvil (sur): el Sol Encadenado con halo dorado
+    hx, hy = 210, 180
+    d.ellipse([hx - 11, hy - 11, hx + 11, hy + 11], fill=_rgb("#ffca62"), outline=_rgb("#9c3e26"))
+    d.ellipse([hx - 6, hy - 6, hx + 6, hy + 6], fill=_rgb("#fff2b4"))
+    d.line([(hx - 18, hy - 2), (hx - 10, hy)], fill=_rgb("#362646"), width=2)
+    d.line([(hx + 10, hy), (hx + 18, hy - 2)], fill=_rgb("#362646"), width=2)
+    d.line([(hx, hy + 10), (hx, hy + 16)], fill=_rgb("#362646"), width=2)
+
+    _rosa_vientos(d, 388, 30, _c("Pergamino 1"), _rgb("#ffca62"))
+    return img
+
+
 def main() -> None:
     os.makedirs(SALIDA, exist_ok=True)
     mapa_mundo_entero().save(os.path.join(SALIDA, "mapa_mundo_entero.png"))
     mapa_sigilia().save(os.path.join(SALIDA, "mapa_sigilia.png"))
     mapa_asterhaul().save(os.path.join(SALIDA, "mapa_asterhaul.png"))
+    mapa_ocaso().save(os.path.join(SALIDA, "mapa_ocaso.png"))
     print("Mapas generados en", SALIDA)
 
 
