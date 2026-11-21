@@ -615,3 +615,12 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Cómo va la luz | El rayo va casilla a casilla: los **espejos de ángulo** («/» o «\», un golpe) lo doblan; el **prisma** deja seguir el dorado y saca un haz **violeta** por la cara que se le gire. El dorado abre la verja; el violeta deshace la celosía y delata la pasarela falsa. |
 | Polillas de papel | No pican: se posan en los espejos encendidos y tapan la luz. Un golpe o la Resonancia de Ámbar las rompen. |
 | Mondo (opción A) | Se parte en él y dos reflejos delante de los espejos altos; un golpe a un espejo suelta un rayo en diagonal: los reflejos que toca se esfuman y el de verdad cae aturdido. 9 de vida, 3 golpes por aturdimiento. Suelta la **Pesa del Este**. |
+
+### 2026-11-21 · La Calzada de los Obeliscos (Construida sobre `documentacion/boceto_calzada_obeliscos.png`, de Gemini, con el jefe que eligió Iam)
+| Qué | Decisión |
+| :--- | :--- |
+| Trazado | **Tal cual el boceto**: Desde Jioni, el Pilar I, el Balcón del Mediodía (secreto), el Viaducto de los Centinelas y la Rotonda de Saa-Mchanga, islas sobre el abismo. |
+| Sombras encadenadas | Cada tramo pide una hora: oeste (Jioni–Pilar), este (Pilar–Balcón), sur (Pilar–Viaducto y Viaducto–Rotonda). Al girar el sol se abre uno y se cierra otro. |
+| Centinelas de Reloj | En penumbra andan y pegan, y nada les hace daño; al sol se quedan de piedra y la Carga Sísmica los rompe. |
+| Saa-Mchanga (opción A) | Se carga, barre la Rotonda con un rayo de sol (a salvo en la sombra de un obelisco) y se inclina: una Carga o girar el Reloj lo vuelca. 9 de vida, 3 golpes por vuelco. Suelta la **Pesa del Sur**. |
+| La Puerta del Horizonte | Se abre en Jioni con las tres pesas (`tres_pesos`). |

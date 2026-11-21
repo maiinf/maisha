@@ -1270,7 +1270,25 @@ El camino del este de Jioni (`documentacion/boceto_jardin_faroles.png`, de Gemin
 | Arte | `herramientas/pintar_jardin.py` → `arte/mundos/ocaso/jardin/` (Prisma Solar, espejos, prisma, verja, celosía, polilla, Mondo, espejos altos, pesa, pérgola, linterna, pabellón) |
 | Misión | `jardin_faroles` |
 | Prueba | `prueba_jardin_faroles` |
-| Falta | Música propia del Jardín y de Mondo (ahora suena la de Jioni y, en la pelea, la de Kivuli), sonidos y verlo en HD-2D (los rayos aún no se ven en 3D) |
+| Falta | Gemini ya puso la música, los sonidos y el HD-2D |
+
+## El Valle del Ocaso: La Calzada de los Obeliscos y Saa-Mchanga
+
+El camino del sureste de Jioni (`documentacion/boceto_calzada_obeliscos.png`, de Gemini; capturas en `documentacion/calzada_captura_1.png`…`_3.png`).
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | Por la salida sureste de Jioni (puerta `calzada` → `jioni`). La misión aparece cuando Kibatari cuenta los tres caminos |
+| Mapa | `calzada_obeliscos` (72×56, `crear_calzada()`): islas sobre el **abismo** (`=`, se cae): Desde Jioni, el Pilar I, el Balcón del Mediodía (secreto), el Viaducto de los Centinelas y la Rotonda. Suelo: `pintar_mirador()`, con la esfera de un reloj de sol grabada en la Rotonda |
+| Sombras encadenadas | Las islas solo las unen las sombras de los obeliscos (`ocaso/sol.gd`): sol al **oeste** → Desde Jioni–Pilar I; al **este** → Pilar I–Balcón; al **sur** → Pilar I–Viaducto y Viaducto–Rotonda. Al girar un Reloj se abre un tramo y se cierra otro. Cinco Relojes |
+| Centinelas de Reloj | `scripts/enemigos/centinela.gd`: en penumbra andan, persiguen y dan con la alabarda (1 hoja); el cetro y la Carga rebotan. Al sol (`sol.iluminado()`: oeste u este, media Viaducto cada uno) se quedan de **piedra** y la **Carga Sísmica** los vuelca y los rompe |
+| **Saa-Mchanga** | `scripts/enemigos/saa_mchanga.gd`, 9 de vida, quieto en el centro. Se **carga** (la arena de luz cae), **barre** la Rotonda con un rayo que da la vuelta entera (1 hoja, salvo **a la sombra** de uno de los cuatro obeliscos) y se **inclina**: una **Carga** o **girar el Reloj** lo **vuelca** (el aro de relojería al aire: cetro 1, semillas 2; a los 3 golpes se levanta). Furia a la mitad: dos rayos y más deprisa. Vencido: **Pesa del Sur** (`peso_sur`) y un Farol |
+| Las tres pesas | Con `peso_oeste`, `peso_este` y `peso_sur`, al entrar en Jioni se pone `tres_pesos` y se abre la **Puerta del Horizonte** |
+| Faroles de la Hora | Tres: el Balcón del Mediodía, el Viaducto y el que suelta Saa-Mchanga |
+| Arte | `herramientas/pintar_calzada.py` → `arte/mundos/ocaso/calzada/` (centinela, Saa-Mchanga, pesa, pilar) |
+| Misión | `calzada_obeliscos` |
+| Prueba | `prueba_calzada_obeliscos` |
+| Falta | Música propia de la Calzada y de Saa-Mchanga (ahora suena la del Mirador y, en la pelea, la de Kivuli), sonidos y verlo en HD-2D (el rayo de Saa-Mchanga) |
 
 ## Las construcciones, al nivel de la casa del castor
 

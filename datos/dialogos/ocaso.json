@@ -585,5 +585,74 @@
 				}
 			}
 		]
+	},
+	"calzada_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Bajo las escaleras de Jioni y el suelo se acaba de golpe. Delante, el abismo del atardecer y, flotando en él, islas de piedra sueltas, como los restos de un puente que se cayó hace mucho.",
+					"No hay nada que las una. Solo los obeliscos, y sus sombras larguísimas tendidas sobre el vacío.",
+					"Si en el Mirador las sombras aguantaban mi peso... aquí van a tener que hacer de puente otra vez."
+				]
+			}
+		]
+	},
+	"calzada_cartel": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Un mojón de arenisca con letras gastadas:",
+					"«Calzada del Mediodía. Para el viajero: cada tramo, a su hora. Al girar el sol se abre un paso y se cierra el de atrás».",
+					"Debajo, rayado a cuchillo: «Los centinelas duermen al sol. NO los despiertes a la sombra»."
+				]
+			}
+		]
+	},
+	"calzada_centinelas": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"En el viaducto hay dos guardianes de bronce con un reloj de arena por cabeza. Uno gira la cabeza hacia mí. La arena le cae por dentro, despacio.",
+					"Donde les da la sombra, se mueven. Donde les da el sol... el otro se ha quedado tieso, dorado, como una estatua.",
+					"Una estatua de piedra no aguanta un buen empujón."
+				]
+			}
+		]
+	},
+	"saa_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"En el centro de la rotonda hay un reloj de arena del tamaño de una torre, metido en un aro de bronce lleno de ruedas dentadas.",
+					"La arena de arriba brilla como el sol. La de abajo es negra como la sombra. Y empieza a caer.",
+					"Cuando la luz llegue abajo del todo... algo me dice que no quiero estar en medio.",
+					"Cuatro obeliscos alrededor. Cuatro sombras donde esconderse."
+				]
+			}
+		]
+	},
+	"saa_vencido": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Saa-Mchanga se queda tumbado, con el aro torcido. Las ruedas giran un poco más... y paran.",
+					"Del hueco de su pecho cae una pesa de bronce con un reloj de arena grabado. La Pesa del Sur. Está tibia, como una piedra al mediodía.",
+					"Ya tengo las tres, si las juntara todas. La Puerta del Horizonte, en Jioni, tiene tres huecos esperándolas."
+				],
+				"recibe": {
+					"peso_sur": 1
+				}
+			}
+		]
 	}
 }

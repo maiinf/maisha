@@ -2745,6 +2745,41 @@ def crear_jardin():
     return ["".join(f) for f in m], {}
 
 
+def crear_calzada():
+    """LA CALZADA DE LOS OBELISCOS (el Valle del Ocaso, el camino del sureste, 72x56): islas de arenisca sobre el
+    abismo del atardecer («=»: quien lo pisa cae), unidas solo por las SOMBRAS de los obeliscos; cada tramo pide una
+    hora del sol y, al girarlo, se abre uno y se cierra otro. Se entra por el norte (de Jioni, «_»).
+      - DESDE JIONI (noroeste): un Reloj de Sol; con el sol al oeste, la sombra de su obelisco cruza al Pilar I.
+      - EL PILAR I (norte): otro Reloj. Al este, con el sol al este, el BALCÓN DEL MEDIODÍA (secreto, un farol); al
+        sur, con el sol al sur, el Viaducto.
+      - EL VIADUCTO DE LOS CENTINELAS (centro): dos Centinelas de Reloj, un Reloj y un farol.
+      - LA ROTONDA (sur, ovalada): SAA-MCHANGA, cuatro obeliscos y un Reloj.
+    Obeliscos, relojes, sombras, centinelas, Saa-Mchanga y los faroles los pone la escena."""
+    ANCHO, ALTO = 72, 56
+    m = [["=" for _ in range(ANCHO)] for _ in range(ALTO)]
+    for y in range(ALTO):
+        for x in range(ANCHO):
+            if x in (0, ANCHO - 1) or y in (0, ALTO - 1):
+                m[y][x] = "0"
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y][x] = c
+
+    rect(10, 1, 12, 2, "%")
+    rect(10, 0, 12, 0, "_")
+    rect(4, 3, 18, 13, "%")                                  # Desde Jioni
+    rect(27, 3, 37, 13, "%")                                 # el Pilar I
+    rect(48, 2, 62, 12, "%")                                 # el Balcón del Mediodía
+    rect(24, 22, 44, 32, "%")                                # el Viaducto de los Centinelas
+    for y in range(35, 55):                                  # la Rotonda (un óvalo)
+        for x in range(1, ANCHO - 1):
+            if ((x + 0.5 - 34.5) / 13.5) ** 2 + ((y + 0.5 - 44.5) / 9.5) ** 2 <= 1.0:
+                m[y][x] = "%"
+    return ["".join(f) for f in m], {}
+
+
 def crear_seccion():
     """LA SECCIÓN PROHIBIDA (Sigilia, 64x72, de sur a norte): las salas de mármol morado bajo el Gran Archivo. Lo que
     no es sala («0») son estanterías de libros encadenados. Se entra por el sur (del Gran Archivo de Maandiko, «_»).
@@ -3527,7 +3562,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mirador_ocaso", "jioni", "dunas_penumbra", "jardin_faroles", "mji_jiwe", "galerias_ambar", "fundicion_escoria", "aguja_caida", "nucleo_estrella"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mirador_ocaso", "jioni", "dunas_penumbra", "jardin_faroles", "calzada_obeliscos", "mji_jiwe", "galerias_ambar", "fundicion_escoria", "aguja_caida", "nucleo_estrella"}
 
 
 def construir_suelo(nombre):
@@ -3679,7 +3714,7 @@ if __name__ == "__main__":
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
                         "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion,
-                        "desfiladero_meteorito": crear_desfiladero, "mirador_ocaso": crear_mirador, "jioni": crear_jioni, "dunas_penumbra": crear_dunas, "jardin_faroles": crear_jardin, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion, "aguja_caida": crear_aguja, "nucleo_estrella": crear_nucleo}.get(nombre, crear_prados)()
+                        "desfiladero_meteorito": crear_desfiladero, "mirador_ocaso": crear_mirador, "jioni": crear_jioni, "dunas_penumbra": crear_dunas, "jardin_faroles": crear_jardin, "calzada_obeliscos": crear_calzada, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion, "aguja_caida": crear_aguja, "nucleo_estrella": crear_nucleo}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

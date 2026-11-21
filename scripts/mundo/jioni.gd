@@ -44,6 +44,9 @@ var _casas := {}                         # nombre → el sprite de su casa o su 
 
 
 func _ready() -> void:
+	# las tres pesas del reloj abren la Puerta del Horizonte
+	if Estado.tiene("peso_oeste") and Estado.tiene("peso_este") and Estado.tiene("peso_sur"):
+		Estado.marcar("tres_pesos")
 	# (antes de super(): al volver por una de ellas, la puerta tiene que estar ya)
 	for s in SALIDAS:
 		var puerta: Area2D = PUERTA.new()

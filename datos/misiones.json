@@ -166,12 +166,16 @@
 		"jioni": [
 			"mirador_ocaso",
 			"dunas_penumbra",
-			"jardin_faroles"
+			"jardin_faroles",
+			"calzada_obeliscos"
 		],
 		"dunas_penumbra": [
 			"jioni"
 		],
 		"jardin_faroles": [
+			"jioni"
+		],
+		"calzada_obeliscos": [
 			"jioni"
 		]
 	},
@@ -2096,6 +2100,50 @@
 					],
 					"ir": {
 						"escena": "jardin_faroles",
+						"buscar": "grupo:jefes"
+					}
+				}
+			]
+		},
+		{
+			"id": "calzada_obeliscos",
+			"tipo": "historia",
+			"titulo": "La Calzada de los Obeliscos",
+			"texto": "Al sureste de Jioni, islas de piedra sobre el abismo que solo unen las sombras de los obeliscos. Al final, en una rotonda, un reloj de arena gigante guarda la última pesa.",
+			"aparece": [
+				"kibatari_caminos"
+			],
+			"hecha": [
+				"saa_vencido"
+			],
+			"pasos": [
+				{
+					"texto": "Sal de Jioni por el sureste, a la Calzada",
+					"hecho": [
+						"calzada_obeliscos"
+					],
+					"ir": {
+						"escena": "jioni",
+						"buscar": "puerta:calzada_obeliscos"
+					}
+				},
+				{
+					"texto": "Cruza las sombras hasta el Viaducto de los Centinelas (gira el sol con los Relojes)",
+					"hecho": [
+						"calzada_centinelas"
+					],
+					"ir": {
+						"escena": "calzada_obeliscos",
+						"buscar": "grupo:relojes_sol"
+					}
+				},
+				{
+					"texto": "Vence a Saa-Mchanga en la Rotonda",
+					"hecho": [
+						"saa_vencido"
+					],
+					"ir": {
+						"escena": "calzada_obeliscos",
 						"buscar": "grupo:jefes"
 					}
 				}

@@ -1173,6 +1173,8 @@ def pintar_mirador(nombre, salida=None):
         else ((36, 1, 38, 10), (30, 38, 56, 41))
     if nombre == "dunas_penumbra":
         calles = ((61, 26, 73, 28),)
+    if nombre == "calzada_obeliscos":
+        calles = ((10, 0, 12, 8), (28, 7, 36, 8), (32, 9, 33, 13), (25, 26, 43, 28), (32, 22, 33, 32))
     for (x0, y0, x1, y1) in calles:
         cv2.rectangle(camino, (x0 * 16 * S, y0 * 16 * S), ((x1 + 1) * 16 * S - 1, (y1 + 1) * 16 * S - 1), 1.0, -1)
     camino = lz.desenfocar(camino, 3) > 0.5
@@ -1194,9 +1196,11 @@ def pintar_mirador(nombre, salida=None):
         lz.pintar(plaza * (np.abs(rp - 150) < 2.0), "#5a2e2a", 0.8)
     # LA ESFERA DEL RELOJ DE SOL, grabada en la plaza (alrededor del reloj)
     cx, cy = (32.0 * 16, 22.0 * 16) if jioni else (42.5 * 16, 23.0 * 16)
+    e0, e1 = (40, 52) if jioni else (58, 70)
+    if nombre == "calzada_obeliscos":                    # (en la Rotonda, alrededor de Saa-Mchanga)
+        cx, cy, e0, e1 = 34.5 * 16, 44.5 * 16, 70, 96
     r = np.hypot(lz.x - cx, (lz.y - cy) * 1.25)
     an = np.arctan2(lz.y - cy, lz.x - cx)
-    e0, e1 = (40, 52) if jioni else (58, 70)
     esfera = suelo * ((np.abs(r - e1) < 1.2) | (np.abs(r - e0) < 0.8) | ((r > e0) & (r < e1) & (np.abs(((an * 12 / np.pi) % 2) - 1) < 0.06)))
     if nombre != "dunas_penumbra":
         lz.pintar(esfera, "#6a3430", 0.75)
@@ -1521,7 +1525,7 @@ def pintar(nombre, salida=None):
         return pintar_fundicion(nombre, salida)
     if nombre == "aguja_caida":
         return pintar_aguja(nombre, salida)
-    if nombre in ("mirador_ocaso", "jioni", "dunas_penumbra"):
+    if nombre in ("mirador_ocaso", "jioni", "dunas_penumbra", "calzada_obeliscos"):
         return pintar_mirador(nombre, salida)
     if nombre == "jardin_faroles":
         return pintar_jardin(nombre, salida)

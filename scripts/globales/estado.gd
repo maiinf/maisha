@@ -76,6 +76,8 @@ const OBJETOS := {
 		"texto": "Una pesa de reloj de bronce, fría y muy pesada para su tamaño, con un sol grabado. La guardaba Kivuli en las Dunas. Encaja en uno de los huecos de la Puerta del Horizonte."},
 	"peso_este": {"uno": "Pesa del Este", "encargo": 0, "hecho": "", "icono": 27,
 		"texto": "Una pesa de reloj de bronce con una luna creciente grabada. Al moverla, la luna parece moverse un poco más tarde que ella, como un reflejo. La guardaba Mondo en el Invernadero. Encaja en otro de los huecos de la Puerta del Horizonte."},
+	"peso_sur": {"uno": "Pesa del Sur", "encargo": 0, "hecho": "", "icono": 27,
+		"texto": "Una pesa de reloj de bronce con un reloj de arena grabado, siempre tibia, como si guardara un mediodía dentro. La guardaba Saa-Mchanga en la Rotonda. Encaja en el último hueco de la Puerta del Horizonte."},
 	"farol_hora": {"uno": "Farol de la Hora", "varios": "Faroles de la Hora", "encargo": 0, "hecho": "", "icono": 27,
 		"texto": "Un farol de latón con el cristal de ámbar. La llama está quieta, sin temblar, como si se hubiera parado a la vez que el sol. En Jioni hay doce huecos esperando a estos faroles."},
 	"esquirla_estrella": {"uno": "Esquirla de Estrella", "varios": "Esquirlas de Estrella", "encargo": 0, "hecho": "", "icono": 27,
