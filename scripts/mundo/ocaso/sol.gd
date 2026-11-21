@@ -117,12 +117,13 @@ func _draw() -> void:
 		var pie: Vector2 = Vector2(o[0]) * 16.0
 		var fin := pie + Vector2(d) * 16.0 * (largo + 1)
 		var borde := Color(COLOR_FILO, COLOR_FILO.a * a)
+		var grosor := 3.0 if Estado.tiene("reloj_bolsillo") else 2.0      # (el reloj de bolsillo de Kikombe: el filo se ve mejor)
 		if d.y == 0:
 			var x0 := minf(pie.x, fin.x) + 16.0
 			var w := 16.0 * largo
-			draw_line(Vector2(x0, pie.y), Vector2(x0 + w, pie.y), borde, 2.0)
-			draw_line(Vector2(x0, pie.y + 32), Vector2(x0 + w, pie.y + 32), borde, 2.0)
+			draw_line(Vector2(x0, pie.y), Vector2(x0 + w, pie.y), borde, grosor)
+			draw_line(Vector2(x0, pie.y + 32), Vector2(x0 + w, pie.y + 32), borde, grosor)
 		else:
 			var y0 := fin.y + 16.0
-			draw_line(Vector2(pie.x, y0), Vector2(pie.x, pie.y), borde, 2.0)
-			draw_line(Vector2(pie.x + 32, y0), Vector2(pie.x + 32, pie.y), borde, 2.0)
+			draw_line(Vector2(pie.x, y0), Vector2(pie.x, pie.y), borde, grosor)
+			draw_line(Vector2(pie.x + 32, y0), Vector2(pie.x + 32, pie.y), borde, grosor)

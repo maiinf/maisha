@@ -624,3 +624,11 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Centinelas de Reloj | En penumbra andan y pegan, y nada les hace daño; al sol se quedan de piedra y la Carga Sísmica los rompe. |
 | Saa-Mchanga (opción A) | Se carga, barre la Rotonda con un rayo de sol (a salvo en la sombra de un obelisco) y se inclina: una Carga o girar el Reloj lo vuelca. 9 de vida, 3 golpes por vuelco. Suelta la **Pesa del Sur**. |
 | La Puerta del Horizonte | Se abre en Jioni con las tres pesas (`tres_pesos`). |
+
+### 2026-11-21 · Jioni parte 2 y el final (Decidido con Iam, sobre `boceto_mercado_crepusculo.png` y `boceto_horizonte_inmovil.png`, de Gemini)
+| Qué | Decisión |
+| :--- | :--- |
+| Orden | Primero el **Mercado del Crepúsculo**; el Horizonte Inmóvil, como cierre. |
+| Mercado | **Opción A**: la tienda de Kikombe (reloj, lente, botas y Capa del Farolillero) y, con los doce Faroles, la **Bendición del Crepúsculo** (+1 hoja). Sin rama nueva en el diario. |
+| El duodécimo Farol | Kikombe regala el farol de su puesto al abrir la tienda (con los tres caminos salían once). |
+| El Horizonte Inmóvil | **Tal cual el boceto**: la pasarela de las tres pesas, Jua-Giza en tres fases (sombra, luz, calma), Mauti al final y el epílogo de la Primera Noche, sin matar al sol. |

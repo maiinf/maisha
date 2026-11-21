@@ -198,6 +198,49 @@
 			"icono": 12,
 			"requiere": "mercado_escoria",
 			"texto": "Cuero curtido de herrero, con un martillito en el bolsillo. Huele a carbón y a trabajo bien hecho. Póntelo desde la mochila."
+		},
+		{
+			"id": "reloj_bolsillo",
+			"tienda": "kikombe",
+			"nombre": "Reloj de bolsillo",
+			"tipo": "marca",
+			"precio": 5,
+			"icono": 28,
+			"marca": "reloj_bolsillo",
+			"requiere": "kikombe_abierto",
+			"texto": "Un reloj de latón que los relojeros de Jioni afinaron para el sol parado. Lleva el compás de la respiración: el Aliento se recupera un 15 % más rápido, y el filo de las sombras-puente se ve más claro."
+		},
+		{
+			"id": "lente_prisma",
+			"tienda": "kikombe",
+			"nombre": "Lente de prisma",
+			"tipo": "marca",
+			"precio": 6,
+			"icono": 29,
+			"marca": "lente_prisma",
+			"requiere": "kikombe_abierto",
+			"texto": "Tallada con una esquirla de cristal del Claustro de los Prismas. Afina la nota del cetro: la Resonancia de Ámbar llega un 25 % más lejos, y los Faroles de la Hora destellan desde lejos."
+		},
+		{
+			"id": "botas_arena",
+			"tienda": "kikombe",
+			"nombre": "Botas de arena firme",
+			"tipo": "marca",
+			"precio": 7,
+			"icono": 30,
+			"marca": "botas_arena",
+			"requiere": "kikombe_abierto",
+			"texto": "Suela ancha cosida por los fénec de las Dunas. Corres un 10 % más deprisa, y en la arena movediza o el agua del Estanque aguantas un momento antes de hundirte."
+		},
+		{
+			"id": "capa_farolillero",
+			"tienda": "kikombe",
+			"nombre": "Capa del Farolillero",
+			"tipo": "prenda",
+			"precio": 9,
+			"icono": 31,
+			"requiere": "kikombe_abierto",
+			"texto": "Azul noche, con ribete dorado y un farolillo a la cintura, como la de Mwanga de joven. Alumbra un poco más en los sitios oscuros. Póntela desde la mochila."
 		}
 	]
 }

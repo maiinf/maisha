@@ -1,5 +1,5 @@
 extends CanvasLayer
-## LA TIENDA (de Tawi, en Cuna de Musgo; de Wino, en Maandiko; de Chuma, en Mji-Jiwe): se abre al hablar con el tendero.
+## LA TIENDA (de Tawi, en Cuna de Musgo; de Wino, en Maandiko; de Chuma, en Mji-Jiwe; de Kikombe, en Jioni): se abre al hablar con el tendero.
 ## A la izquierda, el puesto por dentro con Tawi detrás del mostrador (parpadea, habla, se alegra al vender);
 ## a la derecha, lo que vende, con su precio en Cristales del Nexo.
 ##   ↑ ↓ elegir · Acción comprar · Tab o Esc salir
@@ -26,6 +26,11 @@ const TENDEROS := {
 		"¡Pasa, pasa, que el género no muerde! Bueno, la piedra de amolar un poco.",
 		"Todo forjado aquí mismo, con fuego de verdad. Hacía años que no lo decía.",
 		"¿Cristales del Nexo? Los aceptamos. Y si traes los hornos encendidos, también la sonrisa."]},
+	"kikombe": {"fondo": preload("res://arte/interfaz/tienda_kikombe_fondo.png"), "dibujo": preload("res://arte/interfaz/tienda_kikombe.png"),
+		"nombre": "Kikombe", "rotulo": "Mercado del Crepúsculo", "saludos": [
+		"Siéntate, siéntate. Primero el té, luego las compras. Aquí ya no tenemos prisa.",
+		"Todo lo hicieron las manos de Jioni mientras no podíamos dormir. Algo bueno tenía que salir de tanta vela.",
+		"¿Cristales del Nexo? Valen. Y una sonrisa también, pero esa no te la cobro."]},
 }
 const ICONOS := preload("res://arte/interfaz/objetos.png")
 const CRISTAL := preload("res://arte/interfaz/cristal.png")

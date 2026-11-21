@@ -8,6 +8,9 @@ var zona := Rect2(-100000, -100000, 200000, 200000)
 ## en las Dunas de Penumbra no se cae: se HUNDE en la arena movediza (baja despacio en vez de encogerse)
 var hundir := false
 var cayendo := false
+## con las botas de arena firme (de Kikombe), al hundirse se aguanta un poco (MARGEN_BOTAS s) antes de ir para abajo
+const MARGEN_BOTAS := 0.4
+var _pisando := 0.0
 var _escena: Node
 var _filas: PackedStringArray
 var _firme := Vector2.ZERO
@@ -33,7 +36,7 @@ func sostenida(p: Vector2) -> bool:
 	return false
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	var maisha: Node2D = _escena._maisha
 	if cayendo or maisha.get("esta_caida"):
 		return
@@ -41,9 +44,14 @@ func _process(_delta: float) -> void:
 	var letra := _letra(p)
 	if letra == "=" and zona.has_point(p):
 		if not sostenida(p):
-			_caer()
+			_pisando += delta
+			if not (hundir and Estado.tiene("botas_arena") and _pisando < MARGEN_BOTAS):
+				_caer()
+		else:
+			_pisando = 0.0
 	elif not (letra in ["0", "≈", "="]):
 		_firme = p
+		_pisando = 0.0
 
 
 func _caer() -> void:

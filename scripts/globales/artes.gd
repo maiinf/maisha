@@ -261,7 +261,7 @@ func chispa_runa(sigilo: Node2D, radio: float, desde: float, tipo: String, color
 # --- Los números del combate, con las Artes ------------------------------------------
 
 func vida_maxima() -> int:
-	return R.VIDA_MAXIMA + int(valor("vida_maxima"))
+	return R.VIDA_MAXIMA + int(valor("vida_maxima")) + (1 if Estado.tiene("bendicion_crepusculo") else 0)     # (la Bendición del Crepúsculo, de Kibatari)
 
 
 func aliento_maximo() -> float:
@@ -269,7 +269,7 @@ func aliento_maximo() -> float:
 
 
 func ritmo_aliento() -> float:
-	return (1.0 + valor("ritmo_aliento")) * (1.15 if Estado.tiene("fuelle_rescoldo") else 1.0)     # (el fuelle de Chuma)
+	return (1.0 + valor("ritmo_aliento")) * (1.15 if Estado.tiene("fuelle_rescoldo") else 1.0) * (1.15 if Estado.tiene("reloj_bolsillo") else 1.0)     # (el fuelle de Chuma; el reloj de Kikombe)
 
 
 func semilla_coste() -> float:

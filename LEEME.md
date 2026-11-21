@@ -1288,7 +1288,22 @@ El camino del sureste de Jioni (`documentacion/boceto_calzada_obeliscos.png`, de
 | Arte | `herramientas/pintar_calzada.py` → `arte/mundos/ocaso/calzada/` (centinela, Saa-Mchanga, pesa, pilar) |
 | Misión | `calzada_obeliscos` |
 | Prueba | `prueba_calzada_obeliscos` |
-| Falta | Música propia de la Calzada y de Saa-Mchanga (ahora suena la del Mirador y, en la pelea, la de Kivuli), sonidos y verlo en HD-2D (el rayo de Saa-Mchanga) |
+| Falta | Gemini ya puso la música, los sonidos y el HD-2D |
+
+## Jioni, parte 2: el Mercado del Crepúsculo
+
+Sobre `documentacion/boceto_mercado_crepusculo.png` (de Gemini), **opción A**. Captura: `documentacion/mercado_crepusculo.png`.
+
+| Qué | Cómo |
+| --- | --- |
+| La tienda de Kikombe | Al colgar el primer Farol, Kikombe descansa; al hablarle, **regala el farol de su puesto** (el duodécimo) y abre su tienda (`kikombe_abierto`, `tienda_tawi.gd` con `tendero = "kikombe"`). Puesto y Kikombe grande con 4 gestos, e iconos 28-31: `herramientas/pintar_tienda_kikombe.py` |
+| Reloj de bolsillo (5) | `reloj_bolsillo`: el Aliento se recupera un 15 % más rápido (`artes.gd`) y el filo de las sombras-puente es más grueso (`ocaso/sol.gd`) |
+| Lente de prisma (6) | `lente_prisma`: la Resonancia de Ámbar llega un 25 % más lejos (`resonancia_ambar.gd → alcance()`) y los Faroles de la Hora brillan desde lejos (`recogible.gd`) |
+| Botas de arena firme (7) | `botas_arena`: se corre un 10 % más deprisa y, en arena movediza o el agua del Estanque, se aguanta 0,4 s antes de hundirse (`vacio.gd`) |
+| Capa del Farolillero (9) | Prenda (`capa_farolillero`, `dibujar_prendas.py`): azul noche con ribete dorado y farolillo; alumbra más en los sitios oscuros (`oscuridad.gd`) |
+| La Bendición del Crepúsculo | Con los **doce** Faroles colgados (`jioni/doce_faroles`), Kibatari da la Bendición (`bendicion_crepusculo`): **+1 hoja de vida máxima** (`Artes.vida_maxima()`) |
+| Los doce Faroles | Mirador 2 + Kikombe 1 + Dunas 3 + Jardín 3 + Calzada 3 |
+| Prueba | `prueba_mercado_crepusculo` |
 
 ## Las construcciones, al nivel de la casa del castor
 

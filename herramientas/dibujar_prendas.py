@@ -67,6 +67,10 @@ COLORES = {
     "L": "3E2416",  # cuero de forja oscuro (contorno)
     "M": "7C5234",  # cuero de forja
     "D": "A8784C",  # cuero de forja con luz
+    # Ocaso (la Capa del Farolillero: azul noche con ribete dorado)
+    "O": "0E1430",  # azul noche oscuro (contorno)
+    "Q": "1E2E5E",  # azul noche
+    "K": "3A5294",  # azul noche con luz
     # flor
     "f": "FFD7E0",  # pétalo
     "F": "F9D36A",  # centro
@@ -220,6 +224,24 @@ BROCHE_ABAJO = [
     ".c.",
     "cCq",
     ".q.",
+]
+
+# LA CAPA DEL FAROLILLERO (zona: espalda · se compra en la tienda de Kikombe, Jioni): la misma hechura que la de
+# musgo, en azul noche, con el bajo ribeteado de oro y un farolillo colgado a la cintura
+def _capa_farol(filas):
+    f = [x.translate(str.maketrans("kGgd", "OQKQ")) for x in filas]
+    f[-1] = f[-1].replace("Q", "a").replace("K", "A")
+    return f
+
+
+CAPA_FAROL_ABAJO = _capa_farol(CAPA_ABAJO)
+CAPA_FAROL_ARRIBA = _capa_farol(CAPA_ARRIBA)
+CAPA_FAROL_LADO = _capa_farol(CAPA_LADO)
+FAROLILLO = [
+    ".a.",
+    "aNa",
+    "aNa",
+    ".a.",
 ]
 
 # ---------------------------------------------------------------------------
@@ -908,6 +930,18 @@ PRENDAS = {
             "abajo": [("sombrero_paja_abajo", SOMBRERO_ABAJO, "cabeza", (-2, -4), True)],
             "arriba": [("sombrero_paja_arriba", SOMBRERO_ARRIBA, "cabeza", (-2, -4), True)],
             "lado": [("sombrero_paja_lado", SOMBRERO_LADO, "cabeza", (-2, -4), True)],
+        },
+    },
+    "capa_farolillero": {
+        "nombre": "Capa del Farolillero",
+        "zona": "espalda",
+        "arte": "ocaso",
+        "piezas": {
+            "abajo": [("capa_farolillero_abajo", CAPA_FAROL_ABAJO, "cuerpo", (-2, 0), False),
+                      ("farolillo", FAROLILLO, "cuerpo", (7, 5), True)],
+            "arriba": [("capa_farolillero_arriba", CAPA_FAROL_ARRIBA, "cuerpo", (-1, 1), True)],
+            "lado": [("capa_farolillero_lado", CAPA_FAROL_LADO, "cuerpo", (-3, 1), False),
+                     ("farolillo", FAROLILLO, "cuerpo", (2, 5), True)],
         },
     },
     "capa_musgo": {

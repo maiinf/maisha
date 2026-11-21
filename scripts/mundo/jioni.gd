@@ -126,6 +126,8 @@ func _poner_vecino(nombre: String) -> void:
 ## Un farol más en la plaza: descansa el siguiente vecino (con un fundido: se va el desvelado y llega descansado)
 func _al_colgar_farol() -> void:
 	var n := POSTE.colgados()
+	if n >= 12:
+		Estado.marcar("jioni/doce_faroles")             # (Kibatari da la Bendición del Crepúsculo)
 	_hud.mostrar_mensaje("Faroles de la Hora: %d de 12" % n)
 	for nombre: String in ORDEN:
 		if descansa(nombre):

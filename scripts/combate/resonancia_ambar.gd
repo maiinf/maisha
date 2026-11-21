@@ -14,11 +14,16 @@ func _ready() -> void:
 	z_index = 2
 	Sonido.efecto("resonancia_ambar", 0.0, global_position, 0.05)
 	for nodo in get_tree().get_nodes_in_group("monolitos"):
-		if (nodo as Node2D).global_position.distance_to(global_position) <= ALCANCE * (1.0 + Artes.valor("tierra_alcance")):
+		if (nodo as Node2D).global_position.distance_to(global_position) <= alcance():
 			nodo.call("resonar", 3)
 	for nodo in get_tree().get_nodes_in_group("polillas"):          # (las polillas de papel del Jardín se deshacen)
-		if (nodo as Node2D).global_position.distance_to(global_position) <= ALCANCE * (1.0 + Artes.valor("tierra_alcance")):
+		if (nodo as Node2D).global_position.distance_to(global_position) <= alcance():
 			nodo.call("resonar", 3)
+
+
+## (la lente de prisma de Kikombe la alarga un 25 %)
+static func alcance() -> float:
+	return ALCANCE * (1.0 + Artes.valor("tierra_alcance")) * (1.25 if Estado.tiene("lente_prisma") else 1.0)
 
 
 func _process(delta: float) -> void:

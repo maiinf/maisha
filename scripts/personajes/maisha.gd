@@ -129,7 +129,7 @@ func _physics_process(delta: float) -> void:
 	var rapidez := VELOCIDAD * lentitud
 	corriendo = Input.is_action_pressed("correr") and direccion != Vector2.ZERO and not agotada and lentitud > 0.95 and hundida <= 0.0
 	if corriendo:
-		rapidez *= CORRER
+		rapidez *= CORRER * (1.1 if Estado.tiene("botas_arena") else 1.0)     # (las botas de arena firme de Kikombe)
 	if agotada:
 		rapidez *= R.VELOCIDAD_AGOTADA
 	if _golpeando:

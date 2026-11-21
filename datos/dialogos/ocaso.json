@@ -229,6 +229,24 @@
 		"nombre": "Kibatari",
 		"conversaciones": [
 			{
+				"si": [
+					"jioni/doce_faroles"
+				],
+				"no": [
+					"bendicion_crepusculo"
+				],
+				"lineas": [
+					"Doce. Doce faroles. Cuéntalos conmigo... ¡doce! Mwanga decía que no lo vería nunca, y mírala: la plaza entera encendida.",
+					"Escucha. No se oye nada. Nadie sirve té de pie, nadie amasa, nadie barre arena. Jioni entera está descansando. Por primera vez.",
+					"Mwanga me enseñó una cosa que se hacía antes, cuando terminaba la tarde: la Bendición del Crepúsculo. Nunca la había dicho de verdad.",
+					"«Que la última luz del día te guarde hasta la primera de la mañana». Ya está. Te noto más fuerte, ¿a que sí? Una hoja más, por lo menos.",
+					"Ahora ve al Horizonte. Y cuando vuelvas... a lo mejor ya sé cómo es la noche."
+				],
+				"marca": [
+					"bendicion_crepusculo"
+				]
+			},
+			{
 				"no": [
 					"kibatari_conocido"
 				],
@@ -268,7 +286,7 @@
 					"¿Lo has visto? ¡Kikombe se ha sentado! ¡Sentado! Lleva no sé cuánto sirviendo té de pie y ahora se ha sentado a bebérselo.",
 					"Y a Kesho se le han cerrado los ojos con la masa en las manos. Está roncando. Ronca fatal. Es precioso.",
 					"Vale. Vale, me centro. Faltan diez faroles, y Mwanga siempre decía que se perdieron por los tres caminos.",
-					"Al oeste, las Dunas de Penumbra: allí vive Kivuli, un alacrán de sombra del tamaño de una casa. Al este, el Jardín de los Faroles, con una polilla enorme, Mondo, que no deja que se apague ninguna luz.",
+					"Al oeste, las Dunas de Penumbra: allí vive Kivuli, un alacrán de sombra del tamaño de una casa. Al este, el Jardín de los Faroles: allí vive Mondo, un serval de bronce que nunca está solo, porque se parte en reflejos.",
 					"Y al sureste, la Calzada de los Obeliscos. Allí está Saa-Mchanga, el relojero. Es quien ajustó las cadenas de la torre.",
 					"Cada uno guarda una pesa del reloj. Con las tres, la Puerta del Horizonte se abre. Y detrás... detrás está el sol, atado del todo."
 				],
@@ -307,8 +325,29 @@
 				"lineas": [
 					"Ay... perdona que no me levante. Es la primera vez en no sé cuánto que me siento.",
 					"Cuando has colgado ese farol, la luz se ha puesto un poquito más naranja. Y de pronto he notado las piernas. Y me he sentado. Así, sin más.",
-					"Toma, esta taza sí es para ti. Para que la bebas despacio. Aquí se nos había olvidado hacer las cosas despacio."
-				]
+					"Toma, esta taza sí es para ti. Para que la bebas despacio. Aquí se nos había olvidado hacer las cosas despacio.",
+					"Y otra cosa. Mientras no dormíamos, en el Mercado hicimos de todo: relojes, lentes, botas, capas... Ya iba siendo hora de venderlo.",
+					"Ah, y esto. El farol de mi puesto. Lo tenía encendido para no quedarme sola. Ya no lo necesito: cuélgalo tú en la plaza."
+				],
+				"no": [
+					"kikombe_abierto"
+				],
+				"marca": [
+					"kikombe_abierto"
+				],
+				"recibe": {
+					"farol_hora": 1
+				},
+				"abre": "tienda_kikombe"
+			},
+			{
+				"si": [
+					"kikombe_abierto"
+				],
+				"lineas": [
+					"¿Otra tacita? Esta sí, despacio. Y mira el género mientras se enfría."
+				],
+				"abre": "tienda_kikombe"
 			}
 		]
 	},

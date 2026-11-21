@@ -1824,5 +1824,68 @@
     }
    ]
   }
+ },
+ "capa_farolillero": {
+  "nombre": "Capa del Farolillero",
+  "zona": "espalda",
+  "arte": "ocaso",
+  "piezas": {
+   "abajo": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/capa_farolillero_abajo.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -2,
+      0
+     ],
+     "delante": false
+    },
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/farolillo.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      7,
+      5
+     ],
+     "delante": true
+    }
+   ],
+   "arriba": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/capa_farolillero_arriba.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -1,
+      1
+     ],
+     "delante": true
+    }
+   ],
+   "lado": [
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/capa_farolillero_lado.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      -3,
+      1
+     ],
+     "delante": false
+    },
+    {
+     "fotogramas": 1,
+     "textura": "res://arte/personajes/maisha/prendas/farolillo.png",
+     "ancla": "cuerpo",
+     "desplazamiento": [
+      2,
+      5
+     ],
+     "delante": true
+    }
+   ]
+  }
  }
 }
