@@ -115,7 +115,7 @@ const PUNTO_ASTERHAUL := {
 }
 const DEBILIDAD_BESTIA := {
 	"pagina": ["fuego"], "tintero": ["fuego"], "ruba": ["hielo"], "pweza": ["hielo"],
-	"saa": ["rayo"], "kengele": ["rayo"], "kaa_jiwe": ["sismica"], "mchimbaji": ["sismica"], "kifaru": ["sismica"], "kovu": ["magnetico"], "nyundo": ["magnetico"], "popo": ["resonancia"], "kipanga": ["resonancia"], "corazon": ["sismica", "magnetico", "resonancia"], "kivuli_menor": ["sol"], "kivuli": ["sol"], "mondo": ["sol"], "saa_mchanga": ["sismica", "sol"], "centinela": ["sol", "sismica"], "polilla_papel": ["resonancia"],
+	"saa": ["rayo"], "kengele": ["rayo"], "kaa_jiwe": ["sismica"], "mchimbaji": ["sismica"], "kifaru": ["sismica"], "kovu": ["magnetico"], "nyundo": ["magnetico"], "popo": ["resonancia"], "kipanga": ["resonancia"], "corazon": ["sismica", "magnetico", "resonancia"], "kivuli_menor": ["sol"], "kivuli": ["sol"], "mondo": ["sol"], "saa_mchanga": ["sismica", "sol"], "jua_giza": ["sol", "sismica"], "centinela": ["sol", "sismica"], "polilla_papel": ["resonancia"],
 	"sombra_renglon": ["fuego", "hielo", "rayo"], "grimorio": ["fuego", "hielo", "rayo"],
 	"jabali": ["escudo"], "cangrejo": ["atras"], "espino": ["semilla"],
 	"bundi": ["escudo"], "buibui": ["semilla"], "murcielago": ["latido"],

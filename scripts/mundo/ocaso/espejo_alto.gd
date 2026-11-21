@@ -10,6 +10,7 @@ const DESCANSA := 0.8
 const ANCHO := 12.0
 
 var apunta := Vector2.ZERO               # (global)
+var dura := DURA                         # (en el Altar del Sol, más: los dos espejos están lejos)
 var _t := 0.0                            # lo que le queda de rayo
 var _descanso := 0.0
 var _sprite: Sprite2D
@@ -65,7 +66,7 @@ func _process(delta: float) -> void:
 func recibir_golpe(_danio: int, _direccion: Vector2) -> bool:
 	if activo() or _descanso > 0.0:
 		return false
-	_t = DURA
+	_t = dura
 	Sonido.efecto("espejo_enciende", 0.0, global_position)
 	return true
 
@@ -73,7 +74,7 @@ func recibir_golpe(_danio: int, _direccion: Vector2) -> bool:
 func _dibujar_rayo() -> void:
 	if not activo():
 		return
-	var f := minf(1.0, _t / 0.3) * minf(1.0, (DURA - _t) / 0.12 + 0.2)
+	var f := minf(1.0, _t / 0.3) * minf(1.0, (dura - _t) / 0.12 + 0.2)
 	var a := _origen() + Vector2(0, -16)
 	var b := apunta + Vector2(0, -16)
 	var col := Color(1.0, 0.85, 0.5)

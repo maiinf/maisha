@@ -1305,6 +1305,22 @@ Sobre `documentacion/boceto_mercado_crepusculo.png` (de Gemini), **opción A**. 
 | Los doce Faroles | Mirador 2 + Kikombe 1 + Dunas 3 + Jardín 3 + Calzada 3 |
 | Prueba | `prueba_mercado_crepusculo` |
 
+## El Valle del Ocaso: El Horizonte Inmóvil y Jua-Giza (el final del juego)
+
+Sobre `documentacion/boceto_horizonte_inmovil.png` (de Gemini), **tal cual**. Capturas: `documentacion/horizonte_captura_1.png`…`_4.png`; ilustración del final: `arte/historia/26_primera_noche.png`.
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | Por la **Puerta del Horizonte** de Jioni (sur), que se abre con las tres pesas (`tres_pesos`). La misión `horizonte_inmovil` aparece entonces |
+| Mapa | `horizonte_inmovil` (66×58, `crear_horizonte()`): la Llegada, la Pasarela de los Tres Pesos y el Altar del Sol Encadenado, sobre el abismo (`=`). Suelo: `pintar_mirador()` con la esfera de un reloj de sol en el Altar |
+| La Llegada | Mauti espera (`mauti_horizonte`). En el **pedestal** (`ocaso/pedestal_pesas.gd`) se encajan las tres pesas (`horizonte/pesas`) y baja un puente de cristal |
+| La Pasarela | Tres **pilares dorados** (`ocaso/pilar_dorado.gd`), un repaso del valle: oeste, la sombra de una Vela (de cara y sol al oeste); centro, dos espejos encendidos; este, la sombra de un obelisco (sol al este). Con los tres, otro puente baja al altar |
+| **Jua-Giza** | `scripts/enemigos/jua_giza.gd`, 12 (cuatro por cadena). **Oeste**: llamaradas (a salvo en la sombra de un obelisco) y el **contrapeso** (`ocaso/contrapeso.gd`): dos Cargas. **Este**: el **velo** de Giza; con los **dos espejos altos** a la vez (`espejo_alto.gd`, `dura = 6`) se ve el **broche**: dos golpes cada vez. **Sur**: **olas de penumbra** (con un hueco) y cuatro **rayos cruzados** que giran; tras cada dos olas brilla el **candado** (`ocaso/candado_sur.gd`): un golpe cada vez. No se le mata: se le **suelta** |
+| El final | Al soltar la tercera cadena llega Mauti, calman al sol con el Cetro del Nexo (`ocaso_libre`) y llega **la Primera Noche**: pantalla del final (`fin_mundo.gd`) con la ilustración `26_primera_noche` (`herramientas/cinematicas_ocaso.py`) |
+| Arte | `herramientas/pintar_horizonte.py` → `arte/mundos/ocaso/horizonte/` (Jua-Giza, contrapeso, candado, pilar, pedestal) |
+| Prueba | `prueba_horizonte_inmovil` |
+| Falta | Música propia del final y de Jua-Giza (ahora suenan la de Jioni y la de Saa-Mchanga), sus sonidos, el HD-2D y Jioni de noche al volver |
+
 ## Las construcciones, al nivel de la casa del castor
 
 Todas las casas y construcciones antiguas se han repintado con el pintor de las cinemáticas (volumen, luz, materiales y objetos de su dueño), casi al doble de tamaño. Capturas: `documentacion/aldea_edificios.png` y `documentacion/casas_caminos.png`.

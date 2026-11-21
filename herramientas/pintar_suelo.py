@@ -1173,6 +1173,8 @@ def pintar_mirador(nombre, salida=None):
         else ((36, 1, 38, 10), (30, 38, 56, 41))
     if nombre == "dunas_penumbra":
         calles = ((61, 26, 73, 28),)
+    if nombre == "horizonte_inmovil":
+        calles = ((31, 0, 34, 9), (12, 17, 53, 19), (31, 14, 34, 22))
     if nombre == "calzada_obeliscos":
         calles = ((10, 0, 12, 8), (28, 7, 36, 8), (32, 9, 33, 13), (25, 26, 43, 28), (32, 22, 33, 32))
     for (x0, y0, x1, y1) in calles:
@@ -1199,6 +1201,8 @@ def pintar_mirador(nombre, salida=None):
     e0, e1 = (40, 52) if jioni else (58, 70)
     if nombre == "calzada_obeliscos":                    # (en la Rotonda, alrededor de Saa-Mchanga)
         cx, cy, e0, e1 = 34.5 * 16, 44.5 * 16, 70, 96
+    if nombre == "horizonte_inmovil":                    # (en el Altar, alrededor de Jua-Giza)
+        cx, cy, e0, e1 = 32.5 * 16, 41.5 * 16, 80, 120
     r = np.hypot(lz.x - cx, (lz.y - cy) * 1.25)
     an = np.arctan2(lz.y - cy, lz.x - cx)
     esfera = suelo * ((np.abs(r - e1) < 1.2) | (np.abs(r - e0) < 0.8) | ((r > e0) & (r < e1) & (np.abs(((an * 12 / np.pi) % 2) - 1) < 0.06)))
@@ -1525,7 +1529,7 @@ def pintar(nombre, salida=None):
         return pintar_fundicion(nombre, salida)
     if nombre == "aguja_caida":
         return pintar_aguja(nombre, salida)
-    if nombre in ("mirador_ocaso", "jioni", "dunas_penumbra", "calzada_obeliscos"):
+    if nombre in ("mirador_ocaso", "jioni", "dunas_penumbra", "calzada_obeliscos", "horizonte_inmovil"):
         return pintar_mirador(nombre, salida)
     if nombre == "jardin_faroles":
         return pintar_jardin(nombre, salida)

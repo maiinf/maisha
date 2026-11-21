@@ -167,7 +167,8 @@
 			"mirador_ocaso",
 			"dunas_penumbra",
 			"jardin_faroles",
-			"calzada_obeliscos"
+			"calzada_obeliscos",
+			"horizonte_inmovil"
 		],
 		"dunas_penumbra": [
 			"jioni"
@@ -176,6 +177,9 @@
 			"jioni"
 		],
 		"calzada_obeliscos": [
+			"jioni"
+		],
+		"horizonte_inmovil": [
 			"jioni"
 		]
 	},
@@ -2144,6 +2148,60 @@
 					],
 					"ir": {
 						"escena": "calzada_obeliscos",
+						"buscar": "grupo:jefes"
+					}
+				}
+			]
+		},
+		{
+			"id": "horizonte_inmovil",
+			"tipo": "historia",
+			"titulo": "El Horizonte Inmóvil",
+			"texto": "Detrás de la Puerta del Horizonte, el sol del valle está atado a un altar con tres cadenas. No hay que vencerlo: hay que soltarlo, para que por fin pueda llegar la noche.",
+			"aparece": [
+				"tres_pesos"
+			],
+			"hecha": [
+				"ocaso_libre"
+			],
+			"pasos": [
+				{
+					"texto": "Cruza la Puerta del Horizonte, en el sur de Jioni",
+					"hecho": [
+						"horizonte_inmovil"
+					],
+					"ir": {
+						"escena": "jioni",
+						"buscar": "puerta:horizonte_inmovil"
+					}
+				},
+				{
+					"texto": "Encaja las tres pesas en el pedestal",
+					"hecho": [
+						"horizonte/pesas"
+					],
+					"ir": {
+						"escena": "horizonte_inmovil",
+						"buscar": "grupo:interactuables"
+					}
+				},
+				{
+					"texto": "Enciende los tres pilares dorados de la pasarela",
+					"hecho": [
+						"horizonte/puente_altar"
+					],
+					"ir": {
+						"escena": "horizonte_inmovil",
+						"buscar": "grupo:pilares_dorados"
+					}
+				},
+				{
+					"texto": "Suelta las tres cadenas de Jua-Giza",
+					"hecho": [
+						"ocaso_libre"
+					],
+					"ir": {
+						"escena": "horizonte_inmovil",
 						"buscar": "grupo:jefes"
 					}
 				}

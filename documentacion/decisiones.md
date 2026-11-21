@@ -632,3 +632,9 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | Mercado | **Opción A**: la tienda de Kikombe (reloj, lente, botas y Capa del Farolillero) y, con los doce Faroles, la **Bendición del Crepúsculo** (+1 hoja). Sin rama nueva en el diario. |
 | El duodécimo Farol | Kikombe regala el farol de su puesto al abrir la tienda (con los tres caminos salían once). |
 | El Horizonte Inmóvil | **Tal cual el boceto**: la pasarela de las tres pesas, Jua-Giza en tres fases (sombra, luz, calma), Mauti al final y el epílogo de la Primera Noche, sin matar al sol. |
+
+### 2026-11-21 · El Horizonte Inmóvil, construido (sobre el boceto de Gemini, tal cual)
+| Qué | Decisión |
+| :--- | :--- |
+| Jua-Giza | 12 de vida, cuatro por cadena: Oeste (llamaradas y contrapeso con la Carga), Este (velo; los dos espejos altos a la vez dejan el broche al aire), Sur (olas con hueco, rayos cruzados y el candado que brilla). No se le mata: se le suelta. |
+| El final | Mauti llega, calman al sol con el Cetro del Nexo, y llega la Primera Noche: pantalla del final «La Primera Noche · Fin de Maisha». |

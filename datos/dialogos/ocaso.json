@@ -693,5 +693,150 @@
 				}
 			}
 		]
+	},
+	"horizonte_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Al otro lado de la Puerta del Horizonte no hay calle ni camino. Solo una meseta pequeña colgada en el cielo y, abajo, muy abajo, el sol.",
+					"Atado. Tres cadenas lo sujetan a un altar de piedra, y él tira de ellas despacio, como quien quiere irse a dormir y no le dejan.",
+					"Y Mauti está aquí. Ha llegado antes que yo, como siempre."
+				]
+			}
+		]
+	},
+	"mauti_horizonte": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"si": [
+					"ocaso_libre"
+				],
+				"lineas": [
+					"Mira arriba. Estrellas. Hacía tanto que nadie las veía aquí que se les había olvidado que existían.",
+					"Mañana el sol volverá a salir. Por eso ha podido irse a dormir esta noche."
+				]
+			},
+			{
+				"si": [
+					"horizonte/pesas"
+				],
+				"lineas": [
+					"Baja tú primero. La pasarela te va a pedir todo lo que has aprendido en el valle: sombras, espejos, el sol que se gira.",
+					"Cuando llegues abajo, no le hagas daño. Suéltalo. Yo iré en cuanto me necesites. Te lo prometo."
+				]
+			},
+			{
+				"lineas": [
+					"Sabía que llegarías. Mira el sol, Maisha. ¿Lo ves? No está enfadado. Está agotado.",
+					"Lleva siglos sin poder ponerse. Los de Jioni tenían tanto miedo a que se acabara el día que lo ataron al altar. Y de ese miedo, tan grande y tan viejo, nació Giza.",
+					"Giza no vino de fuera. Nunca vino de fuera. Es lo que pasa cuando nadie se atreve a dejar que algo termine.",
+					"Las tres pesas del reloj van en ese pedestal. Con ellas, se abre el camino hasta él."
+				]
+			}
+		]
+	},
+	"horizonte_pedestal_falta": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Tres huecos con forma de pesa, uno al lado del otro. Me falta alguna: tienen que estar las tres, la del Oeste, la del Este y la del Sur."
+				]
+			}
+		]
+	},
+	"horizonte_pesas": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Encajo las tres pesas en el pedestal. Clac, clac, clac. El reloj del cielo, por fin, tiene con qué contar.",
+					"Del borde de la meseta baja un puente de cristal ámbar hasta la pasarela de abajo."
+				]
+			}
+		]
+	},
+	"horizonte_pasarela": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una inscripción en el suelo, entre tres pilares apagados:",
+					"«Antes de llegar al sol, recuerda el camino: la sombra de la vela, al oeste; la luz que pasa de espejo en espejo, en el centro; la sombra del obelisco, al este».",
+					"«Con los tres pilares encendidos, el puente bajará en calma»."
+				]
+			}
+		]
+	},
+	"horizonte_puente": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Los tres pilares arden dorados a la vez. Desde la pasarela baja otro puente de cristal, despacio, hasta el altar.",
+					"Abajo, el sol encadenado levanta la cara. Me ha visto."
+				]
+			}
+		]
+	},
+	"jua_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"De cerca es enorme. Y tiene cara. Una cara cansadísima, con los ojos muy abiertos, como alguien que lleva siglos sin dormir y ya no sabe cómo se hace.",
+					"Tres cadenas. La del oeste tira de un contrapeso de basalto. La del este se cierra con un broche, escondido bajo un velo morado: Giza. La del sur, con un candado.",
+					"No hay que romper el sol. Hay que soltarlo. Cadena a cadena."
+				]
+			}
+		]
+	},
+	"horizonte_calma": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La última cadena cae al suelo con un ruido largo, de hierro viejo. Y el sol deja de tirar.",
+					"Tiembla un poco. Como si no se creyera que ya puede. Como si tuviera miedo de irse y no volver.",
+					"Oigo pasos detrás. Mauti baja corriendo por el puente de cristal."
+				]
+			}
+		]
+	},
+	"horizonte_mauti": {
+		"nombre": "Mauti",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Ya está. Ya está, ya está. Shhh.",
+					"Tiene miedo de lo mismo que tenían ellos: de que, si se va, ya no haya mañana. Giza era eso. El miedo a que algo bonito se acabe.",
+					"Pon el cetro aquí, junto a su cara. Yo pongo la mano. Le decimos que puede irse a dormir. Que nosotros nos quedamos. Que mañana volverá."
+				]
+			}
+		]
+	},
+	"horizonte_final": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El Cetro del Nexo se enciende con las cuatro luces a la vez: la raíz, la pluma, el ámbar y, ahora, un brillo de atardecer.",
+					"El sol cierra los ojos. Y empieza a bajar. Despacio, muy despacio, hasta que se esconde detrás del horizonte y deja una raya de oro.",
+					"Del velo morado de Giza no queda nada: se deshace como el humo de una vela que alguien sopla con cariño.",
+					"Arriba salen las estrellas. Abajo, en Jioni, doce faroles encendidos. Y todo el mundo, por fin, se va a dormir.",
+					"Es la primera noche. Mañana el sol volverá a salir. Por eso ha podido irse ahora."
+				]
+			}
+		]
 	}
 }
