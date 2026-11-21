@@ -62,6 +62,8 @@ func _ready() -> void:
 	super()
 	Estado.marcar("jioni")
 	_poner_cosas()
+	if Estado.tiene("ocaso_libre"):
+		_anochecer()
 	if not Estado.tiene("jioni_llegada"):
 		_pensar_al_llegar.call_deferred()
 
@@ -170,6 +172,30 @@ func _poner_adorno(dibujo: String, casilla: Vector2i, ancho: float, fondo: float
 		cuerpo.add_child(forma)
 	$Entidades.add_child(cuerpo)
 	return cuerpo
+
+
+## Después del final, en Jioni es de noche: azul oscuro, los faroles de la plaza y las ventanas encendidas, y la
+## ciudad duerme (lo que dicen los vecinos lo cambian sus conversaciones, con «ocaso_libre»). Una penumbra propia
+## (CanvasModulate «Noche»): el relieve aparta su ciclo de día mientras está.
+func _anochecer() -> void:
+	var noche := CanvasModulate.new()
+	noche.name = "Noche"
+	noche.color = Color(0.36, 0.38, 0.62)
+	add_child(noche)
+	var luz := PointLight2D.new()
+	luz.texture = preload("res://scripts/mundo/relieve.gd").textura_luz(128)
+	luz.color = Color(0.85, 0.88, 1.0)
+	luz.energy = 0.55
+	luz.position = Vector2(0, -10)
+	_maisha.add_child(luz)
+	for nombre: String in _casas:
+		var ventana := PointLight2D.new()
+		ventana.texture = luz.texture
+		ventana.color = Color(1.0, 0.72, 0.4)
+		ventana.energy = 0.45
+		ventana.texture_scale = 0.6
+		ventana.position = Vector2(0, -18)
+		(_casas[nombre] as Node2D).add_child(ventana)
 
 
 func _pensar_al_llegar() -> void:

@@ -1319,7 +1319,8 @@ Sobre `documentacion/boceto_horizonte_inmovil.png` (de Gemini), **tal cual**. Ca
 | El final | Al soltar la tercera cadena llega Mauti, calman al sol con el Cetro del Nexo (`ocaso_libre`) y llega **la Primera Noche**: pantalla del final (`fin_mundo.gd`) con la ilustración `26_primera_noche` (`herramientas/cinematicas_ocaso.py`) |
 | Arte | `herramientas/pintar_horizonte.py` → `arte/mundos/ocaso/horizonte/` (Jua-Giza, contrapeso, candado, pilar, pedestal) |
 | Prueba | `prueba_horizonte_inmovil` |
-| Falta | Música propia del final y de Jua-Giza (ahora suenan la de Jioni y la de Saa-Mchanga), sus sonidos, el HD-2D y Jioni de noche al volver |
+| Jioni de noche | Con `ocaso_libre`, `jioni.gd → _anochecer()`: una penumbra propia azul (`CanvasModulate` «Noche»; el relieve aparta su ciclo), luz suave en Maisha y ventanas encendidas; los doce faroles alumbran la plaza. Kibatari ve la noche por primera vez y los vecinos hablan medio dormidos. Captura: `documentacion/jioni_noche.png` |
+| Falta | Música propia del final y de Jua-Giza (ahora suenan la de Jioni y la de Saa-Mchanga), sus sonidos y el HD-2D (encargados a Gemini) |
 
 ## Las construcciones, al nivel de la casa del castor
 

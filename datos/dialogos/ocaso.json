@@ -230,6 +230,16 @@
 		"conversaciones": [
 			{
 				"si": [
+					"ocaso_libre"
+				],
+				"lineas": [
+					"¡Es de noche! ¡De noche de verdad! Mira arriba... ¿eso son estrellas? ¡Hay miles! Mwanga decía que había muchas, pero no tantas.",
+					"Hace frío. Un frío bueno, de los que dan ganas de taparse. Nunca había tenido ganas de taparme.",
+					"He encendido mi primer farol, ¿sabes? Uno de verdad, para que alumbre la noche. Mwanga ha bajado a verlo y ha llorado un poquito. Dice que es por el viento."
+				]
+			},
+			{
+				"si": [
 					"jioni/doce_faroles"
 				],
 				"no": [
@@ -309,6 +319,15 @@
 		"nombre": "Kikombe",
 		"conversaciones": [
 			{
+				"si": [
+					"ocaso_libre"
+				],
+				"lineas": [
+					"Mmm... ¿té? No, no. A estas horas, té no. A estas horas se duerme.",
+					"Siéntate un ratito, si quieres. Pero en silencio, que la ciudad está descansando."
+				]
+			},
+			{
 				"no": [
 					"jioni/descansa_kikombe"
 				],
@@ -355,6 +374,14 @@
 		"nombre": "Kesho",
 		"conversaciones": [
 			{
+				"si": [
+					"ocaso_libre"
+				],
+				"lineas": [
+					"Zzz... la masa... que suba sola... mañana la horneo... zzz..."
+				]
+			},
+			{
 				"no": [
 					"jioni/descansa_kesho"
 				],
@@ -380,6 +407,14 @@
 		"nombre": "Mto",
 		"conversaciones": [
 			{
+				"si": [
+					"ocaso_libre"
+				],
+				"lineas": [
+					"¿Lo oyes? El río suena distinto de noche. Más bajito. Como si también se hubiera dormido."
+				]
+			},
+			{
 				"no": [
 					"jioni/descansa_mto"
 				],
@@ -403,6 +438,14 @@
 	"jioni_pazia": {
 		"nombre": "Pazia",
 		"conversaciones": [
+			{
+				"si": [
+					"ocaso_libre"
+				],
+				"lineas": [
+					"Ya no necesito coser cortinas para fingir la noche. Esta la he dejado abierta: quiero ver las estrellas desde la cama."
+				]
+			},
 			{
 				"no": [
 					"jioni/descansa_pazia"
@@ -428,6 +471,14 @@
 		"nombre": "Ufagio",
 		"conversaciones": [
 			{
+				"si": [
+					"ocaso_libre"
+				],
+				"lineas": [
+					"La arena se ha quedado quieta. Por primera vez en años, la escoba descansa apoyada en la pared. Y yo también."
+				]
+			},
+			{
 				"no": [
 					"jioni/descansa_ufagio"
 				],
@@ -451,6 +502,14 @@
 	"jioni_ndoto": {
 		"nombre": "Ndoto",
 		"conversaciones": [
+			{
+				"si": [
+					"ocaso_libre"
+				],
+				"lineas": [
+					"¿Sabes qué he soñado? Que el sol se iba a dormir y volvía por la mañana. Y luego me he despertado... y era verdad."
+				]
+			},
 			{
 				"no": [
 					"jioni/descansa_ndoto"

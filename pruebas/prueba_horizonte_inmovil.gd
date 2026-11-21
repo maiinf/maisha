@@ -3,7 +3,7 @@ extends Node
 ## llegar; el pedestal (las pesas encajan y baja un puente de cristal); los tres pilares dorados de la pasarela (la
 ## vela al oeste, los dos espejos, el obelisco al este) y el puente al altar; Jua-Giza (la llamarada no hace nada a la
 ## sombra; el contrapeso, con dos Cargas; el velo, con los dos espejos altos a la vez; el candado, entre las olas); la
-## calma, Mauti, la Primera Noche y la pantalla del final.
+## calma, Mauti, la Primera Noche, la pantalla del final y Jioni de noche al volver.
 ## Se ejecuta sin abrir el editor:  godot --headless --path . res://pruebas/ejecutar.tscn -- prueba_horizonte_inmovil
 
 var _fallos := 0
@@ -205,6 +205,20 @@ func _ready() -> void:
 	_comprobar(Estado.tiene("ocaso_libre"), "Mauti llega y calman el sol con el Cetro del Nexo")
 	_comprobar(Estado.tiene("fin_ocaso_visto"), "la pantalla del final: La Primera Noche")
 	_comprobar(Misiones.estado(Misiones.buscar("horizonte_inmovil")) == "hecha", "la misión, hecha")
+
+	print("Jioni, de noche:")
+	get_tree().paused = false
+	await _ir("jioni", "horizonte", "Jioni")
+	var noche := get_tree().current_scene.get_node_or_null("Noche") as CanvasModulate
+	_comprobar(noche != null and noche.color.b > noche.color.r, "al volver, en Jioni es de noche")
+	var kibatari := get_tree().get_nodes_in_group("aldeanos").filter(func(n: Node) -> bool: return n.id == "kibatari")[0] as Node2D
+	m = get_tree().get_first_node_in_group("maisha") as CharacterBody2D
+	m.global_position = kibatari.global_position + Vector2(0, 14)
+	kibatari.interactuar()
+	await _esperar(0.3)
+	var dialogo := get_tree().get_first_node_in_group("dialogo")
+	_comprobar(dialogo.hablando, "y Kibatari ve la noche por primera vez")
+	await _leer_dialogo()
 
 	print("RESULTADO: ", "todo correcto" if _fallos == 0 else "%d fallos" % _fallos)
 	get_tree().quit(_fallos)
