@@ -242,6 +242,23 @@ func _ready() -> void:
 	_comprobar(espejo != null and dunas_altas and absf(float(espejo.get("_alto_pena")) - 1.25) < 0.01, "Las Dunas levantan sus bordes «0» como dunas altas (1,25) sobre arena a ras")
 	_comprobar(puente_suelo and sol_dunas_suelo, "el puente de cristal y las sombras de las velas quedan tumbados en el suelo")
 
+	print("El Jardín de los Faroles en HD-2D:")
+	await _ir("jardin_faroles", "jioni")
+	espejo = _espejo()
+	var jardin_edifs := 0
+	var rayos_3d := false
+	var pasarelas_3d := false
+	if espejo:
+		for par in espejo.get("_gemelos").values():
+			if String(par[4]).begins_with("jardin/"):
+				jardin_edifs += 1
+		var r_mesh: Mesh = espejo.get("_rayos_mesh")
+		var p_mesh: Mesh = espejo.get("_pasarelas_mesh")
+		rayos_3d = r_mesh != null and r_mesh.get_surface_count() > 0
+		pasarelas_3d = p_mesh != null and p_mesh.get_surface_count() > 0
+	_comprobar(jardin_edifs >= 3, "pabellón, pérgola y verja del Jardín se construyen en 3D (%d)" % jardin_edifs)
+	_comprobar(rayos_3d and pasarelas_3d, "los rayos volumétricos 3D y las pasarelas sobre el Estanque se dibujan en 3D")
+
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")
 	espejo = _espejo()

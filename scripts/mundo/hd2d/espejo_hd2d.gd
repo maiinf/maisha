@@ -205,6 +205,11 @@ var _motas_mm: MultiMesh
 var _motas_datos: Array = []
 var _motas_t := 0.0
 var _sol_ocaso: Node = null
+var _rayos_mesh: ImmediateMesh = null
+var _rayos_mi: MeshInstance3D = null
+var _pasarelas_mesh: ImmediateMesh = null
+var _pasarelas_mi: MeshInstance3D = null
+var _pasarelas_nodos: Array[Node] = []
 
 
 func _ready() -> void:
@@ -216,6 +221,7 @@ func _ready() -> void:
 	_crear_camara()
 	_crear_capas()
 	_crear_motas()
+	_crear_efectos_jardin()
 	for n in _todos(escena):
 		_registrar(n)
 	# la raíz de la escena, en los canales de las dos capas (si no, se llevaría por delante a todos sus hijos)
@@ -314,7 +320,7 @@ func _crear_suelo() -> void:
 	for y in filas.size():
 		for x in filas[y].length():
 			var c := filas[y][x]
-			var hundir := (c == "≈" or (mapa_n == "fundicion_escoria" and c == "=" and y >= 32 and y <= 46 and x >= 36 and x <= 48)) if _es_escoria else LETRAS_AGUA.contains(c)
+			var hundir := (c == "≈" or (mapa_n == "fundicion_escoria" and c == "=" and y >= 32 and y <= 46 and x >= 36 and x <= 48)) if _es_escoria else (LETRAS_AGUA.contains(c) or (mapa_n == "jardin_faroles" and c == "="))
 			if not hundir:
 				continue
 			img.set_pixel(x, y, Color.WHITE)
@@ -643,6 +649,17 @@ func _registrar(n: Node) -> void:
 	if n.get_script() and String(n.get_script().resource_path).ends_with("sombra.gd"):
 		ci.visibility_layer = CANAL_NADA
 		return
+	if n.get_script() and String(n.get_script().resource_path).ends_with("luz_jardin.gd"):
+		ci.visibility_layer = CANAL_NADA
+		return
+	if n.get_script() and String(n.get_script().resource_path).ends_with("pasarela_espejo.gd"):
+		ci.visibility_layer = CANAL_NADA
+		if not _pasarelas_nodos.has(n):
+			_pasarelas_nodos.append(n)
+		return
+	if n.get_parent() and n.get_parent().get_script() and String(n.get_parent().get_script().resource_path).ends_with("espejo_alto.gd") and _dibuja(n):
+		ci.visibility_layer = CANAL_NADA
+		return
 	if _de_pantalla(n):
 		ci.visibility_layer = CANAL_PANTALLA
 		return
@@ -854,6 +871,7 @@ func _process(_delta: float) -> void:
 	_colocar_camara(0.12)
 	_mover_capas()
 	_actualizar_motas(_delta)
+	_actualizar_efectos_jardin()
 	if sol and is_instance_valid(_sol_ocaso):
 		sol.rotation_degrees = sol.rotation_degrees.lerp(_angulo_sol_ocaso(), clampf(_delta * 5.0, 0.0, 1.0))
 	# La capa 2D del suelo y las ventanitas ya reciben LuzDelDia / Penumbra; aquí igualamos el suelo lejano, las peñas y los gemelos
@@ -1130,3 +1148,157 @@ func _actualizar_motas(delta: float) -> void:
 		var col: Color = d["col"]
 		_motas_mm.set_instance_transform(i, Transform3D(Basis(), _foco + Vector3(x, y, z)))
 		_motas_mm.set_instance_color(i, Color(col.r, col.g, col.b, pulso * alt_a))
+
+
+## Rayos volumétricos 3D (luz_jardin.gd + espejo_alto.gd) y pasarelas sobre el Estanque (pasarela_espejo.gd)
+func _crear_efectos_jardin() -> void:
+	if region == null or String(region.get("mapa")) != "jardin_faroles":
+		return
+	_rayos_mesh = ImmediateMesh.new()
+	var mat_r := StandardMaterial3D.new()
+	mat_r.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat_r.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat_r.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+	mat_r.vertex_color_use_as_albedo = true
+	mat_r.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mat_r.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	_rayos_mi = MeshInstance3D.new()
+	_rayos_mi.mesh = _rayos_mesh
+	_rayos_mi.material_override = mat_r
+	_rayos_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_rayos_mi.extra_cull_margin = 100.0
+	add_child(_rayos_mi)
+
+	_pasarelas_mesh = ImmediateMesh.new()
+	var mat_p := StandardMaterial3D.new()
+	mat_p.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat_p.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat_p.vertex_color_use_as_albedo = true
+	mat_p.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_pasarelas_mi = MeshInstance3D.new()
+	_pasarelas_mi.mesh = _pasarelas_mesh
+	_pasarelas_mi.material_override = mat_p
+	_pasarelas_mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_pasarelas_mi.extra_cull_margin = 100.0
+	add_child(_pasarelas_mi)
+
+
+func _cinta_3d(m: ImmediateMesh, a: Vector3, b: Vector3, ancho: float, col: Color, vertical := false) -> void:
+	var dir := b - a
+	dir.y = 0.0
+	if dir.length_squared() < 0.0001:
+		return
+	var n := dir.normalized()
+	var off := Vector3(0.0, ancho * 0.5, 0.0) if vertical else Vector3(-n.z, 0.0, n.x) * (ancho * 0.5)
+	var v0 := a - off
+	var v1 := a + off
+	var v2 := b + off
+	var v3 := b - off
+	for v in [v0, v1, v2, v0, v2, v3]:
+		m.surface_set_color(col)
+		m.surface_add_vertex(v)
+
+
+func _rect_suelo_3d(m: ImmediateMesh, x0: float, z0: float, x1: float, z1: float, y: float, col: Color) -> void:
+	var a := Vector3(x0, y, z0)
+	var b := Vector3(x1, y, z0)
+	var c := Vector3(x1, y, z1)
+	var d := Vector3(x0, y, z1)
+	for v in [a, b, c, a, c, d]:
+		m.surface_set_color(col)
+		m.surface_add_vertex(v)
+
+
+func _actualizar_efectos_jardin() -> void:
+	if _rayos_mesh != null:
+		_rayos_mesh.clear_surfaces()
+		var hay_trazos := false
+		var luz_n := escena.get_node_or_null("Luz")
+		var segs: Array = luz_n.get("segmentos") if luz_n != null else []
+		var altos := escena.get_tree().get_nodes_in_group("espejos_altos")
+		var latido := 0.80 + 0.16 * sin(_motas_t * 4.2)
+		if not segs.is_empty():
+			hay_trazos = true
+		else:
+			for e in altos:
+				if is_instance_valid(e) and e.call("activo"):
+					hay_trazos = true
+					break
+		if hay_trazos:
+			_rayos_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
+			for s in segs:
+				var p0: Vector2 = s[0]
+				var p1: Vector2 = s[1]
+				var cid: int = int(s[2])
+				var col := Color(1.0, 0.84, 0.44) if cid == 1 else Color(0.82, 0.52, 1.0)
+				var a := Vector3(p0.x * PX, 0.62, p0.y * PX)
+				var b := Vector3(p1.x * PX, 0.62, p1.y * PX)
+				var a0 := Vector3(p0.x * PX, 0.04, p0.y * PX)
+				var b0 := Vector3(p1.x * PX, 0.04, p1.y * PX)
+				# Mancha luminosa en el suelo + haz volumétrico en cruz a la altura de los espejos
+				_cinta_3d(_rayos_mesh, a0, b0, 0.56, Color(col, 0.22 * latido), false)
+				_cinta_3d(_rayos_mesh, a, b, 0.46, Color(col, 0.34 * latido), false)
+				_cinta_3d(_rayos_mesh, a, b, 0.40, Color(col, 0.30 * latido), true)
+				_cinta_3d(_rayos_mesh, a, b, 0.15, Color(col.lerp(Color.WHITE, 0.65), 0.92 * latido), false)
+				_cinta_3d(_rayos_mesh, a, b, 0.13, Color(col.lerp(Color.WHITE, 0.65), 0.88 * latido), true)
+			for e in altos:
+				if not is_instance_valid(e) or not e.call("activo"):
+					continue
+				var t_rest := float(e.get("_t"))
+				var dura := 2.4
+				var f := minf(1.0, t_rest / 0.3) * minf(1.0, (dura - t_rest) / 0.12 + 0.2)
+				var o2: Vector2 = e.call("_origen")
+				var d2: Vector2 = e.get("apunta")
+				var a := Vector3(o2.x * PX, 1.05, o2.y * PX)
+				var b := Vector3(d2.x * PX, 1.05, d2.y * PX)
+				var a0 := Vector3(o2.x * PX, 0.04, o2.y * PX)
+				var b0 := Vector3(d2.x * PX, 0.04, d2.y * PX)
+				var col := Color(1.0, 0.86, 0.50)
+				_cinta_3d(_rayos_mesh, a0, b0, 0.90, Color(col, 0.24 * f), false)
+				_cinta_3d(_rayos_mesh, a, b, 0.72, Color(col, 0.36 * f), false)
+				_cinta_3d(_rayos_mesh, a, b, 0.62, Color(col, 0.32 * f), true)
+				_cinta_3d(_rayos_mesh, a, b, 0.18, Color(1.0, 1.0, 0.94, 0.95 * f), false)
+				_cinta_3d(_rayos_mesh, a, b, 0.16, Color(1.0, 1.0, 0.94, 0.90 * f), true)
+			_rayos_mesh.surface_end()
+	if _pasarelas_mesh != null:
+		_pasarelas_mesh.clear_surfaces()
+		var vivas := false
+		for p in _pasarelas_nodos:
+			if is_instance_valid(p):
+				vivas = true
+				break
+		if not vivas:
+			return
+		_pasarelas_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
+		for p in _pasarelas_nodos:
+			if not is_instance_valid(p):
+				continue
+			var cas: Rect2i = p.get("casillas")
+			var fantasma := bool(p.get("falsa")) and bool(p.call("delatada"))
+			var y_deck := 0.025
+			for cy in range(cas.position.y, cas.end.y):
+				for cx in range(cas.position.x, cas.end.x):
+					if fantasma:
+						var a := 0.24 + 0.10 * sin(_motas_t * 3.5 + float(cx) * 0.7)
+						_rect_suelo_3d(_pasarelas_mesh, cx + 0.05, cy + 0.05, cx + 0.95, cy + 0.95, y_deck, Color(0.78, 0.55, 1.0, a))
+						_rect_suelo_3d(_pasarelas_mesh, cx + 0.12, cy + 0.45, cx + 0.88, cy + 0.55, y_deck + 0.005, Color(1.0, 0.92, 1.0, a + 0.22))
+					else:
+						for k in 4:
+							var tx0 := float(cx) + float(k) * 0.25
+							var c_mad := Color(0.50, 0.32, 0.22, 1.0) if (cx + k) % 3 else Color(0.43, 0.27, 0.19, 1.0)
+							_rect_suelo_3d(_pasarelas_mesh, tx0 + 0.02, float(cy), tx0 + 0.25, float(cy + 1), y_deck, c_mad)
+							_rect_suelo_3d(_pasarelas_mesh, tx0, float(cy), tx0 + 0.02, float(cy + 1), y_deck + 0.003, Color(0.20, 0.11, 0.08, 1.0))
+						_rect_suelo_3d(_pasarelas_mesh, float(cx), float(cy) + 0.10, float(cx + 1), float(cy) + 0.16, y_deck + 0.004, Color(0.72, 0.50, 0.34, 1.0))
+			if not fantasma:
+				# Canto lateral de madera sobre el agua hundida
+				var x0 := float(cas.position.x)
+				var x1 := float(cas.end.x)
+				var z_frente := float(cas.end.y)
+				var col_canto := Color(0.24, 0.13, 0.10, 1.0)
+				for v in [
+					Vector3(x0, y_deck, z_frente), Vector3(x1, y_deck, z_frente), Vector3(x1, -HONDO_AGUA, z_frente),
+					Vector3(x0, y_deck, z_frente), Vector3(x1, -HONDO_AGUA, z_frente), Vector3(x0, -HONDO_AGUA, z_frente),
+				]:
+					_pasarelas_mesh.surface_set_color(col_canto)
+					_pasarelas_mesh.surface_add_vertex(v)
+		_pasarelas_mesh.surface_end()

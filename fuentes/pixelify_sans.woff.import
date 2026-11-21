@@ -33,4 +33,8 @@ compress=true
 preload=[]
 language_support={}
 script_support={}
-opentype_features={}
+opentype_features={
+"clig": 0,
+"dlig": 0,
+"liga": 0
+}

@@ -3097,6 +3097,130 @@ def puente_funde():
     return reverb(p.entera(), 2.2, 0.40)
 
 
+def prisma_gira():
+    """El prisma de cristal gira un cuarto y reparte el haz violeta."""
+    p = Pista(0.75)
+    clic = paso_banda(ruido(0.06), 1600, 5200) * adsr(_n(0.06), 0.002, 0.015, 0.2, 0.03) * 0.38
+    p.poner(clic, 0.0)
+    p.poner(campanita("A5", 0.55, 0.26), 0.01)
+    p.poner(campanita("E6", 0.62, 0.20), 0.07)
+    return reverb(p.entera(), 1.35, 0.34)
+
+
+def polilla_posa():
+    """Una Polilla de Papel aterriza suavemente sobre un espejo y tapa la luz."""
+    p = Pista(0.55)
+    papel = paso_banda(ruido_rosa(0.24), 900, 3600) * adsr(_n(0.24), 0.02, 0.06, 0.35, 0.12) * 0.46
+    p.poner(papel, 0.0)
+    apaga = seno(_desliz(520, 280, 0.22), 0.22) * adsr(_n(0.22), 0.02, 0.05, 0.35, 0.10) * 0.18
+    p.poner(apaga, 0.04)
+    return reverb(p.entera(), 0.85, 0.22)
+
+
+def polilla_rompe():
+    """La Polilla de Papel se rasga y se deshace en virutas de luz."""
+    p = Pista(0.72)
+    rasga = paso_banda(ruido(0.18), 1400, 5400) * adsr(_n(0.18), 0.005, 0.04, 0.3, 0.09) * 0.56
+    p.poner(rasga, 0.0)
+    p.poner(campanita("C#6", 0.48, 0.22), 0.05)
+    p.poner(campanita("A5", 0.50, 0.16), 0.11)
+    return reverb(p.entera(), 1.15, 0.28)
+
+
+def celosia_deshace():
+    """La luz violeta disuelve la celosía ilusoria del Pabellón del Té."""
+    p = Pista(1.8)
+    velo = paso_banda(ruido_rosa(1.05), 360, 2600) * adsr(_n(1.05), 0.12, 0.24, 0.48, 0.42) * 0.40
+    p.poner(velo, 0.0)
+    for k, nota in enumerate(("F#5", "A5", "C#6", "E6", "F#6")):
+        p.poner(campanita(nota, 1.15, 0.24 - k * 0.02), 0.08 + k * 0.11)
+    return reverb(p.entera(), 2.1, 0.40)
+
+
+def verja_abre():
+    """La luz dorada enciende el disco solar y la verja de bronce del Invernadero baja."""
+    p = Pista(1.9)
+    p.poner(taiko(0.65, 0.68), 0.0)
+    reja = paso_banda(ruido_rosa(0.85), 220, 1400) * adsr(_n(0.85), 0.08, 0.18, 0.55, 0.30) * 0.48
+    p.poner(reja, 0.06)
+    for k, nota in enumerate(("A4", "C#5", "E5", "A5")):
+        p.poner(campanita(nota, 1.20, 0.26 - k * 0.02), 0.18 + k * 0.12)
+    return reverb(p.entera(), 1.9, 0.36)
+
+
+def reflejo_delata():
+    """El haz violeta desenmascara la pasarela falsa sobre el Estanque de los Reflejos."""
+    p = Pista(1.45)
+    onda = seno(_desliz(680, 420, 0.65), 0.65) * adsr(_n(0.65), 0.04, 0.14, 0.45, 0.25) * 0.24
+    p.poner(onda, 0.0)
+    for k, nota in enumerate(("E5", "G#5", "B5", "E6")):
+        p.poner(campanita(nota, 1.05, 0.24 - k * 0.02), k * 0.08)
+    return reverb(p.entera(), 1.85, 0.38)
+
+
+def mondo_divide():
+    """Mondo se multiplica en espejismos brillantes delante de los espejos del Invernadero."""
+    p = Pista(1.15)
+    for k, nota in enumerate(("F#5", "A5", "C#6", "F#6")):
+        p.poner(campanita(nota, 0.72, 0.24 - k * 0.02), k * 0.06)
+    aire = paso_banda(ruido_rosa(0.45), 600, 3400) * adsr(_n(0.45), 0.03, 0.10, 0.40, 0.18) * 0.38
+    p.poner(aire, 0.0)
+    return reverb(p.entera(), 1.5, 0.34)
+
+
+def mondo_salta():
+    """Salto felino elástico de Mondo o uno de sus reflejos."""
+    p = Pista(0.50)
+    impulso = paso_banda(ruido_rosa(0.24), 380, 2200) * adsr(_n(0.24), 0.015, 0.06, 0.35, 0.10) * 0.50
+    p.poner(impulso, 0.0)
+    tono = seno(_desliz(260, 620, 0.22), 0.22) * adsr(_n(0.22), 0.01, 0.05, 0.30, 0.10) * 0.24
+    p.poner(tono, 0.0)
+    p.poner(campanita("C#6", 0.32, 0.14), 0.04)
+    return reverb(p.entera(), 0.85, 0.22)
+
+
+def mondo_zarpa():
+    """Zarpazo metálico y rápido de Mondo al aterrizar."""
+    p = Pista(0.55)
+    corte = paso_banda(ruido(0.14), 1600, 5800) * adsr(_n(0.14), 0.004, 0.03, 0.25, 0.06) * 0.64
+    p.poner(corte, 0.0)
+    metal = seno(_desliz(880, 240, 0.22), 0.22) * adsr(_n(0.22), 0.005, 0.05, 0.30, 0.09) * 0.34
+    p.poner(metal, 0.01)
+    return reverb(p.entera(), 0.80, 0.20)
+
+
+def mondo_esfuma():
+    """Un reflejo falso de Mondo se desvanece en cristal al tocar el rayo solar."""
+    p = Pista(0.85)
+    polvo = paso_banda(ruido(0.32), 2000, 6400) * adsr(_n(0.32), 0.01, 0.08, 0.32, 0.16) * 0.42
+    p.poner(polvo, 0.0)
+    for k, nota in enumerate(("E6", "C#6", "A5")):
+        p.poner(campanita(nota, 0.58, 0.22 - k * 0.03), k * 0.05)
+    return reverb(p.entera(), 1.4, 0.34)
+
+
+def mondo_aturdido():
+    """El Mondo verdadero queda descubierto por el rayo del espejo y cae aturdido."""
+    p = Pista(1.35)
+    p.poner(taiko(0.60, 0.82), 0.06)
+    destello = seno(_desliz(660, 1320, 0.34), 0.34) * adsr(_n(0.34), 0.02, 0.08, 0.40, 0.15) * 0.28
+    p.poner(destello, 0.0)
+    for k, nota in enumerate(("A5", "C#6", "F#6")):
+        p.poner(campanita(nota, 0.95, 0.26 - k * 0.03), 0.08 + k * 0.07)
+    return reverb(p.entera(), 1.7, 0.36)
+
+
+def mondo_muere():
+    """Mondo cae vencido: cascada de espejos y campanitas de bronce en calma."""
+    p = Pista(1.9)
+    p.poner(taiko(0.85, 0.85), 0.0)
+    cristal = paso_banda(ruido(0.55), 1600, 6200) * adsr(_n(0.55), 0.01, 0.12, 0.35, 0.26) * 0.52
+    p.poner(cristal, 0.04)
+    for k, nota in enumerate(("F#6", "E6", "C#6", "A5", "F#5")):
+        p.poner(campanita(nota, 1.25, 0.26 - k * 0.02), 0.08 + k * 0.10)
+    return reverb(p.entera(), 2.2, 0.40)
+
+
 def viento_arena(dur=30.0):
     """Viento cálido de las Dunas de Penumbra arrastrando arena fina sobre la arenisca."""
     n = _n(dur + 4)
@@ -3240,6 +3364,18 @@ EFECTOS = {
     "kivuli_vuelca": (kivuli_vuelca, 0.84),
     "espejo_desentierra": (espejo_desentierra, 0.76),
     "puente_funde": (puente_funde, 0.84),
+    "prisma_gira": (prisma_gira, 0.70),
+    "polilla_posa": (polilla_posa, 0.62),
+    "polilla_rompe": (polilla_rompe, 0.72),
+    "celosia_deshace": (celosia_deshace, 0.78),
+    "verja_abre": (verja_abre, 0.80),
+    "reflejo_delata": (reflejo_delata, 0.76),
+    "mondo_divide": (mondo_divide, 0.76),
+    "mondo_salta": (mondo_salta, 0.70),
+    "mondo_zarpa": (mondo_zarpa, 0.76),
+    "mondo_esfuma": (mondo_esfuma, 0.74),
+    "mondo_aturdido": (mondo_aturdido, 0.84),
+    "mondo_muere": (mondo_muere, 0.86),
 }
 
 AMBIENTES = {

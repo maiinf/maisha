@@ -2768,6 +2768,99 @@ def jefe_kivuli():
     return final(p, sala=2.8, mezcla=0.32, brillo=6000)
 
 
+def jardin_faroles():
+    """«Prismas de papel» (El Jardín de los Faroles, 82 BPM, bucle continuo):
+    atardecer luminoso de agua, papel y prismas de cristal. En La mayor / Fa# menor cristalino:
+    arpegios de kalimba y campanitas como reflejos en el estanque, colchón cálido y flauta delicada."""
+    tempo = Tempo(82)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("A1", "M7"), ("F#1", "m7"), ("D2", "M7"), ("E2", "sus"),
+        ("A1", "M7"), ("C#2", "m7"), ("D2", "M7"), ("B1", "m7"),
+        ("F#1", "m7"), ("C#2", "m7"), ("D2", "M7"), ("A1", "M7"),
+        ("B1", "m7"), ("E2", "M"), ("A1", "M7"), ("E2", "sus"),
+        ("D2", "M7"), ("E2", "M"), ("C#2", "m7"), ("F#1", "m7"),
+        ("B1", "m7"), ("D2", "M7"), ("E2", "sus"), ("A1", "M7"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=1140, volumen=0.24, octava_bajo=1, fuerza_bajo=0.26)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.18, pan=-0.26, patron=(0, 2, 3, 1, 2, 3, 1, 0))
+        notas = acorde(raiz[:-1] + "5", tipo)
+        p.poner(campanita(notas[-1], 2.1, 0.10), tempo.s(i * 4 + 1.5), pan=0.34)
+        if i % 2 == 1:
+            p.poner(campanita(notas[1], 1.7, 0.08), tempo.s(i * 4 + 3.0), pan=-0.30)
+    for b in range(0, pulsos, 4):
+        p.poner(tambor("A1", 0.30, 0.12, golpe=0.15), tempo.s(b), pan=0.0)
+    p.poner(coro(["A3", "C#4", "E4", "G#4"], tempo.s(32)), tempo.s(32), 0.072)
+    p.poner(coro(["D3", "F#3", "A3", "C#4"], tempo.s(32)), tempo.s(64), 0.076)
+    tema_a = [
+        ("E5", 0, 1.5), ("F#5", 1.5, 0.5), ("A5", 2, 2), ("G#5", 4, 1.5), ("F#5", 5.5, 0.5), ("E5", 6, 2),
+        ("C#5", 8, 1.5), ("E5", 9.5, 0.5), ("F#5", 10, 2), ("E5", 12, 4),
+        ("D5", 16, 1.5), ("E5", 17.5, 0.5), ("F#5", 18, 2), ("A5", 20, 2), ("B5", 22, 2),
+        ("A5", 24, 1.5), ("G#5", 25.5, 0.5), ("F#5", 26, 2), ("E5", 28, 4),
+    ]
+    tema_b = [
+        ("C#6", 0, 2), ("B5", 2, 1), ("A5", 3, 1), ("G#5", 4, 2), ("E5", 6, 2),
+        ("F#5", 8, 1.5), ("A5", 9.5, 0.5), ("G#5", 10, 2), ("E5", 12, 4),
+        ("D5", 16, 1.5), ("F#5", 17.5, 0.5), ("A5", 18, 2), ("G#5", 20, 2), ("E5", 22, 2),
+        ("F#5", 24, 2), ("G#5", 26, 2), ("A5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.40, vibrato=4.4)
+    melodia(p, tempo, tema_a, desde=4, instrumento=kalimba, volumen=0.30, pan=0.14)
+    melodia(p, tempo, tema_a, desde=32, instrumento=flauta_, volumen=0.39, sostener=0.95, pan=0.08)
+    melodia(p, tempo, tema_b, desde=64, instrumento=flauta_, volumen=0.39, sostener=0.95, pan=0.08)
+    melodia(p, tempo, transportar(tema_b, -12), desde=64, instrumento=kalimba, volumen=0.18, pan=-0.20)
+    return final(p, sala=4.1, mezcla=0.40, brillo=5600)
+
+
+def jefe_mondo():
+    """«Mil reflejos de bronce» (Mondo, el Serval de Mil Reflejos, 134 BPM, bucle de jefe):
+    ágil, juguetón y cortante en Fa# menor: arpegios en espejo izquierda/derecha como reflejos que saltan,
+    percusión felina sincopada, campanitas de cristal y melodía brillante."""
+    tempo = Tempo(134)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("F#1", "m"), ("F#1", "m"), ("D2", "M"), ("C#2", "M"),
+        ("F#1", "m"), ("A1", "M"), ("B1", "m"), ("C#2", "M"),
+        ("D2", "M"), ("E2", "M"), ("F#1", "m"), ("C#2", "M"),
+        ("B1", "m"), ("D2", "M"), ("C#2", "sus"), ("C#2", "M"),
+        ("F#1", "m"), ("G#1", "m"), ("A1", "M"), ("B1", "m"),
+        ("D2", "M"), ("B1", "m"), ("C#2", "M"), ("F#1", "m"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=1480, volumen=0.25, octava_bajo=1, fuerza_bajo=0.40)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.25, volumen=0.20, pan=-0.36, patron=(0, 2, 1, 3, 2, 0, 3, 1))
+        arpegio(p, tempo, raiz[:-1] + "5", tipo, i * 4, 4, cada=0.5, volumen=0.12, pan=0.36, patron=(3, 1, 2, 0, 1, 3, 0, 2))
+        notas = acorde(raiz[:-1] + "5", tipo)
+        p.poner(campanita(notas[-1], 0.75, 0.11), tempo.s(i * 4 + 1.5), pan=0.40 if i % 2 == 0 else -0.40)
+    for b in range(0, pulsos, 4):
+        p.poner(taiko(0.40, 0.50), tempo.s(b), pan=0.0)
+        p.poner(tambor("F#1", 0.20, 0.30, golpe=0.36), tempo.s(b + 1.5), pan=-0.20)
+        p.poner(tambor("C#2", 0.18, 0.28, golpe=0.36), tempo.s(b + 2.5), pan=0.20)
+        p.poner(taiko(0.32, 0.40), tempo.s(b + 3.0), pan=0.0)
+    p.poner(coro(["F#3", "A3", "C#4", "E4"], tempo.s(32)), tempo.s(32), 0.080)
+    p.poner(coro(["D3", "F#3", "A3", "C#4"], tempo.s(32)), tempo.s(64), 0.085)
+    tema_m = [
+        ("F#5", 0, 1), ("A5", 1, 0.5), ("G#5", 1.5, 0.5), ("F#5", 2, 1), ("C#5", 3, 1),
+        ("D5", 4, 1.5), ("E5", 5.5, 0.5), ("F#5", 6, 1), ("G#5", 7, 1),
+        ("A5", 8, 1), ("B5", 9, 1), ("C#6", 10, 1.5), ("B5", 11.5, 0.5),
+        ("A5", 12, 1.5), ("G#5", 13.5, 0.5), ("F#5", 14, 2),
+        ("D5", 16, 1), ("F#5", 17, 1), ("A5", 18, 1), ("G#5", 19, 1),
+        ("E5", 20, 1), ("G#5", 21, 1), ("B5", 22, 2),
+        ("C#6", 24, 1.5), ("B5", 25.5, 0.5), ("A5", 26, 1), ("G#5", 27, 1),
+        ("F#5", 28, 2), ("C#5", 30, 2),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.45, vibrato=5.4)
+    melodia(p, tempo, tema_m, desde=0, instrumento=kalimba, volumen=0.34, pan=0.18)
+    melodia(p, tempo, tema_m, desde=32, instrumento=flauta_, volumen=0.44, sostener=0.88, pan=-0.10)
+    melodia(p, tempo, transportar(tema_m, -12), desde=32, instrumento=kalimba, volumen=0.24, pan=0.22)
+    melodia(p, tempo, tema_m, desde=64, instrumento=flauta_, volumen=0.45, sostener=0.88, pan=0.0)
+    melodia(p, tempo, transportar(tema_m, 12), desde=64, instrumento=kalimba, volumen=0.20, pan=-0.26)
+    return final(p, sala=2.9, mezcla=0.34, brillo=6400)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2793,6 +2886,8 @@ PIEZAS["mirador_ocaso"] = mirador_ocaso
 PIEZAS["jioni"] = jioni
 PIEZAS["dunas_penumbra"] = dunas_penumbra
 PIEZAS["jefe_kivuli"] = jefe_kivuli
+PIEZAS["jardin_faroles"] = jardin_faroles
+PIEZAS["jefe_mondo"] = jefe_mondo
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -2818,6 +2913,8 @@ TITULOS["mirador_ocaso"] = "El sol detenido"
 TITULOS["jioni"] = "La ciudad que no cierra los ojos"
 TITULOS["dunas_penumbra"] = "Arena que no duerme"
 TITULOS["jefe_kivuli"] = "El reloj bajo la arena"
+TITULOS["jardin_faroles"] = "Prismas de papel"
+TITULOS["jefe_mondo"] = "Mil reflejos de bronce"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]
