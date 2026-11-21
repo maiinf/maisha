@@ -2957,6 +2957,183 @@ def jefe_saa():
     return final(p, sala=3.3, mezcla=0.35, brillo=5800)
 
 
+def tienda_kikombe():
+    """«Té tibio en el crepúsculo»: El Mercado del Crepúsculo (tienda de Kikombe en Jioni). Un vaivén cálido y
+    pausado en fa mayor con olor a té especiado: kalimba suave a contratiempo, acordes tibios de piano, una flauta
+    reposada y campanitas de latón que tintinean con el toldo."""
+    tempo = Tempo(94)
+    pulsos = 80
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("F2", "M7"), ("D2", "m7"), ("A#1", "M7"), ("C2", "sus"),
+        ("F2", "M7"), ("A1", "m7"), ("G1", "m7"), ("C2", "M"),
+        ("A#1", "M7"), ("C2", "M"), ("A1", "m7"), ("D2", "m7"),
+        ("G1", "m7"), ("A#1", "M"), ("C2", "sus"), ("F2", "M7"),
+        ("D2", "m7"), ("A#1", "M7"), ("C2", "M"), ("F2", "M7"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=1050, volumen=0.14, octava_bajo=2, fuerza_bajo=0.22)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.17, pan=-0.22, patron=(0, 2, 1, 3, 2, 1, 2, 3))
+        notas = acorde(raiz[:-1] + "3", tipo)
+        p.poner(acorde_piano(notas, tempo.s(1.6), 0.14, 0.03), tempo.s(i * 4 + 1.0), 1.0, pan=0.22)
+        p.poner(tambor("F2", 0.16, 0.18, golpe=0.24), tempo.s(i * 4), pan=-0.10)
+        p.poner(tambor("C2", 0.12, 0.14, golpe=0.22), tempo.s(i * 4 + 2.5), pan=0.14)
+        if i % 2 == 0:
+            p.poner(campanita(acorde(raiz[:-1] + "5", tipo)[-1], 1.1, 0.07), tempo.s(i * 4 + 3.0), pan=0.30)
+    tema_k = [
+        ("A4", 0, 1.5), ("C5", 1.5, 0.5), ("D5", 2, 1.5), ("C5", 3.5, 0.5),
+        ("A4", 4, 2), ("G4", 6, 2),
+        ("F4", 8, 1.5), ("G4", 9.5, 0.5), ("A4", 10, 1.5), ("C5", 11.5, 0.5),
+        ("G4", 12, 3), ("A4", 15, 1),
+        ("A#4", 16, 1.5), ("A4", 17.5, 0.5), ("G4", 18, 1), ("A4", 19, 1),
+        ("C5", 20, 2), ("D5", 22, 1), ("C5", 23, 1),
+        ("A4", 24, 1.5), ("G4", 25.5, 0.5), ("F4", 26, 2),
+        ("G4", 28, 1.5), ("F4", 29.5, 2.5),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.36, vibrato=4.2)
+    melodia(p, tempo, tema_k, desde=4, instrumento=kalimba, volumen=0.28, pan=0.10)
+    melodia(p, tempo, tema_k, desde=40, instrumento=flauta_, volumen=0.34, sostener=0.92, pan=-0.06)
+    melodia(p, tempo, transportar(tema_k, -12), desde=40, instrumento=kalimba, volumen=0.16, pan=0.22)
+    return final(p, sala=2.2, mezcla=0.28, brillo=5200)
+
+
+def jefe_jua_giza():
+    """«El Sol Encadenado»: el combate final contra Jua-Giza en El Horizonte Inmóvil. No es odio ni monstruosidad:
+    es urgencia, grandeza y compasión. En re menor / dórico a 124 BPM: taikos profundos, campanas solares de bronce,
+    coro luminoso que clama por la noche y el gran motivo final en flauta y kalimba subiendo en tres oleadas."""
+    tempo = Tempo(124)
+    pulsos = 128
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "m"), ("A#1", "M"), ("C2", "M"), ("A1", "sus"),
+        ("D2", "m"), ("F2", "M"), ("G1", "m"), ("A1", "M"),
+        ("A#1", "M7"), ("C2", "M"), ("D2", "m"), ("F2", "M"),
+        ("G1", "m"), ("A#1", "M"), ("A1", "sus"), ("A1", "M"),
+        ("D2", "m"), ("C2", "M"), ("A#1", "M"), ("A1", "M"),
+        ("G1", "m"), ("D2", "m"), ("A#1", "M"), ("C2", "M"),
+        ("D2", "m"), ("F2", "M"), ("A#1", "M7"), ("C2", "M"),
+        ("G1", "m"), ("A1", "sus"), ("A1", "M"), ("D2", "m"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=1420, volumen=0.31, octava_bajo=1, fuerza_bajo=0.48)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.25, volumen=0.20, pan=-0.24, patron=(0, 2, 1, 2, 3, 2, 1, 2))
+        notas = acorde(raiz[:-1] + "5", tipo)
+        p.poner(campanita(notas[0], 1.3, 0.14), tempo.s(i * 4), pan=0.32)
+        if i % 2 == 1:
+            p.poner(campanita(notas[-1], 1.1, 0.11), tempo.s(i * 4 + 2.0), pan=-0.32)
+    for b in range(0, pulsos, 4):
+        p.poner(taiko(0.60, 0.66), tempo.s(b), pan=0.0)
+        p.poner(tambor("D2", 0.18, 0.30, golpe=0.40), tempo.s(b + 1.0), pan=0.20)
+        p.poner(tambor("A1", 0.20, 0.34, golpe=0.42), tempo.s(b + 1.5), pan=-0.20)
+        p.poner(taiko(0.48, 0.54), tempo.s(b + 2.0), pan=0.0)
+        p.poner(tambor("D2", 0.18, 0.32, golpe=0.40), tempo.s(b + 3.0), pan=-0.18)
+        p.poner(tambor("A1", 0.14, 0.26, golpe=0.38), tempo.s(b + 3.5), pan=0.18)
+    p.poner(coro(["D3", "F3", "A3", "D4"], tempo.s(32)), tempo.s(32), 0.105)
+    p.poner(coro(["A#2", "D3", "F3", "A3"], tempo.s(32)), tempo.s(64), 0.110)
+    p.poner(coro(["D3", "A3", "D4", "F4"], tempo.s(32)), tempo.s(96), 0.115)
+    tema_jua = [
+        ("D5", 0, 1.5), ("E5", 1.5, 0.5), ("F5", 2, 1), ("A5", 3, 1),
+        ("G5", 4, 1.5), ("F5", 5.5, 0.5), ("E5", 6, 2),
+        ("F5", 8, 1.5), ("G5", 9.5, 0.5), ("A5", 10, 1), ("D6", 11, 1),
+        ("C6", 12, 2), ("A5", 14, 2),
+        ("A#5", 16, 1.5), ("A5", 17.5, 0.5), ("G5", 18, 1), ("F5", 19, 1),
+        ("G5", 20, 1.5), ("F5", 21.5, 0.5), ("E5", 22, 2),
+        ("F5", 24, 1.5), ("E5", 25.5, 0.5), ("D5", 26, 1), ("C#5", 27, 1),
+        ("D5", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.48, vibrato=5.2)
+    melodia(p, tempo, tema_jua, desde=0, instrumento=kalimba, volumen=0.36, pan=0.14)
+    melodia(p, tempo, tema_jua, desde=32, instrumento=flauta_, volumen=0.47, sostener=0.92, pan=0.05)
+    melodia(p, tempo, transportar(tema_jua, -12), desde=32, instrumento=kalimba, volumen=0.28, pan=-0.20)
+    melodia(p, tempo, tema_jua, desde=64, instrumento=flauta_, volumen=0.48, sostener=0.92, pan=0.0)
+    melodia(p, tempo, transportar(tema_jua, 12), desde=64, instrumento=kalimba, volumen=0.20, pan=0.24)
+    melodia(p, tempo, tema_jua, desde=96, instrumento=flauta_, volumen=0.48, sostener=0.94, pan=-0.04)
+    tocar(p, tempo, transportar(tema_jua, -12), desde=96, fuerza=0.28, pan=0.18)
+    return final(p, sala=3.6, mezcla=0.36, brillo=6000)
+
+
+def ocaso_libre():
+    """«La Primera Noche»: cierre de El Valle del Ocaso y pantalla final de Maisha. El motivo del Sol Encadenado se
+    abre por fin a re mayor luminoso y sereno: arpegios de piano y kalimba como estrellas que asoman, flauta dulce,
+    coro cálido y campanitas celestes mientras el sol descansa por primera vez."""
+    tempo = Tempo(74)
+    pulsos = 96
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("D2", "M"), ("A1", "M"), ("B1", "m7"), ("G1", "M7"),
+        ("D2", "M"), ("F#1", "m7"), ("G1", "M7"), ("A1", "sus"),
+        ("B1", "m7"), ("G1", "M7"), ("D2", "M"), ("A1", "M"),
+        ("G1", "M7"), ("E1", "m7"), ("A1", "sus"), ("D2", "M"),
+        ("D2", "M"), ("G1", "M7"), ("B1", "m7"), ("A1", "M"),
+        ("G1", "M7"), ("D2", "M"), ("A1", "sus"), ("D2", "M"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=1150, volumen=0.22, octava_bajo=1, fuerza_bajo=0.26)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.19, pan=-0.20, patron=(0, 1, 2, 3, 2, 1, 2, 3))
+        notas = acorde(raiz[:-1] + "3", tipo)
+        p.poner(acorde_piano(notas, tempo.s(3.6), 0.16, 0.04), tempo.s(i * 4), 1.0, pan=0.14)
+        n_est = acorde(raiz[:-1] + "5", tipo)
+        p.poner(campanita(n_est[-1], 2.2, 0.09), tempo.s(i * 4 + 2.0), pan=0.34 if i % 2 == 0 else -0.34)
+    p.poner(coro(["D3", "F#3", "A3", "D4"], tempo.s(32)), tempo.s(32), 0.095)
+    p.poner(coro(["G2", "B2", "D3", "F#3"], tempo.s(32)), tempo.s(64), 0.105)
+    tema_fin = [
+        ("F#5", 0, 2), ("A5", 2, 1), ("B5", 3, 1),
+        ("A5", 4, 2), ("F#5", 6, 2),
+        ("G5", 8, 1.5), ("A5", 9.5, 0.5), ("F#5", 10, 1.5), ("E5", 11.5, 0.5),
+        ("D5", 12, 4),
+        ("B5", 16, 2), ("A5", 18, 1), ("F#5", 19, 1),
+        ("G5", 20, 2), ("E5", 22, 2),
+        ("F#5", 24, 1.5), ("G5", 25.5, 0.5), ("A5", 26, 2),
+        ("D6", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.42, vibrato=4.2)
+    tocar(p, tempo, tema_fin, desde=4, fuerza=0.22, pan=-0.10)
+    melodia(p, tempo, tema_fin, desde=32, instrumento=flauta_, volumen=0.38, sostener=0.95, pan=0.06)
+    melodia(p, tempo, transportar(tema_fin, -12), desde=32, instrumento=kalimba, volumen=0.18, pan=-0.22)
+    melodia(p, tempo, tema_fin, desde=64, instrumento=flauta_, volumen=0.40, sostener=0.96, pan=0.0)
+    melodia(p, tempo, transportar(tema_fin, 12), desde=64, instrumento=kalimba, volumen=0.14, pan=0.26)
+    return final(p, sala=4.0, mezcla=0.40, brillo=5400)
+
+
+def jioni_noche():
+    """«La ciudad que por fin duerme»: Jioni bajo las estrellas tras «ocaso_libre». Una nana en sol mayor / mi menor
+    a 68 BPM: kalimba acunada, acordes lentos de piano, una flauta susurrada y chispas agudas de estrellas."""
+    tempo = Tempo(68)
+    pulsos = 80
+    p = Pista(tempo.s(pulsos))
+    progresion = [
+        ("G2", "M7"), ("E2", "m7"), ("C2", "M7"), ("D2", "sus"),
+        ("G2", "M7"), ("B1", "m7"), ("C2", "M7"), ("D2", "M"),
+        ("E2", "m7"), ("C2", "M7"), ("G2", "M7"), ("D2", "sus"),
+        ("C2", "M7"), ("A1", "m7"), ("D2", "sus"), ("G2", "M7"),
+        ("E2", "m7"), ("C2", "M7"), ("D2", "sus"), ("G2", "M7"),
+    ]
+    colchones(p, tempo, progresion, compas=4, brillo=880, volumen=0.16, octava_bajo=1, fuerza_bajo=0.18)
+    rng = np.random.default_rng(20261121)
+    for i, (raiz, tipo) in enumerate(progresion):
+        arpegio(p, tempo, raiz[:-1] + "4", tipo, i * 4, 4, cada=0.5, volumen=0.15, pan=-0.18, patron=(0, 2, 1, 3, 2, 1, 2, 0))
+        notas = acorde(raiz[:-1] + "3", tipo)
+        p.poner(acorde_piano(notas, tempo.s(3.4), 0.12, 0.05), tempo.s(i * 4), 1.0, pan=0.16)
+        n_est = acorde(raiz[:-1] + "6", tipo)
+        p.poner(campanita(n_est[rng.integers(len(n_est))], 1.9, 0.055), tempo.s(i * 4 + 1.5 + rng.random() * 1.5), pan=float(rng.uniform(-0.4, 0.4)))
+    p.poner(coro(["G2", "B2", "D3", "F#3"], tempo.s(28)), tempo.s(36), 0.065)
+    nana = [
+        ("B4", 0, 2), ("D5", 2, 1), ("E5", 3, 1),
+        ("D5", 4, 2.5), ("B4", 6.5, 1.5),
+        ("C5", 8, 2), ("B4", 10, 1), ("A4", 11, 1),
+        ("G4", 12, 4),
+        ("E5", 16, 2), ("D5", 18, 1), ("B4", 19, 1),
+        ("C5", 20, 2), ("A4", 22, 2),
+        ("B4", 24, 1.5), ("A4", 25.5, 0.5), ("G4", 26, 2),
+        ("G4", 28, 4),
+    ]
+    flauta_ = lambda n_, d_: flauta(n_, d_, 0.30, vibrato=3.6)
+    melodia(p, tempo, nana, desde=4, instrumento=kalimba, volumen=0.22, pan=0.12)
+    melodia(p, tempo, nana, desde=40, instrumento=flauta_, volumen=0.30, sostener=0.95, pan=-0.08)
+    melodia(p, tempo, transportar(nana, 12), desde=40, instrumento=kalimba, volumen=0.11, pan=0.24)
+    return final(p, sala=3.8, mezcla=0.38, brillo=4600)
+
+
 PIEZAS["escarcha"] = escarcha
 PIEZAS["maandiko"] = maandiko
 PIEZAS["jefe_bibliotecario"] = jefe_bibliotecario
@@ -2986,6 +3163,10 @@ PIEZAS["jardin_faroles"] = jardin_faroles
 PIEZAS["jefe_mondo"] = jefe_mondo
 PIEZAS["calzada_obeliscos"] = calzada_obeliscos
 PIEZAS["jefe_saa"] = jefe_saa
+PIEZAS["tienda_kikombe"] = tienda_kikombe
+PIEZAS["jefe_jua_giza"] = jefe_jua_giza
+PIEZAS["ocaso_libre"] = ocaso_libre
+PIEZAS["jioni_noche"] = jioni_noche
 TITULOS["maandiko"] = "Las calles del Índice"
 TITULOS["escarcha"] = "La nieve que escribe"
 TITULOS["jefe_bibliotecario"] = "El vals de las páginas perdidas"
@@ -3015,6 +3196,10 @@ TITULOS["jardin_faroles"] = "Prismas de papel"
 TITULOS["jefe_mondo"] = "Mil reflejos de bronce"
 TITULOS["calzada_obeliscos"] = "Puentes de sombra larga"
 TITULOS["jefe_saa"] = "El coloso de arena y bronce"
+TITULOS["tienda_kikombe"] = "Té tibio en el crepúsculo"
+TITULOS["jefe_jua_giza"] = "El Sol Encadenado"
+TITULOS["ocaso_libre"] = "La Primera Noche"
+TITULOS["jioni_noche"] = "La ciudad que por fin duerme"
 
 if __name__ == "__main__":
     solo = sys.argv[1:]

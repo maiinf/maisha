@@ -191,6 +191,9 @@ func _al_poner_marca(marca: String) -> void:
 		_destello_cetro()
 		if marca == "cetro_nexo":
 			Sonido.efecto("cetro_nexo")
+	elif marca == "bendicion_crepusculo":
+		Sonido.efecto("bendicion")
+		_destello_cetro()
 
 
 ## El momento de recibir el cetro: un destello de luz que crece sobre Maisha

@@ -3310,6 +3310,131 @@ def saa_muere():
     return reverb(p.entera(), 2.4, 0.42)
 
 
+def bendicion():
+    """La Bendición del Crepúsculo de Kibatari tras colgar los 12 Faroles: acorde cálido ascendente y halo dorado."""
+    p = Pista(2.1)
+    brillo = seno(_desliz(330, 660, 1.1), 1.1) * adsr(_n(1.1), 0.14, 0.28, 0.42, 0.48) * 0.18
+    p.poner(brillo, 0.04)
+    for k, nota in enumerate(("D5", "F#5", "A5", "D6", "F#6", "A6")):
+        p.poner(campanita(nota, 1.45 - k * 0.08, 0.26 - k * 0.02), 0.04 + k * 0.11, pan=-0.25 + k * 0.10)
+    return reverb(p.entera(), 2.3, 0.42)
+
+
+def pesas_encajan():
+    """Las tres Pesas del Reloj encajan en el Pedestal del Horizonte: tres golpes firmes de bronce y cierre de piedra."""
+    p = Pista(1.5)
+    for k, (f0, nota) in enumerate(((165, "D4"), (196, "A4"), (247, "D5"))):
+        t0 = k * 0.22
+        p.poner(tambor("D2", 0.22, 0.48, golpe=0.44), t0)
+        golpe = seno(_desliz(f0 * 1.4, f0 * 0.85, 0.14), 0.14) * caida(_n(0.14), 0.05) * 0.45
+        p.poner(golpe, t0)
+        p.poner(campanita(nota, 0.72, 0.24), t0 + 0.03)
+    cierre = paso_banda(ruido_rosa(0.45), 140, 900) * adsr(_n(0.45), 0.02, 0.12, 0.45, 0.22) * 0.42
+    p.poner(cierre, 0.62)
+    p.poner(campanita("A5", 1.1, 0.26), 0.68)
+    return reverb(p.entera(), 1.6, 0.34)
+
+
+def pilar_enciende():
+    """Un Pilar Dorado de la Pasarela se enciende con llama solar al superar su prueba."""
+    p = Pista(1.35)
+    soplo = paso_banda(ruido_rosa(0.42), 420, 3200) * adsr(_n(0.42), 0.04, 0.12, 0.42, 0.20) * 0.42
+    p.poner(soplo, 0.0)
+    for k, nota in enumerate(("D5", "A5", "D6", "F#6")):
+        p.poner(campanita(nota, 1.05, 0.28 - k * 0.03), 0.03 + k * 0.08)
+    return reverb(p.entera(), 1.65, 0.36)
+
+
+def jua_aviso():
+    """Jua-Giza reúne luz antes de la llamarada: zumbido solar ascendente y destello agudo de corona."""
+    p = Pista(1.25)
+    sube = (seno(_desliz(220, 660, 0.95), 0.95) * 0.32 + seno(_desliz(440, 1320, 0.95), 0.95) * 0.22) * adsr(_n(0.95), 0.22, 0.20, 0.55, 0.26)
+    p.poner(sube, 0.0)
+    soplo = paso_banda(ruido_rosa(0.95), 700, 4200) * adsr(_n(0.95), 0.28, 0.18, 0.50, 0.24) * 0.34
+    p.poner(soplo, 0.04)
+    p.poner(campanita("A5", 0.85, 0.24), 0.26)
+    p.poner(campanita("D6", 0.90, 0.26), 0.54)
+    return reverb(p.entera(), 1.7, 0.36)
+
+
+def jua_llamarada():
+    """La llamarada solar barre el Altar: estallido cálido monumental y ola de luz blanca."""
+    p = Pista(1.65)
+    p.poner(taiko(0.85, 0.88), 0.0)
+    estallido = paso_banda(ruido_rosa(1.15), 260, 4600) * adsr(_n(1.15), 0.03, 0.25, 0.50, 0.45) * 0.68
+    p.poner(estallido, 0.02)
+    ola = (seno(_desliz(580, 190, 1.05), 1.05) * 0.34 + sierra(_desliz(290, 110, 1.05), 1.05, 10) * 0.18) * caida(_n(1.05), 0.32)
+    p.poner(paso_bajo(ola, 2200), 0.02)
+    p.poner(campanita("D6", 1.15, 0.26), 0.06)
+    return reverb(p.entera(), 2.1, 0.40)
+
+
+def contrapeso_cruje():
+    """La Carga Sísmica agrieta el Contrapeso de basalto del oeste y tensa su cadena."""
+    p = Pista(1.0)
+    p.poner(taiko(0.55, 0.78), 0.0)
+    roca = _crujido_piedra(0.58, 260, grave=True) * adsr(_n(0.58), 0.01, 0.12, 0.48, 0.24) * 0.72
+    p.poner(roca, 0.02)
+    cadena = paso_banda(ruido(0.32), 1400, 5200) * caida(_n(0.32), 0.09) * 0.40
+    p.poner(cadena, 0.08)
+    p.poner(campanita("E5", 0.55, 0.20), 0.10)
+    return reverb(p.entera(), 1.2, 0.28)
+
+
+def cadena_suelta():
+    """Una de las tres cadenas del Sol Encadenado se suelta: chasquido metálico enorme y acorde liberador."""
+    p = Pista(2.1)
+    p.poner(taiko(1.05, 0.90), 0.0)
+    eslabon = paso_banda(ruido(0.46), 1100, 6200) * adsr(_n(0.46), 0.01, 0.12, 0.42, 0.22) * 0.55
+    p.poner(eslabon, 0.04)
+    for k, nota in enumerate(("D5", "A5", "D6", "F#6", "A6")):
+        p.poner(campanita(nota, 1.55 - k * 0.08, 0.30 - k * 0.02), 0.08 + k * 0.11, pan=-0.22 + k * 0.11)
+    return reverb(p.entera(), 2.4, 0.42)
+
+
+def velo_abre():
+    """Los dos rayos de los espejos abren el velo violeta de Giza sobre Jua-Giza."""
+    p = Pista(1.4)
+    velo = paso_banda(ruido_rosa(0.85), 600, 5000) * adsr(_n(0.85), 0.06, 0.18, 0.46, 0.34) * 0.44
+    p.poner(velo, 0.0)
+    sube = seno(_desliz(320, 960, 0.72), 0.72) * adsr(_n(0.72), 0.06, 0.14, 0.45, 0.26) * 0.26
+    p.poner(sube, 0.02)
+    for k, nota in enumerate(("F#5", "A5", "C#6", "F#6")):
+        p.poner(campanita(nota, 1.05, 0.26 - k * 0.03), 0.06 + k * 0.08)
+    return reverb(p.entera(), 1.85, 0.38)
+
+
+def jua_ola():
+    """Una ola circular de penumbra violeta brota de Jua-Giza por el Altar."""
+    p = Pista(1.15)
+    p.poner(tambor("D2", 0.42, 0.60, golpe=0.40), 0.0)
+    pulso = seno(_desliz(175, 68, 0.75), 0.75) * adsr(_n(0.75), 0.05, 0.18, 0.46, 0.28) * 0.42
+    p.poner(pulso, 0.0)
+    sombra = paso_banda(ruido_rosa(0.80), 220, 1600) * adsr(_n(0.80), 0.08, 0.18, 0.48, 0.30) * 0.44
+    p.poner(sombra, 0.04)
+    p.poner(campanita("A4", 0.70, 0.18), 0.08)
+    return reverb(p.entera(), 1.5, 0.32)
+
+
+def candado_brilla():
+    """El Candado del Sur destella entre las olas indicando que se puede golpear."""
+    p = Pista(1.0)
+    for k, nota in enumerate(("A5", "D6", "F#6")):
+        p.poner(campanita(nota, 0.85, 0.28 - k * 0.03), k * 0.07)
+    return reverb(p.entera(), 1.4, 0.32)
+
+
+def candado_golpe():
+    """Golpe de cetro sobre el Candado del Sur: repique brillante de oro y bronce."""
+    p = Pista(0.85)
+    p.poner(tambor("A2", 0.20, 0.42, golpe=0.45), 0.0)
+    metal = paso_banda(ruido(0.18), 1600, 6400) * caida(_n(0.18), 0.05) * 0.42
+    p.poner(metal, 0.0)
+    p.poner(campanita("D6", 0.70, 0.32), 0.02)
+    p.poner(campanita("A6", 0.65, 0.24), 0.07)
+    return reverb(p.entera(), 1.15, 0.28)
+
+
 def viento_arena(dur=30.0):
     """Viento cálido de las Dunas de Penumbra arrastrando arena fina sobre la arenisca."""
     n = _n(dur + 4)
@@ -3473,6 +3598,17 @@ EFECTOS = {
     "saa_endereza": (saa_endereza, 0.76),
     "saa_vuelca": (saa_vuelca, 0.88),
     "saa_muere": (saa_muere, 0.90),
+    "bendicion": (bendicion, 0.82),
+    "pesas_encajan": (pesas_encajan, 0.84),
+    "pilar_enciende": (pilar_enciende, 0.80),
+    "jua_aviso": (jua_aviso, 0.78),
+    "jua_llamarada": (jua_llamarada, 0.90),
+    "contrapeso_cruje": (contrapeso_cruje, 0.84),
+    "cadena_suelta": (cadena_suelta, 0.92),
+    "velo_abre": (velo_abre, 0.82),
+    "jua_ola": (jua_ola, 0.80),
+    "candado_brilla": (candado_brilla, 0.78),
+    "candado_golpe": (candado_golpe, 0.82),
 }
 
 AMBIENTES = {

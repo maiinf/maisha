@@ -281,6 +281,44 @@ func _ready() -> void:
 	_comprobar(espejo != null and not penas_calzada and pilares_3d == 4, "La Calzada respeta el abismo y construye sus 4 pilares en 3D (%d)" % pilares_3d)
 	_comprobar(rayo_saa_ok, "el rayo que barre de Saa-Mchanga se dibuja en 3D desde el ojo del coloso")
 
+	print("El Horizonte Inmóvil y Jioni de noche en HD-2D:")
+	Estado.marcar("horizonte_llegada")
+	Estado.marcar("jua_visto")
+	await _ir("horizonte_inmovil", "jioni")
+	espejo = _espejo()
+	var penas_horizonte := false
+	var rayos_jua_ok := false
+	if espejo:
+		for h in espejo.get_children():
+			if h is MeshInstance3D and (h as MeshInstance3D).layers == 2:
+				penas_horizonte = true
+		var jua_n := get_tree().get_first_node_in_group("jua_giza")
+		if jua_n != null:
+			jua_n.set("fase", 3)
+			jua_n.set("_olas", [{"r": 90.0, "hueco": 0.4, "dio": false}])
+			await _esperar(0.1)
+			var r_mesh: Mesh = espejo.get("_rayos_mesh")
+			rayos_jua_ok = r_mesh != null and r_mesh.get_surface_count() > 0
+	_comprobar(espejo != null and not penas_horizonte, "El Horizonte Inmóvil respeta el abismo del atardecer sin muros falsos")
+	_comprobar(rayos_jua_ok, "las olas de penumbra y los rayos cruzados de Jua-Giza se dibujan en 3D")
+
+	Estado.marcar("ocaso_libre")
+	Estado.marcar("jioni_llegada")
+	Estado.marcar("farol/colgado_00")
+	await _ir("jioni", "mirador")
+	espejo = _espejo()
+	var estrellas_n := 0
+	var luna_ok := false
+	var luces_noche_ok := false
+	if espejo:
+		var mm: MultiMesh = espejo.get("_estrellas_mm")
+		if mm != null:
+			estrellas_n = mm.instance_count
+		luna_ok = espejo.get("_luna_noche") != null
+		var rn_mesh: Mesh = espejo.get("_rayos_mesh")
+		luces_noche_ok = rn_mesh != null and rn_mesh.get_surface_count() > 0
+	_comprobar(espejo != null and bool(espejo.get("_es_jioni_noche")) and estrellas_n >= 80 and luna_ok and luces_noche_ok, "Jioni de noche activa cielo estrellado (%d estrellas), luna creciente y faroles luminosos 3D" % estrellas_n)
+
 	print("Las peñas y el recuerdo:")
 	await _ir("paso_escarcha", "sur")
 	espejo = _espejo()

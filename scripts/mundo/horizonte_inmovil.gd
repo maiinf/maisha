@@ -284,6 +284,13 @@ func _mostrar_fin() -> void:
 	fin.abrir()
 
 
+func volver_a_su_musica() -> void:
+	if Estado.tiene("ocaso_libre") and ResourceLoader.exists("res://audio/musica/ocaso_libre.ogg"):
+		Sonido.musica("ocaso_libre", 2.0)
+	else:
+		super()
+
+
 func _exit_tree() -> void:
 	Impacto.encuadre = Vector2.ZERO
 

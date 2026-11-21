@@ -198,6 +198,13 @@ func _anochecer() -> void:
 		(_casas[nombre] as Node2D).add_child(ventana)
 
 
+func volver_a_su_musica() -> void:
+	if Estado.tiene("ocaso_libre") and ResourceLoader.exists("res://audio/musica/jioni_noche.ogg"):
+		Sonido.musica("jioni_noche", 2.0)
+	else:
+		super()
+
+
 func _pensar_al_llegar() -> void:
 	await get_tree().create_timer(1.4).timeout
 	if not is_inside_tree() or Estado.tiene("jioni_llegada"):

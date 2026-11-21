@@ -100,7 +100,7 @@ func abrir() -> void:
 	_decir(String(saludos[randi() % saludos.size()]))
 	get_tree().paused = true
 	Sonido.efecto("mochila_abrir")
-	Sonido.musica("tienda", 0.8)
+	Sonido.musica("tienda_kikombe" if tendero == "kikombe" and ResourceLoader.exists("res://audio/musica/tienda_kikombe.ogg") else "tienda", 0.8)
 	create_tween().tween_property(self, "_alfa", 1.0, 0.3)
 
 

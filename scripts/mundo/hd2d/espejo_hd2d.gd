@@ -33,7 +33,7 @@ const ALTO_MAPA := {
 	"dunas_penumbra": 1.25,
 }
 ## Mapas en los que «0» no es peña sino cielo o vacío (no se levantan bloques de roca)
-const SIN_PENAS := ["observatorio_aurora", "aguja_caida", "mirador_ocaso", "jioni", "calzada_obeliscos"]
+const SIN_PENAS := ["observatorio_aurora", "aguja_caida", "mirador_ocaso", "jioni", "calzada_obeliscos", "horizonte_inmovil"]
 const SUELO_BAJO := -4             # dibujos con z_index <= SUELO_BAJO: se tumban en el suelo
 const PLATAFORMAS := ["barcaza.gd", "penasco.gd"] # plataformas elevadas sobre vacío o escoria
 const CAMARA_INCLINACION := -48.0  # grados (mirando hacia abajo)
@@ -210,18 +210,24 @@ var _rayos_mi: MeshInstance3D = null
 var _pasarelas_mesh: ImmediateMesh = null
 var _pasarelas_mi: MeshInstance3D = null
 var _pasarelas_nodos: Array[Node] = []
+var _es_jioni_noche := false
+var _estrellas_mm: MultiMesh = null
+var _estrellas_datos: Array = []
+var _luna_noche: Sprite3D = null
 
 
 func _ready() -> void:
 	region = escena.get_node_or_null("Region")
 	_maisha = escena.get_tree().get_first_node_in_group("maisha") as Node2D
 	_sol_ocaso = escena.get_node_or_null("Sol") if (region != null and String(region.get("mundo")) == "ocaso") else null
+	_es_jioni_noche = region != null and String(region.get("mapa")) == "jioni" and Estado.tiene("ocaso_libre")
 	_crear_ambiente()
 	_crear_suelo()
 	_crear_camara()
 	_crear_capas()
 	_crear_motas()
 	_crear_efectos_jardin()
+	_crear_noche_jioni()
 	for n in _todos(escena):
 		_registrar(n)
 	# la raíz de la escena, en los canales de las dos capas (si no, se llevaría por delante a todos sus hijos)
@@ -243,7 +249,7 @@ func _todos(nodo: Node) -> Array:
 func _crear_ambiente() -> void:
 	var entorno := Environment.new()
 	entorno.background_mode = Environment.BG_COLOR
-	_fondo_base = Color.BLACK if region == null else RenderingServer.get_default_clear_color()
+	_fondo_base = Color(0.11, 0.14, 0.34) if _es_jioni_noche else (Color.BLACK if region == null else RenderingServer.get_default_clear_color())
 	entorno.background_color = _fondo_base
 	_entorno = entorno
 	entorno.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
@@ -258,9 +264,14 @@ func _crear_ambiente() -> void:
 	sol = DirectionalLight3D.new()
 	sol.shadow_enabled = true
 	var es_ocaso := region != null and String(region.get("mundo")) == "ocaso"
-	sol.light_energy = 0.26 if es_ocaso else 0.27
-	sol.light_color = Color(1.0, 0.88, 0.72) if es_ocaso else Color(1.0, 0.95, 0.86)
-	sol.rotation_degrees = _angulo_sol_ocaso() if es_ocaso else Vector3(-50, -35, 0)          # (desde arriba a la izquierda y algo por detrás: sombras hacia delante y a la derecha, como las pintadas)
+	if _es_jioni_noche:
+		sol.light_energy = 0.22
+		sol.light_color = Color(0.64, 0.76, 1.0)
+		sol.rotation_degrees = Vector3(-44.0, 28.0, 0.0)
+	else:
+		sol.light_energy = 0.26 if es_ocaso else 0.27
+		sol.light_color = Color(1.0, 0.88, 0.72) if es_ocaso else Color(1.0, 0.95, 0.86)
+		sol.rotation_degrees = _angulo_sol_ocaso() if es_ocaso else Vector3(-50, -35, 0)          # (desde arriba a la izquierda y algo por detrás: sombras hacia delante y a la derecha, como las pintadas)
 	sol.directional_shadow_max_distance = 60.0
 	add_child(sol)
 	# (en cuevas o de noche, un resplandor suave alrededor de Maisha solo sobre los muros para que la roca cercana se distinga)
@@ -657,7 +668,7 @@ func _registrar(n: Node) -> void:
 		if not _pasarelas_nodos.has(n):
 			_pasarelas_nodos.append(n)
 		return
-	if n.get_parent() and n.get_parent().get_script() and (String(n.get_parent().get_script().resource_path).ends_with("espejo_alto.gd") or String(n.get_parent().get_script().resource_path).ends_with("saa_mchanga.gd")) and _dibuja(n):
+	if n.get_parent() and n.get_parent().get_script() and (String(n.get_parent().get_script().resource_path).ends_with("espejo_alto.gd") or String(n.get_parent().get_script().resource_path).ends_with("saa_mchanga.gd") or String(n.get_parent().get_script().resource_path).ends_with("jua_giza.gd")) and _dibuja(n):
 		ci.visibility_layer = CANAL_NADA
 		return
 	if _de_pantalla(n):
@@ -872,6 +883,7 @@ func _process(_delta: float) -> void:
 	_mover_capas()
 	_actualizar_motas(_delta)
 	_actualizar_efectos_jardin()
+	_actualizar_noche_jioni()
 	if sol and is_instance_valid(_sol_ocaso):
 		sol.rotation_degrees = sol.rotation_degrees.lerp(_angulo_sol_ocaso(), clampf(_delta * 5.0, 0.0, 1.0))
 	# La capa 2D del suelo y las ventanitas ya reciben LuzDelDia / Penumbra; aquí igualamos el suelo lejano, las peñas y los gemelos
@@ -1095,6 +1107,10 @@ func _crear_motas() -> void:
 		col_a = Color("ffcb72")
 		col_b = Color("d88450")
 		vel_y = 0.30
+	elif _es_jioni_noche:
+		col_a = Color("ffe284")
+		col_b = Color("a2d2ff")
+		vel_y = 0.20
 	elif mundo == "ocaso":
 		col_a = Color("ffbe68")
 		col_b = Color("e8788a")
@@ -1150,12 +1166,12 @@ func _actualizar_motas(delta: float) -> void:
 		_motas_mm.set_instance_color(i, Color(col.r, col.g, col.b, pulso * alt_a))
 
 
-## Rayos volumétricos 3D (luz_jardin.gd, espejo_alto.gd, saa_mchanga.gd) y pasarelas sobre el Estanque (pasarela_espejo.gd)
+## Rayos volumétricos 3D (luz_jardin.gd, espejo_alto.gd, saa_mchanga.gd, jua_giza.gd), faroles de Jioni de noche y pasarelas sobre el Estanque
 func _crear_efectos_jardin() -> void:
 	if region == null:
 		return
 	var mapa_n := String(region.get("mapa"))
-	if not mapa_n in ["jardin_faroles", "calzada_obeliscos"]:
+	if not (mapa_n in ["jardin_faroles", "calzada_obeliscos", "horizonte_inmovil"] or _es_jioni_noche):
 		return
 	_rayos_mesh = ImmediateMesh.new()
 	var mat_r := StandardMaterial3D.new()
@@ -1214,14 +1230,89 @@ func _rect_suelo_3d(m: ImmediateMesh, x0: float, z0: float, x1: float, z1: float
 		m.surface_add_vertex(v)
 
 
+func _disco_suelo_3d(m: ImmediateMesh, centro: Vector3, radio: float, col_centro: Color, col_borde: Color, segs := 16) -> void:
+	for i in segs:
+		var a0 := float(i) / float(segs) * TAU
+		var a1 := float(i + 1) / float(segs) * TAU
+		var p0 := centro + Vector3(cos(a0) * radio, 0.0, sin(a0) * radio)
+		var p1 := centro + Vector3(cos(a1) * radio, 0.0, sin(a1) * radio)
+		m.surface_set_color(col_centro)
+		m.surface_add_vertex(centro)
+		m.surface_set_color(col_borde)
+		m.surface_add_vertex(p0)
+		m.surface_set_color(col_borde)
+		m.surface_add_vertex(p1)
+
+
+func _halo_vertical_3d(m: ImmediateMesh, centro: Vector3, radio: float, col_centro: Color, col_borde: Color, segs := 16) -> void:
+	for i in segs:
+		var a0 := float(i) / float(segs) * TAU
+		var a1 := float(i + 1) / float(segs) * TAU
+		var p0 := centro + Vector3(cos(a0) * radio, sin(a0) * radio, 0.0)
+		var p1 := centro + Vector3(cos(a1) * radio, sin(a1) * radio, 0.0)
+		m.surface_set_color(col_centro)
+		m.surface_add_vertex(centro)
+		m.surface_set_color(col_borde)
+		m.surface_add_vertex(p0)
+		m.surface_set_color(col_borde)
+		m.surface_add_vertex(p1)
+
+
+func _arco_ola_3d(m: ImmediateMesh, centro2: Vector2, radio_px: float, ang_ini: float, ang_fin: float, alfa: float) -> void:
+	var segs := 44
+	var r := radio_px * PX
+	var cx := centro2.x * PX
+	var cz := centro2.y * PX
+	var col_base := Color(0.55, 0.24, 0.88, 0.42 * alfa + 0.16)
+	var col_cresta := Color(0.92, 0.70, 1.0, 0.78 * alfa + 0.18)
+	var col_tope := Color(0.76, 0.44, 1.0, 0.08 * alfa)
+	var w := 0.32
+	var y0 := 0.06
+	var y1 := 0.44
+	for i in segs:
+		var t0 := lerpf(ang_ini, ang_fin, float(i) / float(segs))
+		var t1 := lerpf(ang_ini, ang_fin, float(i + 1) / float(segs))
+		var c0 := cos(t0)
+		var s0 := sin(t0)
+		var c1 := cos(t1)
+		var s1 := sin(t1)
+		# Franja de peligro en el suelo
+		var g0 := Vector3(cx + c0 * (r - w), y0, cz + s0 * (r - w))
+		var g1 := Vector3(cx + c0 * (r + w), y0, cz + s0 * (r + w))
+		var g2 := Vector3(cx + c1 * (r + w), y0, cz + s1 * (r + w))
+		var g3 := Vector3(cx + c1 * (r - w), y0, cz + s1 * (r - w))
+		for v in [g0, g1, g2, g0, g2, g3]:
+			m.surface_set_color(col_base)
+			m.surface_add_vertex(v)
+		# Cresta vertical luminosa de la ola de penumbra
+		var b0 := Vector3(cx + c0 * r, y0, cz + s0 * r)
+		var b1 := Vector3(cx + c1 * r, y0, cz + s1 * r)
+		var u0 := Vector3(cx + c0 * r, y1, cz + s0 * r)
+		var u1 := Vector3(cx + c1 * r, y1, cz + s1 * r)
+		m.surface_set_color(col_cresta)
+		m.surface_add_vertex(b0)
+		m.surface_set_color(col_cresta)
+		m.surface_add_vertex(b1)
+		m.surface_set_color(col_tope)
+		m.surface_add_vertex(u1)
+		m.surface_set_color(col_cresta)
+		m.surface_add_vertex(b0)
+		m.surface_set_color(col_tope)
+		m.surface_add_vertex(u1)
+		m.surface_set_color(col_tope)
+		m.surface_add_vertex(u0)
+
+
 func _actualizar_efectos_jardin() -> void:
 	if _rayos_mesh != null:
 		_rayos_mesh.clear_surfaces()
-		var hay_trazos := false
+		var hay_trazos := _es_jioni_noche
 		var luz_n := escena.get_node_or_null("Luz")
 		var segs: Array = luz_n.get("segmentos") if luz_n != null else []
 		var altos := escena.get_tree().get_nodes_in_group("espejos_altos")
 		var saas := escena.get_tree().get_nodes_in_group("saa_mchanga")
+		var juas := escena.get_tree().get_nodes_in_group("jua_giza")
+		var mapa_actual := String(region.get("mapa")) if region != null else ""
 		var latido := 0.80 + 0.16 * sin(_motas_t * 4.2)
 		if not segs.is_empty():
 			hay_trazos = true
@@ -1236,6 +1327,15 @@ func _actualizar_efectos_jardin() -> void:
 					continue
 				var f_saa := int(s_j.get("fase"))
 				if f_saa == 2 or (f_saa == 1 and float(s_j.get("_t")) > 2.2 * 0.6):
+					hay_trazos = true
+					break
+		if not hay_trazos:
+			for jg in juas:
+				if not is_instance_valid(jg):
+					continue
+				var fj := int(jg.get("fase"))
+				var olas_chk: Array = jg.get("_olas")
+				if bool(jg.get("_aviso")) or fj == 3 or not olas_chk.is_empty() or (fj == 2 and bool(jg.call("expuesto"))):
 					hay_trazos = true
 					break
 		if hay_trazos:
@@ -1259,12 +1359,13 @@ func _actualizar_efectos_jardin() -> void:
 				if not is_instance_valid(e) or not e.call("activo"):
 					continue
 				var t_rest := float(e.get("_t"))
-				var dura := 2.4
+				var dura_v: Variant = e.get("dura")
+				var dura := float(dura_v) if dura_v != null else 2.4
 				var f := minf(1.0, t_rest / 0.3) * minf(1.0, (dura - t_rest) / 0.12 + 0.2)
 				var o2: Vector2 = e.call("_origen")
 				var d2: Vector2 = e.get("apunta")
 				var a := Vector3(o2.x * PX, 1.05, o2.y * PX)
-				var b := Vector3(d2.x * PX, 1.05, d2.y * PX)
+				var b := Vector3(d2.x * PX, 2.85 if mapa_actual == "horizonte_inmovil" else 1.05, d2.y * PX)
 				var a0 := Vector3(o2.x * PX, 0.04, o2.y * PX)
 				var b0 := Vector3(d2.x * PX, 0.04, d2.y * PX)
 				var col := Color(1.0, 0.86, 0.50)
@@ -1281,9 +1382,8 @@ func _actualizar_efectos_jardin() -> void:
 				var ojo := Vector3(orig2.x * PX, 2.88, orig2.y * PX + 0.12)
 				var col_saa := Color(1.0, 0.86, 0.44)
 				if f_saa == 1 and float(s_j.get("_t")) > 2.2 * 0.6:
-					var r_ojo := 0.45 + 0.14 * sin(_motas_t * 28.0)
-					_cinta_3d(_rayos_mesh, ojo - Vector3(r_ojo, 0, 0), ojo + Vector3(r_ojo, 0, 0), r_ojo * 1.1, Color(col_saa, 0.72), true)
-					_cinta_3d(_rayos_mesh, ojo - Vector3(0, 0, r_ojo), ojo + Vector3(0, 0, r_ojo), r_ojo * 1.1, Color(1.0, 0.96, 0.76, 0.85), false)
+					var r_ojo := 0.55 + 0.16 * sin(_motas_t * 28.0)
+					_halo_vertical_3d(_rayos_mesh, ojo, r_ojo, Color(1.0, 0.96, 0.76, 0.85), Color(col_saa, 0.0), 16)
 				var puntas: Array = s_j.call("rayos")
 				for punta: Vector2 in puntas:
 					var fin2 := orig2 + punta
@@ -1297,6 +1397,62 @@ func _actualizar_efectos_jardin() -> void:
 					_cinta_3d(_rayos_mesh, ojo, b_ojo, 0.70, Color(col_saa, 0.32 * latido), true)
 					_cinta_3d(_rayos_mesh, ojo, b_ojo, 0.22, Color(1.0, 0.99, 0.88, 0.96), false)
 					_cinta_3d(_rayos_mesh, ojo, b_ojo, 0.18, Color(1.0, 0.99, 0.88, 0.90), true)
+			for jg in juas:
+				if not is_instance_valid(jg):
+					continue
+				var pos_j: Vector2 = jg.global_position
+				var centro_sol := Vector3(pos_j.x * PX, 3.85, pos_j.y * PX + 0.14)
+				var col_sol := Color(1.0, 0.86, 0.45)
+				if bool(jg.get("_aviso")):
+					var r_av := 2.4 + 0.45 * sin(_motas_t * 24.0)
+					_halo_vertical_3d(_rayos_mesh, centro_sol, r_av, Color(1.0, 0.96, 0.78, 0.58), Color(col_sol, 0.0), 20)
+					_disco_suelo_3d(_rayos_mesh, Vector3(pos_j.x * PX, 0.06, pos_j.y * PX), 3.6 + 0.4 * sin(_motas_t * 16.0), Color(1.0, 0.84, 0.44, 0.26), Color(1.0, 0.72, 0.28, 0.0), 20)
+				if int(jg.get("fase")) == 2 and bool(jg.call("expuesto")):
+					var broche := Vector3(pos_j.x * PX, 2.35, pos_j.y * PX + 0.18)
+					var rb := 1.05 + 0.20 * sin(_motas_t * 14.0)
+					_halo_vertical_3d(_rayos_mesh, broche, rb, Color(1.0, 0.96, 0.72, 0.75), Color(1.0, 0.84, 0.36, 0.0), 16)
+				var olas_j: Array = jg.get("_olas")
+				for o in olas_j:
+					var r_o := float(o["r"])
+					var h_o := float(o["hueco"])
+					var a_o := clampf(1.0 - r_o / 240.0, 0.0, 1.0)
+					_arco_ola_3d(_rayos_mesh, pos_j, r_o, h_o + 0.6, h_o + TAU - 0.6, a_o)
+				var puntas_j: Array = jg.call("_rayos")
+				for punta_j: Vector2 in puntas_j:
+					var fin_j := pos_j + punta_j
+					var b_j := Vector3(fin_j.x * PX, 0.45, fin_j.y * PX)
+					var a_s := Vector3(pos_j.x * PX, 0.05, pos_j.y * PX)
+					var b_s := Vector3(fin_j.x * PX, 0.05, fin_j.y * PX)
+					_cinta_3d(_rayos_mesh, a_s, b_s, 1.15, Color(col_sol, 0.22 * latido), false)
+					_cinta_3d(_rayos_mesh, a_s, b_s, 0.36, Color(1.0, 0.95, 0.72, 0.48 * latido), false)
+					_cinta_3d(_rayos_mesh, centro_sol, b_j, 0.76, Color(col_sol, 0.34 * latido), false)
+					_cinta_3d(_rayos_mesh, centro_sol, b_j, 0.64, Color(col_sol, 0.30 * latido), true)
+					_cinta_3d(_rayos_mesh, centro_sol, b_j, 0.20, Color(1.0, 0.99, 0.90, 0.95), false)
+					_cinta_3d(_rayos_mesh, centro_sol, b_j, 0.16, Color(1.0, 0.99, 0.90, 0.88), true)
+			if _es_jioni_noche:
+				var postes := escena.get_tree().get_nodes_in_group("postes_farol")
+				for pf in postes:
+					if not is_instance_valid(pf) or not bool(pf.call("encendido")):
+						continue
+					var p2: Vector2 = pf.global_position
+					var pul := 0.86 + 0.14 * sin(_motas_t * 3.1 + p2.x * 0.05)
+					_disco_suelo_3d(_rayos_mesh, Vector3(p2.x * PX, 0.055, p2.y * PX), 2.15, Color(1.0, 0.78, 0.36, 0.24 * pul), Color(1.0, 0.64, 0.22, 0.0), 16)
+					var llama := Vector3(p2.x * PX + 0.20, 1.72, p2.y * PX + 0.14)
+					_halo_vertical_3d(_rayos_mesh, llama, 0.85, Color(1.0, 0.88, 0.48, 0.56 * pul), Color(1.0, 0.66, 0.20, 0.0), 14)
+				var casas_v: Variant = escena.get("_casas")
+				if casas_v is Dictionary:
+					for sp in (casas_v as Dictionary).values():
+						if not is_instance_valid(sp):
+							continue
+						var c2: Vector2 = (sp as Node2D).global_position
+						_disco_suelo_3d(_rayos_mesh, Vector3(c2.x * PX, 0.05, c2.y * PX + 0.85), 2.0, Color(1.0, 0.72, 0.34, 0.22 * latido), Color(1.0, 0.56, 0.22, 0.0), 14)
+						var vent := Vector3(c2.x * PX, 1.05, c2.y * PX + 0.22)
+						_halo_vertical_3d(_rayos_mesh, vent, 0.95, Color(1.0, 0.82, 0.44, 0.36 * latido), Color(1.0, 0.62, 0.22, 0.0), 14)
+				if is_instance_valid(_maisha):
+					var mp := _maisha.global_position
+					var radio_m := 2.35 if Tienda.lleva("capa_farolillero") else 1.45
+					var col_m := Color(1.0, 0.84, 0.46, 0.22) if Tienda.lleva("capa_farolillero") else Color(0.75, 0.86, 1.0, 0.16)
+					_disco_suelo_3d(_rayos_mesh, Vector3(mp.x * PX, 0.05, mp.y * PX), radio_m, col_m, Color(col_m.r, col_m.g, col_m.b, 0.0), 16)
 			_rayos_mesh.surface_end()
 	if _pasarelas_mesh != null:
 		_pasarelas_mesh.clear_surfaces()
@@ -1340,3 +1496,114 @@ func _actualizar_efectos_jardin() -> void:
 					_pasarelas_mesh.surface_set_color(col_canto)
 					_pasarelas_mesh.surface_add_vertex(v)
 		_pasarelas_mesh.surface_end()
+
+
+## Cielo de la Primera Noche en Jioni (tras «ocaso_libre»): estrellas centelleantes y luna creciente fina en 3D
+func _crear_noche_jioni() -> void:
+	if not _es_jioni_noche or region == null:
+		return
+	var filas: PackedStringArray = region.get("_filas")
+	var ancho := filas[0].length() if not filas.is_empty() else 64
+	var alto := filas.size() if not filas.is_empty() else 44
+	var mat := StandardMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	mat.vertex_color_use_as_albedo = true
+	mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.11, 0.11)
+	quad.material = mat
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 20261121
+	var cols := [Color("f6f9ff"), Color("b8d8ff"), Color("fff0c2"), Color("d8e6ff")]
+	var pos_lista: Array[Dictionary] = []
+	# Estrellas en el cielo norte sobre el horizonte y tras la Torre
+	for _i in 185:
+		var sx := rng.randf_range(-4.0, float(ancho) + 4.0)
+		var sz := rng.randf_range(-6.0, 9.2)
+		if sz > -0.3 and sx > 28.5 and sx < 35.5:
+			continue
+		if sz > 0.0 and sz < float(alto) and sx >= 0.0 and sx < float(ancho):
+			var cy := clampi(int(floor(sz)), 0, alto - 1)
+			var cx := clampi(int(floor(sx)), 0, ancho - 1)
+			if filas[cy][cx] != "0":
+				continue
+		var sy := rng.randf_range(0.18, 2.4) if sz >= 0.0 else rng.randf_range(0.25, 4.2)
+		pos_lista.append({
+			"pos": Vector3(sx, sy, sz),
+			"esc": rng.randf_range(0.50, 1.45),
+			"fase": rng.randf() * TAU,
+			"vel": rng.randf_range(1.4, 3.6),
+			"col": cols[rng.randi() % cols.size()],
+		})
+	# Estrellas reflejadas en el abismo nocturno al sur, oeste y este
+	for _j in 80:
+		var sx := rng.randf_range(-4.0, float(ancho) + 4.0)
+		var sz := rng.randf_range(39.2, float(alto) + 8.0) if rng.randf() < 0.7 else rng.randf_range(8.0, 39.0)
+		if sz >= 0.0 and sz < float(alto) and sx >= 0.0 and sx < float(ancho):
+			var cy := clampi(int(floor(sz)), 0, alto - 1)
+			var cx := clampi(int(floor(sx)), 0, ancho - 1)
+			if filas[cy][cx] != "0":
+				continue
+			# Evitar el talud rocoso justo debajo del suelo
+			if cy >= 2 and filas[cy - 2][cx] != "0":
+				continue
+		pos_lista.append({
+			"pos": Vector3(sx, rng.randf_range(0.12, 0.55), sz),
+			"esc": rng.randf_range(0.45, 1.15),
+			"fase": rng.randf() * TAU,
+			"vel": rng.randf_range(1.2, 3.2),
+			"col": cols[rng.randi() % cols.size()],
+		})
+	_estrellas_datos = pos_lista
+	_estrellas_mm = MultiMesh.new()
+	_estrellas_mm.transform_format = MultiMesh.TRANSFORM_3D
+	_estrellas_mm.use_colors = true
+	_estrellas_mm.mesh = quad
+	_estrellas_mm.instance_count = _estrellas_datos.size()
+	var inst := MultiMeshInstance3D.new()
+	inst.multimesh = _estrellas_mm
+	inst.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	inst.extra_cull_margin = 100.0
+	add_child(inst)
+
+	# Luna creciente fina (estilo 26_primera_noche.png) en el cielo norte despejado
+	var img := Image.create_empty(48, 48, false, Image.FORMAT_RGBA8)
+	var centro := Vector2(24.0, 24.0)
+	var recorte := Vector2(29.5, 20.5)
+	for py in 48:
+		for px in 48:
+			var p := Vector2(float(px) + 0.5, float(py) + 0.5)
+			var d_luna := p.distance_to(centro)
+			var d_corte := p.distance_to(recorte)
+			if d_luna <= 13.0 and d_corte >= 10.6:
+				var brillo := clampf(1.0 - (d_luna / 14.0) * 0.15, 0.85, 1.0)
+				img.set_pixel(px, py, Color(1.0 * brillo, 0.96 * brillo, 0.80 * brillo, 1.0))
+			elif d_luna <= 22.0:
+				var halo := pow(clampf(1.0 - (d_luna - 10.0) / 12.0, 0.0, 1.0), 2.2) * 0.28
+				if halo > 0.01:
+					img.set_pixel(px, py, Color(0.84, 0.90, 1.0, halo))
+	var tex_luna := ImageTexture.create_from_image(img)
+	_luna_noche = Sprite3D.new()
+	_luna_noche.texture = tex_luna
+	_luna_noche.pixel_size = 0.072
+	_luna_noche.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_luna_noche.shaded = false
+	_luna_noche.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+	_luna_noche.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_luna_noche.position = Vector3(25.5, 0.95, 3.6)
+	add_child(_luna_noche)
+	_actualizar_noche_jioni()
+
+
+func _actualizar_noche_jioni() -> void:
+	if _estrellas_mm == null or _estrellas_datos.is_empty():
+		return
+	for i in _estrellas_datos.size():
+		var d: Dictionary = _estrellas_datos[i]
+		var esc: float = float(d["esc"])
+		var centelleo := 0.40 + 0.60 * (0.5 + 0.5 * sin(_motas_t * float(d["vel"]) + float(d["fase"])))
+		var col: Color = d["col"]
+		_estrellas_mm.set_instance_transform(i, Transform3D(Basis().scaled(Vector3.ONE * esc), d["pos"]))
+		_estrellas_mm.set_instance_color(i, Color(col.r, col.g, col.b, centelleo))
