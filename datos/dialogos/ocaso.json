@@ -490,5 +490,100 @@
 				}
 			}
 		]
+	},
+	"jardin_llegada": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Detrás de la puerta de Jioni hay un jardín. Setos altísimos, recortados como paredes, y entre ellos el aire huele a té y a flores que se abren de noche.",
+					"Pero aquí nunca llega la noche. Las flores se quedaron a medio abrir, esperándola.",
+					"En medio de la pérgola, un cristal grande sobre una columna recoge el atardecer y lo suelta en un hilo de luz que se va hacia el este.",
+					"Un hilo de luz que se puede seguir... y doblar, si encuentro con qué."
+				]
+			}
+		]
+	},
+	"jardin_cartel": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Una tablilla de cerámica clavada en el seto, con letras pintadas de oro:",
+					"«La luz entra recta y sale doblada. El espejo la tuerce; el prisma la parte en dos: el oro abre lo que está cerrado, el violeta enseña lo que es mentira».",
+					"Debajo, alguien ha añadido con prisa: «Cuidado con las polillas. Se comen la luz»."
+				]
+			}
+		]
+	},
+	"jardin_celosia": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"La luz violeta toca la celosía del seto... y el seto se deshace como el humo de una tetera.",
+					"No había seto. Solo un dibujo de seto, y detrás, un pasillo que lleva a un pabellón con el tejado morado.",
+					"Alguien escondió aquí algo que no quería que se encontrara a la primera."
+				]
+			}
+		]
+	},
+	"jardin_verja": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El rayo dorado llega al disco de sol de la verja. El bronce se pone al rojo, cruje... y la verja se hunde en el suelo.",
+					"Al otro lado hay un invernadero de cristal. Dentro, cuatro espejos altos, de pie, como si esperaran a alguien."
+				]
+			}
+		]
+	},
+	"jardin_reflejo": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"El haz violeta cruza el estanque y una de las dos pasarelas se pone a temblar como el agua.",
+					"No es madera. Es el reflejo de la otra, que se ha quedado flotando.",
+					"Menos mal. Ya iba a pisarla."
+				]
+			}
+		]
+	},
+	"mondo_encuentro": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"En el Invernadero no se oye nada. Ni el agua, ni el viento. Solo un ronroneo, muy grave, que no sé de dónde sale.",
+					"Delante de un espejo hay un serval de bronce sentado, con unas orejas enormes de cristal dorado. Me mira sin parpadear.",
+					"Delante del espejo de al lado... hay otro. Y otro más allá. Los tres iguales, los tres mirándome.",
+					"Solo uno puede ser de verdad. Los otros son reflejos que se han escapado de los espejos."
+				]
+			}
+		]
+	},
+	"mondo_vencido": {
+		"nombre": "",
+		"estilo": "pensamiento",
+		"conversaciones": [
+			{
+				"lineas": [
+					"Mondo se queda tumbado en las baldosas de cristal. Ya no salen más reflejos de ningún espejo.",
+					"Bajo su pata hay una pesa de bronce con una luna creciente grabada. La Pesa del Este.",
+					"Cuando la muevo, la luna tarda un poco en moverse con ella. Como si también fuera un reflejo."
+				],
+				"recibe": {
+					"peso_este": 1
+				}
+			}
+		]
 	}
 }

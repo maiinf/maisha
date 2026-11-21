@@ -1249,7 +1249,28 @@ El camino del oeste de Jioni (`documentacion/boceto_dunas_penumbra.png`, de Gemi
 | Arte | `herramientas/pintar_dunas.py` → `arte/mundos/ocaso/dunas/` (vela, espejo enterrado, pesa, Kivuli) |
 | Misión | `dunas_penumbra` |
 | Prueba | `prueba_dunas_penumbra` |
-| Falta | Música propia y la de Kivuli (ahora suena la del Mirador y, en la pelea, la del Kifaru); verlo pulido en HD-2D |
+| Falta | Gemini ya puso la música, los sonidos y el HD-2D |
+
+## El Valle del Ocaso: El Jardín de los Faroles y Mondo
+
+El camino del este de Jioni (`documentacion/boceto_jardin_faroles.png`, de Gemini; capturas en `documentacion/jardin_captura_1.png`…`_4.png`).
+
+| Qué | Cómo |
+| --- | --- |
+| Cómo se llega | Por la salida este de Jioni (puerta `jardin` → `jioni`). La misión aparece cuando Kibatari cuenta los tres caminos |
+| Mapa | `jardin_faroles` (74×54, `crear_jardin()`): patios entre **setos** altos (`0`). La Pérgola (oeste), el Claustro de los Prismas (centro), el Pabellón del Té (norte, secreto), el Estanque de los Reflejos (sur, agua `=` que hunde) y el Invernadero (este). Suelo: `pintar_jardin()` (césped, grava rastrillada, losas con cruz de mosaico, matas redondas, nenúfares, baldosas de cristal) |
+| La luz | `scripts/mundo/ocaso/luz_jardin.gd`: el **Prisma Solar** de la Pérgola echa un rayo **dorado** al este; la luz va casilla a casilla y la tuercen o paran las «opticas» (`ocupa()`, `desviar()`) |
+| Espejos de ángulo | `ocaso/espejo_angulo.gd`: un golpe los cambia de «/» a «\». Cuatro en el Claustro. Se guardan |
+| Prisma | `ocaso/prisma.gd`: la luz dorada sigue recta y sale un haz **violeta** por la cara que se le gire (nunca hacia atrás). Se guarda |
+| Polillas de papel | `scripts/enemigos/polilla_papel.gd`: cuando Maisha se acerca, vuelan al espejo encendido más cercano y lo **tapan** (la luz se para). Un golpe las rompe; la **Resonancia de Ámbar** (P) también (`combate/resonancia_ambar.gd` mira el grupo `polillas`) |
+| Verja y celosía | `ocaso/barrera_luz.gd`: la **verja** del Invernadero baja con la luz dorada (`jardin/verja`); la **celosía ilusoria** del Pabellón del Té se deshace con la violeta (`jardin/celosia`) |
+| Pasarelas gemelas | `ocaso/pasarela_espejo.gd`: sobre el Estanque, dos iguales; la de arriba es un reflejo (se hunde). La luz violeta la delata (`jardin/reflejo_delatado`) |
+| **Mondo** | `scripts/enemigos/mondo.gd`, 9 de vida. Se parte en él y dos **reflejos** iguales delante de los cuatro **espejos altos** (`ocaso/espejo_alto.gd`); por turnos saltan a Maisha, dan un zarpazo y saltan a otro espejo. Un golpe a un espejo alto suelta un rayo en diagonal: el reflejo que toca **se esfuma**; si toca al de verdad, **cae aturdido** (cetro 1, semillas 2; a los 3 golpes se levanta y se vuelve a partir). Furia a la mitad: un reflejo más. Vencido: **Pesa del Este** (`peso_este`) y un Farol |
+| Faroles de la Hora | Tres: el Pabellón del Té, el muelle del Estanque y el que suelta Mondo |
+| Arte | `herramientas/pintar_jardin.py` → `arte/mundos/ocaso/jardin/` (Prisma Solar, espejos, prisma, verja, celosía, polilla, Mondo, espejos altos, pesa, pérgola, linterna, pabellón) |
+| Misión | `jardin_faroles` |
+| Prueba | `prueba_jardin_faroles` |
+| Falta | Música propia del Jardín y de Mondo (ahora suena la de Jioni y, en la pelea, la de Kivuli), sonidos y verlo en HD-2D (los rayos aún no se ven en 3D) |
 
 ## Las construcciones, al nivel de la casa del castor
 

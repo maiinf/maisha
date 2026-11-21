@@ -165,9 +165,13 @@
 		],
 		"jioni": [
 			"mirador_ocaso",
-			"dunas_penumbra"
+			"dunas_penumbra",
+			"jardin_faroles"
 		],
 		"dunas_penumbra": [
+			"jioni"
+		],
+		"jardin_faroles": [
 			"jioni"
 		]
 	},
@@ -2048,6 +2052,50 @@
 					],
 					"ir": {
 						"escena": "dunas_penumbra",
+						"buscar": "grupo:jefes"
+					}
+				}
+			]
+		},
+		{
+			"id": "jardin_faroles",
+			"tipo": "historia",
+			"titulo": "El Jardín de los Faroles",
+			"texto": "Al este de Jioni, un jardín de setos y estanques donde la luz se dobla en los espejos. En el invernadero, un serval que nunca está solo guarda otra pesa del reloj.",
+			"aparece": [
+				"kibatari_caminos"
+			],
+			"hecha": [
+				"mondo_vencido"
+			],
+			"pasos": [
+				{
+					"texto": "Sal de Jioni por el este, al Jardín",
+					"hecho": [
+						"jardin_faroles"
+					],
+					"ir": {
+						"escena": "jioni",
+						"buscar": "puerta:jardin_faroles"
+					}
+				},
+				{
+					"texto": "Lleva la luz dorada hasta la verja del Invernadero (golpea los espejos)",
+					"hecho": [
+						"jardin/verja"
+					],
+					"ir": {
+						"escena": "jardin_faroles",
+						"buscar": "grupo:espejos"
+					}
+				},
+				{
+					"texto": "Vence a Mondo en el Invernadero",
+					"hecho": [
+						"mondo_vencido"
+					],
+					"ir": {
+						"escena": "jardin_faroles",
 						"buscar": "grupo:jefes"
 					}
 				}

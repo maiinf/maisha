@@ -1217,6 +1217,120 @@ def pintar_mirador(nombre, salida=None):
     print("Suelo pintado:", destino, (lz.w, lz.h))
 
 
+def pintar_jardin(nombre, salida=None):
+    """El suelo de EL JARDÍN DE LOS FAROLES (el Valle del Ocaso): CÉSPED de atardecer (verde con reflejos malva) con
+    caminos de GRAVA rastrillada; SETOS altos («0») con flores de farol; el CLAUSTRO, de losas de arenisca con una
+    cruz de mosaico; el INVERNADERO, de baldosas de cristal y arriates; y el ESTANQUE («=»), agua quieta que copia el
+    cielo del atardecer, con nenúfares. Las pasarelas, la luz y los espejos los dibuja el juego."""
+    filas = leer(nombre)
+    alto, ancho = len(filas), len(filas[0])
+    lz = Lienzo(ancho * CASILLA, alto * CASILLA, s=2, semilla=73)
+    tipos = [["seto" if c == "0" else ("agua" if c == "=" else "suelo") for c in f] for f in filas]
+    seto = mascara(lz, tipos, ("seto",), 2.2, 0.22, semilla=731)
+    agua = mascara(lz, tipos, ("agua",), 1.6, 0.12, semilla=732) * (1 - seto)
+    suelo = np.clip(1 - seto - agua, 0, 1)
+    fina = lz.ruido(0.8, 2, semilla=733)
+    media = lz.ruido(10, 3, semilla=734)
+    grande = lz.ruido(46, 3, semilla=735)
+    S = lz.s
+
+    def zona(x0, y0, x1, y1, borroso=2):
+        z = np.zeros((lz.H, lz.W), np.float32)
+        cv2.rectangle(z, (x0 * 16 * S, y0 * 16 * S), ((x1 + 1) * 16 * S - 1, (y1 + 1) * 16 * S - 1), 1.0, -1)
+        return (lz.desenfocar(z, borroso) > 0.5) * suelo
+    # EL CÉSPED: verde oscuro con briznas y reflejos malva del cielo
+    brizna = (np.abs(np.sin(lz.x * 1.7 + lz.y * 0.4 + fina * 6)) > 0.92) * 1.0
+    vc = 0.45 + (grande - 0.5) * 0.3 + (media - 0.5) * 0.2 + (fina - 0.5) * 0.12 + brizna * 0.12
+    lz.pintar(np.ones((lz.H, lz.W)), rampa(["#101c1a", "#1a2c26", "#243c30", "#30503a", "#3e6244", "#58744e", "#8a8462"], np.clip(vc, 0, 1)))
+    lz.pintar(suelo * (media > 0.62) * (fina > 0.5), "#a878a0", 0.18)
+    flores = suelo * (lz.ruido(1.5, 2, semilla=736) > 0.86) * (grande > 0.55)
+    lz.pintar(flores, "#f0b0c8", 0.7)
+    # LA GRAVA: los caminos, rastrillados en ondas
+    grava = np.clip(zona(0, 26, 50, 28) + zona(31, 2, 34, 43) + zona(4, 24, 12, 30) + zona(20, 42, 36, 43)
+                    + zona(20, 44, 24, 51) + zona(45, 45, 50, 51), 0, 1)
+    rastro = np.sin((lz.y + ruido_torcido_local(lz, 30, 737) * 6) * 1.3) * 0.5 + 0.5
+    lz.pintar(grava, rampa(["#5a4a4a", "#7a6660", "#9a847a", "#b8a294", "#d4c0ae"], np.clip(0.5 + (rastro - 0.5) * 0.35 + (fina - 0.5) * 0.4, 0, 1)))
+    lz.pintar(grava * (lz.ruido(0.6, 1, semilla=738) > 0.8), "#3a2e2e", 0.5)
+    # EL CLAUSTRO: losas de arenisca en hiladas y una cruz de mosaico violeta y oro
+    claustro = zona(23, 17, 43, 37, 1)
+    hilada = np.floor(lz.y / 20)
+    junta = ((lz.y % 20) < 0.9) | (((lz.x + hilada * 13) % 26) < 0.9)
+    celda = (np.sin(hilada * 12.9898 + np.floor((lz.x + hilada * 13) / 26) * 78.233) * 43758.5453) % 1
+    lz.pintar(claustro, rampa(["#6a3a38", "#8a5248", "#a86e58", "#c48c6c", "#dcae88"], np.clip(0.5 + (celda - 0.5) * 0.35 + (fina - 0.5) * 0.25, 0, 1)))
+    lz.pintar(claustro * junta, "#4a2428", 0.6)
+    cruz = claustro * ((np.abs(lz.x - 33.5 * 16) < 10) | (np.abs(lz.y - 27.5 * 16) < 10))
+    mosaico = ((lz.x // 4 + lz.y // 4) % 2) == 0
+    lz.pintar(cruz * mosaico, "#7a4aa0", 0.75)
+    lz.pintar(cruz * (1 - mosaico), "#d8a050", 0.55)
+    # EL PABELLÓN DEL TÉ: un entarimado de madera
+    tarima = zona(24, 3, 42, 8, 1)
+    lz.pintar(tarima, rampa(["#3a2018", "#5a3424", "#7a4a30", "#9a6440"], np.clip(0.5 + (fina - 0.5) * 0.4 + (media - 0.5) * 0.3, 0, 1)))
+    lz.pintar(tarima * ((lz.y % 8) < 0.9), "#2a140e", 0.7)
+    # EL INVERNADERO: baldosas de cristal ahumado en rombos y arriates de flores junto al borde
+    ri = np.sqrt(((lz.x - 61.5 * 16) / (10.5 * 16)) ** 2 + ((lz.y - 27.5 * 16) / (11.5 * 16)) ** 2)
+    inver = suelo * (ri < 0.88)
+    u, w = (lz.x + lz.y) % 22, (lz.x - lz.y) % 22
+    rombo = (u < 1.0) | (w < 1.0)
+    lz.pintar(inver, rampa(["#2a2440", "#3a3458", "#52487a", "#6e62a0", "#9a8cc8"], np.clip(0.45 + (media - 0.5) * 0.4 + (fina - 0.5) * 0.25 + np.sin(lz.x * 0.05) * 0.08, 0, 1)))
+    lz.pintar(inver * rombo, "#c8a860", 0.6)
+    lz.pintar(inver * (lz.ruido(3, 2, semilla=739) > 0.7) * ((u > 8) & (u < 11)), "#e8e0ff", 0.35)
+    arriate = suelo * (ri >= 0.88) * (ri < 1.08)
+    lz.pintar(arriate, rampa(["#1a2a1c", "#284026", "#3a5a30", "#507040"], np.clip(0.5 + (fina - 0.5) * 0.6, 0, 1)))
+    lz.pintar(arriate * (lz.ruido(0.9, 2, semilla=740) > 0.66), "#f8c060", 0.8)
+    # EL ESTANQUE: copia el cielo (malva arriba, coral y ámbar abajo), con ondas lentas y nenúfares
+    vv = 0.3 + ((lz.y / (alto * 16.0)) - 0.75) * 2.0 + (grande - 0.5) * 0.12
+    lz.pintar(agua, rampa(["#1a0e2a", "#2e1846", "#4a2456", "#7a3a62", "#b05a5e", "#e08a5a", "#f8b86a"], np.clip(vv, 0, 1)))
+    onda = (np.abs(np.sin(lz.y * 0.5 + ruido_torcido_local(lz, 40, 741) * 8)) > 0.96) * agua
+    lz.pintar(onda, "#ffd8b0", 0.35)
+    # los nenúfares: hojas redondas con su muesca, y alguna flor rosa
+    rng = np.random.default_rng(742)
+    hojas = np.zeros((lz.H, lz.W), np.float32)
+    flor_n = np.zeros((lz.H, lz.W), np.float32)
+    for _ in range(90):
+        x, y = rng.uniform(25 * 16, 51 * 16), rng.uniform(42 * 16, 52 * 16)          # (el Estanque)
+        if filas[int(y // 16)][int(x // 16)] != "=":
+            continue
+        r = rng.uniform(4, 7)
+        cv2.circle(hojas, (int(x * S), int(y * S)), int(r * S), 1.0, -1)
+        a = rng.uniform(0, 6.28)
+        cv2.ellipse(hojas, (int(x * S), int(y * S)), (int(r * S), int(r * S)), np.degrees(a), 0, 35, 0.0, -1)
+        if rng.random() < 0.3:
+            cv2.circle(flor_n, (int((x + 1) * S), int((y - 1) * S)), int(2 * S), 1.0, -1)
+    hojas *= agua
+    lz.pintar(hojas, rampa(["#1e3a24", "#2e5230", "#44703e", "#5a8a4a"], np.clip(0.5 + (fina - 0.5) * 0.5 + (desplazar(lz, hojas, 1, 1) < 0.5) * 0.3, 0, 1)))
+    lz.pintar(flor_n * agua, "#ffc8e0")
+    lz.pintar(flor_n * agua * (fina > 0.6), "#ffffff", 0.7)
+    lz.pintar(agua * (lz.distancia(1 - agua) < 2.5), "#2a1420", 0.6)        # el borde de piedra del estanque
+    # LOS SETOS: altos y espesos, la copa iluminada de lado, con flores de farol
+    # (matas redondas, de arriba abajo para que las de delante tapen a las de atrás: cada una, más clara arriba a la
+    # izquierda, donde le da el sol del oeste)
+    rng = np.random.default_rng(744)
+    mata = np.zeros((lz.H, lz.W), np.float32)
+    flor_s = np.zeros((lz.H, lz.W), np.float32)
+    bolas = []
+    for _ in range(5200):
+        x, y = rng.uniform(-8, ancho * 16 + 8), rng.uniform(-8, alto * 16 + 8)
+        cx, cy = min(max(int(x // 16), 0), ancho - 1), min(max(int(y // 16), 0), alto - 1)
+        if filas[cy][cx] == "0":
+            bolas.append((y, x, rng.uniform(8, 14)))
+    for (y, x, r) in sorted(bolas):
+        for (dx, dy, k, v) in ((0, 0, 1.0, 0.32), (-0.22, -0.28, 0.72, 0.55), (-0.38, -0.46, 0.38, 0.8)):
+            cv2.circle(mata, (int((x + dx * r) * S), int((y + dy * r) * S)), int(r * k * S), v, -1)
+        if rng.random() < 0.12:
+            for _k in range(3):
+                cv2.circle(flor_s, (int((x + rng.uniform(-r, r) * 0.6) * S), int((y - r * rng.uniform(0.2, 0.7)) * S)), int(1.3 * S), 1.0, -1)
+    hoja = lz.ruido(1.2, 2, semilla=746)
+    vs = mata + (hoja - 0.5) * 0.22
+    lz.pintar(seto, rampa(["#060c0e", "#0c181a", "#142624", "#1e3630", "#2c4a3c", "#40604a", "#5a7a56"], np.clip(vs, 0, 1)))
+    lz.pintar(seto * (desplazar(lz, seto, 0, 6) < 0.5), "#6a8a5a", 0.5)
+    lz.pintar(flor_s * seto, "#f8c060", 0.9)
+    lz.pintar(np.clip(desplazar(lz, seto, 0, 10) - seto, 0, 1) * suelo, "#060a0a", 0.45)   # la sombra del seto
+    destino = salida or os.path.join(RAIZ, "arte", "mundos", "ocaso", "suelos", nombre + "_suelo.png")
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    lz.guardar(destino, tramado=0.014)
+    print("Suelo pintado:", destino, (lz.w, lz.h))
+
+
 def pintar_fundicion(nombre, salida=None):
     """El suelo de LA FUNDICIÓN DE ESCORIA (Asterhaul): un lago de ESCORIA FUNDIDA («≈») que corre despacio de
     oeste a este, naranja y amarilla, con costras negras que flotan; y, sobre ella, islas de LOSAS DE PIEDRA
@@ -1409,6 +1523,8 @@ def pintar(nombre, salida=None):
         return pintar_aguja(nombre, salida)
     if nombre in ("mirador_ocaso", "jioni", "dunas_penumbra"):
         return pintar_mirador(nombre, salida)
+    if nombre == "jardin_faroles":
+        return pintar_jardin(nombre, salida)
     if nombre == "nucleo_estrella":
         return pintar_nucleo(nombre, salida)
     if nombre in BIBLIOTECAS:

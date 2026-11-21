@@ -16,6 +16,9 @@ func _ready() -> void:
 	for nodo in get_tree().get_nodes_in_group("monolitos"):
 		if (nodo as Node2D).global_position.distance_to(global_position) <= ALCANCE * (1.0 + Artes.valor("tierra_alcance")):
 			nodo.call("resonar", 3)
+	for nodo in get_tree().get_nodes_in_group("polillas"):          # (las polillas de papel del Jardín se deshacen)
+		if (nodo as Node2D).global_position.distance_to(global_position) <= ALCANCE * (1.0 + Artes.valor("tierra_alcance")):
+			nodo.call("resonar", 3)
 
 
 func _process(delta: float) -> void:

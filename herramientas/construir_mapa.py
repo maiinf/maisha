@@ -2706,6 +2706,45 @@ def crear_dunas():
     return ["".join(f) for f in m], {}
 
 
+def crear_jardin():
+    """EL JARDÍN DE LOS FAROLES (el Valle del Ocaso, el camino del este, 74x54): patios de un jardín al atardecer entre
+    SETOS altos («0»). Se entra por el oeste (de Jioni, «_»).
+      - LA PÉRGOLA DE ENTRADA (oeste): el PRISMA SOLAR, que echa la luz del atardecer hacia el este.
+      - EL CLAUSTRO DE LOS PRISMAS (centro): cuatro espejos de ángulo y un prisma; polillas de papel.
+      - EL PABELLÓN DEL TÉ (norte, secreto): su pasillo lo tapa una CELOSÍA ILUSORIA (la deshace la luz violeta).
+      - EL ESTANQUE DE LOS REFLEJOS (sur): agua («=»: quien la pisa se hunde) con dos pasarelas gemelas hasta el
+        muelle del farol; una es un reflejo (la luz violeta la delata).
+      - EL INVERNADERO (este, ovalado): tras una verja que abre la luz dorada, MONDO y cuatro espejos altos.
+    Espejos, prismas, la celosía, las pasarelas, la verja, Mondo y los faroles los pone la escena."""
+    ANCHO, ALTO = 74, 54
+    m = [["0" for _ in range(ANCHO)] for _ in range(ALTO)]
+
+    def rect(x0, y0, x1, y1, c):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y][x] = c
+
+    rect(2, 22, 14, 32, "%")                                 # la Pérgola de entrada
+    rect(0, 26, 1, 28, "%")
+    rect(0, 26, 0, 28, "_")
+    rect(15, 26, 21, 28, "%")
+    rect(22, 16, 44, 38, "%")                                # el Claustro de los Prismas
+    rect(31, 9, 34, 15, "%")                                 # el pasillo de la celosía...
+    rect(22, 2, 44, 8, "%")                                  # ...y el Pabellón del Té
+    rect(31, 39, 34, 41, "%")                                # la bajada al Estanque
+    rect(20, 42, 36, 43, "%")                                # el Estanque: la orilla del norte...
+    rect(20, 44, 24, 51, "%")                                # ...la del oeste...
+    rect(25, 44, 44, 51, "=")                                # ...el agua...
+    rect(37, 42, 50, 44, "=")
+    rect(45, 45, 50, 51, "%")                                # ...y el muelle del farol
+    rect(45, 26, 50, 28, "%")                                # la verja del Invernadero
+    for y in range(14, 42):                                  # el Invernadero (un óvalo)
+        for x in range(50, 74):
+            if ((x + 0.5 - 61.5) / 10.5) ** 2 + ((y + 0.5 - 27.5) / 11.5) ** 2 <= 1.0:
+                m[y][x] = "%"
+    return ["".join(f) for f in m], {}
+
+
 def crear_seccion():
     """LA SECCIÓN PROHIBIDA (Sigilia, 64x72, de sur a norte): las salas de mármol morado bajo el Gran Archivo. Lo que
     no es sala («0») son estanterías de libros encadenados. Se entra por el sur (del Gran Archivo de Maandiko, «_»).
@@ -3488,7 +3527,7 @@ def exportar_json(nombre):
 MAPAS_PINTADOS = {"kitovu", "prados_del_eco", "cuna_de_musgo", "bosque_cobrizo", "cienaga_quieta", "campo_segado",
                   "sendero_del_puente", "las_pasarelas", "camino_cobrizo", "senda_surcos", "canada_eco", "lago_espejo",
                   "orilla_juncos", "embarcadero_junco", "la_travesia", "gruta_raices",
-                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mirador_ocaso", "jioni", "dunas_penumbra", "mji_jiwe", "galerias_ambar", "fundicion_escoria", "aguja_caida", "nucleo_estrella"}
+                  "paso_piedra", "cueva_setas", "sendero_olvidado", "ruinas_primer_arbol", "paso_escarcha", "maandiko", "estanterias_colgantes", "canal_tinta", "observatorio_aurora", "seccion_prohibida", "desfiladero_meteorito", "mirador_ocaso", "jioni", "dunas_penumbra", "jardin_faroles", "mji_jiwe", "galerias_ambar", "fundicion_escoria", "aguja_caida", "nucleo_estrella"}
 
 
 def construir_suelo(nombre):
@@ -3640,7 +3679,7 @@ if __name__ == "__main__":
                         "paso_piedra": crear_paso, "cueva_setas": crear_cueva, "sendero_olvidado": crear_olvidado, "ruinas_primer_arbol": crear_ruinas,
                         "paso_escarcha": crear_paso_escarcha, "maandiko": crear_maandiko, "estanterias_colgantes": crear_estanterias,
                         "canal_tinta": crear_canal, "observatorio_aurora": crear_observatorio, "seccion_prohibida": crear_seccion,
-                        "desfiladero_meteorito": crear_desfiladero, "mirador_ocaso": crear_mirador, "jioni": crear_jioni, "dunas_penumbra": crear_dunas, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion, "aguja_caida": crear_aguja, "nucleo_estrella": crear_nucleo}.get(nombre, crear_prados)()
+                        "desfiladero_meteorito": crear_desfiladero, "mirador_ocaso": crear_mirador, "jioni": crear_jioni, "dunas_penumbra": crear_dunas, "jardin_faroles": crear_jardin, "mji_jiwe": crear_mji_jiwe, "galerias_ambar": crear_galerias, "fundicion_escoria": crear_fundicion, "aguja_caida": crear_aguja, "nucleo_estrella": crear_nucleo}.get(nombre, crear_prados)()
         carpeta = os.path.join(RAIZ, "datos", "mapas")
         os.makedirs(carpeta, exist_ok=True)
         with open(os.path.join(carpeta, nombre + ".txt"), "w", encoding="utf-8") as f:

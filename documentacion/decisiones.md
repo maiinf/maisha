@@ -607,3 +607,11 @@ Lo decidido con Iam el 2026-11-07 (los 12 nombres, el Claustro de los Tres Sigil
 | :--- | :--- |
 | Orden | Primero **Las Dunas de Penumbra** (oeste, `boceto_dunas_penumbra.png`); después el Jardín de los Faroles y la Calzada de los Obeliscos. |
 | Jefes | Las tres **opciones A**: **Kivuli, el Alacrán de Reloj de Arena** (se hunde en su sombra; girando el sol para que le dé de lleno se vuelca y deja el reloj expuesto) · **Mondo, el Serval de Mil Reflejos** · **Saa-Mchanga, el Autómata Reloj de Arena**. |
+
+### 2026-11-21 · El Jardín de los Faroles (Construido sobre `documentacion/boceto_jardin_faroles.png`, de Gemini, con el jefe que eligió Iam)
+| Qué | Decisión |
+| :--- | :--- |
+| Trazado | **Tal cual el boceto**: Pérgola de entrada (Prisma Solar), Claustro de los Prismas, Pabellón del Té (secreto, tras una celosía ilusoria), Estanque de los Reflejos (dos pasarelas gemelas) e Invernadero (Mondo y cuatro espejos). |
+| Cómo va la luz | El rayo va casilla a casilla: los **espejos de ángulo** («/» o «\», un golpe) lo doblan; el **prisma** deja seguir el dorado y saca un haz **violeta** por la cara que se le gire. El dorado abre la verja; el violeta deshace la celosía y delata la pasarela falsa. |
+| Polillas de papel | No pican: se posan en los espejos encendidos y tapan la luz. Un golpe o la Resonancia de Ámbar las rompen. |
+| Mondo (opción A) | Se parte en él y dos reflejos delante de los espejos altos; un golpe a un espejo suelta un rayo en diagonal: los reflejos que toca se esfuman y el de verdad cae aturdido. 9 de vida, 3 golpes por aturdimiento. Suelta la **Pesa del Este**. |
