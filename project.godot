@@ -15,9 +15,13 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Maisha"
-config/description="Aventura de exploración en pixel art. Proyecto base."
+config/description="Aventura de acción y exploración HD-2D a través de Raíz, Sigilia, Asterhaul y El Valle del Ocaso."
+config/version="1.0.0"
 run/main_scene="res://escenas/interfaz/inicio.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://arte/interfaz/icono_app.png"
+config/macos_native_icon="res://arte/interfaz/icono_app.icns"
+config/windows_native_icon="res://arte/interfaz/icono_app.ico"
 
 [autoload]
 
@@ -166,6 +170,7 @@ menu={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
+textures/vram_compression/import_etc2_astc=true
 renderer/rendering_method="forward_plus"
 renderer/rendering_method.mobile="forward_plus"
 2d/snap/snap_2d_transforms_to_pixel=true
