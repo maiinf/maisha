@@ -1,0 +1,61 @@
+===============================================================================
+                              M A I S H A  v1.0.0
+===============================================================================
+
+¡Gracias por jugar a Maisha!
+
+Una aventura de acción, puzles y exploración en HD-2D a través de cuatro
+mundos: Raíz, Sigilia, Asterhaul y El Valle del Ocaso.
+
+
+-------------------------------------------------------------------------------
+  CÓMO ABRIR EL JUEGO POR PRIMERA VEZ
+-------------------------------------------------------------------------------
+
+* En macOS (Maisha.app — compatible con Apple Silicon e Intel):
+  1. Arrastra «Maisha.app» a la carpeta «Aplicaciones» (o a donde prefieras).
+  2. Al abrirlo por primera vez, si macOS avisa de que no puede verificar al
+     desarrollador:
+     - Haz clic derecho (o Ctrl + clic) sobre Maisha.app y elige «Abrir», o
+     - Abre «Ajustes del Sistema → Privacidad y seguridad», baja hasta el
+       aviso de Maisha y pulsa «Abrir igualmente».
+
+* En Windows (Maisha.exe — Windows 10/11 64 bits):
+  1. Descomprime toda la carpeta del .zip y haz doble clic en «Maisha.exe».
+  2. Si Windows SmartScreen muestra un aviso de aplicación desconocida, pulsa
+     «Más información» y luego «Ejecutar de todas formas».
+
+
+-------------------------------------------------------------------------------
+  CONTROLES (TECLADO Y MANDO)
+-------------------------------------------------------------------------------
+
+  Moverse                  W A S D  o  Flechas         (Stick / Cruceta)
+  Correr                   C                           (LB)
+  Acción / Hablar          Espacio  o  E               (A / Cruz)
+  Golpe de Cetro           J                           (X / Cuadrado)
+  Semilla explosiva        K   (cambiar con Q)         (Y / Triángulo)
+  Latido (curar)           L  o  Shift                 (B / Círculo)
+  Usar objeto rápido       F                           (R3)
+  Sigilo (Sigilia)         U   (cambiar con R)         (RB)
+  Artes de Asterhaul       I (Carga) · O (Pulso) · P (Resonancia)
+  Diario / Mapa            Tab  (o 1-6 · M = Mapa)     (Select / Back)
+  Pausa y Pantalla comp.   Esc                         (Start / Options)
+
+  Consejo: mantén pulsado Tab unos instantes para abrir la rueda rápida de
+  pestañas del Diario, o usa las teclas numéricas 1 a 6.
+
+
+-------------------------------------------------------------------------------
+  GUARDADO AUTOMÁTICO
+-------------------------------------------------------------------------------
+
+La partida se guarda automáticamente al entrar en cada zona y al cumplir
+hitos importantes (verás el aviso «Guardado» abajo a la derecha).
+
+Ubicación de tu partida:
+  * macOS:   ~/Library/Application Support/Godot/app_userdata/Maisha/
+  * Windows: %APPDATA%\Godot\app_userdata\Maisha\
+
+¡Buen viaje hacia la Primera Noche!
+===============================================================================
