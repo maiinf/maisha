@@ -10,10 +10,24 @@ const PX := 1.0 / 16.0
 
 const SOMBREADOR := """
 shader_type spatial;
-render_mode diffuse_lambert, specular_disabled, cull_disabled;
+render_mode diffuse_lambert, cull_disabled;
 uniform sampler2D textura : filter_nearest, source_color;
+uniform sampler2D textura_normal : filter_nearest;
+uniform float usar_normal = 0.0;
 uniform vec4 tinte : source_color = vec4(1.0);
 uniform vec4 uv_marco = vec4(0.0, 0.0, 1.0, 1.0);
+
+varying vec3 v_tan_vista;
+varying vec3 v_bitan_vista;
+varying vec3 v_norm_local;
+varying float v_altura;
+
+void vertex() {
+	v_tan_vista = normalize((MODELVIEW_MATRIX * vec4(1.0, 0.0, 0.0, 0.0)).xyz);
+	v_bitan_vista = normalize((MODELVIEW_MATRIX * vec4(0.0, 1.0, 0.0, 0.0)).xyz);
+	v_norm_local = NORMAL;
+	v_altura = VERTEX.y;
+}
 
 void fragment() {
 	vec2 uv = uv_marco.xy + UV * uv_marco.zw;
@@ -30,8 +44,18 @@ void fragment() {
 		) / 16.0;
 		if (tinte.a <= bayer) { discard; }
 	}
-	ALBEDO = c.rgb * tinte.rgb * COLOR.rgb;
-	ROUGHNESS = 1.0;
+	float relieve = 1.0;
+	if (usar_normal > 0.5) {
+		vec3 n_tex = texture(textura_normal, uv).rgb * 2.0 - 1.0;
+		float sx = (uv_marco.z < 0.0) ? -1.0 : 1.0;
+		NORMAL = normalize(NORMAL + (v_tan_vista * (n_tex.x * sx) - v_bitan_vista * n_tex.y) * 0.42);
+		relieve = clamp(1.0 + (-n_tex.x * sx * 0.08 - n_tex.y * 0.12), 0.88, 1.12);
+	}
+	float ao_base = clamp(0.92 + clamp(v_altura * 0.09, 0.0, 0.10), 0.92, 1.02);
+	float bisel_top = 1.0 + max(v_norm_local.y, 0.0) * 0.06;
+	ALBEDO = c.rgb * tinte.rgb * COLOR.rgb * relieve * ao_base * bisel_top;
+	ROUGHNESS = 0.82;
+	SPECULAR = 0.14;
 }
 """
 
@@ -415,14 +439,401 @@ const CATALOGO := {
 			["cil", 1, 11, 3, 30, 0.02, -0.60, true, [2, 9, 8, 26], [2, 9, 8, 16]],
 		],
 	},
+	"kitovu/carro.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 5, 38, 11, 21, 0.02, -1.08, true, [8, 34, 12, 19]],
+			["caja", 8, 34, 6, 12, -0.08, -0.94, true, [10, 32, 7, 11]],
+			["capa", 4, 40, 14, 27, -1.10, 0.82],
+		],
+	},
+	"kitovu/tronco.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 2, 32, 7, 17, 0.01, -0.68, true, [5, 29, 8, 16]],
+		],
+		"por_marco": {
+			0: [["caja", 5, 30, 3, 8, 0.02, -0.72, true, [6, 28, 4, 8]]],
+		},
+	},
+	"kitovu/raiz_gigante.png": {
+		"tipo": "bloques", "frente_z": 0.06,
+		"partes": [
+			["caja", 4, 194, 8, 28, 0.02, -1.15, true, [18, 178, 10, 26]],
+			["capa", 0, 200, 3, 29, -0.58, 0.88],
+			["capa", 0, 200, 3, 29, -1.18, 0.76],
+		],
+	},
+	"aldea/yunque.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 6, 22, 13, 19, 0.01, -0.62, true, [8, 20, 14, 18]],
+			["caja", 2, 24, 6, 13, 0.02, -0.68, true, [5, 21, 7, 12]],
+		],
+	},
+	"aldea/estatua.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 4, 21, 29, 37, 0.02, -0.78, true, [6, 19, 30, 36]],
+			["caja", 6, 18, 12, 29, -0.04, -0.68, true, [7, 17, 14, 28]],
+			["capa", 3, 22, 2, 30, -0.26, 0.90],
+			["capa", 3, 22, 2, 30, -0.52, 0.80],
+		],
+	},
+	"embarcadero/grua.png": {
+		"tipo": "bloques", "frente_z": 0.06,
+		"partes": [
+			["caja", 4, 48, 80, 101, 0.02, -1.50, true, [8, 44, 82, 98]],
+			["caja", 20, 32, 12, 82, 0.01, -1.10, true, [21, 31, 20, 76]],
+			["capa", 16, 69, 7, 78, -0.35, 0.92],
+			["capa", 16, 69, 7, 78, -0.72, 0.84],
+			["capa", 16, 69, 7, 78, -1.08, 0.76],
+		],
+	},
+	"gruta/altar_corteza.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 3, 45, 38, 50, 0.02, -1.25, true, [6, 42, 40, 49]],
+			["caja", 7, 41, 22, 38, 0.01, -1.10, true, [10, 38, 24, 36]],
+		],
+		"por_marco": {
+			0: [
+				["capa", 12, 36, 5, 22, -0.35, 0.92],
+				["capa", 12, 36, 5, 22, -0.70, 0.82],
+			],
+		},
+	},
+	"olvidado/brasero.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 5, 17, 17, 23, 0.01, -0.64, true, [6, 16, 18, 22]],
+			["cil", 3, 19, 8, 17, 0.02, -0.72, true, [5, 17, 10, 16], [5, 17, 8, 12]],
+		],
+	},
+	"raiz/paso/armario.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 4, 52, 2, 10, 0.03, -1.25, true, [8, 48, 3, 9]],
+			["caja", 6, 50, 10, 63, 0.01, -1.18, true, [10, 46, 16, 58]],
+		],
+	},
+	"raiz/paso/bloque.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 1, 27, 6, 23, 0.02, -0.95, true, [4, 24, 9, 21], [4, 24, 7, 13]],
+		],
+	},
+	"ruinas/primer_arbol.png": {
+		"tipo": "arbol", "x0": 62, "x1": 114, "y_copa": 104, "y_pico": 2, "fondo": 4.8,
+	},
+	"sigilia/paso/estela.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 2, 20, 30, 37, 0.02, -0.68, true, [4, 18, 31, 36]],
+			["caja", 4, 18, 8, 30, 0.01, -0.54, true, [6, 16, 12, 28]],
+			["capa", 4, 18, 5, 12, -0.26, 0.88],
+		],
+	},
+	"sigilia/paso/puerta.png": {
+		"tipo": "bloques", "frente_z": 0.06,
+		"partes": [
+			["caja", 10, 30, 18, 88, 0.03, -1.65, true, [12, 28, 28, 82]],
+			["caja", 74, 94, 18, 88, 0.03, -1.65, true, [76, 92, 28, 82]],
+			["caja", 14, 90, 4, 24, 0.04, -1.75, true, [22, 82, 8, 22]],
+			["caja", 28, 76, 22, 88, -0.18, -1.55, false, [32, 72, 30, 82]],
+		],
+	},
+	"estanterias/escalera.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 5, 9, 2, 75, 0.02, -0.55, true, [5, 9, 10, 68]],
+			["caja", 27, 31, 2, 75, 0.02, -0.55, true, [27, 31, 10, 68]],
+			["capa", 5, 31, 1, 75, -0.26, 0.88],
+			["capa", 5, 31, 1, 75, -0.52, 0.78],
+		],
+	},
+	"observatorio/telescopio.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 6, 27, 37, 46, 0.02, -0.88, true, [8, 25, 38, 45]],
+			["cil", 12, 24, 22, 37, 0.0, -0.78, true, [13, 22, 24, 35]],
+			["capa", 3, 27, 4, 28, -0.25, 0.92],
+			["capa", 3, 27, 4, 28, -0.52, 0.84],
+			["capa", 3, 27, 4, 28, -0.78, 0.76],
+		],
+	},
+	"observatorio/campanas.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 2, 9, 8, 47, 0.02, -0.82, true, [3, 8, 12, 44]],
+			["caja", 39, 46, 8, 47, 0.02, -0.82, true, [40, 45, 12, 44]],
+			["caja", 2, 46, 5, 11, 0.03, -0.85, true, [6, 42, 6, 10]],
+			["capa", 8, 40, 10, 42, -0.28, 0.92],
+			["capa", 8, 40, 10, 42, -0.56, 0.82],
+		],
+	},
+	"observatorio/diapason.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 4, 20, 36, 47, 0.02, -0.76, true, [6, 18, 38, 45]],
+			["caja", 6, 10, 4, 30, 0.01, -0.52, true, [6, 10, 8, 28]],
+			["caja", 14, 18, 4, 30, 0.01, -0.52, true, [14, 18, 8, 28]],
+			["caja", 9, 15, 28, 36, 0.01, -0.58, false, [9, 15, 29, 35]],
+		],
+	},
+	"observatorio/bobina.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 4, 20, 30, 39, 0.02, -0.78, true, [6, 18, 31, 38]],
+			["cil", 5, 19, 10, 30, 0.01, -0.72, true, [6, 18, 12, 28]],
+			["cil", 9, 15, 2, 10, -0.10, -0.60, true, [9, 15, 3, 9]],
+		],
+	},
+	"desfiladero/estela.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 3, 21, 29, 37, 0.02, -0.72, true, [5, 19, 30, 36]],
+			["caja", 5, 19, 8, 29, 0.01, -0.58, true, [6, 18, 12, 27]],
+			["capa", 6, 18, 2, 10, -0.28, 0.88],
+		],
+	},
+	"desfiladero/pilar.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 4, 20, 40, 51, 0.02, -0.78, true, [6, 18, 41, 49]],
+			["caja", 6, 18, 8, 40, 0.01, -0.66, true, [7, 17, 14, 38]],
+			["capa", 5, 19, 2, 12, -0.32, 0.88],
+		],
+	},
+	"desfiladero/vagoneta.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [],
+		"por_marco": {
+			0: [
+				["caja", 3, 25, 8, 22, 0.02, -0.92, true, [6, 22, 10, 20]],
+				["caja", 6, 22, 4, 9, -0.06, -0.84, true, [8, 20, 5, 8]],
+				["capa", 4, 24, 18, 27, -0.94, 0.82],
+			],
+			1: [
+				["caja", 5, 23, 8, 22, 0.02, -1.10, true, [7, 21, 10, 20]],
+				["caja", 7, 21, 4, 9, -0.06, -1.02, true, [8, 20, 5, 8]],
+				["capa", 5, 23, 18, 27, -1.12, 0.82],
+			],
+		},
+	},
+	"mji_jiwe/diapason.png": {
+		"tipo": "bloques", "frente_z": 0.06,
+		"partes": [
+			["caja", 8, 64, 88, 115, 0.03, -1.85, true, [14, 58, 92, 112]],
+			["caja", 24, 48, 64, 88, 0.01, -1.45, true, [26, 46, 68, 86]],
+			["caja", 18, 30, 6, 68, 0.02, -1.35, true, [19, 29, 14, 64]],
+			["caja", 42, 54, 6, 68, 0.02, -1.35, true, [43, 53, 14, 64]],
+			["capa", 18, 54, 3, 88, -0.65, 0.88],
+			["capa", 18, 54, 3, 88, -1.30, 0.78],
+		],
+	},
+	"mji_jiwe/horno.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 4, 24, 24, 47, 0.02, -0.98, true, [6, 22, 26, 45]],
+			["cil", 8, 20, 3, 24, 0.01, -0.86, true, [9, 19, 6, 22]],
+		],
+	},
+	"mji_jiwe/yunque.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 6, 17, 18, 25, 0.01, -0.62, true, [7, 16, 19, 24]],
+			["caja", 5, 20, 10, 18, 0.02, -0.68, true, [7, 18, 11, 17]],
+		],
+	},
+	"galerias/pilar.png": {
+		"tipo": "bloques", "frente_z": 0.05, "solo_marco": 0,
+		"partes": [
+			["caja", 4, 28, 46, 59, 0.02, -1.10, true, [6, 26, 48, 57]],
+			["caja", 8, 24, 14, 46, 0.01, -0.96, false, [9, 23, 18, 44]],
+			["caja", 5, 27, 4, 14, 0.02, -1.08, true, [7, 25, 6, 13]],
+		],
+	},
+	"galerias/reja.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 1, 6, 4, 39, 0.02, -0.58, true, [1, 5, 8, 36]],
+			["caja", 22, 27, 4, 39, 0.02, -0.58, true, [22, 26, 8, 36]],
+			["caja", 0, 28, 3, 9, 0.03, -0.62, true, [3, 25, 4, 8]],
+		],
+		"por_marco": {
+			0: [["capa", 4, 24, 8, 39, -0.26, 0.88]],
+		},
+	},
+	"galerias/geoda.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 3, 25, 12, 29, 0.01, -0.88, true, [5, 23, 14, 27]],
+			["capa", 4, 24, 4, 22, -0.32, 0.90],
+			["capa", 5, 23, 4, 22, -0.64, 0.80],
+		],
+	},
+	"galerias/parachoques.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 2, 18, 6, 20, 0.02, -0.76, true, [4, 16, 8, 19]],
+		],
+	},
+	"fundicion/bloque.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 2, 22, 4, 27, 0.02, -0.96, true, [4, 20, 7, 25], [4, 20, 4, 11]],
+		],
+	},
+	"fundicion/cabrestante.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 2, 26, 24, 35, 0.02, -0.92, true, [4, 24, 25, 34]],
+			["cil", 4, 25, 9, 24, 0.01, -0.84, true, [6, 22, 11, 22]],
+		],
+	},
+	"fundicion/compuerta.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 1, 6, 2, 63, 0.02, -0.78, true, [1, 5, 10, 58]],
+			["caja", 18, 23, 2, 63, 0.02, -0.78, true, [18, 22, 10, 58]],
+			["caja", 0, 24, 1, 12, 0.03, -0.84, true, [3, 21, 2, 10]],
+		],
+		"por_marco": {
+			0: [["caja", 5, 19, 12, 62, 0.0, -0.62, false, [6, 18, 16, 58]]],
+		},
+	},
+	"aguja/estela.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 3, 21, 29, 37, 0.02, -0.72, true, [5, 19, 30, 36]],
+			["caja", 5, 19, 8, 29, 0.01, -0.58, true, [6, 18, 12, 27]],
+			["capa", 6, 18, 2, 10, -0.28, 0.88],
+		],
+	},
+	"aguja/monolito.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 3, 21, 43, 55, 0.02, -0.86, true, [5, 19, 44, 54]],
+			["caja", 6, 18, 10, 43, 0.01, -0.72, true, [7, 17, 14, 41]],
+			["capa", 6, 18, 2, 14, -0.28, 0.90],
+			["capa", 7, 17, 2, 14, -0.54, 0.80],
+		],
+	},
+	"mirador/reloj.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 12, 32, 27, 37, 0.02, -1.05, true, [14, 30, 28, 36]],
+			["cil", 4, 40, 12, 27, 0.01, -1.15, true, [8, 36, 14, 25], [8, 36, 12, 22]],
+			["capa", 12, 33, 4, 20, -0.45, 0.90],
+		],
+	},
+	"mirador/espejo.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["cil", 8, 20, 27, 37, 0.02, -0.72, true, [10, 18, 28, 36]],
+			["capa", 4, 24, 3, 28, -0.22, 0.90],
+			["capa", 4, 24, 3, 28, -0.44, 0.80],
+		],
+	},
+	"dunas/vela.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 8, 28, 46, 59, 0.02, -0.92, true, [10, 26, 48, 57]],
+			["caja", 15, 21, 4, 46, 0.01, -0.58, true, [16, 20, 10, 44]],
+			["capa", 8, 34, 2, 46, -0.26, 0.90],
+			["capa", 8, 34, 2, 46, -0.52, 0.80],
+		],
+	},
+	"jardin/fuente.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 3, 21, 33, 43, 0.02, -0.78, true, [5, 19, 34, 42]],
+			["cil", 8, 16, 21, 33, 0.0, -0.66, false, [8, 16, 22, 32]],
+			["caja", 5, 19, 4, 21, 0.01, -0.74, true, [6, 18, 6, 19]],
+		],
+	},
+	"jardin/celosia.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 0, 6, 8, 43, 0.02, -0.62, true, [1, 5, 12, 41]],
+			["caja", 26, 32, 8, 43, 0.02, -0.62, true, [27, 31, 12, 41]],
+			["caja", 0, 32, 8, 14, 0.03, -0.66, true, [4, 28, 9, 13]],
+		],
+		"por_marco": {
+			0: [["capa", 4, 28, 12, 43, -0.28, 0.88]],
+		},
+	},
+	"jardin/prisma.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 3, 19, 18, 31, 0.02, -0.68, true, [5, 17, 20, 29]],
+			["cil", 6, 16, 4, 18, 0.01, -0.58, true, [7, 15, 6, 17]],
+		],
+	},
+	"jardin/espejo.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["cil", 6, 20, 24, 33, 0.02, -0.68, true, [8, 18, 25, 32]],
+			["capa", 2, 24, 3, 26, -0.22, 0.90],
+			["capa", 2, 24, 3, 26, -0.44, 0.80],
+		],
+	},
+	"jardin/espejo_alto.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 3, 21, 33, 44, 0.02, -0.82, true, [5, 19, 34, 42]],
+			["caja", 5, 19, 14, 33, 0.01, -0.72, false, [6, 18, 16, 31]],
+			["caja", 3, 21, 2, 14, 0.02, -0.78, true, [5, 19, 4, 13]],
+		],
+	},
+	"horizonte/pedestal.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 2, 46, 25, 33, 0.02, -1.05, true, [6, 42, 26, 32]],
+			["caja", 5, 43, 19, 25, 0.01, -0.95, true, [8, 40, 20, 24]],
+		],
+		"por_marco": {
+			1: [
+				["cil", 7, 16, 6, 19, 0.0, -0.76, true, [8, 15, 8, 18]],
+				["cil", 19, 29, 5, 19, 0.0, -0.78, true, [20, 28, 7, 18]],
+				["cil", 32, 41, 6, 19, 0.0, -0.76, true, [33, 40, 8, 18]],
+			],
+		},
+	},
+	"horizonte/pilar.png": {
+		"tipo": "bloques", "frente_z": 0.04,
+		"partes": [
+			["caja", 2, 18, 33, 43, 0.02, -0.76, true, [4, 16, 34, 42]],
+			["caja", 5, 15, 12, 33, 0.01, -0.64, false, [6, 14, 14, 31]],
+			["caja", 3, 17, 4, 12, 0.02, -0.72, true, [5, 15, 5, 11]],
+		],
+	},
+	"horizonte/contrapeso.png": {
+		"tipo": "bloques", "frente_z": 0.05, "solo_marco": 0,
+		"partes": [
+			["caja", 3, 33, 24, 46, 0.02, -1.15, true, [6, 30, 26, 44]],
+			["caja", 4, 32, 11, 24, 0.01, -1.05, true, [7, 29, 13, 23]],
+			["capa", 12, 24, 0, 12, -0.45, 0.88],
+		],
+	},
+	"horizonte/candado.png": {
+		"tipo": "bloques", "frente_z": 0.05,
+		"partes": [
+			["caja", 3, 29, 10, 34, 0.02, -0.96, true, [6, 26, 12, 32]],
+			["caja", 7, 25, 2, 10, 0.01, -0.82, true, [9, 23, 3, 9]],
+		],
+	},
 }
 
 var _shader: Shader
 var _mallas := {}                     # "ruta|frame" -> ArrayMesh (se libera al destruir el espejo)
+var _normales := {}                   # "ruta" -> Texture2D normal map o null
 
 
 func limpiar() -> void:
 	_mallas.clear()
+	_normales.clear()
 	_shader = null
 
 
@@ -432,17 +843,31 @@ func _nombre_catalogo(tex: Texture2D) -> String:
 	var ruta := tex.resource_path
 	for clave: String in [
 		"desfiladero/taller.png", "desfiladero/muro.png", "desfiladero/derrumbe.png", "desfiladero/puerta.png",
-		"galerias/barricada.png", "nucleo/puerta_triple.png",
-		"mirador/arco.png", "mirador/arco_kitovu.png", "mirador/obelisco.png",
+		"desfiladero/estela.png", "desfiladero/pilar.png", "desfiladero/vagoneta.png",
+		"galerias/barricada.png", "galerias/pilar.png", "galerias/reja.png", "galerias/geoda.png", "galerias/parachoques.png",
+		"fundicion/bloque.png", "fundicion/cabrestante.png", "fundicion/compuerta.png",
+		"aguja/estela.png", "aguja/monolito.png", "nucleo/puerta_triple.png",
+		"mirador/arco.png", "mirador/arco_kitovu.png", "mirador/obelisco.png", "mirador/reloj.png", "mirador/espejo.png",
 		"jioni/casa.png", "jioni/puesto.png", "jioni/torre.png", "jioni/horizonte.png",
+		"dunas/vela.png",
 		"jardin/pabellon.png", "jardin/pergola.png", "jardin/verja.png",
+		"jardin/fuente.png", "jardin/celosia.png", "jardin/prisma.png", "jardin/espejo.png", "jardin/espejo_alto.png",
 		"calzada/pilar.png",
+		"horizonte/pedestal.png", "horizonte/pilar.png", "horizonte/contrapeso.png", "horizonte/candado.png",
 		"mji_jiwe/gran_forja.png", "mji_jiwe/casa.png", "mji_jiwe/mercado.png", "mji_jiwe/verja.png",
-		"aldea/taller.png", "objetos/muro.png", "campo/molino.png",
+		"mji_jiwe/diapason.png", "mji_jiwe/horno.png", "mji_jiwe/yunque.png",
+		"aldea/taller.png", "aldea/yunque.png", "objetos/muro.png", "campo/molino.png",
+		"kitovu/carro.png", "kitovu/tronco.png", "kitovu/raiz_gigante.png",
+		"embarcadero/grua.png", "gruta/altar_corteza.png", "olvidado/brasero.png",
+		"raiz/paso/armario.png", "raiz/paso/bloque.png", "ruinas/primer_arbol.png",
+		"sigilia/paso/estela.png", "sigilia/paso/puerta.png", "estanterias/escalera.png",
+		"observatorio/telescopio.png", "observatorio/campanas.png", "observatorio/diapason.png", "observatorio/bobina.png",
 		"seccion/atril.png", "estanterias/atril.png", "seccion/sello.png",
 	]:
 		if ruta.ends_with(clave):
 			return clave
+	if ruta.contains("/aldea/estatua_"):
+		return "aldea/estatua.png"
 	if ruta.contains("/desfiladero/") or ruta.contains("/mji_jiwe/") or ruta.contains("/galerias/") or ruta.contains("/fundicion/") or ruta.contains("/aguja/") or ruta.contains("/nucleo/") or ruta.contains("/mirador/") or ruta.contains("/jioni/") or ruta.contains("/dunas/") or ruta.contains("/jardin/") or ruta.contains("/calzada/") or ruta.contains("/horizonte/"):
 		return ""
 	var archivo := ruta.get_file()
@@ -495,6 +920,10 @@ func copiar(n: Node2D, mi: MeshInstance3D, ancla: Node2D, z: int, visible: bool,
 	var fila := marco / hf
 	var mat := mi.material_override as ShaderMaterial
 	mat.set_shader_parameter("textura", tex)
+	var tex_n := _textura_normal(s.texture, tex)
+	mat.set_shader_parameter("usar_normal", 1.0 if tex_n != null else 0.0)
+	if tex_n != null:
+		mat.set_shader_parameter("textura_normal", tex_n)
 	mat.set_shader_parameter("tinte", n.modulate * n.self_modulate * tinte)
 	var flip := -1.0 if s.flip_h else 1.0
 	var u0 := (float(col) + (1.0 if s.flip_h else 0.0)) / float(hf)
@@ -532,6 +961,20 @@ static func _textura_base(tex: Texture2D) -> Texture2D:
 	if tex is CanvasTexture:
 		return (tex as CanvasTexture).diffuse_texture
 	return tex
+
+
+func _textura_normal(s_tex: Texture2D, base_tex: Texture2D) -> Texture2D:
+	if s_tex is CanvasTexture and (s_tex as CanvasTexture).normal_texture != null:
+		return (s_tex as CanvasTexture).normal_texture
+	if base_tex == null or base_tex.resource_path.is_empty():
+		return null
+	var ruta := base_tex.resource_path
+	if _normales.has(ruta):
+		return _normales[ruta] as Texture2D
+	var ruta_n := ruta.trim_suffix(".png") + "_n.png"
+	var tn: Texture2D = load(ruta_n) as Texture2D if ResourceLoader.exists(ruta_n) else null
+	_normales[ruta] = tn
+	return tn
 
 
 static func _p(px: float, py: float, z: float, fw: int, fh: int) -> Vector3:
@@ -757,12 +1200,12 @@ func _construir_malla(tex: Texture2D, archivo: String, marco: int, hf: int, fw: 
 		"arbol":
 			_construir_arbol(st, img, cfg, xoff, yoff, fw, fh)
 		"bloques":
-			_construir_bloques(st, img, cfg, xoff, yoff, fw, fh)
+			_construir_bloques(st, img, cfg, marco, xoff, yoff, fw, fh)
 
 	return st.commit()
 
 
-static func _construir_bloques(st: SurfaceTool, img: Image, cfg: Dictionary, xoff: int, yoff: int, fw: int, fh: int) -> void:
+static func _construir_bloques(st: SurfaceTool, img: Image, cfg: Dictionary, marco: int, xoff: int, yoff: int, fw: int, fh: int) -> void:
 	var tiene_frente := cfg.has("frente_z")
 	if tiene_frente:
 		var fz := float(cfg["frente_z"])
@@ -773,7 +1216,10 @@ static func _construir_bloques(st: SurfaceTool, img: Image, cfg: Dictionary, xof
 	if int(cfg.get("solo_marco", -1)) == 0 and (xoff > 0 or yoff > 0):
 		return
 	var col_i := yoff / fh
-	var partes: Array = cfg.get("partes", [])
+	var partes: Array = (cfg.get("partes", []) as Array).duplicate()
+	var pm: Dictionary = cfg.get("por_marco", {})
+	if pm.has(marco):
+		partes.append_array(pm[marco] as Array)
 	for parte_v: Variant in partes:
 		var p := parte_v as Array
 		var kind := String(p[0])

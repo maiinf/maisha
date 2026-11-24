@@ -83,20 +83,31 @@ func _ready() -> void:
 	await _ir("cuna_de_musgo", "")
 	espejo = _espejo()
 	var edificios_3d := 0
+	var con_normal := 0
 	if espejo:
 		for par in espejo.get("_gemelos").values():
 			if par[1] is MeshInstance3D:
 				edificios_3d += 1
-	_comprobar(edificios_3d > 0, "los edificios de Cuna de Musgo se construyen como mallas 3D con volumen (%d)" % edificios_3d)
+				var mat_e := (par[1] as MeshInstance3D).material_override as ShaderMaterial
+				var un: Variant = mat_e.get_shader_parameter("usar_normal") if mat_e != null else null
+				if un != null and float(un) > 0.5:
+					con_normal += 1
+	_comprobar(edificios_3d > 0 and con_normal > 0, "los edificios y estatuas de Cuna de Musgo se construyen en 3D con mapa de normales (%d/%d)" % [con_normal, edificios_3d])
 
 	await _ir("mji_jiwe", "")
 	espejo = _espejo()
 	var mji_edifs := 0
+	var gran_diapason_3d := false
+	var yunques_3d := 0
 	if espejo:
 		for par in espejo.get("_gemelos").values():
 			if par[1] is MeshInstance3D:
 				mji_edifs += 1
-	_comprobar(mji_edifs >= 12, "los edificios y verjas de Mji-Jiwe se construyen en 3D con volumen (%d)" % mji_edifs)
+			if String(par[4]) == "mji_jiwe/diapason.png":
+				gran_diapason_3d = true
+			elif String(par[4]) == "mji_jiwe/yunque.png":
+				yunques_3d += 1
+	_comprobar(mji_edifs >= 25 and gran_diapason_3d and yunques_3d == 12, "edificios, Gran Diapasón y los 12 yunques de Mji-Jiwe se construyen en 3D con volumen (%d)" % mji_edifs)
 	_comprobar(espejo != null and absf(float(espejo.get("_alto_pena")) - 0.75) < 0.01, "los muros de terraza de Mji-Jiwe usan su altura baja (0,75)")
 
 	print("Rutas de Asterhaul y plataformas horizontales:")
@@ -288,10 +299,14 @@ func _ready() -> void:
 	espejo = _espejo()
 	var penas_horizonte := false
 	var rayos_jua_ok := false
+	var horiz_monumentos_3d := 0
 	if espejo:
 		for h in espejo.get_children():
 			if h is MeshInstance3D and (h as MeshInstance3D).layers == 2:
 				penas_horizonte = true
+		for par in espejo.get("_gemelos").values():
+			if String(par[4]).begins_with("horizonte/") or String(par[4]) in ["mirador/reloj.png", "mirador/espejo.png", "mirador/obelisco.png", "dunas/vela.png", "jardin/espejo_alto.png"]:
+				horiz_monumentos_3d += 1
 		var jua_n := get_tree().get_first_node_in_group("jua_giza")
 		if jua_n != null:
 			jua_n.set("fase", 3)
@@ -300,6 +315,7 @@ func _ready() -> void:
 			var r_mesh: Mesh = espejo.get("_rayos_mesh")
 			rayos_jua_ok = r_mesh != null and r_mesh.get_surface_count() > 0
 	_comprobar(espejo != null and not penas_horizonte, "El Horizonte Inmóvil respeta el abismo del atardecer sin muros falsos")
+	_comprobar(horiz_monumentos_3d == 17, "pedestal, pilares, contrapeso, candado, vela, obeliscos, relojes y espejos del Horizonte son 3D (%d)" % horiz_monumentos_3d)
 	_comprobar(rayos_jua_ok, "las olas de penumbra y los rayos cruzados de Jua-Giza se dibujan en 3D")
 
 	Estado.marcar("ocaso_libre")

@@ -40,7 +40,7 @@ empaquetar() {
     ln -s /Applications "$tmp_dmg/Aplicaciones"
     cp "$guia" "$tmp_dmg/LEEME_JUGADOR.txt"
     rm -f "$dmg"
-    hdiutil create -volname "Maisha ${VERSION}" -srcfolder "$tmp_dmg" -ov -format UDZO "$dmg"
+    hdiutil create -size 350m -volname "Maisha ${VERSION}" -srcfolder "$tmp_dmg" -ov -format UDZO "$dmg"
     hdiutil verify "$dmg"
     du -sh "$dmg"
   fi
